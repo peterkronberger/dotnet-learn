@@ -1,0 +1,39 @@
+# LABELS ANLEGEN: Legt alle Labels der Claude-Automatisierung an bzw. aktualisiert sie.
+# Start: manuell unter Actions → "Claude – Labels anlegen" → Run workflow.
+# Mehrfaches Ausführen schadet nicht: Bestehende Labels werden mit Farbe und
+# Beschreibung von hier überschrieben (--force), Issues behalten ihre Labels.
+name: Claude – Labels anlegen
+
+on:
+  workflow_dispatch:
+
+jobs:
+  labels:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write # zum Anlegen und Ändern von Labels
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Labels anlegen oder aktualisieren
+        run: |
+          # mk <Name> <Farbe (Hex ohne #)> <Beschreibung (max. 100 Zeichen)>
+          mk() { gh label create "$1" --color "$2" --description "$3" --force; }
+
+          # Start-Labels (setzt ein Mensch oder der Chat)
+          mk "claude:auto-architect"   "5319e7" "High-Class-Claude-Model setzt automatisch um"
+          mk "claude:auto-implement"   "1f883d" "Low-Class-Claude-Model setzt automatisch um"
+          mk "claude:queued"           "bfdadc" "Wartet auf andere Issues (Depends on #…)"
+
+          # Status-Labels (setzen die Workflows)
+          mk "claude:in-progress"      "fbca04" "Claude arbeitet gerade daran"
+          mk "claude:pr-open"          "0e8a16" "Pull Request offen – bitte reviewen"
+          mk "claude:failed"           "b60205" "Automatische Umsetzung fehlgeschlagen"
+
+          # Mensch gefragt
+          mk "needs-human"             "d93f0b" "Ein Mensch muss etwas tun oder entscheiden"
+          mk "needs-human:access"      "f9d0c4" "Zugänge, Secrets oder Infrastruktur nötig"
+          mk "needs-human:decision"    "f9d0c4" "Offene Entscheidung (Produkt/UX/Architektur)"
+          mk "needs-human:manual-test" "f9d0c4" "Nur manuell prüfbar"
+          mk "needs-human:risky"       "f9d0c4" "Riskante Änderung – Mensch soll entscheiden"
