@@ -312,7 +312,7 @@ body {
   color: var(--err);
 }
 
-/* Step view (spike S5, ADR 0007) */
+/* Step view (spike S5) */
 .pg-steps { margin-top: 1rem; }
 .pg-steps-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .pg-code-lines { list-style: none; margin: 0.5rem 0; padding: 0; font-family: var(--mono, monospace); font-size: 0.9rem; }

@@ -1,4 +1,4 @@
-// Test code for palindrome-task.cs (spike S7, ADR 0006). Compiled together with the learner code.
+// Test code for palindrome-task.cs (spike S7). Compiled together with the learner code.
 public static class TaskTests
 {
     public static (string Name, bool Visible, bool Passed, string Feedback)[] Run() =>

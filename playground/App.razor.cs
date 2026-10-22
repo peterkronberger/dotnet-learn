@@ -60,7 +60,7 @@ public partial class App
         }
     }
 
-    // Reports the result to the embedding page (spike S7, ADR 0006). The origin check
+    // Reports the result to the embedding page (spike S7). The origin check
     // (window.location.origin) happens in index.html (pgBridge.report).
     private async Task ReportAsync(RunResult result)
     {

@@ -1,4 +1,4 @@
-// Syntax highlighting overlay for the playground editor (spike S4, ADR 0005).
+// Syntax highlighting overlay for the playground editor (spike S4).
 // A <pre> behind the transparent <textarea> shows the same text, colored per token and per line.
 (function () {
     var KEYWORDS = new Set((

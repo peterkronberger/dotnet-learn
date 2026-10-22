@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Verifies all examples under website/examples/ (spike S2, ADR 0003).
+# Verifies all examples under website/examples/ (spike S2).
 #
 #   tools/check-examples.sh            compare outputs with the snapshots (<name>.out.txt)
 #   tools/check-examples.sh --update   rewrite the snapshots from the actual run

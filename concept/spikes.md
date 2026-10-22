@@ -10,20 +10,20 @@ Stand: 2026-10-22. Der Status steht in der Tabelle in `CLAUDE.md`.
    - Abhängigkeiten als eigene Zeile `Depends on #<nummer>` (die Workflows setzen solche Issues auf `claude:queued`).
 2. **Issue-Aufbau:** Frage · Hypothese · Akzeptanzkriterien · Zeitlimit · Ausweichlösung · abhängige Inhalte (Abschnitte unten übernehmen).
 3. **Umsetzung** in einem eigenen Branch (`claude/issue-<nr>`) per Pull Request.
-4. **Ergebnis als ADR** in `docs-dev/adr/NNNN-<titel>.md` (Vorlage: `docs-dev/adr/README.md`) – auch wenn die Hypothese falsch war.
-5. **Statustabelle in `CLAUDE.md`** im selben PR aktualisieren (Status + ADR-Link).
+4. **Ergebnis festhalten** unter „Entscheidungen in Kurzform“ in `CLAUDE.md` – auch wenn die Hypothese falsch war.
+5. **Statustabelle in `CLAUDE.md`** im selben PR aktualisieren (Status).
 6. Inhalte, die von einem Spike abhängen, werden erst danach geschrieben.
 
 Reihenfolge: S0 → S1 → S2 → S3 → S4 → S7 → S5 → S6. S3, S4, S5 und S7 ändern alle den Playground (`App.razor`, `index.html`); deshalb nacheinander (`Depends on`), nicht parallel.
 
-Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstand als ADR festhalten, Mensch entscheidet.
+Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstand in `CLAUDE.md` festhalten, Mensch entscheidet.
 
 ## S0 – Roslyn auf 5.x heben
 
 - **Frage:** Kompiliert der Playground C# 14?
 - **Befund aus dem MVP-Abgleich:** `playground/Playground.csproj` nutzt `Microsoft.CodeAnalysis.CSharp` 4.14.0. Laut Roslyn-Wiki entspricht 4.14 **C# 13** (VS 2022 17.14 / .NET 9); erst 5.0 bringt C# 14 (VS 2026 18.0 / .NET 10). `LanguageVersion.Latest` liefert mit 4.14 also höchstens C# 13.
 - **Hypothese:** Version 5.x läuft unverändert in Blazor WebAssembly.
-- **Akzeptanzkriterien:** Beispiel mit `field`-Schlüsselwort und Extension Members kompiliert und läuft im veröffentlichten Playground; bestehende Beispiele laufen weiter; Download-Größe vorher/nachher in der ADR.
+- **Akzeptanzkriterien:** Beispiel mit `field`-Schlüsselwort und Extension Members kompiliert und läuft im veröffentlichten Playground; bestehende Beispiele laufen weiter; Download-Größe vorher/nachher in „Entscheidungen in Kurzform“.
 - **Zeitlimit:** 2 h · **Ausweichlösung:** C#-14-Features nur als nicht ausführbare Beispiele.
 - **Blockiert:** jeden Inhalt mit C#-14-Features.
 
@@ -49,7 +49,7 @@ Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstan
 
 - **Frage:** Kann Roslyn vor dem Ausführen in jede Schleife und Methode eine Zeitprüfung einfügen?
 - **Hypothese:** Ein `CSharpSyntaxRewriter` fügt einen Aufruf ein, der nach ca. 3 s eine eigene Exception wirft; der Runner zeigt „Dein Programm läuft vermutlich endlos – prüfe die Abbruchbedingung in Zeile X“.
-- **Akzeptanzkriterien:** `while (true) { }` und endlose Rekursion brechen nach ca. 3 s ab; Zeilennummern in Compilermeldungen bleiben unverändert; normale Beispiele laufen ohne spürbare Verzögerung (Messung in der ADR).
+- **Akzeptanzkriterien:** `while (true) { }` und endlose Rekursion brechen nach ca. 3 s ab; Zeilennummern in Compilermeldungen bleiben unverändert; normale Beispiele laufen ohne spürbare Verzögerung (Messung in „Entscheidungen in Kurzform“).
 - **Zeitlimit:** 1 Tag · **Ausweichlösung:** Hinweis wie bisher; Schleifen-Übungen so gestalten, dass Endlosschleifen unwahrscheinlich sind. (Web Worker wird nicht weiter verfolgt.)
 - **Blockiert:** Modul 2.
 
@@ -79,7 +79,7 @@ Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstan
 
 - **Frage:** Kann Nutzercode `ServiceCollection` und Logging verwenden?
 - **Hinweis:** Die Blazor-App lädt `Microsoft.Extensions.DependencyInjection` bereits zur Laufzeit (`Program.cs`); für den Compiler fehlen die Referenzen – die Pakete sind nicht Teil von `Microsoft.NETCore.App.Ref`, also nicht über `ReferenceName` einbindbar.
-- **Akzeptanzkriterien:** Beispiel mit `ServiceCollection`, Lebensdauern und Konsolen-Logging läuft; Download-Größe in der ADR.
+- **Akzeptanzkriterien:** Beispiel mit `ServiceCollection`, Lebensdauern und Konsolen-Logging läuft; Download-Größe in „Entscheidungen in Kurzform“.
 - **Zeitlimit:** 0,5 Tag · **Ausweichlösung:** Modul 15 als nicht ausführbare Beispiele.
 - **Blockiert:** Modul 15.
 
