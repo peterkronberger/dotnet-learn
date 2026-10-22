@@ -72,10 +72,10 @@
         var html = '';
         for (var i = 0; i < lines.length; i++) {
             var n = i + 1;
-            var cls = 'pg-line';
-            if (state.errors.indexOf(n) >= 0) { cls += ' pg-line-err'; }
-            else if (state.warnings.indexOf(n) >= 0) { cls += ' pg-line-warn'; }
-            if (n === state.currentLine) { cls += ' pg-line-current'; }
+            var cls = 'pg-hl-line';
+            if (state.errors.indexOf(n) >= 0) { cls += ' pg-hl-line-err'; }
+            else if (state.warnings.indexOf(n) >= 0) { cls += ' pg-hl-line-warn'; }
+            if (n === state.currentLine) { cls += ' pg-hl-line-current'; }
             html += '<span class="' + cls + '">' + lines[i] + '</span>';
         }
         pre.innerHTML = html;
