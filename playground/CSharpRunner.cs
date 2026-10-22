@@ -8,7 +8,7 @@ namespace Playground;
 /// <summary>Eine Zeile der Compiler-Ausgabe.</summary>
 public sealed record DiagnosticLine(bool IsError, string Text, int? Line = null);
 
-/// <summary>Ergebnis eines Aufgabentests. Bei versteckten Tests (<c>Visible = false</c>) ist der Name neutral.</summary>
+/// <summary>Outcome of one task test. For hidden tests (<c>Visible = false</c>) the name is neutral.</summary>
 public sealed record TestOutcome(string Name, bool Visible, bool Passed, string Feedback);
 
 /// <summary>Ergebnis eines Durchlaufs aus Kompilieren und Ausführen.</summary>
