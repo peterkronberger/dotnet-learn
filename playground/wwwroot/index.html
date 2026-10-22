@@ -8,9 +8,7 @@
     <!-- Wird beim Deployment auf den Unterpfad der Seite gesetzt (siehe .github/workflows/pages.yml). -->
     <base href="/" />
     <link rel="icon" href="data:," />
-    <link rel="preload" id="webassembly" />
     <link rel="stylesheet" href="css/playground.css" />
-    <script type="importmap"></script>
 </head>
 
 <body>
@@ -54,7 +52,12 @@
         });
     </script>
 
-    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <!-- Bewusst ohne Platzhalter der Fingerprint-Funktion: Ohne die Projekteigenschaft
+         OverrideHtmlAssetPlaceholders werden diese Platzhalter beim Publish nicht ersetzt. Der Browser
+         fragt dann eine nicht existierende Datei an und die App startet nie. Die Datei
+         _framework/blazor.webassembly.js wird unter diesem Namen ausgeliefert
+         (auf der veröffentlichten Seite geprüft). -->
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>
