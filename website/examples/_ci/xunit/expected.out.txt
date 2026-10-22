@@ -1,0 +1,3 @@
+  Passed CalculatorTests.Add_TwoNumbers_ReturnsSum
+  Passed CalculatorTests.Divide_Integers_TruncatesTowardZero(a: -7, b: 2, expected: -3)
+  Passed CalculatorTests.Divide_Integers_TruncatesTowardZero(a: 7, b: 2, expected: 3)

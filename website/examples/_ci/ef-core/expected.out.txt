@@ -1,0 +1,5 @@
+SELECT "i"."Title"
+FROM "Incidents" AS "i"
+WHERE "i"."Severity" >= 2
+ORDER BY "i"."Title"
+Brute force

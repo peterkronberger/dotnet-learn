@@ -1,0 +1,4 @@
+GET /incidents/42
+200 OK
+application/json; charset=utf-8
+{"id":42,"title":"Brute force"}
