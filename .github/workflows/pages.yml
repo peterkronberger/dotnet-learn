@@ -47,6 +47,13 @@ jobs:
           # Blazor braucht den Unterpfad als <base href>.
           sed -i "s|<base href=\"/\" />|<base href=\"${SITE_BASE_PATH}/runner/\" />|" "$index"
           grep -q "<base href=\"${SITE_BASE_PATH}/runner/\" />" "$index"
+          # Nicht ersetzte Platzhalter führen dazu, dass der Playground nie startet.
+          if grep -q "{fingerprint}" "$index"; then
+            echo "::error::index.html enthält einen nicht ersetzten Fingerprint-Platzhalter"
+            exit 1
+          fi
+          grep -q "_framework/blazor.webassembly" "$index"
+          test -f out/playground/wwwroot/_framework/blazor.webassembly.js
           mkdir -p website/build/runner
           cp -r out/playground/wwwroot/. website/build/runner/
           # Ordner mit führendem Unterstrich (_framework) dürfen nicht von Jekyll verworfen werden.

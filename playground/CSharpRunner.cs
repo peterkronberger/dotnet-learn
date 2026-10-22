@@ -99,7 +99,7 @@ public sealed class CSharpRunner
         try
         {
             var loaded = Assembly.Load(peStream.ToArray());
-            var entryPoint = loaded.EntryPoint
+            var entryPoint = ResolveEntryPoint(loaded)
                 ?? throw new InvalidOperationException("Es wurde kein Einstiegspunkt gefunden.");
 
             object?[]? arguments = entryPoint.GetParameters().Length == 0
@@ -127,6 +127,39 @@ public sealed class CSharpRunner
         }
 
         return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started));
+    }
+
+    /// <summary>
+    /// Für asynchrone Einstiegspunkte (auch "await" in Top-Level-Anweisungen) erzeugt der Compiler
+    /// einen synchronen Wrapper, der den Task blockierend abwartet. Das scheitert in der
+    /// einthreadigen WebAssembly-Laufzeit ("Cannot wait on monitors on this runtime").
+    /// Deshalb wird die asynchrone Methode direkt aufgerufen und von <see cref="RunAsync"/> awaited.
+    /// </summary>
+    private static MethodInfo? ResolveEntryPoint(Assembly assembly)
+    {
+        var entryPoint = assembly.EntryPoint;
+        var type = entryPoint?.DeclaringType;
+
+        if (entryPoint is null || type is null)
+        {
+            return entryPoint;
+        }
+
+        const BindingFlags flags =
+            BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
+
+        foreach (var name in new[] { "<Main>$", "Main" })
+        {
+            var asyncMethod = type.GetMethods(flags)
+                .FirstOrDefault(m => m.Name == name && typeof(Task).IsAssignableFrom(m.ReturnType));
+
+            if (asyncMethod is not null)
+            {
+                return asyncMethod;
+            }
+        }
+
+        return entryPoint;
     }
 
     private static DiagnosticLine FormatDiagnostic(Diagnostic diagnostic)

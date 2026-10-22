@@ -16,6 +16,8 @@
     <BlazorEnableCompression>false</BlazorEnableCompression>
     <InvariantGlobalization>true</InvariantGlobalization>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Ausnahmemeldungen im Klartext statt als Ressourcen-Schlüssel (z. B. "Arg_IndexOutOfRangeException"). -->
+    <UseSystemResourceKeys>false</UseSystemResourceKeys>
   </PropertyGroup>
 
   <ItemGroup>
