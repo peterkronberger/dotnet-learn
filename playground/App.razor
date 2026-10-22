@@ -19,7 +19,7 @@
               @bind:event="oninput"></textarea>
     <p class="pg-hint">
         Strg/⌘ + Enter führt aus. Tab rückt ein, Esc und danach Tab verlässt das Feld.
-        Endlosschleifen blockieren den Tab, der Code läuft im Hauptthread des Browsers.
+        Endlosschleifen und endlose Rekursion werden nach etwa 3 Sekunden abgebrochen; währenddessen ist der Tab blockiert, weil der Code im Hauptthread des Browsers läuft.
     </p>
 
     <section class="pg-result" aria-live="polite" aria-label="Ergebnis">

@@ -35,6 +35,8 @@ public sealed class CSharpRunner
         "global using System.Threading;\n" +
         "global using System.Threading.Tasks;\n";
 
+    private const int TimeoutSeconds = 3;
+
     private static readonly Lazy<IReadOnlyList<MetadataReference>> References = new(LoadReferences);
 
     private static IReadOnlyList<MetadataReference> LoadReferences()
@@ -66,28 +68,27 @@ public sealed class CSharpRunner
         var usingsTree = CSharpSyntaxTree.ParseText(GlobalUsings, parseOptions, path: "GlobalUsings.cs");
         var userTree = CSharpSyntaxTree.ParseText(code, parseOptions, path: "Program.cs");
 
-        var compilation = CSharpCompilation.Create(
-            assemblyName: "UserProgram",
-            syntaxTrees: new[] { usingsTree, userTree },
-            references: References.Value,
-            options: new CSharpCompilationOptions(
-                OutputKind.ConsoleApplication,
-                optimizationLevel: OptimizationLevel.Release,
-                nullableContextOptions: NullableContextOptions.Enable,
-                // WebAssembly läuft hier einthreadig.
-                concurrentBuild: false));
+        // The guard is inserted for execution only. Diagnostics come from the unmodified code,
+        // so line and column numbers stay exact.
+        var guardTree = CSharpSyntaxTree.ParseText(LoopGuardRewriter.GuardSource, parseOptions, path: "Guard.cs");
+        var guardedRoot = LoopGuardRewriter.Rewrite(userTree);
+        var guardedTree = CSharpSyntaxTree.Create((CSharpSyntaxNode)guardedRoot, parseOptions, path: "Program.cs");
 
-        using var peStream = new MemoryStream();
-        var emit = compilation.Emit(peStream);
+        var guarded = Compile(new[] { usingsTree, guardedTree, guardTree });
+        var diagnostics = new List<DiagnosticLine>();
+        var image = guarded.Success ? guarded.Image : null;
 
-        var diagnostics = emit.Diagnostics
-            .Where(d => d.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)
-            .Select(FormatDiagnostic)
-            .ToList();
-
-        if (!emit.Success)
+        if (guarded.Diagnostics.Count > 0 || image is null)
         {
-            return new RunResult(false, string.Empty, diagnostics, Stopwatch.GetElapsedTime(started));
+            var plain = Compile(new[] { usingsTree, userTree });
+            diagnostics = plain.Diagnostics.Select(FormatDiagnostic).ToList();
+            if (!plain.Success)
+            {
+                return new RunResult(false, string.Empty, diagnostics, Stopwatch.GetElapsedTime(started));
+            }
+
+            // The guarded variant failed to compile although the original did: run without guard.
+            image ??= plain.Image;
         }
 
         var output = new StringWriter();
@@ -98,7 +99,9 @@ public sealed class CSharpRunner
 
         try
         {
-            var loaded = Assembly.Load(peStream.ToArray());
+            var loaded = Assembly.Load(image);
+            loaded.GetType(LoopGuardRewriter.GuardTypeName)
+                ?.GetMethod("Reset")?.Invoke(null, new object[] { Stopwatch.Frequency * TimeoutSeconds });
             var entryPoint = ResolveEntryPoint(loaded)
                 ?? throw new InvalidOperationException("Es wurde kein Einstiegspunkt gefunden.");
 
@@ -114,11 +117,17 @@ public sealed class CSharpRunner
         catch (TargetInvocationException ex)
         {
             var inner = ex.InnerException ?? ex;
-            output.WriteLine($"Unbehandelte Ausnahme: {inner.GetType().Name}: {inner.Message}");
+            if (!TryWriteTimeout(inner, output))
+            {
+                output.WriteLine($"Unbehandelte Ausnahme: {inner.GetType().Name}: {inner.Message}");
+            }
         }
         catch (Exception ex)
         {
-            output.WriteLine($"Fehler: {ex.GetType().Name}: {ex.Message}");
+            if (!TryWriteTimeout(ex, output))
+            {
+                output.WriteLine($"Fehler: {ex.GetType().Name}: {ex.Message}");
+            }
         }
         finally
         {
@@ -127,6 +136,39 @@ public sealed class CSharpRunner
         }
 
         return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started));
+    }
+
+    private static (bool Success, byte[] Image, List<Diagnostic> Diagnostics) Compile(IEnumerable<SyntaxTree> trees)
+    {
+        var compilation = CSharpCompilation.Create(
+            assemblyName: "UserProgram",
+            syntaxTrees: trees,
+            references: References.Value,
+            options: new CSharpCompilationOptions(
+                OutputKind.ConsoleApplication,
+                optimizationLevel: OptimizationLevel.Release,
+                nullableContextOptions: NullableContextOptions.Enable,
+                // WebAssembly läuft hier einthreadig.
+                concurrentBuild: false));
+
+        using var peStream = new MemoryStream();
+        var emit = compilation.Emit(peStream);
+        var diagnostics = emit.Diagnostics
+            .Where(d => d.Severity is DiagnosticSeverity.Error or DiagnosticSeverity.Warning)
+            .ToList();
+        return (emit.Success, peStream.ToArray(), diagnostics);
+    }
+
+    private static bool TryWriteTimeout(Exception exception, StringWriter output)
+    {
+        if (exception.GetType().Name != LoopGuardRewriter.ExceptionTypeName)
+        {
+            return false;
+        }
+
+        var line = exception.GetType().GetProperty("Line")?.GetValue(exception);
+        output.WriteLine($"Dein Programm läuft vermutlich endlos – prüfe die Abbruchbedingung in Zeile {line}.");
+        return true;
     }
 
     /// <summary>
