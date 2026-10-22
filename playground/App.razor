@@ -1,0 +1,42 @@
+<div class="pg">
+    <div class="pg-bar">
+        <h1 class="pg-title">C#-Playground</h1>
+        <div class="pg-actions">
+            <button id="run-button" type="button" class="pg-btn pg-btn-primary" @onclick="RunAsync" disabled="@_running">
+                @(_running ? "Läuft …" : "▶ Ausführen")
+            </button>
+            <button type="button" class="pg-btn" @onclick="Reset" disabled="@_running">Zurücksetzen</button>
+        </div>
+    </div>
+
+    <label for="editor" class="pg-sr">C#-Quellcode</label>
+    <textarea id="editor"
+              class="pg-editor"
+              spellcheck="false"
+              autocapitalize="off"
+              autocomplete="off"
+              @bind="_code"
+              @bind:event="oninput"></textarea>
+    <p class="pg-hint">
+        Strg/⌘ + Enter führt aus. Tab rückt ein, Esc und danach Tab verlässt das Feld.
+        Endlosschleifen blockieren den Tab, der Code läuft im Hauptthread des Browsers.
+    </p>
+
+    <section class="pg-result" aria-live="polite" aria-label="Ergebnis">
+        @if (_running)
+        {
+            <p class="pg-meta">Kompiliert und führt aus … Beim ersten Mal dauert das einige Sekunden.</p>
+        }
+        @if (_result is not null)
+        {
+            <ul class="pg-diags" hidden="@(_result.Diagnostics.Count == 0)">
+                @foreach (var line in _result.Diagnostics)
+                {
+                    <li class="@(line.IsError ? "pg-err" : "pg-warn")">@line.Text</li>
+                }
+            </ul>
+            <pre class="pg-output" hidden="@(!_result.Success)">@(_result.Output.Length == 0 ? "(keine Ausgabe)" : _result.Output)</pre>
+            <p class="pg-meta">@_result.Summary</p>
+        }
+    </section>
+</div>

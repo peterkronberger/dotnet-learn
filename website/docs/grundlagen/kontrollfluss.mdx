@@ -1,0 +1,133 @@
+---
+title: Kontrollfluss
+sidebar_position: 2
+description: Verzweigungen und Schleifen in C#.
+---
+
+# Kontrollfluss
+
+*Lesezeit: etwa 10 Minuten*
+
+:::note[Lernziele]
+- Du steuerst den Ablauf mit `if`, `switch` und Schleifen.
+- Du erkennst, wie oft eine Schleife läuft.
+- Du verwendest einen Switch-Ausdruck, um Fälle kompakt zu unterscheiden.
+:::
+
+## Rückblick auf das vorige Kapitel
+
+Bevor es weitergeht: Rufe kurz ab, was du schon weißt. Das Abrufen festigt den Stoff mehr als erneutes Lesen.
+
+<Quiz
+  id="rueckblick-int-division"
+  question="Rückblick: Was ergibt `10 / 4`, wenn beide Zahlen `int` sind?"
+  options={['2.5', '2', '3', '2,5 als decimal']}
+  answer={1}>
+  Bei zwei `int`-Operanden wird der Nachkommateil abgeschnitten: `10 / 4` ergibt `2`. Der Rest der Division steht im Operator `%` zur Verfügung, `10 % 4` ist `2`.
+</Quiz>
+
+## Verzweigungen
+
+Mit `if` und `else` führst du Code nur unter einer Bedingung aus.
+
+```csharp title="if / else"
+int punkte = 82;
+
+if (punkte >= 90)
+{
+    Console.WriteLine("sehr gut");
+}
+else if (punkte >= 75)
+{
+    Console.WriteLine("gut");
+}
+else
+{
+    Console.WriteLine("weiter üben");
+}
+```
+
+## Schleifen
+
+| Schleife | Wann |
+| --- | --- |
+| `for` | Du kennst die Anzahl der Durchläufe. |
+| `foreach` | Du gehst alle Elemente einer Sammlung durch. |
+| `while` | Du wiederholst, solange eine Bedingung gilt. |
+| `do … while` | Wie `while`, der Körper läuft aber mindestens einmal. |
+
+## Switch-Ausdruck
+
+Ein Switch-Ausdruck liefert abhängig vom Muster einen Wert zurück. Das folgende Programm ist das bekannte FizzBuzz.
+
+:::info[Vorhersage]
+Was steht in der letzten Zeile (für `i = 15`)? Und welche Zahlen von 1 bis 15 erscheinen unverändert?
+:::
+
+<CSharpRunner
+  height={480}
+  code={`for (var i = 1; i <= 15; i++)
+{
+    var text = (i % 3, i % 5) switch
+    {
+        (0, 0) => "FizzBuzz",
+        (0, _) => "Fizz",
+        (_, 0) => "Buzz",
+        _ => i.ToString()
+    };
+    Console.WriteLine(text);
+}`}
+/>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die letzte Zeile lautet `FizzBuzz`, denn 15 ist durch 3 und durch 5 teilbar. Unverändert erscheinen 1, 2, 4, 7, 8, 11, 13 und 14.
+
+Die Muster werden von oben nach unten geprüft, das erste passende gewinnt. Der Unterstrich `_` steht für „beliebiger Wert“.
+
+</details>
+
+<details>
+<summary>Vertiefung: foreach über eine Liste (optional)</summary>
+
+```csharp
+var namen = new List<string> { "Ada", "Grace", "Linus" };
+
+foreach (var name in namen)
+{
+    Console.WriteLine(name.ToUpper());
+}
+```
+
+`foreach` braucht keinen Zähler und keine Längenprüfung. Das verhindert eine typische Fehlerquelle bei `for`-Schleifen.
+
+</details>
+
+## Prüfe dein Wissen
+
+<Quiz
+  id="kontrollfluss-for"
+  question="Wie oft wird der Körper von `for (var i = 0; i < 3; i++)` ausgeführt?"
+  options={['2 Mal', '3 Mal', '4 Mal', 'Unendlich oft']}
+  answer={1}>
+  `i` nimmt die Werte 0, 1 und 2 an. Bei 3 ist `i < 3` nicht mehr wahr, die Schleife endet. Das sind drei Durchläufe.
+</Quiz>
+
+<Quiz
+  id="kontrollfluss-do-while"
+  question="Was unterscheidet `do … while` von `while`?"
+  options={[
+    'Es läuft immer unendlich oft',
+    'Die Bedingung wird erst nach dem Körper geprüft, er läuft also mindestens einmal',
+    'Es kann keine Variablen verwenden',
+    'Es gibt keinen Unterschied',
+  ]}
+  answer={1}>
+  Bei `while` wird die Bedingung vor jedem Durchlauf geprüft, der Körper kann also auch nie laufen. Bei `do … while` steht die Prüfung am Ende, der Körper läuft deshalb mindestens einmal.
+</Quiz>
+
+## Quellen
+
+- Microsoft Learn: [C#-Dokumentation](https://learn.microsoft.com/dotnet/csharp/)
+- Microsoft Learn: [C#-Sprachreferenz](https://learn.microsoft.com/dotnet/csharp/language-reference/)

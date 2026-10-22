@@ -1,0 +1,57 @@
+---
+title: Willkommen
+sidebar_position: 0
+slug: /intro
+description: So lernst du hier C# und .NET – mit Vorhersagen, Playground und Quizzes.
+---
+
+# Willkommen
+
+Diese Seite vermittelt Basiswissen zu **C#** und **.NET**. Jedes Kapitel ist kurz, behandelt wenige Konzepte und endet mit Übungen, die du direkt im Browser ausführen kannst.
+
+:::note[Lernziele dieser Seite]
+- Du weißt, wie die Kapitel aufgebaut sind und wie du damit am meisten lernst.
+- Du hast den Playground einmal gestartet und ein erstes Programm ausgeführt.
+:::
+
+## So arbeitest du ein Kapitel durch
+
+1. **Lernziele lesen.** Sie sagen dir, worauf es ankommt.
+2. **Beispiel anschauen.** Erst verstehen, dann selbst probieren.
+3. **Vorhersage treffen.** Überlege, was der Code ausgibt, bevor du ihn startest.
+4. **Ausführen und vergleichen.** Stimmte deine Vorhersage? Wenn nicht: Das ist der wertvollste Moment.
+5. **Quiz beantworten.** Du bekommst zu jeder Antwort eine Erklärung.
+
+Einklappbare Bereiche mit dem Titel „Vertiefung“ sind optional. Du kannst sie beim ersten Durchgang überspringen.
+
+## Dein erstes Programm
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp, dann klicke im Editor auf **Ausführen** (oder drücke Strg/⌘ + Enter).
+:::
+
+<CSharpRunner
+  height={380}
+  code={`var name = "Welt";
+Console.WriteLine("Hallo, " + name + "!");
+Console.WriteLine(name.Length);`}
+/>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Das Programm gibt zwei Zeilen aus: `Hallo, Welt!` und `4`. Die Eigenschaft `Length` liefert die Anzahl der Zeichen von `"Welt"`.
+
+</details>
+
+<Quiz
+  id="intro-length"
+  question="Was gibt `Console.WriteLine(name.Length)` aus, wenn `name` den Text `Welt` enthält?"
+  options={['3', '4', '5', 'Welt']}
+  answer={1}>
+  `Length` zählt Zeichen. „Welt“ hat vier Buchstaben, also ist das Ergebnis `4`. Die Ausgabe ist eine Zahl und kein Text.
+</Quiz>
+
+## Weiter geht es
+
+Starte mit dem ersten Kapitel: [Variablen und Typen](./grundlagen/variablen-und-typen.mdx). Warum die Seite so aufgebaut ist, steht unter [Lernprinzipien](./lernprinzipien.mdx).

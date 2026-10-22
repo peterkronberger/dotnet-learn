@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C#-Playground</title>
+    <!-- Wird beim Deployment auf den Unterpfad der Seite gesetzt (siehe .github/workflows/pages.yml). -->
+    <base href="/" />
+    <link rel="icon" href="data:," />
+    <link rel="preload" id="webassembly" />
+    <link rel="stylesheet" href="css/playground.css" />
+    <script type="importmap"></script>
+</head>
+
+<body>
+    <div id="app">
+        <p class="pg-loading">Lade .NET-Laufzeit …</p>
+    </div>
+
+    <div id="blazor-error-ui" role="alert">
+        Beim Laden ist ein Fehler aufgetreten.
+        <a href="" onclick="location.reload(); return false;">Neu laden</a>
+    </div>
+
+    <script>
+        // Theme der einbettenden Lernseite übernehmen (gleicher Ursprung).
+        window.addEventListener('message', function (event) {
+            if (event.origin !== window.location.origin) { return; }
+            var data = event.data;
+            if (data && data.type === 'theme' && (data.value === 'dark' || data.value === 'light')) {
+                document.documentElement.setAttribute('data-theme', data.value);
+            }
+        });
+
+        // Editor-Komfort: Tab rückt ein, Esc gibt den Fokus wieder frei, Strg/⌘+Enter führt aus.
+        var tabTrapActive = true;
+        document.addEventListener('keydown', function (event) {
+            var target = event.target;
+            if (!(target instanceof HTMLTextAreaElement) || target.id !== 'editor') { return; }
+
+            if (event.key === 'Escape') {
+                tabTrapActive = false;
+            } else if (event.key === 'Tab' && !event.shiftKey && tabTrapActive) {
+                event.preventDefault();
+                document.execCommand('insertText', false, '    ');
+            } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+                event.preventDefault();
+                var button = document.getElementById('run-button');
+                if (button && !button.disabled) { button.click(); }
+            } else if (event.key !== 'Tab' && event.key !== 'Shift') {
+                tabTrapActive = true;
+            }
+        });
+    </script>
+
+    <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+</body>
+
+</html>

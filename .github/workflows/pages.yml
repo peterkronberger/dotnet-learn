@@ -1,0 +1,85 @@
+name: Lernseite bauen und auf GitHub Pages veröffentlichen
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Projektseite: https://<user>.github.io/dotnet-learn/
+  SITE_BASE_PATH: /dotnet-learn
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Docusaurus bauen
+        working-directory: website
+        # Ohne package-lock.json kann "npm ci" nicht laufen. Lockfile committen, dann auf "npm ci" umstellen.
+        run: |
+          npm install
+          npm run build
+
+      - name: C#-Playground veröffentlichen (Blazor WebAssembly)
+        run: dotnet publish playground/Playground.csproj --configuration Release --output out/playground
+
+      - name: Playground in die Seite einbinden
+        shell: bash
+        run: |
+          set -euo pipefail
+          index=out/playground/wwwroot/index.html
+          # Blazor braucht den Unterpfad als <base href>.
+          sed -i "s|<base href=\"/\" />|<base href=\"${SITE_BASE_PATH}/runner/\" />|" "$index"
+          grep -q "<base href=\"${SITE_BASE_PATH}/runner/\" />" "$index"
+          mkdir -p website/build/runner
+          cp -r out/playground/wwwroot/. website/build/runner/
+          # Ordner mit führendem Unterstrich (_framework) dürfen nicht von Jekyll verworfen werden.
+          touch website/build/.nojekyll
+          test -d website/build/runner/_framework
+          du -sh website/build website/build/runner
+
+      - name: GitHub Pages konfigurieren
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Artefakt hochladen
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: website/build
+
+  deploy:
+    name: Deploy
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    # Rechte, die actions/deploy-pages für das Deployment braucht
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Auf GitHub Pages deployen
+        id: deployment
+        uses: actions/deploy-pages@v4
