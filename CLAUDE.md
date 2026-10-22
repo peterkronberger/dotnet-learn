@@ -79,7 +79,7 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 | S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden ([ADR 0003](docs-dev/adr/0003-loop-guard.md)); manuelle Prüfung im Browser ausstehend |
 | S4 | Prism-Overlay im Editor | Modul 2 | entschieden ([ADR 0005](docs-dev/adr/0005-prism-overlay.md)); manuelle Prüfung im Browser ausstehend |
 | S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | entschieden ([ADR 0007](docs-dev/adr/0007-step-view.md)); manuelle Prüfung im Browser ausstehend |
-| S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | offen |
+| S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | entschieden ([ADR 0008](docs-dev/adr/0008-microsoft-extensions.md)); manuelle Prüfung im Browser ausstehend |
 | S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden ([ADR 0006](docs-dev/adr/0006-runner-messages.md)); manuelle Prüfung im Browser ausstehend |
 
 ## Arbeitsweise

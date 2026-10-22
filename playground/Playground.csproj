@@ -24,6 +24,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <!-- Feste Paketmenge für Nutzercode (S6, ADR 0008). Die Laufzeit-DLLs liefert Blazor ohnehin aus;
+         die Referenzen für den Compiler werden unten eingebettet. -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.*" />
   </ItemGroup>
 
   <!--
@@ -55,6 +59,16 @@
       <ReferenceName Include="System.Threading.Tasks" />
     </ItemGroup>
 
+    <!-- Pakete (nicht Teil von Microsoft.NETCore.App.Ref): die aufgelösten Assemblies der festen Menge. -->
+    <ItemGroup>
+      <ExtensionName Include="Microsoft.Extensions.DependencyInjection;Microsoft.Extensions.DependencyInjection.Abstractions;Microsoft.Extensions.Logging;Microsoft.Extensions.Logging.Abstractions;Microsoft.Extensions.Options" />
+      <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyInjection'" />
+      <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyInjection.Abstractions'" />
+      <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.Logging'" />
+      <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.Logging.Abstractions'" />
+      <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.Options'" />
+    </ItemGroup>
+
     <Error Condition="!Exists('$(RefPackDir)System.Runtime.dll')"
            Text="Referenz-Assemblies nicht gefunden unter '$(RefPackDir)'. Prüfe, ob das .NET-SDK für $(TargetFramework) installiert ist." />
 
@@ -62,6 +76,8 @@
       <EmbeddedResource Include="$(RefPackDir)%(ReferenceName.Identity).dll"
                         LogicalName="refs/%(ReferenceName.Identity).dll"
                         Condition="Exists('$(RefPackDir)%(ReferenceName.Identity).dll')" />
+      <EmbeddedResource Include="@(ExtensionRef)"
+                        LogicalName="refs/%(Filename)%(Extension)" />
     </ItemGroup>
   </Target>
 
