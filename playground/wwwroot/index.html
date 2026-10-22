@@ -31,7 +31,7 @@
             }
         });
 
-        // Ergebnis an die einbettende Lernseite melden (Spike S7). Nur an den eigenen Ursprung.
+        // Report the result to the embedding learning page (spike S7). Only to our own origin.
         window.pgBridge = {
             report: function (message) {
                 if (window.parent && window.parent !== window) {
