@@ -4,6 +4,11 @@ sidebar_position: 1
 description: Variablen, eingebaute Typen und Typinferenz in C#.
 ---
 
+import CodeBlock from '@theme/CodeBlock';
+import variables from '!!raw-loader!@site/examples/m01/l02/variables.cs';
+import numericPitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
+import valueVsReference from '!!raw-loader!@site/examples/m01/l02/value-vs-reference.cs';
+
 # Variablen und Typen
 
 *Lesezeit: etwa 10 Minuten*
@@ -18,16 +23,9 @@ description: Variablen, eingebaute Typen und Typinferenz in C#.
 
 Eine Variable hat einen **Typ**, einen **Namen** und einen **Wert**. C# ist statisch typisiert: Der Compiler kennt den Typ schon vor dem Start und meldet Fehler früh.
 
-```csharp title="Variablen"
-int alter = 30;
-string name = "Ada";
-bool istStudent = true;
+<CodeBlock language="csharp" title="Variablen">{variables}</CodeBlock>
 
-// var lässt den Compiler den Typ ermitteln. Er steht danach trotzdem fest.
-var preis = 19.99m;
-
-Console.WriteLine($"{name} ist {alter} Jahre alt.");
-```
+`var` lässt den Compiler den Typ ermitteln; er steht danach trotzdem fest.
 
 Das `$` vor dem Text erzeugt einen **interpolierten String**. Ausdrücke in geschweiften Klammern werden ausgewertet und eingesetzt.
 
@@ -50,20 +48,12 @@ Bevor du weiterliest, probiere die nächste Aufgabe.
 Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
 :::
 
-<CSharpRunner
-  height={420}
-  code={`int a = 7;
-int b = 2;
-Console.WriteLine(a / b);
-Console.WriteLine((double)a / b);
-Console.WriteLine(0.1 + 0.2 == 0.3);
-Console.WriteLine(0.1m + 0.2m == 0.3m);`}
-/>
+<CSharpRunner height={420} code={numericPitfalls} />
 
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>
 
-Ausgabe: `3`, `3,5` bzw. `3.5` (je nach Spracheinstellung), `False`, `True`.
+Ausgabe: `3`, `3.5`, `False`, `True`. Der Playground nutzt `InvariantGlobalization`, deshalb steht immer ein Punkt.
 
 - **Ganzzahldivision:** Sind beide Operanden `int`, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten. Mit `(double)a / b` rechnest du als Gleitkommazahl.
 - **Rundungsfehler:** `double` speichert Zahlen binär. `0.1` und `0.2` lassen sich so nicht exakt darstellen, die Summe weicht minimal von `0.3` ab. `decimal` rechnet dezimal und eignet sich deshalb für Geldbeträge.
@@ -75,22 +65,7 @@ Ausgabe: `3`, `3,5` bzw. `3.5` (je nach Spracheinstellung), `False`, `True`.
 
 Zahlen, `bool` und `char` sind **Werttypen**: Eine Zuweisung kopiert den Wert. Klassen sind **Referenztypen**: Eine Zuweisung kopiert nur den Verweis, beide Variablen zeigen auf dasselbe Objekt.
 
-```csharp
-int x = 1;
-int y = x;
-y++;
-Console.WriteLine(x); // 1, denn y war nur eine Kopie
-
-var p1 = new Person { Name = "Ada" };
-var p2 = p1;
-p2.Name = "Grace";
-Console.WriteLine(p1.Name); // Grace, denn p1 und p2 sind dasselbe Objekt
-
-class Person
-{
-    public string Name { get; set; } = "";
-}
-```
+<CodeBlock language="csharp">{valueVsReference}</CodeBlock>
 
 In Top-Level-Programmen stehen Typdeklarationen am Ende der Datei.
 
