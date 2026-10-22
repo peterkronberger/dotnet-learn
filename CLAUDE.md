@@ -71,7 +71,7 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 
 | # | Spike | Blockiert | Status |
 | --- | --- | --- | --- |
-| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | offen |
+| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden ([ADR 0001](docs-dev/adr/0001-roslyn-5.md)); manuelle Deploy-Prüfung ausstehend |
 | S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden ([ADR 0002](docs-dev/adr/0002-code-import.md)) |
 | S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | offen |
 | S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | offen |
