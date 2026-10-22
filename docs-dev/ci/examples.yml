@@ -1,0 +1,31 @@
+# Proposal for .github/workflows/examples.yml (spike S2, ADR 0003).
+# Claude may not write to .github/workflows/: a human copies this file there and reviews it.
+name: Check examples
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - "website/examples/**"
+      - "tools/check-examples.sh"
+      - ".github/workflows/examples.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    name: Compile examples and compare outputs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Run examples and compare with snapshots
+        run: bash tools/check-examples.sh

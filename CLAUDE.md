@@ -26,7 +26,9 @@ cd website && npm start                       # Dev-Server: http://localhost:300
 dotnet build playground/Playground.csproj     # Build-Prüfung
 dotnet run --project playground               # lokal starten
 
-# Beispielcode prüfen: Befehl folgt mit Spike S2 (bis dahin: entfällt)
+# Beispielcode prüfen (kompilieren + Ausgaben mit <name>.out.txt abgleichen), siehe ADR 0003
+bash tools/check-examples.sh
+bash tools/check-examples.sh --update   # Snapshots bewusst neu schreiben, Diff prüfen
 ```
 
 Vor jedem Commit: beide Build-Prüfungen ausführen. Schlägt eine fehl, wird nicht committet.
@@ -73,7 +75,7 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 | --- | --- | --- | --- |
 | S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | offen |
 | S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden ([ADR 0002](docs-dev/adr/0002-code-import.md)) |
-| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | offen |
+| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft ([ADR 0003](docs-dev/adr/0003-example-ci.md): Skript und Demos da, noch nicht ausgeführt; Workflow und Snapshots fehlen) |
 | S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | offen |
 | S4 | Prism-Overlay im Editor | Modul 2 | offen |
 | S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | offen |

@@ -21,7 +21,7 @@
 - C# 14 / .NET 10, Top-Level-Statements (Typdeklarationen am Dateiende), Nullable aktiv, `var` wo der Typ offensichtlich ist.
 - Moderne Idiome bevorzugen; ältere Schreibweisen nur zeigen, wo man ihnen in fremdem Code oft begegnet – dann mit `<Since>`-Badge und „So schrieb man es vorher“.
 - Namenskonventionen nach Microsoft Learn (PascalCase für Typen/Member, camelCase für lokale Variablen).
-- Jedes Beispiel ist für sich lauffähig oder ausdrücklich als Bruchstück markiert (Markierung legt S2 fest).
+- Jedes Beispiel ist für sich lauffähig oder ausdrücklich als Bruchstück markiert (Dateiendung `.snippet.cs`, wird von der CI übersprungen; ADR 0003).
 - Ausgaben kultur-unabhängig formulieren (Playground nutzt `InvariantGlobalization`): `3.5`, nicht `3,5`.
 
 ## Code-Ablage
