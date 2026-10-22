@@ -31,6 +31,15 @@
             }
         });
 
+        // Report the result to the embedding learning page (spike S7). Only to our own origin.
+        window.pgBridge = {
+            report: function (message) {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage(message, window.location.origin);
+                }
+            }
+        };
+
         // Editor-Komfort: Tab rückt ein, Esc gibt den Fokus wieder frei, Strg/⌘+Enter führt aus.
         var tabTrapActive = true;
         document.addEventListener('keydown', function (event) {

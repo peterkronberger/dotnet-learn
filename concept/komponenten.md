@@ -17,17 +17,22 @@ Aufklappbares: `<details><summary>Lösung und Erklärung anzeigen</summary> … 
 
 Heute: `code` (String), `height` (px, Standard 460). Bettet `/runner/` als iframe ein, Code als Base64url im URL-Fragment, `loading="lazy"`, Theme per `postMessage` (`{type: 'theme', value}`).
 
+Vorhanden (S7, [ADR 0006](../docs-dev/adr/0006-runner-messages.md)):
+- `id`: stabiler Schlüssel der Instanz (Standard: automatisch); ordnet `run-result` der richtigen Instanz zu.
+- `predict` (bool) + `expected` (String, Ausgabe-Snapshot): ein Eingabefeld pro erwarteter Ausgabezeile; nach „Ausführen“ ✓/✗ pro Zeile, sachlich formuliert, Ergebnis in `aria-live`-Region. Geprüft wird gegen die echte Ausgabe.
+- `tests` (String): C#-Prüfcode mit `public static class TaskTests` und `Run()` (Tupel `Name, Visible, Passed, Feedback`); der Runner führt dann nur die Tests aus. Ergebnis pro Test, versteckte Tests mit neutralem Namen.
+- `onResult`: Callback mit der `run-result`-Nachricht.
+- Demo: `/runner-demo`.
+
 Geplant:
 - `code` kommt aus einer `.cs`-Datei (`import x from '!!raw-loader!@site/examples/…'`) – 🔒 S1. Damit entfällt die README-Einschränkung „keine Backticks, Backslashes, `${`“.
 - `stdin` (String): vorbefüllte Konsoleneingabe, zeilenweise von `Console.ReadLine()` gelesen. Im Runner als Eingabefeld unter dem Editor.
-- `predict` (bool): Eingabefelder pro Ausgabezeile; nach „Ausführen“ ✓/✗ pro Zeile, sachlich formuliert – 🔒 S7.
-- `id`: stabiler Schlüssel für Nachrichten und gespeicherten Code.
 - Laden: weit weggescrollte Instanzen entladen, eingegebener Code bleibt erhalten; Runtime aus dem Browser-Cache.
 - Sprache der Runner-Oberfläche (heute fest Deutsch in `App.razor`) über einen Parameter (z. B. `#lang=de`) – für i18n.
 
-Nachrichtenprotokoll (Entwurf für S7):
-- Seite → Runner: `{type: 'theme', value}` (vorhanden)
-- Runner → Seite: `{type: 'run-result', id, success, output, diagnostics, tests?}`
+Nachrichtenprotokoll (S7, vorhanden; Ursprungsprüfung `window.location.origin` in beide Richtungen, Seite prüft zusätzlich `event.source` und `id`):
+- Seite → Runner: `{type: 'theme', value}`; Konfiguration im Fragment: `#code=<b64>&id=<id>&tests=<b64>`
+- Runner → Seite: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
 
 ## Playground (`playground/`) – vorhanden
 

@@ -15,3 +15,40 @@
   font-size: 0.85rem;
   color: var(--ifm-color-emphasis-700);
 }
+
+.predict {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--dl-border);
+  border-radius: var(--ifm-global-radius);
+}
+
+.guessRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0.25rem 0;
+}
+
+.guessRow label {
+  min-width: 5rem;
+}
+
+.guessInput {
+  flex: 1;
+  font-family: var(--ifm-font-family-monospace);
+  padding: 0.25rem 0.5rem;
+  color: var(--ifm-font-color-base);
+  background: var(--ifm-background-color);
+  border: 1px solid var(--ifm-color-emphasis-500);
+  border-radius: var(--ifm-global-radius);
+}
+
+.feedback {
+  margin-top: 0.5rem;
+}
+
+.list {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}

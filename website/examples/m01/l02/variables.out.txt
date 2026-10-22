@@ -1,0 +1,1 @@
+Ada is 30 years old, student: True, price: 19.99.

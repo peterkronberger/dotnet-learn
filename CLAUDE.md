@@ -80,7 +80,7 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 | S4 | Prism-Overlay im Editor | Modul 2 | entschieden ([ADR 0005](docs-dev/adr/0005-prism-overlay.md)); manuelle Prüfung im Browser ausstehend |
 | S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | offen |
 | S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | offen |
-| S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | offen |
+| S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden ([ADR 0006](docs-dev/adr/0006-runner-messages.md)); manuelle Prüfung im Browser ausstehend |
 
 ## Arbeitsweise
 
