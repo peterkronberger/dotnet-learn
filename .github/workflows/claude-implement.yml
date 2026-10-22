@@ -108,6 +108,9 @@ jobs:
 
             1. Lies das Issue inkl. Kommentaren: `gh issue view ${{ env.ISSUE }} --comments`
                Steht dort „Teil von #N“, lies auch #N für den Gesamtkontext.
+               Hat ein Mensch frühere Rückfragen in den Kommentaren beantwortet, sind diese
+               Antworten verbindlich und gehen dem Issue-Text vor. Stelle bereits beantwortete
+               Fragen nicht erneut.
             2. Brauchst du einen Menschen (Vorgaben unklar oder widersprüchlich, Secrets/Zugänge
                nötig, riskante Änderung wie Datenmigration, Auth/Security, .github/workflows/)?
                Dann ändere keinen Code, poste konkrete, nummerierte Fragen mit `gh issue comment`
@@ -140,6 +143,7 @@ jobs:
 
       # Ergebnis des Claude Calls wird per Skript gesetzt
       # Entfernt die Labels claude:in-progress & claude:auto-implement und setzt je nach status das Label claude:pr-open, needs-human oder als Standard needs-human und claude:failed
+      # Bei needs-human und failed wird zusätzlich ein Kommentar mit den Schritten für den Neustart gepostet.
       # always(): läuft auch bei Zeitlimit/Abbruch, damit kein Issue auf claude:in-progress hängen bleibt.
       # Übersprungen nur, wenn das Issue wegen offener Abhängigkeiten auf claude:queued gesetzt wurde.
       - name: Ergebnis per Label melden
@@ -156,7 +160,14 @@ jobs:
           gh issue edit "$ISSUE" --remove-label "claude:in-progress,claude:auto-implement" || true
           case "$STATUS" in
             pr_created)  gh issue edit "$ISSUE" --add-label "claude:pr-open" ;;
-            needs_human) gh issue edit "$ISSUE" --add-label "needs-human" ;;
+            needs_human) gh issue edit "$ISSUE" --add-label "needs-human"
+                         gh issue comment "$ISSUE" --body "❓ Rückfragen siehe Kommentar oben.
+
+          Weiter geht es so:
+          1. Fragen im Issue beantworten (als Kommentar, ohne Claude per @ zu erwähnen – sonst startet zusätzlich ein zweiter Claude-Lauf).
+          2. Danach Label \`claude:auto-implement\` erneut setzen.
+
+          Details: ${RUN_URL}" ;;
             *)           gh issue edit "$ISSUE" --add-label "needs-human,claude:failed"
                          gh issue comment "$ISSUE" --body "⚠️ Umsetzung nicht abgeschlossen: ${REASON}
 

@@ -73,10 +73,10 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 
 | # | Spike | Blockiert | Status |
 | --- | --- | --- | --- |
-| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | offen |
+| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden ([ADR 0001](docs-dev/adr/0001-roslyn-5.md)); manuelle Deploy-Prüfung ausstehend |
 | S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden ([ADR 0002](docs-dev/adr/0002-code-import.md)) |
-| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft ([ADR 0003](docs-dev/adr/0003-example-ci.md): Skript und Demos da, noch nicht ausgeführt; Workflow und Snapshots fehlen) |
-| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | offen |
+| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft ([ADR 0004](docs-dev/adr/0004-example-ci.md)) |
+| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden ([ADR 0003](docs-dev/adr/0003-loop-guard.md)); manuelle Prüfung im Browser ausstehend |
 | S4 | Prism-Overlay im Editor | Modul 2 | offen |
 | S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | offen |
 | S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | offen |

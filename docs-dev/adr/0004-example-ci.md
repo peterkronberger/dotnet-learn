@@ -1,4 +1,4 @@
-# 0003 – CI prüft Beispiele und gleicht Ausgaben ab
+# 0004 – CI prüft Beispiele und gleicht Ausgaben ab
 
 - Status: vorgeschlagen (nicht in der Umgebung ausgeführt, siehe „Ergebnis“)
 - Datum: 2026-10-22
