@@ -5,8 +5,10 @@ import predictDemo from '!!raw-loader!@site/examples/s7/predict-demo.cs';
 import predictDemoOutput from '!!raw-loader!@site/examples/s7/predict-demo.out.txt';
 import palindromeTask from '!!raw-loader!@site/examples/s7/palindrome-task.cs';
 import palindromeTests from '!!raw-loader!@site/examples/s7/palindrome-task.tests.snippet.cs';
+import loopTrace from '!!raw-loader!@site/examples/s5/loop-trace.cs';
+import referenceTypes from '!!raw-loader!@site/examples/s5/reference-types.cs';
 
-// Technische Demo für Spike S7 (docs-dev/adr/0006-runner-messages.md), kein Lerninhalt.
+// Technische Demo für Spike S7(docs-dev/adr/0006-runner-messages.md), kein Lerninhalt.
 export default function RunnerDemo() {
   return (
     <Layout title="Runner-Demo (S7)" description="Technische Demo: Runner meldet Ergebnisse an die Seite">
@@ -20,6 +22,14 @@ export default function RunnerDemo() {
           Implementiere <code>IsPalindrome</code>. Zwei Tests sind sichtbar, zwei versteckt.
         </p>
         <CSharpRunner id="s7-task" code={palindromeTask} tests={palindromeTests} height={360} />
+        <h2>Schrittansicht (Spike S5)</h2>
+        <p>
+          Mit <code>trace</code> zeigt der Runner nach dem Ausführen Zeile, Variablen und Ausgabe pro Schritt
+          (docs-dev/adr/0007-step-view.md).
+        </p>
+        <CSharpRunner id="s5-loop" code={loopTrace} trace height={900} />
+        <p>Wert- und Referenztypen: zwei Variablen können auf dasselbe Objekt zeigen.</p>
+        <CSharpRunner id="s5-refs" code={referenceTypes} trace height={1000} />
       </main>
     </Layout>
   );

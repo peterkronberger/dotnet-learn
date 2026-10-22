@@ -40,6 +40,89 @@
             </ul>
             <pre class="pg-output" hidden="@(!_result.Success)">@(_result.Output.Length == 0 ? "(keine Ausgabe)" : _result.Output)</pre>
             <p class="pg-meta">@_result.Summary</p>
+            @if (_result.TraceUnavailable)
+            {
+                <p class="pg-meta">Die Schrittansicht ist für dieses Programm nicht verfügbar. Das Programm wurde normal ausgeführt.</p>
+            }
         }
     </section>
+
+    @if (Trace is { } trace)
+    {
+        var step = CurrentStep;
+        var lines = CodeLines;
+        <section class="pg-steps" aria-label="Schrittansicht" @onkeydown="OnStepKey">
+            <div class="pg-steps-nav">
+                <button type="button" class="pg-btn" @onclick="() => GoToStep(0)" disabled="@(_stepIndex == 0)">⏮ Anfang</button>
+                <button type="button" class="pg-btn" @onclick="() => GoToStep(_stepIndex - 1)" disabled="@(_stepIndex == 0)">◀ Zurück</button>
+                <button type="button" class="pg-btn pg-btn-primary" @onclick="() => GoToStep(_stepIndex + 1)" disabled="@(_stepIndex == trace.Steps.Count - 1)">Weiter ▶</button>
+                <span class="pg-meta" aria-live="polite">
+                    Schritt @(_stepIndex + 1) von @trace.Steps.Count:
+                    @(step.Line == StepTraceRewriter.EndLine ? "Programmende" : $"Zeile {step.Line} wird als Nächstes ausgeführt")
+                </span>
+            </div>
+            <p class="pg-hint">Pfeiltasten links/rechts wechseln den Schritt, Pos1/Ende springen zum ersten/letzten.</p>
+            <ol class="pg-code-lines">
+                @for (var i = 0; i < lines.Length; i++)
+                {
+                    var number = i + 1;
+                    var isCurrent = number == step.Line;
+                    <li class="@(isCurrent ? "pg-line pg-line-current" : "pg-line")" aria-current="@(isCurrent ? "step" : null)">
+                        <span class="pg-marker" aria-hidden="true">@(isCurrent ? "▶" : "")</span>
+                        <span class="pg-lineno">@number</span>
+                        <code>@lines[i]</code>
+                        @if (isCurrent)
+                        {
+                            <span class="pg-sr"> (aktuelle Zeile)</span>
+                        }
+                    </li>
+                }
+            </ol>
+            <div class="pg-memory">
+                <div>
+                    <h2 class="pg-memory-title">Variablen</h2>
+                    <ul class="pg-rows" aria-label="Variablen">
+                        @foreach (var variable in step.Variables)
+                        {
+                            <li class="pg-row"><span class="pg-name">@variable.Name</span> = <span>@(variable.RefId is { } id ? $"→ Objekt #{id}" : variable.Text)</span></li>
+                        }
+                        @if (step.Variables.Count == 0)
+                        {
+                            <li class="pg-row">(noch keine)</li>
+                        }
+                    </ul>
+                </div>
+                <svg class="pg-arrows" width="@ArrowWidth" height="@(Math.Max(step.Variables.Count, step.Heap.Count) * RowHeight)" aria-hidden="true" focusable="false">
+                    @for (var v = 0; v < step.Variables.Count; v++)
+                    {
+                        var target = step.Variables[v].RefId is { } refId ? step.Heap.ToList().FindIndex(h => h.Id == refId) : -1;
+                        if (target >= 0)
+                        {
+                            <path d="M 2 @ArrowY(v) L @(ArrowWidth - 8) @ArrowY(target)" class="pg-arrow" />
+                            <circle cx="@(ArrowWidth - 5)" cy="@ArrowY(target)" r="3" class="pg-arrow-head" />
+                        }
+                    }
+                </svg>
+                <div>
+                    <h2 class="pg-memory-title">Objekte (Heap-Modell)</h2>
+                    <ul class="pg-rows" aria-label="Objekte">
+                        @foreach (var item in step.Heap)
+                        {
+                            <li class="pg-row"><span class="pg-name">#@item.Id @item.Type</span> <span>@item.Text</span></li>
+                        }
+                        @if (step.Heap.Count == 0)
+                        {
+                            <li class="pg-row">(keine)</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            @if (trace.Truncated)
+            {
+                <p class="pg-meta">Die Aufzeichnung endet nach @StepRecorder.MaxSteps Schritten.</p>
+            }
+            <h2 class="pg-memory-title">Bisherige Ausgabe</h2>
+            <pre class="pg-output">@(step.Output.Length == 0 ? "(noch keine Ausgabe)" : step.Output)</pre>
+        </section>
+    }
 </div>

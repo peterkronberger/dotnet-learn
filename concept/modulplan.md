@@ -44,7 +44,7 @@ Fehlvorstellungen: Off-by-one; die Schleifenbedingung wird nur einmal geprüft; 
 Definition, Parameter, Rückgabe · `return` vs. Ausgabe · Gültigkeitsbereich · Überladung · lokale Funktionen · optionale/benannte Parameter · `ref`/`out` (kurz).
 Fehlvorstellungen: `return` gibt etwas aus; eine Methode ändert die Variable des Aufrufers.
 
-### M4 Typsystem-Fundamente ▶ 🔒 S5
+### M4 Typsystem-Fundamente ▶
 Wert- vs. Referenztypen · Stack/Heap als Modell (als *Modell* kennzeichnen, Laufzeitdetail) · `null`, Nullable Reference Types, `Nullable<T>` · String-Unveränderlichkeit · Gleichheit `==` vs. `Equals` · (Vertiefung: Boxing).
 Fehlvorstellungen: Zuweisung kopiert das Objekt; Werttypen liegen immer auf dem Stack.
 

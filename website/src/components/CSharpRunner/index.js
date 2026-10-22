@@ -31,12 +31,22 @@ function splitLines(text) {
  *  - predict:  Eingabefeld pro Ausgabezeile; nach dem Ausführen ✓/✗ pro Zeile (braucht `expected`)
  *  - expected: erwartete Ausgabe, bestimmt nur die Anzahl der Felder; geprüft wird gegen die echte Ausgabe
  *  - tests:    C#-Prüfcode (siehe docs-dev/adr/0006-runner-messages.md); der Runner führt dann die Tests aus
+ *  - trace:    Schrittansicht im Runner einschalten (Variablen, Heap-Modell; docs-dev/adr/0007-step-view.md)
  *  - onResult: Callback mit der Nachricht `run-result` des Runners
  *
  * Der Runner meldet `{type: 'run-result', id, success, output, diagnostics, tests?}` per postMessage.
  * Beide Seiten prüfen den Ursprung; die Seite prüft zusätzlich Absender (iframe) und `id`.
  */
-export default function CSharpRunner({code = '', height = 460, id, predict = false, expected = '', tests, onResult}) {
+export default function CSharpRunner({
+  code = '',
+  height = 460,
+  id,
+  predict = false,
+  expected = '',
+  tests,
+  trace = false,
+  onResult,
+}) {
   const runnerUrl = useBaseUrl('/runner/');
   const {colorMode} = useColorMode();
   const frame = useRef(null);
@@ -71,6 +81,7 @@ export default function CSharpRunner({code = '', height = 460, id, predict = fal
   if (code) {
     fragment = `#code=${encodeCode(code)}&id=${encodeURIComponent(instanceId)}`;
     if (tests) { fragment += `&tests=${encodeCode(tests)}`; }
+    if (trace && !tests) { fragment += '&trace=1'; }
   }
   const src = `${runnerUrl}${fragment}`;
 

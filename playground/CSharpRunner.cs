@@ -17,7 +17,9 @@ public sealed record RunResult(
     string Output,
     IReadOnlyList<DiagnosticLine> Diagnostics,
     TimeSpan Duration,
-    IReadOnlyList<TestOutcome>? Tests = null)
+    IReadOnlyList<TestOutcome>? Tests = null,
+    StepTrace? Trace = null,
+    bool TraceUnavailable = false)
 {
     public string Summary => Success
         ? $"Fertig in {Duration.TotalMilliseconds:0} ms"
@@ -72,7 +74,11 @@ public sealed class CSharpRunner
     /// <c>public static (string Name, bool Visible, bool Passed, string Feedback)[] Run()</c>.
     /// If given, the tests run instead of the program's entry point.
     /// </param>
-    public async Task<RunResult> RunAsync(string code, string? testsCode = null)
+    /// <param name="trace">
+    /// Record every step (spike S5, ADR 0007). Ignored when tests run. If the instrumented code does not
+    /// compile, the program runs normally and <see cref="RunResult.TraceUnavailable"/> is set.
+    /// </param>
+    public async Task<RunResult> RunAsync(string code, string? testsCode = null, bool trace = false)
     {
         var started = Stopwatch.GetTimestamp();
 
@@ -86,8 +92,10 @@ public sealed class CSharpRunner
         // The guard is inserted for execution only. Diagnostics come from the unmodified code,
         // so line and column numbers stay exact.
         var guardTree = CSharpSyntaxTree.ParseText(LoopGuardRewriter.GuardSource, parseOptions, path: "Guard.cs");
-        var guardedRoot = LoopGuardRewriter.Rewrite(userTree);
-        var guardedTree = CSharpSyntaxTree.Create((CSharpSyntaxNode)guardedRoot, parseOptions, path: "Program.cs");
+        SyntaxTree Guarded(SyntaxTree tree) =>
+            CSharpSyntaxTree.Create((CSharpSyntaxNode)LoopGuardRewriter.Rewrite(tree), parseOptions, path: "Program.cs");
+
+        var guardedTree = Guarded(userTree);
 
         var guarded = Compile(WithTests([usingsTree, guardedTree, guardTree], testsTree));
         var diagnostics = new List<DiagnosticLine>();
@@ -106,7 +114,27 @@ public sealed class CSharpRunner
             image ??= plain.Image;
         }
 
+        // Step view: compile a second variant with the trace calls (after the guard, so the guard stays in).
+        StepRecorder? recorder = null;
+        var traceUnavailable = false;
         var output = new StringWriter();
+        if (trace && testsTree is null && image is not null)
+        {
+            var tracedTree = CSharpSyntaxTree.Create(
+                (CSharpSyntaxNode)StepTraceRewriter.Rewrite(userTree), parseOptions, path: "Program.cs");
+            var traceSupport = CSharpSyntaxTree.ParseText(StepTraceRewriter.TraceSource, parseOptions, path: "Trace.cs");
+            var traced = Compile([usingsTree, Guarded(tracedTree), guardTree, traceSupport]);
+            if (traced.Success)
+            {
+                image = traced.Image;
+                recorder = new StepRecorder(() => output.ToString());
+            }
+            else
+            {
+                traceUnavailable = true;
+            }
+        }
+
         IReadOnlyList<TestOutcome>? tests = null;
         var originalOut = Console.Out;
         var originalError = Console.Error;
@@ -115,9 +143,15 @@ public sealed class CSharpRunner
 
         try
         {
-            var loaded = Assembly.Load(image);
+            var loaded = Assembly.Load(image!);
             loaded.GetType(LoopGuardRewriter.GuardTypeName)
                 ?.GetMethod("Reset")?.Invoke(null, new object[] { Stopwatch.Frequency * TimeoutSeconds });
+            if (recorder is not null)
+            {
+                var hook = loaded.GetType(StepTraceRewriter.TraceTypeName)?.GetField("Hook");
+                hook?.SetValue(null, (Action<int, string[], object?[]>)recorder.Record);
+            }
+
             if (testsTree is not null)
             {
                 tests = RunTests(loaded);
@@ -162,7 +196,8 @@ public sealed class CSharpRunner
             Console.SetError(originalError);
         }
 
-        return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started), tests);
+        return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started), tests,
+            recorder?.ToTrace(), traceUnavailable);
     }
 
     private static IEnumerable<SyntaxTree> WithTests(IEnumerable<SyntaxTree> trees, SyntaxTree? testsTree) =>

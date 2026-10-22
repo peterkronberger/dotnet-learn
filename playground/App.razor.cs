@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Playground;
@@ -18,11 +19,16 @@ public partial class App
     private string? _compiledCode;
     private string? _instanceId;
     private string? _testsCode;
+    private bool _trace;
+    private int _stepIndex;
+
+    private const int RowHeight = 28;
+    private const int ArrowWidth = 72;
 
     protected override void OnInitialized()
     {
         // Die Lernseite übergibt Beispielcode als Base64url im URL-Fragment (#code=...).
-        // Weitere Schlüssel (spike S7): &id=<instance id>, &tests=<Base64url test code>.
+        // Weitere Schlüssel (spike S7): &id=<instance id>, &tests=<Base64url test code>; (spike S5): &trace=1.
         var fragment = Navigation.ToAbsoluteUri(Navigation.Uri).Fragment;
 
         if (fragment.StartsWith(FragmentPrefix, StringComparison.Ordinal))
@@ -41,6 +47,10 @@ public partial class App
                 if (part.StartsWith("id=", StringComparison.Ordinal))
                 {
                     _instanceId = Uri.UnescapeDataString(part[3..]);
+                }
+                else if (part == "trace=1")
+                {
+                    _trace = true;
                 }
                 else if (part.StartsWith("tests=", StringComparison.Ordinal))
                 {
@@ -109,7 +119,8 @@ public partial class App
 
         try
         {
-            _result = await Runner.RunAsync(_code, _testsCode);
+            _result = await Runner.RunAsync(_code, _testsCode, _trace);
+            _stepIndex = 0;
         }
         finally
         {
@@ -124,4 +135,25 @@ public partial class App
         _code = _initialCode;
         _result = null;
     }
+
+    private StepTrace? Trace => _result?.Trace is { Steps.Count: > 0 } trace ? trace : null;
+
+    private StepInfo CurrentStep => Trace!.Steps[_stepIndex];
+
+    private string[] CodeLines => (_compiledCode ?? string.Empty).Replace("\r\n", "\n").Split('\n');
+
+    private void GoToStep(int index) => _stepIndex = Math.Clamp(index, 0, Trace!.Steps.Count - 1);
+
+    private void OnStepKey(KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "ArrowRight": GoToStep(_stepIndex + 1); break;
+            case "ArrowLeft": GoToStep(_stepIndex - 1); break;
+            case "Home": GoToStep(0); break;
+            case "End": GoToStep(Trace!.Steps.Count - 1); break;
+        }
+    }
+
+    private static int ArrowY(int row) => row * RowHeight + RowHeight / 2;
 }

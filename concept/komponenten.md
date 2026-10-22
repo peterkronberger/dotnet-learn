@@ -40,7 +40,7 @@ Nachrichtenprotokoll (S7, vorhanden; Ursprungsprüfung `window.location.origin` 
 - Prism-Overlay für Syntaxfarben, Zeilen-Hervorhebung, Fehlermarkierung – 🔒 S4.
 - Schleifenwächter (Abbruch nach ca. 3 s mit deutscher Meldung und Zeilennummer) – 🔒 S3.
 - Compilerfehler als Liste mit Zeile/Spalte (vorhanden) + deutsche Erklärung häufiger Fehler zusätzlich zur Originalmeldung (geplant).
-- Schritt-für-Schritt-Visualisierung (Variablen, Stack/Heap) nur wo sinnvoll – 🔒 S5.
+- Schritt-für-Schritt-Visualisierung (Variablen, Heap-Modell), pro Runner per `trace` einschaltbar – vorhanden (S5, [ADR 0007](../docs-dev/adr/0007-step-view.md)).
 - Fest vorgeladene Pakete (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – 🔒 S6. Keine freie NuGet-Installation.
 - `InvariantGlobalization=true`: Zahlen erscheinen immer mit Punkt (`3.5`). Die CI muss mit `InvariantCulture` laufen, damit gezeigte Ausgaben übereinstimmen.
 
