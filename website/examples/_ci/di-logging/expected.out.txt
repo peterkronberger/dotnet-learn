@@ -1,0 +1,5 @@
+Information: Program: Singleton: same instance? True
+Information: Program: Transient: same instance? False
+Information: Program: Scoped: same instance within a scope? True
+Information: Program: Scoped: same instance across scopes? False
+Warning: TransientService: Hello, SecLog!
