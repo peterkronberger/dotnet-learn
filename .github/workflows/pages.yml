@@ -1,4 +1,4 @@
-name: Lernseite bauen und auf GitHub Pages veröffentlichen
+name: Build learning page and publish to GitHub pages
 
 on:
   push:
