@@ -10,13 +10,16 @@
     </div>
 
     <label for="editor" class="pg-sr">C#-Quellcode</label>
-    <textarea id="editor"
-              class="pg-editor"
-              spellcheck="false"
-              autocapitalize="off"
-              autocomplete="off"
-              @bind="_code"
-              @bind:event="oninput"></textarea>
+    <div class="pg-editor-wrap">
+        <pre id="editor-highlight" class="pg-highlight" aria-hidden="true"></pre>
+        <textarea id="editor"
+                  class="pg-editor"
+                  spellcheck="false"
+                  autocapitalize="off"
+                  autocomplete="off"
+                  @bind="_code"
+                  @bind:event="oninput"></textarea>
+    </div>
     <p class="pg-hint">
         Strg/⌘ + Enter führt aus. Tab rückt ein, Esc und danach Tab verlässt das Feld.
         Endlosschleifen und endlose Rekursion werden nach etwa 3 Sekunden abgebrochen; währenddessen ist der Tab blockiert, weil der Code im Hauptthread des Browsers läuft.

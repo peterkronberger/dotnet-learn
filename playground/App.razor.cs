@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace Playground;
 
@@ -8,6 +9,7 @@ public partial class App
 
     [Inject] private NavigationManager Navigation { get; set; } = default!;
     [Inject] private CSharpRunner Runner { get; set; } = default!;
+    [Inject] private IJSRuntime Js { get; set; } = default!;
 
     private string _initialCode = Samples.Default;
     private string _code = Samples.Default;
@@ -28,6 +30,23 @@ public partial class App
                 _initialCode = decoded;
                 _code = decoded;
             }
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Syntax colors and line marks live in index.html (pgEditor); they are re-applied after every render.
+        var diagnostics = _result?.Diagnostics ?? [];
+        var errorLines = diagnostics.Where(d => d.IsError && d.Line is not null).Select(d => d.Line!.Value).Distinct().ToArray();
+        var warningLines = diagnostics.Where(d => !d.IsError && d.Line is not null).Select(d => d.Line!.Value).Distinct().ToArray();
+
+        try
+        {
+            await Js.InvokeVoidAsync("pgEditor.refresh", errorLines, warningLines);
+        }
+        catch (JSException)
+        {
+            // The editor still works as a plain textarea without the overlay.
         }
     }
 

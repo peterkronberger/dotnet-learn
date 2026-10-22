@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Playground;
 
 /// <summary>Eine Zeile der Compiler-Ausgabe.</summary>
-public sealed record DiagnosticLine(bool IsError, string Text);
+public sealed record DiagnosticLine(bool IsError, string Text, int? Line = null);
 
 /// <summary>Ergebnis eines Durchlaufs aus Kompilieren und Ausführen.</summary>
 public sealed record RunResult(
@@ -214,7 +214,8 @@ public sealed class CSharpRunner
         {
             var position = diagnostic.Location.GetLineSpan().StartLinePosition;
             return new DiagnosticLine(isError,
-                $"{kind} {diagnostic.Id} (Zeile {position.Line + 1}, Spalte {position.Character + 1}): {message}");
+                $"{kind} {diagnostic.Id} (Zeile {position.Line + 1}, Spalte {position.Character + 1}): {message}",
+                position.Line + 1);
         }
 
         return new DiagnosticLine(isError, $"{kind} {diagnostic.Id}: {message}");

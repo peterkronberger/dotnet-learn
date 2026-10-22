@@ -13,6 +13,14 @@
   --err-bg: #fef3f2;
   --warn: #92400e;
   --warn-bg: #fffbeb;
+  --tok-keyword: #5b21b6;
+  --tok-string: #166534;
+  --tok-number: #9a3412;
+  --tok-comment: #4b5173;
+  --tok-meta: #075985;
+  --line-current: rgba(79, 70, 229, 0.1);
+  --line-err: #fee4e2;
+  --line-warn: #fef3c7;
   --mono: ui-monospace, SFMono-Regular, 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
@@ -31,6 +39,14 @@
     --err-bg: #331616;
     --warn: #fcd34d;
     --warn-bg: #2d2410;
+    --tok-keyword: #c4b5fd;
+    --tok-string: #86efac;
+    --tok-number: #fdba74;
+    --tok-comment: #a3a9d1;
+    --tok-meta: #7dd3fc;
+    --line-current: rgba(165, 180, 252, 0.14);
+    --line-err: #4a1d1d;
+    --line-warn: #3d3010;
   }
 }
 
@@ -48,6 +64,14 @@
   --err-bg: #331616;
   --warn: #fcd34d;
   --warn-bg: #2d2410;
+  --tok-keyword: #c4b5fd;
+  --tok-string: #86efac;
+  --tok-number: #fdba74;
+  --tok-comment: #a3a9d1;
+  --tok-meta: #7dd3fc;
+  --line-current: rgba(165, 180, 252, 0.14);
+  --line-err: #4a1d1d;
+  --line-warn: #3d3010;
 }
 
 :root[data-theme='light'] {
@@ -133,6 +157,76 @@ body {
   line-height: 1.55;
   tab-size: 4;
   resize: vertical;
+  display: block;
+}
+
+.pg-editor-wrap {
+  position: relative;
+}
+
+/* The overlay is only active once editor.js has run; without it the textarea stays readable. */
+.pg-highlight {
+  display: none;
+}
+
+.pg-overlay .pg-highlight {
+  display: block;
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  scrollbar-gutter: stable;
+  pointer-events: none;
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  tab-size: 4;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+  letter-spacing: normal;
+  color: var(--text);
+}
+
+.pg-overlay .pg-editor {
+  position: relative;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text);
+  overflow: auto;
+  scrollbar-gutter: stable;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+/* Background of the wrapper replaces the textarea background. */
+.pg-overlay {
+  background: var(--surface);
+  border-radius: 0.75rem;
+}
+
+.pg-line {
+  display: block;
+  min-height: 1.55em;
+}
+
+.pg-line-current { background: var(--line-current); }
+.pg-line-warn { background: var(--line-warn); box-shadow: inset 3px 0 0 var(--warn); }
+.pg-line-err { background: var(--line-err); box-shadow: inset 3px 0 0 var(--err); }
+
+.tok-keyword { color: var(--tok-keyword); font-weight: 600; }
+.tok-string { color: var(--tok-string); }
+.tok-number { color: var(--tok-number); }
+.tok-comment { color: var(--tok-comment); font-style: italic; }
+.tok-meta { color: var(--tok-meta); }
+
+@media (forced-colors: active) {
+  .pg-overlay .pg-highlight { display: none; }
+  .pg-overlay .pg-editor { color: CanvasText; background: Canvas; }
 }
 
 .pg-hint,
