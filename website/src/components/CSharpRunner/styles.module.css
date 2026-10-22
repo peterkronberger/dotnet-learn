@@ -1,0 +1,17 @@
+.wrapper {
+  margin: 1.5rem 0;
+}
+
+.frame {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--dl-border);
+  border-radius: var(--ifm-global-radius);
+  background: var(--dl-surface);
+}
+
+.note {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--ifm-color-emphasis-700);
+}

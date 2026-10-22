@@ -1,0 +1,218 @@
+/* Farben entsprechen der Lernseite (Indigo). Kontrast Text/Hintergrund jeweils mindestens 4,5:1. */
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff;
+  --surface: #f5f6ff;
+  --border: #d9dcef;
+  --text: #1b1f3b;
+  --muted: #4b5173;
+  --accent: #4f46e5;
+  --accent-text: #ffffff;
+  --ok-bg: #ecfdf3;
+  --err: #b42318;
+  --err-bg: #fef3f2;
+  --warn: #92400e;
+  --warn-bg: #fffbeb;
+  --mono: ui-monospace, SFMono-Regular, 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #151933;
+    --surface: #1b2040;
+    --border: #2a3060;
+    --text: #e8eaff;
+    --muted: #b4b9dc;
+    --accent: #a5b4fc;
+    --accent-text: #11142b;
+    --ok-bg: #0f2a1c;
+    --err: #fca5a5;
+    --err-bg: #331616;
+    --warn: #fcd34d;
+    --warn-bg: #2d2410;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #151933;
+  --surface: #1b2040;
+  --border: #2a3060;
+  --text: #e8eaff;
+  --muted: #b4b9dc;
+  --accent: #a5b4fc;
+  --accent-text: #11142b;
+  --ok-bg: #0f2a1c;
+  --err: #fca5a5;
+  --err-bg: #331616;
+  --warn: #fcd34d;
+  --warn-bg: #2d2410;
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+.pg {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem 1rem;
+}
+
+.pg-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pg-title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.pg-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pg-btn {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.pg-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.pg-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.pg-btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.pg-editor {
+  width: 100%;
+  min-height: 11rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  tab-size: 4;
+  resize: vertical;
+}
+
+.pg-hint,
+.pg-meta {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.pg-output {
+  margin: 0;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--ok-bg);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.pg-diags {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.pg-diags li {
+  padding: 0.45rem 0.7rem;
+  border-radius: 0.5rem;
+  border-left: 4px solid;
+}
+
+.pg-err {
+  color: var(--err);
+  background: var(--err-bg);
+  border-color: var(--err);
+}
+
+.pg-warn {
+  color: var(--warn);
+  background: var(--warn-bg);
+  border-color: var(--warn);
+}
+
+.pg-loading {
+  padding: 1rem;
+  color: var(--muted);
+}
+
+.pg-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+/* Blazor blendet das Element bei einem Absturz selbst ein (display: block). */
+#blazor-error-ui {
+  display: none;
+  position: fixed;
+  inset: auto 0 0 0;
+  padding: 0.6rem 1rem;
+  background: var(--err-bg);
+  color: var(--err);
+}

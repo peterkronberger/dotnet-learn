@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Playground</AssemblyName>
+    <RootNamespace>Playground</RootNamespace>
+
+    <!-- Roslyn nutzt Reflection; Trimming würde den Compiler und die Framework-
+         Assemblies beschneiden, die der Nutzercode später braucht. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <!-- GitHub Pages liefert Brotli nicht nativ aus; die Dateien werden stattdessen
+         vom Server per gzip übertragen. -->
+    <BlazorEnableCompression>false</BlazorEnableCompression>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+  </ItemGroup>
+
+  <!--
+    Referenz-Assemblies für den Roslyn-Compiler.
+    Der Nutzercode wird gegen die Referenz-Assemblies des .NET-SDKs kompiliert (reine Metadaten,
+    wenige hundert KB) und danach auf der Laufzeit ausgeführt, die Blazor ohnehin lädt.
+    Die DLLs werden als Ressourcen in Playground.dll eingebettet und beim ersten Start gelesen.
+  -->
+  <Target Name="EmbedReferenceAssemblies" BeforeTargets="AssignTargetPaths">
+    <PropertyGroup>
+      <RefPackDir>$(NetCoreTargetingPackRoot)/Microsoft.NETCore.App.Ref/$(BundledNETCoreAppPackageVersion)/ref/$(TargetFramework)/</RefPackDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ReferenceName Include="System.Runtime" />
+      <ReferenceName Include="System.Runtime.Extensions" />
+      <ReferenceName Include="System.Runtime.Numerics" />
+      <ReferenceName Include="System.Console" />
+      <ReferenceName Include="System.Collections" />
+      <ReferenceName Include="System.Collections.Concurrent" />
+      <ReferenceName Include="System.Linq" />
+      <ReferenceName Include="System.Memory" />
+      <ReferenceName Include="System.IO" />
+      <ReferenceName Include="System.Globalization" />
+      <ReferenceName Include="System.Text.Encoding.Extensions" />
+      <ReferenceName Include="System.Text.RegularExpressions" />
+      <ReferenceName Include="System.Text.Json" />
+      <ReferenceName Include="System.Threading" />
+      <ReferenceName Include="System.Threading.Tasks" />
+    </ItemGroup>
+
+    <Error Condition="!Exists('$(RefPackDir)System.Runtime.dll')"
+           Text="Referenz-Assemblies nicht gefunden unter '$(RefPackDir)'. Prüfe, ob das .NET-SDK für $(TargetFramework) installiert ist." />
+
+    <ItemGroup>
+      <EmbeddedResource Include="$(RefPackDir)%(ReferenceName.Identity).dll"
+                        LogicalName="refs/%(ReferenceName.Identity).dll"
+                        Condition="Exists('$(RefPackDir)%(ReferenceName.Identity).dll')" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -55,3 +55,8 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Node / Docusaurus (website/)
+node_modules/
+website/build/
+website/.docusaurus/

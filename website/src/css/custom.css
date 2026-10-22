@@ -1,0 +1,116 @@
+/**
+ * Designentscheidungen (siehe docs/lernprinzipien):
+ *  - Kontrast mindestens 4,5:1 für Fließtext (WCAG 2.2, 1.4.3)
+ *  - begrenzte Zeilenlänge (~72 Zeichen) und großzügiger Zeilenabstand für lange Lesephasen
+ *  - ruhige Fläche, eine Akzentfarbe, Code immer in Monospace
+ */
+
+:root {
+  --ifm-color-primary: #4f46e5;
+  --ifm-color-primary-dark: #4338ca;
+  --ifm-color-primary-darker: #3f36c0;
+  --ifm-color-primary-darkest: #342da0;
+  --ifm-color-primary-light: #6a62ea;
+  --ifm-color-primary-lighter: #766ff0;
+  --ifm-color-primary-lightest: #9a95f3;
+
+  --ifm-font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: ui-monospace, SFMono-Regular, 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
+  --ifm-font-size-base: 106%;
+  --ifm-line-height-base: 1.7;
+  --ifm-heading-font-weight: 700;
+  --ifm-leading-desktop: 1.4;
+
+  --ifm-global-radius: 0.75rem;
+  --ifm-code-font-size: 92%;
+  --ifm-navbar-shadow: 0 1px 0 rgba(15, 23, 42, 0.08);
+
+  --dl-surface: #ffffff;
+  --dl-surface-alt: #f5f6ff;
+  --dl-border: #e2e4f0;
+  --dl-ok: #15803d;
+  --dl-ok-bg: #ecfdf3;
+  --dl-bad: #b42318;
+  --dl-bad-bg: #fef3f2;
+
+  --docusaurus-highlighted-code-line-bg: rgba(79, 70, 229, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #a5b4fc;
+  --ifm-color-primary-dark: #8c9dfb;
+  --ifm-color-primary-darker: #7f92fa;
+  --ifm-color-primary-darkest: #5a73f7;
+  --ifm-color-primary-light: #bec9fd;
+  --ifm-color-primary-lighter: #cbd3fd;
+  --ifm-color-primary-lightest: #f1f3ff;
+
+  --ifm-background-color: #0f1226;
+  --ifm-background-surface-color: #151933;
+  --dl-surface: #151933;
+  --dl-surface-alt: #1b2040;
+  --dl-border: #2a3060;
+  --dl-ok: #4ade80;
+  --dl-ok-bg: #0f2a1c;
+  --dl-bad: #fca5a5;
+  --dl-bad-bg: #331616;
+
+  --docusaurus-highlighted-code-line-bg: rgba(165, 180, 252, 0.15);
+}
+
+/* Lesbarkeit: begrenzte Zeilenlänge im Dokumenttext */
+.theme-doc-markdown {
+  max-width: 72ch;
+}
+
+.theme-doc-markdown h1 {
+  font-size: 2.1rem;
+  letter-spacing: -0.01em;
+}
+
+.markdown > h2 {
+  margin-top: 2.5rem;
+}
+
+/* Code: weiche Karten statt harter Kästen */
+.theme-code-block {
+  border: 1px solid var(--dl-border);
+  border-radius: var(--ifm-global-radius);
+  box-shadow: none;
+}
+
+/* Einklappbare Bereiche (<details>) */
+.markdown details,
+details.alert {
+  border: 1px solid var(--dl-border);
+  border-radius: var(--ifm-global-radius);
+  background: var(--dl-surface-alt);
+  padding: 0.25rem 1rem;
+  margin: 1.25rem 0;
+}
+
+.markdown details > summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0.5rem 0;
+}
+
+/* Hinweisboxen */
+.alert {
+  border-radius: var(--ifm-global-radius);
+  box-shadow: none;
+}
+
+/* Sichtbarer Tastaturfokus */
+:focus-visible {
+  outline: 3px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
