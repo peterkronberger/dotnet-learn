@@ -16,21 +16,61 @@ public partial class App
     private bool _running;
     private RunResult? _result;
     private string? _compiledCode;
+    private string? _instanceId;
+    private string? _testsCode;
 
     protected override void OnInitialized()
     {
         // Die Lernseite übergibt Beispielcode als Base64url im URL-Fragment (#code=...).
+        // Weitere Schlüssel (spike S7): &id=<instance id>, &tests=<Base64url test code>.
         var fragment = Navigation.ToAbsoluteUri(Navigation.Uri).Fragment;
 
         if (fragment.StartsWith(FragmentPrefix, StringComparison.Ordinal))
         {
-            var decoded = CodeCodec.TryDecode(fragment[FragmentPrefix.Length..]);
+            var parts = fragment[FragmentPrefix.Length..].Split('&');
+            var decoded = CodeCodec.TryDecode(parts[0]);
 
             if (!string.IsNullOrWhiteSpace(decoded))
             {
                 _initialCode = decoded;
                 _code = decoded;
             }
+
+            foreach (var part in parts.Skip(1))
+            {
+                if (part.StartsWith("id=", StringComparison.Ordinal))
+                {
+                    _instanceId = Uri.UnescapeDataString(part[3..]);
+                }
+                else if (part.StartsWith("tests=", StringComparison.Ordinal))
+                {
+                    _testsCode = CodeCodec.TryDecode(part[6..]);
+                }
+            }
+        }
+    }
+
+    // Reports the result to the embedding page (spike S7, ADR 0006). The origin check
+    // (window.location.origin) happens in index.html (pgBridge.report).
+    private async Task ReportAsync(RunResult result)
+    {
+        var message = new
+        {
+            type = "run-result",
+            id = _instanceId,
+            success = result.Success,
+            output = result.Output,
+            diagnostics = result.Diagnostics.Select(d => new { isError = d.IsError, text = d.Text, line = d.Line }).ToArray(),
+            tests = result.Tests?.Select(t => new { name = t.Name, visible = t.Visible, passed = t.Passed, feedback = t.Feedback }).ToArray(),
+        };
+
+        try
+        {
+            await Js.InvokeVoidAsync("pgBridge.report", message);
+        }
+        catch (JSException)
+        {
+            // Standalone use: no embedding page to report to.
         }
     }
 
@@ -69,12 +109,14 @@ public partial class App
 
         try
         {
-            _result = await Runner.RunAsync(_code);
+            _result = await Runner.RunAsync(_code, _testsCode);
         }
         finally
         {
             _running = false;
         }
+
+        await ReportAsync(_result);
     }
 
     private void Reset()

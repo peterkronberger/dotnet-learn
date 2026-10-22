@@ -8,12 +8,16 @@ namespace Playground;
 /// <summary>Eine Zeile der Compiler-Ausgabe.</summary>
 public sealed record DiagnosticLine(bool IsError, string Text, int? Line = null);
 
+/// <summary>Ergebnis eines Aufgabentests. Bei versteckten Tests (<c>Visible = false</c>) ist der Name neutral.</summary>
+public sealed record TestOutcome(string Name, bool Visible, bool Passed, string Feedback);
+
 /// <summary>Ergebnis eines Durchlaufs aus Kompilieren und Ausführen.</summary>
 public sealed record RunResult(
     bool Success,
     string Output,
     IReadOnlyList<DiagnosticLine> Diagnostics,
-    TimeSpan Duration)
+    TimeSpan Duration,
+    IReadOnlyList<TestOutcome>? Tests = null)
 {
     public string Summary => Success
         ? $"Fertig in {Duration.TotalMilliseconds:0} ms"
@@ -36,6 +40,8 @@ public sealed class CSharpRunner
         "global using System.Threading.Tasks;\n";
 
     private const int TimeoutSeconds = 3;
+    private const string TestsPath = "Tests.cs";
+    private const string TestsTypeName = "TaskTests";
 
     private static readonly Lazy<IReadOnlyList<MetadataReference>> References = new(LoadReferences);
 
@@ -60,13 +66,22 @@ public sealed class CSharpRunner
         return references;
     }
 
-    public async Task<RunResult> RunAsync(string code)
+    /// <param name="code">Learner code.</param>
+    /// <param name="testsCode">
+    /// Optional test code (spike S7, ADR 0006). It declares <c>public static class TaskTests</c> with
+    /// <c>public static (string Name, bool Visible, bool Passed, string Feedback)[] Run()</c>.
+    /// If given, the tests run instead of the program's entry point.
+    /// </param>
+    public async Task<RunResult> RunAsync(string code, string? testsCode = null)
     {
         var started = Stopwatch.GetTimestamp();
 
         var parseOptions = new CSharpParseOptions(LanguageVersion.Latest);
         var usingsTree = CSharpSyntaxTree.ParseText(GlobalUsings, parseOptions, path: "GlobalUsings.cs");
         var userTree = CSharpSyntaxTree.ParseText(code, parseOptions, path: "Program.cs");
+        var testsTree = string.IsNullOrWhiteSpace(testsCode)
+            ? null
+            : CSharpSyntaxTree.ParseText(testsCode, parseOptions, path: TestsPath);
 
         // The guard is inserted for execution only. Diagnostics come from the unmodified code,
         // so line and column numbers stay exact.
@@ -74,13 +89,13 @@ public sealed class CSharpRunner
         var guardedRoot = LoopGuardRewriter.Rewrite(userTree);
         var guardedTree = CSharpSyntaxTree.Create((CSharpSyntaxNode)guardedRoot, parseOptions, path: "Program.cs");
 
-        var guarded = Compile(new[] { usingsTree, guardedTree, guardTree });
+        var guarded = Compile(WithTests([usingsTree, guardedTree, guardTree], testsTree));
         var diagnostics = new List<DiagnosticLine>();
         var image = guarded.Success ? guarded.Image : null;
 
         if (guarded.Diagnostics.Count > 0 || image is null)
         {
-            var plain = Compile(new[] { usingsTree, userTree });
+            var plain = Compile(WithTests([usingsTree, userTree], testsTree));
             diagnostics = plain.Diagnostics.Select(FormatDiagnostic).ToList();
             if (!plain.Success)
             {
@@ -92,6 +107,7 @@ public sealed class CSharpRunner
         }
 
         var output = new StringWriter();
+        IReadOnlyList<TestOutcome>? tests = null;
         var originalOut = Console.Out;
         var originalError = Console.Error;
         Console.SetOut(output);
@@ -102,22 +118,33 @@ public sealed class CSharpRunner
             var loaded = Assembly.Load(image);
             loaded.GetType(LoopGuardRewriter.GuardTypeName)
                 ?.GetMethod("Reset")?.Invoke(null, new object[] { Stopwatch.Frequency * TimeoutSeconds });
-            var entryPoint = ResolveEntryPoint(loaded)
-                ?? throw new InvalidOperationException("Es wurde kein Einstiegspunkt gefunden.");
-
-            object?[]? arguments = entryPoint.GetParameters().Length == 0
-                ? null
-                : new object?[] { Array.Empty<string>() };
-
-            if (entryPoint.Invoke(null, arguments) is Task task)
+            if (testsTree is not null)
             {
-                await task;
+                tests = RunTests(loaded);
+            }
+            else
+            {
+                var entryPoint = ResolveEntryPoint(loaded)
+                    ?? throw new InvalidOperationException("Es wurde kein Einstiegspunkt gefunden.");
+
+                object?[]? arguments = entryPoint.GetParameters().Length == 0
+                    ? null
+                    : new object?[] { Array.Empty<string>() };
+
+                if (entryPoint.Invoke(null, arguments) is Task task)
+                {
+                    await task;
+                }
             }
         }
         catch (TargetInvocationException ex)
         {
             var inner = ex.InnerException ?? ex;
-            if (!TryWriteTimeout(inner, output))
+            if (testsTree is not null)
+            {
+                tests = [new TestOutcome("Aufgabentests", true, false, $"Die Tests konnten nicht ausgeführt werden: {inner.GetType().Name}: {inner.Message}")];
+            }
+            else if (!TryWriteTimeout(inner, output))
             {
                 output.WriteLine($"Unbehandelte Ausnahme: {inner.GetType().Name}: {inner.Message}");
             }
@@ -135,7 +162,23 @@ public sealed class CSharpRunner
             Console.SetError(originalError);
         }
 
-        return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started));
+        return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started), tests);
+    }
+
+    private static IEnumerable<SyntaxTree> WithTests(IEnumerable<SyntaxTree> trees, SyntaxTree? testsTree) =>
+        testsTree is null ? trees : trees.Append(testsTree);
+
+    private static IReadOnlyList<TestOutcome> RunTests(Assembly assembly)
+    {
+        var run = assembly.GetType(TestsTypeName)?.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
+        if (run?.Invoke(null, null) is not (string Name, bool Visible, bool Passed, string Feedback)[] raw)
+        {
+            return [new TestOutcome("Aufgabentests", true, false, "Die Aufgabe enthält keine ausführbaren Tests.")];
+        }
+
+        var hidden = 0;
+        return raw.Select(t => new TestOutcome(
+            t.Visible ? t.Name : $"Versteckter Test {++hidden}", t.Visible, t.Passed, t.Feedback)).ToList();
     }
 
     private static (bool Success, byte[] Image, List<Diagnostic> Diagnostics) Compile(IEnumerable<SyntaxTree> trees)
@@ -209,6 +252,12 @@ public sealed class CSharpRunner
         var isError = diagnostic.Severity == DiagnosticSeverity.Error;
         var kind = isError ? "Fehler" : "Warnung";
         var message = diagnostic.GetMessage();
+
+        if (diagnostic.Location.IsInSource && diagnostic.Location.SourceTree?.FilePath == TestsPath)
+        {
+            // No line number: the learner cannot see the test code.
+            return new DiagnosticLine(isError, $"{kind} {diagnostic.Id} (Prüfcode): {message}");
+        }
 
         if (diagnostic.Location.IsInSource)
         {
