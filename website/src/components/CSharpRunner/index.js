@@ -30,8 +30,8 @@ function splitLines(text) {
  *  - id:       stabiler Schlüssel dieser Instanz (Standard: automatisch)
  *  - predict:  Eingabefeld pro Ausgabezeile; nach dem Ausführen ✓/✗ pro Zeile (braucht `expected`)
  *  - expected: erwartete Ausgabe, bestimmt nur die Anzahl der Felder; geprüft wird gegen die echte Ausgabe
- *  - tests:    C#-Prüfcode (siehe docs-dev/adr/0006-runner-messages.md); der Runner führt dann die Tests aus
- *  - trace:    Schrittansicht im Runner einschalten (Variablen, Heap-Modell; docs-dev/adr/0007-step-view.md)
+ *  - tests:    C#-Prüfcode (siehe concept/komponenten.md); der Runner führt dann die Tests aus
+ *  - trace:    Schrittansicht im Runner einschalten (Variablen, Heap-Modell)
  *  - onResult: Callback mit der Nachricht `run-result` des Runners
  *
  * Der Runner meldet `{type: 'run-result', id, success, output, diagnostics, tests?}` per postMessage.

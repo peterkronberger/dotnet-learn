@@ -16,7 +16,7 @@ public sealed record StepInfo(int Line, IReadOnlyList<VariableInfo> Variables, I
 public sealed record StepTrace(IReadOnlyList<StepInfo> Steps, bool Truncated);
 
 /// <summary>
-/// Receives the calls inserted by <see cref="StepTraceRewriter"/> and builds the step list (spike S5, ADR 0007).
+/// Receives the calls inserted by <see cref="StepTraceRewriter"/> and builds the step list (spike S5).
 /// Reference-type values become numbered heap objects; strings and value types are shown inline.
 /// Only collections and public members are read, never lazy sequences (enumerating them would run user code twice).
 /// </summary>

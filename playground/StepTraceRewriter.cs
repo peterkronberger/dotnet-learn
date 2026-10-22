@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Playground;
 
 /// <summary>
-/// Spike S5 (ADR 0007): inserts a call to the trace hook before every statement of a block and
+/// Spike S5: inserts a call to the trace hook before every statement of a block and
 /// every top-level statement. The call receives the line and the locals declared so far.
 /// Like <see cref="LoopGuardRewriter"/> the insertions contain no line breaks, so line numbers stay the same.
 /// Tracked: parameters and locals with an initializer, <c>for</c>/<c>foreach</c> variables.

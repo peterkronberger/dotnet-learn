@@ -12,7 +12,6 @@ Dieses Dokument ist verbindlich für jede Arbeit im Repo – von Menschen und vo
 | `website/examples/` | **Alle** C#-Beispiele als `.cs`-Dateien (eine Quelle für alle Sprachen, von CI geprüft) – siehe S1/S2 |
 | `playground/` | Blazor WebAssembly + Roslyn; wird unter `/runner/` veröffentlicht und per iframe eingebettet |
 | `concept/` | Lernkonzept (unten importiert) |
-| `docs-dev/adr/` | Entscheidungsnotizen (ADR) zu Spikes und Architektur |
 | `.github/workflows/` | `pages.yml` (Build + Deploy), `claude-*.yml` (Issue-Automatisierung) |
 
 ## Befehle
@@ -26,7 +25,7 @@ cd website && npm start                       # Dev-Server: http://localhost:300
 dotnet build playground/Playground.csproj     # Build-Prüfung
 dotnet run --project playground               # lokal starten
 
-# Beispielcode prüfen (kompilieren + Ausgaben mit <name>.out.txt abgleichen), siehe ADR 0003
+# Beispielcode prüfen (kompilieren + Ausgaben mit <name>.out.txt abgleichen), siehe S2
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # Snapshots bewusst neu schreiben, Diff prüfen
 ```
@@ -69,23 +68,34 @@ Zusätzlich: `npm run build` fehlerfrei, keine toten Links, Abschnitt „Weiterl
 
 ## Status der Spikes (Prototyp-Aufgaben)
 
-Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · läuft · entschieden (mit ADR-Link).
+Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · läuft · entschieden. Die Entscheidungen stehen unten in Kurzform.
 
 | # | Spike | Blockiert | Status |
 | --- | --- | --- | --- |
-| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden ([ADR 0001](docs-dev/adr/0001-roslyn-5.md)); manuelle Deploy-Prüfung ausstehend |
-| S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden ([ADR 0002](docs-dev/adr/0002-code-import.md)) |
-| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft ([ADR 0004](docs-dev/adr/0004-example-ci.md)) |
-| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden ([ADR 0003](docs-dev/adr/0003-loop-guard.md)); manuelle Prüfung im Browser ausstehend |
-| S4 | Prism-Overlay im Editor | Modul 2 | entschieden ([ADR 0005](docs-dev/adr/0005-prism-overlay.md)); manuelle Prüfung im Browser ausstehend |
-| S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | entschieden ([ADR 0007](docs-dev/adr/0007-step-view.md)); manuelle Prüfung im Browser ausstehend |
-| S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | entschieden ([ADR 0008](docs-dev/adr/0008-microsoft-extensions.md)); manuelle Prüfung im Browser ausstehend |
-| S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden ([ADR 0006](docs-dev/adr/0006-runner-messages.md)); manuelle Prüfung im Browser ausstehend |
+| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden; manuelle Deploy-Prüfung ausstehend |
+| S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden |
+| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft |
+| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden; manuelle Prüfung im Browser ausstehend |
+| S4 | Prism-Overlay im Editor | Modul 2 | entschieden; manuelle Prüfung im Browser ausstehend |
+| S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | entschieden; manuelle Prüfung im Browser ausstehend |
+| S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | entschieden; manuelle Prüfung im Browser ausstehend |
+| S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden; manuelle Prüfung im Browser ausstehend |
+
+### Entscheidungen in Kurzform
+
+- **S0:** Roslyn 5.9.0 (C# 14), +0,7 MiB. Fallback: C#-14-Features nur nicht ausführbar.
+- **S1:** `.cs`-Dateien per `raw-loader` in `<CSharpRunner>` und `<CodeBlock>`.
+- **S2:** `tools/check-examples.sh` führt jede `*.cs` aus (Invariant Globalization) und vergleicht mit `<name>.out.txt`; `*.snippet.cs` werden übersprungen; EF Core, Minimal API und xUnit laufen als Projekte unter `website/examples/_ci/<name>/`.
+- **S3:** Roslyn-Rewriter fügt Zeitprüfung ein (ca. 3 s ab Start, Wanduhrzeit). Kein Wächter in Operatoren, Accessors, Ausdruckskörpern; `catch (Exception)` im Nutzercode fängt ihn ab.
+- **S4:** Eigener Tokenizer (`playground/wwwroot/js/editor.js`, kein Prism) färbt ein `<pre>` hinter dem transparenten `<textarea>`. Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Padding, Rahmen), sonst sitzt der Cursor falsch. Fallback: reines `<textarea>`.
+- **S5:** Roslyn-Instrumentierung protokolliert Zeile und Variablen pro Schritt (`trace`). Stack/Heap bleibt ein Modell.
+- **S6:** Feste Paketmenge `Microsoft.Extensions.DependencyInjection` und `…Logging` (+0,6 MiB); Configuration/Hosting fehlen.
+- **S7:** `postMessage`-Protokoll siehe `concept/komponenten.md`; Prüfcode über `TaskTests.Run()`; Fallback: Aufgabe mit eingeklappter Musterlösung.
 
 ## Arbeitsweise
 
 - Größere Aufgaben als Issue mit Label `claude:auto-architect`, kleine mit `claude:auto-implement` (siehe `.github/workflows/claude-*.yml`). Abhängigkeiten im Issue als eigene Zeile `Depends on #<nummer>`.
-- Spikes enden immer mit einer ADR in `docs-dev/adr/` und einer Aktualisierung der Statustabelle oben.
+- Spikes enden immer mit einem Eintrag unter „Entscheidungen in Kurzform“ und einer Aktualisierung der Statustabelle oben.
 - Änderungen an `.github/workflows/` brauchen einen Menschen (so in `claude-implement.yml` festgelegt).
 - Halbjährliche Review (nächste: 2027-04): Versions- und Historienlektion (Modul 0), KI-Modul (Studienlage, Links), tote Links.
 

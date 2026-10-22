@@ -209,14 +209,15 @@ body {
   border-radius: 0.75rem;
 }
 
-.pg-line {
+/* Overlay lines must not change text metrics; the step view uses its own .pg-line classes. */
+.pg-hl-line {
   display: block;
   min-height: 1.55em;
 }
 
-.pg-line-current { background: var(--line-current); }
-.pg-line-warn { background: var(--line-warn); box-shadow: inset 3px 0 0 var(--warn); }
-.pg-line-err { background: var(--line-err); box-shadow: inset 3px 0 0 var(--err); }
+.pg-hl-line-current { background: var(--line-current); }
+.pg-hl-line-warn { background: var(--line-warn); box-shadow: inset 3px 0 0 var(--warn); }
+.pg-hl-line-err { background: var(--line-err); box-shadow: inset 3px 0 0 var(--err); }
 
 .tok-keyword { color: var(--tok-keyword); font-weight: 600; }
 .tok-string { color: var(--tok-string); }
@@ -311,7 +312,7 @@ body {
   color: var(--err);
 }
 
-/* Step view (spike S5, ADR 0007) */
+/* Step view (spike S5) */
 .pg-steps { margin-top: 1rem; }
 .pg-steps-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .pg-code-lines { list-style: none; margin: 0.5rem 0; padding: 0; font-family: var(--mono, monospace); font-size: 0.9rem; }

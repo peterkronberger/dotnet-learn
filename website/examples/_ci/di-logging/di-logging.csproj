@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Same package set as the playground (ADR 0008). -->
+    <!-- Same package set as the playground (S6). -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.*" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.*" />
     <Compile Include="../../s6/di-logging.snippet.cs" Link="Program.cs" />

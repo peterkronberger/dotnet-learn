@@ -17,7 +17,7 @@ Aufklappbares: `<details><summary>Lösung und Erklärung anzeigen</summary> … 
 
 Heute: `code` (String), `height` (px, Standard 460). Bettet `/runner/` als iframe ein, Code als Base64url im URL-Fragment, `loading="lazy"`, Theme per `postMessage` (`{type: 'theme', value}`).
 
-Vorhanden (S7, [ADR 0006](../docs-dev/adr/0006-runner-messages.md)):
+Vorhanden (S7):
 - `id`: stabiler Schlüssel der Instanz (Standard: automatisch); ordnet `run-result` der richtigen Instanz zu.
 - `predict` (bool) + `expected` (String, Ausgabe-Snapshot): ein Eingabefeld pro erwarteter Ausgabezeile; nach „Ausführen“ ✓/✗ pro Zeile, sachlich formuliert, Ergebnis in `aria-live`-Region. Geprüft wird gegen die echte Ausgabe.
 - `tests` (String): C#-Prüfcode mit `public static class TaskTests` und `Run()` (Tupel `Name, Visible, Passed, Feedback`); der Runner führt dann nur die Tests aus. Ergebnis pro Test, versteckte Tests mit neutralem Namen.
@@ -40,7 +40,7 @@ Nachrichtenprotokoll (S7, vorhanden; Ursprungsprüfung `window.location.origin` 
 - Prism-Overlay für Syntaxfarben, Zeilen-Hervorhebung, Fehlermarkierung – 🔒 S4.
 - Schleifenwächter (Abbruch nach ca. 3 s mit deutscher Meldung und Zeilennummer) – 🔒 S3.
 - Compilerfehler als Liste mit Zeile/Spalte (vorhanden) + deutsche Erklärung häufiger Fehler zusätzlich zur Originalmeldung (geplant).
-- Schritt-für-Schritt-Visualisierung (Variablen, Heap-Modell), pro Runner per `trace` einschaltbar – vorhanden (S5, [ADR 0007](../docs-dev/adr/0007-step-view.md)).
+- Schritt-für-Schritt-Visualisierung (Variablen, Heap-Modell), pro Runner per `trace` einschaltbar – vorhanden (S5).
 - Fest vorgeladene Pakete (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – 🔒 S6. Keine freie NuGet-Installation.
 - `InvariantGlobalization=true`: Zahlen erscheinen immer mit Punkt (`3.5`). Die CI muss mit `InvariantCulture` laufen, damit gezeigte Ausgaben übereinstimmen.
 
