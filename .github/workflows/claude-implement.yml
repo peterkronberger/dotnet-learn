@@ -113,8 +113,10 @@ jobs:
                Fragen nicht erneut.
             2. Brauchst du einen Menschen (Vorgaben unklar oder widersprüchlich, Secrets/Zugänge
                nötig, riskante Änderung wie Datenmigration, Auth/Security, .github/workflows/)?
-               Dann ändere keinen Code, poste konkrete, nummerierte Fragen mit `gh issue comment`
-               und gib status=needs_human zurück.
+               Dann ändere keinen Code und gib status=needs_human zurück. Schreib die konkreten,
+               nummerierten Fragen (Markdown) in das Feld `questions` des Ergebnisses.
+               Poste sie NICHT selbst als Kommentar: Der Workflow postet sie danach zusammen
+               mit der Anleitung zum Neustart.
             3. Sonst:
                - Branch vorbereiten: `git fetch origin`. Prüfe mit
                  `git ls-remote --heads origin claude/issue-${{ env.ISSUE }}`, ob der Branch schon existiert.
@@ -138,12 +140,15 @@ jobs:
           claude_args: |
             --model sonnet
             --max-turns 80
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh issue comment:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(pnpm:*),Bash(yarn:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(dotnet:*)"
-            --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"}},"required":["status","reason"]}'
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(pnpm:*),Bash(yarn:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(dotnet:*)"
+            --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Nur bei status=needs_human: nummerierte Rückfragen als Markdown"}},"required":["status","reason"]}'
 
       # Ergebnis des Claude Calls wird per Skript gesetzt
       # Entfernt die Labels claude:in-progress & claude:auto-implement und setzt je nach status das Label claude:pr-open, needs-human oder als Standard needs-human und claude:failed
       # Bei needs-human und failed wird zusätzlich ein Kommentar mit den Schritten für den Neustart gepostet.
+      # Bei needs-human enthält dieser Kommentar auch Claudes Rückfragen (Feld "questions" im Ergebnis).
+      # Claude postet die Fragen nicht selbst: Ein eigener gh-Kommentar aus dem Claude-Schritt kam in der
+      # Praxis nicht an (Issues #26, #29), daher postet sie dieser feste Code.
       # always(): läuft auch bei Zeitlimit/Abbruch, damit kein Issue auf claude:in-progress hängen bleibt.
       # Übersprungen nur, wenn das Issue wegen offener Abhängigkeiten auf claude:queued gesetzt wurde.
       - name: Ergebnis per Label melden
@@ -157,17 +162,23 @@ jobs:
           [ -z "$RESULT" ] && RESULT='{}'
           STATUS=$(jq -r '.status // "failed"' <<<"$RESULT")
           REASON=$(jq -r '.reason // "Kein Ergebnis (Abbruch, Timeout oder Fehler)."' <<<"$RESULT")
+          QUESTIONS=$(jq -r '.questions // empty' <<<"$RESULT")
+          [ -z "$QUESTIONS" ] && QUESTIONS="Claude hat keine Fragen im Ergebnis zurückgegeben. Begründung: ${REASON}"
           gh issue edit "$ISSUE" --remove-label "claude:in-progress,claude:auto-implement" || true
           case "$STATUS" in
             pr_created)  gh issue edit "$ISSUE" --add-label "claude:pr-open" ;;
             needs_human) gh issue edit "$ISSUE" --add-label "needs-human"
-                         gh issue comment "$ISSUE" --body "❓ Rückfragen siehe Kommentar oben.
-
-          Weiter geht es so:
-          1. Fragen im Issue beantworten (als Kommentar, ohne Claude per @ zu erwähnen – sonst startet zusätzlich ein zweiter Claude-Lauf).
-          2. Danach Label \`claude:auto-implement\` erneut setzen.
-
-          Details: ${RUN_URL}" ;;
+                         # Rückfragen und Neustart-Anleitung in EINEM Kommentar. Der Text kommt aus einer
+                         # Datei, damit Backticks oder $ in Claudes Fragen nicht von der Shell ausgewertet werden.
+                         body="$RUNNER_TEMP/needs-human-comment.md"
+                         {
+                           printf '## ❓ Rückfragen von Claude\n\n%s\n\n---\n\n' "$QUESTIONS"
+                           printf 'Weiter geht es so:\n'
+                           printf '1. Fragen im Issue beantworten (als Kommentar, ohne Claude per @ zu erwähnen – sonst startet zusätzlich ein zweiter Claude-Lauf).\n'
+                           printf '2. Danach Label `claude:auto-implement` erneut setzen.\n\n'
+                           printf 'Details: %s\n' "$RUN_URL"
+                         } > "$body"
+                         gh issue comment "$ISSUE" --body-file "$body" ;;
             *)           gh issue edit "$ISSUE" --add-label "needs-human,claude:failed"
                          gh issue comment "$ISSUE" --body "⚠️ Umsetzung nicht abgeschlossen: ${REASON}
 
