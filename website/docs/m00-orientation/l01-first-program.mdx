@@ -3,7 +3,10 @@ title: Willkommen
 sidebar_position: 0
 slug: /intro
 description: So lernst du hier C# und .NET – mit Vorhersagen, Playground und Quizzes.
+lesson_id: m00-l01
 ---
+
+import helloWorld from '!!raw-loader!@site/examples/m00/l01/hello-world.cs';
 
 # Willkommen
 
@@ -30,28 +33,23 @@ Einklappbare Bereiche mit dem Titel „Vertiefung“ sind optional. Du kannst si
 Was gibt das Programm aus? Notiere deinen Tipp, dann klicke im Editor auf **Ausführen** (oder drücke Strg/⌘ + Enter).
 :::
 
-<CSharpRunner
-  height={380}
-  code={`var name = "Welt";
-Console.WriteLine("Hallo, " + name + "!");
-Console.WriteLine(name.Length);`}
-/>
+<CSharpRunner height={380} code={helloWorld} />
 
 <details>
 <summary>Lösung anzeigen</summary>
 
-Das Programm gibt zwei Zeilen aus: `Hallo, Welt!` und `4`. Die Eigenschaft `Length` liefert die Anzahl der Zeichen von `"Welt"`.
+Das Programm gibt zwei Zeilen aus: `Hello, World!` und `5`. Die Eigenschaft `Length` liefert die Anzahl der Zeichen von `"World"`.
 
 </details>
 
 <Quiz
   id="intro-length"
-  question="Was gibt `Console.WriteLine(name.Length)` aus, wenn `name` den Text `Welt` enthält?"
-  options={['3', '4', '5', 'Welt']}
-  answer={1}>
-  `Length` zählt Zeichen. „Welt“ hat vier Buchstaben, also ist das Ergebnis `4`. Die Ausgabe ist eine Zahl und kein Text.
+  question="Was gibt `Console.WriteLine(name.Length)` aus, wenn `name` den Text `World` enthält?"
+  options={['3', '4', '5', 'World']}
+  answer={2}>
+  `Length` zählt Zeichen. „World“ hat fünf Buchstaben, also ist das Ergebnis `5`. Die Ausgabe ist eine Zahl und kein Text.
 </Quiz>
 
 ## Weiter geht es
 
-Starte mit dem ersten Kapitel: [Variablen und Typen](./grundlagen/variablen-und-typen.mdx). Warum die Seite so aufgebaut ist, steht unter [Lernprinzipien](./lernprinzipien.mdx).
+Starte mit dem ersten Kapitel: [Variablen und Typen](../m01-variables-and-types/l02-variables-and-types.mdx). Warum die Seite so aufgebaut ist, steht unter [Lernprinzipien](./lernprinzipien.mdx).

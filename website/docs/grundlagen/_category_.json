@@ -1,9 +1,0 @@
-{
-  "label": "Grundlagen",
-  "position": 1,
-  "collapsed": false,
-  "link": {
-    "type": "generated-index",
-    "description": "Die Bausteine von C#: Variablen, Typen und Kontrollfluss."
-  }
-}

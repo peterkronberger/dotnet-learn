@@ -38,14 +38,29 @@ Lokal zeigt die eingebettete Vorschau den Playground unter dem Pfad `/dotnet-lea
 
 ## Inhalte schreiben
 
-- Kapitel liegen als `.mdx` unter `website/docs/`. Reihenfolge über `sidebar_position`.
-- Code mit Syntax-Highlighting: Markdown-Codeblöcke mit ` ```csharp `.
+Verbindlich sind die Regeln und die Definition of Done in `CLAUDE.md` sowie der Ablauf in `concept/lektions-template.md`.
+
+- **Ablage:** Lektionen liegen unter `website/docs/mXX-<slug>/lYY-<slug>.mdx` (Slugs Englisch, siehe `concept/modulplan.md`). Front Matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
+- **Code** liegt unter `website/examples/mXX/lYY/<english-name>.cs` (Englisch, kebab-case, ein Beispiel pro Datei) und wird per `raw-loader` eingebunden. Backticks, Backslashes und `${` sind im Code erlaubt.
 - Einklappbar: `<details><summary>…</summary> … </details>` (Leerzeilen vor und nach dem Inhalt lassen).
 - Quiz: `<Quiz id="…" question="…" options={[…]} answer={0}>Erklärung</Quiz>`.
-- Ausführbarer Code: `<CSharpRunner code={`…`} />`. Der Code darf keine Backticks, keine Backslashes und keine Zeichenfolge `${` enthalten.
+
+```mdx
+import CodeBlock from '@theme/CodeBlock';
+import pitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
+
+<CSharpRunner height={420} code={pitfalls} />
+
+<CodeBlock language="csharp" title="Beispiel">{pitfalls}</CodeBlock>
+```
+
+- **Ausführbar:** `<CSharpRunner code={…} />`. Weitere Props (Details: `concept/komponenten.md`): `predict` + `expected` (Vorhersagefeld), `tests` (automatisch geprüfte Aufgabe), `trace` (Schrittansicht).
+- **Nicht ausführbar:** `<CodeBlock language="csharp" title="…">{code}</CodeBlock>`.
+- **Ausgaben:** Der Snapshot `<name>.out.txt` entsteht mit `bash tools/check-examples.sh --update` (Diff prüfen). `bash tools/check-examples.sh` kompiliert und vergleicht alle Beispiele. `*.snippet.cs` werden übersprungen. EF Core, Minimal API und xUnit liegen als Projekte unter `website/examples/_ci/`.
 
 ## Grenzen des Playgrounds
 
 - Der erste Start lädt die .NET-Laufzeit und den Roslyn-Compiler (mehrere MB, danach im Browser-Cache) und kompiliert im ersten Durchlauf langsam.
-- Der Code läuft im Hauptthread: Endlosschleifen blockieren den Tab. Eingaben über `Console.ReadLine` werden nicht unterstützt.
+- Der Code läuft im Hauptthread. Endlosschleifen werden nach ca. 3 s mit einer Meldung abgebrochen (S3). Der Wächter greift nicht in Operatoren, Accessors und Ausdruckskörpern; ein `catch (Exception)` im Nutzercode fängt ihn ab. Eingaben über `Console.ReadLine` werden nicht unterstützt.
 - Verfügbar sind die in `playground/Playground.csproj` aufgeführten Referenz-Assemblies (u. a. `System.Linq`, `System.Collections`, `System.Text.RegularExpressions`). Weitere lassen sich in der Liste `ReferenceName` ergänzen.
+- Fest geladen sind außerdem `Microsoft.Extensions.DependencyInjection` und `Microsoft.Extensions.Logging` (S6). Configuration und Hosting fehlen; eine freie NuGet-Installation gibt es nicht.
