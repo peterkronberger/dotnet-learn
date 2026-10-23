@@ -156,6 +156,9 @@ body {
   font-size: 0.92rem;
   line-height: 1.55;
   tab-size: 4;
+  font-variant-ligatures: none;
+  font-kerning: none;
+  letter-spacing: normal;
   resize: vertical;
   display: block;
 }
@@ -184,6 +187,8 @@ body {
   font-size: 0.92rem;
   line-height: 1.55;
   tab-size: 4;
+  font-variant-ligatures: none;
+  font-kerning: none;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   word-break: normal;
@@ -209,7 +214,7 @@ body {
   border-radius: 0.75rem;
 }
 
-/* Overlay lines must not change text metrics; the step view uses its own .pg-line classes. */
+/* Overlay lines and tokens must not change text metrics (no bold/italic: widths may differ from the textarea); the step view uses its own .pg-line classes. */
 .pg-hl-line {
   display: block;
   min-height: 1.55em;
@@ -219,10 +224,10 @@ body {
 .pg-hl-line-warn { background: var(--line-warn); box-shadow: inset 3px 0 0 var(--warn); }
 .pg-hl-line-err { background: var(--line-err); box-shadow: inset 3px 0 0 var(--err); }
 
-.tok-keyword { color: var(--tok-keyword); font-weight: 600; }
+.tok-keyword { color: var(--tok-keyword); }
 .tok-string { color: var(--tok-string); }
 .tok-number { color: var(--tok-number); }
-.tok-comment { color: var(--tok-comment); font-style: italic; }
+.tok-comment { color: var(--tok-comment); }
 .tok-meta { color: var(--tok-meta); }
 
 @media (forced-colors: active) {

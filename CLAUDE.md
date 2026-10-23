@@ -87,7 +87,7 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 - **S1:** `.cs`-Dateien per `raw-loader` in `<CSharpRunner>` und `<CodeBlock>`.
 - **S2:** `tools/check-examples.sh` führt jede `*.cs` aus (Invariant Globalization) und vergleicht mit `<name>.out.txt`; `*.snippet.cs` werden übersprungen; EF Core, Minimal API und xUnit laufen als Projekte unter `website/examples/_ci/<name>/`.
 - **S3:** Roslyn-Rewriter fügt Zeitprüfung ein (ca. 3 s ab Start, Wanduhrzeit). Kein Wächter in Operatoren, Accessors, Ausdruckskörpern; `catch (Exception)` im Nutzercode fängt ihn ab.
-- **S4:** Eigener Tokenizer (`playground/wwwroot/js/editor.js`, kein Prism) färbt ein `<pre>` hinter dem transparenten `<textarea>`. Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Padding, Rahmen), sonst sitzt der Cursor falsch. Fallback: reines `<textarea>`.
+- **S4:** Eigener Tokenizer (`playground/wwwroot/js/editor.js`, kein Prism) färbt ein `<pre>` hinter dem transparenten `<textarea>`. Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Schriftstärke, Kursiv, Ligaturen, Padding, Rahmen), sonst sitzt der Cursor falsch. Fallback: reines `<textarea>`.
 - **S5:** Roslyn-Instrumentierung protokolliert Zeile und Variablen pro Schritt (`trace`). Stack/Heap bleibt ein Modell.
 - **S6:** Feste Paketmenge `Microsoft.Extensions.DependencyInjection` und `…Logging` (+0,6 MiB); Configuration/Hosting fehlen.
 - **S7:** `postMessage`-Protokoll siehe `concept/komponenten.md`; Prüfcode über `TaskTests.Run()`; Fallback: Aufgabe mit eingeklappter Musterlösung.
