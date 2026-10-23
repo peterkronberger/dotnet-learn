@@ -36,7 +36,7 @@ Vor jedem Commit: beide Build-Prüfungen ausführen. Schlägt eine fehl, wird ni
 
 1. **Code, Bezeichner und Code-Kommentare sind immer Englisch.** Fließtext ist Deutsch (weitere Sprachen später über Docusaurus-i18n). Fachbegriffe Englisch, beim ersten Auftreten mit deutscher Erklärung: „Value Type (Werttyp)“.
 2. **Basis: C# 14 / .NET 10 (LTS).** Top-Level-Statements am Anfang, `Main` wird später erklärt. Nullable Reference Types aktiv. Features ab C# 12 / .NET 8 bekommen ein Versions-Badge (`<Since csharp="…" dotnet="…" />`).
-3. **Code liegt in `.cs`-Dateien** unter `website/examples/mXX/lYY/` und wird per `raw-loader` in Codeblöcke und `<CSharpRunner>` eingebunden. Kein neuer Inline-Code in MDX (sobald S1 entschieden ist).
+3. **Code liegt in `.cs`-Dateien** unter `website/examples/mXX/lYY/` und wird per `raw-loader` in Codeblöcke und `<CSharpRunner>` eingebunden. Kein neuer Inline-Code in MDX.
 4. **Jede gezeigte Ausgabe ist echt**: Sie muss mit dem tatsächlichen Lauf übereinstimmen (CI-Abgleich, S2). Keine von Hand erfundenen Ausgaben.
 5. **Nicht ausführbar ≠ gekennzeichnet**: Codebeispiele, die der Playground nicht ausführen kann (ASP.NET Core, EF Core, Unit-Tests), sind normale ` ```csharp title="…" `-Blöcke ohne Hinweis.
 6. **Ausführbar** ist nur, was im `<CSharpRunner>` läuft. Praxisbeispiele folgen dem Muster *Vorhersage → Runner → Lösung und Erklärung → Vertiefung (optional)*.
@@ -74,12 +74,13 @@ Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · l�
 | --- | --- | --- | --- |
 | S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden; manuelle Deploy-Prüfung ausstehend |
 | S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden |
-| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | läuft |
-| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden; manuelle Prüfung im Browser ausstehend |
-| S4 | Prism-Overlay im Editor | Modul 2 | entschieden; manuelle Prüfung im Browser ausstehend |
+| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | entschieden |
+| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden |
+| S4 | Syntaxfarben-Overlay im Editor | Modul 2 | entschieden |
 | S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | entschieden; manuelle Prüfung im Browser ausstehend |
 | S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | entschieden; manuelle Prüfung im Browser ausstehend |
 | S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden; manuelle Prüfung im Browser ausstehend |
+Alle Spikes sind entschieden; die nächsten Arbeitspakete sind der Backlog B1–B11 in `concept/spikes.md`.
 
 ### Entscheidungen in Kurzform
 

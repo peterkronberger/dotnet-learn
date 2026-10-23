@@ -11,7 +11,7 @@ Jede Lektion folgt dieser Reihenfolge. Optionale Elemente stehen in Klammern. Da
 | 3 | Konzept | Kurzer Text + kleines, isoliertes Beispiel | Nur das aktuelle Konzept; kein Projektkontext |
 | 4 | Praxisbeispiel | **Praxisbeispiel-Muster** (unten) | Pflicht, mindestens einmal |
 | 5 | Lücken-Beispiel | Beispiel mit Lücken, Teilziel-Beschriftungen bleiben | Fading: Lücken sitzen im Code |
-| 6 | Ändern und Selbermachen | Automatisch geprüfte Aufgabe | Bis S7 entschieden ist: Aufgabe + eingeklappte Musterlösung |
+| 6 | Ändern und Selbermachen | Automatisch geprüfte Aufgabe | Automatisch geprüfte Aufgabe mit `<CSharpRunner tests={…}>`; eingeklappte Musterlösung nur als Fallback, z. B. für nicht ausführbare Themen |
 | 7 | Fehlvorstellungen | `:::warning[Achtung]`, 1–3 kurze Boxen | Jede Box ist mit einem Quiz-Distraktor verknüpft |
 | 8 | (Umsteiger-Box) | Tabs Java / Python / JS/TS / Go | Nur Unterschiede zu C#, nicht C# erneut erklären |
 | 9 | (Vertiefung) | `<details>` „Vertiefung: … (optional)“ | Ersetzt „Unter der Haube“; Fachaussagen mit Microsoft-Learn-Quelle |
@@ -22,7 +22,7 @@ Jede Lektion folgt dieser Reihenfolge. Optionale Elemente stehen in Klammern. Da
 
 Entspricht PRIMM. So ist es im MVP bereits umgesetzt (`website/docs/grundlagen/variablen-und-typen.mdx`, Abschnitt „Zwei Stolperfallen“):
 
-1. **Vorhersage** (`:::info[Vorhersage]`): Aufgabe, vorab zu überlegen, was herauskommt. Optional mit Eingabefeld pro Ausgabezeile; nach dem Ausführen nüchterne Prüfung ✓/✗ (kein „Überraschung“-Wording). Eingabefeld erst nach S7.
+1. **Vorhersage** (`:::info[Vorhersage]`): Aufgabe, vorab zu überlegen, was herauskommt. Optional mit Eingabefeld pro Ausgabezeile; nach dem Ausführen nüchterne Prüfung ✓/✗ (kein „Überraschung“-Wording). Eingabefeld über `<CSharpRunner predict expected={…}>`, `expected` aus dem `.out.txt`-Snapshot per `raw-loader`.
 2. **`<CSharpRunner>`** (Run)
 3. **`<details>` „Lösung und Erklärung anzeigen“** (Investigate): Ausgabe, dann das *Warum*, gegliedert mit Teilziel-Beschriftungen. Wo passend, eine Frage „Was passiert, wenn …?“.
 4. **`<details>` „Vertiefung: … (optional)“**
@@ -33,7 +33,7 @@ Entspricht PRIMM. So ist es im MVP bereits umgesetzt (`website/docs/grundlagen/v
 
 Vorgerechnete Beispiele gliedern die Lösung in benannte Schritte, z. B. bei LINQ: „1. Datenquelle wählen → 2. Filtern → 3. Projizieren → 4. Ergebnis materialisieren“. Die Beschriftungen stehen im Fließtext oder in der Lösung, **nicht** als Code-Kommentar auf Deutsch (Code-Kommentare sind Englisch).
 
-## Gerüst (Zielzustand nach S1)
+## Gerüst
 
 ```mdx
 ---
