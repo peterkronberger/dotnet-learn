@@ -1,6 +1,6 @@
 # Modulplan
 
-Stand: 2026-10-22. 20 Module (0–19) plus 4 gemischte Wiederholungsmodule. Planungsannahme: 60–80 h für Einsteiger (nicht empirisch abgeleitet). Lektionen sind Vorschläge; Reihenfolge innerhalb eines Moduls darf bei der Ausarbeitung angepasst werden, die Modulreihenfolge nicht.
+Stand: 2026-10-23. 20 Module (0–19) plus 4 gemischte Wiederholungsmodule. Planungsannahme: 60–80 h für Einsteiger (nicht empirisch abgeleitet). Lektionen sind Vorschläge; Reihenfolge innerhalb eines Moduls darf bei der Ausarbeitung angepasst werden, die Modulreihenfolge nicht.
 
 **Endkompetenz:** C#-/.NET-Grundlagen bis OOP, Collections, Generics, LINQ, Exceptions, async/await und Unit-Tests; dazu ASP.NET Core (Minimal APIs) und EF Core. Nicht enthalten: Blazor, Unity.
 
@@ -21,7 +21,7 @@ Stand: 2026-10-22. 20 Module (0–19) plus 4 gemischte Wiederholungsmodule. Plan
 
 ## Module
 
-Legende: ▶ ausführbar im Playground · ◻ nicht ausführbar (normaler Codeblock) · 🔒 Spike muss entschieden sein
+Legende: ▶ ausführbar im Playground · ◻ nicht ausführbar (normaler Codeblock)
 
 ### M0 Orientierung ▶
 1. Dein erstes Programm (sofort ausführen)
@@ -36,7 +36,7 @@ Legende: ▶ ausführbar im Playground · ◻ nicht ausführbar (normaler Codebl
 Anweisungen und Ausgabe · Variablen und eingebaute Typen · Ganzzahl, Gleitkomma, `decimal` · Strings und Interpolation (Objekte *nutzen*: `Length`, `ToUpper`) · Typumwandlung und `Parse` · Konsoleneingabe (über das Eingabefeld des Runners).
 Erwartete Fehlvorstellungen: `=` als Vergleich; Ganzzahldivision rundet; `"3" + 4` ergibt 7; eine Variable „merkt sich“ frühere Werte.
 
-### M2 Kontrollfluss ▶ 🔒 S3, S4
+### M2 Kontrollfluss ▶
 `if`/`else`, Vergleichs- und Logikoperatoren · `switch`-Ausdrücke und einfache Muster · `while`/`do` · `for`/`foreach` · `break`/`continue`.
 Fehlvorstellungen: Off-by-one; die Schleifenbedingung wird nur einmal geprüft; `else` gehört zum falschen `if`.
 
@@ -90,8 +90,8 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testbarer Code. T
 
 ### W4 Wiederholung M12–M14 ▶
 
-### M15 Dependency Injection und Hosting ▶ 🔒 S6
-Abhängigkeiten über Interfaces · `ServiceCollection` · Lebensdauern · Logging · Konfiguration/Options. Fallback ohne S6: nicht ausführbar.
+### M15 Dependency Injection und Hosting ▶
+Abhängigkeiten über Interfaces · `ServiceCollection` · Lebensdauern · Logging · Konfiguration/Options. Ausführbar für DI und Logging; Configuration/Options und Hosting nicht ausführbar (fehlen im Playground, siehe S6).
 
 ### M16 EF Core ◻
 `DbContext`, Modell, Beziehungen (1:n, n:m) · LINQ → SQL (gezeigtes SQL aus CI-Lauf) · Change Tracking · Migrationen.

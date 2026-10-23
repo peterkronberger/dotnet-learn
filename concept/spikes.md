@@ -1,6 +1,8 @@
 # Spikes (Prototyp-Aufgaben) und technischer Backlog
 
-Stand: 2026-10-22. Der Status steht in der Tabelle in `CLAUDE.md`.
+Stand: 2026-10-23. Der Status steht in der Tabelle in `CLAUDE.md`.
+
+Alle Spikes sind entschieden; die Ergebnisse stehen in `CLAUDE.md` unter „Entscheidungen in Kurzform“.
 
 ## Ablauf
 
@@ -53,7 +55,7 @@ Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstan
 - **Zeitlimit:** 1 Tag · **Ausweichlösung:** Hinweis wie bisher; Schleifen-Übungen so gestalten, dass Endlosschleifen unwahrscheinlich sind. (Web Worker wird nicht weiter verfolgt.)
 - **Blockiert:** Modul 2.
 
-## S4 – Prism-Overlay im Editor
+## S4 – Syntaxfarben-Overlay im Editor (umgesetzt ohne Prism, siehe Entscheidung)
 
 - **Frage:** Lässt sich hinter dem `<textarea>` ein deckungsgleicher, gefärbter Codeblock anzeigen?
 - **Akzeptanzkriterien:** Deckungsgleich bei langen Zeilen, Umbrüchen, Scrollen, Mobilgeräten und IME-Eingabe; aktuelle Zeile und Fehlerzeilen hervorhebbar; flüssig bis ca. 200 Zeilen; Tab/Esc/Strg+Enter funktionieren weiter.
@@ -85,16 +87,16 @@ Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstan
 
 ## Technischer Backlog aus dem MVP-Abgleich (keine Spikes)
 
-| # | Aufgabe | Abhängig von |
-| --- | --- | --- |
-| B1 | MVP-Lektionen umstellen: Bezeichner und Kommentare Englisch, neue Ordnerstruktur, Lösungstext „`3,5` bzw. `3.5`“ korrigieren (Ausgabe ist immer `3.5`) | S1 |
-| B2 | Startcode Englisch: `playground/Samples.cs`, `website/src/pages/playground.js` | – |
-| B3 | Quizfragen in Datendateien pro Sprache, Quiz-Typen, versionierter Fortschrittsspeicher, Leitner, Dashboard, Export/Import, Migration der alten Schlüssel | – |
-| B4 | README-Abschnitt „Inhalte schreiben“ an die neuen Regeln anpassen | S1 |
-| B5 | Runner-Oberfläche übersetzbar (Sprachparameter) | – |
-| B6 | Konsoleneingabe: `stdin`-Prop, Eingabefeld, `Console.SetIn` | – |
-| B7 | `package-lock.json` committen, in `pages.yml` auf `npm ci` umstellen | – (Workflow → Mensch) |
-| B8 | Issue-Vorlage „Fehler melden / Feedback“ + Link pro Seite | – |
-| B9 | Mermaid, lokale Suche, Playwright + Barrierefreiheits-Check | – |
-| B10 | `lernprinzipien.mdx` → „Wie dieser Kurs funktioniert“: Literatur aus `didaktik.md`, KI-Absatz, Bedienung | B3 |
-| B11 | `<Since>`-Badge, Umsteiger-Tabs | – |
+| # | Aufgabe | Abhängig von | Status |
+| --- | --- | --- | --- |
+| B1 | MVP-Lektionen umstellen: Bezeichner und Kommentare Englisch, neue Ordnerstruktur, Lösungstext „`3,5` bzw. `3.5`“ korrigieren (Ausgabe ist immer `3.5`) | S1 | freigegeben (S1 entschieden) |
+| B2 | Startcode Englisch: `playground/Samples.cs`, `website/src/pages/playground.js` | – | offen |
+| B3 | Quizfragen in Datendateien pro Sprache, Quiz-Typen, versionierter Fortschrittsspeicher, Leitner, Dashboard, Export/Import, Migration der alten Schlüssel | – | offen |
+| B4 | README-Abschnitt „Inhalte schreiben“ an die neuen Regeln anpassen | S1 | freigegeben (S1 entschieden) |
+| B5 | Runner-Oberfläche übersetzbar (Sprachparameter) | – | offen |
+| B6 | Konsoleneingabe: `stdin`-Prop, Eingabefeld, `Console.SetIn` | – | offen |
+| B7 | `package-lock.json` committen, in `pages.yml` auf `npm ci` umstellen | – (Workflow → Mensch) | erledigt |
+| B8 | Issue-Vorlage „Fehler melden / Feedback“ + Link pro Seite | – | offen |
+| B9 | Mermaid, lokale Suche, Playwright + Barrierefreiheits-Check | – | offen |
+| B10 | `lernprinzipien.mdx` → „Wie dieser Kurs funktioniert“: Literatur aus `didaktik.md`, KI-Absatz, Bedienung | B3 | offen |
+| B11 | `<Since>`-Badge, Umsteiger-Tabs | – | offen |

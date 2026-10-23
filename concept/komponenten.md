@@ -1,6 +1,6 @@
 # Komponenten und Konventionen
 
-Stand: 2026-10-22. Status: **vorhanden** (im MVP) · **geplant** · **🔒 Sx** (hängt von einem Spike ab). Alle Komponenten sind global in `website/src/theme/MDXComponents.js` registriert (kein Import in MDX nötig).
+Stand: 2026-10-23. Status: **vorhanden** · **geplant**. Alle Komponenten sind global in `website/src/theme/MDXComponents.js` registriert (kein Import in MDX nötig).
 
 ## Admonitions (Docusaurus, vorhanden)
 
@@ -22,10 +22,11 @@ Vorhanden (S7):
 - `predict` (bool) + `expected` (String, Ausgabe-Snapshot): ein Eingabefeld pro erwarteter Ausgabezeile; nach „Ausführen“ ✓/✗ pro Zeile, sachlich formuliert, Ergebnis in `aria-live`-Region. Geprüft wird gegen die echte Ausgabe.
 - `tests` (String): C#-Prüfcode mit `public static class TaskTests` und `Run()` (Tupel `Name, Visible, Passed, Feedback`); der Runner führt dann nur die Tests aus. Ergebnis pro Test, versteckte Tests mit neutralem Namen.
 - `onResult`: Callback mit der `run-result`-Nachricht.
+- `code` kommt aus einer `.cs`-Datei (`import x from '!!raw-loader!@site/examples/…'`, S1). Die frühere README-Einschränkung „keine Backticks, Backslashes, `${`“ entfällt.
+- `trace` (bool, S5): schaltet die Schrittansicht (Variablen, Heap-Modell) ein.
 - Demo: `/runner-demo`.
 
 Geplant:
-- `code` kommt aus einer `.cs`-Datei (`import x from '!!raw-loader!@site/examples/…'`) – 🔒 S1. Damit entfällt die README-Einschränkung „keine Backticks, Backslashes, `${`“.
 - `stdin` (String): vorbefüllte Konsoleneingabe, zeilenweise von `Console.ReadLine()` gelesen. Im Runner als Eingabefeld unter dem Editor.
 - Laden: weit weggescrollte Instanzen entladen, eingegebener Code bleibt erhalten; Runtime aus dem Browser-Cache.
 - Sprache der Runner-Oberfläche (heute fest Deutsch in `App.razor`) über einen Parameter (z. B. `#lang=de`) – für i18n.
@@ -37,11 +38,11 @@ Nachrichtenprotokoll (S7, vorhanden; Ursprungsprüfung `window.location.origin` 
 ## Playground (`playground/`) – vorhanden
 
 - `<textarea>`-Editor; Tab, Esc, Strg/⌘+Enter vorhanden. Keine Autovervollständigung (entschieden).
-- Prism-Overlay für Syntaxfarben, Zeilen-Hervorhebung, Fehlermarkierung – 🔒 S4.
-- Schleifenwächter (Abbruch nach ca. 3 s mit deutscher Meldung und Zeilennummer) – 🔒 S3.
+- Syntaxfarben, Zeilen-Hervorhebung, Fehlermarkierung – vorhanden (S4): eigener Tokenizer in `playground/wwwroot/js/editor.js` (kein Prism). Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Schriftstärke, Kursiv, Ligaturen, Padding, Rahmen), sonst sitzt der Cursor falsch.
+- Schleifenwächter (Abbruch nach ca. 3 s mit deutscher Meldung und Zeilennummer) – vorhanden (S3). Kein Wächter in Operatoren, Accessors und Ausdruckskörpern; `catch (Exception)` im Nutzercode fängt ihn ab.
 - Compilerfehler als Liste mit Zeile/Spalte (vorhanden) + deutsche Erklärung häufiger Fehler zusätzlich zur Originalmeldung (geplant).
 - Schritt-für-Schritt-Visualisierung (Variablen, Heap-Modell), pro Runner per `trace` einschaltbar – vorhanden (S5).
-- Fest vorgeladene Pakete (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – 🔒 S6. Keine freie NuGet-Installation.
+- Fest vorgeladene Pakete (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – vorhanden (S6); Configuration und Hosting fehlen. Keine freie NuGet-Installation.
 - `InvariantGlobalization=true`: Zahlen erscheinen immer mit Punkt (`3.5`). Die CI muss mit `InvariantCulture` laufen, damit gezeigte Ausgaben übereinstimmen.
 
 ## `<Quiz>` – vorhanden (Single Choice), wird zur Familie ausgebaut
