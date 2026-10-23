@@ -89,10 +89,10 @@ Zeitlimits sind Schätzungen. Wird eines überschritten: abbrechen, Zwischenstan
 
 | # | Aufgabe | Abhängig von | Status |
 | --- | --- | --- | --- |
-| B1 | MVP-Lektionen umstellen: Bezeichner und Kommentare Englisch, neue Ordnerstruktur, Lösungstext „`3,5` bzw. `3.5`“ korrigieren (Ausgabe ist immer `3.5`) | S1 | freigegeben (S1 entschieden) |
-| B2 | Startcode Englisch: `playground/Samples.cs`, `website/src/pages/playground.js` | – | offen |
+| B1 | MVP-Lektionen umstellen: Bezeichner und Kommentare Englisch, neue Ordnerstruktur, Lösungstext „`3,5` bzw. `3.5`“ korrigieren (Ausgabe ist immer `3.5`) | S1 | erledigt |
+| B2 | Startcode Englisch: `playground/Samples.cs`, `website/src/pages/playground.js` | – | erledigt |
 | B3 | Quizfragen in Datendateien pro Sprache, Quiz-Typen, versionierter Fortschrittsspeicher, Leitner, Dashboard, Export/Import, Migration der alten Schlüssel | – | offen |
-| B4 | README-Abschnitt „Inhalte schreiben“ an die neuen Regeln anpassen | S1 | freigegeben (S1 entschieden) |
+| B4 | README-Abschnitt „Inhalte schreiben“ an die neuen Regeln anpassen | S1 | erledigt |
 | B5 | Runner-Oberfläche übersetzbar (Sprachparameter) | – | offen |
 | B6 | Konsoleneingabe: `stdin`-Prop, Eingabefeld, `Console.SetIn` | – | offen |
 | B7 | `package-lock.json` committen, in `pages.yml` auf `npm ci` umstellen | – (Workflow → Mensch) | erledigt |

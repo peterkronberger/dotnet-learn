@@ -2,10 +2,7 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import CSharpRunner from '@site/src/components/CSharpRunner';
 
-const STARTER = `// Sage voraus, was ausgegeben wird - und führe es dann aus.
-var zahlen = new[] { 3, 1, 4, 1, 5 };
-Console.WriteLine(zahlen.Sum());
-Console.WriteLine(zahlen.Max());`;
+import STARTER from '!!raw-loader!@site/examples/playground/starter.cs';
 
 export default function Playground() {
   return (

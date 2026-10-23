@@ -12,12 +12,12 @@ Stand: 2026-10-23. 20 Module (0–19) plus 4 gemischte Wiederholungsmodule. Plan
 
 ## Bestehender MVP → Zielstruktur
 
-| MVP-Datei | Ziel |
-| --- | --- |
-| `docs/intro.mdx` | M0 · L1 „Dein erstes Programm“ (Bezeichner/Kommentare auf Englisch umstellen) |
-| `docs/lernprinzipien.mdx` | M0 · Seite „Wie dieser Kurs funktioniert“ (um Literatur aus `didaktik.md` und KI-Absatz ergänzen) |
-| `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (Code nach `examples/`, Englisch, Lösungstext zu `3.5` korrigieren – der Playground nutzt `InvariantGlobalization`, die Ausgabe ist immer `3.5`) |
-| `docs/grundlagen/kontrollfluss.mdx` | M2 (aufteilen in mehrere Lektionen) |
+| MVP-Datei | Ziel | Status |
+| --- | --- | --- |
+| `docs/intro.mdx` | M0 · L1 „Dein erstes Programm“ (Bezeichner/Kommentare auf Englisch umstellen) | umgezogen nach `docs/m00-orientation/l01-first-program.mdx` |
+| `docs/lernprinzipien.mdx` | M0 · Seite „Wie dieser Kurs funktioniert“ (um Literatur aus `didaktik.md` und KI-Absatz ergänzen) | offen (B10) |
+| `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (Code nach `examples/`, Englisch, Lösungstext zu `3.5` korrigieren – der Playground nutzt `InvariantGlobalization`, die Ausgabe ist immer `3.5`) | umgezogen nach `docs/m01-variables-and-types/l02-variables-and-types.mdx` |
+| `docs/grundlagen/kontrollfluss.mdx` | M2 (aufteilen in mehrere Lektionen) | umgezogen nach `docs/m02-control-flow/l01-control-flow.mdx` (Aufteilung offen) |
 
 ## Module
 
