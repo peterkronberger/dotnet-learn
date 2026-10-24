@@ -31,6 +31,9 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Check quiz data and links
+        run: node tools/check-quiz.mjs
+        
       - name: Docusaurus build
         working-directory: website
         # Ohne package-lock.json kann "npm ci" nicht laufen. Lockfile committen, dann auf "npm ci" umstellen.
