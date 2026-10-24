@@ -5,7 +5,6 @@
       "id": "m02-l01-q1",
       "lesson": "m02-l01",
       "type": "single",
-      "legacyId": "rueckblick-int-division",
       "question": "Rückblick: Was ergibt `10 / 4`, wenn beide Zahlen `int` sind?",
       "options": [
         { "text": "`2.5`" },
@@ -19,7 +18,6 @@
       "id": "m02-l01-q2",
       "lesson": "m02-l01",
       "type": "single",
-      "legacyId": "kontrollfluss-for",
       "question": "Wie oft wird der Körper von `for (var i = 0; i < 3; i++)` ausgeführt?",
       "options": [
         { "text": "2 Mal" },
@@ -33,7 +31,6 @@
       "id": "m02-l01-q3",
       "lesson": "m02-l01",
       "type": "single",
-      "legacyId": "kontrollfluss-do-while",
       "question": "Was unterscheidet `do … while` von `while`?",
       "options": [
         { "text": "Es läuft immer unendlich oft" },

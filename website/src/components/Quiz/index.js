@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import {getQuestion, legacyIdMap, validateQuestion} from '@site/src/data/quiz';
+import {getQuestion, validateQuestion} from '@site/src/data/quiz';
 import useProgress from '@site/src/lib/progress/useProgress';
 import {recordAnswer} from '@site/src/lib/progress/leitner';
 import {toLocalDate} from '@site/src/lib/progress/dates';
@@ -40,7 +40,7 @@ export default function Quiz(props) {
     throw new Error(`Invalid quiz question "${id}": ${errors.join('; ')}`);
   }
 
-  const {progress, update} = useProgress({legacyIdMap});
+  const {progress, update} = useProgress();
   const recorded = useRef(false);
 
   // Only the first attempt per page view counts for the Leitner system.

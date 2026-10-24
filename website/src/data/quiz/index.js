@@ -75,7 +75,3 @@ export function getQuestion(locale, id) {
 export function getAllQuestions(locale) {
   return [...(INDEX[locale] ?? INDEX[DEFAULT_LOCALE]).values()];
 }
-
-export const legacyIdMap = Object.fromEntries(
-  [...INDEX[DEFAULT_LOCALE].values()].filter((q) => q.legacyId).map((q) => [q.legacyId, q.id]),
-);

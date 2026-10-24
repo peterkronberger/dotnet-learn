@@ -5,7 +5,6 @@
       "id": "m00-l01-q1",
       "lesson": "m00-l01",
       "type": "single",
-      "legacyId": "intro-length",
       "question": "Was gibt `Console.WriteLine(name.Length)` aus, wenn `name` den Text `World` enthält?",
       "options": [
         { "text": "`3`" },

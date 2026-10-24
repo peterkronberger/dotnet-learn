@@ -11,7 +11,6 @@ Eine Datei pro Modul und Sprache: `de/mXX.json`. Neue Dateien werden in `index.j
 | `type` | ja | `single`, `multi`, `output`, `explain` (geplant: `parsons`, `cloze`, `find-bug`, `match`) |
 | `question` | ja | Fragetext |
 | `explanation` | `single`/`multi`/`output` | Erklärt das *Warum* |
-| `legacyId` | nein | Alte Inline-ID für die Migration des Fortschritts |
 
 Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 
