@@ -1,8 +1,8 @@
-# LABELS ANLEGEN: Legt alle Labels der Claude-Automatisierung an bzw. aktualisiert sie.
-# Start: manuell unter Actions → "Claude – Labels anlegen" → Run workflow.
-# Mehrfaches Ausführen schadet nicht: Bestehende Labels werden mit Farbe und
-# Beschreibung von hier überschrieben (--force), Issues behalten ihre Labels.
-name: Claude – Labels anlegen
+# CREATE LABELS: creates or updates all labels of the Claude automation.
+# Start: by hand under Actions → "Claude – Create labels" → Run workflow.
+# Running it more than once does no harm: existing labels get the color and
+# description from here (--force), issues keep their labels.
+name: Claude – Create labels
 
 on:
   workflow_dispatch:
@@ -11,29 +11,29 @@ jobs:
   labels:
     runs-on: ubuntu-latest
     permissions:
-      issues: write # zum Anlegen und Ändern von Labels
+      issues: write # to create and change labels
     env:
       GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
-      - name: Labels anlegen oder aktualisieren
+      - name: Create or update labels
         run: |
-          # mk <Name> <Farbe (Hex ohne #)> <Beschreibung (max. 100 Zeichen)>
+          # mk <name> <color (hex without #)> <description (max. 100 characters)>
           mk() { gh label create "$1" --color "$2" --description "$3" --force; }
 
-          # Start-Labels (setzt ein Mensch oder der Chat)
-          mk "claude:auto-architect"   "5319e7" "High-Class-Claude-Model setzt automatisch um"
-          mk "claude:auto-implement"   "1f883d" "Low-Class-Claude-Model setzt automatisch um"
-          mk "claude:queued"           "bfdadc" "Wartet auf andere Issues (Depends on #…)"
+          # Start labels (set by a human or the chat)
+          mk "claude:auto-architect"   "5319e7" "High-class Claude model works on it automatically"
+          mk "claude:auto-implement"   "1f883d" "Low-class Claude model works on it automatically"
+          mk "claude:queued"           "bfdadc" "Waiting for other issues (Depends on #…)"
 
-          # Status-Labels (setzen die Workflows)
-          mk "claude:in-progress"      "fbca04" "Claude arbeitet gerade daran"
-          mk "claude:pr-open"          "0e8a16" "Pull Request offen – bitte reviewen"
-          mk "claude:failed"           "b60205" "Automatische Umsetzung fehlgeschlagen"
+          # Status labels (set by the workflows)
+          mk "claude:in-progress"      "fbca04" "Claude is working on it"
+          mk "claude:pr-open"          "0e8a16" "Pull request open – please review"
+          mk "claude:failed"           "b60205" "Automatic implementation failed"
 
-          # Mensch gefragt
-          mk "needs-human"             "d93f0b" "Ein Mensch muss etwas tun oder entscheiden"
-          mk "needs-human:access"      "f9d0c4" "Zugänge, Secrets oder Infrastruktur nötig"
-          mk "needs-human:decision"    "f9d0c4" "Offene Entscheidung (Produkt/UX/Architektur)"
-          mk "needs-human:manual-test" "f9d0c4" "Nur manuell prüfbar"
-          mk "needs-human:risky"       "f9d0c4" "Riskante Änderung – Mensch soll entscheiden"
+          # Human needed
+          mk "needs-human"             "d93f0b" "A human must do or decide something"
+          mk "needs-human:access"      "f9d0c4" "Access, secrets or infrastructure needed"
+          mk "needs-human:decision"    "f9d0c4" "Open decision (product/UX/architecture)"
+          mk "needs-human:manual-test" "f9d0c4" "Can only be checked by hand"
+          mk "needs-human:risky"       "f9d0c4" "Risky change – a human should decide"

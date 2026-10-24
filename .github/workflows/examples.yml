@@ -1,5 +1,4 @@
-# Proposal for .github/workflows/examples.yml (spike S2, ADR 0003).
-# Claude may not write to .github/workflows/: a human copies this file there and reviews it.
+# Compiles all C# examples and compares their output with the snapshots (spike S2, ADR 0003).
 name: Check examples
 
 on:
