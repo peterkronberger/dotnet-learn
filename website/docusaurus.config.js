@@ -43,6 +43,9 @@ const config = {
     ],
   ],
 
+  // Lesson index (title, duration, learning goals, module) for the Lernstand page.
+  plugins: [require.resolve('./plugins/lesson-index.js')],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -61,6 +64,7 @@ const config = {
             label: 'Lernpfad',
           },
           {to: '/playground', label: 'Playground', position: 'left'},
+          {to: '/dashboard', label: 'Lernstand', position: 'left'},
           {
             href: 'https://github.com/peterkronberger/dotnet-learn',
             label: 'GitHub',

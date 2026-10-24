@@ -35,6 +35,25 @@
   --dl-badge-fg: #3730a3;
   --dl-badge-bg: #e0e7ff;
 
+  /* Lernstand page (direction A). Contrast checked against --dl-surface:
+     muted text 6.7:1, stage colors 4.5:1 / 5.2:1 / 11.4:1 (WCAG 1.4.3, 1.4.11). */
+  --dl-text: #1b1d2a;
+  --dl-text-muted: #565b73;
+  --dl-accent-text: #4338ca;
+  --dl-page-bg: #f5f6ff;
+  --dl-card-accent-bg: #eef0ff;
+  --dl-card-accent-border: #d6d9f5;
+  --dl-border-strong: #c7cbe6;
+  --dl-border-soft: #eceef6;
+  --dl-track: #e2e4f0;
+  --dl-stage-shaky: #c2410c;
+  --dl-stage-building: #6366f1;
+  --dl-stage-solid: #312e81;
+  --dl-on-stage-solid: #ffffff;
+  --dl-button-bg: #4f46e5;
+  --dl-button-fg: #ffffff;
+  --dl-font-heading: 'Manrope', var(--ifm-font-family-base);
+
   --docusaurus-highlighted-code-line-bg: rgba(79, 70, 229, 0.1);
 }
 
@@ -58,6 +77,23 @@
   --dl-bad-bg: #331616;
   --dl-badge-fg: #e0e7ff;
   --dl-badge-bg: #312e81;
+
+  /* Lernstand page (direction A), dark: muted 7.4:1, stages 7.6:1 / 5.8:1 / 11.6:1. */
+  --dl-text: #e6e8f5;
+  --dl-text-muted: #a3a8c7;
+  --dl-accent-text: #a5b4fc;
+  --dl-page-bg: #0f1226;
+  --dl-card-accent-bg: #1b2040;
+  --dl-card-accent-border: #323a72;
+  --dl-border-strong: #3a4280;
+  --dl-border-soft: #222850;
+  --dl-track: #2a3060;
+  --dl-stage-shaky: #fb923c;
+  --dl-stage-building: #818cf8;
+  --dl-stage-solid: #c7d2fe;
+  --dl-on-stage-solid: #151933;
+  --dl-button-bg: #a5b4fc;
+  --dl-button-fg: #0f1226;
 
   --docusaurus-highlighted-code-line-bg: rgba(165, 180, 252, 0.15);
 }

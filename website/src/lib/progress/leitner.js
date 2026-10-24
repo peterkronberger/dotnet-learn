@@ -41,6 +41,7 @@ export function nextDueDate(progress, intervals = LEITNER_INTERVALS_DAYS) {
 }
 
 // Pure: returns a new progress object, the input stays unchanged.
+// Every recorded answer also counts in the daily activity log (no time limit).
 export function recordAnswer(progress, questionId, result, today) {
   const old = progress.questions[questionId];
   const entry = {
@@ -50,7 +51,51 @@ export function recordAnswer(progress, questionId, result, today) {
     correctCount: (old ? old.correctCount : 0) + (result === 'correct' ? 1 : 0),
     lastResult: result,
   };
-  return { ...progress, questions: { ...progress.questions, [questionId]: entry } };
+  const activity = progress.activity ?? {};
+  const day = activity[today] ?? { answered: 0, correct: 0, partial: 0 };
+  return {
+    ...progress,
+    questions: { ...progress.questions, [questionId]: entry },
+    activity: {
+      ...activity,
+      [today]: {
+        answered: day.answered + 1,
+        correct: day.correct + (result === 'correct' ? 1 : 0),
+        partial: day.partial + (result === 'partial' ? 1 : 0),
+      },
+    },
+  };
+}
+
+// Pure: marks a lesson as completed (keeps the first date if it is already marked).
+export function completeLesson(progress, lessonId, today) {
+  const lessons = progress.lessons ?? {};
+  if (lessons[lessonId]) return progress;
+  return { ...progress, lessons: { ...lessons, [lessonId]: { completedAt: today } } };
+}
+
+// Pure: removes the completion mark of a lesson.
+export function reopenLesson(progress, lessonId) {
+  const lessons = { ...(progress.lessons ?? {}) };
+  delete lessons[lessonId];
+  return { ...progress, lessons };
+}
+
+// Questions due after `today`: the earliest such date and how many are due then, or null.
+export function nextReviewAfter(progress, today, intervals = LEITNER_INTERVALS_DAYS) {
+  let best = null;
+  let count = 0;
+  for (const entry of Object.values(progress.questions)) {
+    const due = dueDate(entry, intervals);
+    if (due <= today) continue;
+    if (best === null || due < best) {
+      best = due;
+      count = 1;
+    } else if (due === best) {
+      count += 1;
+    }
+  }
+  return best === null ? null : { date: best, count };
 }
 
 // Length 5, index 0 = box 1.

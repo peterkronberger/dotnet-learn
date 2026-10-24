@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
-import DueDashboard from '@site/src/components/DueDashboard';
+import LernstandTeaser from '@site/src/components/LernstandTeaser';
 import styles from './index.module.css';
 
 const cycle = [
@@ -51,20 +51,22 @@ export default function Home() {
   return (
     <Layout title={siteConfig.title} description="C# und .NET lernen mit Vorhersagen, Playground und Quizzes">
       <Hero />
-      <main className="container margin-vert--xl">
-        <DueDashboard />
-        <h2 className={styles.heading}>So ist der Lernpfad aufgebaut</h2>
-        <p className={styles.lead}>
-          Kurze Kapitel, ein Konzept nach dem anderen und aktives Üben statt passivem Lesen. Die
-          Hintergründe stehen auf der Seite <Link to="/docs/lernprinzipien">Lernprinzipien</Link>.
-        </p>
-        <div className={styles.grid}>
-          {cycle.map((step) => (
-            <section key={step.title} className={styles.card}>
-              <h3>{step.title}</h3>
-              <p>{step.text}</p>
-            </section>
-          ))}
+      <main>
+        <LernstandTeaser />
+        <div className="container margin-vert--xl">
+          <h2 className={styles.heading}>So ist der Lernpfad aufgebaut</h2>
+          <p className={styles.lead}>
+            Kurze Kapitel, ein Konzept nach dem anderen und aktives Üben statt passivem Lesen. Die
+            Hintergründe stehen auf der Seite <Link to="/docs/lernprinzipien">Lernprinzipien</Link>.
+          </p>
+          <div className={styles.grid}>
+            {cycle.map((step) => (
+              <section key={step.title} className={styles.card}>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </section>
+            ))}
+          </div>
         </div>
       </main>
     </Layout>

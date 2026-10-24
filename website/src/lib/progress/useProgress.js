@@ -2,10 +2,9 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { PROGRESS_EVENT, PROGRESS_KEY } from './config';
 import { emptyProgress, getBrowserStorage, loadProgress, saveProgress } from './storage';
 
-export default function useProgress({ legacyIdMap = {} } = {}) {
+export default function useProgress() {
   const [progress, setProgress] = useState(null);
   const [available, setAvailable] = useState(true);
-  const mapRef = useRef(legacyIdMap);
   const current = useRef(null);
 
   const set = useCallback((p) => {
@@ -16,7 +15,7 @@ export default function useProgress({ legacyIdMap = {} } = {}) {
   useEffect(() => {
     const storage = getBrowserStorage();
     setAvailable(storage !== null);
-    const reload = () => set(loadProgress(storage, { legacyIdMap: mapRef.current }));
+    const reload = () => set(loadProgress(storage));
     const onStorage = (e) => {
       if (e.key === null || e.key === PROGRESS_KEY) reload();
     };

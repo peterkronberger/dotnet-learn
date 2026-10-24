@@ -57,10 +57,11 @@ Available:
 ## Learning progress – available (placement test planned)
 
 Available:
-- One versioned store (e.g. `dotnet-learn:v1:progress`) in localStorage/IndexedDB, all access in `try/catch`. Old keys `dotnet-learn:quiz:*` are migrated.
-- **Leitner system** with 5 boxes; start values of the intervals 1 · 2 · 4 · 8 · 16 days (assumption, adjustable).
-- **"Heute fällig" dashboard** (due today) on the start page.
-- **Export/import** as a JSON file.
+- One versioned store `dotnet-learn:v1:progress` in localStorage, all access in `try/catch`. Fields: `questions` (Leitner state per question), `lessons` (`{completedAt}` per `lesson_id`, set by the button "Lektion abschließen" at the end of every lesson) and `activity` (`{answered, correct, partial}` per day, no time limit). The old keys `dotnet-learn:quiz:*` are no longer migrated (there was no stored data yet).
+- **Leitner system** with 5 boxes; start values of the intervals 1 · 2 · 4 · 8 · 16 days (assumption, adjustable). For display, the boxes form three stages: box 1 "wackelig" (shaky), box 2–3 "im Aufbau" (building), box 4–5 "gefestigt" (solid) – a decision, not an empirical value.
+- **Page "Lernstand"** (`/dashboard`, navbar): Heute (next lesson with learning goals, due reviews with an inline session), Überblick (key figures), Lernpfad (lessons per module with status), Wissensstand (stages and boxes), Aktivität (chart and table: 4 weeks / 3 months / all), Deine Daten (export/import). No streaks, points or badges. The start page shows a teaser card.
+- **Lesson index:** the local plugin `website/plugins/lesson-index.js` reads every doc with `lesson_id` at build time (title, `description`, `duration_min`, the bullet points of `:::note[Lernziele]`, module label from `_category_.json`). The learning goals stay in the lesson; new lessons appear automatically.
+- **Export/import** as a JSON file (with lessons and activity).
 - Test page `/dev/progress-selftest`.
 
 Planned:
