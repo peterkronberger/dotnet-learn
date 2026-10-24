@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const website = join(root, 'website');
 const quizDir = join(website, 'src/data/quiz');
 
-const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug'];
+const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug', 'match'];
 const failures = [];
 const warnings = [];
 
@@ -102,8 +102,24 @@ function validate(q) {
       }
     }
   }
+  if (q.type === 'match') {
+    const pairs = q.pairs;
+    if (!Array.isArray(pairs) || pairs.length < 2 || pairs.length > 8) errors.push(`${w}: match needs 2 to 8 pairs`);
+    else if (pairs.some((p) => !p || typeof p.left !== 'string' || !p.left || typeof p.right !== 'string' || !p.right)) {
+      errors.push(`${w}: every pair needs left and right`);
+    } else {
+      if (new Set(pairs.map((p) => p.left)).size !== pairs.length) errors.push(`${w}: left values must be unique`);
+      if (new Set(pairs.map((p) => p.right)).size !== pairs.length) errors.push(`${w}: right values must be unique`);
+      if (q.wrongMatches !== undefined && !Array.isArray(q.wrongMatches)) errors.push(`${w}: wrongMatches must be a list`);
+      (Array.isArray(q.wrongMatches) ? q.wrongMatches : []).forEach((m, i) => {
+        if (!m || !pairs.some((p) => p.left === m.left)) errors.push(`${w}: wrongMatches ${i} has an unknown left`);
+        else if (!pairs.some((p) => p.right === m.right)) errors.push(`${w}: wrongMatches ${i} has an unknown right`);
+        else if (pairs.some((p) => p.left === m.left && p.right === m.right)) errors.push(`${w}: wrongMatches ${i} is a correct pair`);
+      });
+    }
+  }
   if (q.type === 'explain' && !q.modelAnswer) errors.push(`${w}: explain needs modelAnswer`);
-  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
+  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug', 'match'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
   return errors;
 }
 
@@ -166,6 +182,7 @@ questions
   .forEach((q) => {
     (q.options ?? []).forEach((o) => o.misconception && referenced.add(o.misconception));
     Object.values(q.distractorMisconceptions ?? {}).forEach((m) => referenced.add(m));
+    (q.wrongMatches ?? []).forEach((m) => m.misconception && referenced.add(m.misconception));
     Object.values(q.lineFeedback ?? {}).forEach((l) => l.misconception && referenced.add(l.misconception));
     (q.blanks ?? []).forEach((b) => (b.wrongAnswers ?? []).forEach((w) => w.misconception && referenced.add(w.misconception)));
   });

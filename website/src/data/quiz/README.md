@@ -8,9 +8,9 @@ Eine Datei pro Modul und Sprache: `de/mXX.json`. Neue Dateien werden in `index.j
 | --- | --- | --- |
 | `id` | ja | Stabiler Schlüssel, beginnt mit `lesson` + `-q` (z. B. `m01-l03-q1`) |
 | `lesson` | ja | `mXX-lYY` |
-| `type` | ja | `single`, `multi`, `output`, `explain`, `parsons`, `cloze`, `find-bug` (geplant: `match`) |
+| `type` | ja | `single`, `multi`, `output`, `explain`, `parsons`, `cloze`, `find-bug`, `match` |
 | `question` | ja | Fragetext |
-| `explanation` | `single`/`multi`/`output`/`parsons`/`cloze`/`find-bug` | Erklärt das *Warum* |
+| `explanation` | `single`/`multi`/`output`/`parsons`/`cloze`/`find-bug`/`match` | Erklärt das *Warum* |
 
 Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 
@@ -38,3 +38,4 @@ Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 ```
 
 Demo aller Typen: `/dev/quiz-demo`. Prüfung: `node tools/check-quiz.mjs`.
+- `match`: Begriffe zuordnen. `pairs` = 2 bis 8 Objekte `{left, right}`, `left` und `right` jeweils eindeutig. Pro linkem Begriff ein `<select>` (Label = linker Begriff) mit den rechten Einträgen in gemischter Reihenfolge (Seed = Frage-ID) und der leeren Option „Bitte wählen“. Richtig ist, wenn alle Zuordnungen stimmen. Das Ergebnis steht als Text (✓/✗) pro Zeile, bei Fehlern mit der richtigen Antwort. Optional `wrongMatches`: Liste `{left, right, feedback, misconception}` für typische falsche Zuordnungen (`left`/`right` müssen in `pairs` vorkommen).

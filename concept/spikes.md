@@ -91,7 +91,7 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 | --- | --- | --- | --- |
 | B1 | Convert MVP lessons: identifiers and comments in English, new folder structure, fix the solution text "`3,5` or `3.5`" (the output is always `3.5`) | S1 | erledigt (done) |
 | B2 | Start code in English: `playground/Samples.cs`, `website/src/pages/playground.js` | – | erledigt (done) |
-| B3 | Quiz questions in data files per language, quiz types, versioned progress store, Leitner, dashboard, export/import, migration of the old keys | – | erledigt (done; rest: #38, #39, #40, #41; CI check #42) |
+| B3 | Quiz questions in data files per language, quiz types, versioned progress store, Leitner, dashboard, export/import, migration of the old keys | – | erledigt (done; rest: CI check #42) |
 | B4 | Adapt the README section "Inhalte schreiben" (writing content) to the new rules | S1 | erledigt (done) |
 | B5 | Translatable runner UI (language parameter) | – | offen (open) |
 | B6 | Console input: `stdin` prop, input field, `Console.SetIn` | – | offen (open) |

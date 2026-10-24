@@ -11,6 +11,7 @@ import ExplainQuestion from './ExplainQuestion';
 import ParsonsQuestion from './ParsonsQuestion';
 import ClozeQuestion from './ClozeQuestion';
 import FindBugQuestion from './FindBugQuestion';
+import MatchQuestion from './MatchQuestion';
 import ProgressHint from './ProgressHint';
 
 const COMPONENTS = {
@@ -21,6 +22,7 @@ const COMPONENTS = {
   parsons: ParsonsQuestion,
   cloze: ClozeQuestion,
   'find-bug': FindBugQuestion,
+  match: MatchQuestion,
 };
 
 /**

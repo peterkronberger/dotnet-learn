@@ -77,6 +77,21 @@
         "5": { "feedback": "Die Ausgabe zeigt nur das Ergebnis von `rate`; der Fehler entsteht früher." }
       },
       "explanation": "`passed / total` ist eine Ganzzahldivision und ergibt `0`. Danach bleibt `0 * 100` gleich `0`. Mit `passed * 100 / total` (oder einem `double`-Operanden) ergibt sich `75`."
+    },
+    {
+      "id": "dev-l01-q8",
+      "lesson": "dev-l01",
+      "type": "match",
+      "question": "Ordne jedem Typ den passenden Einsatz zu.",
+      "pairs": [
+        { "left": "`int`", "right": "Anzahl fehlgeschlagener Anmeldungen" },
+        { "left": "`decimal`", "right": "Lizenzkosten in Euro" },
+        { "left": "`double`", "right": "Messwert eines Sensors" }
+      ],
+      "wrongMatches": [
+        { "left": "`double`", "right": "Lizenzkosten in Euro", "misconception": "dev-l01-demo", "feedback": "`double` rechnet binär und kann Dezimalbrüche wie `0.1` nicht exakt darstellen; für Geldbeträge ist `decimal` gedacht." }
+      ],
+      "explanation": "`int` zählt ganze Dinge, `decimal` rechnet Dezimalwerte exakt (Geld), `double` passt zu Messwerten, bei denen kleine Rundungsfehler keine Rolle spielen."
     }
   ]
 }

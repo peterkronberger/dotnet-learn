@@ -6,7 +6,7 @@ import {getExample} from './examples';
 import {splitCloze, clozeCode} from './cloze';
 import {findBugLines} from './findBug';
 
-export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug']; // planned: match
+export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug', 'match'];
 
 const DEFAULT_LOCALE = 'de';
 
@@ -101,10 +101,28 @@ export function validateQuestion(q) {
       }
     }
   }
+  if (q.type === 'match') {
+    const pairs = q.pairs;
+    if (!Array.isArray(pairs) || pairs.length < 2 || pairs.length > 8) {
+      errors.push(`${where}: match needs 2 to 8 pairs`);
+    } else if (pairs.some((p) => !p || typeof p.left !== 'string' || !p.left || typeof p.right !== 'string' || !p.right)) {
+      errors.push(`${where}: every pair needs left and right`);
+    } else {
+      if (new Set(pairs.map((p) => p.left)).size !== pairs.length) errors.push(`${where}: left values must be unique`);
+      if (new Set(pairs.map((p) => p.right)).size !== pairs.length) errors.push(`${where}: right values must be unique`);
+      const wm = q.wrongMatches;
+      if (wm !== undefined && !Array.isArray(wm)) errors.push(`${where}: wrongMatches must be a list`);
+      (Array.isArray(wm) ? wm : []).forEach((w, i) => {
+        if (!w || !pairs.some((p) => p.left === w.left)) errors.push(`${where}: wrongMatches ${i} has an unknown left`);
+        else if (!pairs.some((p) => p.right === w.right)) errors.push(`${where}: wrongMatches ${i} has an unknown right`);
+        else if (pairs.some((p) => p.left === w.left && p.right === w.right)) errors.push(`${where}: wrongMatches ${i} is a correct pair`);
+      });
+    }
+  }
   if (q.type === 'explain' && (typeof q.modelAnswer !== 'string' || !q.modelAnswer)) {
     errors.push(`${where}: explain needs modelAnswer`);
   }
-  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
+  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug', 'match'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
     errors.push(`${where}: explanation is required`);
   }
   return errors;

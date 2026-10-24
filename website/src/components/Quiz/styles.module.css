@@ -233,3 +233,35 @@
   white-space: pre;
   color: inherit;
 }
+
+.matchRows {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.matchRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+
+.matchLabel {
+  min-width: 8rem;
+  font-weight: 600;
+}
+
+.matchSelect {
+  max-width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: 2px solid var(--ifm-color-emphasis-400);
+  border-radius: 6px;
+  background: var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+}
+
+.matchSelect:focus-visible {
+  outline: 3px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
