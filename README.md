@@ -45,13 +45,14 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/lek
 - Collapsible: `<details><summary>…</summary> … </details>` (leave blank lines before and after the content).
 - Quiz: `<Quiz id="m01-l03-q1" />`. The question is stored in `website/src/data/quiz/de/mXX.json` (format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline props are no longer allowed; the build fails.
 - Misconception: `<Misconception id="m01-l03-int-division-rounds" />` as the first line in a `:::warning[Achtung]` box; one answer option points to it with `misconception`.
+- Reference lesson (pattern for new lessons): `website/docs/m01-variables-and-types/l03-numbers.mdx`.
 - Check quiz data and MDX references: `node tools/check-quiz.mjs`.
 - Version badge (only features from C# 12 / .NET 8, otherwise build error): `<Since csharp="12" dotnet="8" />` inline; with children (old code) as a collapsible "So schrieb man es vorher".
 - Switcher box: `<FromLanguage>` with `<TabItem value="java|python|js|go|cpp">` as children (the component sets labels and order; the choice applies to all boxes via `groupId="from-language"`). Example: `website/src/pages/dev/components-demo.mdx`.
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';
-import pitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
+import pitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
 
 <CSharpRunner height={420} code={pitfalls} />
 

@@ -18,7 +18,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 | --- | --- | --- |
 | `docs/intro.mdx` | M0 · L1 "Dein erstes Programm" (switch identifiers/comments to English) | moved to `docs/m00-orientation/l01-first-program.mdx` |
 | `docs/lernprinzipien.mdx` | M0 · page "Wie dieser Kurs funktioniert" (add literature from `didaktik.md` and the AI paragraph) | open (B10) |
-| `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (code to `examples/`, English, fix the solution text to `3.5` – the playground uses `InvariantGlobalization`, so the output is always `3.5`) | moved to `docs/m01-variables-and-types/l02-variables-and-types.mdx` |
+| `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (code to `examples/`, English, fix the solution text to `3.5` – the playground uses `InvariantGlobalization`, so the output is always `3.5`) | moved to `docs/m01-variables-and-types/l02-variables-and-types.mdx`; L3 moved out to `docs/m01-variables-and-types/l03-numbers.mdx` |
 | `docs/grundlagen/kontrollfluss.mdx` | M2 (split into several lessons) | moved to `docs/m02-control-flow/l01-control-flow.mdx` (split still open) |
 
 ## Modules

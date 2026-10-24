@@ -6,6 +6,8 @@ Lesson text is German. The German names of sections and boxes below are the real
 
 ## Flow
 
+Reference lesson as a pattern: `website/docs/m01-variables-and-types/l03-numbers.mdx`.
+
 | # | Step | Form | Note |
 | --- | --- | --- | --- |
 | 1 | Learning goals ("Lernziele") | `:::note[Lernziele]`, 2–4 points | As observable behavior: "Du kannst …" (you can …), "Du erkennst …" (you recognize …) |
@@ -14,15 +16,15 @@ Lesson text is German. The German names of sections and boxes below are the real
 | 4 | Practice example | **Practice-example pattern** (below) | Required, at least once |
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
 | 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |
-| 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes | Every box is linked to a quiz distractor |
-| 8 | (Switcher box) | Tabs Java / Python / JS/TS / Go | Only differences to C#, do not explain C# again |
+| 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes; `<Misconception id="…" />` as the first line of each box | Every box is linked to a quiz distractor |
+| 8 | (Switcher box) | `<FromLanguage>` with tabs Java / Python / JS/TS / Go | Only differences to C#, do not explain C# again |
 | 9 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a Microsoft Learn source |
 | 10 | Summary | 3–5 sentences | No new content |
 | 11 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": 1–3 links to Microsoft Learn / C# specification |
 
 ## Practice-example pattern (required in step 4)
 
-This matches PRIMM. It is already implemented in the MVP (`website/docs/grundlagen/variablen-und-typen.mdx`, section "Zwei Stolperfallen"):
+This matches PRIMM. It is already implemented in the MVP (reference lesson `website/docs/m01-variables-and-types/l03-numbers.mdx`, section "Zwei Stolperfallen"):
 
 1. **Prediction** (`:::info[Vorhersage]`): a task to think ahead about what the output will be. Optionally with an input field per output line. After the run, a sober check ✓/✗ (no "surprise" wording). Input field via `<CSharpRunner predict expected={…}>`, with `expected` taken from the `.out.txt` snapshot via `raw-loader`.
 2. **`<CSharpRunner>`** (Run)
@@ -42,12 +44,12 @@ Worked examples split the solution into named steps. For LINQ, for example: "1. 
 title: Ganzzahldivision und Gleitkommazahlen
 sidebar_position: 2
 description: Warum 7 / 2 in C# 3 ergibt – und wann double und decimal helfen.
-lesson_id: m01-l02
+lesson_id: m01-l03
 duration_min: 20
 ---
 
 import CodeBlock from '@theme/CodeBlock';
-import pitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
+import pitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
 
 # Ganzzahldivision und Gleitkommazahlen
 
@@ -56,7 +58,7 @@ import pitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
 :::
 
 ## Rückblick
-<Quiz id="m01-l01-q1" … />
+<Quiz id="m01-l03-q1" />
 
 ## Zwei Stolperfallen
 
