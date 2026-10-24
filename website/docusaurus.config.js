@@ -1,7 +1,7 @@
 // @ts-check
 const {themes: prismThemes} = require('prism-react-renderer');
 
-// GitHub Pages (Projektseite): https://peterkronberger.github.io/dotnet-learn/
+// GitHub Pages (project site): https://peterkronberger.github.io/dotnet-learn/
 const baseUrl = '/dotnet-learn/';
 
 /** @type {import('@docusaurus/types').Config} */

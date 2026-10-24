@@ -119,7 +119,7 @@
   box-shadow: none;
 }
 
-/* Einklappbare Bereiche (<details>) */
+/* Collapsible sections (<details>) */
 .markdown details,
 details.alert {
   border: 1px solid var(--dl-border);
@@ -135,13 +135,29 @@ details.alert {
   padding: 0.5rem 0;
 }
 
-/* Hinweisboxen */
+/* Docusaurus Details: triangle and summary text in one row */
+details.alert > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+details.alert > summary::before {
+  position: static;
+  flex: none;
+}
+
+details.alert > summary > p {
+  margin: 0;
+}
+
+/* Notice boxes */
 .alert {
   border-radius: var(--ifm-global-radius);
   box-shadow: none;
 }
 
-/* Sichtbarer Tastaturfokus */
+/* Visible keyboard focus */
 :focus-visible {
   outline: 3px solid var(--ifm-color-primary);
   outline-offset: 2px;
