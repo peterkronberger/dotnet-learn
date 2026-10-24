@@ -1,4 +1,4 @@
-/* Farben entsprechen der Lernseite (Indigo). Kontrast Text/Hintergrund jeweils mindestens 4,5:1. */
+/* Colors match the learning site (indigo). Text/background contrast is at least 4.5:1 everywhere. */
 :root {
   color-scheme: light dark;
   --bg: #ffffff;
@@ -307,7 +307,7 @@ body {
   display: none !important;
 }
 
-/* Blazor blendet das Element bei einem Absturz selbst ein (display: block). */
+/* Blazor shows this element itself on a crash (display: block). */
 #blazor-error-ui {
   display: none;
   position: fixed;

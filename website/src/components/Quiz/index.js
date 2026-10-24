@@ -9,7 +9,7 @@ function readProgress(id) {
     const raw = window.localStorage.getItem(STORAGE_PREFIX + id);
     return raw ? JSON.parse(raw) : null;
   } catch (error) {
-    return null; // z. B. privater Modus oder blockierter Speicher
+    return null; // e.g. private mode or blocked storage
   }
 }
 
@@ -17,11 +17,11 @@ function writeProgress(id, value) {
   try {
     window.localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify(value));
   } catch (error) {
-    // Fortschritt ist nur eine Komfortfunktion – Fehler bewusst ignoriert.
+    // Progress is only a convenience feature – errors are ignored on purpose.
   }
 }
 
-// Wandelt `code` in Backticks in <code>-Elemente um.
+// Turns `code` in backticks into <code> elements.
 function renderInline(text) {
   return String(text)
     .split('`')
@@ -31,14 +31,14 @@ function renderInline(text) {
 }
 
 /**
- * Multiple-Choice-Frage mit erklärendem Feedback (Abrufübung).
+ * Multiple-choice question with explanatory feedback (retrieval practice).
  *
  * Props:
- *  - id:       eindeutiger Schlüssel (für den lokalen Lernfortschritt)
- *  - question: Fragetext (Backticks = Inline-Code)
- *  - options:  Array von Antworttexten
- *  - answer:   Index der richtigen Antwort (0-basiert)
- *  - children: Erklärung, wird nach dem Prüfen angezeigt
+ *  - id:       unique key (for the local learning progress)
+ *  - question: question text (backticks = inline code)
+ *  - options:  array of answer texts
+ *  - answer:   index of the correct answer (0-based)
+ *  - children: explanation, shown after checking
  */
 export default function Quiz({id, question, options, answer, children}) {
   const groupName = useId();

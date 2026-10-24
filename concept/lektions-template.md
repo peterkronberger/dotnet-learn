@@ -1,39 +1,41 @@
-# Lektions-Template
+# Lesson template
 
-Jede Lektion folgt dieser Reihenfolge. Optionale Elemente stehen in Klammern. Dauer 15–25 min, ein Kernkonzept. Prüfung gegen die Definition of Done in `CLAUDE.md`.
+Every lesson follows this order. Optional elements are in parentheses. Length 15–25 min, one core concept. Check against the Definition of Done in `CLAUDE.md`.
 
-## Ablauf
+Lesson text is German. The German names of sections and boxes below are the real learner-facing text and stay as they are.
 
-| # | Schritt | Form | Hinweis |
+## Flow
+
+| # | Step | Form | Note |
 | --- | --- | --- | --- |
-| 1 | Lernziele | `:::note[Lernziele]`, 2–4 Punkte | Als beobachtbares Verhalten: „Du kannst …“, „Du erkennst …“ |
-| 2 | Aufwärmen | 2–3 `<Quiz>` zu früheren Lektionen | Überschrift „Rückblick“; Abrufübung, nicht neuer Stoff |
-| 3 | Konzept | Kurzer Text + kleines, isoliertes Beispiel | Nur das aktuelle Konzept; kein Projektkontext |
-| 4 | Praxisbeispiel | **Praxisbeispiel-Muster** (unten) | Pflicht, mindestens einmal |
-| 5 | Lücken-Beispiel | Beispiel mit Lücken, Teilziel-Beschriftungen bleiben | Fading: Lücken sitzen im Code |
-| 6 | Ändern und Selbermachen | Automatisch geprüfte Aufgabe | Automatisch geprüfte Aufgabe mit `<CSharpRunner tests={…}>`; eingeklappte Musterlösung nur als Fallback, z. B. für nicht ausführbare Themen |
-| 7 | Fehlvorstellungen | `:::warning[Achtung]`, 1–3 kurze Boxen | Jede Box ist mit einem Quiz-Distraktor verknüpft |
-| 8 | (Umsteiger-Box) | Tabs Java / Python / JS/TS / Go | Nur Unterschiede zu C#, nicht C# erneut erklären |
-| 9 | (Vertiefung) | `<details>` „Vertiefung: … (optional)“ | Ersetzt „Unter der Haube“; Fachaussagen mit Microsoft-Learn-Quelle |
-| 10 | Zusammenfassung | 3–5 Sätze | Keine neuen Inhalte |
-| 11 | Abschluss | Quiz (→ Leitner-Pool), „In eigenen Worten erklären“, Transferfrage, (SecLog-Zusatzübung), „Weiterlesen“ | „Weiterlesen“: 1–3 Links auf Microsoft Learn / C#-Spezifikation |
+| 1 | Learning goals ("Lernziele") | `:::note[Lernziele]`, 2–4 points | As observable behavior: "Du kannst …" (you can …), "Du erkennst …" (you recognize …) |
+| 2 | Warm-up | 2–3 `<Quiz>` on earlier lessons | Heading "Rückblick" (review); retrieval practice, not new material |
+| 3 | Concept | Short text + small, isolated example | Only the current concept; no project context |
+| 4 | Practice example | **Practice-example pattern** (below) | Required, at least once |
+| 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
+| 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |
+| 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes | Every box is linked to a quiz distractor |
+| 8 | (Switcher box) | Tabs Java / Python / JS/TS / Go | Only differences to C#, do not explain C# again |
+| 9 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a Microsoft Learn source |
+| 10 | Summary | 3–5 sentences | No new content |
+| 11 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": 1–3 links to Microsoft Learn / C# specification |
 
-## Praxisbeispiel-Muster (Pflicht in Schritt 4)
+## Practice-example pattern (required in step 4)
 
-Entspricht PRIMM. So ist es im MVP bereits umgesetzt (`website/docs/grundlagen/variablen-und-typen.mdx`, Abschnitt „Zwei Stolperfallen“):
+This matches PRIMM. It is already implemented in the MVP (`website/docs/grundlagen/variablen-und-typen.mdx`, section "Zwei Stolperfallen"):
 
-1. **Vorhersage** (`:::info[Vorhersage]`): Aufgabe, vorab zu überlegen, was herauskommt. Optional mit Eingabefeld pro Ausgabezeile; nach dem Ausführen nüchterne Prüfung ✓/✗ (kein „Überraschung“-Wording). Eingabefeld über `<CSharpRunner predict expected={…}>`, `expected` aus dem `.out.txt`-Snapshot per `raw-loader`.
+1. **Prediction** (`:::info[Vorhersage]`): a task to think ahead about what the output will be. Optionally with an input field per output line. After the run, a sober check ✓/✗ (no "surprise" wording). Input field via `<CSharpRunner predict expected={…}>`, with `expected` taken from the `.out.txt` snapshot via `raw-loader`.
 2. **`<CSharpRunner>`** (Run)
-3. **`<details>` „Lösung und Erklärung anzeigen“** (Investigate): Ausgabe, dann das *Warum*, gegliedert mit Teilziel-Beschriftungen. Wo passend, eine Frage „Was passiert, wenn …?“.
-4. **`<details>` „Vertiefung: … (optional)“**
+3. **`<details>` "Lösung und Erklärung anzeigen"** (Investigate): the output, then the *why*, structured with subgoal labels. Where it fits, add a question "Was passiert, wenn …?" (what happens if …?).
+4. **`<details>` "Vertiefung: … (optional)"**
 
-„Ändern“ und „Selbermachen“ folgen als eigene Aufgaben (Schritt 5/6).
+"Modify" and "Make" follow as their own tasks (step 5/6).
 
-## Teilziel-Beschriftungen
+## Subgoal labels
 
-Vorgerechnete Beispiele gliedern die Lösung in benannte Schritte, z. B. bei LINQ: „1. Datenquelle wählen → 2. Filtern → 3. Projizieren → 4. Ergebnis materialisieren“. Die Beschriftungen stehen im Fließtext oder in der Lösung, **nicht** als Code-Kommentar auf Deutsch (Code-Kommentare sind Englisch).
+Worked examples split the solution into named steps. For LINQ, for example: "1. Choose data source → 2. Filter → 3. Project → 4. Materialize result". The labels go in the body text or in the solution, **not** as a German code comment (code comments are English).
 
-## Gerüst
+## Skeleton
 
 ```mdx
 ---
@@ -78,8 +80,8 @@ Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe de
 - Microsoft Learn: …
 ```
 
-Nicht ausführbarer Code erscheint wie ein normaler Codeblock mit Titel. Weil der Code aus einer Datei kommt, wird dafür `<CodeBlock language="csharp" title="…">{code}</CodeBlock>` (offizielle Docusaurus-Komponente) verwendet – die Darstellung ist identisch mit ` ```csharp title="…" `.
+Code that cannot run looks like a normal code block with a title. Because the code comes from a file, use `<CodeBlock language="csharp" title="…">{code}</CodeBlock>` (official Docusaurus component). The look is identical to ` ```csharp title="…" `.
 
-## Zusatzübungen SecLog
+## SecLog extra exercises
 
-Neue Konzepte werden **immer zuerst** an kleinen, eigenständigen Beispielen gezeigt. Das Übungsprojekt SecLog kommt danach als optionale Zusatzübung (Schritt 11). Details: `concept/modulplan.md`.
+New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 11). Details: `concept/modulplan.md`.

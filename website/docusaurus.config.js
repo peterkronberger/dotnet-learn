@@ -14,8 +14,8 @@ const config = {
   baseUrl,
   organizationName: 'peterkronberger',
   projectName: 'dotnet-learn',
-  // GitHub Pages hängt standardmäßig Slashes an; die Docusaurus-Doku empfiehlt,
-  // trailingSlash explizit (true oder false) zu setzen.
+  // GitHub Pages adds trailing slashes by default; the Docusaurus docs recommend
+  // setting trailingSlash explicitly (true or false).
   trailingSlash: false,
 
   onBrokenLinks: 'warn',
