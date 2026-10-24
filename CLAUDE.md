@@ -9,10 +9,23 @@ This document is binding for all work in the repo – for humans and for Claude 
 | Path | Content |
 | --- | --- |
 | `website/` | Docusaurus site. Lessons in `website/docs/`, components in `website/src/components/` |
-| `website/examples/` | **All** C# examples as `.cs` files (one source for all languages, checked by CI) – see S1/S2 |
+| `website/examples/` | **All** C# examples as `.cs` files (one source for all languages, checked by CI) – see S1/S2 and "Example folders" below |
+| `website/src/data/quiz/` | Quiz questions per language and module (`de/mXX.json`), format in its `README.md` |
+| `website/plugins/` | Local Docusaurus plugins (`lesson-index.js`) |
 | `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded by iframe |
+| `tools/` | `check-examples.sh` (S2), `check-quiz.mjs` (quiz data and links) |
 | `concept/` | Learning concept (imported below) |
-| `.github/workflows/` | `pages.yml` (build + deploy), `claude-*.yml` (issue automation) |
+| `.claude/rules/` | Path-scoped rules for lessons, examples and the playground |
+| `.github/workflows/` | `pages.yml` (build + deploy), `examples.yml` (example check), `claude-*.yml` (issue automation) |
+
+### Example folders
+
+Under `website/examples/`:
+
+- `mXX/lYY/`: examples of the lessons.
+- `dev/`: examples of the dev showcase pages (`/dev/`).
+- `playground/`: start code of the playground page.
+- `_ci/<name>/`: projects that need NuGet packages (EF Core, Minimal API, xUnit, DI and logging). Each has a `run.sh` and an `expected.out.txt`.
 
 ## Commands
 
@@ -28,6 +41,9 @@ dotnet run --project playground               # run locally
 # Check example code (compile + compare output with <name>.out.txt), see S2
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
+
+# Check quiz data and links (runs in CI before the build)
+node tools/check-quiz.mjs
 ```
 
 Before every commit: run both build checks. If one fails, do not commit.
