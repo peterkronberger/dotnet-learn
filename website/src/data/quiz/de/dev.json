@@ -47,6 +47,23 @@
       "example": "dev/parsons-demo.cs",
       "distractors": ["Console.WriteLine(total / count);"],
       "explanation": "Zuerst brauchen die Werte und die Summe eine Variable, dann addiert die Schleife jeden Wert zur Summe. Erst danach kann der Durchschnitt berechnet und ausgegeben werden. `count` ist nirgends deklariert, die Zeile gehört daher nicht zur Lösung."
+    },
+    {
+      "id": "dev-l01-q6",
+      "lesson": "dev-l01",
+      "type": "cloze",
+      "question": "Ergänze die Lücken, sodass `3.5` ausgegeben wird.",
+      "example": "dev/cloze-demo.cs",
+      "blanks": [
+        {
+          "text": "(double)",
+          "accept": ["(double)", "(decimal)"],
+          "hint": "Ein Operand muss ein Gleitkommatyp sein.",
+          "wrongAnswers": [{ "text": "(int)", "misconception": "dev-l01-demo" }]
+        },
+        { "text": "average", "hint": "Ausgegeben wird das Ergebnis der Berechnung." }
+      ],
+      "explanation": "Mit `(double)` wird `total` in eine Gleitkommazahl umgewandelt, daher ist die Division keine Ganzzahldivision mehr. `(decimal)` funktioniert ebenfalls. Ausgegeben wird die Variable `average`."
     }
   ]
 }
