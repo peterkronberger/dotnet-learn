@@ -84,3 +84,31 @@
 .explanation > :last-child {
   margin-bottom: 0;
 }
+
+.hint,
+.progressHint {
+  font-size: 0.875rem;
+  margin: 0.5rem 0 0;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.mark {
+  font-weight: 700;
+}
+
+.textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--ifm-font-family-monospace);
+  border: 1px solid var(--dl-border);
+  border-radius: 0.6rem;
+  background: var(--dl-surface-alt);
+  color: var(--ifm-font-color-base);
+}
+
+.compare {
+  width: 100%;
+  margin-top: 1rem;
+}

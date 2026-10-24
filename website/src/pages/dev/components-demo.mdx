@@ -1,0 +1,54 @@
+---
+title: Demo Since und FromLanguage
+description: Entwicklerseite für die Komponenten Since und FromLanguage.
+---
+
+import Head from '@docusaurus/Head';
+import CodeBlock from '@theme/CodeBlock';
+import before from '!!raw-loader!@site/examples/dev/collection-expression-before.snippet.cs';
+import after from '!!raw-loader!@site/examples/dev/collection-expression.cs';
+
+<Head>
+  <meta name="robots" content="noindex" />
+</Head>
+
+# Demo: Since und FromLanguage
+
+## Collection Expressions <Since csharp="12" dotnet="8" />
+
+Badge inline in der Überschrift. Im Text: <Since csharp="12" />.
+
+<Since csharp="12" dotnet="8">
+
+<CodeBlock language="csharp" title="Vorher">{before}</CodeBlock>
+
+</Since>
+
+<CodeBlock language="csharp" title="Jetzt">{after}</CodeBlock>
+
+## Umsteiger-Box
+
+<FromLanguage>
+<TabItem value="go">
+
+In Go …
+
+</TabItem>
+<TabItem value="java">
+
+In Java …
+
+</TabItem>
+<TabItem value="python">
+
+In Python …
+
+</TabItem>
+<TabItem value="js">
+
+In JavaScript/TypeScript …
+
+</TabItem>
+</FromLanguage>
+
+[Zweite Demo-Seite](/dev/components-demo-2)

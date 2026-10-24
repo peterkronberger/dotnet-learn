@@ -1,0 +1,44 @@
+{
+  "module": "m01",
+  "questions": [
+    {
+      "id": "m01-l02-q1",
+      "lesson": "m01-l02",
+      "type": "single",
+      "question": "Was passiert bei `int x = 3.7;`?",
+      "options": [
+        { "text": "`x` ist `4`" },
+        { "text": "`x` ist `3`" },
+        { "text": "Der Compiler meldet einen Fehler", "correct": true },
+        { "text": "`x` ist `3.7`" }
+      ],
+      "explanation": "C# wandelt `double` nicht stillschweigend in `int` um, weil dabei Information verloren ginge. Du musst es ausdrücklich verlangen, z. B. mit `(int)3.7`. Das Ergebnis ist dann `3`, denn die Nachkommastellen werden abgeschnitten."
+    },
+    {
+      "id": "m01-l03-q1",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Welchen Typ und Wert hat `var x = 7 / 2;`?",
+      "options": [
+        { "text": "`double` mit dem Wert `3.5`" },
+        { "text": "`int` mit dem Wert `3`", "correct": true },
+        { "text": "`int` mit dem Wert `4`" },
+        { "text": "`decimal` mit dem Wert `3.5`" }
+      ],
+      "explanation": "Beide Operanden sind `int`, also ist die Division eine Ganzzahldivision. Der Nachkommateil wird abgeschnitten (nicht gerundet), das Ergebnis ist `3`. Für `3.5` müsste mindestens ein Operand ein `double` oder `decimal` sein, etwa `7 / 2.0`."
+    },
+    {
+      "id": "m01-l03-q2",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Welcher Typ ist für Geldbeträge am besten geeignet?",
+      "options": [
+        { "text": "`float`" },
+        { "text": "`double`" },
+        { "text": "`decimal`", "correct": true },
+        { "text": "`char`" }
+      ],
+      "explanation": "`decimal` speichert Zahlen im Dezimalsystem. Beträge wie `0.10` lassen sich damit exakt darstellen. Bei `float` und `double` können binäre Rundungsfehler auftreten, wie im Beispiel `0.1 + 0.2`."
+    }
+  ]
+}

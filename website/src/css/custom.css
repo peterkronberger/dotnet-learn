@@ -32,6 +32,8 @@
   --dl-ok-bg: #ecfdf3;
   --dl-bad: #b42318;
   --dl-bad-bg: #fef3f2;
+  --dl-badge-fg: #3730a3;
+  --dl-badge-bg: #e0e7ff;
 
   --docusaurus-highlighted-code-line-bg: rgba(79, 70, 229, 0.1);
 }
@@ -54,6 +56,8 @@
   --dl-ok-bg: #0f2a1c;
   --dl-bad: #fca5a5;
   --dl-bad-bg: #331616;
+  --dl-badge-fg: #e0e7ff;
+  --dl-badge-bg: #312e81;
 
   --docusaurus-highlighted-code-line-bg: rgba(165, 180, 252, 0.15);
 }

@@ -43,7 +43,11 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/lek
 - **Location:** Lessons live in `website/docs/mXX-<slug>/lYY-<slug>.mdx` (slugs in English, see `concept/modulplan.md`). Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
 - **Code** lives in `website/examples/mXX/lYY/<english-name>.cs` (English, kebab-case, one example per file) and is included with `raw-loader`. Backticks, backslashes and `${` are allowed in the code.
 - Collapsible: `<details><summary>…</summary> … </details>` (leave blank lines before and after the content).
-- Quiz: `<Quiz id="…" question="…" options={[…]} answer={0}>Explanation</Quiz>`.
+- Quiz: `<Quiz id="m01-l03-q1" />`. The question is stored in `website/src/data/quiz/de/mXX.json` (format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline props are no longer allowed; the build fails.
+- Misconception: `<Misconception id="m01-l03-int-division-rounds" />` as the first line in a `:::warning[Achtung]` box; one answer option points to it with `misconception`.
+- Check quiz data and MDX references: `node tools/check-quiz.mjs`.
+- Version badge (only features from C# 12 / .NET 8, otherwise build error): `<Since csharp="12" dotnet="8" />` inline; with children (old code) as a collapsible "So schrieb man es vorher".
+- Switcher box: `<FromLanguage>` with `<TabItem value="java|python|js|go|cpp">` as children (the component sets labels and order; the choice applies to all boxes via `groupId="from-language"`). Example: `website/src/pages/dev/components-demo.mdx`.
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';
