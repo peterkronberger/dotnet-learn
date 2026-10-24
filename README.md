@@ -46,6 +46,8 @@ Verbindlich sind die Regeln und die Definition of Done in `CLAUDE.md` sowie der 
 - Quiz: `<Quiz id="m01-l03-q1" />`. Die Frage steht in `website/src/data/quiz/de/mXX.json` (Format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline-Props sind nicht mehr erlaubt, der Build schlägt dann fehl.
 - Fehlvorstellung: `<Misconception id="m01-l03-int-division-rounds" />` als erste Zeile in einer `:::warning[Achtung]`-Box; eine Antwortoption verweist per `misconception` darauf.
 - Prüfung der Quizdaten und MDX-Verweise: `node tools/check-quiz.mjs`.
+- Versions-Badge (nur Features ab C# 12 / .NET 8, sonst Build-Fehler): `<Since csharp="12" dotnet="8" />` inline; mit Kindern (Vorher-Code) als aufklappbares „So schrieb man es vorher“.
+- Umsteiger-Box: `<FromLanguage>` mit `<TabItem value="java|python|js|go|cpp">` als Kindern (Beschriftung und Reihenfolge setzt die Komponente; Auswahl gilt per `groupId="from-language"` für alle Boxen). Beispiel: `website/src/pages/dev/components-demo.mdx`.
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';

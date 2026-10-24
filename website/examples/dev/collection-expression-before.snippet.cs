@@ -1,0 +1,2 @@
+int[] numbers = new int[] { 1, 2, 3 };
+var list = new List<int> { 1, 2, 3 };

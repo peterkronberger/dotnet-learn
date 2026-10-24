@@ -1,0 +1,12 @@
+.box {
+  border: 1px solid var(--dl-border);
+  border-radius: var(--ifm-global-radius);
+  background: var(--dl-surface-alt);
+  padding: 0.75rem 1rem 0.25rem;
+  margin: 1.25rem 0;
+}
+
+.title {
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
