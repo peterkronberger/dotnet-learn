@@ -64,6 +64,7 @@ const config = {
             label: 'Lernpfad',
           },
           {to: '/playground', label: 'Playground', position: 'left'},
+          {to: '/dashboard', label: 'Lernstand', position: 'left'},
           {
             href: 'https://github.com/peterkronberger/dotnet-learn',
             label: 'GitHub',

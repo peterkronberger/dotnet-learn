@@ -1,4 +1,5 @@
 import React, {useId, useState} from 'react';
+import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import {parseImport, serializeProgress} from '@site/src/lib/progress/exportImport';
 import {MAX_IMPORT_LENGTH} from '@site/src/lib/progress/config';
@@ -61,17 +62,14 @@ export default function ProgressTransfer({progress, replace}) {
   }
 
   return (
-    <div>
-      <h3>
-        <Translate id="dashboard.transfer.title">Lernstand sichern</Translate>
-      </h3>
-      <p>
-        <Translate id="dashboard.transfer.text">
-          Dein Lernstand liegt nur in diesem Browser. Exportiere ihn als Datei, um ihn zu sichern oder auf ein anderes Gerät zu übertragen.
+    <div className={clsx(styles.card, styles.dataCard)}>
+      <p className={styles.dataText}>
+        <Translate id="lernstand.data.text">
+          Dein Lernstand liegt nur in diesem Browser, ohne Konto und ohne Tracking. Mit dem Export sicherst du ihn als Datei oder überträgst ihn auf ein anderes Gerät.
         </Translate>
       </p>
-      <div className={styles.actions}>
-        <button type="button" className="button button--secondary" onClick={exportProgress}>
+      <div className={styles.dataActions}>
+        <button type="button" className={styles.buttonSecondary} onClick={exportProgress}>
           <Translate id="dashboard.export">Lernstand exportieren</Translate>
         </button>
         <input
@@ -81,7 +79,7 @@ export default function ProgressTransfer({progress, replace}) {
           accept="application/json,.json"
           onChange={onFile}
         />
-        <label htmlFor={inputId} className={`button button--secondary ${styles.fileLabel}`}>
+        <label htmlFor={inputId} className={clsx(styles.buttonSecondary, styles.fileLabel)}>
           <Translate id="dashboard.import">Lernstand importieren</Translate>
         </label>
       </div>
@@ -91,21 +89,25 @@ export default function ProgressTransfer({progress, replace}) {
             <Translate
               id="dashboard.import.confirm"
               values={{n: Object.keys(pending.questions).length, m: Object.keys(progress.questions).length}}>
-              {'Die Datei enthält {n} Fragen. Dein aktueller Lernstand ({m} Fragen) wird ersetzt.'}
+              {'Die Datei enthält {n} Fragen. Dein aktueller Lernstand ({m} Fragen, abgeschlossene Lektionen und Aktivität) wird ersetzt.'}
             </Translate>
           </p>
           <div className={styles.actions}>
-            <button type="button" className="button button--primary" onClick={confirmReplace}>
+            <button type="button" className={styles.buttonPrimary} onClick={confirmReplace}>
               <Translate id="dashboard.import.replace">Ersetzen</Translate>
             </button>
-            <button type="button" className="button button--secondary" onClick={() => setPending(null)}>
+            <button type="button" className={styles.buttonSecondary} onClick={() => setPending(null)}>
               <Translate id="dashboard.import.cancel">Abbrechen</Translate>
             </button>
           </div>
         </div>
       )}
-      <div role="alert">{error && <p className={styles.error}>{error}</p>}</div>
-      <div aria-live="polite">{message && <p className={styles.success}>{message}</p>}</div>
+      <div role="alert" className={styles.dataMessages}>
+        {error && <p className={styles.error}>{error}</p>}
+      </div>
+      <div aria-live="polite" className={styles.dataMessages}>
+        {message && <p className={styles.success}>{message}</p>}
+      </div>
     </div>
   );
 }
