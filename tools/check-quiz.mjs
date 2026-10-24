@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const website = join(root, 'website');
 const quizDir = join(website, 'src/data/quiz');
 
-const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze'];
+const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug'];
 const failures = [];
 const warnings = [];
 
@@ -83,8 +83,27 @@ function validate(q) {
       }
     }
   }
+  if (q.type === 'find-bug') {
+    if (!q.example) errors.push(`${w}: find-bug needs example`);
+    else if (!Array.isArray(q.bugLines) || q.bugLines.length < 1 || q.bugLines.some((n) => !Number.isInteger(n))) {
+      errors.push(`${w}: find-bug needs bugLines (at least one line number)`);
+    } else {
+      const cs = join(website, 'examples', q.example);
+      if (!existsSync(cs)) errors.push(`${w}: example ${q.example} not found`);
+      else {
+        if (!q.example.endsWith('.snippet.cs') && !existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
+        // Same line rule as findBugLines in website/src/data/quiz/findBug.js.
+        const count = readFileSync(cs, 'utf8').replace(/\r\n?/g, '\n').replace(/\n+$/, '').split('\n').length;
+        if (q.bugLines.some((n) => n < 1 || n > count)) errors.push(`${w}: bugLines must be within 1..${count}`);
+        if (new Set(q.bugLines).size !== q.bugLines.length) errors.push(`${w}: bugLines has duplicates`);
+        for (const k of Object.keys(q.lineFeedback ?? {})) {
+          if (!/^\d+$/.test(k) || Number(k) < 1 || Number(k) > count) errors.push(`${w}: lineFeedback key "${k}" is not a line within 1..${count}`);
+        }
+      }
+    }
+  }
   if (q.type === 'explain' && !q.modelAnswer) errors.push(`${w}: explain needs modelAnswer`);
-  if (['single', 'multi', 'output', 'parsons', 'cloze'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
+  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
   return errors;
 }
 
@@ -147,6 +166,7 @@ questions
   .forEach((q) => {
     (q.options ?? []).forEach((o) => o.misconception && referenced.add(o.misconception));
     Object.values(q.distractorMisconceptions ?? {}).forEach((m) => referenced.add(m));
+    Object.values(q.lineFeedback ?? {}).forEach((l) => l.misconception && referenced.add(l.misconception));
     (q.blanks ?? []).forEach((b) => (b.wrongAnswers ?? []).forEach((w) => w.misconception && referenced.add(w.misconception)));
   });
 const linkErrors = [];

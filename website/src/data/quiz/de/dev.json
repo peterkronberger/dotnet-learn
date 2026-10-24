@@ -64,6 +64,19 @@
         { "text": "average", "hint": "Ausgegeben wird das Ergebnis der Berechnung." }
       ],
       "explanation": "Mit `(double)` wird `total` in eine Gleitkommazahl umgewandelt, daher ist die Division keine Ganzzahldivision mehr. `(decimal)` funktioniert ebenfalls. Ausgegeben wird die Variable `average`."
+    },
+    {
+      "id": "dev-l01-q7",
+      "lesson": "dev-l01",
+      "type": "find-bug",
+      "question": "In welcher Zeile steckt der Fehler? Erwartet wird die Quote in Prozent (`75`), ausgegeben wird `0`.",
+      "example": "dev/find-bug-demo.cs",
+      "bugLines": [4],
+      "lineFeedback": {
+        "4": { "feedback": "Hier teilt C# zuerst `int` durch `int`: `18 / 24` ergibt `0`.", "misconception": "dev-l01-demo" },
+        "5": { "feedback": "Die Ausgabe zeigt nur das Ergebnis von `rate`; der Fehler entsteht früher." }
+      },
+      "explanation": "`passed / total` ist eine Ganzzahldivision und ergibt `0`. Danach bleibt `0 * 100` gleich `0`. Mit `passed * 100 / total` (oder einem `double`-Operanden) ergibt sich `75`."
     }
   ]
 }

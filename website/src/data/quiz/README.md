@@ -8,9 +8,9 @@ Eine Datei pro Modul und Sprache: `de/mXX.json`. Neue Dateien werden in `index.j
 | --- | --- | --- |
 | `id` | ja | Stabiler Schlüssel, beginnt mit `lesson` + `-q` (z. B. `m01-l03-q1`) |
 | `lesson` | ja | `mXX-lYY` |
-| `type` | ja | `single`, `multi`, `output`, `explain`, `parsons`, `cloze` (geplant: `find-bug`, `match`) |
+| `type` | ja | `single`, `multi`, `output`, `explain`, `parsons`, `cloze`, `find-bug` (geplant: `match`) |
 | `question` | ja | Fragetext |
-| `explanation` | `single`/`multi`/`output`/`parsons`/`cloze` | Erklärt das *Warum* |
+| `explanation` | `single`/`multi`/`output`/`parsons`/`cloze`/`find-bug` | Erklärt das *Warum* |
 
 Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 
@@ -23,6 +23,7 @@ Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 - `explain`: `modelAnswer` (Pflicht). Die Antwort der Lernenden wird nicht gespeichert; Selbstbewertung `correct`/`partial`/`wrong`.
 - `parsons`: Zeilen ordnen. `example` = Pfad wie bei `output`; die richtige Reihenfolge sind die nicht-leeren Zeilen der Datei (Einrückung wird angezeigt, aber nicht bewertet). Optional: `distractors` (Zeilen, die nicht in die Lösung gehören, nicht identisch mit Lösungszeilen) und `distractorMisconceptions` (Objekt `Zeilentext` → Misconception-ID). Anzeige in fester, aus der Frage-ID abgeleiteter Mischung. Bedienung per Knöpfen (Hinzufügen, Nach oben/unten, Entfernen); Änderungen werden in einer Live-Region angesagt.
 - `cloze`: Code-Lückentext. `example` = Pfad wie bei `output` (vollständiger, lauffähiger Code). `blanks` = Lücken in der Reihenfolge des Codes. Jede Lücke ist das erste noch nicht vergebene Vorkommen von `text`, gesucht ab dem Ende der vorherigen Lücke; kommt `text` nicht vor, schlagen Build und `check-quiz.mjs` fehl. Pro Lücke: `text` (Lösung), optional `accept` (akzeptierte Eingaben, Standard `[text]`, Vergleich ohne Leerzeichen), `hint` (bei falscher Lücke), `wrongAnswers` (Liste aus `text` und `feedback` und/oder `misconception`). Jede Lücke hat das Label „Lücke N von M“; das Ergebnis steht pro Lücke als Text (✓/✗) neben dem Feld.
+- `find-bug`: fehlerhafte Zeile(n) auswählen. `example` = Pfad wie bei `output`; bei Code, der nicht kompiliert, eine `*.snippet.cs`-Datei (ohne `.out.txt`). `bugLines` = Zeilennummern (1-basiert, mindestens eine, innerhalb der Datei). Genau eine Zeile: Auswahl per Radio-Button, sonst Checkboxen. Richtig ist, wenn die gewählte Menge genau `bugLines` entspricht. Optional `lineFeedback`: Objekt `Zeilennummer` → `{feedback, misconception}`, gezeigt für gewählte Zeilen. Jede Zeile hat das Label „Zeile N: <Code>“; das Ergebnis steht als Text (✓/✗) neben der Zeile.
 
 ## Beispiele
 
