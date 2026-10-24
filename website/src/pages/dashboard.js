@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '@theme/Layout';
 import {translate} from '@docusaurus/Translate';
-import Lernstand from '@site/src/components/Lernstand';
+import ProgressDashboard from '@site/src/components/ProgressDashboard';
 
 export default function DashboardPage() {
   return (
@@ -12,7 +12,7 @@ export default function DashboardPage() {
         message: 'Was heute ansteht, wie weit du im Lernpfad bist und wie sicher der Stoff sitzt.',
       })}>
       <main>
-        <Lernstand />
+        <ProgressDashboard />
       </main>
     </Layout>
   );

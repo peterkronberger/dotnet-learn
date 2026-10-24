@@ -40,7 +40,7 @@ Before every commit: run both build checks. If one fails, do not commit.
 4. **Every shown output is real**: it must match the actual run (CI comparison, S2). No outputs invented by hand.
 5. **Not runnable ≠ marked**: code examples that the playground cannot run (ASP.NET Core, EF Core, unit tests) are normal ` ```csharp title="…" ` blocks without a note.
 6. **Runnable** is only what runs in `<CSharpRunner>`. Practice examples follow the pattern *predict → runner → solution and explanation → deepening (optional)*.
-7. **Facts need a source**: technical statements link to Microsoft Learn or the C# specification; teaching statements link to the literature in `concept/didaktik.md`. Do not invent anything – if in doubt, mark it as an open question.
+7. **Facts need a source**: technical statements link to Microsoft Learn or the C# specification; teaching statements link to the literature in `concept/didactics.md`. Do not invent anything – if in doubt, mark it as an open question.
 8. **Lesson = 15–25 min, one core concept.** Longer → split.
 9. **Accessibility WCAG 2.2 AA**: keyboard use for all interactions, contrast in light and dark mode, text alternative for diagrams.
 10. **No tracking**, no accounts. Learning progress only local (localStorage/IndexedDB) with JSON export/import.
@@ -91,7 +91,7 @@ All spikes are decided; the next work packages are the backlog B1–B11 in `conc
 - **S4:** Own tokenizer (`playground/wwwroot/js/editor.js`, no Prism) colors a `<pre>` behind the transparent `<textarea>`. Overlay lines use the classes `pg-hl-line*`; they must not change text metrics (font, weight, italic, ligatures, padding, border), or the cursor will sit wrong. Fallback: plain `<textarea>`.
 - **S5:** Roslyn instrumentation records line and variables per step (`trace`). Stack/heap stays a model.
 - **S6:** Fixed package set `Microsoft.Extensions.DependencyInjection` and `…Logging` (+0.6 MiB); Configuration/Hosting are missing.
-- **S7:** `postMessage` protocol see `concept/komponenten.md`; check code via `TaskTests.Run()`; fallback: task with a collapsed sample solution.
+- **S7:** `postMessage` protocol see `concept/components.md`; check code via `TaskTests.Run()`; fallback: task with a collapsed sample solution.
 
 ## Way of working
 
@@ -103,10 +103,10 @@ All spikes are decided; the next work packages are the backlog B1–B11 in `conc
 
 ## Concept (binding)
 
-@concept/didaktik.md
-@concept/lektions-template.md
-@concept/modulplan.md
-@concept/komponenten.md
-@concept/stil-und-sprache.md
-@concept/ki-modul.md
+@concept/didactics.md
+@concept/lesson-template.md
+@concept/module-plan.md
+@concept/components.md
+@concept/style-and-language.md
+@concept/ai-module.md
 @concept/spikes.md

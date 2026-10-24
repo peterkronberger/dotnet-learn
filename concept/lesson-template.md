@@ -86,4 +86,4 @@ Code that cannot run looks like a normal code block with a title. Because the co
 
 ## SecLog extra exercises
 
-New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 11). Details: `concept/modulplan.md`.
+New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 11). Details: `concept/module-plan.md`.

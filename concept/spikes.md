@@ -98,5 +98,5 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 | B7 | Commit `package-lock.json`, switch `pages.yml` to `npm ci` | – (workflow → human) | erledigt (done) |
 | B8 | Issue template "Fehler melden / Feedback" + link per page | – | offen (open) |
 | B9 | Mermaid, local search, Playwright + accessibility check | – | offen (open) |
-| B10 | `lernprinzipien.mdx` → "Wie dieser Kurs funktioniert": literature from `didaktik.md`, AI paragraph, how to use | B3 | offen (open) |
+| B10 | `learning-principles.mdx` → "Wie dieser Kurs funktioniert": literature from `didactics.md`, AI paragraph, how to use | B3 | offen (open) |
 | B11 | `<Since>` badge, switcher tabs | – | erledigt (done) |

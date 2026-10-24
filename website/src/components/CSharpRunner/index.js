@@ -30,7 +30,7 @@ function splitLines(text) {
  *  - id:       stable key of this instance (default: automatic)
  *  - predict:  input field per output line; after running, ✓/✗ per line (needs `expected`)
  *  - expected: expected output, only sets the number of fields; the check uses the real output
- *  - tests:    C# check code (see concept/komponenten.md); the runner then runs the tests
+ *  - tests:    C# check code (see concept/components.md); the runner then runs the tests
  *  - trace:    turn on the step view in the runner (variables, heap model)
  *  - onResult: callback with the `run-result` message of the runner
  *

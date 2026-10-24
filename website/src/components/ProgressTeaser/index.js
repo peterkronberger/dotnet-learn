@@ -5,8 +5,8 @@ import BrowserOnly from '@docusaurus/BrowserOnly';
 import Translate, {translate} from '@docusaurus/Translate';
 import useProgress from '@site/src/lib/progress/useProgress';
 import {toLocalDate} from '@site/src/lib/progress/dates';
-import useLernstandData from '@site/src/components/Lernstand/useLernstandData';
-import base from '@site/src/components/Lernstand/styles.module.css';
+import useProgressDashboardData from '@site/src/components/ProgressDashboard/useProgressDashboardData';
+import base from '@site/src/components/ProgressDashboard/styles.module.css';
 import styles from './styles.module.css';
 
 // "Modul 1 – Erste Programme, …" -> "Modul 1"
@@ -17,7 +17,7 @@ function shortModule(label) {
 function TeaserContent() {
   const {progress} = useProgress();
   const [today] = useState(() => toLocalDate());
-  const data = useLernstandData(progress, today);
+  const data = useProgressDashboardData(progress, today);
   if (!data || data.lessons.length === 0) return <Placeholder />;
 
   const {next, lessons, due} = data;
@@ -117,7 +117,7 @@ function Placeholder() {
   return <div className={clsx(base.card, base.cardAccent, styles.teaser, styles.placeholder)} aria-hidden="true" />;
 }
 
-export default function LernstandTeaser() {
+export default function ProgressTeaser() {
   return (
     <div className={clsx('container', styles.wrap)}>
       <BrowserOnly fallback={<Placeholder />}>{() => <TeaserContent />}</BrowserOnly>

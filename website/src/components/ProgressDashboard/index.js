@@ -4,7 +4,7 @@ import Translate, {translate} from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import useProgress from '@site/src/lib/progress/useProgress';
 import {toLocalDate} from '@site/src/lib/progress/dates';
-import useLernstandData from './useLernstandData';
+import useProgressDashboardData from './useProgressDashboardData';
 import Today from './Today';
 import Overview from './Overview';
 import LearningPath from './LearningPath';
@@ -41,7 +41,7 @@ function Content() {
   const {progress, replace, available} = useProgress();
   const [today] = useState(() => toLocalDate());
   const [range, setRange] = useState('4w');
-  const data = useLernstandData(progress, today);
+  const data = useProgressDashboardData(progress, today);
 
   if (!data) return <Loading />;
 
@@ -121,7 +121,7 @@ function Content() {
   );
 }
 
-export default function Lernstand() {
+export default function ProgressDashboard() {
   return (
     <div className={styles.page}>
       <div className={styles.container}>

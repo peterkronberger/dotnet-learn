@@ -6,15 +6,15 @@ import Translate, {translate} from '@docusaurus/Translate';
 import useProgress from '@site/src/lib/progress/useProgress';
 import {toLocalDate} from '@site/src/lib/progress/dates';
 import {completeLesson, reopenLesson} from '@site/src/lib/progress/leitner';
-import useLernstandData from '@site/src/components/Lernstand/useLernstandData';
-import {formatDate} from '@site/src/components/Lernstand/format';
-import base from '@site/src/components/Lernstand/styles.module.css';
+import useProgressDashboardData from '@site/src/components/ProgressDashboard/useProgressDashboardData';
+import {formatDate} from '@site/src/components/ProgressDashboard/format';
+import base from '@site/src/components/ProgressDashboard/styles.module.css';
 import styles from './styles.module.css';
 
 function Content({lessonId}) {
   const {progress, update} = useProgress();
   const [today] = useState(() => toLocalDate());
-  const data = useLernstandData(progress, today);
+  const data = useProgressDashboardData(progress, today);
   if (!progress || !data) return null;
 
   const entry = progress.lessons[lessonId];

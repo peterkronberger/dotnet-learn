@@ -6,7 +6,7 @@ import {boxCounts, dueQuestionIds, nextReviewAfter} from '@site/src/lib/progress
 import {activitySum, lessonOverview, nextLesson, stageTotals} from '@site/src/lib/progress/summary';
 
 // Everything the Lernstand page and the start page teaser need, derived from the progress.
-export default function useLernstandData(progress, today) {
+export default function useProgressDashboardData(progress, today) {
   const {i18n} = useDocusaurusContext();
   const lessons = useLessons();
   const questionIds = useQuestionIdsByLesson();
