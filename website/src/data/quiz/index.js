@@ -4,8 +4,9 @@ import deM02 from './de/m02.json';
 import deDev from './de/dev.json';
 import {getExample} from './examples';
 import {splitCloze, clozeCode} from './cloze';
+import {findBugLines} from './findBug';
 
-export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze']; // planned: find-bug, match
+export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find-bug']; // planned: match
 
 const DEFAULT_LOCALE = 'de';
 
@@ -76,10 +77,34 @@ export function validateQuestion(q) {
       }
     }
   }
+  if (q.type === 'find-bug') {
+    if (typeof q.example !== 'string' || !q.example) {
+      errors.push(`${where}: find-bug needs example`);
+    } else if (!Array.isArray(q.bugLines) || q.bugLines.length < 1 || q.bugLines.some((n) => !Number.isInteger(n))) {
+      errors.push(`${where}: find-bug needs bugLines (at least one line number)`);
+    } else {
+      const example = getExample(q.example);
+      if (!example) {
+        errors.push(`${where}: example ${q.example} not found`);
+      } else {
+        const count = findBugLines(example.code).length;
+        if (q.bugLines.some((n) => n < 1 || n > count)) errors.push(`${where}: bugLines must be within 1..${count}`);
+        if (new Set(q.bugLines).size !== q.bugLines.length) errors.push(`${where}: bugLines has duplicates`);
+        const lf = q.lineFeedback;
+        if (lf !== undefined) {
+          if (typeof lf !== 'object' || lf === null || Array.isArray(lf)) {
+            errors.push(`${where}: lineFeedback must be an object`);
+          } else if (Object.keys(lf).some((k) => !/^\d+$/.test(k) || Number(k) < 1 || Number(k) > count)) {
+            errors.push(`${where}: lineFeedback keys must be line numbers within 1..${count}`);
+          }
+        }
+      }
+    }
+  }
   if (q.type === 'explain' && (typeof q.modelAnswer !== 'string' || !q.modelAnswer)) {
     errors.push(`${where}: explain needs modelAnswer`);
   }
-  if (['single', 'multi', 'output', 'parsons', 'cloze'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
+  if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
     errors.push(`${where}: explanation is required`);
   }
   return errors;

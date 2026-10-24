@@ -12,7 +12,10 @@ function read(path) {
 
 export function getExample(path) {
   const code = read(path);
+  if (code === undefined) return undefined;
+  // Snippets (*.snippet.cs) are not run by CI and have no snapshot.
+  if (path.endsWith('.snippet.cs')) return {code, expected: undefined};
   const expected = read(path.replace(/\.cs$/, '.out.txt'));
-  if (code === undefined || expected === undefined) return undefined;
+  if (expected === undefined) return undefined;
   return {code, expected};
 }
