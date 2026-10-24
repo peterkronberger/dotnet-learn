@@ -1,5 +1,6 @@
 import React from 'react';
 import Layout from '@theme/Layout';
+import DevNav from '@site/src/components/DevNav';
 import CSharpRunner from '@site/src/components/CSharpRunner';
 import predictDemo from '!!raw-loader!@site/examples/s7/predict-demo.cs';
 import predictDemoOutput from '!!raw-loader!@site/examples/s7/predict-demo.out.txt';
@@ -13,6 +14,7 @@ export default function RunnerDemo() {
   return (
     <Layout title="Runner-Demo (S7)" description="Technische Demo: Runner meldet Ergebnisse an die Seite">
       <main className="container margin-vert--lg">
+        <DevNav />
         <h1>Runner-Demo (Spike S7)</h1>
         <h2>Vorhersagefeld</h2>
         <p>Tippe die Ausgabe jeder Zeile, führe den Code aus und vergleiche.</p>

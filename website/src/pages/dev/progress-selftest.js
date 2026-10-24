@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '@theme/Layout';
 import Head from '@docusaurus/Head';
+import DevNav from '@site/src/components/DevNav';
 import { runProgressSelfTests } from '@site/src/lib/progress/selftest';
 
 // Developer page: runs the progress library self-tests in the browser (memory storage only).
@@ -20,6 +21,7 @@ export default function ProgressSelftest() {
         <meta name="robots" content="noindex" />
       </Head>
       <main className="container margin-vert--lg" data-selftest-status={status}>
+        <DevNav />
         <h1>Selbsttest: Lernfortschritt</h1>
         <p aria-live="polite">
           {results ? `${passed} von ${results.length} Tests bestanden` : 'Tests laufen …'}

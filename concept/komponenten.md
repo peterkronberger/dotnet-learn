@@ -24,7 +24,8 @@ Available (S7):
 - `onResult`: callback with the `run-result` message.
 - `code` comes from a `.cs` file (`import x from '!!raw-loader!@site/examples/…'`, S1). The former README limit "no backticks, backslashes, `${`" no longer applies.
 - `trace` (bool, S5): turns on the step view (variables, heap model).
-- Demo: `/runner-demo`.
+- Demo: `/dev/runner-demo`.
+- All dev showcase pages are listed on `/dev/` (`<DevNav />`, list in `website/src/components/DevNav/index.js`). Add new dev pages there.
 
 Planned:
 - `stdin` (string): pre-filled console input, read line by line by `Console.ReadLine()`. Shown in the runner as an input field below the editor.
