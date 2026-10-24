@@ -1,6 +1,6 @@
 # Didactics – learning methods and evidence
 
-As of 2026-10-22. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (so far `website/docs/lernprinzipien.mdx`).
+As of 2026-10-22. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (so far `website/docs/learning-principles.mdx`).
 
 ## Two target groups, one core path
 
@@ -50,7 +50,7 @@ Every lesson is checked against these five points [Merrill 2002]: real task (Sec
 
 ## AI and learning (for the paragraph on "Wie dieser Kurs funktioniert")
 
-Solve exercises without AI first. Reason: in an RCT, developers who learned a new library with AI help did worse on the comprehension test than those without AI [Shen & Tamkin 2026]. Details and neutral presentation: `concept/ki-modul.md`.
+Solve exercises without AI first. Reason: in an RCT, developers who learned a new library with AI help did worse on the comprehension test than those without AI [Shen & Tamkin 2026]. Details and neutral presentation: `concept/ai-module.md`.
 
 ## References
 
@@ -79,4 +79,4 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 Not verified by us (check before use):
 
 - [Sweller & Cooper 1985] Sweller, J., & Cooper, G. A. (1985). The use of worked examples as a substitute for problem solving in learning algebra. *Cognition and Instruction, 2*(1), 59–89. – Details taken from the MVP; DOI not checked.
-- Taken from `lernprinzipien.mdx` (MVP), not checked: Kornell, Hays & Bjork (2009); Sweller (1988); Mayer (2009); Shute (2008, Focus on formative feedback).
+- Taken from `learning-principles.mdx` (MVP), not checked: Kornell, Hays & Bjork (2009); Sweller (1988); Mayer (2009); Shute (2008, Focus on formative feedback).

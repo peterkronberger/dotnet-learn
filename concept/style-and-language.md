@@ -7,7 +7,7 @@
 - **Code, identifiers, code comments:** always English – also in examples, quizzes and the playground start code. Explanations belong in the body text or in the solution, not in German comments.
 - **Technical terms:** English. At first use, add a German explanation: "Value Type (Werttyp)". Every term goes into the glossary.
 - **UI texts** (React components): use `<Translate>`/`code.json`, do not hard-code them.
-- **Quiz texts, learning goals, hints:** in language-specific data files (see `komponenten.md`).
+- **Quiz texts, learning goals, hints:** in language-specific data files (see `components.md`).
 - **Slugs:** English, so URLs stay the same in all languages.
 
 ## Tone

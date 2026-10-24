@@ -7,7 +7,7 @@ A learning site for C# and .NET on GitHub Pages. It has two parts that are publi
 | Learning site (chapters, quizzes, collapsible code) | [`website/`](website) | Docusaurus 3 | `https://peterkronberger.github.io/dotnet-learn/` |
 | C# playground (run code in the browser) | [`playground/`](playground) | Blazor WebAssembly + Roslyn (.NET 10) | `https://peterkronberger.github.io/dotnet-learn/runner/` |
 
-The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Lernprinzipien" (learning principles) (`website/docs/lernprinzipien.mdx`).
+The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Lernprinzipien" (learning principles) (`website/docs/learning-principles.mdx`).
 
 ## One-time setup on GitHub (manual)
 
@@ -38,9 +38,9 @@ Locally, the embedded preview shows the playground at the path `/dotnet-learn/ru
 
 ## Writing content
 
-The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/lektions-template.md` are binding.
+The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/lesson-template.md` are binding.
 
-- **Location:** Lessons live in `website/docs/mXX-<slug>/lYY-<slug>.mdx` (slugs in English, see `concept/modulplan.md`). Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
+- **Location:** Lessons live in `website/docs/mXX-<slug>/lYY-<slug>.mdx` (slugs in English, see `concept/module-plan.md`). Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
 - **Code** lives in `website/examples/mXX/lYY/<english-name>.cs` (English, kebab-case, one example per file) and is included with `raw-loader`. Backticks, backslashes and `${` are allowed in the code.
 - Collapsible: `<details><summary>…</summary> … </details>` (leave blank lines before and after the content).
 - Quiz: `<Quiz id="m01-l03-q1" />`. The question is stored in `website/src/data/quiz/de/mXX.json` (format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline props are no longer allowed; the build fails.
@@ -59,7 +59,7 @@ import pitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
 <CodeBlock language="csharp" title="Beispiel">{pitfalls}</CodeBlock>
 ```
 
-- **Runnable:** `<CSharpRunner code={…} />`. More props (details: `concept/komponenten.md`): `predict` + `expected` (prediction field), `tests` (automatically checked task), `trace` (step view).
+- **Runnable:** `<CSharpRunner code={…} />`. More props (details: `concept/components.md`): `predict` + `expected` (prediction field), `tests` (automatically checked task), `trace` (step view).
 - **Not runnable:** `<CodeBlock language="csharp" title="…">{code}</CodeBlock>`.
 - **Outputs:** The snapshot `<name>.out.txt` is created with `bash tools/check-examples.sh --update` (check the diff). `bash tools/check-examples.sh` compiles and compares all examples. `*.snippet.cs` files are skipped. EF Core, Minimal API and xUnit are projects under `website/examples/_ci/`.
 

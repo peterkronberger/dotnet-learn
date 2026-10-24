@@ -17,7 +17,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 | MVP file | Target | Status |
 | --- | --- | --- |
 | `docs/intro.mdx` | M0 · L1 "Dein erstes Programm" (switch identifiers/comments to English) | moved to `docs/m00-orientation/l01-first-program.mdx` |
-| `docs/lernprinzipien.mdx` | M0 · page "Wie dieser Kurs funktioniert" (add literature from `didaktik.md` and the AI paragraph) | open (B10) |
+| `docs/learning-principles.mdx` | M0 · page "Wie dieser Kurs funktioniert" (add literature from `didactics.md` and the AI paragraph) | open (B10) |
 | `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (code to `examples/`, English, fix the solution text to `3.5` – the playground uses `InvariantGlobalization`, so the output is always `3.5`) | moved to `docs/m01-variables-and-types/l02-variables-and-types.mdx`; L3 moved out to `docs/m01-variables-and-types/l03-numbers.mdx` |
 | `docs/grundlagen/kontrollfluss.mdx` | M2 (split into several lessons) | moved to `docs/m02-control-flow/l01-control-flow.mdx` (split still open) |
 
@@ -105,7 +105,7 @@ Routing, handlers · binding and validation · status codes · middleware pipeli
 Full SecLog: domain logic, LINQ analysis and classifier ▶ automatically checked; EF Core and API parts ◻ as code-review tasks ("Finde 3 Probleme in diesem Endpoint" – find 3 problems in this endpoint, "Welches SQL entsteht?" – which SQL is produced?).
 
 ### M19 Programmieren mit KI (programming with AI) ◻/▶
-See `concept/ki-modul.md`.
+See `concept/ai-module.md`.
 
 ## Practice project SecLog
 
