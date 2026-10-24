@@ -5,7 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>C#-Playground</title>
-    <!-- Wird beim Deployment auf den Unterpfad der Seite gesetzt (siehe .github/workflows/pages.yml). -->
+    <!-- Set to the sub-path of the site on deployment (see .github/workflows/pages.yml). -->
     <base href="/" />
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="css/playground.css" />
@@ -22,7 +22,7 @@
     </div>
 
     <script>
-        // Theme der einbettenden Lernseite übernehmen (gleicher Ursprung).
+        // Take over the theme of the embedding learning site (same origin).
         window.addEventListener('message', function (event) {
             if (event.origin !== window.location.origin) { return; }
             var data = event.data;
@@ -40,7 +40,7 @@
             }
         };
 
-        // Editor-Komfort: Tab rückt ein, Esc gibt den Fokus wieder frei, Strg/⌘+Enter führt aus.
+        // Editor comfort: Tab indents, Esc releases the focus, Ctrl/⌘+Enter runs the code.
         var tabTrapActive = true;
         document.addEventListener('keydown', function (event) {
             var target = event.target;
@@ -63,11 +63,11 @@
 
     <script src="js/editor.js"></script>
 
-    <!-- Bewusst ohne Platzhalter der Fingerprint-Funktion: Ohne die Projekteigenschaft
-         OverrideHtmlAssetPlaceholders werden diese Platzhalter beim Publish nicht ersetzt. Der Browser
-         fragt dann eine nicht existierende Datei an und die App startet nie. Die Datei
-         _framework/blazor.webassembly.js wird unter diesem Namen ausgeliefert
-         (auf der veröffentlichten Seite geprüft). -->
+    <!-- Deliberately without the placeholders of the fingerprint feature: without the project property
+         OverrideHtmlAssetPlaceholders these placeholders are not replaced on publish. The browser
+         then requests a file that does not exist and the app never starts. The file
+         _framework/blazor.webassembly.js is served under this name
+         (checked on the published site). -->
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 

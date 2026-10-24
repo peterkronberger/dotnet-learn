@@ -5,16 +5,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 namespace Playground;
 
 /// <summary>
-/// Fügt vor dem Kompilieren in jeden Schleifenkörper und jeden Methodenanfang einen Aufruf
-/// der Wächterklasse ein. Die Einfügungen enthalten keine Zeilenumbrüche, Zeilennummern bleiben
-/// daher gleich; Spalten können sich in derselben Zeile verschieben (siehe <see cref="CSharpRunner"/>).
+/// Before compiling, inserts a call to the guard class into every loop body and at the start of
+/// every method. The insertions contain no line breaks, so line numbers stay the same;
+/// columns can shift within the same line (see <see cref="CSharpRunner"/>).
 /// </summary>
 public sealed class LoopGuardRewriter : CSharpSyntaxRewriter
 {
     public const string GuardTypeName = "__PlaygroundGuard";
     public const string ExceptionTypeName = "__PlaygroundTimeoutException";
 
-    /// <summary>Quelltext der Wächterklasse; wird als eigener Syntaxbaum in den Nutzercode-Assembly kompiliert.</summary>
+    /// <summary>Source text of the guard class; compiled as its own syntax tree into the user code assembly.</summary>
     public const string GuardSource = $$"""
         internal sealed class {{ExceptionTypeName}} : System.Exception
         {

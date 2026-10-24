@@ -5,8 +5,8 @@ import {useColorMode} from '@docusaurus/theme-common';
 import Translate from '@docusaurus/Translate';
 import styles from './styles.module.css';
 
-// Base64url (UTF-8), damit beliebiger Code im URL-Fragment übergeben werden kann.
-// Das Fragment wird nie an den Server gesendet.
+// Base64url (UTF-8), so that any code can be passed in the URL fragment.
+// The fragment is never sent to the server.
 function encodeCode(code) {
   const bytes = new TextEncoder().encode(code);
   let binary = '';
@@ -21,21 +21,21 @@ function splitLines(text) {
 }
 
 /**
- * Bettet den C#-Playground (Blazor WebAssembly + Roslyn, liegt unter /runner/)
- * als iframe ein und füllt den Editor mit `code`.
+ * Embeds the C# playground (Blazor WebAssembly + Roslyn, served under /runner/)
+ * as an iframe and fills the editor with `code`.
  *
  * Props:
- *  - code:     Startcode (String)
- *  - height:   Höhe in Pixeln (Standard 460)
- *  - id:       stabiler Schlüssel dieser Instanz (Standard: automatisch)
- *  - predict:  Eingabefeld pro Ausgabezeile; nach dem Ausführen ✓/✗ pro Zeile (braucht `expected`)
- *  - expected: erwartete Ausgabe, bestimmt nur die Anzahl der Felder; geprüft wird gegen die echte Ausgabe
- *  - tests:    C#-Prüfcode (siehe concept/komponenten.md); der Runner führt dann die Tests aus
- *  - trace:    Schrittansicht im Runner einschalten (Variablen, Heap-Modell)
- *  - onResult: Callback mit der Nachricht `run-result` des Runners
+ *  - code:     start code (string)
+ *  - height:   height in pixels (default 460)
+ *  - id:       stable key of this instance (default: automatic)
+ *  - predict:  input field per output line; after running, ✓/✗ per line (needs `expected`)
+ *  - expected: expected output, only sets the number of fields; the check uses the real output
+ *  - tests:    C# check code (see concept/komponenten.md); the runner then runs the tests
+ *  - trace:    turn on the step view in the runner (variables, heap model)
+ *  - onResult: callback with the `run-result` message of the runner
  *
- * Der Runner meldet `{type: 'run-result', id, success, output, diagnostics, tests?}` per postMessage.
- * Beide Seiten prüfen den Ursprung; die Seite prüft zusätzlich Absender (iframe) und `id`.
+ * The runner reports `{type: 'run-result', id, success, output, diagnostics, tests?}` by postMessage.
+ * Both sides check the origin; the page also checks the sender (iframe) and `id`.
  */
 export default function CSharpRunner({
   code = '',

@@ -1,60 +1,62 @@
-# Modul 19 – Programmieren mit KI
+# Module 19 – Programmieren mit KI (programming with AI)
 
-Stand: 2026-10-22 · nächste Review: 2027-04
+As of 2026-10-22 · next review: 2027-04
 
-## Rahmen
+Lesson text is German. German names below are the real learner-facing text and stay as they are.
 
-- **Platzierung:** letztes Modul, nach dem Abschlussprojekt. Ergänzend, setzt die Grundlagen voraus. Keine KI-Inhalte in anderen Modulen; einzige Ausnahme: ein Absatz auf „Wie dieser Kurs funktioniert“.
-- **Werkzeugneutral:** keine Produktnamen als Basis. Es geht um die Formen *Code-Vervollständigung*, *Chat* und *agentische Assistenten*. Keine Bedienungsanleitungen.
-- **Haltung:** neutral und wissenschaftlich fundiert – weder skeptisch noch übermäßig positiv.
+## Frame
 
-## Neutralitäts-Prüfliste (verbindlich für jede Lektion)
+- **Placement:** last module, after the final project. It is an add-on and assumes the basics. No AI content in other modules. The only exception: one paragraph on "Wie dieser Kurs funktioniert".
+- **Tool-neutral:** no product names as a base. The focus is on the forms *code completion*, *chat* and *agentic assistants*. No usage manuals.
+- **Stance:** neutral and scientifically grounded – neither skeptical nor overly positive.
 
-1. Jede Aussage zu Produktivität, Lernen oder Sicherheit nennt **Gruppe, Aufgabe, Werkzeug-Generation/Zeitpunkt, Stichprobengröße und Effekt mit Unsicherheit**.
-2. Gibt es gegensätzliche Befunde, werden sie **gemeinsam** gezeigt.
-3. **Interessenkonflikte** offenlegen (Autoren beim Hersteller des untersuchten Werkzeugs).
-4. **Keine wertenden Adjektive** („erschreckend“, „revolutionär“).
-5. Strikt kennzeichnen: **Studienbefund** (mit Quelle) oder **Best Practice (nicht studienbasiert)**.
-6. **Alter der Studie** nennen; Befunde gelten für eine bestimmte Werkzeug-Generation.
+## Neutrality checklist (binding for every lesson)
 
-## Studienlage (verifiziert, Stand 2026-10-22)
+1. Every statement about productivity, learning or security names the **group, task, tool generation/time, sample size and effect with uncertainty**.
+2. If findings conflict, show them **together**.
+3. **Disclose conflicts of interest** (authors work for the maker of the studied tool).
+4. **No judging adjectives** ("erschreckend" = alarming, "revolutionär" = revolutionary).
+5. Label strictly: **study finding** (with source) or **best practice (not study-based)**.
+6. **State the age of the study.** Findings apply to a specific tool generation.
 
-| Studie | Design / Gruppe | Aufgabe / Werkzeug | Ergebnis | Hinweis |
+## State of the evidence (verified, as of 2026-10-22)
+
+| Study | Design / group | Task / tool | Result | Note |
 | --- | --- | --- | --- | --- |
-| Peng et al. 2023 | Kontrolliertes Experiment, angeworbene Entwickler | HTTP-Server in JavaScript; GitHub Copilot (Codex-Generation) | 55,8 % schneller (95-%-KI: 21–89 %) | Autoren u. a. Microsoft Research und GitHub; eine eng umrissene Aufgabe |
-| Paradis et al. 2025 | RCT, 96 Google-Engineers | Komplexe Enterprise-Aufgabe; drei interne KI-Funktionen (Sommer 2024) | ca. 21 % schneller, großes Konfidenzintervall | Autoren schreiben selbst: nicht ohne Weiteres auf andere Tools/Zeitpunkte übertragbar; interne Google-Tools |
-| METR 2025 | RCT, 16 erfahrene Open-Source-Entwickler, 246 Aufgaben in eigenen großen Repos | Werkzeuge Anfang 2025 | 19 % **länger**; Erwartung vorher +24 %, Schätzung nachher +20 %; < 44 % der Vorschläge übernommen; 9 % der Zeit für Prüfen/Aufräumen | Kleine Stichprobe; METR erwartet bei neueren Tools andere Ergebnisse |
-| Perry et al. 2023 (CCS) | Nutzerstudie | Sicherheitsrelevante Aufgaben; Assistent auf Basis codex-davinci-002 | In 4 von 5 Aufgaben häufiger unsichere Lösungen, zugleich häufiger für sicher gehalten; wer weniger vertraute und Prompts sorgfältiger formulierte, hatte weniger Schwachstellen | Ältere Modellgeneration |
-| Prather et al. 2024 (ICER) | 21 Anfänger, Laborsitzungen (Beobachtung, Interview, Eye-Tracking) | Programmieraufgabe mit GenAI | Bei Lernenden mit Schwierigkeiten verstärkte KI Probleme der Selbsteinschätzung; 11 von 21 zeigten keine solchen Probleme | Qualitativ, kleine Stichprobe |
-| Shen & Tamkin 2026 | RCT, 52 Engineers | Unbekannte Python-Bibliothek (Trio) lernen, mit/ohne KI | Verständnistest signifikant schlechter mit KI (Sekundärquelle: ca. 50 % vs. 67 %); Zeitgewinn nicht signifikant; größte Lücke beim Fehlerfinden; gute Ergebnisse bei Nutzung zum Verstehen (Nachfragen, Erklärungen) | Autoren bei Anthropic; kleine Stichprobe, kurzer Zeitraum |
+| Peng et al. 2023 | Controlled experiment, recruited developers | HTTP server in JavaScript; GitHub Copilot (Codex generation) | 55.8 % faster (95 % CI: 21–89 %) | Authors include Microsoft Research and GitHub; one narrowly defined task |
+| Paradis et al. 2025 | RCT, 96 Google engineers | Complex enterprise task; three internal AI features (summer 2024) | about 21 % faster, wide confidence interval | The authors themselves write: not easily transferable to other tools/times; internal Google tools |
+| METR 2025 | RCT, 16 experienced open-source developers, 246 tasks in their own large repos | Tools from early 2025 | 19 % **longer**; expectation before +24 %, estimate after +20 %; < 44 % of suggestions accepted; 9 % of time spent on checking/cleanup | Small sample; METR expects different results for newer tools |
+| Perry et al. 2023 (CCS) | User study | Security-relevant tasks; assistant based on codex-davinci-002 | In 4 of 5 tasks more insecure solutions, and these were more often judged secure; those who trusted less and wrote prompts more carefully had fewer vulnerabilities | Older model generation |
+| Prather et al. 2024 (ICER) | 21 beginners, lab sessions (observation, interview, eye tracking) | Programming task with GenAI | For learners who struggled, AI made self-assessment problems worse; 11 of 21 showed no such problems | Qualitative, small sample |
+| Shen & Tamkin 2026 | RCT, 52 engineers | Learning an unfamiliar Python library (Trio), with/without AI | Comprehension test significantly worse with AI (secondary source: about 50 % vs. 67 %); time gain not significant; biggest gap in finding errors; good results when used for understanding (follow-up questions, explanations) | Authors at Anthropic; small sample, short period |
 
-Quellen: Peng et al., arXiv:2302.06590 · Paradis et al., ICSE 2025 SEIP, arXiv:2410.12944 · METR (2025-07-10), „Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity“ · Perry et al., CCS '23, 2785–2799, https://doi.org/10.1145/3576915.3623157 · Prather et al., ICER 2024, arXiv:2405.17739 · Shen & Tamkin, arXiv:2601.20245.
+Sources: Peng et al., arXiv:2302.06590 · Paradis et al., ICSE 2025 SEIP, arXiv:2410.12944 · METR (2025-07-10), "Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity" · Perry et al., CCS '23, 2785–2799, https://doi.org/10.1145/3576915.3623157 · Prather et al., ICER 2024, arXiv:2405.17739 · Shen & Tamkin, arXiv:2601.20245.
 
-## Lektionen
+## Lessons
 
-| # | Thema | Kerninhalt | Kennzeichnung |
+| # | Topic | Core content | Label |
 | --- | --- | --- | --- |
-| 1 | Realistische Erwartungen | Produktivität hängt von Aufgabe, Erfahrung, Codebasis und Werkzeug ab; das eigene Zeitgefühl ist unzuverlässig (Peng, Paradis, METR gemeinsam) | Studienbefund |
-| 2 | Lernen vs. Abgeben | KI zum Verstehen nutzen (Nachfragen, Erklärungen, konzeptionelle Fragen) statt Aufgaben abzugeben | Studienbefund (Shen & Tamkin) |
-| 3 | Verifizieren | KI-Code lesen, Ausgabe vorhersagen, testen; veraltete Idiome und erfundene APIs erkennen | Teils Studienbefund (METR: Prüfaufwand), teils Best Practice |
-| 4 | Sicherheit | Typische Schwachstellen in KI-Code am SecLog-Kontext; Vertrauen kalibrieren | Studienbefund (Perry) |
-| 5 | Kontext geben | Präzise Aufgaben, Hilfsfunktionen mitliefern, Projekt-Anweisungsdateien | Nur „mehr Kontext → weniger Schwachstellen“ ist Studienbefund (Perry); Rest Best Practice |
-| 6 | Selbsteinschätzung prüfen | Selbsttest: „Kann ich das ohne KI erklären?“ | Studienbefund (Prather) + Best Practice |
-| 7 | Daten und Geheimnisse | Keine Secrets, Zugangsdaten oder personenbezogenen Daten in Prompts | Best Practice (nicht studienbasiert) |
+| 1 | Realistische Erwartungen (realistic expectations) | Productivity depends on task, experience, code base and tool; your own sense of time is unreliable (Peng, Paradis, METR together) | Study finding |
+| 2 | Lernen vs. Abgeben (learning vs. handing off) | Use AI to understand (follow-up questions, explanations, conceptual questions) instead of handing off tasks | Study finding (Shen & Tamkin) |
+| 3 | Verifizieren (verifying) | Read AI code, predict the output, test; spot outdated idioms and invented APIs | Partly study finding (METR: checking effort), partly best practice |
+| 4 | Sicherheit (security) | Typical vulnerabilities in AI code in the SecLog context; calibrate trust | Study finding (Perry) |
+| 5 | Kontext geben (giving context) | Precise tasks, supply helper functions, project instruction files | Only "more context → fewer vulnerabilities" is a study finding (Perry); the rest is best practice |
+| 6 | Selbsteinschätzung prüfen (check self-assessment) | Self-test: "Kann ich das ohne KI erklären?" (can I explain this without AI?) | Study finding (Prather) + best practice |
+| 7 | Daten und Geheimnisse (data and secrets) | No secrets, credentials or personal data in prompts | Best practice (not study-based) |
 
-## Übungsformen (ohne echte KI im Browser)
+## Exercise forms (without real AI in the browser)
 
-1. **KI-Code-Review** (`find-bug`): statische C#-Antworten mit eingebauten Fehlern oder Schwachstellen.
-2. **Prompt verbessern** (`explain`): schwachen Prompt überarbeiten, mit Musterlösung vergleichen, selbst bewerten.
-3. **„Stimmt der KI-Vorschlag?“**: Vorhersage, dann im `<CSharpRunner>` ausführen.
+1. **AI code review** (`find-bug`): static C# answers with built-in errors or vulnerabilities.
+2. **Improve the prompt** (`explain`): rewrite a weak prompt, compare with a model solution, rate yourself.
+3. **"Stimmt der KI-Vorschlag?"** (is the AI suggestion right?): predict, then run in the `<CSharpRunner>`.
 
-## KI-Beispiele
+## AI examples
 
-- Konstruiert, aber realistisch. Immer mit `:::note[Typische KI-Antwort (konstruiertes Beispiel)]` kennzeichnen.
-- Sie dienen dazu, konkretes Wissen zu vermitteln (z. B. ein erfundener API-Aufruf, eine fehlende Eingabeprüfung).
-- Code darin folgt denselben Regeln (Englisch, `.cs`-Datei, CI-geprüft – fehlerhafter Code bewusst als Bruchstück bzw. mit erwarteter Fehlermeldung).
+- Made up, but realistic. Always label with `:::note[Typische KI-Antwort (konstruiertes Beispiel)]`.
+- They teach concrete knowledge (e.g. an invented API call, a missing input check).
+- The code in them follows the same rules (English, `.cs` file, CI-checked – faulty code deliberately as a fragment or with the expected error message).
 
-## Aktualität
+## Currency
 
-- Jede Lektion trägt „Stand: YYYY-MM-DD“.
-- Halbjährliche Review: Studienlage (neue RCTs, Replikationen), tote Links, Formulierungen gegen die Neutralitäts-Prüfliste.
+- Every lesson carries "Stand: YYYY-MM-DD" (as of date).
+- Review twice a year: state of the evidence (new RCTs, replications), dead links, wording against the neutrality checklist.

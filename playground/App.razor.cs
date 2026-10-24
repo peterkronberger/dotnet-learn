@@ -27,8 +27,8 @@ public partial class App
 
     protected override void OnInitialized()
     {
-        // Die Lernseite übergibt Beispielcode als Base64url im URL-Fragment (#code=...).
-        // Weitere Schlüssel (spike S7): &id=<instance id>, &tests=<Base64url test code>; (spike S5): &trace=1.
+        // The learning site passes example code as Base64url in the URL fragment (#code=...).
+        // More keys (spike S7): &id=<instance id>, &tests=<Base64url test code>; (spike S5): &trace=1.
         var fragment = Navigation.ToAbsoluteUri(Navigation.Uri).Fragment;
 
         if (fragment.StartsWith(FragmentPrefix, StringComparison.Ordinal))
@@ -114,7 +114,7 @@ public partial class App
         _compiledCode = _code;
         StateHasChanged();
 
-        // Dem Browser Zeit geben, die Statusmeldung zu zeichnen, bevor der Compiler den Hauptthread belegt.
+        // Give the browser time to paint the status message before the compiler occupies the main thread.
         await Task.Delay(50);
 
         try

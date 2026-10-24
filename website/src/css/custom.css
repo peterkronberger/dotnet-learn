@@ -1,8 +1,8 @@
 /**
- * Designentscheidungen (siehe docs/lernprinzipien):
- *  - Kontrast mindestens 4,5:1 für Fließtext (WCAG 2.2, 1.4.3)
- *  - begrenzte Zeilenlänge (~72 Zeichen) und großzügiger Zeilenabstand für lange Lesephasen
- *  - ruhige Fläche, eine Akzentfarbe, Code immer in Monospace
+ * Design decisions (see docs/lernprinzipien):
+ *  - contrast of at least 4.5:1 for body text (WCAG 2.2, 1.4.3)
+ *  - limited line length (~72 characters) and generous line spacing for long reading phases
+ *  - calm surface, one accent color, code always in monospace
  */
 
 :root {
@@ -62,7 +62,7 @@
   --docusaurus-highlighted-code-line-bg: rgba(165, 180, 252, 0.15);
 }
 
-/* Lesbarkeit: begrenzte Zeilenlänge im Dokumenttext */
+/* Readability: limited line length in the document text */
 .theme-doc-markdown {
   max-width: 72ch;
 }
@@ -76,7 +76,7 @@
   margin-top: 2.5rem;
 }
 
-/* Code: weiche Karten statt harter Kästen */
+/* Code: soft cards instead of hard boxes */
 .theme-code-block {
   border: 1px solid var(--dl-border);
   border-radius: var(--ifm-global-radius);
