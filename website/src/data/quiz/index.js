@@ -2,8 +2,10 @@ import deM00 from './de/m00.json';
 import deM01 from './de/m01.json';
 import deM02 from './de/m02.json';
 import deDev from './de/dev.json';
+import {getExample} from './examples';
+import {splitCloze, clozeCode} from './cloze';
 
-export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons']; // planned: cloze, find-bug, match
+export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze']; // planned: find-bug, match
 
 const DEFAULT_LOCALE = 'de';
 
@@ -54,10 +56,30 @@ export function validateQuestion(q) {
       errors.push(`${where}: distractorMisconceptions must be an object`);
     }
   }
+  if (q.type === 'cloze') {
+    if (typeof q.example !== 'string' || !q.example) {
+      errors.push(`${where}: cloze needs example`);
+    } else if (!Array.isArray(q.blanks) || q.blanks.length < 1) {
+      errors.push(`${where}: cloze needs at least one blank`);
+    } else if (q.blanks.some((b) => !b || typeof b.text !== 'string' || !b.text)) {
+      errors.push(`${where}: every blank needs a text`);
+    } else {
+      const example = getExample(q.example);
+      if (!example) {
+        errors.push(`${where}: example ${q.example} or its .out.txt not found`);
+      } else {
+        try {
+          splitCloze(clozeCode(example.code), q.blanks);
+        } catch (e) {
+          errors.push(`${where}: ${e.message}`);
+        }
+      }
+    }
+  }
   if (q.type === 'explain' && (typeof q.modelAnswer !== 'string' || !q.modelAnswer)) {
     errors.push(`${where}: explain needs modelAnswer`);
   }
-  if (['single', 'multi', 'output', 'parsons'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
+  if (['single', 'multi', 'output', 'parsons', 'cloze'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
     errors.push(`${where}: explanation is required`);
   }
   return errors;

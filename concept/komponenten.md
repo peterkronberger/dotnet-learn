@@ -49,12 +49,12 @@ Message protocol (S7, available; origin check `window.location.origin` in both d
 
 Available:
 - **Questions in data files per language**, e.g. `website/src/data/quiz/de/m01.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="m01-l03-q1" />`. Existing inline quizzes are migrated.
-- Types: `single`, `multi`, `output` (predict the output), `explain` (explain in your own words, reveal a model answer, self-rating), `parsons` (put the lines of a CI-checked example file in order; buttons for add/remove/move, announced in an `aria-live` region; optional distractor lines).
+- Types: `single`, `multi`, `output` (predict the output), `explain` (explain in your own words, reveal a model answer, self-rating), `parsons` (put the lines of a CI-checked example file in order; buttons for add/remove/move, announced in an `aria-live` region; optional distractor lines), `cloze` (fill the blanks in a CI-checked example file; one input per blank, ✓/✗ as text per blank, optional `accept` list and `wrongAnswers` with misconception links).
 - Every answer option can carry a `misconception` reference. `<Misconception id="…" />` is the anchor in the "Achtung" box (DoD point 11). `node tools/check-quiz.mjs` checks IDs and links.
 - Feedback always explains the *why*.
 
 Planned:
-- Types `cloze` (code with gaps, #39), `find-bug` (click the line, #40), `match` (matching, #41).
+- Types `find-bug` (click the line, #40), `match` (matching, #41).
 
 ## Learning progress – available (placement test planned)
 

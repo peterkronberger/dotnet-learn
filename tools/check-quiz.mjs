@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const website = join(root, 'website');
 const quizDir = join(website, 'src/data/quiz');
 
-const TYPES = ['single', 'multi', 'output', 'explain', 'parsons'];
+const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze'];
 const failures = [];
 const warnings = [];
 
@@ -63,8 +63,28 @@ function validate(q) {
       }
     }
   }
+  if (q.type === 'cloze') {
+    if (!q.example) errors.push(`${w}: cloze needs example`);
+    else if (!Array.isArray(q.blanks) || q.blanks.length < 1) errors.push(`${w}: cloze needs at least one blank`);
+    else if (q.blanks.some((b) => !b || typeof b.text !== 'string' || !b.text)) errors.push(`${w}: every blank needs a text`);
+    else {
+      const cs = join(website, 'examples', q.example);
+      if (!existsSync(cs)) errors.push(`${w}: example ${q.example} not found`);
+      else {
+        if (!existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
+        // Same search rule as splitCloze in website/src/data/quiz/cloze.js.
+        const code = readFileSync(cs, 'utf8').replace(/\r\n?/g, '\n').replace(/\n+$/, '');
+        let position = 0;
+        q.blanks.forEach((b, i) => {
+          const found = code.indexOf(b.text, position);
+          if (found < 0) errors.push(`${w}: blank ${i + 1} "${b.text}" not found in ${q.example}`);
+          else position = found + b.text.length;
+        });
+      }
+    }
+  }
   if (q.type === 'explain' && !q.modelAnswer) errors.push(`${w}: explain needs modelAnswer`);
-  if (['single', 'multi', 'output', 'parsons'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
+  if (['single', 'multi', 'output', 'parsons', 'cloze'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
   return errors;
 }
 
@@ -127,6 +147,7 @@ questions
   .forEach((q) => {
     (q.options ?? []).forEach((o) => o.misconception && referenced.add(o.misconception));
     Object.values(q.distractorMisconceptions ?? {}).forEach((m) => referenced.add(m));
+    (q.blanks ?? []).forEach((b) => (b.wrongAnswers ?? []).forEach((w) => w.misconception && referenced.add(w.misconception)));
   });
 const linkErrors = [];
 for (const a of anchors) if (!referenced.has(a)) linkErrors.push(`<Misconception id="${a}"> is not referenced by any option`);
