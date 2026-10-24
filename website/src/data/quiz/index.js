@@ -3,7 +3,7 @@ import deM01 from './de/m01.json';
 import deM02 from './de/m02.json';
 import deDev from './de/dev.json';
 
-export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain']; // planned: parsons, cloze, find-bug, match
+export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons']; // planned: cloze, find-bug, match
 
 const DEFAULT_LOCALE = 'de';
 
@@ -42,10 +42,22 @@ export function validateQuestion(q) {
   if (q.type === 'output' && (typeof q.example !== 'string' || !q.example)) {
     errors.push(`${where}: output needs example`);
   }
+  if (q.type === 'parsons') {
+    if (typeof q.example !== 'string' || !q.example) errors.push(`${where}: parsons needs example`);
+    if (q.distractors !== undefined) {
+      if (!Array.isArray(q.distractors) || q.distractors.some((d) => typeof d !== 'string' || !d.trim())) {
+        errors.push(`${where}: distractors must be a list of non-empty strings`);
+      }
+    }
+    const dm = q.distractorMisconceptions;
+    if (dm !== undefined && (typeof dm !== 'object' || dm === null || Array.isArray(dm))) {
+      errors.push(`${where}: distractorMisconceptions must be an object`);
+    }
+  }
   if (q.type === 'explain' && (typeof q.modelAnswer !== 'string' || !q.modelAnswer)) {
     errors.push(`${where}: explain needs modelAnswer`);
   }
-  if (['single', 'multi', 'output'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
+  if (['single', 'multi', 'output', 'parsons'].includes(q.type) && (typeof q.explanation !== 'string' || !q.explanation)) {
     errors.push(`${where}: explanation is required`);
   }
   return errors;

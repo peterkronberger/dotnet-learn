@@ -7,7 +7,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const website = join(root, 'website');
 const quizDir = join(website, 'src/data/quiz');
 
-const TYPES = ['single', 'multi', 'output', 'explain'];
+const TYPES = ['single', 'multi', 'output', 'explain', 'parsons'];
 const failures = [];
 const warnings = [];
 
@@ -46,8 +46,25 @@ function validate(q) {
       if (!existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
     }
   }
+  if (q.type === 'parsons') {
+    if (!q.example) errors.push(`${w}: parsons needs example`);
+    else {
+      const cs = join(website, 'examples', q.example);
+      if (!existsSync(cs)) errors.push(`${w}: example ${q.example} not found`);
+      else {
+        if (!existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
+        const lines = readFileSync(cs, 'utf8').split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+        for (const d of q.distractors ?? []) {
+          if (lines.includes(String(d).trim())) errors.push(`${w}: distractor "${d}" is identical to a solution line`);
+        }
+        for (const key of Object.keys(q.distractorMisconceptions ?? {})) {
+          if (!(q.distractors ?? []).includes(key)) errors.push(`${w}: distractorMisconceptions key "${key}" is not a distractor`);
+        }
+      }
+    }
+  }
   if (q.type === 'explain' && !q.modelAnswer) errors.push(`${w}: explain needs modelAnswer`);
-  if (['single', 'multi', 'output'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
+  if (['single', 'multi', 'output', 'parsons'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
   return errors;
 }
 
@@ -107,7 +124,10 @@ check('MDX quiz references', mdxErrors);
 const referenced = new Set();
 questions
   .filter((q) => q.locale === 'de')
-  .forEach((q) => (q.options ?? []).forEach((o) => o.misconception && referenced.add(o.misconception)));
+  .forEach((q) => {
+    (q.options ?? []).forEach((o) => o.misconception && referenced.add(o.misconception));
+    Object.values(q.distractorMisconceptions ?? {}).forEach((m) => referenced.add(m));
+  });
 const linkErrors = [];
 for (const a of anchors) if (!referenced.has(a)) linkErrors.push(`<Misconception id="${a}"> is not referenced by any option`);
 for (const r of referenced) if (!anchors.has(r)) linkErrors.push(`misconception "${r}" has no anchor in MDX`);
