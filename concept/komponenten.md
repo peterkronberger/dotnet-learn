@@ -1,6 +1,6 @@
 # Components and conventions
 
-As of 2026-10-23. Status: **available** · **planned**. All components are registered globally in `website/src/theme/MDXComponents.js` (no import needed in MDX).
+As of 2026-10-24. Status: **available** · **planned**. All components are registered globally in `website/src/theme/MDXComponents.js` (no import needed in MDX).
 
 ## Admonitions (Docusaurus, available)
 
@@ -45,30 +45,35 @@ Message protocol (S7, available; origin check `window.location.origin` in both d
 - Fixed preloaded packages (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – available (S6); Configuration and Hosting are missing. No free NuGet install.
 - `InvariantGlobalization=true`: numbers always appear with a dot (`3.5`). CI must run with `InvariantCulture` so that shown outputs match.
 
-## `<Quiz>` – available (single choice), being grown into a family
+## `<Quiz>` – available, being grown into a family
 
-Today: `id`, `question`, `options`, `answer`, `children` (explanation). Progress is stored under `dotnet-learn:quiz:<id>` in localStorage.
-
-Planned:
-- **Questions in data files per language** instead of inline in MDX, e.g. `website/src/data/quiz/de/m01.json`. In MDX only `<Quiz id="m01-l02-q3" />`. Reason: the Leitner dashboard and placement tests need all questions in one place; translation per language. Migrate existing inline quizzes.
-- Types: `single`, `multi`, `output` (predict the output), `parsons` (with keyboard alternative), `cloze` (code with gaps), `find-bug` (click the line), `match` (matching), `explain` (explain in your own words, reveal a model answer, self-rating).
-- Every answer option can carry a `misconception` reference (link to the "Achtung" box, DoD point 11).
+Available:
+- **Questions in data files per language**, e.g. `website/src/data/quiz/de/m01.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="m01-l03-q1" />`. Existing inline quizzes are migrated.
+- Types: `single`, `multi`, `output` (predict the output), `explain` (explain in your own words, reveal a model answer, self-rating).
+- Every answer option can carry a `misconception` reference. `<Misconception id="…" />` is the anchor in the "Achtung" box (DoD point 11). `node tools/check-quiz.mjs` checks IDs and links.
 - Feedback always explains the *why*.
 
-## Learning progress – planned
+Planned:
+- Types `parsons` (with keyboard alternative, #38), `cloze` (code with gaps, #39), `find-bug` (click the line, #40), `match` (matching, #41).
 
+## Learning progress – available (placement test planned)
+
+Available:
 - One versioned store (e.g. `dotnet-learn:v1:progress`) in localStorage/IndexedDB, all access in `try/catch`. Old keys `dotnet-learn:quiz:*` are migrated.
 - **Leitner system** with 5 boxes; start values of the intervals 1 · 2 · 4 · 8 · 16 days (assumption, adjustable).
 - **"Heute fällig" dashboard** (due today) on the start page.
-- **Placement test** per module (8–12 questions, ≥ 80 % → "known", questions go to a higher box).
 - **Export/import** as a JSON file.
+- Test page `/dev/progress-selftest`.
 
-## More components – planned
+Planned:
+- **Placement test** per module (8–12 questions, ≥ 80 % → "known", questions go to a higher box).
 
-| Component | Purpose |
-| --- | --- |
-| `<Since csharp="13" dotnet="9" />` | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
-| Switcher box | Docusaurus `<Tabs groupId="from-language">` with Java / Python / JS/TS / Go; choice is kept across pages (check the behavior of `groupId` in the Docusaurus docs before building) |
+## More components
+
+| Component | Status | Purpose |
+| --- | --- | --- |
+| `<Since csharp="13" dotnet="9" />` | available | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
+| `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`); the choice is kept across pages (`groupId="from-language"`) |
 | Feedback link | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
 | `<CodeBlock>` | Official Docusaurus component for code that cannot run, taken from `.cs` files |
 

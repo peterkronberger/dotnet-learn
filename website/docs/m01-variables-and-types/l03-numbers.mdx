@@ -1,0 +1,202 @@
+---
+title: Ganzzahl, Gleitkomma und decimal
+sidebar_position: 3
+description: Warum 7 / 2 in C# 3 ergibt – und wann double und decimal helfen.
+lesson_id: m01-l03
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import averageSession from '!!raw-loader!@site/examples/m01/l03/average-session.cs';
+import numericPitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
+import numericPitfallsOutput from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.out.txt';
+import licenseCostGaps from '!!raw-loader!@site/examples/m01/l03/license-cost.gaps.snippet.cs';
+import licenseCost from '!!raw-loader!@site/examples/m01/l03/license-cost.cs';
+import licenseCostOutput from '!!raw-loader!@site/examples/m01/l03/license-cost.out.txt';
+import failureRateTask from '!!raw-loader!@site/examples/m01/l03/failure-rate-task.cs';
+import failureRateTests from '!!raw-loader!@site/examples/m01/l03/failure-rate-task.tests.snippet.cs';
+import failureRateSolution from '!!raw-loader!@site/examples/m01/l03/failure-rate-solution.cs';
+
+# Ganzzahl, Gleitkomma und decimal
+
+:::note[Lernziele]
+- Du sagst das Ergebnis von `int / int` korrekt voraus.
+- Du erzwingst eine Gleitkomma-Division.
+- Du erkennst Rundungsfehler bei `double`.
+- Du wählst `decimal` für Geldbeträge.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l02-q1" />
+
+<Quiz id="m00-l01-q1" />
+
+## Drei Zahlentypen im Vergleich
+
+Zahlen gibt es in C# in mehreren Typen. Die drei wichtigsten für Rechnungen:
+
+| Typ | Größe | Genauigkeit | Wofür |
+| --- | --- | --- | --- |
+| `int` | 4 Byte | ganze Zahlen, kein Nachkommateil | Zähler, Indizes, Anzahlen |
+| `double` | 8 Byte | etwa 15–17 Stellen | Messwerte, allgemeine Rechnungen |
+| `decimal` | 16 Byte | 28–29 Stellen | Geldbeträge, Zinssätze |
+
+Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types).
+
+Das erste Beispiel rechnet die durchschnittliche Sitzungsdauer aus. Es ist in vier Teilziele gegliedert: **1. Eingaben festlegen → 2. In den passenden Typ umwandeln → 3. Rechnen → 4. Ergebnis ausgeben**.
+
+<CSharpRunner id="m01-l03-average" height={380} code={averageSession} />
+
+Wenn beide Operanden `int` sind, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten (Richtung 0). Mit `(double)totalMinutes / sessions` wird zuerst ein Operand umgewandelt (Teilziel 2), dann wird als Gleitkommazahl gerechnet (Teilziel 3).
+
+## Zwei Stolperfallen
+
+:::info[Vorhersage]
+Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m01-l03-pitfalls" height={420} code={numericPitfalls} predict expected={numericPitfallsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Ausgabe: `3`, `3.5`, `False`, `True`. Der Playground nutzt `InvariantGlobalization`, deshalb steht immer ein Punkt.
+
+1. **Eingaben festlegen:** `a` und `b` sind beide `int`.
+2. **Umwandeln:** In Zeile 2 wird `a` vor der Division zu `double`. Deshalb ist das Ergebnis `3.5`.
+3. **Rechnen:** Zeile 1 teilt zwei `int`. Das Ergebnis ist `3`, weil der Nachkommateil abgeschnitten wird. Bei `0.1 + 0.2 == 0.3` mit `double` ist das Ergebnis `False`, mit `decimal` `True`.
+4. **Ausgeben:** `Console.WriteLine` zeigt den Wert des Vergleichs.
+
+**Was passiert, wenn du `(double)(a / b)` schreibst?** Dann steht `3`. Die Klammer wird zuerst ausgewertet, die Ganzzahldivision ist schon passiert. Die Umwandlung kommt zu spät.
+
+Quellen: [Arithmetic operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators) (Abschnitte zur Division und „Round-off errors“).
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum 0.1 als double nicht exakt ist (optional)</summary>
+
+`double` speichert Zahlen binär. Ein Wert wie `0.1` lässt sich als `double` (und als `float`) nicht exakt darstellen, als `decimal` schon. Deshalb weicht `0.1 + 0.2` minimal von `0.3` ab. `decimal` ist für Fälle gedacht, in denen die Genauigkeit durch die Nachkommastellen bestimmt ist, etwa Geldbeträge.
+
+Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types).
+
+</details>
+
+## Lückenbeispiel: Lizenzkosten
+
+Gleiche Teilziele, aber jetzt fehlen Teile im Code. Setze an den Stellen mit `___` den Typ, das Literal-Suffix und die Variablen ein. Für `decimal`-Literale gilt das Suffix `m`.
+
+<CSharpRunner id="m01-l03-license-gaps" height={420} code={licenseCostGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="license-cost.cs">{licenseCost}</CodeBlock>
+
+Ausgabe:
+
+<CodeBlock language="text">{licenseCostOutput}</CodeBlock>
+
+`decimal` und `double` lassen sich nicht ohne ausdrückliche Umwandlung mischen. Darum haben alle Geldwerte hier den Typ `decimal`.
+
+Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types).
+
+</details>
+
+## Ändern und selbermachen
+
+Im SecLog-Projekt (Auswertung von Anmeldeversuchen) soll die Fehlerquote in Prozent berechnet werden. Mit `7` fehlgeschlagenen von `20` Versuchen sollte `35` herauskommen. Der Startcode gibt aber `0` aus. Behebe den Fehler. Bei `0` Versuchen soll die Methode `0` zurückgeben.
+
+<CSharpRunner id="m01-l03-failure-rate" height={440} code={failureRateTask} tests={failureRateTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="failure-rate-solution.cs">{failureRateSolution}</CodeBlock>
+
+Erst die Prüfung auf `0` (sonst wirft die Ganzzahldivision eine `DivideByZeroException`), dann `(double)failed / total * 100`.
+
+</details>
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l03-int-division-rounds" />
+
+**„Ganzzahldivision rundet.“** Sie schneidet Richtung 0 ab: `7 / 2` ergibt `3`, nicht `4`. Auch `-7 / 2` ergibt `-3`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l03-double-exact" />
+
+**„`double` rechnet mit Dezimalbrüchen exakt.“** Nein: `0.1 + 0.2 == 0.3` ist `False`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l03-cast-after-division" />
+
+**„`(double)(a / b)` rettet die Nachkommastellen.“** Die Umwandlung kommt zu spät. Die Ganzzahldivision ist schon passiert. Richtig: `(double)a / b`.
+:::
+
+## Kommst du aus …?
+
+<FromLanguage>
+<TabItem value="java">
+
+`int / int` schneidet wie in C# Richtung 0 ab. Für exakte Dezimalzahlen nutzt Java die Klasse `BigDecimal`; C# hat dafür den eingebauten Typ `decimal`.
+
+</TabItem>
+<TabItem value="python">
+
+In Python liefert `/` immer eine Gleitkommazahl (`7 / 2` → `3.5`). `//` rundet **ab** (`-7 // 2` → `-4`). C# schneidet Richtung 0 ab (`-7 / 2` → `-3`). Dezimalzahlen gibt es in Python über das Modul `decimal`.
+
+</TabItem>
+<TabItem value="js">
+
+`number` ist ein 64-Bit-Gleitkommawert (wie `double`), `7 / 2` ergibt `3.5`. Eine Ganzzahldivision brauchst du dort mit `Math.trunc(7 / 2)`. Einen eingebauten Dezimaltyp gibt es nicht.
+
+</TabItem>
+<TabItem value="go">
+
+Die Ganzzahldivision schneidet wie in C# Richtung 0 ab. Einen eingebauten Dezimaltyp gibt es nicht.
+
+</TabItem>
+</FromLanguage>
+
+<details>
+<summary>Vertiefung: decimal, double und Division durch 0 (optional)</summary>
+
+Bei Ganzzahlen wirft die Division durch 0 eine `DivideByZeroException`. Bei `double` ergibt sie `Infinity` oder `NaN`. Bei `decimal` wirft sie wieder eine Ausnahme. Das Vorzeichen des Rests `%` folgt dem linken Operanden.
+
+Quelle: [Arithmetic operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators).
+
+</details>
+
+## Zusammenfassung
+
+Teilst du zwei `int`, bekommst du einen `int`; der Nachkommateil wird abgeschnitten. Für eine Gleitkomma-Division muss vor der Division mindestens ein Operand `double` oder `decimal` sein. `double` speichert binär und kann Dezimalbrüche nur ungefähr darstellen. `decimal` passt für Geldbeträge.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l03-q1" />
+
+<Quiz id="m01-l03-q2" />
+
+<Quiz id="m01-l03-q3" />
+
+<Quiz id="m01-l03-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l03-q5" />
+
+### Transferfrage
+
+<Quiz id="m01-l03-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Arithmetic operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators)
+- Microsoft Learn: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types)
+- Microsoft Learn: [Integral numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/integral-numeric-types)

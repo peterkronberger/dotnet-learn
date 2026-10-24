@@ -1,0 +1,2 @@
+int division: 6
+double division: 6.4

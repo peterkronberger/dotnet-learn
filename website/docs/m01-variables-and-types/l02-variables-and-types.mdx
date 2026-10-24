@@ -7,7 +7,6 @@ lesson_id: m01-l02
 
 import CodeBlock from '@theme/CodeBlock';
 import variables from '!!raw-loader!@site/examples/m01/l02/variables.cs';
-import numericPitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
 import valueVsReference from '!!raw-loader!@site/examples/m01/l02/value-vs-reference.cs';
 
 # Variablen und Typen
@@ -17,7 +16,6 @@ import valueVsReference from '!!raw-loader!@site/examples/m01/l02/value-vs-refer
 :::note[Lernziele]
 - Du kannst Variablen deklarieren und initialisieren.
 - Du kennst die wichtigsten eingebauten Typen und wann du welchen nutzt.
-- Du erkennst typische Stolperfallen: Ganzzahldivision und Rundungsfehler bei `double`.
 :::
 
 ## Variablen deklarieren
@@ -41,26 +39,6 @@ Das `$` vor dem Text erzeugt einen **interpolierten String**. Ausdrücke in gesc
 | `char` | `'A'` | ein einzelnes Zeichen |
 | `string` | `"Hallo"` | Text |
 
-## Zwei Stolperfallen
-
-Bevor du weiterliest, probiere die nächste Aufgabe.
-
-:::info[Vorhersage]
-Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
-:::
-
-<CSharpRunner height={420} code={numericPitfalls} />
-
-<details>
-<summary>Lösung und Erklärung anzeigen</summary>
-
-Ausgabe: `3`, `3.5`, `False`, `True`. Der Playground nutzt `InvariantGlobalization`, deshalb steht immer ein Punkt.
-
-- **Ganzzahldivision:** Sind beide Operanden `int`, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten. Mit `(double)a / b` rechnest du als Gleitkommazahl.
-- **Rundungsfehler:** `double` speichert Zahlen binär. `0.1` und `0.2` lassen sich so nicht exakt darstellen, die Summe weicht minimal von `0.3` ab. `decimal` rechnet dezimal und eignet sich deshalb für Geldbeträge.
-
-</details>
-
 <details>
 <summary>Vertiefung: Wert- und Referenztypen (optional)</summary>
 
@@ -74,11 +52,9 @@ In Top-Level-Programmen stehen Typdeklarationen am Ende der Datei.
 
 ## Prüfe dein Wissen
 
-<Quiz id="m01-l03-q1" />
-
-<Quiz id="m01-l03-q2" />
-
 <Quiz id="m01-l02-q1" />
+
+Wie Ganzzahl-Division und Rundungsfehler funktionieren, lernst du in der nächsten Lektion: [Ganzzahl, Gleitkomma und decimal](./l03-numbers.mdx).
 
 ## Quellen
 
