@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-10-23. 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-10-24. 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -20,6 +20,10 @@ Lesson titles and text are German. German titles below are the real learner-faci
 | `docs/learning-principles.mdx` | M0 · page "Wie dieser Kurs funktioniert" (add literature from `didactics.md` and the AI paragraph) | open (B10) |
 | `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (code to `examples/`, English, fix the solution text to `3.5` – the playground uses `InvariantGlobalization`, so the output is always `3.5`) | moved to `docs/m01-variables-and-types/l02-variables-and-types.mdx`; L3 moved out to `docs/m01-variables-and-types/l03-numbers.mdx` |
 | `docs/grundlagen/kontrollfluss.mdx` | M2 (split into several lessons) | moved to `docs/m02-control-flow/l01-control-flow.mdx` (split still open) |
+
+Known gaps (not errors):
+- M1 has no L1 yet. The planned lesson is "Statements and output"; the existing lessons start at `l02`.
+- M2 `l01-control-flow.mdx` still needs to be split into several lessons.
 
 ## Modules
 

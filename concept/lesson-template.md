@@ -17,7 +17,7 @@ Reference lesson as a pattern: `website/docs/m01-variables-and-types/l03-numbers
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
 | 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |
 | 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes; `<Misconception id="…" />` as the first line of each box | Every box is linked to a quiz distractor |
-| 8 | (Switcher box) | `<FromLanguage>` with tabs Java / Python / JS/TS / Go | Only differences to C#, do not explain C# again |
+| 8 | (Switcher box) | `<FromLanguage>` with tabs Java / Python / JS/TS / Go (C++ only where it fits) | Only differences to C#, do not explain C# again |
 | 9 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a Microsoft Learn source |
 | 10 | Summary | 3–5 sentences | No new content |
 | 11 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": 1–3 links to Microsoft Learn / C# specification |

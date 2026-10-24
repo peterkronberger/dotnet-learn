@@ -7,7 +7,15 @@ A learning site for C# and .NET on GitHub Pages. It has two parts that are publi
 | Learning site (chapters, quizzes, collapsible code) | [`website/`](website) | Docusaurus 3 | `https://peterkronberger.github.io/dotnet-learn/` |
 | C# playground (run code in the browser) | [`playground/`](playground) | Blazor WebAssembly + Roslyn (.NET 10) | `https://peterkronberger.github.io/dotnet-learn/runner/` |
 
-The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Lernprinzipien" (learning principles) (`website/docs/learning-principles.mdx`).
+The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Lernprinzipien" (learning principles) (`website/docs/learning-principles.mdx`; it is planned to rename it to "Wie dieser Kurs funktioniert", backlog B10).
+
+## Repository structure
+
+The table is in [`CLAUDE.md`](CLAUDE.md#repo-structure). In short: lessons in `website/docs/`, all C# examples in `website/examples/`, quiz questions in `website/src/data/quiz/`, the playground in `playground/`, the learning concept in `concept/`, checks in `tools/`.
+
+## Working with Claude
+
+Issues can start the Claude workflows through labels: `claude:auto-architect` for larger tasks and `claude:auto-implement` for small ones. Write a dependency as its own line `Depends on #<number>`. Changes to `.github/workflows/` need a human. Details: "Way of working" in [`CLAUDE.md`](CLAUDE.md).
 
 ## One-time setup on GitHub (manual)
 
@@ -22,7 +30,7 @@ The site is built and published on every push to `main`. Pull requests are only 
 
 ## Develop locally
 
-Requirements: Node.js 20 or newer, .NET SDK 10.
+Requirements: Node.js 20 or newer (`engines` in `website/package.json`), .NET SDK 10.
 
 ```bash
 # Learning site (http://localhost:3000/dotnet-learn/)
@@ -32,6 +40,15 @@ npm start
 
 # Playground (separate terminal)
 dotnet run --project playground
+```
+
+Checks to run before a commit (the first two are the build checks from `CLAUDE.md`):
+
+```bash
+cd website && npm run build                # learning site
+dotnet build playground/Playground.csproj  # playground
+bash tools/check-examples.sh               # compile all examples, compare outputs
+node tools/check-quiz.mjs                  # quiz data and links
 ```
 
 Locally, the embedded preview shows the playground at the path `/dotnet-learn/runner/` of the Docusaurus site only if the playground was published first and copied to `website/build/runner`. For development it is enough to open the playground directly with `dotnet run`.

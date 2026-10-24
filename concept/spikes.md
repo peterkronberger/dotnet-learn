@@ -1,8 +1,8 @@
 # Spikes (prototype tasks) and technical backlog
 
-As of 2026-10-23. The status is in the table in `CLAUDE.md`.
+As of 2026-10-24. The status is in the table in `CLAUDE.md`.
 
-All spikes are decided. The results are in `CLAUDE.md` under "Entscheidungen in Kurzform" (decisions in short form).
+All spikes are decided. The results are in `CLAUDE.md` under "Decisions in short form".
 
 ## Process
 
@@ -12,7 +12,7 @@ All spikes are decided. The results are in `CLAUDE.md` under "Entscheidungen in 
    - dependencies as their own line `Depends on #<number>` (the workflows set such issues to `claude:queued`).
 2. **Issue structure:** question · hypothesis · acceptance criteria · time limit · fallback · dependent content (copy the sections below).
 3. **Implementation** in its own branch (`claude/issue-<nr>`) through a pull request.
-4. **Record the result** under "Entscheidungen in Kurzform" in `CLAUDE.md` – even if the hypothesis was wrong.
+4. **Record the result** under "Decisions in short form" in `CLAUDE.md` – even if the hypothesis was wrong.
 5. **Update the status table in `CLAUDE.md`** in the same PR (status).
 6. Content that depends on a spike is written only after it.
 
@@ -25,7 +25,7 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 - **Question:** Does the playground compile C# 14?
 - **Finding from the MVP comparison:** `playground/Playground.csproj` uses `Microsoft.CodeAnalysis.CSharp` 4.14.0. According to the Roslyn wiki, 4.14 matches **C# 13** (VS 2022 17.14 / .NET 9). Only 5.0 brings C# 14 (VS 2026 18.0 / .NET 10). So `LanguageVersion.Latest` gives at most C# 13 with 4.14.
 - **Hypothesis:** Version 5.x runs unchanged in Blazor WebAssembly.
-- **Acceptance criteria:** An example with the `field` keyword and extension members compiles and runs in the published playground. Existing examples still run. Download size before/after is recorded in "Entscheidungen in Kurzform".
+- **Acceptance criteria:** An example with the `field` keyword and extension members compiles and runs in the published playground. Existing examples still run. Download size before/after is recorded in "Decisions in short form".
 - **Time limit:** 2 h · **Fallback:** C# 14 features only as examples that cannot run.
 - **Blocks:** any content with C# 14 features.
 
@@ -51,7 +51,7 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 
 - **Question:** Can Roslyn insert a time check into every loop and method before running?
 - **Hypothesis:** A `CSharpSyntaxRewriter` inserts a call that throws its own exception after about 3 s. The runner shows "Dein Programm läuft vermutlich endlos – prüfe die Abbruchbedingung in Zeile X" (your program probably runs forever – check the stop condition in line X).
-- **Acceptance criteria:** `while (true) { }` and endless recursion stop after about 3 s. Line numbers in compiler messages stay unchanged. Normal examples run without a noticeable delay (measurement recorded in "Entscheidungen in Kurzform").
+- **Acceptance criteria:** `while (true) { }` and endless recursion stop after about 3 s. Line numbers in compiler messages stay unchanged. Normal examples run without a noticeable delay (measurement recorded in "Decisions in short form").
 - **Time limit:** 1 day · **Fallback:** hint as before. Design loop exercises so that endless loops are unlikely. (Web Worker is not pursued further.)
 - **Blocks:** module 2.
 
@@ -81,7 +81,7 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 
 - **Question:** Can user code use `ServiceCollection` and logging?
 - **Note:** The Blazor app already loads `Microsoft.Extensions.DependencyInjection` at run time (`Program.cs`). The references for the compiler are missing. The packages are not part of `Microsoft.NETCore.App.Ref`, so they cannot be added through `ReferenceName`.
-- **Acceptance criteria:** An example with `ServiceCollection`, lifetimes and console logging runs. Download size is recorded in "Entscheidungen in Kurzform".
+- **Acceptance criteria:** An example with `ServiceCollection`, lifetimes and console logging runs. Download size is recorded in "Decisions in short form".
 - **Time limit:** 0.5 day · **Fallback:** module 15 as examples that cannot run.
 - **Blocks:** module 15.
 
@@ -89,14 +89,14 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 
 | # | Task | Depends on | Status |
 | --- | --- | --- | --- |
-| B1 | Convert MVP lessons: identifiers and comments in English, new folder structure, fix the solution text "`3,5` or `3.5`" (the output is always `3.5`) | S1 | erledigt (done) |
-| B2 | Start code in English: `playground/Samples.cs`, `website/src/pages/playground.js` | – | erledigt (done) |
-| B3 | Quiz questions in data files per language, quiz types, versioned progress store, Leitner, dashboard, export/import, migration of the old keys | – | erledigt (done; rest: CI check #42) |
-| B4 | Adapt the README section "Inhalte schreiben" (writing content) to the new rules | S1 | erledigt (done) |
-| B5 | Translatable runner UI (language parameter) | – | offen (open) |
-| B6 | Console input: `stdin` prop, input field, `Console.SetIn` | – | offen (open) |
-| B7 | Commit `package-lock.json`, switch `pages.yml` to `npm ci` | – (workflow → human) | erledigt (done) |
-| B8 | Issue template "Fehler melden / Feedback" + link per page | – | offen (open) |
-| B9 | Mermaid, local search, Playwright + accessibility check | – | offen (open) |
-| B10 | `learning-principles.mdx` → "Wie dieser Kurs funktioniert": literature from `didactics.md`, AI paragraph, how to use | B3 | offen (open) |
-| B11 | `<Since>` badge, switcher tabs | – | erledigt (done) |
+| B1 | Convert MVP lessons: identifiers and comments in English, new folder structure, fix the solution text "`3,5` or `3.5`" (the output is always `3.5`) | S1 | done |
+| B2 | Start code in English: `playground/Samples.cs`, `website/src/pages/playground.js` | – | done |
+| B3 | Quiz questions in data files per language, quiz types, versioned progress store, Leitner, dashboard, export/import, migration of the old keys | – | done |
+| B4 | Adapt the README section "Writing content" to the new rules | S1 | done |
+| B5 | Translatable runner UI (language parameter) | – | open |
+| B6 | Console input: `stdin` prop, input field, `Console.SetIn` | – | open |
+| B7 | Commit `package-lock.json`, switch `pages.yml` to `npm ci` | – (workflow → human) | done |
+| B8 | Issue template "Fehler melden / Feedback" + link per page | – | open |
+| B9 | Mermaid, local search, Playwright + accessibility check | – | open |
+| B10 | `learning-principles.mdx` → "Wie dieser Kurs funktioniert": literature from `didactics.md`, AI paragraph, how to use | B3 | open |
+| B11 | `<Since>` badge, switcher tabs | – | done |

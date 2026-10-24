@@ -72,8 +72,8 @@ Planned:
 | Component | Status | Purpose |
 | --- | --- | --- |
 | `<Since csharp="13" dotnet="9" />` | available | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
-| `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`); the choice is kept across pages (`groupId="from-language"`) |
-| Feedback link | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
+| `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`), plus C++ (`cpp`) only where it fits, e.g. memory or `struct`; the choice is kept across pages (`groupId="from-language"`) |
+| Feedback link | planned (B8) | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
 | `<CodeBlock>` | Official Docusaurus component for code that cannot run, taken from `.cs` files |
 
 ## Site extensions
