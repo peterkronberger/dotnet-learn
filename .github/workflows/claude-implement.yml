@@ -1,21 +1,21 @@
-# IMPLEMENT (Sonnet): Issue umsetzen und Pull Request öffnen.
-# Start: Label "claude:auto-implement" – durch dich, oder automatisch durch claude-architect.yml.
-# Vorab-Prüfung: Hat das Issue offene "Depends on #…", wird es auf claude:queued gesetzt
-# und Claude NICHT gestartet. Der unlock-Job in claude-architect.yml startet es später.
-# Ergebnis als Label: claude:pr-open | needs-human | claude:failed | claude:queued
+# IMPLEMENT (Sonnet): implement an issue and open a pull request.
+# Start: label "claude:auto-implement" – set by you, or automatically by claude-architect.yml.
+# Pre-check: if the issue has open "Depends on #…", it is set to claude:queued
+# and Claude is NOT started. The unlock job in claude-architect.yml starts it later.
+# Result as a label: claude:pr-open | needs-human | claude:failed | claude:queued
 name: Claude – Implement (Sonnet)
 
 on:
   issues:
-    # Ausüfhren bei Labelling von Issues
+    # Run when an issue is labeled
     types: [labeled]
-  
-  workflow_dispatch: # Workflow darf per Knopf oder Befehl gestartet werden
-    inputs:          
-      issue_number:  # … und nimmt dabei Eingaben entgegen:
-        description: "Issue-Nummer" # Beschriftung des Feldes in der GitHub-Oberfläche
-        required: true              # Pflichtfeld – ohne Nummer kein Start
-        type: number                # Nur Zahlen erlaubt
+
+  workflow_dispatch: # the workflow can be started by button or command
+    inputs:
+      issue_number:  # … and takes this input:
+        description: "Issue number" # label of the field in the GitHub UI
+        required: true              # required – no start without a number
+        type: number                # numbers only
 
 concurrency:
   group: claude-implement-${{ github.event.issue.number || inputs.issue_number }}
@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
   implement:
-    # Manueller Start oder claude:auto-implement-Label wurde vergeben
+    # Manual start, or the label claude:auto-implement was set
     if: github.event_name == 'workflow_dispatch' || github.event.label.name == 'claude:auto-implement'
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -41,26 +41,26 @@ jobs:
         with:
           fetch-depth: 0
 
-      # Optional: Toolchain installieren (Node, Python, Java, Go usw. sind auf GitHub-Runnern schon da).
+      # Optional: install a toolchain (Node, Python, Java, Go etc. are already on GitHub runners).
       # - uses: actions/setup-node@v4
       #   with: { node-version: 22 }
       # - run: npm ci
 
       # ─────────────────────────────────────────────────────────────────
-      # ABHÄNGIGKEITEN PRÜFEN (bevor Claude startet)
-      # Egal wer das Label gesetzt hat (Chat, Mensch, Architect): Ein Issue mit
-      # offenen Vorgängern darf noch nicht umgesetzt werden.
+      # CHECK DEPENDENCIES (before Claude starts)
+      # No matter who set the label (chat, human, architect): an issue with
+      # open predecessors must not be implemented yet.
       #
-      # Ablauf:
-      #  1. Issue-Text lesen, alle Zeilen "Depends on #<Nummer>" suchen.
-      #  2. Jeden Vorgänger prüfen. Offen oder nicht lesbar → blockiert.
-      #  3. Blockiert → Labels claude:auto-implement/in-progress entfernen,
-      #     claude:queued setzen, Ausgabe blocked=true. Alle weiteren Schritte
-      #     werden übersprungen (kein Claude-Aufruf, kein Kontingent).
-      #     Der unlock-Job startet das Issue, sobald alle Vorgänger geschlossen sind.
-      #  4. Nicht blockiert → blocked=false, normal weiter.
+      # Flow:
+      #  1. Read the issue text, find all lines "Depends on #<number>".
+      #  2. Check each predecessor. Open or not readable → blocked.
+      #  3. Blocked → remove the labels claude:auto-implement/in-progress,
+      #     set claude:queued, output blocked=true. All further steps
+      #     are skipped (no Claude call, no quota used).
+      #     The unlock job starts the issue as soon as all predecessors are closed.
+      #  4. Not blocked → blocked=false, continue as normal.
       # ─────────────────────────────────────────────────────────────────
-      - name: Abhängigkeiten prüfen
+      - name: Check dependencies
         id: deps
         env:
           GH_TOKEN: ${{ github.token }}
@@ -74,7 +74,7 @@ jobs:
             [ "$state" != "CLOSED" ] && open="$open #$d"
           done
           if [ -n "$open" ]; then
-            echo "Offene Abhängigkeiten:$open → warten"
+            echo "Open dependencies:$open → waiting"
             gh issue edit "$ISSUE" --remove-label "claude:auto-implement,claude:in-progress" || true
             gh issue edit "$ISSUE" --add-label "claude:queued" || true
             echo "blocked=true" >> "$GITHUB_OUTPUT"
@@ -82,7 +82,7 @@ jobs:
             echo "blocked=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Status → in Arbeit
+      - name: Status → in progress
         if: steps.deps.outputs.blocked != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -91,67 +91,68 @@ jobs:
           gh issue edit "$ISSUE" --add-label "claude:in-progress" || true
           gh issue edit "$ISSUE" --remove-label "claude:failed,needs-human,claude:queued" || true
 
-      # Umsetzung des Issues mittels Claude Sonnet. Rückgabe eines JSON zum Status der Umsetzung
-      - name: Claude setzt um
+      # Claude Sonnet implements the issue. Returns a JSON with the status of the work.
+      - name: Claude implements
         id: claude
         if: steps.deps.outputs.blocked != 'true'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          allowed_bots: "github-actions[bot]" # nötig für den automatischen Start durch architect
+          allowed_bots: "github-actions[bot]" # needed for the automatic start by architect
           prompt: |
             REPO: ${{ github.repository }}
             ISSUE NUMBER: ${{ env.ISSUE }}
 
-            Setze GitHub Issue #${{ env.ISSUE }} um. Halte dich an CLAUDE.md und an die
-            Vorgaben im Issue (Dateien, Schnittstellen, Akzeptanzkriterien).
+            Implement GitHub issue #${{ env.ISSUE }}. Follow CLAUDE.md and the
+            requirements in the issue (files, interfaces, acceptance criteria).
 
-            1. Lies das Issue inkl. Kommentaren: `gh issue view ${{ env.ISSUE }} --comments`
-               Steht dort „Teil von #N“, lies auch #N für den Gesamtkontext.
-               Hat ein Mensch frühere Rückfragen in den Kommentaren beantwortet, sind diese
-               Antworten verbindlich und gehen dem Issue-Text vor. Stelle bereits beantwortete
-               Fragen nicht erneut.
-            2. Brauchst du einen Menschen (Vorgaben unklar oder widersprüchlich, Secrets/Zugänge
-               nötig, riskante Änderung wie Datenmigration, Auth/Security, .github/workflows/)?
-               Dann ändere keinen Code und gib status=needs_human zurück. Schreib die konkreten,
-               nummerierten Fragen (Markdown) in das Feld `questions` des Ergebnisses.
-               Poste sie NICHT selbst als Kommentar: Der Workflow postet sie danach zusammen
-               mit der Anleitung zum Neustart.
-            3. Sonst:
-               - Branch vorbereiten: `git fetch origin`. Prüfe mit
-                 `git ls-remote --heads origin claude/issue-${{ env.ISSUE }}`, ob der Branch schon existiert.
-                 * Existiert er (z. B. Neustart, oder ein offener PR mit Korrekturen per @claude):
+            1. Read the issue with its comments: `gh issue view ${{ env.ISSUE }} --comments`
+               If it says "Part of #N" (older issues: "Teil von #N"), also read #N for the full context.
+               If a human has answered earlier questions in the comments, these
+               answers are binding and come before the issue text. Do not ask questions
+               again that were already answered.
+            2. Do you need a human (requirements unclear or contradictory, secrets/access
+               needed, a risky change like a data migration, auth/security, .github/workflows/)?
+               Then change no code and return status=needs_human. Write the concrete,
+               numbered questions (Markdown) into the field `questions` of the result.
+               Do NOT post them as a comment yourself: the workflow posts them afterwards together
+               with the restart instructions.
+            3. Otherwise:
+               - Prepare the branch: `git fetch origin`. Check with
+                 `git ls-remote --heads origin claude/issue-${{ env.ISSUE }}` whether the branch already exists.
+                 * If it exists (e.g. a restart, or an open PR with fixes via @claude):
                    `git checkout -B claude/issue-${{ env.ISSUE }} origin/claude/issue-${{ env.ISSUE }}`
-                   und darauf weiterarbeiten. Bestehende Commits NICHT verwerfen. Ist der Branch
-                   veraltet, `git merge origin/${{ github.event.repository.default_branch }}` und
-                   Konflikte sauber lösen.
-                 * Existiert er nicht: `git checkout -b claude/issue-${{ env.ISSUE }} origin/${{ github.event.repository.default_branch }}`
-               - Umsetzen, inkl. Tests für die Akzeptanzkriterien. Nur das ändern, was das Issue verlangt.
-               - Tests/Linter laufen lassen (Befehle in CLAUDE.md) und Fehler beheben.
-                 Scheitert es nach mehreren Versuchen: status=failed mit Begründung.
-               - Commit, dann `git push -u origin HEAD` (kein Force-Push – so bleiben frühere
-                 Commits und Korrekturen erhalten).
-               - Prüfe mit `gh pr list --head claude/issue-${{ env.ISSUE }} --state open`, ob schon ein PR existiert.
-                 Wenn nein: `gh pr create --title "<Titel>" --body "<Was, warum, wie getestet. Closes #${{ env.ISSUE }}>"`
-                 Wenn ja: der Push genügt.
-               - status=pr_created und pr_url zurückgeben.
-            4. Niemals mergen, keine Labels ändern.
-          # Bash-Freigaben auf deinen Tech-Stack kürzen (je weniger, desto sicherer).
+                   and keep working on it. Do NOT throw away existing commits. If the branch is
+                   out of date, `git merge origin/${{ github.event.repository.default_branch }}` and
+                   resolve conflicts cleanly.
+                 * If it does not exist: `git checkout -b claude/issue-${{ env.ISSUE }} origin/${{ github.event.repository.default_branch }}`
+               - Implement it, including tests for the acceptance criteria. Change only what the issue asks for.
+               - Run tests/linters (commands in CLAUDE.md) and fix errors.
+                 If it still fails after several tries: status=failed with a reason.
+               - Commit, then `git push -u origin HEAD` (no force push – so earlier
+                 commits and fixes are kept).
+               - Check with `gh pr list --head claude/issue-${{ env.ISSUE }} --state open` whether a PR already exists.
+                 If not: `gh pr create --title "<title>" --body "<What, why, how tested. Closes #${{ env.ISSUE }}>"`
+                 If yes: the push is enough.
+               - Return status=pr_created and pr_url.
+            4. Never merge, never change labels.
+          # Cut the Bash permissions down to your tech stack (the fewer, the safer).
           claude_args: |
             --model sonnet
             --max-turns 80
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(bash tools/check-examples.sh:*),Bash(node tools/check-quiz.mjs:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(pnpm:*),Bash(yarn:*)"
-            --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Nur bei status=needs_human: nummerierte Rückfragen als Markdown"}},"required":["status","reason"]}'
+            --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Only for status=needs_human: numbered questions as Markdown"}},"required":["status","reason"]}'
 
-      # Ergebnis des Claude Calls wird per Skript gesetzt
-      # Entfernt die Labels claude:in-progress & claude:auto-implement und setzt je nach status das Label claude:pr-open, needs-human oder als Standard needs-human und claude:failed
-      # Bei needs-human und failed wird zusätzlich ein Kommentar mit den Schritten für den Neustart gepostet.
-      # Bei needs-human enthält dieser Kommentar auch Claudes Rückfragen (Feld "questions" im Ergebnis).
-      # Claude postet die Fragen nicht selbst: Ein eigener gh-Kommentar aus dem Claude-Schritt kam in der
-      # Praxis nicht an (Issues #26, #29), daher postet sie dieser feste Code.
-      # always(): läuft auch bei Zeitlimit/Abbruch, damit kein Issue auf claude:in-progress hängen bleibt.
-      # Übersprungen nur, wenn das Issue wegen offener Abhängigkeiten auf claude:queued gesetzt wurde.
-      - name: Ergebnis per Label melden
+      # A script reports the result of the Claude call.
+      # It removes the labels claude:in-progress and claude:auto-implement and, by status, sets claude:pr-open,
+      # needs-human, or by default needs-human and claude:failed.
+      # For needs-human and failed it also posts a comment with the restart steps.
+      # For needs-human this comment also contains Claude's questions (field "questions" in the result).
+      # Claude does not post the questions itself: in practice, a gh comment from the Claude step
+      # did not arrive (issues #26, #29), so this fixed code posts them.
+      # always(): runs also on timeout/cancel, so no issue stays stuck on claude:in-progress.
+      # Skipped only when the issue was set to claude:queued because of open dependencies.
+      - name: Report result as label
         if: always() && steps.deps.outputs.blocked != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -161,27 +162,27 @@ jobs:
         run: |
           [ -z "$RESULT" ] && RESULT='{}'
           STATUS=$(jq -r '.status // "failed"' <<<"$RESULT")
-          REASON=$(jq -r '.reason // "Kein Ergebnis (Abbruch, Timeout oder Fehler)."' <<<"$RESULT")
+          REASON=$(jq -r '.reason // "No result (cancelled, timeout or error)."' <<<"$RESULT")
           QUESTIONS=$(jq -r '.questions // empty' <<<"$RESULT")
-          [ -z "$QUESTIONS" ] && QUESTIONS="Claude hat keine Fragen im Ergebnis zurückgegeben. Begründung: ${REASON}"
+          [ -z "$QUESTIONS" ] && QUESTIONS="Claude returned no questions in the result. Reason: ${REASON}"
           gh issue edit "$ISSUE" --remove-label "claude:in-progress,claude:auto-implement" || true
           case "$STATUS" in
             pr_created)  gh issue edit "$ISSUE" --add-label "claude:pr-open" ;;
             needs_human) gh issue edit "$ISSUE" --add-label "needs-human"
-                         # Rückfragen und Neustart-Anleitung in EINEM Kommentar. Der Text kommt aus einer
-                         # Datei, damit Backticks oder $ in Claudes Fragen nicht von der Shell ausgewertet werden.
+                         # Questions and restart instructions in ONE comment. The text comes from a
+                         # file, so backticks or $ in Claude's questions are not evaluated by the shell.
                          body="$RUNNER_TEMP/needs-human-comment.md"
                          {
-                           printf '## ❓ Rückfragen von Claude\n\n%s\n\n---\n\n' "$QUESTIONS"
-                           printf 'Weiter geht es so:\n'
-                           printf '1. Fragen im Issue beantworten (als Kommentar, ohne Claude per @ zu erwähnen – sonst startet zusätzlich ein zweiter Claude-Lauf).\n'
-                           printf '2. Danach Label `claude:auto-implement` erneut setzen.\n\n'
+                           printf '## ❓ Questions from Claude\n\n%s\n\n---\n\n' "$QUESTIONS"
+                           printf 'How to continue:\n'
+                           printf '1. Answer the questions in the issue (as a comment, without mentioning Claude with @ – otherwise a second Claude run starts as well).\n'
+                           printf '2. Then set the label `claude:auto-implement` again.\n\n'
                            printf 'Details: %s\n' "$RUN_URL"
                          } > "$body"
                          gh issue comment "$ISSUE" --body-file "$body" ;;
             *)           gh issue edit "$ISSUE" --add-label "needs-human,claude:failed"
-                         gh issue comment "$ISSUE" --body "⚠️ Umsetzung nicht abgeschlossen: ${REASON}
+                         gh issue comment "$ISSUE" --body "⚠️ Implementation not finished: ${REASON}
 
           Details: ${RUN_URL}
-          Neustart: Label \`claude:auto-implement\` erneut setzen." ;;
+          Restart: set the label \`claude:auto-implement\` again." ;;
           esac

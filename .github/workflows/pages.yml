@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 env:
-  # Projektseite: https://<user>.github.io/dotnet-learn/
+  # Project page: https://<user>.github.io/dotnet-learn/
   SITE_BASE_PATH: /dotnet-learn
 
 jobs:
@@ -36,41 +36,40 @@ jobs:
         
       - name: Docusaurus build
         working-directory: website
-        # Ohne package-lock.json kann "npm ci" nicht laufen. Lockfile committen, dann auf "npm ci" umstellen.
         run: |
           npm ci
           npm run build
 
-      - name: C#-Playground veröffentlichen (Blazor WebAssembly)
+      - name: Publish C# playground (Blazor WebAssembly)
         run: dotnet publish playground/Playground.csproj --configuration Release --output out/playground
 
-      - name: Playground in die Seite einbinden
+      - name: Add playground to the site
         shell: bash
         run: |
           set -euo pipefail
           index=out/playground/wwwroot/index.html
-          # Blazor braucht den Unterpfad als <base href>.
+          # Blazor needs the sub path as <base href>.
           sed -i "s|<base href=\"/\" />|<base href=\"${SITE_BASE_PATH}/runner/\" />|" "$index"
           grep -q "<base href=\"${SITE_BASE_PATH}/runner/\" />" "$index"
-          # Nicht ersetzte Platzhalter führen dazu, dass der Playground nie startet.
+          # Placeholders that were not replaced stop the playground from ever starting.
           if grep -q "{fingerprint}" "$index"; then
-            echo "::error::index.html enthält einen nicht ersetzten Fingerprint-Platzhalter"
+            echo "::error::index.html contains a fingerprint placeholder that was not replaced"
             exit 1
           fi
           grep -q "_framework/blazor.webassembly" "$index"
           test -f out/playground/wwwroot/_framework/blazor.webassembly.js
           mkdir -p website/build/runner
           cp -r out/playground/wwwroot/. website/build/runner/
-          # Ordner mit führendem Unterstrich (_framework) dürfen nicht von Jekyll verworfen werden.
+          # Jekyll must not drop folders that start with an underscore (_framework).
           touch website/build/.nojekyll
           test -d website/build/runner/_framework
           du -sh website/build website/build/runner
 
-      - name: GitHub Pages konfigurieren
+      - name: Configure GitHub Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
 
-      - name: Artefakt hochladen
+      - name: Upload artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
@@ -81,7 +80,7 @@ jobs:
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
-    # Rechte, die actions/deploy-pages für das Deployment braucht
+    # Permissions that actions/deploy-pages needs for the deployment
     permissions:
       pages: write
       id-token: write
@@ -92,6 +91,6 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Auf GitHub Pages deployen
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
