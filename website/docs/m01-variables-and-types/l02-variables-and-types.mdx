@@ -74,29 +74,11 @@ In Top-Level-Programmen stehen Typdeklarationen am Ende der Datei.
 
 ## Prüfe dein Wissen
 
-<Quiz
-  id="typen-int-division"
-  question="Welchen Typ und Wert hat `var x = 7 / 2;`?"
-  options={['double mit dem Wert 3.5', 'int mit dem Wert 3', 'int mit dem Wert 4', 'decimal mit dem Wert 3.5']}
-  answer={1}>
-  Beide Operanden sind `int`, also ist die Division eine Ganzzahldivision. Der Nachkommateil wird abgeschnitten (nicht gerundet), das Ergebnis ist `3`. Für `3.5` müsste mindestens ein Operand ein `double` oder `decimal` sein, etwa `7 / 2.0`.
-</Quiz>
+<Quiz id="m01-l03-q1" />
 
-<Quiz
-  id="typen-geld"
-  question="Welcher Typ ist für Geldbeträge am besten geeignet?"
-  options={['float', 'double', 'decimal', 'char']}
-  answer={2}>
-  `decimal` speichert Zahlen im Dezimalsystem. Beträge wie `0.10` lassen sich damit exakt darstellen. Bei `float` und `double` können binäre Rundungsfehler auftreten, wie im Beispiel `0.1 + 0.2`.
-</Quiz>
+<Quiz id="m01-l03-q2" />
 
-<Quiz
-  id="typen-implizit"
-  question="Was passiert bei `int x = 3.7;`?"
-  options={['x ist 4', 'x ist 3', 'Der Compiler meldet einen Fehler', 'x ist 3.7']}
-  answer={2}>
-  C# wandelt `double` nicht stillschweigend in `int` um, weil dabei Information verloren ginge. Du musst es ausdrücklich verlangen, z. B. mit `(int)3.7`. Das Ergebnis ist dann `3`, denn die Nachkommastellen werden abgeschnitten.
-</Quiz>
+<Quiz id="m01-l02-q1" />
 
 ## Quellen
 

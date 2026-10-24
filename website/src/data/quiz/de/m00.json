@@ -1,0 +1,19 @@
+{
+  "module": "m00",
+  "questions": [
+    {
+      "id": "m00-l01-q1",
+      "lesson": "m00-l01",
+      "type": "single",
+      "legacyId": "intro-length",
+      "question": "Was gibt `Console.WriteLine(name.Length)` aus, wenn `name` den Text `World` enthält?",
+      "options": [
+        { "text": "`3`" },
+        { "text": "`4`" },
+        { "text": "`5`", "correct": true },
+        { "text": "`World`" }
+      ],
+      "explanation": "`Length` zählt Zeichen. „World“ hat fünf Buchstaben, also ist das Ergebnis `5`. Die Ausgabe ist eine Zahl und kein Text."
+    }
+  ]
+}
