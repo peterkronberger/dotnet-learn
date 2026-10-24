@@ -1,106 +1,108 @@
 # CLAUDE.md – dotnet-learn
 
-Lernseite für C# und .NET: Docusaurus 3 (Lernpfad, Quizzes) + Blazor-WebAssembly-Playground mit Roslyn (.NET 10), gehostet auf GitHub Pages. Zielgruppe: Programmiereinsteiger **und** Umsteiger aus anderen Sprachen. Didaktik: beispielorientiert, wissenschaftlich fundiert, Fundamente werden erklärt.
+Learning site for C# and .NET: Docusaurus 3 (learning path, quizzes) + Blazor WebAssembly playground with Roslyn (.NET 10), hosted on GitHub Pages. Audience: programming beginners **and** switchers from other languages. Teaching style: example-driven, based on research, fundamentals are explained.
 
-Dieses Dokument ist verbindlich für jede Arbeit im Repo – von Menschen und von Claude (auch in den Workflows `claude-architect.yml` / `claude-implement.yml`).
+This document is binding for all work in the repo – for humans and for Claude (also in the workflows `claude-architect.yml` / `claude-implement.yml`).
 
-## Repo-Struktur
+## Repo structure
 
-| Pfad | Inhalt |
+| Path | Content |
 | --- | --- |
-| `website/` | Docusaurus-Seite. Lektionen unter `website/docs/`, Komponenten unter `website/src/components/` |
-| `website/examples/` | **Alle** C#-Beispiele als `.cs`-Dateien (eine Quelle für alle Sprachen, von CI geprüft) – siehe S1/S2 |
-| `playground/` | Blazor WebAssembly + Roslyn; wird unter `/runner/` veröffentlicht und per iframe eingebettet |
-| `concept/` | Lernkonzept (unten importiert) |
-| `.github/workflows/` | `pages.yml` (Build + Deploy), `claude-*.yml` (Issue-Automatisierung) |
+| `website/` | Docusaurus site. Lessons in `website/docs/`, components in `website/src/components/` |
+| `website/examples/` | **All** C# examples as `.cs` files (one source for all languages, checked by CI) – see S1/S2 |
+| `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded with an iframe |
+| `concept/` | Learning concept (imported below) |
+| `.github/workflows/` | `pages.yml` (build + deploy), `claude-*.yml` (issue automation) |
 
-## Befehle
+## Commands
 
 ```bash
-# Lernseite
-cd website && npm install && npm run build   # Build-Prüfung (muss fehlerfrei sein)
-cd website && npm start                       # Dev-Server: http://localhost:3000/dotnet-learn/
+# Learning site
+cd website && npm install && npm run build   # build check (must pass without errors)
+cd website && npm start                       # dev server: http://localhost:3000/dotnet-learn/
 
 # Playground
-dotnet build playground/Playground.csproj     # Build-Prüfung
-dotnet run --project playground               # lokal starten
+dotnet build playground/Playground.csproj     # build check
+dotnet run --project playground               # run locally
 
-# Beispielcode prüfen (kompilieren + Ausgaben mit <name>.out.txt abgleichen), siehe S2
+# Check example code (compile + compare output with <name>.out.txt), see S2
 bash tools/check-examples.sh
-bash tools/check-examples.sh --update   # Snapshots bewusst neu schreiben, Diff prüfen
+bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
 ```
 
-Vor jedem Commit: beide Build-Prüfungen ausführen. Schlägt eine fehl, wird nicht committet.
+Before every commit: run both build checks. If one fails, do not commit.
 
-## Unverhandelbare Regeln
+## Non-negotiable rules
 
-1. **Code, Bezeichner und Code-Kommentare sind immer Englisch.** Fließtext ist Deutsch (weitere Sprachen später über Docusaurus-i18n). Fachbegriffe Englisch, beim ersten Auftreten mit deutscher Erklärung: „Value Type (Werttyp)“.
-2. **Basis: C# 14 / .NET 10 (LTS).** Top-Level-Statements am Anfang, `Main` wird später erklärt. Nullable Reference Types aktiv. Features ab C# 12 / .NET 8 bekommen ein Versions-Badge (`<Since csharp="…" dotnet="…" />`).
-3. **Code liegt in `.cs`-Dateien** unter `website/examples/mXX/lYY/` und wird per `raw-loader` in Codeblöcke und `<CSharpRunner>` eingebunden. Kein neuer Inline-Code in MDX.
-4. **Jede gezeigte Ausgabe ist echt**: Sie muss mit dem tatsächlichen Lauf übereinstimmen (CI-Abgleich, S2). Keine von Hand erfundenen Ausgaben.
-5. **Nicht ausführbar ≠ gekennzeichnet**: Codebeispiele, die der Playground nicht ausführen kann (ASP.NET Core, EF Core, Unit-Tests), sind normale ` ```csharp title="…" `-Blöcke ohne Hinweis.
-6. **Ausführbar** ist nur, was im `<CSharpRunner>` läuft. Praxisbeispiele folgen dem Muster *Vorhersage → Runner → Lösung und Erklärung → Vertiefung (optional)*.
-7. **Fakten mit Quelle**: Technische Aussagen verweisen auf Microsoft Learn oder die C#-Spezifikation; didaktische Aussagen auf die Literatur in `concept/didaktik.md`. Nichts erfinden – im Zweifel als offene Frage markieren.
-8. **Lektion = 15–25 min, ein Kernkonzept.** Länger → teilen.
-9. **Barrierefreiheit WCAG 2.2 AA**: Tastaturbedienung für alle Interaktionen, Kontrast in Hell- und Dunkelmodus, Textalternative für Diagramme.
-10. **Kein Tracking**, keine Konten. Lernfortschritt nur lokal (localStorage/IndexedDB) mit JSON-Export/-Import.
-11. **Abhängige Inhalte erst nach entschiedenem Spike** (Tabelle unten). Nicht um einen offenen Spike herum bauen.
-12. **Keine KI-Inhalte außerhalb von Modul 19** – einzige Ausnahme: ein Absatz auf der Seite „Wie dieser Kurs funktioniert“.
+1. **Everything in the repo is English, except the learning text.** Code, identifiers, code comments, CSS, config, docs in `concept/`, `README.md` and `.claude/`, commit messages, and **pull request titles and descriptions** are always English (simple English). Only the learning text in `website/docs/**/*.mdx` and the UI texts for learners (React components, playground UI) are German (more languages later through Docusaurus i18n). Code that learners see (examples, comments, identifiers, program output) is always English. Technical terms stay English; on first use give a German explanation: "Value Type (Werttyp)".
+2. **Base: C# 14 / .NET 10 (LTS).** Top-level statements first, `Main` is explained later. Nullable reference types on. Features from C# 12 / .NET 8 on get a version badge (`<Since csharp="…" dotnet="…" />`).
+3. **Code lives in `.cs` files** under `website/examples/mXX/lYY/` and is included with `raw-loader` in code blocks and `<CSharpRunner>`. No new inline code in MDX.
+4. **Every shown output is real**: it must match the actual run (CI comparison, S2). No outputs invented by hand.
+5. **Not runnable ≠ marked**: code examples that the playground cannot run (ASP.NET Core, EF Core, unit tests) are normal ` ```csharp title="…" ` blocks without a note.
+6. **Runnable** means only what runs in `<CSharpRunner>`. Practice examples follow the pattern *prediction → runner → solution and explanation → deep dive (optional)*.
+7. **Facts with sources**: technical statements point to Microsoft Learn or the C# specification; teaching statements point to the literature in `concept/didaktik.md`. Do not invent anything – if unsure, mark it as an open question.
+8. **Lesson = 15–25 min, one core concept.** Longer → split.
+9. **Accessibility WCAG 2.2 AA**: keyboard use for all interactions, contrast in light and dark mode, text alternative for diagrams.
+10. **No tracking**, no accounts. Learning progress only local (localStorage/IndexedDB) with JSON export/import.
+11. **Dependent content only after the spike is decided** (table below). Do not build around an open spike.
+12. **No AI content outside module 19** – only exception: one paragraph on the page "Wie dieser Kurs funktioniert" (How this course works).
 
-## Definition of Done – Lektion
+## Definition of Done – lesson
 
-Eine Lektion ist fertig, wenn alle Punkte erfüllt sind:
+A lesson is done when all points are met:
 
-1. Jedes Lernziel ist durch mindestens eine Quiz- oder Übungsaufgabe abgedeckt.
-2. Alle Codebeispiele bestehen den CI-Check (kompilieren, Ausgaben stimmen).
-3. Die Pflichtmethoden sind enthalten: vorgerechnetes Beispiel mit Ausblenden, PRIMM-Praxisbeispiel, Abrufübung, Fragen für die verteilte Wiederholung.
-4. Mindestens eine Fehlvorstellung wird behandelt (Box „Achtung“).
-5. Features ab C# 12 / .NET 8 tragen das Versions-Badge.
-6. Fachaussagen in „Vertiefung“-Bereichen verweisen auf Microsoft Learn oder die C#-Spezifikation.
-7. Dauer 15–25 min (geschätzt über Wortzahl und Anzahl der Aufgaben).
-8. Jedes vorgerechnete Beispiel hat Teilziel-Beschriftungen.
-9. Mindestens eine Aufgabe hat einen echten Anwendungskontext (meist SecLog oder Phishing-Klassifikator).
-10. Mindestens eine Übertragungsfrage („Wo würdest du das einsetzen?“) oder eine Projekt-Zusatzübung.
-11. Jede Fehlvorstellungs-Box ist mit mindestens einer falschen Antwort im Quiz verknüpft.
-12. Mindestens eine Aufgabe „In eigenen Worten erklären“.
+1. Every learning goal is covered by at least one quiz or exercise task.
+2. All code examples pass the CI check (compile, outputs match).
+3. The required methods are included: worked example with fading, PRIMM practice example, retrieval practice, questions for spaced repetition.
+4. At least one misconception is addressed (box "Achtung").
+5. Features from C# 12 / .NET 8 on carry the version badge.
+6. Technical statements in "Vertiefung" (deep dive) sections point to Microsoft Learn or the C# specification.
+7. Duration 15–25 min (estimated from word count and number of tasks).
+8. Every worked example has subgoal labels.
+9. At least one task has a real application context (mostly SecLog or the phishing classifier).
+10. At least one transfer question ("Where would you use this?") or a project bonus exercise.
+11. Every misconception box is linked to at least one wrong answer in the quiz.
+12. At least one task "explain in your own words".
 
-Zusätzlich: `npm run build` fehlerfrei, keine toten Links, Abschnitt „Weiterlesen“ mit 1–3 Links auf Microsoft Learn bzw. die Spezifikation.
+In addition: `npm run build` without errors, no dead links, section "Weiterlesen" (further reading) with 1–3 links to Microsoft Learn or the specification.
 
-## Status der Spikes (Prototyp-Aufgaben)
+## Status of the spikes (prototype tasks)
 
-Details, Akzeptanzkriterien und Ablauf: `concept/spikes.md`. Status: offen · läuft · entschieden. Die Entscheidungen stehen unten in Kurzform.
+Details, acceptance criteria and process: `concept/spikes.md`. Status: open · running · decided. The decisions are listed below in short form.
 
-| # | Spike | Blockiert | Status |
+| # | Spike | Blocks | Status |
 | --- | --- | --- | --- |
-| S0 | Roslyn auf 5.x heben (C# 14) | jeglichen Inhalt mit C#-14-Features | entschieden; manuelle Deploy-Prüfung ausstehend |
-| S1 | Code aus `.cs`-Dateien in Codeblock und `<CSharpRunner>` einbinden | jeglichen neuen Inhalt | entschieden |
-| S2 | CI: alle `.cs`-Dateien kompilieren und Ausgaben abgleichen | jeglichen neuen Inhalt | entschieden |
-| S3 | Roslyn-Schleifenwächter gegen Endlosschleifen | Modul 2 (Schleifen) | entschieden |
-| S4 | Syntaxfarben-Overlay im Editor | Modul 2 | entschieden |
-| S5 | Schritt-für-Schritt-Visualisierung | Modul 4 | entschieden; manuelle Prüfung im Browser ausstehend |
-| S6 | `Microsoft.Extensions.*` im Playground | Modul 15 | entschieden; manuelle Prüfung im Browser ausstehend |
-| S7 | Runner ↔ Seite: Ausgabe/Testergebnis per `postMessage` | Vorhersagefeld, geprüfte Aufgaben | entschieden; manuelle Prüfung im Browser ausstehend |
-Alle Spikes sind entschieden; die nächsten Arbeitspakete sind der Backlog B1–B11 in `concept/spikes.md`.
+| S0 | Raise Roslyn to 5.x (C# 14) | any content with C# 14 features | decided; manual deploy check pending |
+| S1 | Include code from `.cs` files in code block and `<CSharpRunner>` | any new content | decided |
+| S2 | CI: compile all `.cs` files and compare outputs | any new content | decided |
+| S3 | Roslyn loop guard against infinite loops | module 2 (loops) | decided |
+| S4 | Syntax color overlay in the editor | module 2 | decided |
+| S5 | Step-by-step visualization | module 4 | decided; manual check in the browser pending |
+| S6 | `Microsoft.Extensions.*` in the playground | module 15 | decided; manual check in the browser pending |
+| S7 | Runner ↔ page: output/test result via `postMessage` | prediction field, checked tasks | decided; manual check in the browser pending |
 
-### Entscheidungen in Kurzform
+All spikes are decided; the next work packages are the backlog B1–B11 in `concept/spikes.md`.
 
-- **S0:** Roslyn 5.9.0 (C# 14), +0,7 MiB. Fallback: C#-14-Features nur nicht ausführbar.
-- **S1:** `.cs`-Dateien per `raw-loader` in `<CSharpRunner>` und `<CodeBlock>`.
-- **S2:** `tools/check-examples.sh` führt jede `*.cs` aus (Invariant Globalization) und vergleicht mit `<name>.out.txt`; `*.snippet.cs` werden übersprungen; EF Core, Minimal API und xUnit laufen als Projekte unter `website/examples/_ci/<name>/`.
-- **S3:** Roslyn-Rewriter fügt Zeitprüfung ein (ca. 3 s ab Start, Wanduhrzeit). Kein Wächter in Operatoren, Accessors, Ausdruckskörpern; `catch (Exception)` im Nutzercode fängt ihn ab.
-- **S4:** Eigener Tokenizer (`playground/wwwroot/js/editor.js`, kein Prism) färbt ein `<pre>` hinter dem transparenten `<textarea>`. Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Schriftstärke, Kursiv, Ligaturen, Padding, Rahmen), sonst sitzt der Cursor falsch. Fallback: reines `<textarea>`.
-- **S5:** Roslyn-Instrumentierung protokolliert Zeile und Variablen pro Schritt (`trace`). Stack/Heap bleibt ein Modell.
-- **S6:** Feste Paketmenge `Microsoft.Extensions.DependencyInjection` und `…Logging` (+0,6 MiB); Configuration/Hosting fehlen.
-- **S7:** `postMessage`-Protokoll siehe `concept/komponenten.md`; Prüfcode über `TaskTests.Run()`; Fallback: Aufgabe mit eingeklappter Musterlösung.
+### Decisions in short form
 
-## Arbeitsweise
+- **S0:** Roslyn 5.9.0 (C# 14), +0.7 MiB. Fallback: C# 14 features only as non-runnable code.
+- **S1:** `.cs` files with `raw-loader` in `<CSharpRunner>` and `<CodeBlock>`.
+- **S2:** `tools/check-examples.sh` runs every `*.cs` (invariant globalization) and compares with `<name>.out.txt`; `*.snippet.cs` files are skipped; EF Core, Minimal API and xUnit run as projects under `website/examples/_ci/<name>/`.
+- **S3:** A Roslyn rewriter inserts a time check (about 3 s from start, wall-clock time). No guard in operators, accessors, expression bodies; `catch (Exception)` in user code catches it.
+- **S4:** Own tokenizer (`playground/wwwroot/js/editor.js`, no Prism) colors a `<pre>` behind the transparent `<textarea>`. Overlay lines use the classes `pg-hl-line*`; they must not change text metrics (font, font weight, italic, ligatures, padding, border), or the cursor is in the wrong place. Fallback: plain `<textarea>`.
+- **S5:** Roslyn instrumentation records line and variables per step (`trace`). Stack/heap stays a model.
+- **S6:** Fixed set of packages `Microsoft.Extensions.DependencyInjection` and `…Logging` (+0.6 MiB); configuration/hosting are missing.
+- **S7:** `postMessage` protocol: see `concept/komponenten.md`; check code via `TaskTests.Run()`; fallback: task with a collapsed model solution.
 
-- Größere Aufgaben als Issue mit Label `claude:auto-architect`, kleine mit `claude:auto-implement` (siehe `.github/workflows/claude-*.yml`). Abhängigkeiten im Issue als eigene Zeile `Depends on #<nummer>`.
-- Spikes enden immer mit einem Eintrag unter „Entscheidungen in Kurzform“ und einer Aktualisierung der Statustabelle oben.
-- Änderungen an `.github/workflows/` brauchen einen Menschen (so in `claude-implement.yml` festgelegt).
-- Halbjährliche Review (nächste: 2027-04): Versions- und Historienlektion (Modul 0), KI-Modul (Studienlage, Links), tote Links.
+## Way of working
 
-## Konzept (verbindlich)
+- Larger tasks as an issue with label `claude:auto-architect`, small ones with `claude:auto-implement` (see `.github/workflows/claude-*.yml`). Write dependencies in the issue on their own line: `Depends on #<number>`.
+- Spikes always end with an entry under "Decisions in short form" and an update of the status table above.
+- Changes to `.github/workflows/` need a human (as set in `claude-implement.yml`).
+- Half-yearly review (next: 2027-04): version and history lesson (module 0), AI module (state of studies, links), dead links.
+- Pull requests: title, description and commit messages are written in English, even if the issue is in German.
+
+## Concept (binding)
 
 @concept/didaktik.md
 @concept/lektions-template.md

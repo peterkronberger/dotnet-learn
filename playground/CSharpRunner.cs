@@ -5,13 +5,13 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Playground;
 
-/// <summary>Eine Zeile der Compiler-Ausgabe.</summary>
+/// <summary>One line of compiler output.</summary>
 public sealed record DiagnosticLine(bool IsError, string Text, int? Line = null);
 
 /// <summary>Outcome of one task test. For hidden tests (<c>Visible = false</c>) the name is neutral.</summary>
 public sealed record TestOutcome(string Name, bool Visible, bool Passed, string Feedback);
 
-/// <summary>Ergebnis eines Durchlaufs aus Kompilieren und Ausführen.</summary>
+/// <summary>Result of one compile-and-run pass.</summary>
 public sealed record RunResult(
     bool Success,
     string Output,
@@ -27,12 +27,12 @@ public sealed record RunResult(
 }
 
 /// <summary>
-/// Kompiliert C#-Code mit Roslyn im Browser und führt ihn aus.
-/// Alles läuft lokal in der WebAssembly-Sandbox, es wird nichts an einen Server gesendet.
+/// Compiles C# code with Roslyn in the browser and runs it.
+/// Everything runs locally in the WebAssembly sandbox; nothing is sent to a server.
 /// </summary>
 public sealed class CSharpRunner
 {
-    // Entspricht den „Implicit Usings“ eines Konsolenprojekts.
+    // Matches the implicit usings of a console project.
     private const string GlobalUsings =
         "global using System;\n" +
         "global using System.Collections.Generic;\n" +
@@ -226,7 +226,7 @@ public sealed class CSharpRunner
                 OutputKind.ConsoleApplication,
                 optimizationLevel: OptimizationLevel.Release,
                 nullableContextOptions: NullableContextOptions.Enable,
-                // WebAssembly läuft hier einthreadig.
+                // WebAssembly is single-threaded here.
                 concurrentBuild: false));
 
         using var peStream = new MemoryStream();
@@ -250,10 +250,10 @@ public sealed class CSharpRunner
     }
 
     /// <summary>
-    /// Für asynchrone Einstiegspunkte (auch "await" in Top-Level-Anweisungen) erzeugt der Compiler
-    /// einen synchronen Wrapper, der den Task blockierend abwartet. Das scheitert in der
-    /// einthreadigen WebAssembly-Laufzeit ("Cannot wait on monitors on this runtime").
-    /// Deshalb wird die asynchrone Methode direkt aufgerufen und von <see cref="RunAsync"/> awaited.
+    /// For async entry points (also "await" in top-level statements) the compiler generates
+    /// a synchronous wrapper that blocks on the task. That fails on the single-threaded
+    /// WebAssembly runtime ("Cannot wait on monitors on this runtime").
+    /// So the async method is called directly and awaited by <see cref="RunAsync"/>.
     /// </summary>
     private static MethodInfo? ResolveEntryPoint(Assembly assembly)
     {

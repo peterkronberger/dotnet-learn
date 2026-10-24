@@ -8,7 +8,7 @@ import palindromeTests from '!!raw-loader!@site/examples/s7/palindrome-task.test
 import loopTrace from '!!raw-loader!@site/examples/s5/loop-trace.cs';
 import referenceTypes from '!!raw-loader!@site/examples/s5/reference-types.cs';
 
-// Technische Demo für Spike S7, kein Lerninhalt.
+// Technical demo for spike S7, not learning content.
 export default function RunnerDemo() {
   return (
     <Layout title="Runner-Demo (S7)" description="Technische Demo: Runner meldet Ergebnisse an die Seite">

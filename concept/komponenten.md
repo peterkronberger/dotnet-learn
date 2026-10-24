@@ -1,80 +1,82 @@
-# Komponenten und Konventionen
+# Components and conventions
 
-Stand: 2026-10-23. Status: **vorhanden** · **geplant**. Alle Komponenten sind global in `website/src/theme/MDXComponents.js` registriert (kein Import in MDX nötig).
+Note: The course text for learners (MDX lessons) is German; this document is English.
+
+Stand: 2026-10-23 (as of). Status: **vorhanden** (exists) · **geplant** (planned). All components are registered globally in `website/src/theme/MDXComponents.js` (no import needed in MDX).
 
 ## Admonitions (Docusaurus, vorhanden)
 
 | Zweck | Syntax |
 | --- | --- |
-| Lernziele | `:::note[Lernziele]` |
-| Vorhersage | `:::info[Vorhersage]` |
-| Fehlvorstellung | `:::warning[Achtung]` |
-| Typische KI-Antwort (nur Modul 19) | `:::note[Typische KI-Antwort (konstruiertes Beispiel)]` |
+| Learning goals | `:::note[Lernziele]` |
+| Prediction | `:::info[Vorhersage]` |
+| Misconception | `:::warning[Achtung]` |
+| Typical AI answer (module 19 only) | `:::note[Typische KI-Antwort (konstruiertes Beispiel)]` |
 
-Aufklappbares: `<details><summary>Lösung und Erklärung anzeigen</summary> … </details>` bzw. `Vertiefung: … (optional)` (Leerzeilen vor und nach dem Inhalt).
+Collapsible parts: `<details><summary>Lösung und Erklärung anzeigen</summary> … </details>` (show solution and explanation) or `Vertiefung: … (optional)` (deep dive). Put blank lines before and after the content.
 
-## `<CSharpRunner>` – vorhanden, wird erweitert
+## `<CSharpRunner>` – exists, will be extended
 
-Heute: `code` (String), `height` (px, Standard 460). Bettet `/runner/` als iframe ein, Code als Base64url im URL-Fragment, `loading="lazy"`, Theme per `postMessage` (`{type: 'theme', value}`).
+Today: `code` (string), `height` (px, default 460). It embeds `/runner/` as an iframe. The code goes in the URL fragment as Base64url, `loading="lazy"`, theme via `postMessage` (`{type: 'theme', value}`).
 
-Vorhanden (S7):
-- `id`: stabiler Schlüssel der Instanz (Standard: automatisch); ordnet `run-result` der richtigen Instanz zu.
-- `predict` (bool) + `expected` (String, Ausgabe-Snapshot): ein Eingabefeld pro erwarteter Ausgabezeile; nach „Ausführen“ ✓/✗ pro Zeile, sachlich formuliert, Ergebnis in `aria-live`-Region. Geprüft wird gegen die echte Ausgabe.
-- `tests` (String): C#-Prüfcode mit `public static class TaskTests` und `Run()` (Tupel `Name, Visible, Passed, Feedback`); der Runner führt dann nur die Tests aus. Ergebnis pro Test, versteckte Tests mit neutralem Namen.
-- `onResult`: Callback mit der `run-result`-Nachricht.
-- `code` kommt aus einer `.cs`-Datei (`import x from '!!raw-loader!@site/examples/…'`, S1). Die frühere README-Einschränkung „keine Backticks, Backslashes, `${`“ entfällt.
-- `trace` (bool, S5): schaltet die Schrittansicht (Variablen, Heap-Modell) ein.
+Exists (S7):
+- `id`: stable key of the instance (default: automatic). It maps `run-result` to the right instance.
+- `predict` (bool) + `expected` (string, output snapshot): one input field per expected output line. After „Ausführen“ (run), ✓/✗ per line, worded plainly, result in an `aria-live` region. The check is against the real output.
+- `tests` (string): C# test code with `public static class TaskTests` and `Run()` (tuple `Name, Visible, Passed, Feedback`). The Runner then runs only the tests. Result per test, hidden tests with a neutral name.
+- `onResult`: callback with the `run-result` message.
+- `code` comes from a `.cs` file (`import x from '!!raw-loader!@site/examples/…'`, S1). The old README limit "no backticks, backslashes, `${`" no longer applies.
+- `trace` (bool, S5): turns on the step view (variables, heap model).
 - Demo: `/runner-demo`.
 
-Geplant:
-- `stdin` (String): vorbefüllte Konsoleneingabe, zeilenweise von `Console.ReadLine()` gelesen. Im Runner als Eingabefeld unter dem Editor.
-- Laden: weit weggescrollte Instanzen entladen, eingegebener Code bleibt erhalten; Runtime aus dem Browser-Cache.
-- Sprache der Runner-Oberfläche (heute fest Deutsch in `App.razor`) über einen Parameter (z. B. `#lang=de`) – für i18n.
+Planned:
+- `stdin` (string): prefilled console input, read line by line by `Console.ReadLine()`. In the Runner it is an input field under the editor.
+- Loading: unload instances that are scrolled far away; typed code is kept; runtime from the browser cache.
+- Language of the Runner UI (today fixed German in `App.razor`) through a parameter (for example `#lang=de`) – for i18n.
 
-Nachrichtenprotokoll (S7, vorhanden; Ursprungsprüfung `window.location.origin` in beide Richtungen, Seite prüft zusätzlich `event.source` und `id`):
-- Seite → Runner: `{type: 'theme', value}`; Konfiguration im Fragment: `#code=<b64>&id=<id>&tests=<b64>`
-- Runner → Seite: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
+Message protocol (S7, exists; origin check `window.location.origin` in both directions, the page also checks `event.source` and `id`):
+- Page → Runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>`
+- Runner → page: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
 
-## Playground (`playground/`) – vorhanden
+## Playground (`playground/`) – exists
 
-- `<textarea>`-Editor; Tab, Esc, Strg/⌘+Enter vorhanden. Keine Autovervollständigung (entschieden).
-- Syntaxfarben, Zeilen-Hervorhebung, Fehlermarkierung – vorhanden (S4): eigener Tokenizer in `playground/wwwroot/js/editor.js` (kein Prism). Overlay-Zeilen nutzen die Klassen `pg-hl-line*`; sie dürfen keine Textmetriken ändern (Schrift, Schriftstärke, Kursiv, Ligaturen, Padding, Rahmen), sonst sitzt der Cursor falsch.
-- Schleifenwächter (Abbruch nach ca. 3 s mit deutscher Meldung und Zeilennummer) – vorhanden (S3). Kein Wächter in Operatoren, Accessors und Ausdruckskörpern; `catch (Exception)` im Nutzercode fängt ihn ab.
-- Compilerfehler als Liste mit Zeile/Spalte (vorhanden) + deutsche Erklärung häufiger Fehler zusätzlich zur Originalmeldung (geplant).
-- Schritt-für-Schritt-Visualisierung (Variablen, Heap-Modell), pro Runner per `trace` einschaltbar – vorhanden (S5).
-- Fest vorgeladene Pakete (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – vorhanden (S6); Configuration und Hosting fehlen. Keine freie NuGet-Installation.
-- `InvariantGlobalization=true`: Zahlen erscheinen immer mit Punkt (`3.5`). Die CI muss mit `InvariantCulture` laufen, damit gezeigte Ausgaben übereinstimmen.
+- `<textarea>` editor; Tab, Esc, Ctrl/⌘+Enter exist (Strg/⌘+Enter in the German UI). No autocomplete (decided).
+- Syntax colors, line highlight, error marks – exist (S4): own tokenizer in `playground/wwwroot/js/editor.js` (no Prism). Overlay lines use the classes `pg-hl-line*`. They must not change text metrics (font, font weight, italic, ligatures, padding, border). Otherwise the cursor sits in the wrong place.
+- Loop guard (stops after about 3 s with a German message and line number) – exists (S3). No guard in operators, accessors, and expression bodies. `catch (Exception)` in user code catches it.
+- Compiler errors as a list with line/column (exists) + German explanation of common errors in addition to the original message (planned).
+- Step-by-step visualization (variables, heap model), can be turned on per Runner with `trace` – exists (S5).
+- Fixed preloaded packages (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – exist (S6). Configuration and Hosting are missing. No free NuGet install.
+- `InvariantGlobalization=true`: numbers always appear with a dot (`3.5`). CI must run with `InvariantCulture` so that shown outputs match.
 
-## `<Quiz>` – vorhanden (Single Choice), wird zur Familie ausgebaut
+## `<Quiz>` – exists (single choice), will grow into a family
 
-Heute: `id`, `question`, `options`, `answer`, `children` (Erklärung); Fortschritt unter `dotnet-learn:quiz:<id>` in localStorage.
+Today: `id`, `question`, `options`, `answer`, `children` (explanation). Progress is stored under `dotnet-learn:quiz:<id>` in localStorage.
 
-Geplant:
-- **Fragen in Datendateien pro Sprache** statt inline in MDX, z. B. `website/src/data/quiz/de/m01.json`; in MDX nur `<Quiz id="m01-l02-q3" />`. Grund: Leitner-Dashboard und Einstufungstests brauchen alle Fragen zentral; Übersetzung pro Sprache. Bestehende Inline-Quizzes migrieren.
-- Typen: `single`, `multi`, `output` (Ausgabe vorhersagen), `parsons` (mit Tastatur-Alternative), `cloze` (Code-Lückentext), `find-bug` (Zeile anklicken), `match` (Zuordnung), `explain` (In eigenen Worten erklären, Musterantwort aufdecken, Selbstbewertung).
-- Jede Antwortoption kann eine `misconception`-Referenz tragen (Verknüpfung mit der „Achtung“-Box, DoD-Punkt 11).
-- Feedback erklärt immer das *Warum*.
+Planned:
+- **Questions in data files per language** instead of inline in MDX, for example `website/src/data/quiz/de/m01.json`. In MDX only `<Quiz id="m01-l02-q3" />`. Reason: the Leitner dashboard and placement tests need all questions in one place; translation per language. Migrate existing inline quizzes.
+- Types: `single`, `multi`, `output` (predict the output), `parsons` (with keyboard alternative), `cloze` (code fill-in), `find-bug` (click a line), `match` (matching), `explain` (explain in your own words, reveal a model answer, self-rating).
+- Each answer option can carry a `misconception` reference (link to the „Achtung“ box, DoD point 11).
+- Feedback always explains the *why*.
 
-## Lernfortschritt – geplant
+## Lernfortschritt (learning progress) – planned
 
-- Ein versionierter Speicher (z. B. `dotnet-learn:v1:progress`) in localStorage/IndexedDB, alle Zugriffe in `try/catch`; alte Schlüssel `dotnet-learn:quiz:*` werden migriert.
-- **Leitner-System** mit 5 Boxen; Startwerte der Intervalle 1 · 2 · 4 · 8 · 16 Tage (Annahme, anpassbar).
-- **„Heute fällig“-Dashboard** auf der Startseite.
-- **Einstufungstest** pro Modul (8–12 Fragen, ≥ 80 % → „bekannt“, Fragen in höhere Box).
-- **Export/Import** als JSON-Datei.
+- One versioned store (for example `dotnet-learn:v1:progress`) in localStorage/IndexedDB, all access in `try/catch`. Old keys `dotnet-learn:quiz:*` are migrated.
+- **Leitner system** with 5 boxes. Start values of the intervals 1 · 2 · 4 · 8 · 16 days (an assumption, can be changed).
+- **„Heute fällig“ dashboard** (due today) on the start page.
+- **Placement test** per module (8–12 questions, ≥ 80 % → "known", questions go to a higher box).
+- **Export/Import** as a JSON file.
 
-## Weitere Komponenten – geplant
+## Weitere Komponenten (more components) – planned
 
 | Komponente | Zweck |
 | --- | --- |
-| `<Since csharp="13" dotnet="9" />` | Versions-Badge für Features ab C# 12 / .NET 8, mit aufklappbarem „So schrieb man es vorher“ |
-| Umsteiger-Box | Docusaurus `<Tabs groupId="from-language">` mit Java / Python / JS/TS / Go; Auswahl seitenübergreifend (Verhalten von `groupId` vor Umsetzung in der Docusaurus-Doku prüfen) |
-| Feedback-Link | Pro Seite „Fehler melden / Feedback“ → vorausgefüllte GitHub-Issue-Vorlage mit Seiten-URL (Vorlage unter `.github/ISSUE_TEMPLATE/` anlegen) |
-| `<CodeBlock>` | Offizielle Docusaurus-Komponente für nicht ausführbaren Code aus `.cs`-Dateien |
+| `<Since csharp="13" dotnet="9" />` | Version badge for features from C# 12 / .NET 8, with a collapsible „So schrieb man es vorher“ (how it was written before) |
+| Switcher box (Umsteiger-Box) | Docusaurus `<Tabs groupId="from-language">` with Java / Python / JS/TS / Go. The choice carries across pages (check how `groupId` behaves in the Docusaurus docs before building) |
+| Feedback link | Per page „Fehler melden / Feedback“ (report error / feedback) → prefilled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
+| `<CodeBlock>` | Official Docusaurus component for code from `.cs` files that cannot run |
 
-## Erweiterungen der Seite
+## Site extensions
 
-- `@docusaurus/theme-mermaid` für Diagramme (mit Textbeschreibung).
-- Lokale Volltextsuche (Paket bei Auswahl auf Docusaurus-3- und i18n-Kompatibilität prüfen).
-- Playwright-E2E-Tests mit automatischem Barrierefreiheits-Check (z. B. axe-core) in CI.
-- Später: `@docusaurus/plugin-pwa`.
+- `@docusaurus/theme-mermaid` for diagrams (with a text description).
+- Local full-text search (when choosing a package, check Docusaurus 3 and i18n compatibility).
+- Playwright E2E tests with an automatic accessibility check (for example axe-core) in CI.
+- Later: `@docusaurus/plugin-pwa`.

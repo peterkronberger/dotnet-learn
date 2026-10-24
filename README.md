@@ -1,49 +1,49 @@
 # dotnet-learn
 
-Lernseite für C# und .NET auf GitHub Pages. Sie besteht aus zwei Teilen, die zusammen veröffentlicht werden:
+A learning site for C# and .NET on GitHub Pages. It has two parts that are published together:
 
-| Teil | Ordner | Technik | URL |
+| Part | Folder | Technology | URL |
 | --- | --- | --- | --- |
-| Lernseite (Kapitel, Quizzes, einklappbarer Code) | [`website/`](website) | Docusaurus 3 | `https://peterkronberger.github.io/dotnet-learn/` |
-| C#-Playground (Code im Browser ausführen) | [`playground/`](playground) | Blazor WebAssembly + Roslyn (.NET 10) | `https://peterkronberger.github.io/dotnet-learn/runner/` |
+| Learning site (chapters, quizzes, collapsible code) | [`website/`](website) | Docusaurus 3 | `https://peterkronberger.github.io/dotnet-learn/` |
+| C# playground (run code in the browser) | [`playground/`](playground) | Blazor WebAssembly + Roslyn (.NET 10) | `https://peterkronberger.github.io/dotnet-learn/runner/` |
 
-Die Lernseite bettet den Playground per `<CSharpRunner code={...} />` als iframe ein. Das Konzept hinter dem Aufbau steht auf der Seite „Lernprinzipien“ (`website/docs/lernprinzipien.mdx`).
+The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The idea behind the design is on the page "Lernprinzipien" (learning principles) (`website/docs/lernprinzipien.mdx`).
 
-## Einmalige Einrichtung auf GitHub (manuell)
+## One-time setup on GitHub (manual)
 
-Diese Schritte lassen sich nicht über Code festlegen:
+You cannot set these steps in code:
 
-1. **Pages-Quelle umstellen:** *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
-2. **Environment prüfen (nur bei Fehlermeldung):** Meldet das Deployment, der Branch dürfe nicht nach `github-pages` deployen, unter *Settings → Environments → github-pages* den Branch `main` erlauben.
-3. **Repository öffentlich** lassen. Mit GitHub Free ist Pages nur für öffentliche Repositories verfügbar.
-4. **Eigene Domain (optional):** *Settings → Pages → Custom domain*, DNS beim Anbieter setzen, dann *Enforce HTTPS* aktivieren. Danach `url` und `baseUrl` in `website/docusaurus.config.js` sowie `SITE_BASE_PATH` in `.github/workflows/pages.yml` anpassen.
+1. **Switch the Pages source:** *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
+2. **Check the environment (only if there is an error):** If the deployment says the branch may not deploy to `github-pages`, allow the branch `main` under *Settings → Environments → github-pages*.
+3. **Keep the repository public.** With GitHub Free, Pages is only available for public repositories.
+4. **Custom domain (optional):** *Settings → Pages → Custom domain*, set DNS at your provider, then turn on *Enforce HTTPS*. After that, change `url` and `baseUrl` in `website/docusaurus.config.js` and `SITE_BASE_PATH` in `.github/workflows/pages.yml`.
 
-Die Seite wird bei jedem Push auf `main` gebaut und veröffentlicht. Pull-Requests werden nur gebaut, nicht veröffentlicht.
+The site is built and published on every push to `main`. Pull requests are only built, not published.
 
-## Lokal entwickeln
+## Develop locally
 
-Voraussetzungen: Node.js 20 oder neuer, .NET SDK 10.
+Requirements: Node.js 20 or newer, .NET SDK 10.
 
 ```bash
-# Lernseite (http://localhost:3000/dotnet-learn/)
+# Learning site (http://localhost:3000/dotnet-learn/)
 cd website
 npm install
 npm start
 
-# Playground (separates Terminal)
+# Playground (separate terminal)
 dotnet run --project playground
 ```
 
-Lokal zeigt die eingebettete Vorschau den Playground unter dem Pfad `/dotnet-learn/runner/` der Docusaurus-Seite nur, wenn der Playground vorher veröffentlicht und nach `website/build/runner` kopiert wurde. Für die Entwicklung genügt es, den Playground direkt über `dotnet run` aufzurufen.
+Locally, the embedded preview shows the playground at the path `/dotnet-learn/runner/` of the Docusaurus site only if you published the playground first and copied it to `website/build/runner`. For development, it is enough to open the playground directly with `dotnet run`.
 
-## Inhalte schreiben
+## Write content
 
-Verbindlich sind die Regeln und die Definition of Done in `CLAUDE.md` sowie der Ablauf in `concept/lektions-template.md`.
+The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/lektions-template.md` are binding.
 
-- **Ablage:** Lektionen liegen unter `website/docs/mXX-<slug>/lYY-<slug>.mdx` (Slugs Englisch, siehe `concept/modulplan.md`). Front Matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
-- **Code** liegt unter `website/examples/mXX/lYY/<english-name>.cs` (Englisch, kebab-case, ein Beispiel pro Datei) und wird per `raw-loader` eingebunden. Backticks, Backslashes und `${` sind im Code erlaubt.
-- Einklappbar: `<details><summary>…</summary> … </details>` (Leerzeilen vor und nach dem Inhalt lassen).
-- Quiz: `<Quiz id="…" question="…" options={[…]} answer={0}>Erklärung</Quiz>`.
+- **Location:** Lessons are in `website/docs/mXX-<slug>/lYY-<slug>.mdx` (slugs in English, see `concept/modulplan.md`). Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
+- **Code** is in `website/examples/mXX/lYY/<english-name>.cs` (English, kebab-case, one example per file) and is included with `raw-loader`. Backticks, backslashes and `${` are allowed in the code.
+- Collapsible: `<details><summary>…</summary> … </details>` (leave blank lines before and after the content).
+- Quiz: `<Quiz id="…" question="…" options={[…]} answer={0}>Explanation</Quiz>`.
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';
@@ -54,13 +54,13 @@ import pitfalls from '!!raw-loader!@site/examples/m01/l02/numeric-pitfalls.cs';
 <CodeBlock language="csharp" title="Beispiel">{pitfalls}</CodeBlock>
 ```
 
-- **Ausführbar:** `<CSharpRunner code={…} />`. Weitere Props (Details: `concept/komponenten.md`): `predict` + `expected` (Vorhersagefeld), `tests` (automatisch geprüfte Aufgabe), `trace` (Schrittansicht).
-- **Nicht ausführbar:** `<CodeBlock language="csharp" title="…">{code}</CodeBlock>`.
-- **Ausgaben:** Der Snapshot `<name>.out.txt` entsteht mit `bash tools/check-examples.sh --update` (Diff prüfen). `bash tools/check-examples.sh` kompiliert und vergleicht alle Beispiele. `*.snippet.cs` werden übersprungen. EF Core, Minimal API und xUnit liegen als Projekte unter `website/examples/_ci/`.
+- **Runnable:** `<CSharpRunner code={…} />`. More props (details: `concept/komponenten.md`): `predict` + `expected` (prediction field), `tests` (automatically checked task), `trace` (step view).
+- **Not runnable:** `<CodeBlock language="csharp" title="…">{code}</CodeBlock>`.
+- **Outputs:** The snapshot `<name>.out.txt` is created with `bash tools/check-examples.sh --update` (check the diff). `bash tools/check-examples.sh` compiles and compares all examples. `*.snippet.cs` files are skipped. EF Core, Minimal API and xUnit are projects under `website/examples/_ci/`.
 
-## Grenzen des Playgrounds
+## Limits of the playground
 
-- Der erste Start lädt die .NET-Laufzeit und den Roslyn-Compiler (mehrere MB, danach im Browser-Cache) und kompiliert im ersten Durchlauf langsam.
-- Der Code läuft im Hauptthread. Endlosschleifen werden nach ca. 3 s mit einer Meldung abgebrochen (S3). Der Wächter greift nicht in Operatoren, Accessors und Ausdruckskörpern; ein `catch (Exception)` im Nutzercode fängt ihn ab. Eingaben über `Console.ReadLine` werden nicht unterstützt.
-- Verfügbar sind die in `playground/Playground.csproj` aufgeführten Referenz-Assemblies (u. a. `System.Linq`, `System.Collections`, `System.Text.RegularExpressions`). Weitere lassen sich in der Liste `ReferenceName` ergänzen.
-- Fest geladen sind außerdem `Microsoft.Extensions.DependencyInjection` und `Microsoft.Extensions.Logging` (S6). Configuration und Hosting fehlen; eine freie NuGet-Installation gibt es nicht.
+- The first start loads the .NET runtime and the Roslyn compiler (several MB, then in the browser cache). The first run compiles slowly.
+- The code runs on the main thread. Endless loops are stopped after about 3 s with a message (S3). The guard does not work inside operators, accessors and expression bodies. A `catch (Exception)` in user code catches it. Input with `Console.ReadLine` is not supported.
+- The reference assemblies listed in `playground/Playground.csproj` are available (for example `System.Linq`, `System.Collections`, `System.Text.RegularExpressions`). You can add more to the `ReferenceName` list.
+- `Microsoft.Extensions.DependencyInjection` and `Microsoft.Extensions.Logging` are also loaded by default (S6). Configuration and Hosting are missing. There is no free NuGet install.

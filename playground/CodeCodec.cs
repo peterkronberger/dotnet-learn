@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Playground;
 
-/// <summary>Liest Code aus einem Base64url-codierten URL-Fragment (UTF-8).</summary>
+/// <summary>Reads code from a Base64url-encoded URL fragment (UTF-8).</summary>
 internal static class CodeCodec
 {
     public static string? TryDecode(string encoded)

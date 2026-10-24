@@ -7,16 +7,16 @@
     <AssemblyName>Playground</AssemblyName>
     <RootNamespace>Playground</RootNamespace>
 
-    <!-- Roslyn nutzt Reflection; Trimming würde den Compiler und die Framework-
-         Assemblies beschneiden, die der Nutzercode später braucht. -->
+    <!-- Roslyn uses reflection; trimming would cut the compiler and the framework
+         assemblies that user code needs later. -->
     <PublishTrimmed>false</PublishTrimmed>
     <RunAOTCompilation>false</RunAOTCompilation>
-    <!-- GitHub Pages liefert Brotli nicht nativ aus; die Dateien werden stattdessen
-         vom Server per gzip übertragen. -->
+    <!-- GitHub Pages does not serve Brotli natively; the server sends the files
+         with gzip instead. -->
     <BlazorEnableCompression>false</BlazorEnableCompression>
     <InvariantGlobalization>true</InvariantGlobalization>
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
-    <!-- Ausnahmemeldungen im Klartext statt als Ressourcen-Schlüssel (z. B. "Arg_IndexOutOfRangeException"). -->
+    <!-- Exception messages as plain text instead of resource keys (e.g. "Arg_IndexOutOfRangeException"). -->
     <UseSystemResourceKeys>false</UseSystemResourceKeys>
   </PropertyGroup>
 
@@ -24,17 +24,17 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
-    <!-- Feste Paketmenge für Nutzercode (S6). Die Laufzeit-DLLs liefert Blazor ohnehin aus;
-         die Referenzen für den Compiler werden unten eingebettet. -->
+    <!-- Fixed set of packages for user code (S6). Blazor ships the runtime DLLs anyway;
+         the references for the compiler are embedded below. -->
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.*" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.*" />
   </ItemGroup>
 
   <!--
-    Referenz-Assemblies für den Roslyn-Compiler.
-    Der Nutzercode wird gegen die Referenz-Assemblies des .NET-SDKs kompiliert (reine Metadaten,
-    wenige hundert KB) und danach auf der Laufzeit ausgeführt, die Blazor ohnehin lädt.
-    Die DLLs werden als Ressourcen in Playground.dll eingebettet und beim ersten Start gelesen.
+    Reference assemblies for the Roslyn compiler.
+    User code is compiled against the reference assemblies of the .NET SDK (metadata only,
+    a few hundred KB) and then runs on the runtime that Blazor loads anyway.
+    The DLLs are embedded as resources in Playground.dll and read on first start.
   -->
   <Target Name="EmbedReferenceAssemblies" BeforeTargets="AssignTargetPaths">
     <PropertyGroup>
@@ -59,7 +59,7 @@
       <ReferenceName Include="System.Threading.Tasks" />
     </ItemGroup>
 
-    <!-- Pakete (nicht Teil von Microsoft.NETCore.App.Ref): die aufgelösten Assemblies der festen Menge. -->
+    <!-- Packages (not part of Microsoft.NETCore.App.Ref): the resolved assemblies of the fixed set. -->
     <ItemGroup>
       <ExtensionName Include="Microsoft.Extensions.DependencyInjection;Microsoft.Extensions.DependencyInjection.Abstractions;Microsoft.Extensions.Logging;Microsoft.Extensions.Logging.Abstractions;Microsoft.Extensions.Options" />
       <ExtensionRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyInjection'" />
@@ -70,7 +70,7 @@
     </ItemGroup>
 
     <Error Condition="!Exists('$(RefPackDir)System.Runtime.dll')"
-           Text="Referenz-Assemblies nicht gefunden unter '$(RefPackDir)'. Prüfe, ob das .NET-SDK für $(TargetFramework) installiert ist." />
+           Text="Reference assemblies not found in '$(RefPackDir)'. Check that the .NET SDK for $(TargetFramework) is installed." />
 
     <ItemGroup>
       <EmbeddedResource Include="$(RefPackDir)%(ReferenceName.Identity).dll"

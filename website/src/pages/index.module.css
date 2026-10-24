@@ -1,7 +1,7 @@
 .hero {
   padding: 5rem 0 4.5rem;
   color: #ffffff;
-  /* Beide Farben haben mit weißem Text mindestens 7:1 Kontrast. */
+  /* Both colors have a contrast of at least 7:1 with white text. */
   background: linear-gradient(135deg, #312e81 0%, #4c1d95 100%);
 }
 
