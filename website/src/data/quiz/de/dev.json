@@ -1,0 +1,43 @@
+{
+  "module": "dev",
+  "questions": [
+    {
+      "id": "dev-l01-q1",
+      "lesson": "dev-l01",
+      "type": "single",
+      "question": "Was ergibt `7 / 2` bei zwei `int`-Operanden?",
+      "options": [
+        { "text": "`3.5`", "feedback": "Beide Operanden sind `int`, daher gibt es keinen Nachkommateil.", "misconception": "dev-l01-demo" },
+        { "text": "`3`", "correct": true }
+      ],
+      "explanation": "Die Division zweier `int` ist eine Ganzzahldivision, der Nachkommateil wird abgeschnitten."
+    },
+    {
+      "id": "dev-l01-q2",
+      "lesson": "dev-l01",
+      "type": "multi",
+      "question": "Welche dieser Typen sind Werttypen?",
+      "options": [
+        { "text": "`int`", "correct": true },
+        { "text": "`string`", "feedback": "`string` ist ein Referenztyp." },
+        { "text": "`bool`", "correct": true }
+      ],
+      "explanation": "`int` und `bool` sind Werttypen (`struct`). `string` ist ein Referenztyp, verhält sich wegen seiner Unveränderlichkeit aber oft ähnlich."
+    },
+    {
+      "id": "dev-l01-q3",
+      "lesson": "dev-l01",
+      "type": "output",
+      "question": "Was gibt dieses Programm aus?",
+      "example": "dev/quiz-output.cs",
+      "explanation": "`10 % 3` ist der Rest der Ganzzahldivision, also `1`. Die Interpolation setzt die Werte in den Text ein."
+    },
+    {
+      "id": "dev-l01-q4",
+      "lesson": "dev-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `7 / 2` bei `int` den Wert `3` ergibt.",
+      "modelAnswer": "Beide Operanden sind `int`, also rechnet C# mit Ganzzahlen.\n\nDer Nachkommateil wird abgeschnitten, nicht gerundet."
+    }
+  ]
+}

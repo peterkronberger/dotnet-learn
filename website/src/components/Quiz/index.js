@@ -1,126 +1,62 @@
-import React, {useEffect, useId, useState} from 'react';
-import clsx from 'clsx';
-import styles from './styles.module.css';
+import React, {useRef} from 'react';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import {getQuestion, validateQuestion} from '@site/src/data/quiz';
+import useProgress from '@site/src/lib/progress/useProgress';
+import {recordAnswer} from '@site/src/lib/progress/leitner';
+import {toLocalDate} from '@site/src/lib/progress/dates';
+import SingleChoice from './SingleChoice';
+import MultiChoice from './MultiChoice';
+import OutputQuestion from './OutputQuestion';
+import ExplainQuestion from './ExplainQuestion';
+import ProgressHint from './ProgressHint';
 
-const STORAGE_PREFIX = 'dotnet-learn:quiz:';
-
-function readProgress(id) {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_PREFIX + id);
-    return raw ? JSON.parse(raw) : null;
-  } catch (error) {
-    return null; // z. B. privater Modus oder blockierter Speicher
-  }
-}
-
-function writeProgress(id, value) {
-  try {
-    window.localStorage.setItem(STORAGE_PREFIX + id, JSON.stringify(value));
-  } catch (error) {
-    // Fortschritt ist nur eine Komfortfunktion – Fehler bewusst ignoriert.
-  }
-}
-
-// Wandelt `code` in Backticks in <code>-Elemente um.
-function renderInline(text) {
-  return String(text)
-    .split('`')
-    .map((part, index) =>
-      index % 2 === 1 ? <code key={index}>{part}</code> : <span key={index}>{part}</span>,
-    );
-}
+const COMPONENTS = {
+  single: SingleChoice,
+  multi: MultiChoice,
+  output: OutputQuestion,
+  explain: ExplainQuestion,
+};
 
 /**
- * Multiple-Choice-Frage mit erklärendem Feedback (Abrufübung).
- *
- * Props:
- *  - id:       eindeutiger Schlüssel (für den lokalen Lernfortschritt)
- *  - question: Fragetext (Backticks = Inline-Code)
- *  - options:  Array von Antworttexten
- *  - answer:   Index der richtigen Antwort (0-basiert)
- *  - children: Erklärung, wird nach dem Prüfen angezeigt
+ * Renders a question from the data files in src/data/quiz.
+ * Props: id (question id), onAnswered(result) (optional).
  */
-export default function Quiz({id, question, options, answer, children}) {
-  const groupName = useId();
-  const [selected, setSelected] = useState(null);
-  const [checked, setChecked] = useState(false);
-  const [previous, setPrevious] = useState(null);
+export default function Quiz(props) {
+  const {id, onAnswered} = props;
+  const unsupported = Object.keys(props).filter((key) => !['id', 'onAnswered'].includes(key));
+  if (unsupported.length > 0) {
+    throw new Error(
+      `Inline quiz props are no longer supported (${unsupported.join(', ')}). Use <Quiz id="…" /> and add the question to src/data/quiz.`,
+    );
+  }
 
-  useEffect(() => {
-    setPrevious(readProgress(id));
-  }, [id]);
+  const {i18n} = useDocusaurusContext();
+  const question = getQuestion(i18n.currentLocale, id);
+  if (!question) {
+    throw new Error(`Unknown quiz id "${id}". Add the question to a file in src/data/quiz/<locale>/.`);
+  }
+  const errors = validateQuestion(question);
+  if (errors.length > 0) {
+    throw new Error(`Invalid quiz question "${id}": ${errors.join('; ')}`);
+  }
 
-  const isCorrect = checked && selected === answer;
+  const {progress, update} = useProgress();
+  const recorded = useRef(false);
 
-  function check(event) {
-    event.preventDefault();
-    if (selected === null) {
-      return;
+  // Only the first attempt per page view counts for the Leitner system.
+  function handleResult(result) {
+    if (!recorded.current) {
+      recorded.current = true;
+      update((p) => recordAnswer(p, id, result, toLocalDate()));
     }
-    setChecked(true);
-    const before = readProgress(id) ?? {attempts: 0};
-    const next = {
-      attempts: before.attempts + 1,
-      correct: selected === answer,
-      lastAttempt: new Date().toISOString(),
-    };
-    writeProgress(id, next);
-    setPrevious(next);
+    if (onAnswered) onAnswered(result);
   }
 
-  function retry() {
-    setSelected(null);
-    setChecked(false);
-  }
-
+  const Component = COMPONENTS[question.type];
   return (
-    <form className={styles.quiz} onSubmit={check}>
-      <fieldset className={styles.fieldset} disabled={checked}>
-        <legend className={styles.question}>{renderInline(question)}</legend>
-        {options.map((option, index) => (
-          <label
-            key={index}
-            className={clsx(
-              styles.option,
-              checked && index === answer && styles.optionCorrect,
-              checked && index === selected && index !== answer && styles.optionWrong,
-            )}>
-            <input
-              type="radio"
-              name={groupName}
-              value={index}
-              checked={selected === index}
-              onChange={() => setSelected(index)}
-            />
-            <span>{renderInline(option)}</span>
-          </label>
-        ))}
-      </fieldset>
-
-      <div className={styles.actions}>
-        {!checked && (
-          <button type="submit" className="button button--primary" disabled={selected === null}>
-            Antwort prüfen
-          </button>
-        )}
-        {checked && !isCorrect && (
-          <button type="button" className="button button--secondary" onClick={retry}>
-            Nochmal versuchen
-          </button>
-        )}
-        {previous?.correct && !checked && (
-          <span className={styles.badge}>✓ schon einmal richtig beantwortet</span>
-        )}
-      </div>
-
-      <div aria-live="polite">
-        {checked && (
-          <div className={clsx(styles.feedback, isCorrect ? styles.feedbackOk : styles.feedbackBad)}>
-            <strong>{isCorrect ? 'Richtig.' : 'Noch nicht ganz.'}</strong>
-            <div className={styles.explanation}>{children}</div>
-          </div>
-        )}
-      </div>
-    </form>
+    <div>
+      <Component key={id} question={question} onResult={handleResult} />
+      <ProgressHint entry={progress ? progress.questions[id] : undefined} />
+    </div>
   );
 }

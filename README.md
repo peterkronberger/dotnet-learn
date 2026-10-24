@@ -43,7 +43,9 @@ Verbindlich sind die Regeln und die Definition of Done in `CLAUDE.md` sowie der 
 - **Ablage:** Lektionen liegen unter `website/docs/mXX-<slug>/lYY-<slug>.mdx` (Slugs Englisch, siehe `concept/modulplan.md`). Front Matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
 - **Code** liegt unter `website/examples/mXX/lYY/<english-name>.cs` (Englisch, kebab-case, ein Beispiel pro Datei) und wird per `raw-loader` eingebunden. Backticks, Backslashes und `${` sind im Code erlaubt.
 - Einklappbar: `<details><summary>…</summary> … </details>` (Leerzeilen vor und nach dem Inhalt lassen).
-- Quiz: `<Quiz id="…" question="…" options={[…]} answer={0}>Erklärung</Quiz>`.
+- Quiz: `<Quiz id="m01-l03-q1" />`. Die Frage steht in `website/src/data/quiz/de/mXX.json` (Format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline-Props sind nicht mehr erlaubt, der Build schlägt dann fehl.
+- Fehlvorstellung: `<Misconception id="m01-l03-int-division-rounds" />` als erste Zeile in einer `:::warning[Achtung]`-Box; eine Antwortoption verweist per `misconception` darauf.
+- Prüfung der Quizdaten und MDX-Verweise: `node tools/check-quiz.mjs`.
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';
