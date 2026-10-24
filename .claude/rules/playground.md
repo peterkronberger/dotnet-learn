@@ -4,14 +4,14 @@ paths:
   - "website/src/components/CSharpRunner/**"
 ---
 
-# Regeln für Playground und Runner-Einbettung
+# Rules for the playground and the runner embedding
 
-- Der Playground läuft einthreadig in WebAssembly. Nichts blockierend warten (`.Wait()`, `.Result`) – siehe `ResolveEntryPoint` in `playground/CSharpRunner.cs`.
-- `PublishTrimmed` und AOT bleiben aus (Roslyn nutzt Reflection). `InvariantGlobalization` bleibt an.
-- Referenzen für Nutzercode kommen ausschließlich aus der `ReferenceName`-Liste bzw. den in S6 festgelegten Paketen. Keine freie NuGet-Installation.
-- Nichts an einen Server senden: Kompilieren und Ausführen bleiben lokal im Browser.
-- `postMessage` nur mit Ursprungsprüfung (`window.location.origin`) in beide Richtungen.
-- Die `<base href>`-Ersetzung und die Fingerprint-Prüfung in `.github/workflows/pages.yml` nicht brechen; `index.html` ohne Fingerprint-Platzhalter lassen.
-- Oberflächentexte nicht neu hart kodieren; sie werden übersetzbar (Backlog B5).
-- Tastaturbedienung (Tab, Esc, Strg/⌘+Enter) und `aria-live`-Ergebnisbereich erhalten.
-- Nach Änderungen: `dotnet build playground/Playground.csproj` und `cd website && npm run build`.
+- The playground runs on a single thread in WebAssembly. Never block while waiting (`.Wait()`, `.Result`) – see `ResolveEntryPoint` in `playground/CSharpRunner.cs`.
+- `PublishTrimmed` and AOT stay off (Roslyn uses reflection). `InvariantGlobalization` stays on.
+- References for user code come only from the `ReferenceName` list and the packages decided in S6. No free NuGet install.
+- Send nothing to a server: compiling and running stay local in the browser.
+- `postMessage` only with an origin check (`window.location.origin`) in both directions.
+- Do not break the `<base href>` replacement and the fingerprint check in `.github/workflows/pages.yml`; keep `index.html` free of fingerprint placeholders.
+- UI texts are not hard-coded again; they will be translatable (backlog B5).
+- Keep keyboard use (Tab, Esc, Ctrl/⌘+Enter) and the `aria-live` result area.
+- After changes: `dotnet build playground/Playground.csproj` and `cd website && npm run build`.
