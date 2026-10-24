@@ -1,8 +1,19 @@
-import { LEGACY_PREFIX, PROGRESS_KEY } from './config';
+import { PROGRESS_KEY } from './config';
 import { addDays } from './dates';
-import { parseImport, serializeProgress } from './exportImport';
-import { boxCounts, dueQuestionIds, isDue, nextBox, nextDueDate, recordAnswer } from './leitner';
-import { createMemoryStorage, emptyProgress, loadProgress, migrateLegacy, saveProgress } from './storage';
+import { parseImport, serializeProgress, validateProgress } from './exportImport';
+import {
+  boxCounts,
+  completeLesson,
+  dueQuestionIds,
+  isDue,
+  nextBox,
+  nextDueDate,
+  nextReviewAfter,
+  recordAnswer,
+  reopenLesson,
+} from './leitner';
+import { createMemoryStorage, emptyProgress, loadProgress, saveProgress } from './storage';
+import { activityBuckets, activitySum, isoWeek, lessonOverview, nextLesson, stageTotals } from './summary';
 
 function eq(a, b) {
   return JSON.stringify(a) === JSON.stringify(b);
@@ -76,27 +87,6 @@ const TESTS = [
     expectEqual(addDays('2026-01-31', 1), '2026-02-01', 'month boundary');
     expectEqual(addDays('2028-02-28', 1), '2028-02-29', 'leap year');
   }],
-  ['Migration: old keys → v1, old keys deleted, only once', () => {
-    const storage = createMemoryStorage({
-      [`${LEGACY_PREFIX}old-a`]: JSON.stringify({ attempts: 2, correct: true, lastAttempt: '2026-10-20T12:00:00' }),
-      [`${LEGACY_PREFIX}old-b`]: JSON.stringify({ attempts: 1, correct: false, lastAttempt: 'broken' }),
-      [`${LEGACY_PREFIX}broken`]: '{not json',
-      unrelated: 'x',
-    });
-    const p = loadProgress(storage, { legacyIdMap: { 'old-a': 'm01-l01-q1' } });
-    expectEqual(Object.keys(p.questions).sort(), ['m01-l01-q1', 'old-b'], 'IDs');
-    expectEqual(p.questions['m01-l01-q1'], { box: 2, lastReviewed: '2026-10-20', attempts: 2, correctCount: 1, lastResult: 'correct' }, 'entry a');
-    expectEqual([p.questions['old-b'].box, p.questions['old-b'].lastResult, p.questions['old-b'].correctCount], [1, 'wrong', 0], 'entry b');
-    check(storage.getItem(PROGRESS_KEY) !== null, 'v1 written');
-    expectEqual(storage.length, 2, 'left over: v1 + unrelated (the broken key is deleted too)');
-    storage.setItem(`${LEGACY_PREFIX}late`, JSON.stringify({ attempts: 1, correct: true, lastAttempt: '2026-10-21T00:00:00' }));
-    const again = loadProgress(storage);
-    expectEqual(Object.keys(again.questions).sort(), ['m01-l01-q1', 'old-b'], 'no second migration');
-    check(storage.getItem(`${LEGACY_PREFIX}late`) !== null, 'old key is ignored');
-  }],
-  ['Migration: without old keys returns null', () => {
-    check(migrateLegacy(createMemoryStorage()) === null, 'expected null');
-  }],
   ['Export → import gives the same state', () => {
     const p = sample();
     const r = parseImport(serializeProgress(p, new Date('2026-10-23T10:00:00Z')));
@@ -108,6 +98,7 @@ const TESTS = [
     const p = sample();
     const valid = JSON.parse(serializeProgress(p));
     const withEntry = (patch) => JSON.stringify({ ...valid, progress: { version: 1, questions: { 'm01-l01-q1': { ...p.questions['m01-l01-q1'], ...patch } } } });
+    const withProgress = (patch) => JSON.stringify({ ...valid, progress: { ...valid.progress, ...patch } });
     const cases = {
       'not JSON': 'this is not json',
       'wrong format': JSON.stringify({ ...valid, format: 'x' }),
@@ -116,6 +107,10 @@ const TESTS = [
       'correctCount > attempts': withEntry({ attempts: 1, correctCount: 2 }),
       'lastResult unknown': withEntry({ lastResult: 'maybe' }),
       'too large': ' '.repeat(1_000_001),
+      'lesson id invalid': withProgress({ lessons: { 'Lektion 1': { completedAt: '2026-10-24' } } }),
+      'lesson date invalid': withProgress({ lessons: { 'm01-l02': { completedAt: '24.10.2026' } } }),
+      'activity date invalid': withProgress({ activity: { '2026-02-30': { answered: 1, correct: 1, partial: 0 } } }),
+      'activity correct > answered': withProgress({ activity: { '2026-10-24': { answered: 1, correct: 1, partial: 1 } } }),
     };
     const storage = createMemoryStorage();
     saveProgress(p, storage);
@@ -144,7 +139,6 @@ const TESTS = [
     const s = throwingStorage();
     expectEqual(loadProgress(s), emptyProgress(), 'loadProgress');
     expectEqual(saveProgress(sample(), s), false, 'saveProgress');
-    check(migrateLegacy(s) === null, 'migrateLegacy');
   }],
   ['Broken v1 entry is only replaced on save', () => {
     const storage = createMemoryStorage({ [PROGRESS_KEY]: '{broken' });
@@ -152,6 +146,65 @@ const TESTS = [
     expectEqual(storage.getItem(PROGRESS_KEY), '{broken', 'unchanged after load');
     saveProgress(sample(), storage);
     expectEqual(loadProgress(storage), sample(), 'after save');
+  }],
+  ['Activity log: every answer counts per day, correct and partial separately', () => {
+    const p = sample();
+    // Keys appear in the order the answers were recorded (see sample()).
+    expectEqual(p.activity, {
+      '2026-10-23': { answered: 1, correct: 1, partial: 0 },
+      '2026-10-25': { answered: 1, correct: 1, partial: 0 },
+      '2026-10-24': { answered: 2, correct: 0, partial: 1 },
+    }, 'activity');
+    expectEqual(activitySum(p, '2026-10-25', 2), { answered: 3, correct: 1, partial: 1, activeDays: 2 }, 'sum of 2 days');
+  }],
+  ['Lessons: complete keeps the first date, reopen removes the mark', () => {
+    let p = completeLesson(emptyProgress(), 'm01-l02', '2026-10-24');
+    p = completeLesson(p, 'm01-l02', '2026-10-30');
+    expectEqual(p.lessons, { 'm01-l02': { completedAt: '2026-10-24' } }, 'complete');
+    expectEqual(reopenLesson(p, 'm01-l02').lessons, {}, 'reopen');
+  }],
+  ['Validation: file without lessons and activity is valid and filled with empty objects', () => {
+    const r = validateProgress({ version: 1, questions: {} });
+    check(r.ok, 'ok');
+    expectEqual(r.progress, emptyProgress(), 'progress');
+  }],
+  ['nextReviewAfter: earliest date after today and its count', () => {
+    const p = sample();
+    // l02-q1 and l02-q2 are due on 10-25, l01-q1 on 10-29
+    expectEqual(nextReviewAfter(p, '2026-10-24'), { date: '2026-10-25', count: 2 }, 'after 10-24');
+    expectEqual(nextReviewAfter(p, '2026-10-25'), { date: '2026-10-29', count: 1 }, 'after 10-25');
+    expectEqual(nextReviewAfter(p, '2026-10-29'), null, 'nothing later');
+  }],
+  ['Overview: status per lesson, stages and next lesson', () => {
+    const lessons = [{ id: 'm00-l01' }, { id: 'm01-l01' }, { id: 'm01-l02' }, { id: 'm02-l01' }];
+    const ids = { 'm00-l01': ['m00-l01-q1'], 'm01-l01': ['m01-l01-q1'], 'm01-l02': ['m01-l02-q1', 'm01-l02-q2', 'm01-l02-q3'], 'm02-l01': [] };
+    let p = completeLesson(sample(), 'm00-l01', '2026-10-20');
+    const o = lessonOverview(lessons, ids, p);
+    expectEqual(o.map((l) => l.status), ['done', 'started', 'started', 'open'], 'status');
+    expectEqual(o[2].stages, { shaky: 2, building: 0, solid: 0, open: 1 }, 'stages m01-l02');
+    expectEqual(o[1].stages, { shaky: 0, building: 1, solid: 0, open: 0 }, 'stages m01-l01 (box 3)');
+    expectEqual(nextLesson(o).id, 'm01-l01', 'most recently worked started lesson (10-25)');
+    expectEqual(stageTotals(o), { shaky: 2, building: 1, solid: 0, open: 2 }, 'totals');
+    p = completeLesson(completeLesson(p, 'm01-l01', '2026-10-26'), 'm01-l02', '2026-10-26');
+    expectEqual(nextLesson(lessonOverview(lessons, ids, p)).id, 'm02-l01', 'first open lesson');
+    p = completeLesson(p, 'm02-l01', '2026-10-26');
+    check(nextLesson(lessonOverview(lessons, ids, p)) === null, 'all done → null');
+  }],
+  ['Activity buckets: 28 days, 13 weeks, months', () => {
+    const p = sample();
+    const days = activityBuckets(p, '2026-10-25', '4w');
+    expectEqual([days.length, days[0].start, days[27].start, days[26].answered, days[26].wrong], [28, '2026-09-28', '2026-10-25', 2, 1], '4w');
+    const weeks = activityBuckets(p, '2026-10-25', '3m');
+    expectEqual([weeks.length, weeks[12].start, weeks[12].week, weeks[12].answered], [13, '2026-10-19', 43, 4], '3m');
+    const months = activityBuckets({ ...p, activity: { ...p.activity, '2026-08-31': { answered: 2, correct: 1, partial: 0 } } }, '2026-10-25', 'all');
+    expectEqual(months.map((m) => [m.start, m.answered]), [['2026-08-01', 2], ['2026-09-01', 0], ['2026-10-01', 4]], 'all');
+    expectEqual(activityBuckets(emptyProgress(), '2026-10-25', 'all').length, 1, 'all without data: current month');
+  }],
+  ['ISO week numbers', () => {
+    expectEqual(isoWeek('2026-01-01'), 1, '2026-01-01 (Thursday)');
+    expectEqual(isoWeek('2026-12-31'), 53, '2026-12-31');
+    expectEqual(isoWeek('2027-01-03'), 53, '2027-01-03 (Sunday)');
+    expectEqual(isoWeek('2027-01-04'), 1, '2027-01-04 (Monday)');
   }],
 ];
 

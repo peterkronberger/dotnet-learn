@@ -1,7 +1,9 @@
 import {
   BOX_COUNT,
   EXPORT_FORMAT,
+  LESSON_ID_PATTERN,
   MAX_IMPORT_LENGTH,
+  MAX_LESSON_ID_LENGTH,
   MAX_QUESTION_ID_LENGTH,
 } from './config';
 import { isValidIsoDate } from './dates';
@@ -12,6 +14,10 @@ function isCount(v) {
   return Number.isInteger(v) && v >= 0;
 }
 
+function isPlainObject(v) {
+  return !!v && typeof v === 'object' && !Array.isArray(v);
+}
+
 function fail(error) {
   return { ok: false, error };
 }
@@ -20,27 +26,29 @@ function invalidField(field, id) {
   return fail(`Die Datei ist kein gültiger Lernfortschritt (Feld "${field}" in ${id}).`);
 }
 
+function invalid(field) {
+  return fail(`Die Datei ist kein gültiger Lernfortschritt (Feld "${field}").`);
+}
+
 // Validates a progress object; only known fields are copied into the result.
+// `lessons` and `activity` are optional, so a file with questions only stays valid.
 export function validateProgress(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value) || value.version !== 1) {
-    return fail('Die Datei ist kein gültiger Lernfortschritt (Feld "version").');
-  }
+  if (!isPlainObject(value) || value.version !== 1) return invalid('version');
+
   const questions = value.questions;
-  if (!questions || typeof questions !== 'object' || Array.isArray(questions)) {
-    return fail('Die Datei ist kein gültiger Lernfortschritt (Feld "questions").');
-  }
-  const clean = {};
+  if (!isPlainObject(questions)) return invalid('questions');
+  const cleanQuestions = {};
   for (const [id, e] of Object.entries(questions)) {
     if (id.length === 0 || id.length > MAX_QUESTION_ID_LENGTH) {
       return fail('Die Datei ist kein gültiger Lernfortschritt (ungültige Frage-ID).');
     }
-    if (!e || typeof e !== 'object' || Array.isArray(e)) return invalidField('entry', id);
+    if (!isPlainObject(e)) return invalidField('entry', id);
     if (!Number.isInteger(e.box) || e.box < 1 || e.box > BOX_COUNT) return invalidField('box', id);
     if (!isValidIsoDate(e.lastReviewed)) return invalidField('lastReviewed', id);
     if (!isCount(e.attempts)) return invalidField('attempts', id);
     if (!isCount(e.correctCount) || e.correctCount > e.attempts) return invalidField('correctCount', id);
     if (!RESULTS.includes(e.lastResult)) return invalidField('lastResult', id);
-    clean[id] = {
+    cleanQuestions[id] = {
       box: e.box,
       lastReviewed: e.lastReviewed,
       attempts: e.attempts,
@@ -48,7 +56,31 @@ export function validateProgress(value) {
       lastResult: e.lastResult,
     };
   }
-  return { ok: true, progress: { version: 1, questions: clean } };
+
+  const lessons = value.lessons ?? {};
+  if (!isPlainObject(lessons)) return invalid('lessons');
+  const cleanLessons = {};
+  for (const [id, e] of Object.entries(lessons)) {
+    if (id.length > MAX_LESSON_ID_LENGTH || !LESSON_ID_PATTERN.test(id)) {
+      return fail('Die Datei ist kein gültiger Lernfortschritt (ungültige Lektions-ID).');
+    }
+    if (!isPlainObject(e) || !isValidIsoDate(e.completedAt)) return invalidField('completedAt', id);
+    cleanLessons[id] = { completedAt: e.completedAt };
+  }
+
+  const activity = value.activity ?? {};
+  if (!isPlainObject(activity)) return invalid('activity');
+  const cleanActivity = {};
+  for (const [day, e] of Object.entries(activity)) {
+    if (!isValidIsoDate(day)) return fail('Die Datei ist kein gültiger Lernfortschritt (ungültiges Datum in "activity").');
+    if (!isPlainObject(e) || !isCount(e.answered)) return invalidField('answered', day);
+    if (!isCount(e.correct) || !isCount(e.partial) || e.correct + e.partial > e.answered) {
+      return invalidField('correct/partial', day);
+    }
+    cleanActivity[day] = { answered: e.answered, correct: e.correct, partial: e.partial };
+  }
+
+  return { ok: true, progress: { version: 1, questions: cleanQuestions, lessons: cleanLessons, activity: cleanActivity } };
 }
 
 // Pretty JSON (2 spaces).
