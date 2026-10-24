@@ -20,6 +20,8 @@ export default function ClozeQuestion({question, onResult}) {
   const parts = splitCloze(clozeCode(example.code), blanks);
   const [values, setValues] = useState(() => blanks.map(() => ''));
   const [marks, setMarks] = useState(null); // per blank: true/false once checked
+  const [failedTries, setFailedTries] = useState(0);
+  const [showSolution, setShowSolution] = useState(false);
   const checked = marks !== null;
   const result = checked ? (marks.every(Boolean) ? 'correct' : 'wrong') : null;
 
@@ -32,6 +34,7 @@ export default function ClozeQuestion({question, onResult}) {
       (blank.accept ?? [blank.text]).map(normalizeBlank).includes(normalizeBlank(values[i])),
     );
     setMarks(next);
+    if (!next.every(Boolean)) setFailedTries(failedTries + 1);
     onResult(next.every(Boolean) ? 'correct' : 'wrong');
   }
 
@@ -92,6 +95,32 @@ export default function ClozeQuestion({question, onResult}) {
           </button>
         )}
       </div>
+      {checked && result === 'wrong' && failedTries >= 2 && (
+        <div className={styles.actions}>
+          <button
+            type="button"
+            className="button button--secondary"
+            aria-expanded={showSolution}
+            onClick={() => setShowSolution(!showSolution)}>
+            {showSolution ? (
+              <Translate id="quiz.cloze.hideSolution">Lösung ausblenden</Translate>
+            ) : (
+              <Translate id="quiz.cloze.showSolution">Lösung anzeigen</Translate>
+            )}
+          </button>
+        </div>
+      )}
+      {showSolution && (
+        <div role="region" aria-label={t('quiz.cloze.solutionLabel', 'Lösung')}>
+          <ul>
+            {blanks.map((blank, i) => (
+              <li key={i}>
+                {label(i)}: <code>{blank.text}</code>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Feedback result={result} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
     </form>
   );
