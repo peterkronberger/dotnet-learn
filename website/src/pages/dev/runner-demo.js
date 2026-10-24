@@ -2,12 +2,12 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import DevNav from '@site/src/components/DevNav';
 import CSharpRunner from '@site/src/components/CSharpRunner';
-import predictDemo from '!!raw-loader!@site/examples/s7/predict-demo.cs';
-import predictDemoOutput from '!!raw-loader!@site/examples/s7/predict-demo.out.txt';
-import palindromeTask from '!!raw-loader!@site/examples/s7/palindrome-task.cs';
-import palindromeTests from '!!raw-loader!@site/examples/s7/palindrome-task.tests.snippet.cs';
-import loopTrace from '!!raw-loader!@site/examples/s5/loop-trace.cs';
-import referenceTypes from '!!raw-loader!@site/examples/s5/reference-types.cs';
+import predictDemo from '!!raw-loader!@site/examples/dev/predict-demo.cs';
+import predictDemoOutput from '!!raw-loader!@site/examples/dev/predict-demo.out.txt';
+import palindromeTask from '!!raw-loader!@site/examples/dev/palindrome-task.cs';
+import palindromeTests from '!!raw-loader!@site/examples/dev/palindrome-task.tests.snippet.cs';
+import loopTrace from '!!raw-loader!@site/examples/dev/loop-trace.cs';
+import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
 
 // Technical demo for spike S7, not learning content.
 export default function RunnerDemo() {
