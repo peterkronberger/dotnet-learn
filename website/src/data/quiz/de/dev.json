@@ -38,6 +38,15 @@
       "type": "explain",
       "question": "Erkläre in eigenen Worten, warum `7 / 2` bei `int` den Wert `3` ergibt.",
       "modelAnswer": "Beide Operanden sind `int`, also rechnet C# mit Ganzzahlen.\n\nDer Nachkommateil wird abgeschnitten, nicht gerundet."
+    },
+    {
+      "id": "dev-l01-q5",
+      "lesson": "dev-l01",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Das Programm berechnet den Durchschnitt und gibt ihn aus.",
+      "example": "dev/parsons-demo.cs",
+      "distractors": ["Console.WriteLine(total / count);"],
+      "explanation": "Zuerst brauchen die Werte und die Summe eine Variable, dann addiert die Schleife jeden Wert zur Summe. Erst danach kann der Durchschnitt berechnet und ausgegeben werden. `count` ist nirgends deklariert, die Zeile gehört daher nicht zur Lösung."
     }
   ]
 }

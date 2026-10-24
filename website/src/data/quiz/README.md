@@ -8,9 +8,9 @@ Eine Datei pro Modul und Sprache: `de/mXX.json`. Neue Dateien werden in `index.j
 | --- | --- | --- |
 | `id` | ja | Stabiler Schlüssel, beginnt mit `lesson` + `-q` (z. B. `m01-l03-q1`) |
 | `lesson` | ja | `mXX-lYY` |
-| `type` | ja | `single`, `multi`, `output`, `explain` (geplant: `parsons`, `cloze`, `find-bug`, `match`) |
+| `type` | ja | `single`, `multi`, `output`, `explain`, `parsons` (geplant: `cloze`, `find-bug`, `match`) |
 | `question` | ja | Fragetext |
-| `explanation` | `single`/`multi`/`output` | Erklärt das *Warum* |
+| `explanation` | `single`/`multi`/`output`/`parsons` | Erklärt das *Warum* |
 
 Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 
@@ -21,6 +21,7 @@ Texte: Inline-Code mit Backticks, Absätze mit `\n\n`, sonst kein Markdown.
 - Option: `text` (Pflicht), `correct`, `feedback` (Warum falsch/richtig), `misconception` (ID einer „Achtung“-Box, `<lesson_id>-<kebab-slug>`).
 - `output`: `example` = Pfad relativ zu `website/examples/`. Code aus `<example>.cs`, erwartete Ausgabe aus `<example>.out.txt` (CI-Snapshot).
 - `explain`: `modelAnswer` (Pflicht). Die Antwort der Lernenden wird nicht gespeichert; Selbstbewertung `correct`/`partial`/`wrong`.
+- `parsons`: Zeilen ordnen. `example` = Pfad wie bei `output`; die richtige Reihenfolge sind die nicht-leeren Zeilen der Datei (Einrückung wird angezeigt, aber nicht bewertet). Optional: `distractors` (Zeilen, die nicht in die Lösung gehören, nicht identisch mit Lösungszeilen) und `distractorMisconceptions` (Objekt `Zeilentext` → Misconception-ID). Anzeige in fester, aus der Frage-ID abgeleiteter Mischung. Bedienung per Knöpfen (Hinzufügen, Nach oben/unten, Entfernen); Änderungen werden in einer Live-Region angesagt.
 
 ## Beispiele
 
