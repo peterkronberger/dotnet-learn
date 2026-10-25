@@ -25,6 +25,10 @@ const config = {
     locales: ['de'],
   },
 
+  // Mermaid diagrams in ```mermaid code blocks (wrap them in <Diagram>).
+  markdown: {mermaid: true},
+  themes: ['@docusaurus/theme-mermaid'],
+
   presets: [
     [
       'classic',
@@ -81,6 +85,8 @@ const config = {
       docs: {
         sidebar: {hideable: true, autoCollapseCategories: false},
       },
+      // The theme re-renders diagrams when the color mode changes.
+      mermaid: {theme: {light: 'neutral', dark: 'dark'}},
       prism: {
         theme: prismThemes.github,
         darkTheme: prismThemes.dracula,

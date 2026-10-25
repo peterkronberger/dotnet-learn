@@ -20,6 +20,11 @@ export const DEV_PAGES = [
     description: 'Prüft, dass die Sprachwahl seitenübergreifend gilt.',
   },
   {
+    to: '/dev/diagram-demo',
+    title: 'Diagramme (Mermaid)',
+    description: 'Mermaid-Diagramme mit Textbeschreibung, hell und dunkel.',
+  },
+  {
     to: '/dev/progress-selftest',
     title: 'Selbsttest: Lernfortschritt',
     description: 'Führt die Selbsttests der Fortschrittsbibliothek im Browser aus.',
