@@ -5,7 +5,9 @@
       "term": "Variable",
       "category": "language",
       "definition": "Ein benannter Speicherplatz für einen Wert. Der Typ der Variable legt fest, welche Werte sie aufnehmen kann, zum Beispiel `int count = 3;`.",
-      "aliases": ["Variablen"],
+      "aliases": [
+        "Variablen"
+      ],
       "lesson": "m01-l02",
       "source": {
         "title": "Variables (C# specification)",
@@ -18,8 +20,12 @@
       "german": "Werttyp",
       "category": "language",
       "definition": "Ein Typ, dessen Variable den Wert selbst enthält. Eine Zuweisung kopiert den Wert. Beispiele: `int`, `double`, `bool`.",
-      "aliases": ["Werttypen"],
-      "related": ["reference-type"],
+      "aliases": [
+        "Werttypen"
+      ],
+      "related": [
+        "reference-type"
+      ],
       "lesson": "m01-l02",
       "source": {
         "title": "Value types (C# reference)",
@@ -32,8 +38,12 @@
       "german": "Referenztyp",
       "category": "language",
       "definition": "Ein Typ, dessen Variable nur einen Verweis auf ein Objekt enthält. Eine Zuweisung kopiert den Verweis, nicht das Objekt. Beispiele: `string`, Arrays, Klassen.",
-      "aliases": ["Referenztypen"],
-      "related": ["value-type"],
+      "aliases": [
+        "Referenztypen"
+      ],
+      "related": [
+        "value-type"
+      ],
       "lesson": "m01-l02",
       "source": {
         "title": "Reference types (C# reference)",
@@ -46,7 +56,9 @@
       "german": "Ganzzahldivision",
       "category": "language",
       "definition": "Teilst du zwei ganze Zahlen, ist auch das Ergebnis eine ganze Zahl. Der Nachkommateil entfällt: `7 / 2` ergibt `3`.",
-      "aliases": ["Ganzzahldivisionen"],
+      "aliases": [
+        "Ganzzahldivisionen"
+      ],
       "lesson": "m01-l03",
       "source": {
         "title": "Arithmetic operators",
@@ -58,7 +70,563 @@
       "term": "Leitner-System",
       "category": "course",
       "definition": "Ein Wiederholungssystem mit Boxen. Wird eine Frage richtig beantwortet, rückt sie eine Box weiter, bei einer falschen Antwort zurück in Box 1. Fragen in höheren Boxen kommen erst nach längeren Abständen wieder.",
-      "aliases": ["Leitner", "Boxen"]
+      "aliases": [
+        "Leitner",
+        "Boxen"
+      ],
+      "related": [
+        "learning-status"
+      ]
+    },
+    {
+      "id": "csharp",
+      "term": "C#",
+      "category": "language",
+      "definition": "Die Programmiersprache, die du in diesem Kurs lernst. Du schreibst C#-Code, und .NET führt ihn aus.",
+      "related": [
+        "dotnet"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "A tour of the C# language",
+        "url": "https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/"
+      }
+    },
+    {
+      "id": "type",
+      "term": "Type",
+      "german": "Typ",
+      "category": "language",
+      "definition": "Der Typ legt fest, welche Werte eine Variable aufnehmen kann und was du damit tun darfst. Beispiele: `int`, `double`, `string`.",
+      "aliases": [
+        "Typen"
+      ],
+      "related": [
+        "static-typing",
+        "built-in-type"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "The C# type system",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/"
+      }
+    },
+    {
+      "id": "static-typing",
+      "term": "Static Typing",
+      "german": "statische Typisierung",
+      "category": "language",
+      "definition": "In C# kennt der Compiler den Typ jeder Variable schon vor dem Start des Programms. Typfehler meldet er deshalb früh.",
+      "related": [
+        "type",
+        "compiler"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "The C# type system",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/"
+      }
+    },
+    {
+      "id": "built-in-type",
+      "term": "Built-in Type",
+      "german": "eingebauter Typ",
+      "category": "language",
+      "definition": "Ein Typ, den C# mit einem eigenen Schlüsselwort mitbringt, zum Beispiel `int`, `double`, `decimal`, `bool`, `char` und `string`.",
+      "aliases": [
+        "eingebaute Typen"
+      ],
+      "related": [
+        "type"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Built-in types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/built-in-types"
+      }
+    },
+    {
+      "id": "type-inference",
+      "term": "Type Inference",
+      "german": "Typinferenz",
+      "category": "language",
+      "definition": "Mit `var` ermittelt der Compiler den Typ aus dem zugewiesenen Wert. Der Typ steht danach trotzdem fest.",
+      "aliases": [
+        "var"
+      ],
+      "related": [
+        "compiler",
+        "static-typing"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Declaration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/declarations"
+      }
+    },
+    {
+      "id": "string-interpolation",
+      "term": "String Interpolation",
+      "german": "interpolierter String",
+      "category": "language",
+      "definition": "Ein Text mit `$` davor. Ausdrücke in geschweiften Klammern werden ausgewertet und in den Text eingesetzt, zum Beispiel `$\"Summe: {a + b}\"`.",
+      "aliases": [
+        "interpolierte Strings"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "String interpolation using $",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/tokens/interpolated"
+      }
+    },
+    {
+      "id": "top-level-statements",
+      "term": "Top-level Statements",
+      "german": "Anweisungen auf oberster Ebene",
+      "category": "language",
+      "definition": "Ein Programm, dessen Anweisungen direkt in der Datei stehen, ohne umgebende `Main`-Methode. Typdeklarationen stehen am Ende der Datei.",
+      "aliases": [
+        "Top-Level-Programme"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Top-level statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements"
+      }
+    },
+    {
+      "id": "integral-type",
+      "term": "Integral Type",
+      "german": "Ganzzahltyp",
+      "category": "language",
+      "definition": "Ein Typ für ganze Zahlen ohne Nachkommateil, zum Beispiel `int`. Teilst du zwei Ganzzahlen, ist das Ergebnis wieder eine Ganzzahl.",
+      "aliases": [
+        "Ganzzahltypen"
+      ],
+      "related": [
+        "integer-division"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Integral numeric types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/integral-numeric-types"
+      }
+    },
+    {
+      "id": "floating-point-type",
+      "term": "Floating-Point Type",
+      "german": "Gleitkommatyp",
+      "category": "language",
+      "definition": "Ein Typ für Zahlen mit Nachkommateil. `double` speichert binär und ist für Messwerte gedacht, `decimal` genauer für Geldbeträge.",
+      "aliases": [
+        "double",
+        "decimal",
+        "Gleitkommazahl",
+        "Gleitkommazahlen"
+      ],
+      "related": [
+        "round-off-error",
+        "literal"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Floating-point numeric types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types"
+      }
+    },
+    {
+      "id": "literal",
+      "term": "Literal",
+      "category": "language",
+      "definition": "Ein Wert, der direkt im Code steht, zum Beispiel `42`, `3.14` oder `\"Hallo\"`. Ein `decimal`-Literal bekommt das Suffix `m`, zum Beispiel `19.99m`.",
+      "aliases": [
+        "Literale"
+      ],
+      "related": [
+        "floating-point-type"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Floating-point numeric types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types"
+      }
+    },
+    {
+      "id": "operand",
+      "term": "Operand",
+      "category": "language",
+      "definition": "Ein Wert, mit dem ein Operator rechnet. In `7 / 2` sind `7` und `2` die Operanden. Sind beide `int`, ist auch das Ergebnis ein `int`.",
+      "aliases": [
+        "Operanden"
+      ],
+      "related": [
+        "integer-division"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Arithmetic operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators"
+      }
+    },
+    {
+      "id": "cast",
+      "term": "Cast",
+      "german": "explizite Typumwandlung",
+      "category": "language",
+      "definition": "Eine ausdrückliche Umwandlung in einen anderen Typ, geschrieben als `(double)a`. Sie wirkt nur auf den Ausdruck direkt dahinter.",
+      "aliases": [
+        "Casts",
+        "Typumwandlung"
+      ],
+      "related": [
+        "operand"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Type-testing operators and cast expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/type-testing-and-cast"
+      }
+    },
+    {
+      "id": "round-off-error",
+      "term": "Round-off Error",
+      "german": "Rundungsfehler",
+      "category": "language",
+      "definition": "Ein `double` kann viele Dezimalbrüche nur ungefähr speichern. Deshalb ist `0.1 + 0.2 == 0.3` mit `double` `False`.",
+      "aliases": [
+        "Rundungsfehler"
+      ],
+      "related": [
+        "floating-point-type"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Arithmetic operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators"
+      }
+    },
+    {
+      "id": "exception",
+      "term": "Exception",
+      "german": "Ausnahme",
+      "category": "language",
+      "definition": "Ein Fehler zur Laufzeit, der das Programm unterbricht, wenn niemand ihn behandelt. Beispiel: `DivideByZeroException` bei einer Ganzzahldivision durch 0.",
+      "aliases": [
+        "Ausnahmen",
+        "Exceptions"
+      ],
+      "related": [
+        "integer-division"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Exceptions and exception handling",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/exceptions/"
+      }
+    },
+    {
+      "id": "method",
+      "term": "Method",
+      "german": "Methode",
+      "category": "language",
+      "definition": "Ein benannter Codeblock, den du mit Namen aufrufen kannst. Er kann Werte entgegennehmen und einen Wert zurückgeben.",
+      "aliases": [
+        "Methoden"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/methods"
+      }
+    },
+    {
+      "id": "property",
+      "term": "Property",
+      "german": "Eigenschaft",
+      "category": "language",
+      "definition": "Ein Wert, den ein Objekt bereitstellt und den du wie eine Variable liest. Beispiel: `\"World\".Length` liefert die Anzahl der Zeichen.",
+      "aliases": [
+        "Properties",
+        "Eigenschaften"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "Properties",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/properties"
+      }
+    },
+    {
+      "id": "selection-statement",
+      "term": "Selection Statement",
+      "german": "Verzweigung",
+      "category": "language",
+      "definition": "Eine Anweisung, die Code nur unter einer Bedingung ausführt, zum Beispiel `if` und `else` oder `switch`.",
+      "aliases": [
+        "Verzweigungen",
+        "if"
+      ],
+      "related": [
+        "loop",
+        "switch-expression"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Selection statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements"
+      }
+    },
+    {
+      "id": "loop",
+      "term": "Loop",
+      "german": "Schleife",
+      "category": "language",
+      "definition": "Eine Anweisung, die Code wiederholt ausführt. In C# gibt es `for`, `foreach`, `while` und `do … while`.",
+      "aliases": [
+        "Schleifen"
+      ],
+      "related": [
+        "selection-statement",
+        "collection"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "switch-expression",
+      "term": "Switch Expression",
+      "german": "Switch-Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck, der abhängig vom passenden Muster einen Wert liefert. Die Muster werden von oben nach unten geprüft, das erste passende gewinnt.",
+      "aliases": [
+        "Switch-Ausdrücke"
+      ],
+      "related": [
+        "pattern",
+        "discard"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "switch expression",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression"
+      }
+    },
+    {
+      "id": "pattern",
+      "term": "Pattern",
+      "german": "Muster",
+      "category": "language",
+      "definition": "Eine Form, gegen die ein Wert geprüft wird, zum Beispiel in einem Switch-Ausdruck. Passt der Wert, gilt der zugehörige Zweig.",
+      "aliases": [
+        "Muster"
+      ],
+      "related": [
+        "switch-expression"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns"
+      }
+    },
+    {
+      "id": "discard",
+      "term": "Discard",
+      "german": "Platzhalter `_`",
+      "category": "language",
+      "definition": "Der Unterstrich `_` steht in einem Muster für „beliebiger Wert“. Im Switch-Ausdruck fängt er alle Fälle auf, die vorher nicht passten.",
+      "aliases": [
+        "Unterstrich"
+      ],
+      "related": [
+        "switch-expression"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Discards",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/functional/discards"
+      }
+    },
+    {
+      "id": "collection",
+      "term": "Collection",
+      "german": "Sammlung",
+      "category": "language",
+      "definition": "Ein Objekt, das mehrere Elemente enthält, zum Beispiel eine Liste. Mit `foreach` gehst du alle Elemente durch.",
+      "aliases": [
+        "Collections",
+        "Sammlungen"
+      ],
+      "related": [
+        "loop"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Collections",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/collections"
+      }
+    },
+    {
+      "id": "dotnet",
+      "term": ".NET",
+      "category": "platform",
+      "definition": "Die Plattform, die C#-Programme ausführt. Sie besteht unter anderem aus Laufzeitumgebung und Standardbibliothek.",
+      "aliases": [
+        "dotnet"
+      ],
+      "related": [
+        "csharp",
+        "compiler"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "Introduction to .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/introduction"
+      }
+    },
+    {
+      "id": "compiler",
+      "term": "Compiler",
+      "category": "platform",
+      "definition": "Ein Programm, das deinen Quelltext prüft und übersetzt, bevor das Programm läuft. Er meldet Fehler wie falsche Typen früh.",
+      "related": [
+        "roslyn",
+        "static-typing"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Introduction to .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/introduction"
+      }
+    },
+    {
+      "id": "roslyn",
+      "term": "Roslyn",
+      "category": "platform",
+      "definition": "Der C#-Compiler von .NET. Der Playground dieser Seite nutzt ihn, um deinen Code direkt im Browser zu kompilieren.",
+      "related": [
+        "compiler",
+        "playground"
+      ],
+      "source": {
+        "title": "The .NET Compiler Platform SDK",
+        "url": "https://learn.microsoft.com/dotnet/csharp/roslyn-sdk/"
+      }
+    },
+    {
+      "id": "lts",
+      "term": "LTS",
+      "german": "Long Term Support",
+      "category": "platform",
+      "definition": "LTS-Versionen von .NET werden länger unterstützt als STS-Versionen. .NET 10 ist eine LTS-Version.",
+      "related": [
+        "dotnet"
+      ],
+      "source": {
+        "title": ".NET releases, patches, and support",
+        "url": "https://learn.microsoft.com/dotnet/core/releases-and-support"
+      }
+    },
+    {
+      "id": "playground",
+      "term": "Playground",
+      "category": "course",
+      "definition": "Ein Editor auf dieser Seite, der C#-Code direkt in deinem Browser kompiliert und ausführt.",
+      "related": [
+        "roslyn"
+      ],
+      "lesson": "m00-l01"
+    },
+    {
+      "id": "prediction",
+      "term": "Vorhersage",
+      "category": "course",
+      "definition": "Ein Kasten vor einem Beispiel. Du überlegst zuerst, was der Code ausgibt, und führst ihn dann aus.",
+      "aliases": [
+        "Vorhersagen"
+      ],
+      "lesson": "m00-l01"
+    },
+    {
+      "id": "deep-dive",
+      "term": "Vertiefung",
+      "category": "course",
+      "definition": "Ein optionaler, einklappbarer Bereich. Du kannst ihn beim ersten Durchgang überspringen.",
+      "aliases": [
+        "Vertiefungen"
+      ],
+      "lesson": "m00-l01"
+    },
+    {
+      "id": "learning-goal",
+      "term": "Lernziel",
+      "category": "course",
+      "definition": "Ein Kasten am Anfang einer Lektion. Er nennt, was du danach können sollst.",
+      "aliases": [
+        "Lernziele"
+      ],
+      "lesson": "m00-l01"
+    },
+    {
+      "id": "review",
+      "term": "Rückblick",
+      "category": "course",
+      "definition": "Fragen zu früheren Lektionen am Anfang einer Lektion. Sie lassen dich Gelerntes abrufen.",
+      "lesson": "m01-l03"
+    },
+    {
+      "id": "subgoal",
+      "term": "Teilziel",
+      "category": "course",
+      "definition": "Ein benannter Schritt eines durchgerechneten Beispiels. Er hilft dir, die Lösung in Abschnitte zu gliedern.",
+      "aliases": [
+        "Teilziele"
+      ],
+      "related": [
+        "gap-example"
+      ],
+      "lesson": "m01-l03"
+    },
+    {
+      "id": "gap-example",
+      "term": "Lückenbeispiel",
+      "category": "course",
+      "definition": "Ein durchgerechnetes Beispiel mit Lücken im Code, die du selbst füllst. Die Teilziele bleiben dabei erhalten.",
+      "aliases": [
+        "Lückenbeispiele"
+      ],
+      "related": [
+        "subgoal"
+      ],
+      "lesson": "m01-l03"
+    },
+    {
+      "id": "misconception",
+      "term": "Fehlvorstellung",
+      "category": "course",
+      "definition": "Eine typische falsche Annahme, zum Beispiel „Ganzzahldivision rundet“. Sie steht in den „Achtung“-Kästen und wird im Quiz geprüft.",
+      "aliases": [
+        "Fehlvorstellungen"
+      ],
+      "lesson": "m01-l03"
+    },
+    {
+      "id": "seclog",
+      "term": "SecLog",
+      "category": "course",
+      "definition": "Das Übungsprojekt des Kurses: Du wertest ausgedachte Anmeldeprotokolle aus. Es ist rein defensiv.",
+      "lesson": "m01-l03"
+    },
+    {
+      "id": "learning-status",
+      "term": "Lernstand",
+      "category": "course",
+      "definition": "Die Seite mit fälligen Wiederholungen, Lernpfad und Datenexport. Dein Fortschritt wird nur in deinem Browser gespeichert.",
+      "related": [
+        "leitner-system"
+      ]
     }
   ]
 }
