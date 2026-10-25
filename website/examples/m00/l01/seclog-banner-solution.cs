@@ -1,0 +1,2 @@
+Console.WriteLine("SecLog 0.1");
+Console.WriteLine("2026-01-01 08:00 login failed user=alice");

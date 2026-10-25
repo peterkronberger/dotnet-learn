@@ -1,4 +1,94 @@
 {
   "module": "m00",
-  "questions": []
+  "questions": [
+    {
+      "id": "m00-l01-q1",
+      "lesson": "m00-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf `Write` und `WriteLine`.",
+      "example": "m00/l01/quiz-order.cs",
+      "explanation": "`Console.Write(\"B\")` beendet die Zeile nicht. Das nächste `WriteLine(\"C\")` schreibt direkt dahinter, also steht `BC` in einer Zeile. Erst dieses `WriteLine` beginnt danach eine neue Zeile."
+    },
+    {
+      "id": "m00-l01-q2",
+      "lesson": "m00-l01",
+      "type": "single",
+      "question": "Du schreibst `Console.WriteLine(Hello);` ohne Anführungszeichen. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm gibt `Hello` aus.",
+          "feedback": "Ohne Anführungszeichen ist `Hello` kein Text. Der Compiler liest es als Namen.",
+          "misconception": "m00-l01-text-without-quotes"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil er den Namen `Hello` nicht kennt.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm gibt eine leere Zeile aus.",
+          "feedback": "Eine leere Zeile entsteht nur mit `Console.WriteLine()` ohne Argument. Hier kommt es gar nicht zum Start, weil der Code nicht kompiliert.",
+          "misconception": "m00-l01-text-without-quotes"
+        }
+      ],
+      "explanation": "Text muss als Zeichenkette in Anführungszeichen stehen. Ohne sie ist `Hello` ein Name, den es im Programm nicht gibt. Der Compiler meldet das als Fehler, bevor das Programm läuft."
+    },
+    {
+      "id": "m00-l01-q3",
+      "lesson": "m00-l01",
+      "type": "single",
+      "question": "Du vertauschst die beiden Zeilen `Console.WriteLine(\"A\");` und `Console.WriteLine(\"B\");`. Was ändert sich?",
+      "options": [
+        {
+          "text": "Nichts, die Reihenfolge der Anweisungen ist egal.",
+          "feedback": "Die Anweisungen laufen von oben nach unten. Die Ausgabe folgt derselben Reihenfolge.",
+          "misconception": "m00-l01-statement-order"
+        },
+        {
+          "text": "Die Ausgabe erscheint in der Reihenfolge `B`, dann `A`.",
+          "correct": true
+        },
+        {
+          "text": "C# sortiert die Ausgabe alphabetisch, es kommt weiter `A`, dann `B`.",
+          "feedback": "C# sortiert nichts. Jede Anweisung läuft genau dann, wenn sie an der Reihe ist.",
+          "misconception": "m00-l01-statement-order"
+        }
+      ],
+      "explanation": "Ein Programm ist eine Folge von Anweisungen. C# führt sie von oben nach unten aus, also steht die Ausgabe in derselben Reihenfolge."
+    },
+    {
+      "id": "m00-l01-q4",
+      "lesson": "m00-l01",
+      "type": "single",
+      "question": "Welcher Unterschied besteht zwischen `Console.Write` und `Console.WriteLine`?",
+      "options": [
+        {
+          "text": "`WriteLine` hängt nach dem Text einen Zeilenumbruch an, `Write` nicht.",
+          "correct": true
+        },
+        {
+          "text": "`Write` schreibt auf den Bildschirm, `WriteLine` in eine Datei.",
+          "feedback": "Beide schreiben in dieselbe Konsolenausgabe."
+        },
+        {
+          "text": "`WriteLine` darf nur Text ausgeben, `Write` auch Zahlen.",
+          "feedback": "Beide gibt es für Text und für Zahlen."
+        }
+      ],
+      "explanation": "Beide schreiben in die Konsolenausgabe. `WriteLine` beendet die Zeile danach, `Write` bleibt in derselben Zeile."
+    },
+    {
+      "id": "m00-l01-q5",
+      "lesson": "m00-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie C# ein Programm aus mehreren `Console.WriteLine`-Anweisungen ausführt und was in den Klammern stehen muss, wenn Text ausgegeben werden soll.",
+      "modelAnswer": "C# führt die Anweisungen nacheinander von oben nach unten aus. Jede Anweisung endet mit einem Semikolon. Jedes `Console.WriteLine` schreibt eine Zeile in die Ausgabe.\n\nText muss in Anführungszeichen stehen, zum Beispiel `\"Hello\"`. Ohne Anführungszeichen liest der Compiler das Wort als Namen und meldet einen Fehler."
+    },
+    {
+      "id": "m00-l01-q6",
+      "lesson": "m00-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo gibt ein Programm noch Text Zeile für Zeile aus? Nenne ein Beispiel und sage, warum die Reihenfolge dort wichtig ist.",
+      "modelAnswer": "Ein Beispiel ist ein Log: Ein Programm schreibt für jedes Ereignis eine Zeile, zum Beispiel einen fehlgeschlagenen Login. Die Reihenfolge der Zeilen zeigt dann, was zuerst passiert ist. Weitere Beispiele sind Statusmeldungen beim Start eines Programms oder Fortschrittsanzeigen."
+    }
+  ]
 }
