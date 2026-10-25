@@ -472,15 +472,18 @@
       "id": "dotnet",
       "term": ".NET",
       "category": "platform",
-      "definition": "Die Plattform, die C#-Programme ausführt. Sie besteht unter anderem aus Laufzeitumgebung und Standardbibliothek.",
+      "definition": "Die Plattform, die C#-Programme ausführt. Sie besteht unter anderem aus Laufzeitumgebung, Standardbibliothek, Compiler und SDK.",
       "aliases": [
         "dotnet"
       ],
       "related": [
         "csharp",
-        "compiler"
+        "compiler",
+        "clr",
+        "bcl",
+        "sdk"
       ],
-      "lesson": "m00-l01",
+      "lesson": "m00-l02",
       "source": {
         "title": "Introduction to .NET",
         "url": "https://learn.microsoft.com/dotnet/core/introduction"
@@ -495,7 +498,7 @@
         "roslyn",
         "static-typing"
       ],
-      "lesson": "m01-l02",
+      "lesson": "m00-l02",
       "source": {
         "title": "Introduction to .NET",
         "url": "https://learn.microsoft.com/dotnet/core/introduction"
@@ -513,7 +516,8 @@
       "source": {
         "title": "The .NET Compiler Platform SDK",
         "url": "https://learn.microsoft.com/dotnet/csharp/roslyn-sdk/"
-      }
+      },
+      "lesson": "m00-l02"
     },
     {
       "id": "lts",
@@ -661,6 +665,77 @@
       "source": {
         "title": "Console.WriteLine Method",
         "url": "https://learn.microsoft.com/dotnet/api/system.console.writeline"
+      }
+    },
+    {
+      "id": "clr",
+      "term": "CLR",
+      "german": "Common Language Runtime, Laufzeitumgebung",
+      "category": "platform",
+      "definition": "Die Laufzeitumgebung von .NET. Sie führt den übersetzten Code aus und bietet Dienste wie automatische Speicherverwaltung.",
+      "related": [
+        "dotnet",
+        "bcl"
+      ],
+      "lesson": "m00-l02",
+      "source": {
+        "title": "Common Language Runtime (CLR) overview",
+        "url": "https://learn.microsoft.com/dotnet/standard/clr"
+      }
+    },
+    {
+      "id": "bcl",
+      "term": "BCL",
+      "german": "Base Class Library, Standardbibliothek",
+      "category": "platform",
+      "definition": "Die Standardbibliothek von .NET mit Typen wie `Console`, `Math` und `string`. Sie gehört zur Plattform, nicht zur Sprache.",
+      "aliases": [
+        "Standardbibliothek"
+      ],
+      "related": [
+        "dotnet",
+        "clr",
+        "csharp"
+      ],
+      "lesson": "m00-l02",
+      "source": {
+        "title": "Introduction to .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/introduction"
+      }
+    },
+    {
+      "id": "sdk",
+      "term": "SDK",
+      "german": "Software Development Kit",
+      "category": "platform",
+      "definition": "Die Werkzeuge, mit denen du .NET-Projekte baust, testest und startest. Dazu gehört der Befehl `dotnet`.",
+      "related": [
+        "dotnet",
+        "compiler"
+      ],
+      "lesson": "m00-l02",
+      "source": {
+        "title": "Introduction to .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/introduction"
+      }
+    },
+    {
+      "id": "language-specification",
+      "term": "Sprachspezifikation",
+      "category": "language",
+      "definition": "Der Text, der festlegt, wie C#-Code geschrieben wird und was er bedeutet. Er beschreibt die Sprache, nicht die Laufzeitumgebung oder die Bibliothek.",
+      "aliases": [
+        "Spezifikation",
+        "Language Specification"
+      ],
+      "related": [
+        "csharp",
+        "dotnet"
+      ],
+      "lesson": "m00-l02",
+      "source": {
+        "title": "C# language specification: Scope",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/scope"
       }
     }
   ]

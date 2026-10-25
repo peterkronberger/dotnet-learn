@@ -1,0 +1,213 @@
+---
+title: "C# und .NET: Sprache und Plattform"
+sidebar_position: 2
+description: C# ist eine Sprache, .NET ist die Plattform, die C#-Programme übersetzt und ausführt. Du lernst, welcher Teil wofür zuständig ist.
+lesson_id: m00-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aliasTypes from '!!raw-loader!@site/examples/m00/l02/alias-types.cs';
+import aliasTypesOutput from '!!raw-loader!@site/examples/m00/l02/alias-types.out.txt';
+import seclogLine from '!!raw-loader!@site/examples/m00/l02/seclog-line.cs';
+import seclogLineOutput from '!!raw-loader!@site/examples/m00/l02/seclog-line.out.txt';
+import upperTask from '!!raw-loader!@site/examples/m00/l02/seclog-upper-task.cs';
+import upperTests from '!!raw-loader!@site/examples/m00/l02/seclog-upper-task.tests.snippet.cs';
+import upperSolution from '!!raw-loader!@site/examples/m00/l02/seclog-upper-solution.cs';
+
+# C# und .NET: Sprache und Plattform
+
+:::note[Lernziele]
+- Du ordnest Begriffe richtig zu: Sprache (C#), Laufzeitumgebung (CLR), Standardbibliothek (BCL), SDK, Compiler (Roslyn).
+- Du erkennst in einem Programm, was zur Sprache gehört (Schlüsselwörter wie `var`, `int`) und was aus der Bibliothek kommt (`Console`, `Math`).
+- Du erklärst, warum es drei Quellen gibt (Standard, Entwurf auf Microsoft Learn, Feature-Spezifikationen) und welche du für welche Frage liest.
+:::
+
+## Rückblick
+
+<Quiz id="m00-l01-q3" />
+
+<Quiz id="m00-l01-q4" />
+
+## Sprache und Plattform sind zwei Dinge
+
+In der ersten Lektion hast du `Console.WriteLine("Hello");` geschrieben. Dahinter stecken mehrere Teile, die oft in einen Topf geworfen werden. Diese Lektion trennt sie.
+
+<Term id="csharp">C#</Term> ist eine **Sprache**: Sie legt fest, wie du Code schreibst und was er bedeutet. Das steht in der <Term id="language-specification">Sprachspezifikation</Term>. Sie beschreibt „die Form“ und „die Interpretation“ von C#-Programmen. Sie beschreibt nicht, wie ein Programm für einen Computer übersetzt oder gestartet wird ([Scope](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/scope)).
+
+<Term id="dotnet">.NET</Term> ist die **Plattform**, die C#-Programme ausführt. Microsoft nennt diese Komponenten ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)):
+
+| Teil | Aufgabe |
+| --- | --- |
+| Runtime (<Term id="clr">CLR</Term>, Laufzeitumgebung) | führt den übersetzten Code aus ([CLR overview](https://learn.microsoft.com/dotnet/standard/clr)) |
+| Libraries (<Term id="bcl">BCL</Term>, Standardbibliothek) | fertige Typen und Methoden, zum Beispiel für JSON |
+| Compiler (<Term id="roslyn">Roslyn</Term> für C#) | übersetzt Quelltext in ausführbaren Code |
+| <Term id="sdk">SDK</Term> und Werkzeuge | bauen, testen und starten Projekte, zum Beispiel mit `dotnet build` |
+
+<Diagram
+  caption="Von der Sprache zum laufenden Programm"
+  description="Du schreibst C#-Code. Der Compiler Roslyn übersetzt ihn. Die Laufzeitumgebung CLR führt das Ergebnis aus. Dein Code ruft dabei Typen der Standardbibliothek BCL auf, zum Beispiel Console. Das SDK enthält die Werkzeuge, die diese Schritte für ein Projekt auslösen. Der Begriff C# gehört nur zum ersten Kasten, alle anderen gehören zu .NET."
+>
+
+```mermaid
+flowchart LR
+  accTitle: Von der Sprache zum laufenden Programm
+  code["C#-Code (Sprache)"] --> roslyn["Compiler: Roslyn"]
+  roslyn --> clr["Laufzeitumgebung: CLR"]
+  code -. "ruft auf" .-> bcl["Standardbibliothek: BCL"]
+  bcl --> clr
+  sdk["SDK: Werkzeuge"] -. "startet" .-> roslyn
+```
+
+</Diagram>
+
+Wie aus dem Code ein laufendes Programm wird, erfährst du in Lektion 5. Hier genügt: Der Compiler wird nur genannt.
+
+## Sprache oder Bibliothek?
+
+Die Spezifikation schreibt vor, dass jede Implementierung von C# eine kleine Standardbibliothek mitbringt. Sie enthält nur Typen, die die Sprache selbst braucht. Eine Implementierung liefert laut Spezifikation normalerweise eine viel größere Bibliothek mit ([Annex C: Standard library](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/standard-library)). Die Typen, die du täglich benutzt, stammen aus dieser größeren Bibliothek von .NET.
+
+Ein Beispiel für die Grenze: Das Schlüsselwort `int` gehört zur Sprache. Die Spezifikation sagt, dass solche einfachen Typen Aliase (andere Namen) für Typen im Namespace `System` sind ([Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). `typeof(int).FullName` fragt nach dem vollen Namen dieses Bibliothekstyps.
+
+:::info[Vorhersage]
+Was geben die drei Zeilen aus? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m00-l02-alias" height={300} code={aliasTypes} predict expected={aliasTypesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `System.Int32`, `System.String` und `System.Boolean`.
+
+1. **Schlüsselwort lesen:** `int`, `string` und `bool` sind Schlüsselwörter der Sprache.
+2. **Alias auflösen:** Jedes Schlüsselwort steht für einen Typ der Bibliothek im Namespace `System`.
+3. **Namen ablesen:** `FullName` gibt den vollen Namen dieses Typs aus.
+
+Was passiert, wenn du `typeof(double)` einsetzt? Probiere es im Runner aus.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum gibt es Aliase? (optional)</summary>
+
+Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im Namespace `System` und nennt eine Tabelle der Zuordnungen ([Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). Du kannst also `int` oder `System.Int32` schreiben. Beides meint denselben Typ.
+
+</details>
+
+## Ein SecLog-Programm zerlegen
+
+:::info[Vorhersage]
+Das folgende Programm gehört zu <Term id="seclog">SecLog</Term>. Was gibt es aus? Überlege dabei, welche Wörter zur Sprache und welche zur Bibliothek gehören. Die Kommentare im Code verraten die Antwort. Lies sie erst nach deinem Tipp.
+:::
+
+<CSharpRunner id="m00-l02-seclog-line" height={340} code={seclogLine} predict expected={seclogLineOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `LOGIN FAILED USER=ALICE` und `5`.
+
+1. **Sprache erkennen:** `var`, `int`, `=` und `;` sind Teil der Sprache.
+2. **Bibliothek erkennen:** `Console`, `Math` und `ToUpper` sind Typen oder Methoden der Bibliothek.
+3. **Ausgabe ablesen:** `ToUpper` macht aus dem Text Großbuchstaben. `Math.Max` gibt die größere der beiden Zahlen zurück, hier `5`.
+
+Was passiert, wenn du `Math.Max(attempts, 1)` schreibst? Probiere es im Runner aus.
+
+</details>
+
+## Ändern und selbermachen
+
+Im Startcode fehlt die Umwandlung. Das Gerüst ist wie oben: eine Variable, dann zwei Ausgaben.
+
+<CSharpRunner id="m00-l02-upper" height={320} code={upperTask} tests={upperTests} />
+
+Aufgabe: Die erste Ausgabe soll die Log-Zeile in Großbuchstaben zeigen, die zweite die Anzahl ihrer Zeichen. Die Methode `ToUpper` und die Eigenschaft `Length` kommen beide aus der Bibliothek.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-upper-solution.cs">{upperSolution}</CodeBlock>
+
+`line.ToUpper()` liefert einen neuen Text in Großbuchstaben. `line.Length` ist die Anzahl der Zeichen.
+
+</details>
+
+## Drei Quellen für „die Spezifikation“
+
+Wenn du genau wissen willst, was in C# erlaubt ist, gibt es drei Schichten:
+
+1. **ECMA-334:** der veröffentlichte Standard. Die neueste Ausgabe auf der Ecma-Seite ist die 7. Ausgabe (Dezember 2023); Ecma ordnet sie C# 7 zu ([ECMA-334](https://ecma-international.org/publications-and-standards/standards/ecma-334)). *Stand: 2026-10-25.*
+2. **Entwurf des Standards auf Microsoft Learn:** der Arbeitstext der nächsten Ausgabe. Er enthält schon spätere Features ([C#-Spezifikation](https://learn.microsoft.com/dotnet/csharp/specification/)).
+3. **Feature-Spezifikationen:** Der Standard liegt hinter der Implementierung zurück. Darum veröffentlicht Microsoft für neuere Features eigene Spezifikationen, bis der Standard sie aufnimmt ([Feature specifications](https://learn.microsoft.com/dotnet/csharp/specification/feature-spec-overview)).
+
+Faustregel: Frage zuerst den Entwurf auf Microsoft Learn. Steht das Feature dort nicht, lies die Feature-Spezifikation. Für Fragen zu `Console`, `List<T>` oder anderen Bibliothekstypen hilft die Spezifikation nicht, dafür gibt es die Dokumentation der Bibliothek auf Microsoft Learn.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m00-l02-csharp-is-dotnet" />
+
+**„C# und .NET sind dasselbe.“** C# ist die Sprache. .NET ist die Plattform mit Laufzeitumgebung, Bibliothek, Compiler und SDK. .NET kann laut Microsoft auch Programme in anderen Sprachen ausführen, C# ist dabei die beliebteste ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)).
+:::
+
+:::warning[Achtung]
+<Misconception id="m00-l02-console-is-language" />
+
+**„`Console.WriteLine` gehört zur Sprache C#.“** `Console` ist ein Typ der Bibliothek, `WriteLine` eine seiner Methoden. Die Sprache legt fest, wie ein Aufruf aussieht. Was `WriteLine` tut, steht in der Dokumentation der Bibliothek.
+:::
+
+## Kommst du aus …?
+
+<FromLanguage>
+<TabItem value="java">
+
+Java trennt auch Sprache und Plattform: die Sprache Java, die Laufzeitumgebung JVM, die Klassenbibliothek und das JDK. In C# entsprechen dem grob CLR (Laufzeit), BCL (Bibliothek) und SDK (Werkzeuge).
+
+</TabItem>
+<TabItem value="python">
+
+Bei Python meint „Python“ oft Sprache und das Programm zusammen, das sie ausführt. In C# sind die Namen getrennt: C# ist nur die Sprache, die Ausführung übernimmt .NET.
+
+</TabItem>
+<TabItem value="js">
+
+JavaScript läuft in einer Engine, zum Beispiel im Browser. Wie dort ist auch hier `Console` keine Spracheigenschaft, sondern ein Objekt der Umgebung beziehungsweise Bibliothek.
+
+</TabItem>
+<TabItem value="go">
+
+In Go kommen Compiler, Werkzeuge und Standardbibliothek in einer Toolchain. In C# heißen die Teile getrennt: Roslyn, SDK und BCL gehören zu .NET, und die Laufzeitumgebung CLR führt das Ergebnis aus.
+
+</TabItem>
+</FromLanguage>
+
+## Zusammenfassung
+
+C# ist eine Sprache. Ihre Regeln stehen in der Spezifikation, die nur die Sprache beschreibt. .NET ist die Plattform mit Compiler (Roslyn), Laufzeitumgebung (CLR), Standardbibliothek (BCL) und SDK. Schlüsselwörter wie `var` und `int` gehören zur Sprache, `Console` und `Math` zur Bibliothek. Für Sprachfragen gibt es drei Quellen: den ECMA-Standard, den Entwurf auf Microsoft Learn und die Feature-Spezifikationen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m00-l02-q1" />
+
+<Quiz id="m00-l02-q2" />
+
+<Quiz id="m00-l02-q3" />
+
+<Quiz id="m00-l02-q4" />
+
+<Quiz id="m00-l02-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m00-l02-q6" />
+
+### Transferfrage
+
+<Quiz id="m00-l02-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)
+- Microsoft Learn: [Common Language Runtime (CLR) overview](https://learn.microsoft.com/dotnet/standard/clr)
+- Microsoft Learn: [C#-Spezifikation, Scope](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/scope)
