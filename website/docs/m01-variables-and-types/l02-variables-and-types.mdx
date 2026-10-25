@@ -20,13 +20,13 @@ import valueVsReference from '!!raw-loader!@site/examples/m01/l02/value-vs-refer
 
 ## Variablen deklarieren
 
-Eine Variable hat einen **Typ**, einen **Namen** und einen **Wert**. C# ist statisch typisiert: Der Compiler kennt den Typ schon vor dem Start und meldet Fehler früh.
+Eine <Term id="variable">Variable</Term> hat einen **<Term id="type">Typ</Term>**, einen **Namen** und einen **Wert**. C# ist <Term id="static-typing">statisch typisiert</Term>: Der <Term id="compiler">Compiler</Term> kennt den Typ schon vor dem Start und meldet Fehler früh.
 
 <CodeBlock language="csharp" title="Variablen">{variables}</CodeBlock>
 
-`var` lässt den Compiler den Typ ermitteln; er steht danach trotzdem fest.
+`var` lässt den Compiler den Typ <Term id="type-inference">ermitteln</Term>; er steht danach trotzdem fest.
 
-Das `$` vor dem Text erzeugt einen **interpolierten String**. Ausdrücke in geschweiften Klammern werden ausgewertet und eingesetzt.
+Das `$` vor dem Text erzeugt einen **<Term id="string-interpolation">interpolierten String</Term>**. Ausdrücke in geschweiften Klammern werden ausgewertet und eingesetzt.
 
 ## Die wichtigsten Typen
 
@@ -42,11 +42,11 @@ Das `$` vor dem Text erzeugt einen **interpolierten String**. Ausdrücke in gesc
 <details>
 <summary>Vertiefung: Wert- und Referenztypen (optional)</summary>
 
-Zahlen, `bool` und `char` sind **Werttypen**: Eine Zuweisung kopiert den Wert. Klassen sind **Referenztypen**: Eine Zuweisung kopiert nur den Verweis, beide Variablen zeigen auf dasselbe Objekt.
+Zahlen, `bool` und `char` sind **<Term id="value-type">Werttypen</Term>**: Eine Zuweisung kopiert den Wert. Klassen sind **<Term id="reference-type">Referenztypen</Term>**: Eine Zuweisung kopiert nur den Verweis, beide Variablen zeigen auf dasselbe Objekt.
 
 <CodeBlock language="csharp">{valueVsReference}</CodeBlock>
 
-In Top-Level-Programmen stehen Typdeklarationen am Ende der Datei.
+In <Term id="top-level-statements">Top-Level-Programmen</Term> stehen Typdeklarationen am Ende der Datei.
 
 </details>
 
