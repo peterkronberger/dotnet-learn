@@ -29,6 +29,11 @@ export const DEV_PAGES = [
     title: 'Selbsttest: Lernfortschritt',
     description: 'Führt die Selbsttests der Fortschrittsbibliothek im Browser aus.',
   },
+  {
+    to: '/dev/search-selftest',
+    title: 'Selbsttest: Suche',
+    description: 'Führt die Selbsttests der Suchlogik im Browser aus.',
+  },
 ];
 
 // Navigation across all dev pages; the overview page shows descriptions as well.
