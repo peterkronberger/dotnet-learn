@@ -737,6 +737,97 @@
         "title": "C# language specification: Scope",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/scope"
       }
+    },
+    {
+      "id": "dotnet-framework",
+      "term": ".NET Framework",
+      "category": "platform",
+      "definition": "Die ursprüngliche Variante von .NET, seit 2002. Sie ist für Windows-Apps und Webdienste gedacht und wird gewartet. Für Neuentwicklung empfiehlt Microsoft das heutige .NET.",
+      "aliases": [
+        "NET Framework"
+      ],
+      "related": [
+        "dotnet",
+        "dotnet-core",
+        "mono"
+      ],
+      "lesson": "m00-l03",
+      "source": {
+        "title": "Overview of .NET Framework",
+        "url": "https://learn.microsoft.com/dotnet/framework/get-started/overview"
+      }
+    },
+    {
+      "id": "dotnet-core",
+      "term": ".NET Core",
+      "category": "platform",
+      "definition": "Die plattformübergreifende, quelloffene Variante von .NET. Sie heißt heute einfach „.NET“ und ist die Hauptvariante für neue Projekte. Nicht zu verwechseln mit Entity Framework Core.",
+      "aliases": [
+        ".NET (Core)",
+        "NET Core"
+      ],
+      "related": [
+        "dotnet",
+        "dotnet-framework",
+        "ef-core"
+      ],
+      "lesson": "m00-l03",
+      "source": {
+        "title": ".NET implementations",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/implementations"
+      }
+    },
+    {
+      "id": "dotnet-standard",
+      "term": ".NET Standard",
+      "category": "platform",
+      "definition": "Eine Spezifikation von .NET-Schnittstellen, die auf mehreren Varianten von .NET vorhanden sind. Es erscheinen keine neuen Versionen mehr; .NET 5 und neuer brauchen sie meist nicht.",
+      "aliases": [
+        "NET Standard",
+        "netstandard"
+      ],
+      "related": [
+        "dotnet",
+        "dotnet-framework"
+      ],
+      "lesson": "m00-l03",
+      "source": {
+        "title": ".NET Standard overview",
+        "url": "https://learn.microsoft.com/dotnet/standard/net-standard"
+      }
+    },
+    {
+      "id": "mono",
+      "term": "Mono",
+      "category": "platform",
+      "definition": "Eine plattformübergreifende, quelloffene Implementierung von .NET Framework, die aus der Community stammt. Sie trieb Xamarin-Apps an und dient Spielen mit der Unity-Engine.",
+      "related": [
+        "dotnet",
+        "dotnet-framework"
+      ],
+      "lesson": "m00-l03",
+      "source": {
+        "title": ".NET implementations",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/implementations"
+      }
+    },
+    {
+      "id": "ef-core",
+      "term": "Entity Framework Core",
+      "category": "platform",
+      "definition": "Eine Bibliothek für den Datenbankzugriff mit .NET-Objekten (O/RM). Sie läuft auf .NET, ist aber nicht die Plattform .NET Core.",
+      "aliases": [
+        "EF Core"
+      ],
+      "related": [
+        "dotnet",
+        "dotnet-core"
+      ],
+      "lesson": "m00-l03",
+      "source": {
+        "title": "Overview of Entity Framework Core",
+        "url": "https://learn.microsoft.com/ef/core/"
+      }
     }
   ]
 }
