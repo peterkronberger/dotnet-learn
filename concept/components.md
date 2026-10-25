@@ -89,6 +89,6 @@ Planned:
 ## Site extensions
 
 - `@docusaurus/theme-mermaid` for diagrams – **available** (light theme `neutral`, dark theme `dark`). Use it through `<Diagram>` (with a text description). Demo: `/dev/diagram-demo`.
-- Local full-text search (when choosing a package, check Docusaurus 3 and i18n compatibility).
+- Local full-text search – **available**. Own build-time index plugin `website/plugins/search-index.js` (format and static pages: `website/src/data/search/README.md`), navbar field `@theme/SearchBar` (top 3 hits, Enter or icon opens the search page) and page `/search?q=…` (all hits grouped by page, `noindex`). Indexed: lessons (by heading section), glossary entries, and the static pages Lernstand and Playground. Quiz questions are **not** indexed, because their texts and answers would reveal solutions in the results. Hits on the Lernstand page open `/dashboard#<section>`; the dashboard scrolls to the section after it has rendered. Self-test: `/dev/search-selftest`.
 - Playwright E2E tests with an automatic accessibility check (e.g. axe-core) in CI.
 - Later: `@docusaurus/plugin-pwa`.

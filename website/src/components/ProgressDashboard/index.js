@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import Translate, {translate} from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -42,6 +42,23 @@ function Content() {
   const [today] = useState(() => toLocalDate());
   const [range, setRange] = useState('4w');
   const data = useProgressDashboardData(progress, today);
+  const hasData = Boolean(data);
+
+  // The sections exist only after the first render in the browser, so jump to the hash here (once).
+  const scrolledToHash = useRef(false);
+  useEffect(() => {
+    if (!hasData || scrolledToHash.current) return;
+    scrolledToHash.current = true;
+    const hash = window.location.hash;
+    if (!hash) return;
+    let id = hash.slice(1);
+    try {
+      id = decodeURIComponent(id);
+    } catch {
+      // keep the raw value
+    }
+    document.getElementById(id)?.scrollIntoView();
+  }, [hasData]);
 
   if (!data) return <Loading />;
 
