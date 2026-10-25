@@ -1,6 +1,6 @@
 # Search data
 
-The plugin `website/plugins/search-index.js` builds the search index at build time and writes it with `actions.createData('search-index.json', …)`. One index per locale.
+The plugin `website/plugins/search-index.js` builds the search index at build time and writes it with `actions.createData('search-index.json', …)`. One index per locale. The index is used by the navbar field (`website/src/theme/SearchBar`) and the search page `/search` (`website/src/pages/search.js`).
 
 ## What is indexed
 
