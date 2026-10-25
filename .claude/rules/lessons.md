@@ -20,5 +20,5 @@ paths:
 - New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
 - End with "Weiterlesen" (further reading): 1–3 links to Microsoft Learn or the C# specification. The links must exist.
-- Before writing, check that nothing blocks the module: every component the lesson needs is "available" in `concept/components.md` (not "planned"), and no entry under "Open questions" in `concept/module-plan.md` concerns it (step 0 in `concept/issue-blueprint.md`).
+- Before writing, check that nothing blocks the module: every component the lesson needs is "available" in `concept/components.md` (not "planned"), and no entry under "Open questions" in `concept/module-plan.md` concerns it (see section 5 of `concept/issue-blueprint.md`).
 - No AI content outside module 19.
