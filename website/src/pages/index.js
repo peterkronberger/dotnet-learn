@@ -34,7 +34,7 @@ function Hero() {
         <h1 className={styles.title}>{siteConfig.title}</h1>
         <p className={styles.tagline}>{siteConfig.tagline}</p>
         <div className={styles.buttons}>
-          <Link className={clsx('button button--lg', styles.primary)} to="/docs/intro">
+          <Link className={clsx('button button--lg', styles.primary)} to="/docs/learning-principles">
             Loslegen
           </Link>
           <Link className={clsx('button button--lg', styles.secondary)} to="/playground">
