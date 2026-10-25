@@ -99,7 +99,7 @@ jobs:
           claude_args: |
             --model opus
             --max-turns 60
-            --allowedTools "Read,Write,Glob,Grep,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(gh issue comment:*)"
+            --allowedTools "Read,Write,Glob,Grep,Bash(gh issue view:*),Bash(gh issue list:*),Bash(gh issue create:*),Bash(gh issue comment:*),WebFetch(domain:learn.microsoft.com)"
             --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["done","needs_human"]},"created":{"type":"array","items":{"type":"object","properties":{"number":{"type":"integer"},"class":{"type":"string","enum":["implement","queued","human"]}},"required":["number","class"]}},"reason":{"type":"string"}},"required":["status"]}'
 
       # ─────────────────────────────────────────────────────────────────
