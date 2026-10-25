@@ -75,6 +75,7 @@ Planned:
 | `<Since csharp="13" dotnet="9" />` | available | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
 | `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`), plus C++ (`cpp`) only where it fits, e.g. memory or `struct`; the choice is kept across pages (`groupId="from-language"`) |
 | Feedback link | planned (B8) | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
+| `<Diagram caption="…" description="…">` | available | Mermaid code block inside, `accTitle` set (same text as `caption`). Renders `<figure>` with `<figcaption>` and a `<details>` "Diagramm als Text". Text description is required (a missing one fails the build). Color is never the only signal. |
 | `<CodeBlock>` | Official Docusaurus component for code that cannot run, taken from `.cs` files |
 
 ## Glossary – available
@@ -87,7 +88,7 @@ Planned:
 
 ## Site extensions
 
-- `@docusaurus/theme-mermaid` for diagrams (with a text description).
+- `@docusaurus/theme-mermaid` for diagrams – **available** (light theme `neutral`, dark theme `dark`). Use it through `<Diagram>` (with a text description). Demo: `/dev/diagram-demo`.
 - Local full-text search (when choosing a package, check Docusaurus 3 and i18n compatibility).
 - Playwright E2E tests with an automatic accessibility check (e.g. axe-core) in CI.
 - Later: `@docusaurus/plugin-pwa`.
