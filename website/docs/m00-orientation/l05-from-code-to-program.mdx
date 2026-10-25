@@ -34,7 +34,7 @@ import modelSolution from '!!raw-loader!@site/examples/m00/l05/seclog-model-solu
 
 Dein Quelltext ist Text. Ein Prozessor kann ihn nicht ausführen. In .NET sind dafür zwei Übersetzungsschritte nötig ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)):
 
-1. **Compiler:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. Microsoft Learn beschreibt IL als „CPU-independent set of instructions that can be efficiently converted to native code“. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
+1. **<Term id="compiler">Compiler</Term>:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. Microsoft Learn beschreibt IL als „CPU-independent set of instructions that can be efficiently converted to native code“. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
 2. **<Term id="jit">JIT (Just-in-Time-Compiler)</Term>:** Er gehört zur <Term id="clr">CLR</Term> und übersetzt die IL erst, wenn das Programm läuft, in Maschinencode für den Prozessor. Die Quelle sagt: Eine Methode wird beim ersten Aufruf übersetzt, danach läuft der gespeicherte Maschinencode.
 
 Der Maschinencode ist die erste Form, die der Prozessor direkt ausführen kann. Die CLR führt das Programm dann aus und bietet Dienste wie die automatische Speicherverwaltung.

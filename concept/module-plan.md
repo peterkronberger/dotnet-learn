@@ -21,7 +21,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 
 ## Existing content: early implementations
 
-The lessons that exist today – M0 `l01-first-program.mdx`, M1 `l02-variables-and-types.mdx` and `l03-numbers.mdx`, M2 `l01-control-flow.mdx`, and the page `learning-principles.mdx` – are early implementations (MVP). They do not follow the current rules. Every module, including M0–M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a). The page "Wie dieser Kurs funktioniert" is rebuilt as part of M0.
+M0 and the page "Wie dieser Kurs funktioniert" are rebuilt (module review 2026-10-25); no early M0 file is left. The lessons that still exist from the early implementation – M1 `l02-variables-and-types.mdx` and `l03-numbers.mdx`, M2 `l01-control-flow.mdx` – are early implementations (MVP). They do not follow the current rules. Every module, including M1 and M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a).
 
 ## Reference: which source counts as "the specification"
 
@@ -74,7 +74,14 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
   - STS support is 24 months, starting with .NET 9 (announced 2025-09-16). LTS stays 3 years.
   - .NET 8 (LTS) and .NET 9 (STS) both reach end of support on **2026-11-10**. L4 must reflect this at the first review after that date.
   - .NET 11 is planned for 2026-11-10 together with C# 15 (secondary source: Visual Studio Magazine, 2026-09-14). By the odd/even rule it is an STS release. The course base stays C# 14 / .NET 10 (LTS) – see `CLAUDE.md`.
-  - **Open question:** end of support for .NET 10 is 2028-11-14 on the .NET support policy page, but 2028-11-10 on the EF Core 10 "What's new" page. Use the support policy page as the primary source; recheck before writing L4.
+  - End of support for .NET 10 is **2028-11-14** (checked 2026-10-25, .NET support policy page, primary source). The EF Core 10 "What's new" page says 2028-11-10; that is not used.
+
+- **Placement test candidates** (component is planned; quiz format unchanged; every lesson covered at least once, no `explain` questions):
+  - `m00-l01-q1`, `m00-l01-q3`
+  - `m00-l02-q2`, `m00-l02-q3`, `m00-l02-q5`
+  - `m00-l03-q1`, `m00-l03-q2`
+  - `m00-l04-q1`, `m00-l04-q4`
+  - `m00-l05-q2`, `m00-l05-q3`
 
 ### M1 Erste Programme, Variablen, Typen (first programs, variables, types) ▶
 Statements and output · variables and built-in types · integer, floating point, `decimal` · strings and interpolation (*use* objects: `Length`, `ToUpper`) · type conversion and `Parse` · console input (through the runner's input field).
@@ -439,7 +446,6 @@ Secondary source:
 - Visual Studio Magazine, ".NET 11 RC1 gets go-live support ahead of November launch" (2026-09-14): https://visualstudiomagazine.com/articles/2026/09/14/net-11-rc1-gets-go-live-support-ahead-of-november-launch.aspx
 
 Open questions from the review:
-- End of support of .NET 10: 2028-11-14 (support policy) vs. 2028-11-10 (EF Core 10 page).
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
 - Playground support for files (M7) and System.Text.Json (M17): check before deciding ▶ or ◻.

@@ -86,7 +86,7 @@
       "related": [
         "dotnet"
       ],
-      "lesson": "m00-l01",
+      "lesson": "m00-l02",
       "source": {
         "title": "A tour of the C# language",
         "url": "https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/"
@@ -340,22 +340,6 @@
       }
     },
     {
-      "id": "property",
-      "term": "Property",
-      "german": "Eigenschaft",
-      "category": "language",
-      "definition": "Ein Wert, den ein Objekt bereitstellt und den du wie eine Variable liest. Beispiel: `\"World\".Length` liefert die Anzahl der Zeichen.",
-      "aliases": [
-        "Properties",
-        "Eigenschaften"
-      ],
-      "lesson": "m00-l01",
-      "source": {
-        "title": "Properties",
-        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/properties"
-      }
-    },
-    {
       "id": "selection-statement",
       "term": "Selection Statement",
       "german": "Verzweigung",
@@ -500,7 +484,7 @@
         "il",
         "compile-error"
       ],
-      "lesson": "m00-l02",
+      "lesson": "m00-l05",
       "source": {
         "title": "Managed Execution Process",
         "url": "https://learn.microsoft.com/dotnet/standard/managed-execution-process"
@@ -512,8 +496,7 @@
       "category": "platform",
       "definition": "Der C#-Compiler von .NET. Der Playground dieser Seite nutzt ihn, um deinen Code direkt im Browser zu kompilieren.",
       "related": [
-        "compiler",
-        "playground"
+        "compiler"
       ],
       "source": {
         "title": "The .NET Compiler Platform SDK",
@@ -569,46 +552,6 @@
         "title": ".NET releases, patches, and support",
         "url": "https://learn.microsoft.com/dotnet/core/releases-and-support"
       }
-    },
-    {
-      "id": "playground",
-      "term": "Playground",
-      "category": "course",
-      "definition": "Ein Editor auf dieser Seite, der C#-Code direkt in deinem Browser kompiliert und ausführt.",
-      "related": [
-        "roslyn"
-      ],
-      "lesson": "m00-l01"
-    },
-    {
-      "id": "prediction",
-      "term": "Vorhersage",
-      "category": "course",
-      "definition": "Ein Kasten vor einem Beispiel. Du überlegst zuerst, was der Code ausgibt, und führst ihn dann aus.",
-      "aliases": [
-        "Vorhersagen"
-      ],
-      "lesson": "m00-l01"
-    },
-    {
-      "id": "deep-dive",
-      "term": "Vertiefung",
-      "category": "course",
-      "definition": "Ein optionaler, einklappbarer Bereich. Du kannst ihn beim ersten Durchgang überspringen.",
-      "aliases": [
-        "Vertiefungen"
-      ],
-      "lesson": "m00-l01"
-    },
-    {
-      "id": "learning-goal",
-      "term": "Lernziel",
-      "category": "course",
-      "definition": "Ein Kasten am Anfang einer Lektion. Er nennt, was du danach können sollst.",
-      "aliases": [
-        "Lernziele"
-      ],
-      "lesson": "m00-l01"
     },
     {
       "id": "review",
