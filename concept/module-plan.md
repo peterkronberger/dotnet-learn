@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-10-25. 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 43 lesson proposals and 30 smaller parts inside lessons. Lessons only: 43 × 15–25 min = 645–1,075 min ≈ +11–18 h, so the new working assumption is about 70–100 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-10-25 (second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -40,7 +40,7 @@ Clauses of the draft and where they are taught:
 | Clause (draft) | Slug | Covered in |
 | --- | --- | --- |
 | §6 Lexical structure | `lexical-structure` | M1 (literals, comments, identifiers), M14 (preprocessing directives, only the ones listed there) |
-| §7 Basic concepts | `basic-concepts` | M6 (application startup, accessibility), M3 (declarations, scopes, signatures), M4 (automatic memory management, deep dive) |
+| §7 Basic concepts | `basic-concepts` | M6 (application startup, accessibility), M3 (declarations, scopes, signatures), M4 (automatic memory management, deep dive), M13 part B (execution order between threads) |
 | §8 Types | `types` | M1, M4, M8, M9, M16 (expression tree types) |
 | §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values) |
 | §10 Conversions | `conversions` | M1 (numeric), M4 (boxing, nullable), M5 (collection expressions), M8 (reference, user-defined), M10 (anonymous function and method group) |
@@ -48,8 +48,8 @@ Clauses of the draft and where they are taught:
 | §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13 |
 | §13 Statements | `statements` | M2, M3, M7, M11, M13 |
 | §14 Namespaces | `namespaces` | M6 |
-| §15 Classes | `classes` | M6, M8, M9, M10, M11, M13 |
-| §16 Structs | `structs` | M8 |
+| §15 Classes | `classes` | M6, M8 (incl. sealed classes and members), M9, M10, M11, M13 (async functions; volatile fields in part B) |
+| §16 Structs | `structs` | M8 (incl. "structs are implicitly sealed") |
 | §17 Arrays | `arrays` | M5 |
 | §18 Interfaces | `interfaces` | M8, M9 |
 | §19 Enums | `enums` | M8 |
@@ -68,7 +68,7 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
 2. C# vs. .NET: language vs. platform – runtime (CLR), standard library (BCL), SDK, compiler (Roslyn)
 3. The .NET family: .NET Framework (Windows only, no further development), .NET Core (cross-platform, open source), from .NET 5 on ".NET"; briefly Mono/Xamarin, .NET Standard. **Name clarification**: ".NET Core" ≠ "Entity Framework Core"; ".NET Framework Core" does not exist.
 4. History and versions: timeline, yearly release rhythm (November), LTS (even versions, 3 years) vs. STS (odd versions, **24 months since .NET 9**, before 18 months), support length. With an "as of" date; review twice a year.
-5. From code to running program: compiler → IL → JIT → CLR (medium depth, no machine code)
+5. From code to running program: compiler → IL → JIT → CLR (medium depth, no machine code). Plus the overview of execution models: JIT at run time (default), ReadyToRun (IL plus precompiled native code, less JIT work at startup), Native AOT (native code only, no JIT, limits on compatibility). Only the idea here; the build and publish commands come in M14.
 - Page "Wie dieser Kurs funktioniert": methods, limits, how to use it (Leitner, export/import), **one** paragraph on AI use while learning.
 - Facts already verified for L4: C#/.NET mapping C# 9/.NET 5, 10/.NET 6, 11/.NET 7, 12/.NET 8, 13/.NET 9, 14/.NET 10 (Roslyn wiki); .NET 10 = LTS, released 2025-11-11, support until November 2028. Check everything else (older years, .NET Framework versions) against Microsoft Learn when writing.
 - **Spec:** language vs. implementation: the standard describes the language, not the runtime or the library (draft: Scope, Conformance, Annex "Standard library"); the three source layers from "Reference" above, in learner words.
@@ -168,7 +168,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 - *(new)* Lesson "Where the program starts": entry point, top-level statements as generated `Main`, command-line arguments, exit code. (`CLAUDE.md` says "`Main` is explained later" – this is that place.)
 - *(new)* Short part "Documentation comments" for public members.
 - **Spec:**
-  - §15: class declarations and modifiers (`static`, `sealed`, `partial` only by name), members, accessibility (`public`, `private`, `internal`, `protected` – the last one in M8; `protected internal`/`private protected` only by name), instance and static fields, readonly fields vs. constants, methods, properties and accessors (incl. accessor accessibility), instance and static constructors, constructor overloading and chaining with `this`, `this` access; primary constructors: parameters are in scope for the whole class and are captured, they are **not** properties (unlike records).
+  - §15: class declarations and modifiers (static classes; sealed classes only by name here, taught in M8; partial types only by name), members, accessibility (`public`, `private`, `internal`, `protected` – the last one in M8; `protected internal`/`private protected` only by name), instance and static fields, readonly fields vs. constants, methods, properties and accessors (incl. accessor accessibility), instance and static constructors, constructor overloading and chaining with `this`, `this` access; primary constructors: parameters are in scope for the whole class and are captured, they are **not** properties (unlike records).
   - §7: accessibility domains; `internal` means "same assembly" (link M14 projects); application startup and termination, entry point rules, top-level statements.
   - §14: compilation units, namespace declarations (block and file-scoped), using directives (namespace, alias, static), global using directives; fully qualified names and the global namespace alias (short).
   - §12: object creation, target-typed object creation, object initializers, member access.
@@ -193,13 +193,16 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 
 ### M8 OOP II ▶
 Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · equality of objects.
-- *(new)* Lesson "Virtual, override and hiding" (incl. `sealed`, `base`, constructor chaining to the base class).
+- *(new)* Lesson "Virtual, override and hiding" (incl. `base`, constructor chaining to the base class).
+- *(new)* Lesson "Sealed classes and sealed members": stop inheritance on purpose; when to seal and when not (design guideline, not spec); link to records and structs.
 - *(new)* Lesson "Type tests and casts" (type test, safe cast, pattern-based test; link M12).
 - *(new)* Lesson "Enums" (named constants, underlying values, flags, parsing).
 - *(new)* Lesson "Comparing and sorting objects" (comparison interfaces, comparer objects).
 - *(new)* Short part "Composition vs. inheritance" (design guideline, not spec).
 - **Spec:**
-  - §15: base classes, inheritance of members, protected accessibility, virtual, override, sealed and abstract members, member hiding and the warning for it, base access, abstract classes; operator overloading and user-defined conversions (short or deep dive); indexers (deep dive).
+  - §15: base classes, inheritance of members, protected accessibility, virtual, override and abstract members, member hiding and the warning for it, base access, abstract classes;
+  - §15 (sealing): a sealed class cannot be a base class (compile error on derivation); a sealed member is only allowed together with an override and stops further overriding; a class cannot be sealed and abstract at the same time; a non-virtual member needs no sealing, because it cannot be overridden anyway;
+  - §16 (sealing): struct types are implicitly sealed, so there is no inheritance between structs; records: a record class can be sealed like a class; operator overloading and user-defined conversions (short or deep dive); indexers (deep dive).
   - §18: interface declarations and members, implementation and explicit interface member implementation, default interface members (C# 8, deep dive), interfaces as types.
   - §16: struct semantics (copy on assignment, value of `default`, no inheritance from other structs), readonly structs and readonly members, record structs (C# 10), boxing when a struct is used through an interface.
   - Records (in the draft): record class vs. record struct, positional records, compiler-generated members (value-based equality, `ToString`, deconstruction, copy constructor), records and inheritance.
@@ -207,7 +210,8 @@ Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · e
   - §12: type-testing operator, `as` operator, explicit reference conversions and their runtime check.
   - §8/§10: implicit and explicit reference conversions.
 - **Library (not spec):** the virtual members of `object` and the equality contract (`Equals` and `GetHashCode` must agree), `IEquatable<T>`, `IComparable<T>`/`IComparer<T>`, flags attribute for enums, `Enum.Parse`/`TryParse`.
-- More misconceptions: a record is always immutable; an enum variable can only hold its named values; overriding `Equals` without `GetHashCode` is harmless.
+- **Library / tooling (not spec), sealing:** the .NET design guidelines on sealing (check the current wording when writing); the code analysis rule that suggests sealing internal types (check rule id and text on Microsoft Learn).
+- More misconceptions: a record is always immutable; an enum variable can only hold its named values; overriding `Equals` without `GetHashCode` is harmless; a sealed class makes its objects immutable (sealing is about inheritance, not about state).
 
 ### W2 Wiederholung M5–M8 ▶
 
@@ -265,25 +269,53 @@ Type, property, relational and list patterns · `switch` expressions · `record`
   - Deconstruction: user-defined deconstruct methods and how positional patterns use them.
 - More misconceptions: `with` changes the original; the order of switch arms does not matter.
 
-### M13 async/await ▶
+### M13 async/await und Nebenläufigkeit (async/await and concurrency) ▶ (part A) · ◻ (part B)
 `Task` · `async`/`await` · exceptions in asynchronous code · cancellation (`CancellationToken`).
 Misconception: `async` starts a new thread automatically. Note: the playground runs on one thread (WebAssembly). True parallelism only as an example that cannot run.
+
+The module has two parts. Part A (asynchrony) is runnable. Part B (threads and concurrency) is **not runnable in the browser, but it is a core concept and is taught in full depth**, not only as a deep dive. If the module grows too long, part B may become its own module at a later renumbering; until then it stays in M13 (module order rule).
+
+**Part A – Asynchrony ▶**
 - *(new)* Lesson "Waiting for several tasks" (all, any; timeouts).
 - *(new)* Lesson "Async streams" (asynchronous iteration).
 - *(new)* Async disposal.
 - *(new)* Part "Pitfalls": async void (only for event handlers), blocking on a task (deadlock risk, ◻), I/O-bound vs. CPU-bound work.
-- *(new)* Deep dive ◻ "Shared data and locks" (thread safety only as a concept).
-- **Spec:**
+- **Spec (part A):**
   - §15: async functions, the allowed return types (task types, void, async iterators), evaluation of an async function (runs synchronously until the first await of an incomplete task).
   - §12: await expressions, the awaitable pattern; an exception in an async method is stored in the task and rethrown at the await.
-  - §13: asynchronous foreach and asynchronous using (C# 8); the lock statement (deep dive).
-- **Library (not spec):** `Task`/`Task<T>`, `ValueTask` (only by name), `Task.WhenAll`/`WhenAny`, cancellation tokens and their sources, `IAsyncEnumerable<T>`, `IAsyncDisposable`, synchronization context and `ConfigureAwait` (deep dive, library code).
-- **Badge:** the `System.Threading.Lock` type with the lock statement (C# 13 / .NET 9, deep dive only).
-- More misconceptions: `await` blocks the thread; an exception in an awaited task is lost.
+  - §13: asynchronous foreach and asynchronous using (C# 8).
+- **Library (part A, not spec):** `Task`/`Task<T>`, `ValueTask` (only by name), `Task.WhenAll`/`WhenAny`, cancellation tokens and their sources, `IAsyncEnumerable<T>`, `IAsyncDisposable`, synchronization context and `ConfigureAwait` (deep dive, library code).
+- More misconceptions (part A): `await` blocks the thread; an exception in an awaited task is lost.
+
+**Part B – Threads and concurrency ◻** *(new, replaces the former deep dive "Shared data and locks")*
+1. *(new)* Lesson "Concurrency, parallelism, asynchrony": three different ideas; process, thread, processor core; the scheduler interleaves threads – the order of steps between threads is not fixed.
+2. *(new)* Lesson "Threads and the thread pool": what a thread is, why application code rarely creates threads itself, the thread pool, starting CPU-bound work as a task, how this connects to part A (an await does not need a thread while it waits).
+3. *(new)* Lesson "Race conditions": shared mutable data, read-modify-write is not atomic (a simple increment is three steps), lost updates, check-then-act; why a test that passes many times proves nothing.
+4. *(new)* Lesson "Mutual exclusion with locks": critical sections, the lock statement, a dedicated private lock object (never lock on publicly reachable objects), the lock is released also when an exception occurs, keep locks short, no await inside a lock.
+5. *(new)* Lesson "Deadlocks and other hazards": circular waiting, fixed lock order, timeouts to detect it; sync-over-async deadlock (link part A); starvation and livelock only by name.
+6. *(new)* Lesson "Atomic operations and visibility": atomic operations for simple counters and exchanges; the memory model in plain words (without synchronization, a write in one thread may be seen late or reordered by another); volatile only as a concept and as a warning (not a replacement for locks).
+7. *(new)* Lesson "Strategies for thread safety": avoid sharing (confinement), immutable data (link records M8, immutability M4), thread-safe collections, synchronize only where data is shared; .NET instance members are in general not thread safe – read the documentation of a type; static mutable state is dangerous; in a web app many requests run at the same time, so a singleton service must be thread safe (link M15/M17).
+8. *(new)* Lesson "Data parallelism": parallel loops, async parallel loops, PLINQ; overhead and when parallel code is slower; the serial part limits the possible speedup (Amdahl's law – add a source before use); results order and side effects.
+9. *(new)* Lesson "Coordinating workers": producer/consumer with channels, limiting concurrency with an async-compatible semaphore, cancellation for several workers; SecLog: analyze many log files in parallel and collect results safely.
+- **Spec (part B):**
+  - §13: the lock statement (what it guarantees: mutual exclusion on one object, release on every exit path) and which expressions are allowed as the lock target.
+  - §15: volatile fields (what the standard promises about ordering, and what it does not); static constructors run at most once.
+  - §7: execution order – the standard only guarantees the order of side effects as observed by one thread; other threads can observe other orders.
+  - §12: await expressions again (await does not block the thread; link part A).
+- **Library (part B, not spec):** `System.Threading` (threads, thread pool, `Interlocked`, `Monitor` only by name, `SemaphoreSlim`, `System.Threading.Lock`), Task Parallel Library (`Task.Run`, `Parallel`), PLINQ, `System.Collections.Concurrent`, `System.Threading.Channels`; Microsoft Learn "Managed threading best practices" as the main reference.
+- **Badge:** the `System.Threading.Lock` type with the lock statement (C# 13 / .NET 9) – now part of the main lesson 4.
+- **Didactics for part B (no runner):**
+  - Notional machine: interleaving tables and sequence diagrams (`<Diagram>`) that show two threads step by step; learners trace them by hand.
+  - Tasks: "Which outputs are possible?" (`multi`), find the race (`find-bug`), put the steps of an interleaving in order (`parsons`), explain in your own words why a lock fixes it.
+  - Literature on prior conceptions of concurrency (check and add to `didactics.md` before use): Kolikant 2001, *Computer Science Education* 11(3), 221–245, https://doi.org/10.1076/csed.11.3.221.3831 (verified 2026-10-25); a 2010 *Communications of the ACM* article on beginners' commonsense understanding of concurrency ("concert tickets"; authors and pages not verified yet).
+- **Rule 4 (real outputs) for part B:** a racy program has no fixed output, so it cannot have a CI snapshot. Shown outputs only come from deterministic examples (for example the correctly synchronized counter). Racy examples are shown as code plus a *hand-traced* list of possible results that is labeled as such, never as a claimed real output. Open question for S2: a "compile only" mode in `tools/check-examples.sh` so racy examples are still compiled in CI.
+- More misconceptions (part B): more threads always make a program faster; a simple increment is atomic; a program that ran correctly 100 times has no race; `volatile` makes code thread safe; async code and multithreaded code are the same.
 
 ### M14 Testen (testing) ◻
 xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. The test runner output is produced in CI (S2).
 - *(new)* Lesson "From the playground to a project" (first lessons of the module): the SDK and the `dotnet` CLI, file-based apps (one `.cs` file, .NET 10) as the bridge from the playground, SDK-style project file (target framework, nullable, implicit usings, warnings as errors), solutions and project references, NuGet package references, build configurations, assemblies (link `internal` from M6).
+- *(new)* Lesson "Build and run": the difference between build and publish; build configurations (Debug vs. Release, what changes); the ways to start a program – `dotnet run` (project or single file), the apphost executable, `dotnet <app>.dll`; runtime version roll-forward to the newest installed patch (framework-dependent only).
+- *(new)* Lesson "Publishing options" (decision table): framework-dependent (needs an installed runtime, small) incl. the cross-platform DLL without apphost; self-contained (runtime included, platform-specific, patches only through a new build); runtime identifiers (target OS and architecture); single-file; ReadyToRun (faster startup, larger files); Native AOT (no JIT, no installed runtime, but limited library compatibility, longer builds, one build per platform; must be set in the project file); trimming (smaller self-contained output, risk of removed code); container images directly from the SDK (.NET 8 SDK and newer, no Dockerfile needed; a container runtime is needed to run them). For each option: how the result is started.
 - *(new)* Lesson "Using a debugger" (breakpoints, stepping, watching variables; tool-neutral, ◻).
 - *(new)* Lesson "Attributes" (▶ possible: obsolete warnings, caller info) – needed for `[Fact]`, ASP.NET Core and EF Core.
 - *(new)* Lesson "Test doubles": hand-written fakes first; mocking libraries only by name.
@@ -293,15 +325,17 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
   - §22: attribute classes, attribute usage, positional and named parameters, attribute targets, reserved attributes (conditional, obsolete, caller info attributes, attribute usage).
   - §6: preprocessing directives – only conditional compilation symbols (Debug/Release), the nullable directive and the directives of file-based apps; nothing else.
   - §7: assemblies as the unit of deployment and accessibility (`internal`).
+- **Tooling (not spec), build and publish:** `dotnet build`/`run`/`publish`, publish properties for self-contained, single-file, ReadyToRun, Native AOT and trimming, the RID catalog, SDK container publishing; Microsoft Learn ".NET application publishing overview" and "Containerize a .NET app with dotnet publish" as main references. Shown publish outputs (file lists, sizes) only from CI runs, and sizes with units (MB) and the date of the run, because they change between SDK versions.
 - **Library / tooling (not spec):** xUnit.net (check current major version, v3 at the time of writing), test platforms VSTest vs. Microsoft.Testing.Platform (MTP); MSTest, NUnit and TUnit only by name; data-driven tests; `TimeProvider` (.NET 8) and `FakeTimeProvider` (package `Microsoft.Extensions.TimeProvider.Testing`).
 - **Badge:** `TimeProvider` (.NET 8); file-based apps (.NET 10 SDK).
-- More misconceptions: a test that never fails is a good test; 100 % coverage means no bugs.
+- More misconceptions: a test that never fails is a good test; 100 % coverage means no bugs; a Debug build is fine for production; self-contained apps get runtime security patches automatically; Native AOT works with every library.
 
 ### W4 Wiederholung M12–M14 ▶
 
 ### M15 Dependency Injection und Hosting ▶
 Dependencies through interfaces · `ServiceCollection` · lifetimes · logging · configuration/options. Runnable for DI and logging. Configuration/options and hosting cannot run (missing in the playground, see S6).
 - *(new)* Captive dependencies and scope validation (a singleton must not hold a scoped service).
+- *(new)* Lifetimes and thread safety: a singleton is shared by all callers at the same time, so its state must be thread safe (link M13 part B).
 - *(new)* Structured logging (message templates, log levels, categories).
 - *(new)* Configuration sources and their order (JSON files, environment variables, command line), environments; secrets do not go into source code (user secrets / environment variables).
 - *(new)* Generic host and background services (◻, short).
@@ -333,6 +367,7 @@ Routing, handlers · binding and validation · status codes · middleware pipeli
 - *(new)* Lesson "Who may call the endpoint?": authentication vs. authorization as a concept, defensive (SecLog incident API).
 - *(new)* Integration tests for endpoints (link M14, CI only).
 - *(new)* Cancellation in request handlers (link M13).
+- *(new)* Lesson "Running an ASP.NET Core app" ◻: an ASP.NET Core app is a console app with the built-in web server Kestrel; publish to a folder and start it; a process manager starts and restarts it; optional reverse proxy in front of Kestrel (Nginx or IIS only by name) and the forwarded headers it needs; environments (development vs. production); container image from the SDK (link M14). Concepts only, no provider-specific steps.
 - **Spec:** no new language content; uses lambdas (M10), attributes (M14), records (M8), async (M13).
 - **Library (not spec):** ASP.NET Core 10 Minimal APIs; built-in validation (`AddValidation`, data annotations, `IValidatableObject`; some validation attributes are experimental in .NET 10); typed results; middleware order; configuration and environments (link M15); `Microsoft.AspNetCore.OpenApi`.
 - More misconceptions: validation runs automatically without registration; middleware order does not matter.
@@ -359,11 +394,11 @@ Content of the specification or platform that the course leaves out, and why. "O
 | Interop (P/Invoke, COM), `extern` members, extern alias | §15, §14 | Platform-specific; not needed for cross-platform web and console apps. |
 | Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, …) | §6 | Tool and editor concerns; no effect on program logic. |
 | UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), `nameof` of unbound generic types (C# 14) | feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
-| Multithreading and parallel programming (threads, parallel loops, PLINQ, channels, concurrent collections) | library | The playground runs on one thread (WebAssembly); the topic needs its own course. Only the concept "shared data needs synchronization" in the M13 deep dive. |
+| Low-level threading primitives and expert topics: wait handles and mutexes across processes, spin locks, lock-free algorithms, TPL Dataflow, custom task schedulers and partitioners | library | Expert topics; Microsoft's best practices point to higher-level APIs. Multithreading as such **is** covered in full in M13 part B (concepts, race conditions, locks, deadlocks, atomic operations, thread-safe design, parallel loops, channels) – only without runnable examples, because the playground runs on one thread. |
 | Garbage collector internals, finalization details, memory profiling | runtime | Implementation detail, not specified by the standard (§7 only requires automatic memory management). Only a deep dive in M4/M7. |
 | Regular expressions | library | Useful for log parsing, but a separate language. Optional deep dive in M5 at most; SecLog uses string methods. |
 | Cryptography, password hashing, writing own security code | library | The SecLog domain is defensive and analytic; writing security primitives yourself is a known source of vulnerabilities. Only the advice "use vetted platform APIs". |
-| Native AOT, trimming, containers, cloud deployment | tooling | Deployment is outside the end goal. Only by name in M14. |
+| Provider-specific deployment (cloud services, IIS configuration details), CI/CD pipelines, container orchestration | tooling | Step-by-step guides depend on one provider and change often. The build options, publishing options and ways to run a program (framework-dependent, self-contained, single-file, ReadyToRun, Native AOT, trimming, containers, hosting an ASP.NET Core app) **are** covered in M0 L5 (idea), M14 and M17. |
 | Blazor, MAUI, WPF, WinForms, Unity, gRPC, SignalR | frameworks | Outside the end goal (see top of file). |
 | .NET Framework-only technology (AppDomains, remoting, WCF server) | platform | Not available in modern .NET; only mentioned as history in M0. |
 | C# 15 / .NET 11 features | – | .NET 11 is an STS release (planned 2026-11-10). The course base is C# 14 / .NET 10 LTS. Review at the next half-yearly review (2027-04). |
@@ -393,6 +428,14 @@ Primary sources:
 - Microsoft Learn, What's new in EF Core 10: https://learn.microsoft.com/ef/core/what-is-new/ef-core-10.0/whatsnew
 - Microsoft Learn, Validation in ASP.NET Core: https://learn.microsoft.com/aspnet/core/validation/overview – updated 2026-10-16.
 - .NET Blog, OpenAPI document generation in .NET 9 (2024-11-25): https://devblogs.microsoft.com/dotnet/dotnet9-openapi/
+- Microsoft Learn, sealed modifier (C# reference): https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/sealed – updated 2026-06-05.
+- Microsoft Learn, Managed threading best practices: https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices – updated 2026-03-13.
+- Microsoft Learn, Parallel programming in .NET: https://learn.microsoft.com/dotnet/standard/parallel-programming/ – updated 2026-08-13.
+- Microsoft Learn, Channels: https://learn.microsoft.com/dotnet/core/extensions/channels
+- Microsoft Learn, .NET application publishing overview: https://learn.microsoft.com/dotnet/core/deploying/ – updated 2025-10-28.
+- Microsoft Learn, Containerize a .NET app with dotnet publish: https://learn.microsoft.com/dotnet/core/containers/sdk-publish – updated 2026-05-27.
+- Microsoft Learn, Host and deploy ASP.NET Core: https://learn.microsoft.com/aspnet/core/host-and-deploy/
+- Kolikant, Y. B.-D. (2001). Gardeners and cinema tickets: High school students' preconceptions of concurrency. *Computer Science Education, 11*(3), 221–245. https://doi.org/10.1076/csed.11.3.221.3831
 
 Secondary source:
 - Visual Studio Magazine, ".NET 11 RC1 gets go-live support ahead of November launch" (2026-09-14): https://visualstudiomagazine.com/articles/2026/09/14/net-11-rc1-gets-go-live-support-ahead-of-november-launch.aspx
@@ -402,3 +445,6 @@ Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
 - Playground support for files (M7) and System.Text.Json (M17): check before deciding ▶ or ◻.
+- M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
+- M8: current wording of the .NET design guidelines on sealing and the id of the analysis rule that suggests sealing internal types.
+- M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.
