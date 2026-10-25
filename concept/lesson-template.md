@@ -12,7 +12,7 @@ Reference lesson as a pattern: `website/docs/m01-variables-and-types/l03-numbers
 | --- | --- | --- | --- |
 | 1 | Learning goals ("Lernziele") | `:::note[Lernziele]`, 2–4 points | As observable behavior: "Du kannst …" (you can …), "Du erkennst …" (you recognize …) |
 | 2 | Warm-up | 2–3 `<Quiz>` on earlier lessons | Heading "Rückblick" (review); retrieval practice, not new material |
-| 3 | Concept | Short text + small, isolated example | Only the current concept; no project context |
+| 3 | Concept | Short text + small, isolated example | Only the current concept; no project context. First use of a technical term: `<Term id="…">`, entry in the glossary |
 | 4 | Practice example | **Practice-example pattern** (below) | Required, at least once |
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
 | 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |

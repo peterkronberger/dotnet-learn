@@ -10,6 +10,7 @@ This document is binding for all work in the repo – for humans and for Claude 
 | --- | --- |
 | `website/` | Docusaurus site. Lessons in `website/docs/`, components in `website/src/components/` |
 | `website/examples/` | **All** C# examples as `.cs` files (one source for all languages, checked by CI) – see S1/S2 and "Example folders" below |
+| `website/src/data/glossary/` | Glossary entries per language (`de.json`), format in its `README.md` |
 | `website/src/data/quiz/` | Quiz questions per language and module (`de/mXX.json`), format in its `README.md` |
 | `website/plugins/` | Local Docusaurus plugins (`lesson-index.js`) |
 | `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded by iframe |
@@ -80,7 +81,7 @@ A lesson is done when all points are met:
 11. Every misconception box is linked to at least one wrong answer in the quiz.
 12. At least one task "In eigenen Worten erklären" (explain in your own words).
 
-In addition: `npm run build` passes, no dead links, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
+In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
 
 ## Status of the spikes (prototype tasks)
 

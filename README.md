@@ -65,6 +65,7 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/les
 - Reference lesson (pattern for new lessons): `website/docs/m01-variables-and-types/l03-numbers.mdx`.
 - Check quiz data and MDX references: `node tools/check-quiz.mjs`.
 - Version badge (only features from C# 12 / .NET 8, otherwise build error): `<Since csharp="12" dotnet="8" />` inline; with children (old code) as a collapsible "So schrieb man es vorher".
+- Glossary link: `<Term id="value-type" />` (renders "Value Type (Werttyp)") or `<Term id="value-type">Werttypen</Term>`, only at the first use of a term in a lesson. Entries: `website/src/data/glossary/de.json`. An unknown id fails `node tools/check-quiz.mjs` and the build.
 - Switcher box: `<FromLanguage>` with `<TabItem value="java|python|js|go|cpp">` as children (the component sets labels and order; the choice applies to all boxes via `groupId="from-language"`). Example: `website/src/pages/dev/components-demo.mdx`.
 
 ```mdx

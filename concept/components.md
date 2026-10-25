@@ -71,10 +71,19 @@ Planned:
 
 | Component | Status | Purpose |
 | --- | --- | --- |
+| `<Term id="…">` | available | Link to the glossary entry at the first use of a term in a lesson (`<Term id="value-type" />`, or own link text as children) |
 | `<Since csharp="13" dotnet="9" />` | available | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
 | `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`), plus C++ (`cpp`) only where it fits, e.g. memory or `struct`; the choice is kept across pages (`groupId="from-language"`) |
 | Feedback link | planned (B8) | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
 | `<CodeBlock>` | Official Docusaurus component for code that cannot run, taken from `.cs` files |
+
+## Glossary – available
+
+- Page `/glossary` (navbar "Glossar") with a search field.
+- Data: `website/src/data/glossary/<locale>.json`, format in its `README.md`.
+- Anchors: `/glossary#<id>`.
+- `<Term id="…">` is a normal link (no tooltip, because of WCAG 2.2 SC 1.4.13). An unknown id fails the build.
+- Checks: `node tools/check-quiz.mjs` (glossary data and `<Term>` ids).
 
 ## Site extensions
 

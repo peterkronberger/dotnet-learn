@@ -5,7 +5,7 @@
 - **Lesson text and learner-facing UI:** German. Several languages will come through the built-in Docusaurus i18n (`i18n.locales`, only `de` for now). Translations come later under `website/i18n/<locale>/…`. MDX pages are translated as a whole.
 - **Everything else** (docs, concept files, PRs, commits, issues): English.
 - **Code, identifiers, code comments:** always English – also in examples, quizzes and the playground start code. Explanations belong in the body text or in the solution, not in German comments.
-- **Technical terms:** English. At first use, add a German explanation: "Value Type (Werttyp)". Every term goes into the glossary.
+- **Technical terms:** English. At first use, add a German explanation: "Value Type (Werttyp)". Every term goes into the glossary (`website/src/data/glossary/de.json`). At the first use in a lesson, link it with `<Term id="…">`; later uses stay plain text.
 - **UI texts** (React components): use `<Translate>`/`code.json`, do not hard-code them.
 - **Quiz texts, learning goals, hints:** in language-specific data files (see `components.md`).
 - **Slugs:** English, so URLs stay the same in all languages.

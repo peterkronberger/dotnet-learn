@@ -17,6 +17,7 @@ paths:
 - Quiz questions live in `website/src/data/quiz/de/mXX.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="…" />`, no inline quiz.
 - Every "Achtung" box (misconception) starts with `<Misconception id="…" />` as its first line and is linked to at least one wrong quiz answer.
 - After changing quiz data or misconception boxes, run `node tools/check-quiz.mjs`.
+- New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
 - End with "Weiterlesen" (further reading): 1–3 links to Microsoft Learn or the C# specification. The links must exist.
 - Before writing, check in the spike table in `CLAUDE.md` whether a spike that is not decided yet blocks the module.

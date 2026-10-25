@@ -1,0 +1,6 @@
+/* Normal link color, dotted underline to tell glossary links apart. */
+.term {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 0.2em;
+}

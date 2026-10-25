@@ -203,6 +203,7 @@ check('quiz data', dataErrors);
 const glossaryDir = join(website, 'src/data/glossary');
 const glossaryErrors = [];
 const glossaryLessons = [];
+const glossaryIds = new Set();
 for (const file of readdirSync(glossaryDir).filter((n) => n.endsWith('.json'))) {
   let data;
   try {
@@ -213,6 +214,7 @@ for (const file of readdirSync(glossaryDir).filter((n) => n.endsWith('.json'))) 
   }
   glossaryErrors.push(...validateGlossary(data.terms).map((e) => `${file}: ${e}`));
   for (const t of Array.isArray(data.terms) ? data.terms : []) {
+    if (typeof t?.id === 'string' && file === 'de.json') glossaryIds.add(t.id);
     if (t?.lesson) glossaryLessons.push({id: t.id, lesson: t.lesson});
   }
 }
@@ -221,6 +223,7 @@ check('glossary data', glossaryErrors);
 // 2. MDX references
 const mdxFiles = [...walk(join(website, 'docs'), '.mdx'), ...walk(join(website, 'src/pages'), '.mdx')];
 const mdxErrors = [];
+const glossaryRefErrors = [];
 const anchors = new Set();
 const lessonIds = new Set();
 for (const file of mdxFiles) {
@@ -231,11 +234,15 @@ for (const file of mdxFiles) {
     if (!exact) mdxErrors.push(`${rel}: <Quiz> must have the form <Quiz id="…" />: ${m[0].slice(0, 60)}`);
     else if (!idsByLocale.de?.has(exact[1])) mdxErrors.push(`${rel}: unknown quiz id ${exact[1]}`);
   }
+  for (const m of text.matchAll(/<Term\s+id="([^"]+)"/g)) {
+    if (!glossaryIds.has(m[1])) glossaryRefErrors.push(`${rel}: unknown glossary id ${m[1]}`);
+  }
   for (const m of text.matchAll(/<Misconception id="([^"]+)"\s*\/>/g)) anchors.add(m[1]);
   const lesson = /^lesson_id:\s*(\S+)/m.exec(text);
   if (lesson) lessonIds.add(lesson[1]);
 }
 check('MDX quiz references', mdxErrors);
+check('glossary references', glossaryRefErrors);
 
 // 3. Misconception links (DoD 11)
 const referenced = new Set();
