@@ -193,9 +193,6 @@ export default function SearchBar() {
       onBlur={(event) => {
         if (!formRef.current.contains(event.relatedTarget)) setFocused(false);
       }}>
-      <label htmlFor={inputId} className="sr-only">
-        <Translate id="search.label">Inhalte durchsuchen</Translate>
-      </label>
       <input
         ref={inputRef}
         id={inputId}
