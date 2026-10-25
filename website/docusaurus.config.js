@@ -70,6 +70,8 @@ const config = {
           {to: '/playground', label: 'Playground', position: 'left'},
           {to: '/dashboard', label: 'Lernstand', position: 'left'},
           {to: '/glossary', label: 'Glossar', position: 'left'},
+          // Right side order: search, GitHub link, color mode toggle (the toggle is always last).
+          {type: 'search', position: 'right'},
           {
             href: 'https://github.com/peterkronberger/dotnet-learn',
             label: 'GitHub',
