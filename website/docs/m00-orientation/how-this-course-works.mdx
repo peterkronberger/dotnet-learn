@@ -1,0 +1,111 @@
+---
+title: Wie dieser Kurs funktioniert
+sidebar_position: 6
+description: Wie eine Lektion aufgebaut ist, welche Lernmethoden dahinterstehen, wie du mit dem Leitner-System wiederholst und wo die Grenzen der Forschung liegen.
+---
+
+# Wie dieser Kurs funktioniert
+
+Diese Seite erklärt, wie der Kurs aufgebaut ist und warum. Sie ist keine Lektion: Es gibt keine Quizfragen und keinen Eintrag im Lernpfad. Kurzzitate wie [Dunlosky 2013] verweisen auf die Literaturliste am Ende.
+
+## Wie eine Lektion aufgebaut ist
+
+Jede Lektion dauert etwa 15 bis 25 Minuten und behandelt ein Konzept. Der Ablauf ist immer ähnlich:
+
+1. **Lernziele:** Was du nach der Lektion kannst, als beobachtbares Verhalten.
+2. **Rückblick:** Zwei bis drei Fragen zu früheren Lektionen.
+3. **Konzept:** Ein kurzer Text mit einem kleinen Beispiel.
+4. **Übungsbeispiel:** Du sagst die Ausgabe voraus, führst den Code aus und liest dann die Erklärung.
+5. **Lückenbeispiel und eigene Aufgabe:** Du ergänzt Code und schreibst danach selbst welchen.
+6. **Achtung-Kästen:** Typische Denkfehler werden gezielt angesprochen.
+7. **Abschluss:** Quiz, eine Erklärung in eigenen Worten und eine Transferfrage.
+
+Code, den der Browser nicht ausführen kann (zum Beispiel ASP.NET Core), steht als normaler Codeblock da. Alle gezeigten Ausgaben stammen aus echten Programmläufen.
+
+## Warum so? Die Lernmethoden
+
+Die Tabelle zeigt, welche Methode wo umgesetzt ist und worauf sie sich stützt.
+
+| Methode | Umsetzung hier | Quelle |
+| --- | --- | --- |
+| Ausgearbeitete Beispiele mit Ausblenden (Fading) | Vollständiges Beispiel, dann Beispiel mit Lücken, dann freie Aufgabe | [Kalyuga 2003] |
+| Teilziel-Beschriftungen (Subgoal Labels) | Jedes Beispiel ist in benannte Schritte gegliedert | [Margulieux & Catrambone 2016], [Margulieux 2020] |
+| PRIMM (Predict, Run, Investigate, Modify, Make) | Vorhersagen, ausführen, untersuchen, ändern, selbst schreiben | [Sentance 2019] |
+| Explizite Vorhersage | Eingabefeld pro Ausgabezeile, danach ein nüchternes ✓/✗ | [Brod 2021], [Brod 2022] |
+| Abrufübung (Retrieval Practice) | Rückblick am Anfang, Quiz am Ende jeder Lektion | [Roediger & Karpicke 2006], [Dunlosky 2013] |
+| Verteiltes Wiederholen (Spaced Repetition) | Leitner-System und die Seite „Lernstand“ | [Cepeda 2006], [Dunlosky 2013] |
+| Lesen und nachverfolgen vor dem Schreiben | Code lesen und Ausgabe vorhersagen, dann „In eigenen Worten erklären“ | [Lopez 2008] |
+| Denkfehler gezielt ansprechen | Achtung-Kästen; falsche Quizantworten stammen aus typischen Denkfehlern | [Qian & Lehman 2017] |
+| Gedankenmodell der Maschine (Notional Machine) | Vereinfachte, aber korrekte Modelle der Ausführung, etwa Speicherbilder und Schritt-für-Schritt-Ansicht | [Sorva 2013], [Guo 2013] |
+| Erklärendes Feedback | Jede Quizantwort sagt, *warum* sie stimmt oder nicht | [Hattie & Timperley 2007] |
+| Erweiterte Compilermeldungen (geplant) | Deutsche Erklärung häufiger Fehler zusätzlich zur Originalmeldung | [Becker 2016] |
+
+Zur Reihenfolge der Inhalte: Ob man zuerst Objekte oder zuerst Prozedurales lehrt, ist empirisch weitgehend neutral. Wichtiger sind Lernziel und Qualität des Materials [Ehlert & Schulte 2009]. Dieser Kurs beginnt prozedural; eigene Klassen kommen ab Modul 6. Jede Lektion wird außerdem gegen fünf Punkte geprüft: echte Aufgabe, Vorwissen aktivieren, Beispiel zeigen, mit Feedback anwenden, Transfer [Merrill 2002].
+
+## Anfänger und Umsteiger
+
+Der Kurs richtet sich an zwei Gruppen. Anfänger brauchen ausführliche Beispiele. Wer schon eine andere Sprache kann, wird davon gebremst. Dieses Phänomen heißt Expertise-Umkehr-Effekt (Expertise Reversal Effect) [Kalyuga 2003].
+
+Deshalb gibt es einen gemeinsamen Kernpfad und dazu:
+
+- **Optionale Vertiefungen:** einklappbare Abschnitte, damit Anfänger nicht überladen werden.
+- **Umsteiger-Kästen** „Kommst du aus …?“ mit Tabs für Java, Python, JavaScript/TypeScript und Go. Sie zeigen nur die Unterschiede zu C#. Deine Wahl bleibt lokal gespeichert.
+- **Einstufungstest pro Modul:** Er ist geplant, aber noch nicht verfügbar. Vorgesehen sind 8 bis 12 Fragen. Bei 80 % oder mehr gilt ein Modul als bekannt. Die 80 % sind eine Entscheidung, kein empirischer Wert.
+
+## Wiederholen mit dem Leitner-System
+
+Die Fragen aus den Quizzen landen im <Term id="leitner-system">Leitner-System</Term>. Es hat fünf Boxen. Eine richtig beantwortete Frage rückt eine Box weiter und kommt später wieder. Eine falsch beantwortete Frage fällt zurück.
+
+Die Abstände betragen zu Beginn 1, 2, 4, 8 und 16 Tage. Das sind Annahmen, keine gemessenen Werte; sie können angepasst werden.
+
+Zur Anzeige werden die Boxen zu drei Stufen zusammengefasst:
+
+| Stufe | Boxen |
+| --- | --- |
+| wackelig | Box 1 |
+| im Aufbau | Box 2 und 3 |
+| gefestigt | Box 4 und 5 |
+
+Auch diese Einteilung ist eine Entscheidung, kein empirischer Wert. Auf der Seite [Lernstand](/dashboard) siehst du, was heute fällig ist, wie weit du im Lernpfad bist und wie dein <Term id="learning-status">Wissensstand</Term> aussieht. Es gibt dort keine Serien, Punkte oder Abzeichen.
+
+## Deine Daten bleiben bei dir
+
+- Der Kurs hat kein Tracking und keine Konten.
+- Dein Lernfortschritt liegt nur lokal in deinem Browser.
+- Auf der Seite [Lernstand](/dashboard) kannst du ihn unter „Deine Daten“ als JSON-Datei exportieren und wieder importieren. So kannst du ihn sichern oder auf ein anderes Gerät mitnehmen.
+
+Löschst du die Browserdaten ohne Export, ist der Fortschritt weg.
+
+## KI beim Lernen
+
+Löse Übungen zuerst ohne KI. In einer randomisierten kontrollierten Studie (RCT) mit 52 Softwareentwicklern, die eine unbekannte Python-Bibliothek lernen sollten, schnitten die Teilnehmenden mit KI-Hilfe im anschließenden Verständnistest schlechter ab als die ohne; der Zeitgewinn war nicht signifikant [Shen & Tamkin 2026]. Die Stichprobe war klein und der Zeitraum kurz. Die Autoren arbeiten bei Anthropic, einem Hersteller von KI-Modellen; dieser Interessenkonflikt gehört zur Einordnung der Studie. Mehr dazu und zu weiteren Studien folgt in Modul 19.
+
+## Grenzen
+
+- Viele Befunde stammen aus Gedächtnis-, Schul- oder Mathematik-Settings. Dass sie beim Programmieren ähnlich ausfallen, ist plausibel, aber nicht für jede Methode direkt gezeigt.
+- Die Studie zu expliziten Vorhersagen untersucht das Lernen von Fakten, nicht von Programmcode [Brod 2022].
+- Schwellen wie die 80 % beim Einstufungstest und die Leitner-Abstände sind Entscheidungen, keine empirisch ermittelten Werte.
+- Die Seite misst ihren eigenen Lernerfolg nicht, weil sie nichts trackt.
+
+## Literatur
+
+- [Becker 2016] Becker, B. A., Glanville, G., Iwashima, R., McDonnell, C., Goslin, K., & Mooney, C. (2016). Effective compiler error message enhancement for novice programming students. *Computer Science Education, 26*(2–3), 148–175.
+- [Brod 2021] Brod, G. (2021). Predicting as a learning strategy. *Psychonomic Bulletin & Review*. https://doi.org/10.3758/s13423-021-01904-1
+- [Brod 2022] Brod, G., Greve, A., Jolles, D., Theobald, M., & Galeano-Keiner, E. M. (2022). Explicitly predicting outcomes enhances learning of expectancy-violating information. *Psychonomic Bulletin & Review, 29*, 2192–2201. https://doi.org/10.3758/s13423-022-02124-x
+- [Cepeda 2006] Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks. *Psychological Bulletin, 132*(3), 354–380. https://doi.org/10.1037/0033-2909.132.3.354
+- [Dunlosky 2013] Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques. *Psychological Science in the Public Interest, 14*(1), 4–58. https://doi.org/10.1177/1529100612453266
+- [Ehlert & Schulte 2009] Ehlert, A., & Schulte, C. (2009). Empirical comparison of objects-first and objects-later. *ICER '09*, 15–26.
+- [Guo 2013] Guo, P. J. (2013). Online Python Tutor: Embeddable web-based program visualization for CS education. *SIGCSE '13*.
+- [Hattie & Timperley 2007] Hattie, J., & Timperley, H. (2007). The power of feedback. *Review of Educational Research, 77*(1), 81–112. https://doi.org/10.3102/003465430298487
+- [Kalyuga 2003] Kalyuga, S., Ayres, P., Chandler, P., & Sweller, J. (2003). The expertise reversal effect. *Educational Psychologist, 38*(1), 23–31.
+- [Lopez 2008] Lopez, M., Whalley, J., Robbins, P., & Lister, R. (2008). Relationships between reading, tracing and writing skills in introductory programming. *ICER '08*.
+- [Margulieux & Catrambone 2016] Margulieux, L. E., & Catrambone, R. (2016). Improving problem solving with subgoal labels in expository text and worked examples. *Learning and Instruction, 42*, 58–71. https://doi.org/10.1016/j.learninstruc.2015.12.002
+- [Margulieux 2020] Margulieux, L. E., Morrison, B. B., & Decker, A. (2020). Reducing withdrawal and failure rates in introductory programming with subgoal labeled worked examples. *International Journal of STEM Education*.
+- [Merrill 2002] Merrill, M. D. (2002). First principles of instruction. *Educational Technology Research and Development, 50*(3), 43–59.
+- [Qian & Lehman 2017] Qian, Y., & Lehman, J. (2017). Students' misconceptions and other difficulties in introductory programming: A literature review. *ACM Transactions on Computing Education, 18*(1), 1–24.
+- [Roediger & Karpicke 2006] Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning. *Psychological Science, 17*(3), 249–255. https://doi.org/10.1111/j.1467-9280.2006.01693.x
+- [Sentance 2019] Sentance, S., Waite, J., & Kallia, M. (2019). Teaching computer programming with PRIMM: A sociocultural perspective. *Computer Science Education, 29*(2–3), 136–176. https://doi.org/10.1080/08993408.2019.1608781
+- [Shen & Tamkin 2026] Shen, J. H., & Tamkin, A. (2026). How AI impacts skill formation. arXiv:2601.20245.
+- [Sorva 2013] Sorva, J. (2013). Notional machines and introductory programming education. *ACM Transactions on Computing Education, 13*(2). https://doi.org/10.1145/2483710.2483713
+
+*Stand: 2026-10-25*

@@ -7,7 +7,7 @@ A learning site for C# and .NET on GitHub Pages. It has two parts that are publi
 | Learning site (chapters, quizzes, collapsible code) | [`website/`](website) | Docusaurus 3 | `https://peterkronberger.github.io/dotnet-learn/` |
 | C# playground (run code in the browser) | [`playground/`](playground) | Blazor WebAssembly + Roslyn (.NET 10) | `https://peterkronberger.github.io/dotnet-learn/runner/` |
 
-The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Lernprinzipien" (learning principles) (`website/docs/learning-principles.mdx`; it is planned to rename it to "Wie dieser Kurs funktioniert", backlog B10).
+The learning site embeds the playground as an iframe with `<CSharpRunner code={...} />`. The ideas behind the design are on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
 
 ## Repository structure
 
