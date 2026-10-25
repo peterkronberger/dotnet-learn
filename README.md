@@ -47,7 +47,7 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/les
 - Collapsible: `<details><summary>…</summary> … </details>` (leave blank lines before and after the content).
 - Quiz: `<Quiz id="m01-l03-q1" />`. The question is stored in `website/src/data/quiz/de/mXX.json` (format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline props are no longer allowed; the build fails.
 - Misconception: `<Misconception id="m01-l03-int-division-rounds" />` as the first line in a `:::warning[Achtung]` box; one answer option points to it with `misconception`.
-- Reference lesson (pattern for new lessons): `website/docs/m01-variables-and-types/l03-numbers.mdx`.
+- Reference lesson: none yet – the existing lessons are early implementations and are rebuilt (`concept/module-plan.md`, "Existing content"). Pattern: `concept/lesson-template.md`.
 - Check quiz data and MDX references: `node tools/check-quiz.mjs`.
 - Version badge (only features from C# 12 / .NET 8, otherwise build error): `<Since csharp="12" dotnet="8" />` inline; with children (old code) as a collapsible "So schrieb man es vorher".
 - Glossary link: `<Term id="value-type" />` (renders "Value Type (Werttyp)") or `<Term id="value-type">Werttypen</Term>`, only at the first use of a term in a lesson. Entries: `website/src/data/glossary/de.json`. An unknown id fails `node tools/check-quiz.mjs` and the build.

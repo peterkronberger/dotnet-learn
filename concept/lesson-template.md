@@ -6,7 +6,7 @@ Lesson text is German. The German names of sections and boxes below are the real
 
 ## Flow
 
-Reference lesson as a pattern: `website/docs/m01-variables-and-types/l03-numbers.mdx`.
+There is no reference lesson yet. The existing lessons are early implementations and are no pattern (`module-plan.md`, "Existing content"). The first rebuilt lesson that passes its module review becomes the reference lesson; add it here then.
 
 | # | Step | Form | Note |
 | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Reference lesson as a pattern: `website/docs/m01-variables-and-types/l03-numbers
 
 ## Practice-example pattern (required in step 4)
 
-This matches PRIMM. It is already implemented in the MVP (reference lesson `website/docs/m01-variables-and-types/l03-numbers.mdx`, section "Zwei Stolperfallen"):
+This matches PRIMM:
 
 1. **Prediction** (`:::info[Vorhersage]`): a task to think ahead about what the output will be. Optionally with an input field per output line. After the run, a sober check ✓/✗ (no "surprise" wording). Input field via `<CSharpRunner predict expected={…}>`, with `expected` taken from the `.out.txt` snapshot via `raw-loader`.
 2. **`<CSharpRunner>`** (Run)
@@ -38,6 +38,8 @@ This matches PRIMM. It is already implemented in the MVP (reference lesson `webs
 Worked examples split the solution into named steps. For LINQ, for example: "1. Choose data source → 2. Filter → 3. Project → 4. Materialize result". The labels go in the body text or in the solution, **not** as a German code comment (code comments are English).
 
 ## Skeleton
+
+The values below (title, ids, file names) only show the format.
 
 ```mdx
 ---

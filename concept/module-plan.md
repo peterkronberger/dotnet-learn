@@ -10,7 +10,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 
 - Folder: `website/docs/mXX-<slug>/`, lessons `lYY-<slug>.mdx`. Examples in parallel under `website/examples/mXX/lYY/`.
 - Slugs in English (Docusaurus does not translate slugs, so URLs stay the same in all languages). Titles and body text in German.
-- `lesson_id` in the front matter (`m04-l02`) is the stable key for quiz questions and learning progress.
+- `lesson_id` in the front matter (`m04-l02`) is the stable key for quiz questions and learning progress – from the rebuild of a module on (see below); ids of early implementations are not protected.
 - **Review modules W1–W4** (defined 2026-10-25) use the same structure with the prefix `w`, so module numbers do not change:
   - Folder `website/docs/wXX-review-<slug>/` (for example `w01-review-basics/`), lessons `lYY-<slug>.mdx`.
   - `lesson_id` `wXX-lYY` (for example `w01-l01`). The existing checks accept this pattern (`^[a-z0-9]+-l\d+$` in `website/src/data/quiz/index.js` and `tools/check-quiz.mjs`).
@@ -19,18 +19,9 @@ Lesson titles and text are German. German titles below are the real learner-faci
   - A review lesson brings no new content. Its questions first make learners recognize which concept is asked (`didactics.md`, interleaving).
   - **Open decision:** the Definition of Done is written for lessons with new content (for example DoD 4 "Achtung" box, new glossary terms). Proposal: review lessons meet DoD 4 and 11 with quiz distractors that link to the misconception ids of the original lessons, and skip new glossary terms. Decide before writing W1.
 
-## Existing MVP → target structure
+## Existing content: early implementations
 
-| MVP file | Target | Status |
-| --- | --- | --- |
-| `docs/intro.mdx` | M0 · L1 "Dein erstes Programm" (switch identifiers/comments to English) | moved to `docs/m00-orientation/l01-first-program.mdx` |
-| `docs/learning-principles.mdx` | M0 · page "Wie dieser Kurs funktioniert" (add literature from `didactics.md` and the AI paragraph) | open (B10) |
-| `docs/grundlagen/variablen-und-typen.mdx` | M1 · L2/L3 (code to `examples/`, English, fix the solution text to `3.5` – the playground uses `InvariantGlobalization`, so the output is always `3.5`) | moved to `docs/m01-variables-and-types/l02-variables-and-types.mdx`; L3 moved out to `docs/m01-variables-and-types/l03-numbers.mdx` |
-| `docs/grundlagen/kontrollfluss.mdx` | M2 (split into several lessons) | moved to `docs/m02-control-flow/l01-control-flow.mdx` (split still open) |
-
-Known gaps (not errors):
-- M1 has no L1 yet. The planned lesson is "Statements and output"; the existing lessons start at `l02`.
-- M2 `l01-control-flow.mdx` still needs to be split into several lessons.
+The lessons that exist today – M0 `l01-first-program.mdx`, M1 `l02-variables-and-types.mdx` and `l03-numbers.mdx`, M2 `l01-control-flow.mdx`, and the page `learning-principles.mdx` – are early implementations (MVP). They do not follow the current rules. Every module, including M0–M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a). The page "Wie dieser Kurs funktioniert" is rebuilt as part of M0.
 
 ## Reference: which source counts as "the specification"
 

@@ -22,10 +22,10 @@ The architect (`claude-architect.yml`) does the rest: it derives the content (se
 | --- | --- |
 | Module section | The heading `### M<N> …` (or `### W<N> …`) in `module-plan.md` up to the next `###`. If it is missing: stop, status `needs_human`. |
 | Module title (German) | The heading text after `M<N>`, without the part in parentheses and without ▶/◻. |
-| Module folder | The existing folder `website/docs/<prefix>NN-*/`. If there is none: `<prefix>NN-<slug>`, slug = short English kebab-case name of the topic (from the English part in parentheses, otherwise from the heading). Review modules: `wNN-review-<slug>` (`module-plan.md`, "Location and naming"). |
+| Module folder | `<prefix>NN-<slug>`, slug = short English kebab-case name of the topic (from the English part in parentheses, otherwise from the heading). An existing folder name is kept if it fits this rule. Review modules: `wNN-review-<slug>` (`module-plan.md`, "Location and naming"). |
 | `_category_.json` | Label "Modul <N> – <German title>" (review: "Wiederholung <N> – Module A–B"), `position` = `<N>` (review: decimal from "Location and naming"). |
-| Lessons | 1. Existing lessons in the folder keep their `lesson_id`, file and order. 2. Then, in plan order: the topics of the first line of the section (separated by `·`) and every line `*(new)* Lesson "…"`. 3. Every other `*(new)*` line and every `Spec`/`Library` item goes into the lesson it fits. 4. Split or merge so that each lesson has one core concept and 15–25 min (`CLAUDE.md` rule 8). Notes in the section (for example "split `l01`") come first. |
-| `lesson_id`, file | Next free number: `<prefix>NN-lYY`, file `lYY-<slug>.mdx`, slug = English kebab-case from the lesson name. Existing ids never change. |
+| Lessons | Only from the plan, never from existing files (section 2a). In plan order: the topics of the first line of the section (separated by `·`) and every line `*(new)* Lesson "…"`. Every other `*(new)*` line and every `Spec`/`Library` item goes into the lesson it fits. Split or merge so that each lesson has one core concept and 15–25 min (`CLAUDE.md` rule 8). |
+| `lesson_id`, file | Numbered from `l01` in sidebar order: `<prefix>NN-lYY`, file `lYY-<slug>.mdx`, slug = English kebab-case from the lesson name. |
 | Lesson title (German) | German translation of the lesson name in the plan (lines already in German stay as they are). |
 | ▶ / ◻ | Marker in the heading; a marker on a single line wins. |
 | Spec, library, badges, misconceptions | The `Spec`, `Library`, `Badge` and `misconceptions` lines of the section. Each item goes to exactly one lesson. Misconception id = `<lesson_id>-<English kebab-slug>`. |
@@ -37,15 +37,24 @@ The architect (`claude-architect.yml`) does the rest: it derives the content (se
 | Warm-up questions | Quiz ids of earlier lessons (`website/src/data/quiz/de/*.json`). |
 | Lesson structure, DoD | `concept/lesson-template.md`, `CLAUDE.md` (Definition of Done, rules 1–11). Not copied into issues – referenced. |
 
+## 2a. Existing content of the module
+
+Content that already exists for the module (today M0–M2) is an **early implementation**: it does not follow the current rules. The module is rebuilt completely; nothing is kept because it exists.
+
+- The lesson cut, `lesson_id`s, titles and files come only from section 2. Old lesson ids are not protected.
+- Old text, examples and quiz questions are not copied. They may only be used as raw material when the new lesson issue says so and the result meets all rules.
+- Removing the old content is part of the scaffold issue (section 3). Until the new lessons are merged, the module is empty on the site; this is accepted.
+- Learning progress: the dashboard ignores stored answers to question ids that no longer exist (`useProgressDashboardData.js`), so removed questions do no harm. A reused question id keeps its old Leitner state; this is accepted for early implementations.
+
 ## 3. Issues to create
 
 Order and chain (one PR per issue; every issue that changes a file another issue also changes gets `Depends on #<number>` – `de.json` and the quiz file are shared by all lessons, so lessons are one chain):
 
 1. **Decision/research issue** per blocker from "Open questions" (label `needs-human:decision` if a human must decide). Everything else depends on it.
 2. **CI project issue** – only for ◻ lessons whose CI project does not exist yet. Changes to `.github/workflows/` go to "What a human must do".
-3. **Scaffold issue**: `_category_.json`, empty quiz file, import in `website/src/data/quiz/index.js`, example folder.
+3. **Scaffold issue**: remove the early implementation of the module (lesson files, `website/examples/<prefix>NN/`, the questions in `de/<prefix>NN.json`) and fix every reference to it (find them with a search for the old ids and paths, for example `website/plugins/search-index.test.js`, `README.md`, the `lesson` field in `de.json`); then `_category_.json`, empty quiz file, import in `website/src/data/quiz/index.js`, example folder. Glossary entries stay until the lesson that introduces the term rewrites them.
 4. **One lesson issue per lesson**, in sidebar order, each depending on the one before (the first on the scaffold).
-5. **Module review issue**: every spec item and misconception is taught in its lesson; 8–12 questions marked as placement test candidates; `module-plan.md` updated (answered open questions removed).
+5. **Module review issue**: every spec item and misconception is taught in its lesson; no file of the early implementation is left; glossary entries that no new lesson introduces or links are removed or fixed; 8–12 questions marked as placement test candidates; `module-plan.md` updated (answered open questions removed).
 
 Do not start a second module while one is in progress (shared `de.json`).
 
