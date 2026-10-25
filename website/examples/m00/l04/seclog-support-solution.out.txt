@@ -1,0 +1,4 @@
+Runtime: .NET 8
+End of support: 2026-11-10
+Check date: 2026-12-01
+Supported: False

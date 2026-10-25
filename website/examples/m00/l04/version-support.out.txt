@@ -1,0 +1,5 @@
+Release: 2025-11-11
+LTS estimate (+3 years): 2028-11-11
+STS estimate (+24 months): 2027-11-11
+Official end for .NET 10: 2028-11-14
+Difference in days: 3

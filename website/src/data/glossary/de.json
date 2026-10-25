@@ -524,10 +524,45 @@
       "term": "LTS",
       "german": "Long Term Support",
       "category": "platform",
-      "definition": "LTS-Versionen von .NET werden länger unterstützt als STS-Versionen. .NET 10 ist eine LTS-Version.",
+      "definition": "Eine .NET-Version mit langem Support: mindestens drei Jahre, oder ein Jahr nach der nächsten LTS-Version, falls das später liegt. .NET 10 ist eine LTS-Version.",
       "related": [
+        "sts",
+        "end-of-support",
         "dotnet"
       ],
+      "lesson": "m00-l04",
+      "source": {
+        "title": ".NET releases, patches, and support",
+        "url": "https://learn.microsoft.com/dotnet/core/releases-and-support"
+      }
+    },
+    {
+      "id": "sts",
+      "term": "STS",
+      "german": "Standard Term Support",
+      "category": "platform",
+      "definition": "Eine .NET-Version mit kürzerem Support. Seit .NET 9 sind es 24 Monate. STS-Versionen sind keine Vorabversionen, sondern vollwertige Releases.",
+      "related": [
+        "lts",
+        "end-of-support"
+      ],
+      "lesson": "m00-l04",
+      "source": {
+        "title": ".NET releases, patches, and support",
+        "url": "https://learn.microsoft.com/dotnet/core/releases-and-support"
+      }
+    },
+    {
+      "id": "end-of-support",
+      "term": "End of Support",
+      "german": "Support-Ende",
+      "category": "platform",
+      "definition": "Das Datum, ab dem Microsoft keine Fixes, Updates und keine technische Hilfe mehr für eine Version liefert. Danach gibt es auch keine Sicherheitsupdates mehr.",
+      "related": [
+        "lts",
+        "sts"
+      ],
+      "lesson": "m00-l04",
       "source": {
         "title": ".NET releases, patches, and support",
         "url": "https://learn.microsoft.com/dotnet/core/releases-and-support"
