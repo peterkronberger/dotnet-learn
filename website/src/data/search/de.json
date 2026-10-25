@@ -1,0 +1,26 @@
+{
+  "pages": [
+    {
+      "id": "lernstand",
+      "url": "/dashboard",
+      "title": "Lernstand",
+      "sections": [
+        {"anchor": "", "heading": "Lernstand", "text": "Was heute ansteht, wie weit du im Lernpfad bist und wie sicher der Stoff sitzt. Gespeichert nur in diesem Browser."},
+        {"anchor": "heute", "heading": "Heute", "text": "Nächste Lektion, Lernziele und fällige Wiederholungen."},
+        {"anchor": "ueberblick", "heading": "Überblick", "text": "Kennzahlen zu deinem Lernstand."},
+        {"anchor": "lernpfad", "heading": "Lernpfad", "text": "Alle Lektionen pro Modul mit Status, zum Beispiel wie viele Lektionen abgeschlossen sind."},
+        {"anchor": "wissensstand", "heading": "Wissensstand", "text": "Fragen nach Stufe (wackelig, im Aufbau, gefestigt) und nach Leitner-Box."},
+        {"anchor": "aktivitaet", "heading": "Aktivität", "text": "Beantwortete Fragen pro Tag als Diagramm und Tabelle, für 4 Wochen, 3 Monate oder alles."},
+        {"anchor": "daten", "heading": "Deine Daten", "text": "Lernstand als JSON-Datei exportieren und importieren. Die Daten liegen nur lokal in deinem Browser."}
+      ]
+    },
+    {
+      "id": "playground",
+      "url": "/playground",
+      "title": "Playground",
+      "sections": [
+        {"anchor": "", "heading": "C#-Playground", "text": "C# direkt im Browser schreiben und ausführen. Schreibe C#-Code und führe ihn sofort aus. Es reichen Anweisungen ohne Main (Top-Level-Statements). Häufige Namespaces wie System, System.Linq und System.Collections.Generic sind bereits eingebunden."}
+      ]
+    }
+  ]
+}
