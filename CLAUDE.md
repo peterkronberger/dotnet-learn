@@ -86,9 +86,10 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 ## Way of working
 
 - Larger tasks as an issue with label `claude:auto-architect`, small ones with `claude:auto-implement` (see `.github/workflows/claude-*.yml`). Write dependencies in the issue as their own line `Depends on #<number>`.
+- A new module starts with one issue `Module <N>` (label `claude:auto-architect`); the architect derives all lessons and issues from `concept/module-plan.md` as described in `concept/issue-blueprint.md`.
 - Changes to `.github/workflows/` need a human (set in `claude-implement.yml`).
 - Pull requests (title and description) and commit messages are written in English.
-- Half-yearly review (next: 2027-04) about ned C#/.Net features, AI module (state of studies, links), dead links.
+- Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
 ## Concept (binding)
 
