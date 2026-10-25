@@ -1,0 +1,134 @@
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 0 0.5rem;
+}
+
+.input {
+  width: 14rem;
+  padding: 0.3rem 2.2rem 0.3rem 0.75rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: 1.2rem;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.input:focus-visible,
+.button:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.button {
+  position: absolute;
+  right: 0.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ifm-font-color-base);
+  cursor: pointer;
+}
+
+.dropdown {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 300;
+  width: 26rem;
+  max-width: 90vw;
+  max-height: 70vh;
+  overflow-y: auto;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 0.5rem;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-font-color-base);
+  box-shadow: var(--ifm-global-shadow-md);
+}
+
+.list,
+.group {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pageTitle {
+  padding: 0.5rem 0.75rem 0.2rem;
+  font-weight: var(--ifm-font-weight-bold);
+}
+
+.context {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.option {
+  display: block;
+  padding: 0.4rem 0.75rem 0.4rem 1.25rem;
+  cursor: pointer;
+}
+
+.option:hover {
+  background: var(--ifm-color-emphasis-200);
+}
+
+.active {
+  background: var(--ifm-color-emphasis-200);
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: -2px;
+}
+
+.heading {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.snippet {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.all {
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+  padding-left: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.state {
+  margin: 0;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.dropdown mark {
+  background: #ffe58a;
+  color: #1c1e21;
+  padding: 0 0.1em;
+  border-radius: 2px;
+}
+
+@media (max-width: 996px) {
+  .input {
+    width: 9rem;
+  }
+
+  .dropdown {
+    position: fixed;
+    top: var(--ifm-navbar-height);
+    left: 0.5rem;
+    right: 0.5rem;
+    width: auto;
+    max-width: none;
+    margin-top: 0.25rem;
+  }
+}
