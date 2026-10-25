@@ -74,7 +74,7 @@ Planned:
 | `<Term id="…">` | available | Link to the glossary entry at the first use of a term in a lesson (`<Term id="value-type" />`, or own link text as children) |
 | `<Since csharp="13" dotnet="9" />` | available | Version badge for features from C# 12 / .NET 8, with a collapsible "So schrieb man es vorher" (how it used to be written) |
 | `<FromLanguage>` | available | Switcher box: tabs Java / Python / JS/TS / Go (`<TabItem value="java|python|js|go">`), plus C++ (`cpp`) only where it fits, e.g. memory or `struct`; the choice is kept across pages (`groupId="from-language"`) |
-| Feedback link | planned (B8) | Per page "Fehler melden / Feedback" (report error / feedback) → pre-filled GitHub issue template with the page URL (create the template under `.github/ISSUE_TEMPLATE/`) |
+| `<FeedbackLink />` (`website/src/components/FeedbackLink`) | available (B8) | Link "Fehler melden / Feedback" at the end of every docs page → GitHub issue form `.github/ISSUE_TEMPLATE/feedback.yml` with page URL and `lesson_id` pre-filled; the form sets the label `needs-human` |
 | `<Diagram caption="…" description="…">` | available | Mermaid code block inside, `accTitle` set (same text as `caption`). Renders `<figure>` with `<figcaption>` and a `<details>` "Diagramm als Text". Text description is required (a missing one fails the build). Color is never the only signal. |
 | `<CodeBlock>` | Official Docusaurus component for code that cannot run, taken from `.cs` files |
 

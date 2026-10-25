@@ -96,7 +96,7 @@ Time limits are estimates. If one is exceeded: stop, record the interim state in
 | B5 | Translatable runner UI (language parameter) | – | open |
 | B6 | Console input: `stdin` prop, input field, `Console.SetIn` | – | open |
 | B7 | Commit `package-lock.json`, switch `pages.yml` to `npm ci` | – (workflow → human) | done |
-| B8 | Issue template "Fehler melden / Feedback" + link per page | – | open |
+| B8 | Issue template "Fehler melden / Feedback" + link per page | – | done |
 | B9 | Mermaid, local search, Playwright + accessibility check | – | in progress (Mermaid done; local search, Playwright open) |
 | B10 | `learning-principles.mdx` → "Wie dieser Kurs funktioniert": literature from `didactics.md`, AI paragraph, how to use | B3 | open |
 | B11 | `<Since>` badge, switcher tabs | – | done |
