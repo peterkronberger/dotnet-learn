@@ -44,11 +44,11 @@ Zahlen gibt es in C# in mehreren Typen. Die drei wichtigsten für Rechnungen:
 
 Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types).
 
-Das erste Beispiel rechnet die durchschnittliche Sitzungsdauer aus. Es ist in vier Teilziele gegliedert: **1. Eingaben festlegen → 2. In den passenden Typ umwandeln → 3. Rechnen → 4. Ergebnis ausgeben**.
+Das erste Beispiel rechnet die durchschnittliche Sitzungsdauer aus. Es ist in vier <Term id="subgoal">Teilziele</Term> gegliedert: **1. Eingaben festlegen → 2. In den passenden Typ umwandeln → 3. Rechnen → 4. Ergebnis ausgeben**.
 
 <CSharpRunner id="m01-l03-average" height={380} code={averageSession} />
 
-Wenn beide Operanden `int` sind, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten (Richtung 0). Mit `(double)totalMinutes / sessions` wird zuerst ein Operand umgewandelt (Teilziel 2), dann wird als Gleitkommazahl gerechnet (Teilziel 3).
+Wenn beide <Term id="operand">Operanden</Term> `int` sind, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten (Richtung 0). Mit `(double)totalMinutes / sessions` wird zuerst ein Operand umgewandelt (Teilziel 2), dann wird als <Term id="floating-point-type">Gleitkommazahl</Term> gerechnet (Teilziel 3).
 
 ## Zwei Stolperfallen
 
@@ -68,7 +68,7 @@ Ausgabe: `3`, `3.5`, `False`, `True`. Der Playground nutzt `InvariantGlobalizati
 3. **Rechnen:** Zeile 1 teilt zwei `int`. Das Ergebnis ist `3`, weil der Nachkommateil abgeschnitten wird. Bei `0.1 + 0.2 == 0.3` mit `double` ist das Ergebnis `False`, mit `decimal` `True`.
 4. **Ausgeben:** `Console.WriteLine` zeigt den Wert des Vergleichs.
 
-**Was passiert, wenn du `(double)(a / b)` schreibst?** Dann steht `3`. Die Klammer wird zuerst ausgewertet, die Ganzzahldivision ist schon passiert. Die Umwandlung kommt zu spät.
+**Was passiert, wenn du `(double)(a / b)` schreibst?** Dann steht `3`. Die Klammer wird zuerst ausgewertet, die <Term id="integer-division">Ganzzahldivision</Term> ist schon passiert. Die <Term id="cast">Umwandlung</Term> kommt zu spät.
 
 Quellen: [Arithmetic operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators) (Abschnitte zur Division und „Round-off errors“).
 
@@ -85,7 +85,7 @@ Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp
 
 ## Lückenbeispiel: Lizenzkosten
 
-Gleiche Teilziele, aber jetzt fehlen Teile im Code. Setze an den Stellen mit `___` den Typ, das Literal-Suffix und die Variablen ein. Für `decimal`-Literale gilt das Suffix `m`.
+Gleiche Teilziele, aber jetzt fehlen Teile im Code. Setze an den Stellen mit `___` den Typ, das <Term id="literal">Literal</Term>-Suffix und die Variablen ein. Für `decimal`-Literale gilt das Suffix `m`.
 
 <CSharpRunner id="m01-l03-license-gaps" height={420} code={licenseCostGaps} />
 
@@ -106,7 +106,7 @@ Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp
 
 ## Ändern und selbermachen
 
-Im SecLog-Projekt (Auswertung von Anmeldeversuchen) soll die Fehlerquote in Prozent berechnet werden. Mit `7` fehlgeschlagenen von `20` Versuchen sollte `35` herauskommen. Der Startcode gibt aber `0` aus. Behebe den Fehler. Bei `0` Versuchen soll die Methode `0` zurückgeben.
+Im <Term id="seclog">SecLog</Term>-Projekt (Auswertung von Anmeldeversuchen) soll die Fehlerquote in Prozent berechnet werden. Mit `7` fehlgeschlagenen von `20` Versuchen sollte `35` herauskommen. Der Startcode gibt aber `0` aus. Behebe den Fehler. Bei `0` Versuchen soll die <Term id="method">Methode</Term> `0` zurückgeben.
 
 <CSharpRunner id="m01-l03-failure-rate" height={440} code={failureRateTask} tests={failureRateTests} />
 
@@ -167,7 +167,7 @@ Die Ganzzahldivision schneidet wie in C# Richtung 0 ab. Einen eingebauten Dezima
 <details>
 <summary>Vertiefung: decimal, double und Division durch 0 (optional)</summary>
 
-Bei Ganzzahlen wirft die Division durch 0 eine `DivideByZeroException`. Bei `double` ergibt sie `Infinity` oder `NaN`. Bei `decimal` wirft sie wieder eine Ausnahme. Das Vorzeichen des Rests `%` folgt dem linken Operanden.
+Bei Ganzzahlen wirft die Division durch 0 eine `DivideByZeroException`. Bei `double` ergibt sie `Infinity` oder `NaN`. Bei `decimal` wirft sie wieder eine <Term id="exception">Ausnahme</Term>. Das Vorzeichen des Rests `%` folgt dem linken Operanden.
 
 Quelle: [Arithmetic operators](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators).
 
