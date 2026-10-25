@@ -71,7 +71,7 @@ A lesson is done when all points are met:
 2. All code examples pass the CI check (compile, outputs match).
 3. The required methods are included: worked example with fading, PRIMM practice example, retrieval practice, questions for spaced repetition.
 4. At least one misconception is handled (box "Achtung").
-5. Features from C# 12 / .NET 8 carry the version badge.
+5. Features from C# 12 / .NET 8 or newer carry the version badge.
 6. Technical statements in "Vertiefung" (deepening) sections link to Microsoft Learn or the C# specification.
 7. Duration 15–25 min (estimated by word count and number of tasks).
 8. Every worked example has subgoal labels.
@@ -79,6 +79,7 @@ A lesson is done when all points are met:
 10. At least one transfer question ("Where would you use this?") or an extra project exercise.
 11. Every misconception box is linked to at least one wrong answer in the quiz.
 12. At least one task "In eigenen Worten erklären" (explain in your own words).
+13. Each information regarding C# is validated against the C# language specification on Microsoft Learn
 
 In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
 
