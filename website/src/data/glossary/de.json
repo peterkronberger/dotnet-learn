@@ -184,11 +184,11 @@
       "term": "Top-level Statements",
       "german": "Anweisungen auf oberster Ebene",
       "category": "language",
-      "definition": "Ein Programm, dessen Anweisungen direkt in der Datei stehen, ohne umgebende `Main`-Methode. Typdeklarationen stehen am Ende der Datei.",
+      "definition": "Ein Programm, dessen Anweisungen direkt in der Datei stehen, ohne umgebende `Main`-Methode. Der Compiler erzeugt daraus den Startpunkt. Typdeklarationen stehen am Ende der Datei.",
       "aliases": [
         "Top-Level-Programme"
       ],
-      "lesson": "m01-l02",
+      "lesson": "m00-l01",
       "source": {
         "title": "Top-level statements",
         "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements"
@@ -627,6 +627,41 @@
       "related": [
         "leitner-system"
       ]
+    },
+    {
+      "id": "statement",
+      "term": "Statement",
+      "german": "Anweisung",
+      "category": "language",
+      "definition": "Ein einzelner Schritt eines Programms. Anweisungen enden in C# meist mit einem Semikolon und laufen von oben nach unten.",
+      "aliases": [
+        "Anweisung",
+        "Anweisungen",
+        "Statements"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "Statements (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements"
+      }
+    },
+    {
+      "id": "console-output",
+      "term": "Konsolenausgabe",
+      "category": "platform",
+      "definition": "Der Text, den ein Programm mit `Console.WriteLine` oder `Console.Write` ausgibt. `WriteLine` beendet die Zeile, `Write` nicht.",
+      "aliases": [
+        "Console.WriteLine",
+        "Console.Write"
+      ],
+      "related": [
+        "statement"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "Console.WriteLine Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.console.writeline"
+      }
     }
   ]
 }

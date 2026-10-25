@@ -1,0 +1,182 @@
+---
+title: Dein erstes Programm
+sidebar_position: 1
+description: Ein C#-Programm ist eine Folge von Anweisungen, die von oben nach unten laufen. Du führst es sofort aus und änderst es.
+lesson_id: m00-l01
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import helloLines from '!!raw-loader!@site/examples/m00/l01/hello-lines.cs';
+import helloLinesOutput from '!!raw-loader!@site/examples/m00/l01/hello-lines.out.txt';
+import writeVsWriteLine from '!!raw-loader!@site/examples/m00/l01/write-vs-writeline.cs';
+import writeVsWriteLineOutput from '!!raw-loader!@site/examples/m00/l01/write-vs-writeline.out.txt';
+import missingQuote from '!!raw-loader!@site/examples/m00/l01/missing-quote.snippet.cs';
+import missingSemicolon from '!!raw-loader!@site/examples/m00/l01/missing-semicolon.snippet.cs';
+import bannerTask from '!!raw-loader!@site/examples/m00/l01/seclog-banner-task.cs';
+import bannerTests from '!!raw-loader!@site/examples/m00/l01/seclog-banner-task.tests.snippet.cs';
+import bannerSolution from '!!raw-loader!@site/examples/m00/l01/seclog-banner-solution.cs';
+
+# Dein erstes Programm
+
+:::note[Lernziele]
+- Du führst ein C#-Programm im Playground aus und änderst es.
+- Du sagst die Ausgabe eines Programms mit mehreren `Console.WriteLine`-Anweisungen Zeile für Zeile voraus.
+- Du erkennst, dass Text in Anführungszeichen stehen muss und dass die Anweisungen von oben nach unten laufen.
+:::
+
+Das ist die erste Lektion des Kurses. Es gibt noch keinen Stoff, den du wiederholen könntest, darum fehlt hier der Rückblick. Am Ende prüft ein Quiz, was du behalten hast.
+
+## Ein Programm ist eine Folge von Anweisungen
+
+Ein C#-Programm besteht aus <Term id="statement">Anweisungen</Term> (Statements). Jede Anweisung sagt dem Computer, was er tun soll, und endet mit einem Semikolon `;`. Der Computer führt sie nacheinander aus, von oben nach unten ([C#-Spezifikation, §13.3.2: Statement lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)).
+
+Eine Anweisung, die du sofort brauchst, ist `Console.WriteLine("Hello");`. Sie schreibt den Text in den Klammern als eine Zeile in die <Term id="console-output">Konsolenausgabe</Term>. Solch ein Aufruf ist ein Ausdruck, den du als Anweisung hinschreibst (Expression Statement, [§13.7](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)).
+
+Der Text steht in Anführungszeichen. So ein Stück Text im Code heißt <Term id="literal">Literal</Term>; hier ein String-Literal. Mehr dazu kommt in Modul 1.
+
+Du musst dafür keine weiteren Zeilen drumherum schreiben. Bei <Term id="top-level-statements">Top-level Statements</Term> ist die Datei das Programm: Der Compiler macht aus den Anweisungen am Anfang der Datei den Startpunkt ([§7.1.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts)). Wie dieser Startpunkt genau aussieht, erfährst du in Modul 6.
+
+## Vorhersagen, ausführen, vergleichen
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Schreibe deinen Tipp für jede Ausgabezeile in das Feld und führe den Code dann aus. Du kannst den Code auch ändern, zum Beispiel einen anderen Text einsetzen.
+:::
+
+<CSharpRunner id="m00-l01-hello" height={300} code={helloLines} predict expected={helloLinesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `Hello`, `C#` und `Done`. So kommst du darauf:
+
+1. **Anweisungen finden:** Es gibt drei Anweisungen, jede endet mit `;`.
+2. **Der Reihe nach ausführen:** Die erste Anweisung läuft zuerst, die letzte zuletzt.
+3. **Ausgabe ablesen:** Jedes `Console.WriteLine` schreibt seinen Text und beginnt danach eine neue Zeile. Die Anführungszeichen gehören nicht zur Ausgabe.
+
+Was passiert, wenn du die erste und die letzte Zeile tauschst? Probiere es im Runner aus.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wo ist die Main-Methode? (optional)</summary>
+
+In älteren C#-Programmen siehst du eine Klasse mit einer Methode `Main`. Bei Top-level Statements erzeugt der Compiler diese Methode selbst. Eine Datei pro Projekt darf solche Anweisungen enthalten ([Top-level statements](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements)).
+
+</details>
+
+## Write und WriteLine
+
+`Console.WriteLine` beendet die Zeile nach dem Text. `Console.Write` schreibt den Text und bleibt in derselben Zeile ([Console.WriteLine](https://learn.microsoft.com/dotnet/api/system.console.writeline)).
+
+:::info[Vorhersage]
+Wie viele Zeilen gibt dieses Programm aus, und was steht in ihnen?
+:::
+
+<CSharpRunner id="m00-l01-write" height={300} code={writeVsWriteLine} predict expected={writeVsWriteLineOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Es sind zwei Zeilen: `Hello C#!` und `Next line`.
+
+1. **Write:** Die ersten beiden Anweisungen schreiben `Hello ` und `C#` ohne Zeilenende. Das Leerzeichen in `"Hello "` gehört zum Text.
+2. **WriteLine:** Die dritte Anweisung hängt `!` an und beendet die Zeile.
+3. **Nächste Zeile:** Die vierte Anweisung schreibt in eine neue Zeile.
+
+</details>
+
+## Dein erster Fehler
+
+Fehler gehören zum Lernen. Der Compiler meldet sie, bevor das Programm läuft. Probiere diese beiden im Runner aus: Ändere die Beispiele oben und schaue, was der Playground anzeigt.
+
+- **Was passiert, wenn du die Anführungszeichen weglässt?** Dann steht dort `Console.WriteLine(Hello);`. Der Compiler kennt keinen Namen `Hello` und meldet einen Fehler.
+- **Was passiert, wenn das Semikolon fehlt?** Dann steht dort `Console.WriteLine("Hello")` ohne `;`. Der Compiler erwartet ein Semikolon.
+
+<CodeBlock language="csharp" title="missing-quote.snippet.cs">{missingQuote}</CodeBlock>
+
+<CodeBlock language="csharp" title="missing-semicolon.snippet.cs">{missingSemicolon}</CodeBlock>
+
+Der Playground zeigt die Fehler als Liste mit Zeile und Spalte an. Die genaue Meldung lies im Playground selbst nach. Sie steht dort in der Sprache des Compilers.
+
+## Ändern und selbermachen
+
+Das <Term id="seclog">SecLog</Term>-Werkzeug soll zuerst ein Banner und dann eine (erfundene) Log-Zeile ausgeben. Im Startcode stehen die beiden Anweisungen in der falschen Reihenfolge. Bringe sie in die richtige Reihenfolge.
+
+<CSharpRunner id="m00-l01-banner" height={300} code={bannerTask} tests={bannerTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-banner-solution.cs">{bannerSolution}</CodeBlock>
+
+Die Anweisungen laufen von oben nach unten. Das Banner muss also vor der Log-Zeile stehen.
+
+</details>
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m00-l01-text-without-quotes" />
+
+**„Text wird auch ohne Anführungszeichen ausgegeben.“** Ohne Anführungszeichen liest der Compiler `Hello` als Namen. Gibt es keinen Namen `Hello`, ist das ein Fehler.
+:::
+
+:::warning[Achtung]
+<Misconception id="m00-l01-statement-order" />
+
+**„Die Reihenfolge der Anweisungen ist egal.“** Die Anweisungen laufen von oben nach unten. Tauschst du zwei `Console.WriteLine`-Zeilen, tauscht auch die Ausgabe.
+:::
+
+## Kommst du aus …?
+
+<FromLanguage>
+<TabItem value="java">
+
+In Java brauchst du für „Hello World“ eine Klasse und eine `main`-Methode. In C# reicht `Console.WriteLine("Hello");` allein in der Datei.
+
+</TabItem>
+<TabItem value="python">
+
+Wie bei `print("Hello")` läuft die Datei von oben nach unten. Neu ist das Semikolon am Ende jeder Anweisung. Außerdem hängt `Console.WriteLine` selbst einen Zeilenumbruch an. Ohne Umbruch gibt es `Console.Write`.
+
+</TabItem>
+<TabItem value="js">
+
+`Console.WriteLine("Hello");` entspricht `console.log("Hello");`. Text steht in C# in doppelten Anführungszeichen `"…"`. Einfache Anführungszeichen sind für einzelne Zeichen gedacht.
+
+</TabItem>
+<TabItem value="go">
+
+In Go brauchst du `package main` und `func main()`. In C# stehen die Anweisungen mit Top-level Statements direkt in der Datei.
+
+</TabItem>
+</FromLanguage>
+
+## Zusammenfassung
+
+Ein C#-Programm ist eine Folge von Anweisungen, jede endet mit `;`. Sie laufen von oben nach unten. `Console.WriteLine` schreibt Text als eine Zeile, `Console.Write` bleibt in der Zeile. Text steht in Anführungszeichen, sonst liest der Compiler ihn als Namen und meldet einen Fehler. Mit Top-level Statements ist die Datei selbst das Programm.
+
+## Prüfe dein Wissen
+
+<Quiz id="m00-l01-q1" />
+
+<Quiz id="m00-l01-q2" />
+
+<Quiz id="m00-l01-q3" />
+
+<Quiz id="m00-l01-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m00-l01-q5" />
+
+### Transferfrage
+
+<Quiz id="m00-l01-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Top-level statements](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements)
+- Microsoft Learn: [Console.WriteLine](https://learn.microsoft.com/dotnet/api/system.console.writeline)
+- Microsoft Learn: [C#-Spezifikation, Statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)
