@@ -48,7 +48,7 @@ const config = {
   ],
 
   // Lesson index (title, duration, learning goals, module) for the Lernstand page.
-  plugins: [require.resolve('./plugins/lesson-index.js')],
+  plugins: [require.resolve('./plugins/lesson-index.js'), require.resolve('./plugins/search-index.js')],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */

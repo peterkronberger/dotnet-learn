@@ -121,3 +121,6 @@ module.exports = function lessonIndexPlugin(context) {
 };
 
 module.exports.loadLessons = loadLessons;
+module.exports.listDocs = listDocs;
+module.exports.parseFrontMatter = parseFrontMatter;
+module.exports.readCategory = readCategory;
