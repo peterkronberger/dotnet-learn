@@ -1,0 +1,65 @@
+# Issue form for learners to report errors or ideas for improvement.
+# "labels" sets needs-human automatically on every issue created with this form.
+# The ids "page-url" and "lesson-id" are pre-filled by the feedback link on the
+# docs pages (website/src/theme/DocItem/Footer) through the URL query.
+name: Fehler melden / Feedback
+description: Melde einen Fehler oder schlage eine Verbesserung für eine Seite vor.
+title: "[Feedback] "
+labels: ["needs-human"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Danke für deine Rückmeldung!
+
+        Bitte beschreibe kurz, was dir aufgefallen ist. Die Seitenadresse wird automatisch eingetragen, wenn du über den Link auf einer Lektion kommst.
+
+        **Bitte keine persönlichen Daten eintragen – das Issue ist öffentlich.**
+  - type: input
+    id: page-url
+    attributes:
+      label: Seite (URL)
+      placeholder: https://peterkronberger.github.io/dotnet-learn/docs/...
+    validations:
+      required: true
+  - type: input
+    id: lesson-id
+    attributes:
+      label: Lektions-ID
+      description: Wird automatisch eingetragen, falls vorhanden (z. B. m01-l03).
+    validations:
+      required: false
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Art der Rückmeldung
+      options:
+        - Fehler im Text
+        - Fehler in einem Codebeispiel oder einer Ausgabe
+        - Fehler in einem Quiz
+        - Technisches Problem (Playground, Darstellung, Bedienung)
+        - Verbesserungsvorschlag
+        - Sonstiges
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Beschreibung
+      description: Was ist falsch oder was könnte besser sein? Wo genau auf der Seite (Abschnitt, Quizfrage, Codebeispiel)?
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Vorschlag (optional)
+      description: Wie sollte es richtig sein oder was schlägst du vor?
+    validations:
+      required: false
+  - type: input
+    id: browser
+    attributes:
+      label: Browser und Gerät (optional)
+      description: Nur bei technischen Problemen nötig (z. B. Firefox 130 auf Windows 11).
+    validations:
+      required: false
