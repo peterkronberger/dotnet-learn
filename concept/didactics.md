@@ -1,6 +1,6 @@
 # Didactics – learning methods and evidence
 
-As of 2026-10-22. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (so far `website/docs/learning-principles.mdx`).
+As of 2026-10-22. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
 
 ## Two target groups, one core path
 
