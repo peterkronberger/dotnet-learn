@@ -1,0 +1,4 @@
+Step 1: program started
+Step 2: about to divide
+Run-time error: Attempted to divide by zero.
+Step 3: program finished

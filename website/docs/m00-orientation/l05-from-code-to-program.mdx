@@ -1,0 +1,205 @@
+---
+title: Vom Code zum laufenden Programm
+sidebar_position: 5
+description: "Du lernst den Weg vom Quellcode über Compiler, IL, JIT und CLR zum laufenden Programm, den Unterschied zwischen Compiler- und Laufzeitfehler und die Idee von ReadyToRun und Native AOT."
+lesson_id: m00-l05
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import beforeError from '!!raw-loader!@site/examples/m00/l05/statements-before-error.cs';
+import beforeErrorOutput from '!!raw-loader!@site/examples/m00/l05/statements-before-error.out.txt';
+import missingSemicolon from '!!raw-loader!@site/examples/m00/l05/missing-semicolon.snippet.cs';
+import modelTask from '!!raw-loader!@site/examples/m00/l05/seclog-model-task.cs';
+import modelTests from '!!raw-loader!@site/examples/m00/l05/seclog-model-task.tests.snippet.cs';
+import modelSolution from '!!raw-loader!@site/examples/m00/l05/seclog-model-solution.cs';
+
+# Vom Code zum laufenden Programm
+
+*Stand: 2026-10-25. Diese Lektion wird zweimal im Jahr geprüft (nächste Prüfung: 2027-04).*
+
+:::note[Lernziele]
+- Du beschreibst den Weg Quellcode → Compiler → IL → JIT → CLR in der richtigen Reihenfolge.
+- Du unterscheidest einen Compilerfehler (vor dem Start, kein Programm läuft) von einem Laufzeitfehler (während das Programm läuft).
+- Du ordnest JIT, ReadyToRun und Native AOT ihren Eigenschaften zu (Start, Kompatibilität, Größe – nur die Idee).
+:::
+
+## Rückblick
+
+<Quiz id="m00-l02-q1" />
+
+<Quiz id="m00-l02-q3" />
+
+## Zwei Übersetzungen
+
+Dein Quelltext ist Text. Ein Prozessor kann ihn nicht ausführen. In .NET sind dafür zwei Übersetzungsschritte nötig ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)):
+
+1. **Compiler:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. Microsoft Learn beschreibt IL als „CPU-independent set of instructions that can be efficiently converted to native code“. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
+2. **<Term id="jit">JIT (Just-in-Time-Compiler)</Term>:** Er gehört zur <Term id="clr">CLR</Term> und übersetzt die IL erst, wenn das Programm läuft, in Maschinencode für den Prozessor. Die Quelle sagt: Eine Methode wird beim ersten Aufruf übersetzt, danach läuft der gespeicherte Maschinencode.
+
+Der Maschinencode ist die erste Form, die der Prozessor direkt ausführen kann. Die CLR führt das Programm dann aus und bietet Dienste wie die automatische Speicherverwaltung.
+
+<Diagram
+  caption="Vom Quellcode zum laufenden Programm"
+  description="Fünf Schritte nacheinander. Der Quellcode in C# wird vom Compiler in IL übersetzt. Das passiert vor dem Start. Beim Start und während das Programm läuft übersetzt der JIT der CLR die IL methodenweise in Maschinencode. Der Prozessor führt den Maschinencode aus."
+>
+
+```mermaid
+flowchart LR
+  accTitle: Vom Quellcode zum laufenden Programm
+  src["1. Quellcode (C#)"] --> comp["2. Compiler"]
+  comp --> il["3. IL und Metadaten (Programmdatei)"]
+  il --> jit["4. JIT der CLR (zur Laufzeit)"]
+  jit --> run["5. Maschinencode wird ausgeführt"]
+```
+
+</Diagram>
+
+Das Diagramm zeigt zwei Zeitpunkte: Schritt 2 liegt vor dem Start, Schritt 4 und 5 liegen im Lauf. Diese Trennung brauchst du gleich bei den Fehlern.
+
+## Compilerfehler und Laufzeitfehler
+
+Weil der Compiler vor dem Start arbeitet, kann er manche Fehler schon dann melden. Solange ein <Term id="compile-error">Compilerfehler</Term> besteht, gibt es keine Programmdatei, die starten könnte. Ein <Term id="runtime-error">Laufzeitfehler</Term> dagegen bleibt unbemerkt, bis die betroffene Anweisung läuft. Alles davor ist dann schon passiert.
+
+So sieht ein Compilerfehler aus. In Zeile 1 fehlt das Semikolon:
+
+<CodeBlock language="csharp" title="missing-semicolon.snippet.cs">{missingSemicolon}</CodeBlock>
+
+Der Compiler meldet das und das Programm startet nicht. Du siehst keine einzige Ausgabezeile. Du probierst das gleich selbst im Runner aus.
+
+## Vorhersage und Lauf
+
+Das Programm unten hat keinen Compilerfehler. Es teilt durch eine Variable, die den Wert 0 hat. Zwei neue Dinge: `try`/`catch` fängt einen Laufzeitfehler ab, sodass das Programm weiterläuft. Das lernst du in Modul 7 genau. Und `ex.Message` ist der Text der Fehlermeldung.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus, und in welcher Reihenfolge? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m00-l05-before-error" height={400} code={beforeError} predict expected={beforeErrorOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen.
+
+1. **Übersetzen:** Der Compiler findet keinen Fehler. Das Programm startet.
+2. **Anweisungen davor:** Die Zeilen „Step 1“ und „Step 2“ laufen normal.
+3. **Fehler im Lauf:** `10 / divisor` teilt durch null. Das ist ein Laufzeitfehler. Der Compiler hat ihn nicht gemeldet, weil er erst mit dem Wert der Variablen entsteht.
+4. **Abfangen:** `catch` gibt die Meldung aus, danach läuft das Programm bis „Step 3“ weiter.
+
+Was passiert, wenn du in Zeile 1 das Semikolon am Ende löschst? Probiere es im Runner aus: Es erscheint keine einzige Ausgabezeile mehr, auch „Step 2“ nicht. Der Compiler stoppt vor dem Start.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum nicht gleich alles vorab in Maschinencode? (optional)</summary>
+
+Microsoft Learn nennt für den JIT zwei Eigenschaften ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)): Dieselbe IL kann auf jeder unterstützten Prozessorarchitektur laufen, weil die CLR für jede Architektur einen JIT mitbringt. Und der JIT übersetzt nur, was wirklich aufgerufen wird, statt Zeit und Speicher für alle Methoden aufzuwenden. Der Preis: Die Übersetzung kostet Zeit während des Laufs. Die nächsten Abschnitte zeigen Wege, davon etwas vorab zu erledigen.
+
+</details>
+
+## Drei Ausführungsmodelle
+
+Der JIT ist der Standard. Es gibt zwei Varianten, bei denen Maschinencode schon vor dem Start entsteht (<Term id="ready-to-run">ReadyToRun</Term> und <Term id="native-aot">Native AOT</Term>; AOT steht für Ahead of Time, „im Voraus“). Hier geht es nur um die Idee. Wie man sie einschaltet, kommt in Modul 14.
+
+| Modell | Was steckt im Programm? | Start | Kompatibilität und Größe |
+| --- | --- | --- | --- |
+| **JIT zur Laufzeit** (Standard) | IL | Der JIT übersetzt beim Lauf. | Läuft auf jedem Rechner mit passender .NET-Laufzeit. |
+| **ReadyToRun** | IL **und** vorab erzeugter Maschinencode | Weniger JIT-Arbeit beim Start. | Dateien werden größer, laut Quelle meist zwei- bis dreimal. Der JIT bleibt nötig, zum Beispiel für manche Methoden. |
+| **Native AOT** | Nur Maschinencode (mit der nötigen Laufzeit darin) | Schnellerer Start, kein JIT. | Läuft ohne installierte .NET-Laufzeit, aber mit Einschränkungen: zum Beispiel kein dynamisches Laden von Assemblies und kein Erzeugen von Code zur Laufzeit. |
+
+Quellen: [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run) („R2R binaries are larger because they contain both intermediate language (IL) code […] and the native version of the same code“), [Native AOT deployment overview](https://learn.microsoft.com/dotnet/core/deploying/native-aot/) („Native AOT apps don't use a just-in-time (JIT) compiler when the application runs“; Liste der Einschränkungen). *Stand: 2026-10-25.*
+
+## Ändern und selbermachen
+
+Das SecLog-Werkzeug soll auf einem kleinen Server ohne installierte .NET-Laufzeit schnell starten. Im Startcode steht ein Modell, das dazu nicht passt.
+
+<CSharpRunner id="m00-l05-model" height={360} code={modelTask} tests={modelTests} />
+
+Aufgabe: Ändere nur die dritte Zeile so, dass sie das passende Modell nennt: `Choice: Native AOT`. Begründe es mit den zwei Zeilen „Need“.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-model-solution.cs">{modelSolution}</CodeBlock>
+
+1. **Anforderungen sammeln:** schneller Start, keine installierte Laufzeit.
+2. **Modelle vergleichen:** Der JIT-Standard und ReadyToRun enthalten weiter IL und setzen die .NET-Laufzeit voraus. Native AOT kommt ohne JIT aus und läuft laut Quelle auch ohne installierte Laufzeit.
+3. **Preis prüfen:** Native AOT hat Einschränkungen. SecLog müsste vorher gegen sie geprüft werden.
+
+Das ist nur die Entscheidungsidee. Wie du ein Programm so veröffentlichst, steht in Modul 14.
+
+</details>
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m00-l05-compiles-to-machine-code" />
+
+**„Der C#-Compiler erzeugt direkt Maschinencode.“** Standardmäßig erzeugt er IL. Maschinencode entsteht erst danach: zur Laufzeit durch den JIT, oder vorab bei ReadyToRun und Native AOT ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)).
+:::
+
+:::warning[Achtung]
+<Misconception id="m00-l05-compile-error-at-runtime" />
+
+**„Ein Compilerfehler zeigt sich erst, wenn die Zeile läuft.“** Der Compiler arbeitet vor dem Start und prüft den ganzen Quelltext. Mit einem Compilerfehler läuft keine Zeile, auch nicht die davor. Erst Laufzeitfehler treten mitten im Lauf auf, nachdem die Anweisungen davor gelaufen sind.
+:::
+
+## Kommst du aus …?
+
+Die Vergleiche sind grobe Orientierung und nicht Teil der .NET-Dokumentation.
+
+<FromLanguage>
+<TabItem value="java">
+
+Ähnliches Prinzip: Der Java-Compiler erzeugt Bytecode, den die JVM ausführt und dabei zur Laufzeit in Maschinencode übersetzt. IL entspricht dem Bytecode, die CLR der JVM.
+
+</TabItem>
+<TabItem value="python">
+
+Python übersetzt Quelltext ebenfalls in Bytecode, den ein Interpreter ausführt. Ein Unterschied: Bei C# prüft der Compiler vor dem Start den ganzen Quelltext, etwa auf falsche Typen.
+
+</TabItem>
+<TabItem value="js">
+
+JavaScript-Engines übersetzen Code oft erst zur Laufzeit mit einem JIT. Bei C# liegt vor dem JIT ein eigener Compilerschritt, der Fehler vor dem Start meldet.
+
+</TabItem>
+<TabItem value="go">
+
+Go übersetzt Quelltext vorab in Maschinencode. Das entspricht in der Idee am ehesten Native AOT. Bei C# ist der JIT der Standard.
+
+</TabItem>
+</FromLanguage>
+
+## Zusammenfassung
+
+Der C#-Compiler übersetzt den Quelltext vor dem Start in IL. Der JIT der CLR macht daraus während des Laufs Maschinencode. Ein Compilerfehler verhindert den Start, ein Laufzeitfehler tritt auf, nachdem die Anweisungen davor gelaufen sind. ReadyToRun legt Maschinencode zusätzlich zur IL vorab ab und verkürzt so den Start. Native AOT übersetzt alles vorab, braucht keinen JIT, hat aber Einschränkungen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m00-l05-q1" />
+
+<Quiz id="m00-l05-q2" />
+
+<Quiz id="m00-l05-q3" />
+
+<Quiz id="m00-l05-q4" />
+
+<Quiz id="m00-l05-q5" />
+
+<Quiz id="m00-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m00-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m00-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)
+- Microsoft Learn: [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run)
+- Microsoft Learn: [Native AOT deployment overview](https://learn.microsoft.com/dotnet/core/deploying/native-aot/)

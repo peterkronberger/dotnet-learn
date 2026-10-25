@@ -508,6 +508,141 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du das Wissen über Support-Enden in einem echten Projekt anwenden?",
       "modelAnswer": "Ich trage das Support-Ende der genutzten .NET-Version in die Planung ein und plane das Update rechtzeitig, zum Beispiel für den SecLog-Server. So bekommt der Server weiter Sicherheitsupdates."
+    },
+    {
+      "id": "m00-l05-q1",
+      "lesson": "m00-l05",
+      "type": "match",
+      "question": "Ordne jeden Schritt auf dem Weg vom Quellcode zum laufenden Programm seiner Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "1. Compiler (Roslyn)",
+          "right": "Übersetzt den C#-Quelltext in IL"
+        },
+        {
+          "left": "2. IL",
+          "right": "Prozessorunabhängige Zwischenform, die in der Programmdatei steht"
+        },
+        {
+          "left": "3. JIT",
+          "right": "Übersetzt IL beim Aufruf einer Methode in Maschinencode"
+        },
+        {
+          "left": "4. CLR",
+          "right": "Führt das Programm aus und stellt Dienste wie Speicherverwaltung bereit"
+        }
+      ],
+      "explanation": "Der Compiler erzeugt IL, der JIT der CLR macht daraus während des Laufs Maschinencode, und die CLR führt ihn aus."
+    },
+    {
+      "id": "m00-l05-q2",
+      "lesson": "m00-l05",
+      "type": "single",
+      "question": "Was erzeugt der C#-Compiler im Normalfall aus deinem Quelltext?",
+      "options": [
+        {
+          "text": "Maschinencode, den der Prozessor direkt ausführt.",
+          "feedback": "Normalerweise entsteht IL. Maschinencode erzeugt erst der JIT während des Laufs.",
+          "misconception": "m00-l05-compiles-to-machine-code"
+        },
+        {
+          "text": "IL, eine prozessorunabhängige Zwischenform.",
+          "correct": true
+        },
+        {
+          "text": "Nichts: C# wird Zeile für Zeile aus dem Quelltext ausgeführt.",
+          "feedback": "Der Quelltext wird vor dem Start übersetzt. Ein zeilenweises Auslesen des Quelltexts gibt es bei C# nicht.",
+          "misconception": "m00-l05-compiles-to-machine-code"
+        }
+      ],
+      "explanation": "Der Compiler übersetzt den Quelltext in IL samt Metadaten. In Maschinencode wird IL erst später übersetzt, meist vom JIT."
+    },
+    {
+      "id": "m00-l05-q3",
+      "lesson": "m00-l05",
+      "type": "single",
+      "question": "Im Programm fehlt in Zeile 1 ein Semikolon, der Rest ist in Ordnung. Wann merkst du das?",
+      "options": [
+        {
+          "text": "Erst wenn das Programm Zeile 1 erreicht.",
+          "feedback": "Ein Syntaxfehler wird beim Übersetzen gemeldet, bevor das Programm startet. Dann läuft keine einzige Zeile.",
+          "misconception": "m00-l05-compile-error-at-runtime"
+        },
+        {
+          "text": "Beim Übersetzen: Der Compiler meldet den Fehler und das Programm startet nicht.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm läuft komplett durch und meldet den Fehler am Ende.",
+          "feedback": "Der Compiler prüft den ganzen Quelltext vor dem Start. Ein Compilerfehler verhindert den Start.",
+          "misconception": "m00-l05-compile-error-at-runtime"
+        }
+      ],
+      "explanation": "Compilerfehler entstehen vor dem Start. Laufzeitfehler, zum Beispiel eine Division durch null, treten erst auf, wenn die betroffene Anweisung läuft."
+    },
+    {
+      "id": "m00-l05-q4",
+      "lesson": "m00-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, wann der Fehler auftritt.",
+      "example": "m00/l05/statements-before-error.cs",
+      "explanation": "Der Compiler findet keinen Fehler, also startet das Programm. Die ersten beiden Zeilen laufen, dann tritt die Division durch null auf und `catch` fängt sie ab. Danach läuft das Programm weiter."
+    },
+    {
+      "id": "m00-l05-q5",
+      "lesson": "m00-l05",
+      "type": "match",
+      "question": "Ordne jedem Ausführungsmodell seine Eigenschaft zu.",
+      "pairs": [
+        {
+          "left": "JIT zur Laufzeit",
+          "right": "IL wird beim Aufruf einer Methode in Maschinencode übersetzt"
+        },
+        {
+          "left": "ReadyToRun",
+          "right": "IL und vorab erzeugter Maschinencode: weniger JIT-Arbeit beim Start, größere Dateien"
+        },
+        {
+          "left": "Native AOT",
+          "right": "Nur vorab erzeugter Maschinencode: kein JIT, aber Einschränkungen bei der Kompatibilität"
+        }
+      ],
+      "explanation": "ReadyToRun enthält zusätzlich zum Maschinencode noch die IL. Native AOT verzichtet auf den JIT und braucht keine installierte .NET-Laufzeit."
+    },
+    {
+      "id": "m00-l05-q6",
+      "lesson": "m00-l05",
+      "type": "single",
+      "question": "SecLog soll auf einem kleinen Server ohne installierte .NET-Laufzeit schnell starten. Welches Modell passt zur Idee?",
+      "options": [
+        {
+          "text": "JIT zur Laufzeit: Das ist der Standard.",
+          "feedback": "Der Standard braucht die installierte Laufzeit und übersetzt beim Start erst noch."
+        },
+        {
+          "text": "ReadyToRun: Das Programm enthält IL und vorab übersetzten Code.",
+          "feedback": "ReadyToRun verkürzt den Start, enthält aber weiter IL und kann den JIT für manche Methoden nicht ersetzen."
+        },
+        {
+          "text": "Native AOT: vollständig vorab übersetzt, ohne JIT.",
+          "correct": true
+        }
+      ],
+      "explanation": "Native-AOT-Programme starten laut Microsoft Learn schneller und laufen auch auf Rechnern ohne installierte .NET-Laufzeit. Der Preis sind Einschränkungen, zum Beispiel kein dynamisches Laden von Assemblies."
+    },
+    {
+      "id": "m00-l05-q7",
+      "lesson": "m00-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Weg vom Quellcode zum laufenden Programm und den Unterschied zwischen Compilerfehler und Laufzeitfehler.",
+      "modelAnswer": "Der Compiler übersetzt den C#-Quelltext in IL. Beim Start übersetzt der JIT der CLR die IL methodenweise in Maschinencode, und die CLR führt ihn aus.\n\nEin Compilerfehler tritt beim Übersetzen auf, bevor das Programm startet; dann läuft nichts. Ein Laufzeitfehler tritt auf, während das Programm läuft; die Anweisungen davor sind schon ausgeführt."
+    },
+    {
+      "id": "m00-l05-q8",
+      "lesson": "m00-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du dein Wissen über Compilerfehler und Laufzeitfehler anwenden?",
+      "modelAnswer": "Beim Lesen von Fehlermeldungen: Kommt die Meldung vor dem Start, suche ich im Quelltext nach Syntax oder Typen. Kommt sie mitten im Lauf, etwa im SecLog-Programm beim Lesen einer Logzeile, prüfe ich, welche Daten die Anweisung bekommen hat."
     }
   ]
 }

@@ -493,15 +493,17 @@
       "id": "compiler",
       "term": "Compiler",
       "category": "platform",
-      "definition": "Ein Programm, das deinen Quelltext prüft und übersetzt, bevor das Programm läuft. Er meldet Fehler wie falsche Typen früh.",
+      "definition": "Ein Programm, das deinen Quelltext prüft und in eine andere Form übersetzt, bevor das Programm läuft. Der C#-Compiler erzeugt dabei IL und meldet Fehler wie falsche Typen früh.",
       "related": [
         "roslyn",
-        "static-typing"
+        "static-typing",
+        "il",
+        "compile-error"
       ],
       "lesson": "m00-l02",
       "source": {
-        "title": "Introduction to .NET",
-        "url": "https://learn.microsoft.com/dotnet/core/introduction"
+        "title": "Managed Execution Process",
+        "url": "https://learn.microsoft.com/dotnet/standard/managed-execution-process"
       }
     },
     {
@@ -863,6 +865,105 @@
         "title": "Overview of Entity Framework Core",
         "url": "https://learn.microsoft.com/ef/core/"
       }
+    },
+    {
+      "id": "il",
+      "term": "IL",
+      "german": "Intermediate Language, Zwischensprache",
+      "category": "platform",
+      "aliases": [
+        "CIL",
+        "MSIL"
+      ],
+      "definition": "Eine vom Prozessor unabhängige Befehlsfolge, die der C#-Compiler aus deinem Quelltext erzeugt. Sie ist noch kein Maschinencode.",
+      "related": [
+        "compiler",
+        "jit",
+        "clr"
+      ],
+      "lesson": "m00-l05",
+      "source": {
+        "title": "Managed Execution Process",
+        "url": "https://learn.microsoft.com/dotnet/standard/managed-execution-process"
+      }
+    },
+    {
+      "id": "jit",
+      "term": "JIT",
+      "german": "Just-in-Time-Compiler",
+      "category": "platform",
+      "definition": "Der Teil der Laufzeitumgebung, der IL erst während des Programmlaufs in Maschinencode übersetzt. Er übersetzt eine Methode beim ersten Aufruf.",
+      "related": [
+        "il",
+        "clr",
+        "ready-to-run",
+        "native-aot"
+      ],
+      "lesson": "m00-l05",
+      "source": {
+        "title": "Managed Execution Process",
+        "url": "https://learn.microsoft.com/dotnet/standard/managed-execution-process"
+      }
+    },
+    {
+      "id": "ready-to-run",
+      "term": "ReadyToRun",
+      "german": "vorab übersetzte Assemblies",
+      "category": "platform",
+      "aliases": [
+        "R2R"
+      ],
+      "definition": "Eine Form von Ahead-of-Time-Kompilierung: Das Programm enthält IL und zusätzlich vorab erzeugten Maschinencode. Der JIT hat beim Start weniger zu tun, die Dateien werden größer.",
+      "related": [
+        "jit",
+        "native-aot",
+        "il"
+      ],
+      "lesson": "m00-l05",
+      "source": {
+        "title": "ReadyToRun deployment overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/ready-to-run"
+      }
+    },
+    {
+      "id": "native-aot",
+      "term": "Native AOT",
+      "german": "vollständig vorab übersetzt",
+      "category": "platform",
+      "definition": "Das Programm wird vorab komplett in Maschinencode übersetzt und braucht zur Laufzeit keinen JIT und keine installierte .NET-Laufzeit. Dafür gibt es Einschränkungen, zum Beispiel kein dynamisches Laden von Assemblies.",
+      "related": [
+        "jit",
+        "ready-to-run",
+        "il"
+      ],
+      "lesson": "m00-l05",
+      "source": {
+        "title": "Native AOT deployment overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/native-aot/"
+      }
+    },
+    {
+      "id": "compile-error",
+      "term": "Compilerfehler",
+      "category": "course",
+      "definition": "Ein Fehler, den der Compiler vor dem Start meldet, zum Beispiel ein fehlendes Semikolon. Solange er besteht, läuft kein Programm.",
+      "related": [
+        "compiler",
+        "runtime-error"
+      ],
+      "lesson": "m00-l05"
+    },
+    {
+      "id": "runtime-error",
+      "term": "Laufzeitfehler",
+      "category": "course",
+      "definition": "Ein Fehler, der erst auftritt, während das Programm läuft, zum Beispiel eine Division durch null. Anweisungen davor sind dann schon ausgeführt.",
+      "related": [
+        "compiler",
+        "compile-error",
+        "exception"
+      ],
+      "lesson": "m00-l05"
     }
   ]
 }
