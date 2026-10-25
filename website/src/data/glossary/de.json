@@ -1,0 +1,64 @@
+{
+  "terms": [
+    {
+      "id": "variable",
+      "term": "Variable",
+      "category": "language",
+      "definition": "Ein benannter Speicherplatz für einen Wert. Der Typ der Variable legt fest, welche Werte sie aufnehmen kann, zum Beispiel `int count = 3;`.",
+      "aliases": ["Variablen"],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Variables (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables"
+      }
+    },
+    {
+      "id": "value-type",
+      "term": "Value Type",
+      "german": "Werttyp",
+      "category": "language",
+      "definition": "Ein Typ, dessen Variable den Wert selbst enthält. Eine Zuweisung kopiert den Wert. Beispiele: `int`, `double`, `bool`.",
+      "aliases": ["Werttypen"],
+      "related": ["reference-type"],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Value types (C# reference)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/value-types"
+      }
+    },
+    {
+      "id": "reference-type",
+      "term": "Reference Type",
+      "german": "Referenztyp",
+      "category": "language",
+      "definition": "Ein Typ, dessen Variable nur einen Verweis auf ein Objekt enthält. Eine Zuweisung kopiert den Verweis, nicht das Objekt. Beispiele: `string`, Arrays, Klassen.",
+      "aliases": ["Referenztypen"],
+      "related": ["value-type"],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Reference types (C# reference)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/reference-types"
+      }
+    },
+    {
+      "id": "integer-division",
+      "term": "Integer Division",
+      "german": "Ganzzahldivision",
+      "category": "language",
+      "definition": "Teilst du zwei ganze Zahlen, ist auch das Ergebnis eine ganze Zahl. Der Nachkommateil entfällt: `7 / 2` ergibt `3`.",
+      "aliases": ["Ganzzahldivisionen"],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "Arithmetic operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators"
+      }
+    },
+    {
+      "id": "leitner-system",
+      "term": "Leitner-System",
+      "category": "course",
+      "definition": "Ein Wiederholungssystem mit Boxen. Wird eine Frage richtig beantwortet, rückt sie eine Box weiter, bei einer falschen Antwort zurück in Box 1. Fragen in höheren Boxen kommen erst nach längeren Abständen wieder.",
+      "aliases": ["Leitner", "Boxen"]
+    }
+  ]
+}

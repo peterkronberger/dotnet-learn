@@ -1,0 +1,78 @@
+.search {
+  margin: 1rem 0 0.5rem;
+}
+
+.search label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.search input {
+  width: 100%;
+  max-width: 24rem;
+  padding: 0.5rem 0.75rem;
+  font: inherit;
+  color: var(--ifm-font-color-base);
+  background: var(--ifm-background-color);
+  border: 1px solid var(--ifm-color-emphasis-500);
+  border-radius: var(--ifm-global-radius);
+}
+
+.count {
+  margin: 0.5rem 0 1rem;
+  color: var(--ifm-color-emphasis-800);
+}
+
+.letters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.letters a {
+  min-width: 2rem;
+  text-align: center;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--ifm-color-emphasis-400);
+  border-radius: var(--ifm-global-radius);
+  font-weight: 600;
+}
+
+.list h2 {
+  scroll-margin-top: calc(var(--ifm-navbar-height) + 0.5rem);
+  margin: 1.5rem 0 0.5rem;
+}
+
+.list dt {
+  font-weight: 700;
+  margin-top: 1rem;
+  padding: 0.25rem 0.5rem;
+  border-left: 4px solid transparent;
+  scroll-margin-top: calc(var(--ifm-navbar-height) + 0.5rem);
+}
+
+/* Targeted entry: border, background and a marker character, so color is not the only signal. */
+.list dt:target {
+  border-left-color: var(--ifm-color-primary);
+  background: var(--ifm-color-emphasis-200);
+}
+
+.list dt:target::before {
+  content: '→ ';
+}
+
+.list dd {
+  margin: 0 0 0 0.5rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.list dd p {
+  margin: 0 0 0.25rem;
+}
+
+.meta {
+  font-size: 0.9rem;
+  color: var(--ifm-color-emphasis-800);
+}

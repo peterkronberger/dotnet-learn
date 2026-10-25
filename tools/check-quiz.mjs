@@ -123,6 +123,49 @@ function validate(q) {
   return errors;
 }
 
+// Same rules as validateGlossary in website/src/data/glossary/index.js (duplicated to stay dependency-free).
+function validateGlossary(terms) {
+  if (!Array.isArray(terms)) return ['Glossary "terms" is not a list'];
+  const errors = [];
+  const isText = (v) => typeof v === 'string' && v.trim() !== '';
+  const ids = new Set(terms.map((t) => t?.id).filter((i) => typeof i === 'string'));
+  const seen = new Set();
+  for (const t of terms) {
+    if (!t || typeof t !== 'object') {
+      errors.push('Glossary entry is not an object');
+      continue;
+    }
+    const w = `Term "${t.id}"`;
+    if (typeof t.id !== 'string' || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(t.id)) errors.push(`${w}: invalid id`);
+    else if (seen.has(t.id)) errors.push(`${w}: duplicate id`);
+    else seen.add(t.id);
+    if (!isText(t.term)) errors.push(`${w}: missing term`);
+    if (t.german !== undefined && !isText(t.german)) errors.push(`${w}: german must be a non-empty string`);
+    if (!['language', 'platform', 'course'].includes(t.category)) errors.push(`${w}: unknown category "${t.category}"`);
+    if (!isText(t.definition)) errors.push(`${w}: missing definition`);
+    else if (t.definition.length > 400) errors.push(`${w}: definition is longer than 400 characters`);
+    if (t.aliases !== undefined && (!Array.isArray(t.aliases) || t.aliases.some((a) => !isText(a)))) {
+      errors.push(`${w}: aliases must be a list of non-empty strings`);
+    }
+    if (t.related !== undefined) {
+      if (!Array.isArray(t.related)) errors.push(`${w}: related must be a list`);
+      else {
+        for (const r of t.related) {
+          if (r === t.id) errors.push(`${w}: related contains the entry itself`);
+          else if (!ids.has(r)) errors.push(`${w}: related id "${r}" does not exist`);
+        }
+      }
+    }
+    if (t.lesson !== undefined && (typeof t.lesson !== 'string' || !/^[a-z0-9]+-l\d+$/.test(t.lesson))) errors.push(`${w}: invalid lesson`);
+    const s = t.source;
+    if (s === undefined) {
+      if (t.category === 'language' || t.category === 'platform') errors.push(`${w}: source is required for category "${t.category}"`);
+    } else if (!s || !isText(s.title) || !isText(s.url)) errors.push(`${w}: source needs title and url`);
+    else if (!s.url.startsWith('https://learn.microsoft.com/')) errors.push(`${w}: source url must start with https://learn.microsoft.com/`);
+  }
+  return errors;
+}
+
 function check(name, errors) {
   if (errors.length === 0) console.log(`OK   ${name}`);
   else {
@@ -155,6 +198,25 @@ for (const locale of readdirSync(quizDir).filter((n) => statSync(join(quizDir, n
   }
 }
 check('quiz data', dataErrors);
+
+// 1b. Glossary data
+const glossaryDir = join(website, 'src/data/glossary');
+const glossaryErrors = [];
+const glossaryLessons = [];
+for (const file of readdirSync(glossaryDir).filter((n) => n.endsWith('.json'))) {
+  let data;
+  try {
+    data = JSON.parse(readFileSync(join(glossaryDir, file), 'utf8'));
+  } catch (e) {
+    glossaryErrors.push(`${file}: ${e.message}`);
+    continue;
+  }
+  glossaryErrors.push(...validateGlossary(data.terms).map((e) => `${file}: ${e}`));
+  for (const t of Array.isArray(data.terms) ? data.terms : []) {
+    if (t?.lesson) glossaryLessons.push({id: t.id, lesson: t.lesson});
+  }
+}
+check('glossary data', glossaryErrors);
 
 // 2. MDX references
 const mdxFiles = [...walk(join(website, 'docs'), '.mdx'), ...walk(join(website, 'src/pages'), '.mdx')];
@@ -194,6 +256,9 @@ check('misconception links', linkErrors);
 // 4. Lessons (warning only)
 for (const q of questions.filter((x) => x.locale === 'de')) {
   if (!q.lesson?.startsWith('dev-') && !lessonIds.has(q.lesson)) warnings.push(`${q.id}: lesson ${q.lesson} has no lesson_id in docs`);
+}
+for (const g of glossaryLessons) {
+  if (!lessonIds.has(g.lesson)) warnings.push(`glossary ${g.id}: lesson ${g.lesson} has no lesson_id in docs`);
 }
 [...new Set(warnings)].forEach((w) => console.log(`WARN ${w}`));
 
