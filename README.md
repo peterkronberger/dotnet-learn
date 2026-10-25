@@ -13,21 +13,6 @@ The learning site embeds the playground as an iframe with `<CSharpRunner code={.
 
 The table is in [`CLAUDE.md`](CLAUDE.md#repo-structure). In short: lessons in `website/docs/`, all C# examples in `website/examples/`, quiz questions in `website/src/data/quiz/`, the playground in `playground/`, the learning concept in `concept/`, checks in `tools/`.
 
-## Working with Claude
-
-Issues can start the Claude workflows through labels: `claude:auto-architect` for larger tasks and `claude:auto-implement` for small ones. Write a dependency as its own line `Depends on #<number>`. Changes to `.github/workflows/` need a human. Details: "Way of working" in [`CLAUDE.md`](CLAUDE.md).
-
-## One-time setup on GitHub (manual)
-
-You cannot set these steps in code:
-
-1. **Switch the Pages source:** *Settings → Pages → Build and deployment → Source: **GitHub Actions***.
-2. **Check the environment (only if there is an error):** If the deployment says the branch may not deploy to `github-pages`, allow the branch `main` under *Settings → Environments → github-pages*.
-3. **Keep the repository public.** With GitHub Free, Pages is only available for public repositories.
-4. **Custom domain (optional):** *Settings → Pages → Custom domain*, set DNS at your provider, then turn on *Enforce HTTPS*. After that, change `url` and `baseUrl` in `website/docusaurus.config.js` and `SITE_BASE_PATH` in `.github/workflows/pages.yml`.
-
-The site is built and published on every push to `main`. Pull requests are only built, not published.
-
 ## Develop locally
 
 Requirements: Node.js 20 or newer (`engines` in `website/package.json`), .NET SDK 10.
