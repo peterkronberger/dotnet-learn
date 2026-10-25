@@ -1,0 +1,5 @@
+.NET Framework -> for Windows apps
+.NET Core -> cross-platform
+.NET 5 and later -> the same line of products as .NET Core
+
+Mono -> cross-platform implementation of .NET Framework

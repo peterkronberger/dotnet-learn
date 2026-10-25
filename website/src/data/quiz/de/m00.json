@@ -237,6 +237,148 @@
       "type": "explain",
       "question": "Transferfrage: Wo ist es nützlich zu wissen, ob etwas zur Sprache oder zur Bibliothek gehört? Nenne ein Beispiel.",
       "modelAnswer": "Bei Fehlern und bei der Suche nach Hilfe: Eine Frage zu `var` beantwortet die Sprachspezifikation. Eine Frage zu `Console` oder `string.ToUpper` beantwortet die Dokumentation der Bibliothek. Auch in einem SecLog-Programm hilft das: `var` kommt aus der Sprache, `ToUpper` aus der Bibliothek."
+    },
+    {
+      "id": "m00-l03-q1",
+      "lesson": "m00-l03",
+      "type": "single",
+      "question": "Ein Kollege sagt: „Wir nutzen .NET Core für die Datenbank.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Für Datenbankzugriff gibt es die Bibliothek Entity Framework Core. .NET Core ist die Plattform, auf der sie läuft.",
+          "correct": true
+        },
+        {
+          "text": ".NET Core und Entity Framework Core sind zwei Namen für dasselbe.",
+          "feedback": "Das „Core“ im Namen führt in die Irre. .NET Core ist die Plattform, EF Core eine Bibliothek für Datenbanken.",
+          "misconception": "m00-l03-dotnet-core-is-ef-core"
+        },
+        {
+          "text": "Entity Framework Core ist die neuere Bezeichnung für .NET Core.",
+          "feedback": "Die neuere Bezeichnung für .NET Core ist einfach „.NET“. EF Core ist eine eigene Bibliothek.",
+          "misconception": "m00-l03-dotnet-core-is-ef-core"
+        }
+      ],
+      "explanation": "EF Core ist laut Microsoft eine Version der Datenzugriffstechnologie Entity Framework. .NET Core ist die Plattform, die heute „.NET“ heißt. Ein „.NET Framework Core“ gibt es nicht."
+    },
+    {
+      "id": "m00-l03-q2",
+      "lesson": "m00-l03",
+      "type": "single",
+      "question": "Du startest ein neues Projekt. Welche Variante empfiehlt Microsoft?",
+      "options": [
+        {
+          "text": ".NET Framework, weil es die älteste und damit stabilste Variante ist.",
+          "feedback": "Das .NET Framework wird gewartet, aber für Neuentwicklung empfiehlt Microsoft das heutige .NET.",
+          "misconception": "m00-l03-framework-is-current"
+        },
+        {
+          "text": "Das heutige .NET (ab .NET 5).",
+          "correct": true
+        },
+        {
+          "text": "Mono, weil es plattformübergreifend ist.",
+          "feedback": "Mono ist eine Implementierung von .NET Framework. Die Hauptvariante ist das heutige .NET, das ebenfalls plattformübergreifend ist."
+        }
+      ],
+      "explanation": "Laut Microsoft Learn ist das heutige .NET die primäre Implementierung. Das .NET Framework musst du nicht migrieren, für neue Projekte nimmst du aber .NET."
+    },
+    {
+      "id": "m00-l03-q3",
+      "lesson": "m00-l03",
+      "type": "match",
+      "question": "Ordne jeden Namen seiner Beschreibung zu.",
+      "pairs": [
+        {
+          "left": ".NET Framework",
+          "right": "Die ursprüngliche Variante für Windows-Apps, wird gewartet"
+        },
+        {
+          "left": ".NET Core / .NET",
+          "right": "Plattformübergreifend, quelloffen, heute die Hauptvariante"
+        },
+        {
+          "left": "Mono",
+          "right": "Plattformübergreifende Implementierung von .NET Framework"
+        },
+        {
+          "left": "Entity Framework Core",
+          "right": "Bibliothek für den Datenbankzugriff"
+        }
+      ],
+      "wrongMatches": [
+        {
+          "left": ".NET Core / .NET",
+          "right": "Bibliothek für den Datenbankzugriff",
+          "feedback": "Der Datenbankzugriff ist Aufgabe von Entity Framework Core, einer Bibliothek. .NET Core ist die Plattform.",
+          "misconception": "m00-l03-dotnet-core-is-ef-core"
+        },
+        {
+          "left": ".NET Framework",
+          "right": "Plattformübergreifend, quelloffen, heute die Hauptvariante",
+          "feedback": "Das beschreibt das heutige .NET. Das .NET Framework ist die ursprüngliche Variante und wird nur gewartet.",
+          "misconception": "m00-l03-framework-is-current"
+        }
+      ],
+      "explanation": "Die Namen stammen aus .NET implementations und der EF-Core-Übersicht auf Microsoft Learn."
+    },
+    {
+      "id": "m00-l03-q4",
+      "lesson": "m00-l03",
+      "type": "single",
+      "question": "Was ist .NET Standard?",
+      "options": [
+        {
+          "text": "Eine Spezifikation von .NET-Schnittstellen für mehrere Varianten; es erscheinen keine neuen Versionen mehr.",
+          "correct": true
+        },
+        {
+          "text": "Die Standardversion von .NET, die jeder installieren muss.",
+          "feedback": "Es ist keine Version zum Installieren, sondern eine Spezifikation von Schnittstellen."
+        },
+        {
+          "text": "Der Standard, der die Sprache C# beschreibt.",
+          "feedback": "Die Sprache C# beschreibt die Sprachspezifikation (Lektion 2). .NET Standard betrifft Bibliotheken."
+        }
+      ],
+      "explanation": "Laut Microsoft Learn soll .NET Standard Bibliotheken über mehrere Varianten hinweg ermöglichen. .NET 5 und neuer machen es in den meisten Fällen überflüssig."
+    },
+    {
+      "id": "m00-l03-q5",
+      "lesson": "m00-l03",
+      "type": "single",
+      "question": "SecLog soll auf einem Linux-Server und auf Windows-Laptops laufen. Was wählst du?",
+      "options": [
+        {
+          "text": ".NET Framework 4.8, weil es überall verbreitet ist.",
+          "feedback": "Das .NET Framework ist für Windows-Apps gedacht. Für Linux und Windows brauchst du die plattformübergreifende Variante.",
+          "misconception": "m00-l03-framework-is-current"
+        },
+        {
+          "text": "Das heutige .NET, weil es plattformübergreifend ist.",
+          "correct": true
+        },
+        {
+          "text": "Entity Framework Core, weil „Core“ plattformübergreifend heißt.",
+          "feedback": "EF Core ist eine Datenbankbibliothek und keine Plattform.",
+          "misconception": "m00-l03-dotnet-core-is-ef-core"
+        }
+      ],
+      "explanation": "Die Anforderung ist Linux und Windows. Das heutige .NET ist plattformübergreifend und für neue Projekte empfohlen."
+    },
+    {
+      "id": "m00-l03-q6",
+      "lesson": "m00-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen .NET Framework, .NET Core und dem heutigen .NET.",
+      "modelAnswer": "Das .NET Framework ist die ursprüngliche Variante für Windows-Apps und wird nur noch gewartet. .NET Core ist die plattformübergreifende, quelloffene Neuentwicklung.\n\nAb .NET 5 heißt sie einfach „.NET“. Für neue Projekte nimmst du diese Variante."
+    },
+    {
+      "id": "m00-l03-q7",
+      "lesson": "m00-l03",
+      "type": "explain",
+      "question": "Transferfrage: Du liest ein Tutorial, in dem „.NET Framework 4.8“ steht. Wo würdest du dieses Wissen anwenden?",
+      "modelAnswer": "Ich prüfe, ob das Tutorial alt ist oder ein bestehendes Windows-Projekt meint. Für ein neues SecLog-Projekt würde ich die Schritte auf das heutige .NET übertragen und die Dokumentation dafür lesen."
     }
   ]
 }

@@ -1,0 +1,3 @@
+Target: Linux server
+Target: Windows laptop
+Choice: .NET Framework 4.8
