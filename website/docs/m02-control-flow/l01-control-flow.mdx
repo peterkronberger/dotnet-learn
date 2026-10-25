@@ -32,6 +32,28 @@ Mit `if` und `else` führst du Code nur unter einer Bedingung aus.
 
 <CodeBlock language="csharp" title="if / else">{ifElse}</CodeBlock>
 
+Das Diagramm zeigt den Ablauf: Die Bedingungen werden von oben nach unten geprüft. Sobald eine zutrifft, läuft nur ihr Zweig.
+
+<Diagram
+  caption="Ablauf von if / else if / else"
+  description="Start. Erste Prüfung: points >= 90? Bei ja: Ausgabe excellent, dann Ende. Bei nein: zweite Prüfung: points >= 75? Bei ja: Ausgabe good, dann Ende. Bei nein: Ausgabe keep practicing, dann Ende. Es läuft immer genau ein Zweig. Mit points = 82 ist die erste Prüfung falsch und die zweite wahr, also wird good ausgegeben."
+>
+
+```mermaid
+flowchart TD
+  accTitle: Ablauf von if / else if / else
+  start([Start]) --> c1{"points >= 90?"}
+  c1 -- ja --> o1["Ausgabe: excellent"]
+  c1 -- nein --> c2{"points >= 75?"}
+  c2 -- ja --> o2["Ausgabe: good"]
+  c2 -- nein --> o3["Ausgabe: keep practicing"]
+  o1 --> stop([Ende])
+  o2 --> stop
+  o3 --> stop
+```
+
+</Diagram>
+
 ## Schleifen
 
 | Schleife | Wann |
