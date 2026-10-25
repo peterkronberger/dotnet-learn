@@ -89,6 +89,154 @@
       "type": "explain",
       "question": "Transferfrage: Wo gibt ein Programm noch Text Zeile für Zeile aus? Nenne ein Beispiel und sage, warum die Reihenfolge dort wichtig ist.",
       "modelAnswer": "Ein Beispiel ist ein Log: Ein Programm schreibt für jedes Ereignis eine Zeile, zum Beispiel einen fehlgeschlagenen Login. Die Reihenfolge der Zeilen zeigt dann, was zuerst passiert ist. Weitere Beispiele sind Statusmeldungen beim Start eines Programms oder Fortschrittsanzeigen."
+    },
+    {
+      "id": "m00-l02-q1",
+      "lesson": "m00-l02",
+      "type": "match",
+      "question": "Ordne jedem Begriff seine Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "C#",
+          "right": "Die Programmiersprache: Regeln für Schreibweise und Bedeutung deines Codes"
+        },
+        {
+          "left": "Roslyn",
+          "right": "Der Compiler, der C#-Code übersetzt"
+        },
+        {
+          "left": "CLR",
+          "right": "Die Laufzeitumgebung, die das übersetzte Programm ausführt"
+        },
+        {
+          "left": "BCL",
+          "right": "Die Standardbibliothek mit Typen wie Console und Math"
+        },
+        {
+          "left": "SDK",
+          "right": "Die Werkzeuge zum Bauen und Starten von Projekten"
+        }
+      ],
+      "wrongMatches": [
+        {
+          "left": "C#",
+          "right": "Die Laufzeitumgebung, die das übersetzte Programm ausführt",
+          "feedback": "C# ist die Sprache. Ausgeführt wird dein Programm von der Laufzeitumgebung (CLR), die zu .NET gehört.",
+          "misconception": "m00-l02-csharp-is-dotnet"
+        },
+        {
+          "left": "C#",
+          "right": "Die Standardbibliothek mit Typen wie Console und Math",
+          "feedback": "Die Bibliothek gehört zu .NET, nicht zur Sprache. C# beschreibt nur Schreibweise und Bedeutung des Codes.",
+          "misconception": "m00-l02-console-is-language"
+        }
+      ],
+      "explanation": "C# ist die Sprache. Zur Plattform .NET gehören der Compiler (Roslyn), die Laufzeitumgebung (CLR), die Standardbibliothek (BCL) und das SDK. Jeder Teil hat eine eigene Aufgabe."
+    },
+    {
+      "id": "m00-l02-q2",
+      "lesson": "m00-l02",
+      "type": "single",
+      "question": "Ein Freund sagt: „C# und .NET sind dasselbe.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Stimmt: Beide Namen meinen dieselbe Sache.",
+          "feedback": "C# ist die Sprache. .NET ist die Plattform, die C#-Programme ausführt und eine Bibliothek mitbringt.",
+          "misconception": "m00-l02-csharp-is-dotnet"
+        },
+        {
+          "text": "C# ist eine Sprache, .NET ist die Plattform mit Laufzeitumgebung, Bibliothek, Compiler und SDK.",
+          "correct": true
+        },
+        {
+          "text": "C# ist die Laufzeitumgebung von .NET.",
+          "feedback": "Die Laufzeitumgebung heißt CLR. C# ist die Sprache, in der du schreibst.",
+          "misconception": "m00-l02-csharp-is-dotnet"
+        }
+      ],
+      "explanation": "Die Introduction to .NET nennt die Komponenten Runtime, Libraries, Compiler und SDK. C# ist die Sprache, mit der du für diese Plattform schreibst. .NET kann auch Programme in anderen Sprachen ausführen."
+    },
+    {
+      "id": "m00-l02-q3",
+      "lesson": "m00-l02",
+      "type": "single",
+      "question": "`Console.WriteLine(\"Hi\");` – woher kommt `Console`?",
+      "options": [
+        {
+          "text": "Aus der Sprache C#: `Console` ist ein Schlüsselwort.",
+          "feedback": "`Console` ist kein Schlüsselwort, sondern ein Typ der Standardbibliothek im Namespace `System`.",
+          "misconception": "m00-l02-console-is-language"
+        },
+        {
+          "text": "Aus der Standardbibliothek von .NET.",
+          "correct": true
+        },
+        {
+          "text": "Aus dem Compiler Roslyn.",
+          "feedback": "Der Compiler übersetzt deinen Code. Typen wie `Console` stehen in der Bibliothek, die dein Programm benutzt."
+        }
+      ],
+      "explanation": "Schlüsselwörter wie `var` und `int` gehören zur Sprache. `Console` und `Math` sind Typen der Bibliothek. Die Spezifikation beschreibt die Sprache, nicht diese Bibliothek."
+    },
+    {
+      "id": "m00-l02-q4",
+      "lesson": "m00-l02",
+      "type": "multi",
+      "question": "Im Code von `seclog-line.cs` stehen `var`, `int`, `Math` und `ToUpper`. Welche davon gehören zur Sprache C#, nicht zur Bibliothek? Wähle alle richtigen.",
+      "options": [
+        {
+          "text": "`var`",
+          "correct": true
+        },
+        {
+          "text": "`int`",
+          "correct": true
+        },
+        {
+          "text": "`Math`",
+          "feedback": "`Math` ist ein Typ der Bibliothek."
+        },
+        {
+          "text": "`ToUpper`",
+          "feedback": "`ToUpper` ist eine Methode des Typs `string` aus der Bibliothek."
+        }
+      ],
+      "explanation": "`var` und `int` sind Schlüsselwörter der Sprache. `Math` und `ToUpper` kommen aus der Bibliothek."
+    },
+    {
+      "id": "m00-l02-q5",
+      "lesson": "m00-l02",
+      "type": "single",
+      "question": "Du willst wissen, was die Sprache C# für ein neues Feature aus C# 14 genau festlegt. Welche Quelle liest du zuerst?",
+      "options": [
+        {
+          "text": "Die Feature-Spezifikation auf Microsoft Learn.",
+          "correct": true
+        },
+        {
+          "text": "Die ECMA-334-Ausgabe von Dezember 2023.",
+          "feedback": "Diese Ausgabe entspricht C# 7. Neuere Features stehen dort nicht."
+        },
+        {
+          "text": "Die Introduction to .NET.",
+          "feedback": "Sie beschreibt die Plattform, nicht die Regeln der Sprache."
+        }
+      ],
+      "explanation": "Der Standard hinkt der Implementierung hinterher. Microsoft veröffentlicht darum Feature-Spezifikationen für neuere Features, die noch nicht im Standard stehen."
+    },
+    {
+      "id": "m00-l02-q6",
+      "lesson": "m00-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen der Sprache C# und der Plattform .NET. Nenne mindestens drei Teile der Plattform.",
+      "modelAnswer": "C# ist eine Programmiersprache: Sie legt fest, wie du Code schreibst und was er bedeutet. .NET ist die Plattform, die C#-Programme übersetzt und ausführt.\n\nZu .NET gehören zum Beispiel der Compiler (Roslyn), die Laufzeitumgebung (CLR), die Standardbibliothek (BCL) und das SDK."
+    },
+    {
+      "id": "m00-l02-q7",
+      "lesson": "m00-l02",
+      "type": "explain",
+      "question": "Transferfrage: Wo ist es nützlich zu wissen, ob etwas zur Sprache oder zur Bibliothek gehört? Nenne ein Beispiel.",
+      "modelAnswer": "Bei Fehlern und bei der Suche nach Hilfe: Eine Frage zu `var` beantwortet die Sprachspezifikation. Eine Frage zu `Console` oder `string.ToUpper` beantwortet die Dokumentation der Bibliothek. Auch in einem SecLog-Programm hilft das: `var` kommt aus der Sprache, `ToUpper` aus der Bibliothek."
     }
   ]
 }
