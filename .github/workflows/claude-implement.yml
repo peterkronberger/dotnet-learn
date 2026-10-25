@@ -140,7 +140,7 @@ jobs:
           claude_args: |
             --model sonnet
             --max-turns 80
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(bash tools/check-examples.sh:*),Bash(node tools/check-quiz.mjs:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(pnpm:*),Bash(yarn:*)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(bash tools/check-examples.sh:*),Bash(node tools/check-quiz.mjs:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(pnpm:*),Bash(yarn:*),WebFetch(domain:learn.microsoft.com)"
             --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Only for status=needs_human: numbered questions as Markdown"}},"required":["status","reason"]}'
 
       # A script reports the result of the Claude call.
