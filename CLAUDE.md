@@ -85,7 +85,7 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 
 ## Status of the spikes (prototype tasks)
 
-Details, acceptance criteria and process: `concept/spikes.md`. Status: open · running · decided. The decisions are listed below in short form.
+Status: open · running · decided. The decisions are listed below in short form.
 
 | # | Spike | Blocks | Status |
 | --- | --- | --- | --- |
@@ -97,7 +97,7 @@ Details, acceptance criteria and process: `concept/spikes.md`. Status: open · r
 | S5 | Step-by-step visualization | module 4 | decided; manual browser check pending |
 | S6 | `Microsoft.Extensions.*` in the playground | module 15 | decided; manual browser check pending |
 | S7 | Runner ↔ page: output/test result via `postMessage` | prediction field, checked tasks | decided; manual browser check pending |
-All spikes are decided; the next work packages are the backlog B1–B11 in `concept/spikes.md`.
+All spikes are decided.
 
 ### Decisions in short form
 
@@ -126,4 +126,3 @@ All spikes are decided; the next work packages are the backlog B1–B11 in `conc
 @concept/components.md
 @concept/style-and-language.md
 @concept/ai-module.md
-@concept/spikes.md
