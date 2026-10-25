@@ -379,6 +379,135 @@
       "type": "explain",
       "question": "Transferfrage: Du liest ein Tutorial, in dem „.NET Framework 4.8“ steht. Wo würdest du dieses Wissen anwenden?",
       "modelAnswer": "Ich prüfe, ob das Tutorial alt ist oder ein bestehendes Windows-Projekt meint. Für ein neues SecLog-Projekt würde ich die Schritte auf das heutige .NET übertragen und die Dokumentation dafür lesen."
+    },
+    {
+      "id": "m00-l04-q1",
+      "lesson": "m00-l04",
+      "type": "single",
+      "question": "Ein Kollege sagt: „.NET 9 ist eine STS-Version, also eine Vorabversion. Dafür nehmen wir sie nicht in Produktion.“ Was stimmt?",
+      "options": [
+        {
+          "text": "STS-Versionen sind Previews, die nicht für den echten Einsatz gedacht sind.",
+          "feedback": "STS ist ein Support-Zeitraum, keine Reifestufe. STS-Versionen sind normale, veröffentlichte Releases mit Support.",
+          "misconception": "m00-l04-sts-is-preview"
+        },
+        {
+          "text": "STS ist eine normale Version mit kürzerem Support: 24 Monate seit .NET 9.",
+          "correct": true
+        },
+        {
+          "text": "STS-Versionen bekommen gar keinen Support.",
+          "feedback": "Sie werden unterstützt, nur kürzer als LTS-Versionen. .NET 9 zum Beispiel bis November 2026.",
+          "misconception": "m00-l04-sts-is-preview"
+        }
+      ],
+      "explanation": "Microsoft nennt STS „Standard Term Support“: Die Version wird zwei Jahre (24 Monate) unterstützt. Das sagt nichts über ihre Reife aus."
+    },
+    {
+      "id": "m00-l04-q2",
+      "lesson": "m00-l04",
+      "type": "single",
+      "question": ".NET 8 (LTS) erschien im November 2023, .NET 9 (STS) im November 2024. Was stimmt über ihr Support-Ende?",
+      "options": [
+        {
+          "text": ".NET 9 ist neuer, also hat es auch das spätere Support-Ende.",
+          "feedback": "Beide enden laut Support-Policy am 10. November 2026. Die neuere Version hat hier nicht den längeren Support.",
+          "misconception": "m00-l04-newest-has-longest-support"
+        },
+        {
+          "text": "Beide Versionen enden am 10. November 2026.",
+          "correct": true
+        },
+        {
+          "text": ".NET 8 endet früher, weil LTS-Versionen kürzer unterstützt werden.",
+          "feedback": "Es ist umgekehrt: LTS wird mindestens drei Jahre unterstützt, STS 24 Monate. Hier fallen beide Enden auf denselben Tag.",
+          "misconception": "m00-l04-newest-has-longest-support"
+        }
+      ],
+      "explanation": "LTS dauert mindestens drei Jahre (.NET 8: Nov 2023 bis Nov 2026), STS 24 Monate (.NET 9: Nov 2024 bis Nov 2026). Darum hat eine neuere STS-Version nicht automatisch längeren Support."
+    },
+    {
+      "id": "m00-l04-q3",
+      "lesson": "m00-l04",
+      "type": "match",
+      "question": "Ordne jeder C#-Version die .NET-Version zu, mit der sie erschien.",
+      "pairs": [
+        {
+          "left": "C# 11",
+          "right": ".NET 7"
+        },
+        {
+          "left": "C# 12",
+          "right": ".NET 8"
+        },
+        {
+          "left": "C# 13",
+          "right": ".NET 9"
+        },
+        {
+          "left": "C# 14",
+          "right": ".NET 10"
+        }
+      ],
+      "explanation": "Seit C# 9 / .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. Das Projekt nutzt standardmäßig die C#-Version, die zum Target Framework passt."
+    },
+    {
+      "id": "m00-l04-q4",
+      "lesson": "m00-l04",
+      "type": "single",
+      "question": "SecLog läuft auf .NET 8. Das Support-Ende ist der 10. November 2026. Wie ist der Stand am 1. Dezember 2026?",
+      "options": [
+        {
+          "text": "Support-Ende ist überschritten: .NET 8 bekommt keine Sicherheitsupdates mehr. SecLog sollte auf .NET 10 wechseln.",
+          "correct": true
+        },
+        {
+          "text": ".NET 8 ist als LTS-Version noch unterstützt.",
+          "feedback": "LTS bedeutet langer, aber nicht unbegrenzter Support. Das Datum zählt, nicht das Etikett."
+        },
+        {
+          "text": "Es kommt darauf an, ob SecLog neue Features nutzt.",
+          "feedback": "Der Support hängt von der Version und dem Datum ab, nicht davon, welche Features dein Programm nutzt."
+        }
+      ],
+      "explanation": "Nach dem Support-Ende liefert Microsoft keine Sicherheitsupdates mehr. .NET 10 (LTS) wird laut Support-Policy bis zum 14. November 2028 unterstützt."
+    },
+    {
+      "id": "m00-l04-q5",
+      "lesson": "m00-l04",
+      "type": "single",
+      "question": "Warum nutzt dieser Kurs C# 14 und .NET 10?",
+      "options": [
+        {
+          "text": "Weil .NET 10 eine LTS-Version ist: aktuell, mit Support bis zum 14. November 2028.",
+          "correct": true
+        },
+        {
+          "text": "Weil STS-Versionen wie .NET 9 Vorabversionen sind.",
+          "feedback": "STS-Versionen sind normale Releases, nur mit kürzerem Support.",
+          "misconception": "m00-l04-sts-is-preview"
+        },
+        {
+          "text": "Weil die neueste Version immer den längsten Support hat.",
+          "feedback": "Das stimmt nicht allgemein: Eine STS-Version nach einer LTS-Version kann gleichzeitig enden.",
+          "misconception": "m00-l04-newest-has-longest-support"
+        }
+      ],
+      "explanation": "Für einen Kurs zählt ein stabiler Rahmen: Mit LTS ändert sich die Basis während des Lernens nicht, und der Support läuft lange."
+    },
+    {
+      "id": "m00-l04-q6",
+      "lesson": "m00-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen LTS und STS und wie du prüfst, ob eine .NET-Version an einem Datum noch Support hat.",
+      "modelAnswer": "LTS-Versionen werden mindestens drei Jahre unterstützt, STS-Versionen seit .NET 9 24 Monate. Beide erscheinen jährlich im November, und LTS und STS wechseln sich ab.\n\nOb eine Version noch Support hat, prüfe ich mit dem Support-Ende-Datum auf der Support-Policy-Seite von Microsoft. Die Faustregel (+3 Jahre bzw. +24 Monate) ist nur eine Schätzung."
+    },
+    {
+      "id": "m00-l04-q7",
+      "lesson": "m00-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du das Wissen über Support-Enden in einem echten Projekt anwenden?",
+      "modelAnswer": "Ich trage das Support-Ende der genutzten .NET-Version in die Planung ein und plane das Update rechtzeitig, zum Beispiel für den SecLog-Server. So bekommt der Server weiter Sicherheitsupdates."
     }
   ]
 }

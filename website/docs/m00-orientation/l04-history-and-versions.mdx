@@ -1,0 +1,161 @@
+---
+title: Geschichte und Versionen
+sidebar_position: 4
+description: "Du lernst, wie oft .NET erscheint, was LTS und STS bedeuten, welche C#-Version zu welcher .NET-Version gehört und warum dieser Kurs .NET 10 nutzt."
+lesson_id: m00-l04
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import versionSupport from '!!raw-loader!@site/examples/m00/l04/version-support.cs';
+import versionSupportOutput from '!!raw-loader!@site/examples/m00/l04/version-support.out.txt';
+import supportTask from '!!raw-loader!@site/examples/m00/l04/seclog-support-task.cs';
+import supportTests from '!!raw-loader!@site/examples/m00/l04/seclog-support-task.tests.snippet.cs';
+import supportSolution from '!!raw-loader!@site/examples/m00/l04/seclog-support-solution.cs';
+
+# Geschichte und Versionen
+
+*Stand: 2026-10-25. Diese Lektion wird zweimal im Jahr geprüft (nächste Prüfung: 2027-04).*
+
+:::note[Lernziele]
+- Du ordnest C#-Versionen den .NET-Versionen zu (C# 9 / .NET 5 bis C# 14 / .NET 10).
+- Du unterscheidest <Term id="lts">LTS</Term> und <Term id="sts">STS</Term> und bestimmst, ob eine .NET-Version an einem Datum noch Support hat.
+- Du begründest, warum dieser Kurs C# 14 / .NET 10 nutzt.
+:::
+
+## Rückblick
+
+<Quiz id="m00-l02-q2" />
+
+<Quiz id="m00-l03-q1" />
+
+## Jedes Jahr im November
+
+Seit C# 9 und .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. Microsoft Learn schreibt: „C# 9 was released with .NET 5. It's the default language version for any assembly that targets the .NET 5 release.“ ([The history of C#](https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-version-history)). Diese Zuordnung gilt seitdem: Ein Projekt nutzt standardmäßig die C#-Version, die zu seinem Target Framework passt ([Configure language version](https://learn.microsoft.com/dotnet/csharp/language-reference/configure-language-version)).
+
+| C# erschien | C#-Version | .NET-Version | Support-Typ |
+| --- | --- | --- | --- |
+| November 2020 | C# 9 | .NET 5 | STS |
+| November 2021 | C# 10 | .NET 6 | LTS |
+| November 2022 | C# 11 | .NET 7 | STS |
+| November 2023 | C# 12 | .NET 8 | LTS |
+| November 2024 | C# 13 | .NET 9 | STS |
+| November 2025 | C# 14 | .NET 10 | LTS |
+
+Quellen: [The history of C#](https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-version-history) (Spalten 1 und 2), [.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support) (Support-Typ von .NET 8 bis 10: „Releases alternate between LTS and STS“). *Stand: 2026-10-25.*
+
+Die Tabelle zeigt auch: Die Typen wechseln sich ab. Gerade Versionen sind LTS, ungerade STS. Das ist die Abfolge in der Tabelle, keine Garantie für die Zukunft.
+
+## LTS und STS
+
+Microsoft kennt zwei Support-Zeiträume ([.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support)):
+
+- **LTS (Long Term Support, langer Support):** mindestens drei Jahre.
+- **STS (Standard Term Support):** zwei Jahre (24 Monate). Bis .NET 8 waren es 18 Monate, seit .NET 9 sind es 24 ([.NET Blog, 2025-09-16](https://devblogs.microsoft.com/dotnet/dotnet-sts-releases-supported-for-24-months/)).
+
+Nach dem <Term id="end-of-support">End of Support (Support-Ende)</Term> liefert Microsoft keine Fixes, Updates oder technische Hilfe mehr. Versionen außerhalb des Supports bekommen keine Sicherheitsupdates mehr ([.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support)).
+
+Verbindlich sind die Daten auf der [.NET Support Policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core). Stand 2026-10-25 stehen dort:
+
+| Version | Typ | Erschienen | Support-Ende |
+| --- | --- | --- | --- |
+| .NET 8 | LTS | November 2023 | 10. November 2026 |
+| .NET 9 | STS | November 2024 | 10. November 2026 |
+| .NET 10 | LTS | 11. November 2025 | 14. November 2028 |
+
+.NET 11 ist laut Presseberichten für den 10. November 2026 geplant und wäre eine STS-Version (nur Sekundärquelle, das Datum ist ein Plan). Dieser Kurs bleibt bei C# 14 / .NET 10.
+
+## Vorhersage und Lauf
+
+Das Programm schätzt das Support-Ende aus einem Erscheinungsdatum. Neu sind zwei Dinge: `DateOnly` ist ein Typ für ein Datum ohne Uhrzeit, und `new DateOnly(2025, 11, 11)` erzeugt den 11. November 2025. `{release:yyyy-MM-dd}` gibt das Datum als `2025-11-11` aus, unabhängig von der Landeseinstellung. Typen und Variablen kommen in Modul 1 ausführlich.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Rechne die Schätzungen im Kopf nach: LTS plus drei Jahre, STS plus 24 Monate. Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus. Wie groß ist der Unterschied zum offiziellen Datum?
+:::
+
+<CSharpRunner id="m00-l04-versions" height={380} code={versionSupport} predict expected={versionSupportOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen.
+
+1. **Ausgangsdatum lesen:** `release` ist der 11. November 2025, das Erscheinungsdatum von .NET 10.
+2. **Regel anwenden:** `AddYears(3)` ergibt 2028-11-11, `AddMonths(24)` ergibt 2027-11-11.
+3. **Mit der Policy vergleichen:** Das offizielle Ende von .NET 10 ist 2028-11-14, also drei Tage später als die Schätzung. `DayNumber` zählt die Tage seit einem festen Anfangsdatum, darum ergibt die Differenz `3`.
+
+Die Faustregel liefert nur eine Schätzung. Verbindlich ist die Support-Policy.
+
+Was passiert, wenn du `AddYears(3)` durch `AddYears(2)` ersetzt? Probiere es im Runner aus.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum die Regel nur eine Schätzung ist (optional)</summary>
+
+Microsoft schreibt, LTS-Versionen würden „for a minimum of three years, or one year after the next LTS release ships if that date is later“ unterstützt ([.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support)). „Drei Jahre“ ist also ein Minimum, und die genauen Tage legt die Support-Policy fest. Eine feste Rechenregel im Code ersetzt das Nachschlagen nicht.
+
+</details>
+
+## Ändern und selbermachen
+
+Der SecLog-Server läuft auf .NET 8. Bis wann ist er unterstützt, und wann muss er auf .NET 10 wechseln? Das Programm prüft ein Datum gegen das Support-Ende.
+
+<CSharpRunner id="m00-l04-support" height={360} code={supportTask} tests={supportTests} />
+
+Aufgabe: Ändere nur das Prüfdatum auf den 1. Dezember 2026, sodass das Programm `Supported: False` ausgibt. Das Support-Ende von .NET 8 ist der 10. November 2026 ([.NET Support Policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core)). Vereinfachung im Beispiel: Der Endtag selbst zählt schon als nicht mehr unterstützt.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-support-solution.cs">{supportSolution}</CodeBlock>
+
+1. **Frage klären:** Ist .NET 8 am Prüfdatum noch unterstützt?
+2. **Datum vergleichen:** `checkDate < endOfSupport` ist nur wahr, wenn das Prüfdatum vor dem Ende liegt.
+3. **Folgern:** Am 1. Dezember 2026 ist das Ende vorbei. SecLog muss vorher auf eine unterstützte Version wechseln, zum Beispiel .NET 10 (LTS, bis 14. November 2028).
+
+</details>
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m00-l04-sts-is-preview" />
+
+**„STS-Versionen sind Vorabversionen und nichts für echte Projekte.“** STS steht für einen kürzeren Support-Zeitraum, nicht für eine Reifestufe. STS-Versionen sind normale Releases mit Support ([.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support)). Wichtig ist, dass du das Support-Ende kennst und rechtzeitig wechselst.
+:::
+
+:::warning[Achtung]
+<Misconception id="m00-l04-newest-has-longest-support" />
+
+**„Die neueste Version hat immer den längsten Support.“** .NET 8 (LTS, November 2023) und .NET 9 (STS, November 2024) enden beide am 10. November 2026. Die neuere Version hat hier keinen längeren Support ([.NET Support Policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core)).
+:::
+
+## Zusammenfassung
+
+Seit .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version, zum Beispiel C# 14 mit .NET 10. LTS-Versionen werden mindestens drei Jahre unterstützt, STS-Versionen 24 Monate (vor .NET 9: 18). Ob eine Version unterstützt ist, entscheidet das Datum auf der Support-Policy, nicht die Rechenregel. Der Kurs nutzt C# 14 / .NET 10, weil es eine aktuelle LTS-Version ist.
+
+## Prüfe dein Wissen
+
+<Quiz id="m00-l04-q1" />
+
+<Quiz id="m00-l04-q2" />
+
+<Quiz id="m00-l04-q3" />
+
+<Quiz id="m00-l04-q4" />
+
+<Quiz id="m00-l04-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m00-l04-q6" />
+
+### Transferfrage
+
+<Quiz id="m00-l04-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [.NET releases, patches, and support](https://learn.microsoft.com/dotnet/core/releases-and-support)
+- .NET Support Policy: [dotnet.microsoft.com](https://dotnet.microsoft.com/platform/support/policy/dotnet-core)
+- Microsoft Learn: [The history of C#](https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-version-history)
