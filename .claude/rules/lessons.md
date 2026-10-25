@@ -6,10 +6,10 @@ paths:
 
 # Rules for writing lessons
 
-- Follow `concept/lektions-template.md` exactly (11 steps, practice-example pattern in step 4).
+- Follow `concept/lesson-template.md` exactly (11 steps, practice-example pattern in step 4).
 - Before you finish, check the Definition of Done in `CLAUDE.md` point by point and tick it off in the PR.
-- Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`), `duration_min`.
-- Body text in German, informal "Du" form, matter-of-fact (`concept/stil-und-sprache.md`). Code, identifiers and comments in English.
+- Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`; review modules `wXX-lYY`, see `concept/module-plan.md`), `duration_min`.
+- Body text in German, informal "Du" form, matter-of-fact (`concept/style-and-language.md`). Code, identifiers and comments in English.
 - Do not write code inline. Import it from `website/examples/mXX/lYY/*.cs`.
 - Never type outputs by hand. Take them only from CI snapshots (`<name>.out.txt`, made by `bash tools/check-examples.sh`; rewrite them on purpose with `--update`).
 - Code that cannot run: a normal code block with a title, without a "not runnable" note.
@@ -20,5 +20,5 @@ paths:
 - New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
 - End with "Weiterlesen" (further reading): 1–3 links to Microsoft Learn or the C# specification. The links must exist.
-- Before writing, check in the spike table in `CLAUDE.md` whether a spike that is not decided yet blocks the module.
+- Before writing, check that nothing blocks the module: every component the lesson needs is "available" in `concept/components.md` (not "planned"), and no entry under "Open questions" in `concept/module-plan.md` concerns it (step 0 in `concept/issue-blueprint.md`).
 - No AI content outside module 19.

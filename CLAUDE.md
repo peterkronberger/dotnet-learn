@@ -89,7 +89,7 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 - A new module starts with a module epic built from `concept/issue-blueprint.md` (templates for epic, scaffold, lesson and review issues, dependency rules).
 - Changes to `.github/workflows/` need a human (set in `claude-implement.yml`).
 - Pull requests (title and description) and commit messages are written in English.
-- Half-yearly review (next: 2027-04) about ned C#/.Net features, AI module (state of studies, links), dead links.
+- Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
 ## Concept (binding)
 

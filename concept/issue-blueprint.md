@@ -66,6 +66,65 @@ Human: module epic  ──label claude:auto-architect──▶  Architect (Opus)
 
 **Step 5 – Plan the split and the chain** (section 6), then write the epic and set the label `claude:auto-architect`.
 
+### Placeholders in the templates
+
+Replace every placeholder before an issue is created. A leftover placeholder makes the issue ambiguous, and a wrong `#<number>` blocks it forever.
+
+**Module and lesson numbers**
+
+| Placeholder | Meaning | Format | Example (M3, lesson 10) | Comes from |
+| --- | --- | --- | --- | --- |
+| `MXX` | Module in titles and text | `M` + number without leading zero | `M3` | module plan |
+| `mXX` | Module in paths and ids | `m` + two digits | `m03` | module plan |
+| `XX` (in `Modul XX`, `position XX`) | Module number in `_category_.json` | number without leading zero | `3` | module plan |
+| `LYY` | Lesson in issue titles | `L` + two digits | `L10` | step 3 |
+| `lYY` | Lesson in paths and ids | `l` + two digits | `l10` | step 3 |
+| `mXX-lYY` | `lesson_id` | `mXX-lYY` | `m03-l10` | step 3 |
+| `mXX-lZZ` | Another lesson of the same module (cross-reference) | as `mXX-lYY` | `m03-l08` | epic, "Scope" |
+
+For review modules replace `m`/`M` with `w`/`W` (`w01-l01`, "W1"); see "Location and naming" in `module-plan.md`.
+
+**Names and slugs**
+
+| Placeholder | Meaning | Format | Example |
+| --- | --- | --- | --- |
+| `<German module title>` | Module title as in the module plan heading | German, unchanged | `Methoden` |
+| `<German title>`, `<German lesson title>` | Lesson title (learner-facing) | German | `Rekursion und Aufrufstapel` |
+| `<slug>` in `mXX-<slug>/` | Module folder slug | English, kebab-case | `methods` → `m03-methods/` |
+| `<slug>` in `lYY-<slug>.mdx` | Lesson file slug | English, kebab-case | `recursion` → `l10-recursion.mdx` |
+| `<slug>` / `<kebab-slug>` in misconception ids | Short name of the misconception | English, kebab-case | `m03-l10-no-base-case` |
+| `<name>` in `website/examples/mXX/lYY/<name>.cs` | Example file | English, kebab-case, descriptive | `factorial.cs` |
+| `<name>` in `website/examples/_ci/<name>/` | CI project (◻ modules) | existing folder name | `xunit`, `ef-core`, `minimal-api`, `di-logging` |
+| `q<n>` | Number of a quiz question in the lesson | `q1`, `q2`, … | `m03-l10-q3` |
+
+**Content placeholders** (copied from the epic or the module plan)
+
+| Placeholder | Fill with |
+| --- | --- |
+| `<core concept in one sentence>` | The "Core concept" column of the epic, as one sentence |
+| `<lesson line>` | The line of the lesson in the module section of `module-plan.md`, word for word |
+| `<item>` | One row of the epic's "Spec coverage" table |
+| `<clause URL or feature spec URL>` | The source of that row (draft clause or feature specification, opened and checked) |
+| `<feature>` + `csharp="…" dotnet="…"` | One row of the epic's "Version badges" table, e.g. `params` collections → `csharp="13" dotnet="9"` |
+| `<plan wording>` | The misconception as written in the module plan |
+| `<question>` | The open question as written under "Open questions" in `module-plan.md` |
+| `<copy section 5.1>` | The full checkbox list of section 5.1 |
+| `▶ / ◻`, `yes/no` | Keep one of the options, delete the other |
+| `…` | Free text or table rows; delete rows you do not need, never leave `…` in the issue |
+
+**Issue numbers** (only known after the issues exist)
+
+| Placeholder | Fill with |
+| --- | --- |
+| `#<epic>` | Number of the module epic |
+| `#<scaffold issue or previous lesson issue>` | First lesson: the scaffold issue. Every other lesson: the lesson before it in sidebar order (section 6) |
+| `#<last lesson issue>` | The last lesson issue of the module (for the review issue) |
+| `#<number>` | Any other dependency, one `Depends on #<number>` line each |
+
+Create the issues in dependency order (epic → scaffold → lessons → review), so the numbers exist when you write them. The architect does this itself when it splits the epic.
+
+**Not placeholders – keep them as they are:** component tags and syntax that the lesson must use, such as `<Quiz>`, `<Term>`, `<Misconception id="…" />`, `<Since csharp="…" dotnet="…" />`, `<CSharpRunner predict expected={…}>`, `<CSharpRunner tests={…}>`, `<CodeBlock>`, `<Diagram>`, `<FromLanguage>`, `:::note[Lernziele]`. Their `…` values are filled when the lesson is written, not when the issue is created.
+
 ## 4. Template: module epic
 
 Title: `Module MXX – <German module title>`
@@ -313,7 +372,7 @@ Fill the epic of each module with these extra points (on top of its section in `
 | M1 | ▶ | Existing lessons `m01-l02`, `m01-l03` keep their ids; L1 "Statements and output" is still missing. Console input depends on the planned `stdin` prop → prerequisite issue or task without input. Culture-independent outputs (`3.5`). |
 | M2 | ▶ | Split of the existing `m02-l01` is part of the epic: keep `m02-l01` for the first part, new ids for the rest; move quiz questions to the matching new `lesson` values. |
 | M3–M6 | ▶ | `trace` (step view) fits recursion (M3), argument passing (M4), arrays (M5) and objects (M6). M6 explains `Main` (`CLAUDE.md` rule 2 "explained later"). |
-| W1–W4 | ▶ | Mixed practice only, no new content: questions must first make learners recognize the concept. Folder and `lesson_id` format for review modules is not defined yet → research/decision issue first. |
+| W1–W4 | ▶ | Mixed practice only, no new content: questions must first make learners recognize the concept. Folder, `lesson_id` (`wXX-lYY`), quiz file and sidebar position as in `module-plan.md`, "Location and naming". Before W1: decide which DoD points apply to review lessons (open decision there → decision issue, template 5.5). |
 | M7 | ▶/◻ | File lesson: decide ▶ or ◻ first (open question on the playground file system). |
 | M8 | ▶ | Sealing: check the current design guideline and analyzer rule before writing (open question). |
 | M9–M12 | ▶ | M11: extension members (C# 14) need the badge; M12: check `with` for structs/anonymous types in the feature spec first. |
@@ -362,8 +421,9 @@ Fill the epic of each module with these extra points (on top of its section in `
 
 The lesson titles, cut and minutes above are an example of the format, not a decision; the real cut is made when the M3 epic is written.
 
-## 9. Known inconsistencies (fix in a separate issue)
+## 9. Changes to related files (2026-10-25)
 
-- `.claude/rules/lessons.md` refers to `concept/lektions-template.md` and `concept/stil-und-sprache.md`; the files are `concept/lesson-template.md` and `concept/style-and-language.md`.
-- `.claude/rules/lessons.md` asks to check a "spike table in `CLAUDE.md`"; `CLAUDE.md` has no such table (spikes S1–S7 are only referenced by name).
-- The format of review modules (W1–W4: folder, `lesson_id`, sidebar) is not defined anywhere.
+Fixed together with this blueprint:
+- `.claude/rules/lessons.md` now points to `concept/lesson-template.md` and `concept/style-and-language.md` (before: old German file names).
+- `.claude/rules/lessons.md` asked to check a "spike table in `CLAUDE.md`" that does not exist. It now asks to check `concept/components.md` (component status) and "Open questions" in `concept/module-plan.md` (step 0 above).
+- The format of review modules W1–W4 is now defined in `concept/module-plan.md`, "Location and naming". Still open: which DoD points apply to review lessons.
