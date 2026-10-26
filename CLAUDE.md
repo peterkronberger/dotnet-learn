@@ -81,6 +81,7 @@ A lesson is done when all points are met:
 12. At least one task "In eigenen Worten erklären" (explain in your own words).
 13. Each information regarding C# is validated against the C# language specification on Microsoft Learn
 14. Every information is described in detail before it is part of any quiz
+15. When finalizing a module, ensure that the lessons follow a cohesive thread throughout. Across all lessons, do not assume any programming-related information unless it has been explained beforehand—either in this module or in a preceding one.
 
 In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
 
