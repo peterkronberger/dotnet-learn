@@ -1,43 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
+import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
 import {renderInline} from './QuizText';
 import {getExample} from '../../data/quiz/examples';
 import styles from './styles.module.css';
-
-// Simple string hash (FNV-1a) used as the seed.
-function hashSeed(seed) {
-  let h = 2166136261;
-  for (let i = 0; i < seed.length; i++) {
-    h ^= seed.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return h >>> 0;
-}
-
-// Deterministic PRNG (mulberry32).
-function random(seedNumber) {
-  let a = seedNumber;
-  return () => {
-    a = (a + 0x6d2b79f5) >>> 0;
-    let t = a;
-    t = Math.imul(t ^ (t >>> 15), t | 1);
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// Fisher-Yates shuffle with a fixed seed, so SSR and client render the same order.
-export function seededShuffle(items, seed) {
-  const result = [...items];
-  const next = random(hashSeed(seed));
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(next() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
-  }
-  return result;
-}
 
 // Non-empty lines of the example file; indentation stays part of the line.
 export function solutionLines(code) {
@@ -59,7 +27,7 @@ export default function ParsonsQuestion({question, onResult}) {
   const distractorMisconceptions = question.distractorMisconceptions ?? {};
   // Items get a stable id: solution lines first, then distractors.
   const items = [...correct, ...distractors].map((text, id) => ({id, text}));
-  const [order] = useState(() => seededShuffle(items, question.id).map((item) => item.id));
+  const {order, ready, reshuffle} = useShuffledOrder(items.length);
 
   const [chosen, setChosen] = useState([]); // item ids in the learner's order
   const [result, setResult] = useState(null);
@@ -135,6 +103,7 @@ export default function ParsonsQuestion({question, onResult}) {
   function retry() {
     setResult(null);
     setAnnouncement('');
+    reshuffle();
   }
 
   const rows = Math.max(chosen.length, correct.length);
@@ -179,7 +148,7 @@ export default function ParsonsQuestion({question, onResult}) {
       <h4 className={styles.parsonsHeading} id={`${question.id}-available`}>
         <Translate id="quiz.parsons.available">Verfügbare Zeilen</Translate>
       </h4>
-      <ol className={styles.parsonsList} aria-labelledby={`${question.id}-available`}>
+      <ol className={clsx(styles.parsonsList, !ready && styles.shuffling)} aria-labelledby={`${question.id}-available`}>
         {available.map((id) => (
           <li key={id} className={styles.parsonsItem}>
             <code className={styles.parsonsCode}>{items[id].text}</code>

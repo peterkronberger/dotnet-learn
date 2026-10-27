@@ -265,3 +265,8 @@
   outline: 3px solid var(--ifm-color-primary);
   outline-offset: 2px;
 }
+
+/* Options are hidden until the first shuffle ran (see shuffle.js); the space stays reserved. */
+.shuffling {
+  visibility: hidden;
+}

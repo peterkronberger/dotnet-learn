@@ -1,6 +1,7 @@
 import React, {useId, useState} from 'react';
 import clsx from 'clsx';
 import Translate from '@docusaurus/Translate';
+import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
 import {renderInline} from './QuizText';
 import styles from './styles.module.css';
@@ -12,6 +13,8 @@ export default function Choice({question, multi, onResult}) {
   const [result, setResult] = useState(null);
   const checked = result !== null;
   const options = question.options;
+  const pinnedLast = options.flatMap((o, i) => (o.pin === 'last' ? [i] : []));
+  const {order, ready, reshuffle} = useShuffledOrder(options.length, {pinnedLast});
 
   function toggle(index) {
     setSelected((prev) =>
@@ -31,6 +34,7 @@ export default function Choice({question, multi, onResult}) {
   function retry() {
     setSelected([]);
     setResult(null);
+    reshuffle();
   }
 
   // Feedback of wrongly set options (and missing correct ones for multi).
@@ -48,7 +52,9 @@ export default function Choice({question, multi, onResult}) {
     <form className={styles.quiz} onSubmit={check}>
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
-        {options.map((option, index) => {
+        <div className={clsx(!ready && styles.shuffling)}>
+        {order.map((index) => {
+          const option = options[index];
           const isSelected = selected.includes(index);
           const isCorrect = Boolean(option.correct);
           return (
@@ -73,6 +79,7 @@ export default function Choice({question, multi, onResult}) {
             </label>
           );
         })}
+        </div>
       </fieldset>
       {multi && !checked && (
         <p className={styles.hint}>
