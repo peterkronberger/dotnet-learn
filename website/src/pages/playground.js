@@ -14,7 +14,7 @@ export default function Playground() {
           (Top-Level-Statements). Häufige Namespaces wie <code>System</code>,{' '}
           <code>System.Linq</code> und <code>System.Collections.Generic</code> sind bereits eingebunden.
         </p>
-        <CSharpRunner code={STARTER} height={640} />
+        <CSharpRunner code={STARTER} minHeight={640} />
       </main>
     </Layout>
   );

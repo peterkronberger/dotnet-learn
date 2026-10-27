@@ -18,19 +18,19 @@ export default function RunnerDemo() {
         <h1>Runner-Demo (Spike S7)</h1>
         <h2>Vorhersagefeld</h2>
         <p>Tippe die Ausgabe jeder Zeile, führe den Code aus und vergleiche.</p>
-        <CSharpRunner id="s7-predict" code={predictDemo} predict expected={predictDemoOutput} height={300} />
+        <CSharpRunner id="s7-predict" code={predictDemo} predict expected={predictDemoOutput} />
         <h2>Geprüfte Aufgabe</h2>
         <p>
           Implementiere <code>IsPalindrome</code>. Zwei Tests sind sichtbar, zwei versteckt.
         </p>
-        <CSharpRunner id="s7-task" code={palindromeTask} tests={palindromeTests} height={360} />
+        <CSharpRunner id="s7-task" code={palindromeTask} tests={palindromeTests} />
         <h2>Schrittansicht (Spike S5)</h2>
         <p>
           Mit <code>trace</code> zeigt der Runner nach dem Ausführen Zeile, Variablen und Ausgabe pro Schritt.
         </p>
-        <CSharpRunner id="s5-loop" code={loopTrace} trace height={900} />
+        <CSharpRunner id="s5-loop" code={loopTrace} trace />
         <p>Wert- und Referenztypen: zwei Variablen können auf dasselbe Objekt zeigen.</p>
-        <CSharpRunner id="s5-refs" code={referenceTypes} trace height={1000} />
+        <CSharpRunner id="s5-refs" code={referenceTypes} trace />
       </main>
     </Layout>
   );
