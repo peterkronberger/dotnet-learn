@@ -81,6 +81,15 @@
         pre.innerHTML = html;
         pre.parentElement.classList.add('pg-overlay');
         syncScroll();
+        fitHeight();
+    }
+
+    // The editor grows with its code and never scrolls vertically.
+    function fitHeight() {
+        var textarea = document.getElementById('editor');
+        if (!textarea) { return; }
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 2 + 'px'; // + top and bottom border (1px each)
     }
 
     function syncScroll() {
@@ -122,6 +131,7 @@
                 render();
             }
         });
+        window.addEventListener('resize', fitHeight);
         document.addEventListener('scroll', function (event) {
             if (event.target && event.target.id === 'editor') { syncScroll(); }
         }, true);

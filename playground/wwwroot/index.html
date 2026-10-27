@@ -40,6 +40,30 @@
             }
         };
 
+        // Report the content height (of #app, not of the document) to the embedding page.
+        (function () {
+            if (!window.parent || window.parent === window) { return; }
+            var app = document.getElementById('app');
+            if (!app || typeof ResizeObserver === 'undefined') { return; }
+            var id = null;
+            var parts = window.location.hash.slice(1).split('&');
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i].indexOf('id=') === 0) {
+                    try { id = decodeURIComponent(parts[i].slice(3)); } catch (e) { id = null; }
+                    break;
+                }
+            }
+            var lastHeight = -1;
+            function post() {
+                var height = Math.ceil(app.getBoundingClientRect().height);
+                if (height === lastHeight) { return; }
+                lastHeight = height;
+                window.pgBridge.report({ type: 'resize', id: id, height: height });
+            }
+            new ResizeObserver(post).observe(app);
+            post();
+        })();
+
         // Editor comfort: Tab indents, Esc releases the focus, Ctrl/⌘+Enter runs the code.
         var tabTrapActive = true;
         document.addEventListener('keydown', function (event) {

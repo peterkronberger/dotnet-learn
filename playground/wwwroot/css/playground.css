@@ -146,7 +146,7 @@ body {
 
 .pg-editor {
   width: 100%;
-  min-height: 11rem;
+  min-height: calc(3 * 1.55em + 1.6rem + 2px);
   padding: 0.8rem 0.9rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
@@ -159,7 +159,8 @@ body {
   font-variant-ligatures: none;
   font-kerning: none;
   letter-spacing: normal;
-  resize: vertical;
+  resize: none;
+  overflow-y: hidden;
   display: block;
 }
 
@@ -181,7 +182,6 @@ body {
   border: 1px solid transparent;
   border-radius: 0.75rem;
   overflow: hidden;
-  scrollbar-gutter: stable;
   pointer-events: none;
   font-family: var(--mono);
   font-size: 0.92rem;
@@ -201,8 +201,8 @@ body {
   background: transparent;
   color: transparent;
   caret-color: var(--text);
-  overflow: auto;
-  scrollbar-gutter: stable;
+  overflow-x: hidden;
+  overflow-y: hidden;
   white-space: pre-wrap;
   overflow-wrap: break-word;
   word-break: normal;
@@ -321,7 +321,8 @@ body {
 .pg-steps { margin-top: 1rem; }
 .pg-steps-nav { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
 .pg-code-lines { list-style: none; margin: 0.5rem 0; padding: 0; font-family: var(--mono, monospace); font-size: 0.9rem; }
-.pg-line { display: flex; gap: 0.5rem; white-space: pre; padding: 0 0.25rem; }
+.pg-line { display: flex; gap: 0.5rem; white-space: pre-wrap; overflow-wrap: anywhere; padding: 0 0.25rem; }
+.pg-line code { min-width: 0; }
 .pg-line-current { font-weight: bold; border-left: 4px solid var(--accent); background: var(--accent-bg, rgba(127, 127, 127, 0.2)); }
 .pg-marker { width: 1.2em; }
 .pg-lineno { width: 2.5em; text-align: right; opacity: 0.7; }
