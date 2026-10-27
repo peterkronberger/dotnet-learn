@@ -1,6 +1,6 @@
 # Didactics – learning methods and evidence
 
-As of 2026-10-22. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
+As of 2026-10-27. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
 
 ## Two target groups, one core path
 
@@ -60,6 +60,7 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 - [Brod 2021] Brod, G. (2021). Predicting as a learning strategy. *Psychonomic Bulletin & Review*. https://doi.org/10.3758/s13423-021-01904-1
 - [Brod 2022] Brod, G., Greve, A., Jolles, D., Theobald, M., & Galeano-Keiner, E. M. (2022). Explicitly predicting outcomes enhances learning of expectancy-violating information. *Psychonomic Bulletin & Review, 29*, 2192–2201. https://doi.org/10.3758/s13423-022-02124-x – Limitation: studies fact learning.
 - [Cepeda 2006] Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks. *Psychological Bulletin, 132*(3), 354–380. https://doi.org/10.1037/0033-2909.132.3.354
+- [DeStefano & LeFevre 2007] DeStefano, D., & LeFevre, J.-A. (2007). Cognitive load in hypertext reading: A review. *Computers in Human Behavior, 23*(3), 1616–1641. https://doi.org/10.1016/j.chb.2005.08.012 – Volume and pages taken from the bibliographic record.
 - [Dunlosky 2013] Dunlosky, J., Rawson, K. A., Marsh, E. J., Nathan, M. J., & Willingham, D. T. (2013). Improving students' learning with effective learning techniques. *Psychological Science in the Public Interest, 14*(1), 4–58. https://doi.org/10.1177/1529100612453266
 - [Ehlert & Schulte 2009] Ehlert, A., & Schulte, C. (2009). Empirical comparison of objects-first and objects-later. *ICER '09*, 15–26.
 - [Guo 2013] Guo, P. J. (2013). Online Python Tutor: Embeddable web-based program visualization for CS education. *SIGCSE '13*.
@@ -75,6 +76,7 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 - [Sentance 2019] Sentance, S., Waite, J., & Kallia, M. (2019). Teaching computer programming with PRIMM: A sociocultural perspective. *Computer Science Education, 29*(2–3), 136–176. https://doi.org/10.1080/08993408.2019.1608781
 - [Shen & Tamkin 2026] Shen, J. H., & Tamkin, A. (2026). How AI impacts skill formation. arXiv:2601.20245 (Anthropic; disclose the conflict of interest).
 - [Sorva 2013] Sorva, J. (2013). Notional machines and introductory programming education. *ACM Transactions on Computing Education, 13*(2). https://doi.org/10.1145/2483710.2483713
+- [Sweller, van Merriënboer & Paas 2019] Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. *Educational Psychology Review, 31*(2), 261–292. https://doi.org/10.1007/s10648-019-09465-5
 
 Not verified by us (check before use):
 

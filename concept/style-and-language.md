@@ -33,10 +33,8 @@
 
 ## Sources and currency
 
-- Technical statements → Microsoft Learn or the C# specification. At the end of a lesson, add "Weiterlesen" with 1–3 links.
-- Teaching literature appears only on the page "Wie dieser Kurs funktioniert" (how this course works), not in every lesson.
+- Verification, visible citation, "Weiterlesen" and wording rules: `concept/sources.md`.
 - Content about versions, history and AI carries "Stand: YYYY-MM-DD" (as of date) and is reviewed twice a year.
-- Do not invent anything. If a source is missing, leave the statement out or mark it as an open question.
 
 ## Accessibility (WCAG 2.2 AA)
 

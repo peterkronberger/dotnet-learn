@@ -19,6 +19,11 @@ paths:
 - After changing quiz data or misconception boxes, run `node tools/check-quiz.mjs`.
 - New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
-- End with "Weiterlesen" (further reading): 1–3 links to Microsoft Learn or the C# specification. The links must exist.
+- Sources (`concept/sources.md`):
+  - No attribution phrases such as "laut Microsoft Learn", "die Quelle sagt" or "Microsoft beschreibt". State the fact directly. The forbidden list is in `concept/sources.md`, "Automatic check".
+  - No English quotes in German text. Paraphrase in German.
+  - At most one inline link per paragraph, on a descriptive noun phrase (never "hier").
+  - The PR contains the section "Verification" (table: statement · URL with clause or heading · date checked).
+- End with "Weiterlesen" (further reading): level 3 of `concept/sources.md` (1–3 links to Microsoft Learn or the C# specification). The links must exist.
 - Before writing, check that nothing blocks the module: every component the lesson needs is "available" in `concept/components.md` (not "planned"), and no entry under "Open questions" in `concept/module-plan.md` concerns it (see section 5 of `concept/issue-blueprint.md`).
 - No AI content outside module 19.

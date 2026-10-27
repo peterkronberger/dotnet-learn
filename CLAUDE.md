@@ -57,7 +57,7 @@ Before every commit: run both build checks. If one fails, do not commit.
 4. **Every shown output is real**: it must match the actual run (CI comparison, S2). No outputs invented by hand.
 5. **Not runnable ≠ marked**: code examples that the playground cannot run (ASP.NET Core, EF Core, unit tests) are normal ` ```csharp title="…" ` blocks without a note.
 6. **Runnable** is only what runs in `<CSharpRunner>`. Practice examples follow the pattern *predict → runner → solution and explanation → deepening (optional)*.
-7. **Facts need a source**: technical statements link to Microsoft Learn or the C# specification; teaching statements link to the literature in `concept/didactics.md`. Do not invent anything – if in doubt, mark it as an open question.
+7. **Facts need a source**: every statement is verified against a primary source (Microsoft Learn or the C# specification). The lesson shows a source only where it helps the learner and words it without attribution phrases. Teaching statements link to the literature in `concept/didactics.md`. Do not invent anything – if in doubt, mark it as an open question. Details: `concept/sources.md`.
 8. **Lesson = 15–25 min, one core concept.** Longer → split.
 9. **Accessibility WCAG 2.2 AA**: keyboard use for all interactions, contrast in light and dark mode, text alternative for diagrams.
 10. **No tracking**, no accounts. Learning progress only local (localStorage/IndexedDB) with JSON export/import.
@@ -72,16 +72,17 @@ A lesson is done when all points are met:
 3. The required methods are included: worked example with fading, PRIMM practice example, retrieval practice, questions for spaced repetition.
 4. At least one misconception is handled (box "Achtung").
 5. Features from C# 12 / .NET 8 or newer carry the version badge.
-6. Technical statements in "Vertiefung" (deepening) sections link to Microsoft Learn or the C# specification.
+6. Technical statements in "Vertiefung" (deepening) sections are verified and cited as in `concept/sources.md` level 2 (clause as link text).
 7. Duration 15–25 min (estimated by word count and number of tasks).
 8. Every worked example has subgoal labels.
 9. At least one task has a real application context (mostly SecLog or the phishing classifier).
 10. At least one transfer question ("Where would you use this?") or an extra project exercise.
 11. Every misconception box is linked to at least one wrong answer in the quiz.
 12. At least one task "In eigenen Worten erklären" (explain in your own words).
-13. Each information regarding C# is validated against the C# language specification on Microsoft Learn
+13. Each information regarding C# is validated against the C# language specification on Microsoft Learn (verification: `concept/sources.md` level 0)
 14. Every information is described in detail before it is part of any quiz
 15. When finalizing a module, ensure that the lessons follow a cohesive thread throughout. Across all lessons, do not assume any programming-related information unless it has been explained beforehand—either in this module or in a preceding one.
+16. The PR contains the section "Verification" (table: statement · URL with clause or heading · date checked), see `concept/sources.md` level 0.
 
 In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
 
@@ -100,4 +101,5 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 @concept/module-plan.md
 @concept/components.md
 @concept/style-and-language.md
+@concept/sources.md
 @concept/ai-module.md
