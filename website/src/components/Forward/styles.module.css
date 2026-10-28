@@ -1,0 +1,13 @@
+/* Short note in the lesson flow: left border and muted background, no color-only signal. */
+.forward {
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  border-left: 4px solid var(--ifm-color-emphasis-500);
+  background-color: var(--ifm-color-emphasis-100);
+  color: var(--ifm-font-color-base);
+  font-size: 0.9rem;
+}
+
+.forward p {
+  margin: 0;
+}

@@ -8,6 +8,7 @@ import Since from '@site/src/components/Since';
 import Term from '@site/src/components/Term';
 import DevNav from '@site/src/components/DevNav';
 import Diagram from '@site/src/components/Diagram';
+import Forward from '@site/src/components/Forward';
 
 // Components are available in all .mdx files without an import.
 export default {
@@ -21,4 +22,5 @@ export default {
   Term,
   DevNav,
   Diagram,
+  Forward,
 };
