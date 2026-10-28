@@ -34,8 +34,8 @@ import modelSolution from '!!raw-loader!@site/examples/m00/l05/seclog-model-solu
 
 Dein Quelltext ist Text. Ein Prozessor kann ihn nicht ausführen. In .NET sind dafür zwei Übersetzungsschritte nötig ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)):
 
-1. **<Term id="compiler">Compiler</Term>:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. Microsoft Learn beschreibt IL als „CPU-independent set of instructions that can be efficiently converted to native code“. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
-2. **<Term id="jit">JIT (Just-in-Time-Compiler)</Term>:** Er gehört zur <Term id="clr">CLR</Term> und übersetzt die IL erst, wenn das Programm läuft, in Maschinencode für den Prozessor. Die Quelle sagt: Eine Methode wird beim ersten Aufruf übersetzt, danach läuft der gespeicherte Maschinencode.
+1. **<Term id="compiler">Compiler</Term>:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. IL ist eine prozessorunabhängige Folge von Befehlen, die sich effizient in Maschinencode umwandeln lässt. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
+2. **<Term id="jit">JIT (Just-in-Time-Compiler)</Term>:** Er gehört zur <Term id="clr">CLR</Term> und übersetzt die IL erst, wenn das Programm läuft, in Maschinencode für den Prozessor. Eine Methode wird beim ersten Aufruf übersetzt, danach läuft der gespeicherte Maschinencode.
 
 Der Maschinencode ist die erste Form, die der Prozessor direkt ausführen kann. Die CLR führt das Programm dann aus und bietet Dienste wie die automatische Speicherverwaltung.
 
@@ -94,7 +94,7 @@ Was passiert, wenn du in Zeile 1 das Semikolon am Ende löschst? Probiere es im 
 <details>
 <summary>Vertiefung: Warum nicht gleich alles vorab in Maschinencode? (optional)</summary>
 
-Microsoft Learn nennt für den JIT zwei Eigenschaften ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)): Dieselbe IL kann auf jeder unterstützten Prozessorarchitektur laufen, weil die CLR für jede Architektur einen JIT mitbringt. Und der JIT übersetzt nur, was wirklich aufgerufen wird, statt Zeit und Speicher für alle Methoden aufzuwenden. Der Preis: Die Übersetzung kostet Zeit während des Laufs. Die nächsten Abschnitte zeigen Wege, davon etwas vorab zu erledigen.
+Der JIT hat zwei Eigenschaften (siehe [Compilation by the JIT compiler](https://learn.microsoft.com/dotnet/standard/managed-execution-process#compilation-by-the-jit-compiler)): Dieselbe IL kann auf jeder unterstützten Prozessorarchitektur laufen, weil die CLR für jede Architektur einen JIT mitbringt. Und der JIT übersetzt nur, was wirklich aufgerufen wird, statt Zeit und Speicher für alle Methoden aufzuwenden. Der Preis: Die Übersetzung kostet Zeit während des Laufs. Die nächsten Abschnitte zeigen Wege, davon etwas vorab zu erledigen.
 
 </details>
 
@@ -105,10 +105,8 @@ Der JIT ist der Standard. Es gibt zwei Varianten, bei denen Maschinencode schon 
 | Modell | Was steckt im Programm? | Start | Kompatibilität und Größe |
 | --- | --- | --- | --- |
 | **JIT zur Laufzeit** (Standard) | IL | Der JIT übersetzt beim Lauf. | Läuft auf jedem Rechner mit passender .NET-Laufzeit. |
-| **ReadyToRun** | IL **und** vorab erzeugter Maschinencode | Weniger JIT-Arbeit beim Start. | Dateien werden größer, laut Quelle meist zwei- bis dreimal. Der JIT bleibt nötig, zum Beispiel für manche Methoden. |
+| **ReadyToRun** | IL **und** vorab erzeugter Maschinencode | Weniger JIT-Arbeit beim Start. | Dateien werden größer, meist auf das Zwei- bis Dreifache (siehe [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run#impact-of-using-the-readytorun-feature), Stand: 2026-10-28). Der JIT bleibt nötig, zum Beispiel für manche Methoden. |
 | **Native AOT** | Nur Maschinencode (mit der nötigen Laufzeit darin) | Schnellerer Start, kein JIT. | Läuft ohne installierte .NET-Laufzeit, aber mit Einschränkungen: zum Beispiel kein dynamisches Laden von Assemblies und kein Erzeugen von Code zur Laufzeit. |
-
-Quellen: [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run) („R2R binaries are larger because they contain both intermediate language (IL) code […] and the native version of the same code“), [Native AOT deployment overview](https://learn.microsoft.com/dotnet/core/deploying/native-aot/) („Native AOT apps don't use a just-in-time (JIT) compiler when the application runs“; Liste der Einschränkungen). *Stand: 2026-10-25.*
 
 ## Ändern und selbermachen
 
@@ -124,7 +122,7 @@ Aufgabe: Ändere nur die dritte Zeile so, dass sie das passende Modell nennt: `C
 <CodeBlock language="csharp" title="seclog-model-solution.cs">{modelSolution}</CodeBlock>
 
 1. **Anforderungen sammeln:** schneller Start, keine installierte Laufzeit.
-2. **Modelle vergleichen:** Der JIT-Standard und ReadyToRun enthalten weiter IL und setzen die .NET-Laufzeit voraus. Native AOT kommt ohne JIT aus und läuft laut Quelle auch ohne installierte Laufzeit.
+2. **Modelle vergleichen:** Der JIT-Standard und ReadyToRun enthalten weiter IL und setzen die .NET-Laufzeit voraus. Native AOT kommt ohne JIT aus und läuft auch ohne installierte Laufzeit.
 3. **Preis prüfen:** Native AOT hat Einschränkungen. SecLog müsste vorher gegen sie geprüft werden.
 
 Das ist nur die Entscheidungsidee. Wie du ein Programm so veröffentlichst, steht in Modul 14.

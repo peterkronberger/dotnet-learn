@@ -628,7 +628,7 @@
           "correct": true
         }
       ],
-      "explanation": "Native-AOT-Programme starten laut Microsoft Learn schneller und laufen auch auf Rechnern ohne installierte .NET-Laufzeit. Der Preis sind Einschränkungen, zum Beispiel kein dynamisches Laden von Assemblies."
+      "explanation": "Native-AOT-Programme starten schneller und laufen auch auf Rechnern ohne installierte .NET-Laufzeit. Der Preis sind Einschränkungen, zum Beispiel kein dynamisches Laden von Assemblies."
     },
     {
       "id": "m00-l05-q7",
