@@ -1,4 +1,3 @@
-// The compiler accepted this program, so it starts. The error appears while it runs.
 Console.WriteLine("Step 1: program started");
 Console.WriteLine("Step 2: about to divide");
 

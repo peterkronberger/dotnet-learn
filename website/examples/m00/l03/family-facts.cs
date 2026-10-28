@@ -1,4 +1,3 @@
-// Write keeps the cursor in the line, WriteLine ends the line.
 Console.Write(".NET Framework");
 Console.WriteLine(" -> for Windows apps");
 Console.Write(".NET Core");

@@ -34,7 +34,7 @@ import projectSolution from '!!raw-loader!@site/examples/m00/l05/seclog-profile-
 
 Dein Quelltext ist Text. Ein Prozessor kann ihn nicht ausführen. In .NET sind dafür zwei Übersetzungsschritte nötig ([Managed Execution Process](https://learn.microsoft.com/dotnet/standard/managed-execution-process)):
 
-1. **<Term id="compiler">Compiler</Term>:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. IL ist eine prozessorunabhängige Folge von Befehlen, die sich effizient in Maschinencode umwandeln lässt. Dazu erzeugt der Compiler Metadaten, die zum Beispiel die Typen deines Programms beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
+1. **<Term id="compiler">Compiler</Term>:** Er übersetzt den Quelltext in <Term id="il">IL (Intermediate Language, Zwischensprache)</Term>. IL ist eine prozessorunabhängige Folge von Befehlen, die sich effizient in Maschinencode umwandeln lässt. Dazu erzeugt der Compiler Metadaten, die dein Programm beschreiben. IL und Metadaten stehen zusammen in der Programmdatei.
 2. **<Term id="jit">JIT (Just-in-Time-Compiler)</Term>:** Er gehört zur <Term id="clr">CLR</Term> und übersetzt die IL erst, wenn das Programm läuft, in Maschinencode für den Prozessor. Eine Methode wird beim ersten Aufruf übersetzt, danach läuft der gespeicherte Maschinencode.
 
 Der Maschinencode ist die erste Form, die der Prozessor direkt ausführen kann. Die CLR führt das Programm dann aus und bietet Dienste wie die automatische Speicherverwaltung.
@@ -69,11 +69,15 @@ Der Compiler meldet das und das Programm startet nicht. Du siehst keine einzige 
 
 ## Vorhersage und Lauf
 
-Das Programm unten hat keinen Compilerfehler. Es teilt durch eine Variable, die den Wert 0 hat. Zwei neue Dinge: `try`/`catch` fängt einen Laufzeitfehler ab, sodass das Programm weiterläuft. Das lernst du in Modul 7 genau. Und `ex.Message` ist der Text der Fehlermeldung.
+Das Programm unten hat keinen Compilerfehler. Es teilt durch 0 und meldet dann einen Laufzeitfehler. Wie es den Fehler meldet, ist für diese Lektion nicht wichtig.
 
 :::info[Vorhersage]
 Welche Zeilen gibt das Programm aus, und in welcher Reihenfolge? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
 :::
+
+<Forward concepts={['Variablen', '`var`', 'Division mit ganzen Zahlen', 'String-Interpolation']} module="1" />
+
+<Forward concepts={['`try`/`catch`', 'Exceptions']} module="7" />
 
 <CSharpRunner id="m00-l05-before-error" code={beforeError} predict expected={beforeErrorOutput} />
 
@@ -84,8 +88,8 @@ Die Ausgabe sind vier Zeilen.
 
 1. **Übersetzen:** Der Compiler findet keinen Fehler. Das Programm startet.
 2. **Anweisungen davor:** Die Zeilen „Step 1“ und „Step 2“ laufen normal.
-3. **Fehler im Lauf:** `10 / divisor` teilt durch null. Das ist ein Laufzeitfehler. Der Compiler hat ihn nicht gemeldet, weil er erst mit dem Wert der Variablen entsteht.
-4. **Abfangen:** `catch` gibt die Meldung aus, danach läuft das Programm bis „Step 3“ weiter.
+3. **Fehler im Lauf:** Das Programm teilt durch null. Das ist ein Laufzeitfehler. Der Compiler hat ihn nicht gemeldet, weil er erst entsteht, wenn die Anweisung läuft.
+4. **Fehler melden:** Das Programm gibt eine Fehlermeldung aus und läuft danach bis „Step 3“ weiter.
 
 Was passiert, wenn du in Zeile 1 das Semikolon am Ende löschst? Probiere es im Runner aus: Es erscheint keine einzige Ausgabezeile mehr, auch „Step 2“ nicht. Der Compiler stoppt vor dem Start.
 
@@ -106,7 +110,7 @@ Der JIT ist der Standard. Es gibt zwei Varianten, bei denen Maschinencode schon 
 | --- | --- | --- | --- |
 | **JIT zur Laufzeit** (Standard) | IL | Der JIT übersetzt beim Lauf. | Läuft auf jedem Rechner mit passender .NET-Laufzeit. |
 | **ReadyToRun** | IL **und** vorab erzeugter Maschinencode | Weniger JIT-Arbeit beim Start. | Dateien werden größer, meist auf das Zwei- bis Dreifache (siehe [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run#impact-of-using-the-readytorun-feature), Stand: 2026-10-28). Der JIT bleibt nötig, zum Beispiel für manche Methoden. |
-| **Native AOT** | Nur Maschinencode (mit der nötigen Laufzeit darin) | Schnellerer Start, kein JIT. | Läuft ohne installierte .NET-Laufzeit, aber mit Einschränkungen: zum Beispiel kein dynamisches Laden von Assemblies und kein Erzeugen von Code zur Laufzeit. |
+| **Native AOT** | Nur Maschinencode (mit der nötigen Laufzeit darin) | Schnellerer Start, kein JIT. | Läuft ohne installierte .NET-Laufzeit, aber mit Einschränkungen: zum Beispiel kein Nachladen von Programmteilen zur Laufzeit und kein Erzeugen von Code zur Laufzeit. |
 
 ## Projektschritt
 
