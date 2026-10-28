@@ -1,0 +1,21 @@
+{
+  "lessons": [
+    {"id": "fx-l01", "file": "fx/l01.mdx", "text": "<Term id=\"late\" /> and <Term id=\"marked\" />\n\n<Forward concepts={['Marked term']} lesson=\"fx-l02\" />\n\n<Term id=\"early\" />"},
+    {"id": "fx-l02", "file": "fx/l02.mdx", "text": "<Term id=\"late\" /> <Term id=\"marked\" />"}
+  ],
+  "terms": [
+    {"id": "early", "term": "Early term", "lesson": "fx-l01"},
+    {"id": "late", "term": "Late term", "lesson": "fx-l02"},
+    {"id": "marked", "term": "Marked term", "lesson": "fx-l02"},
+    {"id": "free", "term": "Free term"}
+  ],
+  "questions": [
+    {"id": "fx-l01-q1", "lesson": "fx-l01", "type": "single", "question": "What is a Late term?", "options": [{"text": "Free term", "correct": true}, {"text": "Lately"}], "explanation": "See [glossary](/glossary#marked)."},
+    {"id": "fx-l02-q1", "lesson": "fx-l02", "type": "single", "question": "What is a Late term?", "options": [{"text": "a", "correct": true}, {"text": "b"}], "explanation": "x"}
+  ],
+  "expected": [
+    "fx/l01.mdx: <Term id=\"late\">",
+    "fx-l01-q1: question names \"Late term\"",
+    "fx-l01-q1: explanation links /glossary#marked"
+  ]
+}

@@ -2,7 +2,9 @@
 import {readdirSync, readFileSync, existsSync, statSync} from 'node:fs';
 import {join, dirname, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
 
+const {loadLessons} = createRequire(import.meta.url)('../website/plugins/lesson-index.js');
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const website = join(root, 'website');
 const quizDir = join(website, 'src/data/quiz');
@@ -20,6 +22,11 @@ const FORBIDDEN_PHRASES = [
 ];
 // true: forbidden phrases are errors (exit code 1). Set by #126 after the module 0 cleanup.
 const WORDING_IS_ERROR = true;
+
+// Terms used before their introducing lesson (concept/lesson-template.md, "Forward references").
+// false: findings are warnings. The module 0 forward-reference issue sets it to true.
+const FORWARD_IS_ERROR = false;
+const EARLY_IMPLEMENTATIONS = ['m01-l02', 'm01-l03', 'm02-l01'];
 
 // Markup of the removed language-comparison box (#127, concept/style-and-language.md). Must not come back.
 const REMOVED_LANGUAGE_BOX = [
@@ -252,6 +259,71 @@ function validateGlossary(terms) {
   return errors;
 }
 
+// Concept names of all <Forward concepts={[…]} …/> in one MDX text (backticks removed).
+function forwardConcepts(mdxText) {
+  const names = [];
+  for (const m of mdxText.matchAll(/<Forward\b[^>]*?concepts=\{\[(.*?)\]\}/gs)) {
+    for (const s of m[1].matchAll(/'([^']*)'|"([^"]*)"/g)) names.push((s[1] ?? s[2]).replaceAll('`', '').trim());
+  }
+  return names;
+}
+
+const escapeRegExp = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// lessons: [{id, file, text}] in sidebar order; terms: glossary entries; questions: quiz questions.
+// Returns [{lesson, message}].
+function forwardProblems({lessons, terms, questions}) {
+  const order = new Map(lessons.map((l, i) => [l.id, i]));
+  const later = (entry, lessonId) => order.has(entry.lesson) && order.get(entry.lesson) > order.get(lessonId);
+  const names = (e) => [e.term, e.german, ...(e.aliases ?? [])].filter((n) => typeof n === 'string' && n.length >= 3);
+  const byId = new Map(terms.map((t) => [t.id, t]));
+  const problems = [];
+  // Rule A: <Term> in lessons
+  for (const l of lessons) {
+    const marked = forwardConcepts(l.text).map((c) => c.toLowerCase());
+    for (const id of new Set([...l.text.matchAll(/<Term\s+id="([^"]+)"/g)].map((m) => m[1]))) {
+      const e = byId.get(id);
+      if (!e || !later(e, l.id)) continue;
+      if ([e.id, e.term, e.german, ...(e.aliases ?? [])].some((n) => typeof n === 'string' && marked.includes(n.toLowerCase()))) continue;
+      problems.push({
+        lesson: l.id,
+        message: `${l.file}: <Term id="${id}"> is introduced in ${e.lesson} (later); add a <Forward> note or move the term`,
+      });
+    }
+  }
+  // Rule B: quiz texts
+  for (const q of questions) {
+    if (!order.has(q.lesson)) continue;
+    const fields = [
+      ['question', q.question],
+      ...(q.options ?? []).flatMap((o) => [['option', o.text], ['feedback', o.feedback]]),
+      ['explanation', q.explanation],
+      ['modelAnswer', q.modelAnswer],
+      ...(q.wrongMatches ?? []).map((w) => ['feedback', w.feedback]),
+      ...(q.pairs ?? []).flatMap((p) => [['pair', p.left], ['pair', p.right]]),
+    ].filter(([, v]) => typeof v === 'string');
+    const seen = new Set();
+    for (const [field, text] of fields) {
+      for (const m of text.matchAll(/glossary#([a-z0-9-]+)/g)) {
+        const e = byId.get(m[1]);
+        if (!e || !later(e, q.lesson) || seen.has(`link:${e.id}`)) continue;
+        seen.add(`link:${e.id}`);
+        problems.push({lesson: q.lesson, message: `${q.id}: ${field} links /glossary#${e.id} (introduced in ${e.lesson}, later)`});
+      }
+      for (const e of terms) {
+        if (!later(e, q.lesson) || seen.has(`name:${e.id}`)) continue;
+        for (const n of names(e)) {
+          if (!new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(n)}(?![\\p{L}\\p{N}])`, 'u').test(text)) continue;
+          seen.add(`name:${e.id}`);
+          problems.push({lesson: q.lesson, message: `${q.id}: ${field} names "${n}" (glossary ${e.id}, introduced in ${e.lesson}, later)`});
+          break;
+        }
+      }
+    }
+  }
+  return problems;
+}
+
 function check(name, errors) {
   if (errors.length === 0) console.log(`OK   ${name}`);
   else {
@@ -312,6 +384,7 @@ const mdxErrors = [];
 const glossaryRefErrors = [];
 const anchors = new Set();
 const lessonIds = new Set();
+const lessonFiles = new Map();
 for (const file of mdxFiles) {
   const text = readFileSync(file, 'utf8');
   const rel = relative(root, file);
@@ -325,7 +398,10 @@ for (const file of mdxFiles) {
   }
   for (const m of text.matchAll(/<Misconception id="([^"]+)"\s*\/>/g)) anchors.add(m[1]);
   const lesson = /^lesson_id:\s*(\S+)/m.exec(text);
-  if (lesson) lessonIds.add(lesson[1]);
+  if (lesson) {
+    lessonIds.add(lesson[1]);
+    lessonFiles.set(lesson[1], file);
+  }
 }
 check('MDX quiz references', mdxErrors);
 check('glossary references', glossaryRefErrors);
@@ -381,6 +457,37 @@ const boxFiles = ['docs', 'src/pages'].flatMap((d) =>
   ['.md', '.mdx', '.js'].flatMap((ext) => walk(join(website, d), ext)),
 );
 check('no language comparison box', boxFiles.flatMap(findRemovedLanguageBox));
+
+// 7. Forward references (concept/lesson-template.md)
+const fixtureForward = JSON.parse(readFileSync(join(root, 'tools/fixtures/forward-references.json'), 'utf8'));
+const selfTestErrors = [];
+const fixtureFindings = forwardProblems(fixtureForward).map((p) => p.message);
+for (const prefix of fixtureForward.expected) {
+  const n = fixtureFindings.filter((m) => m.startsWith(prefix)).length;
+  if (n !== 1) selfTestErrors.push(`forward reference self-test: expected exactly one finding for "${prefix}", got ${n}`);
+}
+for (const m of fixtureFindings) {
+  if (!fixtureForward.expected.some((prefix) => m.startsWith(prefix))) selfTestErrors.push(`forward reference self-test: unexpected finding "${m}"`);
+}
+check('forward reference self-test', selfTestErrors);
+
+const glossaryDe = JSON.parse(readFileSync(join(glossaryDir, 'de.json'), 'utf8')).terms ?? [];
+const forwardLessons = loadLessons(join(website, 'docs')).map((l) => {
+  const file = lessonFiles.get(l.id);
+  return {id: l.id, file: relative(root, file), text: readFileSync(file, 'utf8')};
+});
+const forwardFindings = forwardProblems({
+  lessons: forwardLessons,
+  terms: glossaryDe,
+  questions: questions.filter((x) => x.locale === 'de' && !x.lesson?.startsWith('dev-')),
+});
+const forwardErrors = [];
+for (const f of forwardFindings) {
+  if (FORWARD_IS_ERROR && !EARLY_IMPLEMENTATIONS.includes(f.lesson)) forwardErrors.push(f.message);
+  else warnings.push(`forward: ${f.message}`);
+}
+if (FORWARD_IS_ERROR) check('forward references', forwardErrors);
+else if (forwardFindings.length === 0) console.log('OK   forward references');
 
 [...new Set(warnings)].forEach((w) => console.log(`WARN ${w}`));
 
