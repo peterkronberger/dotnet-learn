@@ -29,7 +29,7 @@ The architect (`claude-architect.yml`) does the rest: it derives the content (se
 | Lesson title (German) | German translation of the lesson name in the plan (lines already in German stay as they are). |
 | ▶ / ◻ | Marker in the heading; a marker on a single line wins. |
 | Spec, library, badges, misconceptions | The `Spec`, `Library`, `Badge` and `misconceptions` lines of the section. Each item goes to exactly one lesson. Misconception id = `<lesson_id>-<English kebab-slug>`. |
-| Sources | Spec items: clause of the draft or feature specification ("Reference" in `module-plan.md`); library items: Microsoft Learn. Only pages that were opened. |
+| Sources | Spec items: clause of the draft or feature specification ("Reference" in `module-plan.md`); library items: Microsoft Learn. Only pages that were opened; visible citation per `concept/sources.md`. |
 | Application context | The step of this module in "Practice project SecLog". |
 | Out of scope | Rows of "Deliberately not covered" that name this module or its topics. |
 | Blockers | Lines of "Open questions" that name this module; components the lessons need that are "planned" in `components.md`; for ◻ the CI project in `website/examples/_ci/` named in the section. |
@@ -67,7 +67,7 @@ Use the sections that `claude-architect.yml` requires. Fill them only with value
 - **Affected files**: lesson file, example folder, quiz file, `de.json` (paths from section 2).
 - **Interfaces**: front matter (`lesson_id`, `sidebar_position`, `duration_min`), quiz ids `<lesson_id>-q<n>`, misconception ids, new glossary ids.
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–11."
-- **Acceptance criteria**: "Definition of Done 1–13 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; every spec item of this issue is taught and its source linked."
+- **Acceptance criteria**: "Definition of Done 1–16 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
 - **Tests**: `bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `cd website && npm run build`.
 - **Not part of this issue**: other lessons, components, playground.
 
