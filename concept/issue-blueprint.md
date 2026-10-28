@@ -63,11 +63,11 @@ Do not start a second module while one is in progress (shared `de.json`).
 Use the sections that `claude-architect.yml` requires. Fill them only with values from section 2:
 
 - **Part of** `#<module issue>` · **Goal**: `lesson_id`, German title, core concept in one sentence.
-- **Context**: ▶/◻; 2–4 learning goals ("Du kannst …"); the spec and library items of this lesson with their sources; badges; misconceptions with their ids; warm-up quiz ids; project step: start state (path of the previous solution file) and the new requirement, from the milestone row; for the first lesson of a module also the text of the module box; topics that belong to other lessons or are out of scope.
+- **Context**: ▶/◻; 2–4 learning goals ("Du kannst …"); the spec and library items of this lesson with their sources; badges; misconceptions with their ids; warm-up quiz ids; project step: start state (path of the previous solution file) and the new requirement, from the milestone row; for the first lesson of a module also the text of the module box; constructs the examples may use (taught so far) and planned forward references with their target module; topics that belong to other lessons or are out of scope.
 - **Affected files**: lesson file, example folder, quiz file, `de.json` (paths from section 2).
 - **Interfaces**: front matter (`lesson_id`, `sidebar_position`, `duration_min`), quiz ids `<lesson_id>-q<n>`, misconception ids, new glossary ids.
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–10."
-- **Acceptance criteria**: "Definition of Done 1–16 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
+- **Acceptance criteria**: "Definition of Done 1–17 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
 - **Tests**: `bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `cd website && npm run build`.
 - **Not part of this issue**: other lessons, components, playground.
 

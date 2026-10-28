@@ -12,7 +12,7 @@ There is no reference lesson yet. The existing lessons are early implementations
 | --- | --- | --- | --- |
 | 1 | Learning goals ("Lernziele") | `:::note[Lernziele]`, 2–4 points | As observable behavior: "Du kannst …" (you can …), "Du erkennst …" (you recognize …) |
 | 2 | Warm-up | 2–3 `<Quiz>` on earlier lessons | Heading "Rückblick" (review); retrieval practice, not new material |
-| 3 | Concept | Short text + small, isolated example | Only the current concept; no project context. First use of a technical term: `<Term id="…">`, entry in the glossary |
+| 3 | Concept | Short text + small, isolated example | Only the current concept; no project context. First use of a technical term: `<Term id="…">`, entry in the glossary. Use only what is explained so far; unavoidable forward references get a `<Forward>` note (section "Forward references") |
 | 4 | Practice example | **Practice-example pattern** (below) | Required, at least once |
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
 | 6 | Projektschritt (project step) | Fixed frame (section "Project step (Projektschritt)" below), `<CSharpRunner tests={…}>` | The automatically checked make task of the lesson, always on SecLog. Start code = previous solution (`concept/project-seclog.md`). A collapsed model solution is part of the frame; for ◻ lessons the runner is replaced by a `<CodeBlock>` |
@@ -84,6 +84,37 @@ Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe de
 ```
 
 Code that cannot run looks like a normal code block with a title. Because the code comes from a file, use `<CodeBlock language="csharp" title="…">{code}</CodeBlock>` (official Docusaurus component). The look is identical to ` ```csharp title="…" `.
+
+## Forward references
+
+A forward reference is a term or code construct that a lesson or its example uses before the course explains it.
+
+1. **Order first.** Use only terms and constructs that are explained in this lesson or an earlier one. Prefer an example that needs no forward reference.
+2. **Unavoidable forward references** get a `<Forward>` note with a fixed German sentence. One concept: "Das Konzept von **X** wurde bisher nicht erläutert und folgt in Lektion „<title>“ / Modul N. Für dieses Beispiel ist das weitere Verständnis dafür nicht notwendig." Several concepts use the plural of the same sentence (the plural is the only grammatical change): "Die Konzepte von **X**, **Y** und **Z** wurden bisher nicht erläutert und folgen in … Für dieses Beispiel ist das weitere Verständnis dafür nicht notwendig." The note links the target lesson (`lesson`) or names the module (`module`).
+3. **Several terms in one note.** Terms with the same target go into one note. One note per target: if one example has forward references with different targets, put one `<Forward>` per target directly after each other.
+4. **Quizzes.** A quiz question never needs a concept that is only marked as a forward reference.
+
+Syntax: exactly one of these two forms, on its own line with a blank line before and after.
+
+```mdx
+<Forward concepts={['Variablen', '`var`']} lesson="m01-l02" />
+<Forward concepts={['Variablen', '`var`']} module="1" />
+```
+
+- `concepts`: non-empty list of German display names in single quotes. A name wrapped in backticks is shown as code.
+- `lesson`: a `lesson_id` that exists; the build fails otherwise. `module`: module number from `concept/module-plan.md` (`0`–`19`), used when the target lesson does not exist yet.
+- **Early implementations:** the lessons `m01-l02`, `m01-l03` and `m02-l01` have ids that are not stable (`concept/module-plan.md`, "Existing content"). Never use them as `lesson` target; use `module`.
+- **Placement:** at the first place in the lesson where the concept appears: normally directly before the runner or code block whose example uses it, or directly after the sentence that names the term.
+- **Concept ledger:** the glossary field `lesson` is the lesson that introduces a term. Terms that are first explained on "Wie dieser Kurs funktioniert" have no `lesson` field.
+- **Code constructs** without a glossary entry (for example `var`, `typeof`, comments `//`) are checked in review: the PR lists, per example file, every construct used and where it is explained (lesson) or marked (`<Forward>`).
+
+Example (a lesson in module 0 whose example uses `var`):
+
+```mdx
+<Forward concepts={['`var`']} module="1" />
+
+<CSharpRunner code={firstProgram} />
+```
 
 ## Project step (Projektschritt)
 

@@ -77,7 +77,7 @@ Source of truth is the constant `FORBIDDEN_PHRASES` in `tools/check-quiz.mjs`. T
 ## Evidence
 
 - Links inside a text are not free: hypertext reading adds decision-making and visual-processing demands, and restricting links helped readers [DeStefano & LeFevre 2007].
-- Extraneous material binds limited working memory [Sweller, van Merriënboer & Paas 2019].
+- Extraneous material binds limited working memory [Sweller 2019].
 - The wording rules (no attribution phrases) are an **editorial decision**, not a study finding. The studies support only the general point that extra links and extra material cost attention.
 
 References: see `concept/didactics.md`.
