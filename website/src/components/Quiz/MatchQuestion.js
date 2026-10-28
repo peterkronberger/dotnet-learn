@@ -3,15 +3,15 @@ import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import Feedback from './Feedback';
 import {renderInline} from './QuizText';
-import {seededShuffle} from './ParsonsQuestion';
+import {useShuffledOrder} from './shuffle';
 import styles from './styles.module.css';
 
 const t = (id, message, values) => translate({id, message}, values);
 
 export default function MatchQuestion({question, onResult}) {
   const baseId = useId();
-  // Same order on the server and in the browser: the seed is the question id.
-  const [rights] = useState(() => seededShuffle(question.pairs.map((p) => p.right), question.id));
+  const {order, reshuffle} = useShuffledOrder(question.pairs.length);
+  const rights = order.map((i) => question.pairs[i].right);
   const [chosen, setChosen] = useState(() => question.pairs.map(() => ''));
   const [result, setResult] = useState(null);
   const checked = result !== null;
@@ -28,6 +28,7 @@ export default function MatchQuestion({question, onResult}) {
   function retry() {
     setChosen(question.pairs.map(() => ''));
     setResult(null);
+    reshuffle();
   }
 
   const wrongMatches = question.wrongMatches ?? [];
