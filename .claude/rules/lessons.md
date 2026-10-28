@@ -15,6 +15,7 @@ paths:
 - Code that cannot run: a normal code block with a title, without a "not runnable" note.
 - Write learning goals as observable behavior. A task checks every learning goal.
 - Quiz questions live in `website/src/data/quiz/de/mXX.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="…" />`, no inline quiz.
+- Quiz options are shown in random order. They must not refer to their position (no "Antwort A", "die erste Option", "beide oben"). Options like "Keine der genannten" need `"pin": "last"` (format: `website/src/data/quiz/README.md`).
 - Every "Achtung" box (misconception) starts with `<Misconception id="…" />` as its first line and is linked to at least one wrong quiz answer.
 - After changing quiz data or misconception boxes, run `node tools/check-quiz.mjs`.
 - New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.

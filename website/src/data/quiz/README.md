@@ -14,17 +14,23 @@ One file per module and language: `de/mXX.json`. New files must be imported in `
 
 Texts: inline code with backticks, paragraphs with `\n\n`, no other Markdown.
 
+## Answer order
+
+The options of `single`/`multi`, the pool of lines of `parsons` and the right entries of `match` are shown in a new random order on every view and on every "Nochmal versuchen" (try again). Write options in any order (do not put the correct one first). `find-bug`, `cloze`, `output` and `explain` keep their order.
+
+Rule: option texts, option `feedback`, `explanation` and `wrongMatches[].feedback` must not refer to a position. Examples of forbidden text: "Antwort A", "die erste Option", "beide oben", "die obige Antwort". `node tools/check-quiz.mjs` checks this.
+
 ## Types
 
 - `single`: `options` (at least 2) with exactly one option `correct: true`.
 - `multi`: `options` (at least 2) with at least one correct option.
-- Option: `text` (required), `correct`, `feedback` (why it is wrong or right), `misconception` (ID of an "Achtung" box, `<lesson_id>-<kebab-slug>`).
+- Option: `text` (required), `correct`, `feedback` (why it is wrong or right), `misconception` (ID of an "Achtung" box, `<lesson_id>-<kebab-slug>`), `pin` (`"last"`, optional, only on `single`/`multi` options: the option is always shown after all shuffled options; several pinned options keep their data order). Use it for options that only make sense at the end, e.g. "Keine der genannten" or "Alle genannten". Such summary options must have `"pin": "last"`.
 - `output`: `example` = path relative to `website/examples/`. The code comes from `<example>.cs`, the expected output from `<example>.out.txt` (CI snapshot).
 - `explain`: `modelAnswer` (required). The learner's answer is not stored; self-rating `correct`/`partial`/`wrong`.
-- `parsons`: put lines in order. `example` = path as for `output`; the correct order is the non-empty lines of the file (indentation is shown but not graded). Optional: `distractors` (lines that are not part of the solution, not identical to a solution line) and `distractorMisconceptions` (object `line text` → misconception ID; every key must be a distractor). Lines are shown in a fixed shuffle derived from the question ID. Controlled with buttons (add, move up/down, remove); changes are announced in a live region.
+- `parsons`: put lines in order. `example` = path as for `output`; the correct order is the non-empty lines of the file (indentation is shown but not graded). Optional: `distractors` (lines that are not part of the solution, not identical to a solution line) and `distractorMisconceptions` (object `line text` → misconception ID; every key must be a distractor). The pool of available lines (solution lines and distractors) is shown in random order (new on every view and every retry). Controlled with buttons (add, move up/down, remove); changes are announced in a live region.
 - `cloze`: code with blanks. `example` = path as for `output` (complete, runnable code). `blanks` = the blanks in code order (at least one). Each blank is the first unused occurrence of `text`, searched from the end of the previous blank; if `text` is not found, the build and `check-quiz.mjs` fail. Per blank: `text` (solution), optional `accept` (accepted inputs, default `[text]`, compared with all whitespace removed), `hint` (shown when the blank is wrong), `wrongAnswers` (list of `text` plus `feedback` and/or `misconception`). Each blank has the label "Lücke N von M" (blank N of M); the result is shown per blank as text (✓/✗) next to the field.
 - `find-bug`: select the faulty line(s). `example` = path as for `output`; for code that does not compile, a `*.snippet.cs` file (without `.out.txt`). `bugLines` = line numbers (1-based, at least one, inside the file, no duplicates). Exactly one line: radio buttons, otherwise checkboxes. The answer is correct when the selected set is exactly `bugLines`. Optional `lineFeedback`: object `line number` → `{feedback, misconception}`, shown for selected lines. Each line has the label "Zeile N: <code>" (line N: <code>); the result is shown as text (✓/✗) next to the line.
-- `match`: match terms. `pairs` = 2 to 8 objects `{left, right}`; every `left` and every `right` is unique. One `<select>` per left term (label = the left term) with the right entries in shuffled order (seed = question ID) and the empty option "Bitte wählen" (please choose). The answer is correct when all matches are right. The result is shown as text (✓/✗) per row, with the correct answer on errors. Optional `wrongMatches`: list of `{left, right, feedback, misconception}` for typical wrong matches (`left`/`right` must appear in `pairs`, and the pair must not be a correct one).
+- `match`: match terms. `pairs` = 2 to 8 objects `{left, right}`; every `left` and every `right` is unique. One `<select>` per left term (label = the left term) with the right entries in random order (new on every view and every retry) and the empty option "Bitte wählen" (please choose). The answer is correct when all matches are right. The result is shown as text (✓/✗) per row, with the correct answer on errors. Optional `wrongMatches`: list of `{left, right, feedback, misconception}` for typical wrong matches (`left`/`right` must appear in `pairs`, and the pair must not be a correct one).
 
 ## Examples
 

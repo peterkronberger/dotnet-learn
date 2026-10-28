@@ -17,7 +17,7 @@ As of 2026-10-28. This file sets **which** learning methods the course uses, **w
 | Subgoal labels | Every worked example is split into named steps. Gap examples keep the labels | [Margulieux 2020], [Margulieux & Catrambone 2016] |
 | PRIMM (Predict, Run, Investigate, Modify, Make) | Practice-example pattern: prediction → runner → solution and explanation → modify/make it yourself | [Sentance 2019] |
 | Explicit prediction | Optional input field per output line, then a sober ✓/✗ check | [Brod 2021], [Brod 2022] |
-| Retrieval practice | Warm-up questions at the start, closing quiz in every lesson | [Roediger & Karpicke 2006], [Dunlosky 2013] |
+| Retrieval practice | Warm-up questions at the start, closing quiz in every lesson; answer options appear in random order on every attempt, so learners recall the content, not the position | [Roediger & Karpicke 2006], [Dunlosky 2013]; [Attali & Bar-Hillel 2003] (position bias; the benefit for repeated retrieval is an inference, not tested directly) |
 | Spaced repetition | Leitner system, "Heute fällig" (due today) dashboard | [Cepeda 2006], [Dunlosky 2013] |
 
 ## Additional methods
@@ -55,6 +55,7 @@ Solve exercises without AI first. Reason: in an RCT, developers who learned a ne
 
 Verified (primary source or publisher/repository entry checked, as of 2026-10-22):
 
+- [Attali & Bar-Hillel 2003] Attali, Y., & Bar-Hillel, M. (2003). Guess where: The position of correct answers in multiple-choice test items as a psychometric variable. *Journal of Educational Measurement, 40*(2), 109–128. https://doi.org/10.1111/j.1745-3984.2003.tb01099.x – Test makers and test takers both favor middle positions. Checked 2026-10-27 (Hebrew University research portal).
 - [Becker 2016] Becker, B. A., Glanville, G., Iwashima, R., McDonnell, C., Goslin, K., & Mooney, C. (2016). Effective compiler error message enhancement for novice programming students. *Computer Science Education, 26*(2–3), 148–175.
 - [Brod 2021] Brod, G. (2021). Predicting as a learning strategy. *Psychonomic Bulletin & Review*. https://doi.org/10.3758/s13423-021-01904-1
 - [Brod 2022] Brod, G., Greve, A., Jolles, D., Theobald, M., & Galeano-Keiner, E. M. (2022). Explicitly predicting outcomes enhances learning of expectancy-violating information. *Psychonomic Bulletin & Review, 29*, 2192–2201. https://doi.org/10.3758/s13423-022-02124-x – Limitation: studies fact learning.
