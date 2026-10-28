@@ -18,8 +18,8 @@ const FORBIDDEN_PHRASES = [
   /\bMicrosoft(\s+Learn)?\s+(schreibt|beschreibt|nennt|rät|sagt)\b/gi,
   /\bgemäß\s+(der\s+)?Dokumentation/gi,
 ];
-// false: findings are warnings. #126 sets this to true (error) after the module 0 cleanup.
-const WORDING_IS_ERROR = false;
+// true: forbidden phrases are errors (exit code 1). Set by #126 after the module 0 cleanup.
+const WORDING_IS_ERROR = true;
 
 // Line-based on the raw text, so the line number is exact (also for JSON).
 function findForbiddenPhrases(file) {

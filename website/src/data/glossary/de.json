@@ -722,7 +722,7 @@
       "id": "dotnet-framework",
       "term": ".NET Framework",
       "category": "platform",
-      "definition": "Die ursprüngliche Variante von .NET, seit 2002. Sie ist für Windows-Apps und Webdienste gedacht und wird gewartet. Für Neuentwicklung empfiehlt Microsoft das heutige .NET.",
+      "definition": "Die ursprüngliche Variante von .NET, seit 2002. Sie ist für Windows-Apps und Webdienste gedacht und wird gewartet. Für neue Projekte nimmt man das heutige .NET.",
       "aliases": [
         "NET Framework"
       ],

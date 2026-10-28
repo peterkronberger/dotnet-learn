@@ -72,7 +72,7 @@ Source of truth is the constant `FORBIDDEN_PHRASES` in `tools/check-quiz.mjs`. T
 
 "Die Spezifikation legt fest / schreibt vor" is not matched on purpose. English quotes are not checked automatically (too many false positives with code and product names).
 
-**Current state:** the check reports a **warning** (`WARN`, exit code stays 0), because module 0 still contains known findings. The module 0 wording cleanup (#126) removes them and switches the check to an error in the same PR.
+**Current state:** the check is an **error**: a finding prints `FAIL wording` with file and line, and the exit code is 1 (`WORDING_IS_ERROR = true` in the script).
 
 ## Evidence
 
