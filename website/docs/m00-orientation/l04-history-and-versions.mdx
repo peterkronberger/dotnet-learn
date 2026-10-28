@@ -73,7 +73,7 @@ Das Programm schätzt das Support-Ende aus einem Erscheinungsdatum. Neu sind zwe
 Was gibt das Programm aus? Rechne die Schätzungen im Kopf nach: LTS plus drei Jahre, STS plus 24 Monate. Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus. Wie groß ist der Unterschied zum offiziellen Datum?
 :::
 
-<CSharpRunner id="m00-l04-versions" height={380} code={versionSupport} predict expected={versionSupportOutput} />
+<CSharpRunner id="m00-l04-versions" code={versionSupport} predict expected={versionSupportOutput} />
 
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>
@@ -101,7 +101,7 @@ LTS-Versionen werden mindestens drei Jahre unterstützt, oder ein Jahr nach dem 
 
 Der SecLog-Server läuft auf .NET 8. Bis wann ist er unterstützt, und wann muss er auf .NET 10 wechseln? Das Programm prüft ein Datum gegen das Support-Ende.
 
-<CSharpRunner id="m00-l04-support" height={360} code={supportTask} tests={supportTests} />
+<CSharpRunner id="m00-l04-support" code={supportTask} tests={supportTests} />
 
 Aufgabe: Ändere nur das Prüfdatum auf den 1. Dezember 2026, sodass das Programm `Supported: False` ausgibt. Das Support-Ende von .NET 8 ist der 10. November 2026 ([.NET Support Policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core)). Vereinfachung im Beispiel: Der Endtag selbst zählt schon als nicht mehr unterstützt.
 
