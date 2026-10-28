@@ -56,8 +56,10 @@ Solve exercises without AI first. Reason: in an RCT, developers who learned a ne
 
 ## References
 
-Verified (primary source or publisher/repository entry checked, as of 2026-10-22):
+Verified (bibliographic record checked, as of 2026-10-28):
 
+- [Sweller & Cooper 1985] Sweller, J., & Cooper, G. A. (1985). The use of worked examples as a substitute for problem solving in learning algebra. *Cognition and Instruction, 2*(1), 59–89. https://doi.org/10.1207/s1532690xci0201_3 – Checked 2026-10-28 (Crossref).
+- [Ausubel 1960] Ausubel, D. P. (1960). The use of advance organizers in the learning and retention of meaningful verbal material. *Journal of Educational Psychology, 51*(5), 267–272. https://doi.org/10.1037/h0046669 – Bibliographic record checked 2026-10-28 (Crossref).
 - [Attali & Bar-Hillel 2003] Attali, Y., & Bar-Hillel, M. (2003). Guess where: The position of correct answers in multiple-choice test items as a psychometric variable. *Journal of Educational Measurement, 40*(2), 109–128. https://doi.org/10.1111/j.1745-3984.2003.tb01099.x – Test makers and test takers both favor middle positions. Checked 2026-10-27 (Hebrew University research portal).
 - [Becker 2016] Becker, B. A., Glanville, G., Iwashima, R., McDonnell, C., Goslin, K., & Mooney, C. (2016). Effective compiler error message enhancement for novice programming students. *Computer Science Education, 26*(2–3), 148–175.
 - [Brod 2021] Brod, G. (2021). Predicting as a learning strategy. *Psychonomic Bulletin & Review*. https://doi.org/10.3758/s13423-021-01904-1
@@ -82,9 +84,4 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 - [Vandewaetere 2015] Vandewaetere, M., Manhaeve, D., Aertgeerts, B., Clarebout, G., van Merriënboer, J. J. G., & Roex, A. (2015). 4C/ID in medical education: How to design an educational program based on whole-task learning: AMEE Guide No. 93. *Medical Teacher, 37*(1), 4–20. https://doi.org/10.3109/0142159X.2014.928407 – Checked 2026-10-27.
 - [Sweller 2019] (also written [Sweller, van Merriënboer & Paas 2019]) Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. *Educational Psychology Review, 31*(2), 261–292. https://doi.org/10.1007/s10648-019-09465-5 – Checked 2026-10-27.
 
-Not verified by us (check before use):
-
-- [Sweller & Cooper 1985] Sweller, J., & Cooper, G. A. (1985). The use of worked examples as a substitute for problem solving in learning algebra. *Cognition and Instruction, 2*(1), 59–89. – Details taken from the MVP; DOI not checked.
-- [Ausubel 1960] Ausubel, D. P. (1960). The use of advance organizers in the learning and retention of meaningful verbal material. *Journal of Educational Psychology, 51*, 267–272. – Primary record not opened by us.
-- [Barnes & Clawson 1975] Review of advance-organizer studies. Numbers (12 of 32 studies positive) only from a secondary source; check the primary source before quoting.
-- Taken from `learning-principles.mdx` (MVP), not checked: Kornell, Hays & Bjork (2009); Sweller (1988); Mayer (2009); Shute (2008, Focus on formative feedback).
+Removed on 2026-10-28 because no primary record could be checked (do not use before verifying): Barnes & Clawson (1975), Kornell, Hays & Bjork (2009), Sweller (1988), Mayer (2009), Shute (2008).
