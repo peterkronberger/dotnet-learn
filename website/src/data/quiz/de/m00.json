@@ -154,7 +154,7 @@
           "misconception": "m00-l02-csharp-is-dotnet"
         }
       ],
-      "explanation": "Die Introduction to .NET nennt die Komponenten Runtime, Libraries, Compiler und SDK. C# ist die Sprache, mit der du für diese Plattform schreibst. .NET kann auch Programme in anderen Sprachen ausführen."
+      "explanation": "Zu .NET gehören die Komponenten Runtime, Libraries, Compiler und SDK. C# ist die Sprache, mit der du für diese Plattform schreibst. .NET kann auch Programme in anderen Sprachen ausführen."
     },
     {
       "id": "m00-l02-q3",
@@ -222,7 +222,7 @@
           "feedback": "Sie beschreibt die Plattform, nicht die Regeln der Sprache."
         }
       ],
-      "explanation": "Der Standard hinkt der Implementierung hinterher. Microsoft veröffentlicht darum Feature-Spezifikationen für neuere Features, die noch nicht im Standard stehen."
+      "explanation": "Der Standard hinkt der Implementierung hinterher. Darum gibt es Feature-Spezifikationen für neuere Features, die noch nicht im Standard stehen."
     },
     {
       "id": "m00-l02-q6",
@@ -259,17 +259,17 @@
           "misconception": "m00-l03-dotnet-core-is-ef-core"
         }
       ],
-      "explanation": "EF Core ist laut Microsoft eine Version der Datenzugriffstechnologie Entity Framework. .NET Core ist die Plattform, die heute „.NET“ heißt. Ein „.NET Framework Core“ gibt es nicht."
+      "explanation": "EF Core ist eine Version der Datenzugriffstechnologie Entity Framework. .NET Core ist die Plattform, die heute „.NET“ heißt. Ein „.NET Framework Core“ gibt es nicht."
     },
     {
       "id": "m00-l03-q2",
       "lesson": "m00-l03",
       "type": "single",
-      "question": "Du startest ein neues Projekt. Welche Variante empfiehlt Microsoft?",
+      "question": "Du startest ein neues Projekt. Welche Variante nimmst du?",
       "options": [
         {
           "text": ".NET Framework, weil es die älteste und damit stabilste Variante ist.",
-          "feedback": "Das .NET Framework wird gewartet, aber für Neuentwicklung empfiehlt Microsoft das heutige .NET.",
+          "feedback": "Das .NET Framework wird gewartet, aber für Neuentwicklung nimmst du das heutige .NET.",
           "misconception": "m00-l03-framework-is-current"
         },
         {
@@ -281,7 +281,7 @@
           "feedback": "Mono ist eine Implementierung von .NET Framework. Die Hauptvariante ist das heutige .NET, das ebenfalls plattformübergreifend ist."
         }
       ],
-      "explanation": "Laut Microsoft Learn ist das heutige .NET die primäre Implementierung. Das .NET Framework musst du nicht migrieren, für neue Projekte nimmst du aber .NET."
+      "explanation": "Das heutige .NET ist die primäre Implementierung. Das .NET Framework musst du nicht migrieren, für neue Projekte nimmst du aber .NET."
     },
     {
       "id": "m00-l03-q3",
@@ -320,7 +320,7 @@
           "misconception": "m00-l03-framework-is-current"
         }
       ],
-      "explanation": "Die Namen stammen aus .NET implementations und der EF-Core-Übersicht auf Microsoft Learn."
+      "explanation": "Die vier Namen sind verschiedene Dinge: drei Implementierungen von .NET und eine Datenbankbibliothek."
     },
     {
       "id": "m00-l03-q4",
@@ -341,7 +341,7 @@
           "feedback": "Die Sprache C# beschreibt die Sprachspezifikation (Lektion 2). .NET Standard betrifft Bibliotheken."
         }
       ],
-      "explanation": "Laut Microsoft Learn soll .NET Standard Bibliotheken über mehrere Varianten hinweg ermöglichen. .NET 5 und neuer machen es in den meisten Fällen überflüssig."
+      "explanation": "Mit .NET Standard sollten Bibliotheken über mehrere Varianten hinweg nutzbar sein. .NET 5 und neuer machen es in den meisten Fällen überflüssig."
     },
     {
       "id": "m00-l03-q5",
