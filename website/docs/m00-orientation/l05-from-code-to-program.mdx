@@ -143,33 +143,6 @@ Das ist nur die Entscheidungsidee. Wie du ein Programm so veröffentlichst, steh
 **„Ein Compilerfehler zeigt sich erst, wenn die Zeile läuft.“** Der Compiler arbeitet vor dem Start und prüft den ganzen Quelltext. Mit einem Compilerfehler läuft keine Zeile, auch nicht die davor. Erst Laufzeitfehler treten mitten im Lauf auf, nachdem die Anweisungen davor gelaufen sind.
 :::
 
-## Kommst du aus …?
-
-Die Vergleiche sind grobe Orientierung und nicht Teil der .NET-Dokumentation.
-
-<FromLanguage>
-<TabItem value="java">
-
-Ähnliches Prinzip: Der Java-Compiler erzeugt Bytecode, den die JVM ausführt und dabei zur Laufzeit in Maschinencode übersetzt. IL entspricht dem Bytecode, die CLR der JVM.
-
-</TabItem>
-<TabItem value="python">
-
-Python übersetzt Quelltext ebenfalls in Bytecode, den ein Interpreter ausführt. Ein Unterschied: Bei C# prüft der Compiler vor dem Start den ganzen Quelltext, etwa auf falsche Typen.
-
-</TabItem>
-<TabItem value="js">
-
-JavaScript-Engines übersetzen Code oft erst zur Laufzeit mit einem JIT. Bei C# liegt vor dem JIT ein eigener Compilerschritt, der Fehler vor dem Start meldet.
-
-</TabItem>
-<TabItem value="go">
-
-Go übersetzt Quelltext vorab in Maschinencode. Das entspricht in der Idee am ehesten Native AOT. Bei C# ist der JIT der Standard.
-
-</TabItem>
-</FromLanguage>
-
 ## Zusammenfassung
 
 Der C#-Compiler übersetzt den Quelltext vor dem Start in IL. Der JIT der CLR macht daraus während des Laufs Maschinencode. Ein Compilerfehler verhindert den Start, ein Laufzeitfehler tritt auf, nachdem die Anweisungen davor gelaufen sind. ReadyToRun legt Maschinencode zusätzlich zur IL vorab ab und verkürzt so den Start. Native AOT übersetzt alles vorab, braucht keinen JIT, hat aber Einschränkungen.

@@ -11,13 +11,8 @@ export const DEV_PAGES = [
   },
   {
     to: '/dev/components-demo',
-    title: 'Since und FromLanguage',
-    description: 'Versions-Badge und Umsteiger-Box.',
-  },
-  {
-    to: '/dev/components-demo-2',
-    title: 'FromLanguage (Seite 2)',
-    description: 'Prüft, dass die Sprachwahl seitenübergreifend gilt.',
+    title: 'Since und Term',
+    description: 'Versions-Badge und Glossar-Link.',
   },
   {
     to: '/dev/diagram-demo',

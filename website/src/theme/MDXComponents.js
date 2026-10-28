@@ -5,7 +5,6 @@ import CSharpRunner from '@site/src/components/CSharpRunner';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import Since from '@site/src/components/Since';
-import FromLanguage from '@site/src/components/FromLanguage';
 import Term from '@site/src/components/Term';
 import DevNav from '@site/src/components/DevNav';
 import Diagram from '@site/src/components/Diagram';
@@ -19,7 +18,6 @@ export default {
   Tabs,
   TabItem,
   Since,
-  FromLanguage,
   Term,
   DevNav,
   Diagram,
