@@ -137,31 +137,6 @@ Erst die Prüfung auf `0` (sonst wirft die Ganzzahldivision eine `DivideByZeroEx
 **„`(double)(a / b)` rettet die Nachkommastellen.“** Die Umwandlung kommt zu spät. Die Ganzzahldivision ist schon passiert. Richtig: `(double)a / b`.
 :::
 
-## Kommst du aus …?
-
-<FromLanguage>
-<TabItem value="java">
-
-`int / int` schneidet wie in C# Richtung 0 ab. Für exakte Dezimalzahlen nutzt Java die Klasse `BigDecimal`; C# hat dafür den eingebauten Typ `decimal`.
-
-</TabItem>
-<TabItem value="python">
-
-In Python liefert `/` immer eine Gleitkommazahl (`7 / 2` → `3.5`). `//` rundet **ab** (`-7 // 2` → `-4`). C# schneidet Richtung 0 ab (`-7 / 2` → `-3`). Dezimalzahlen gibt es in Python über das Modul `decimal`.
-
-</TabItem>
-<TabItem value="js">
-
-`number` ist ein 64-Bit-Gleitkommawert (wie `double`), `7 / 2` ergibt `3.5`. Eine Ganzzahldivision brauchst du dort mit `Math.trunc(7 / 2)`. Einen eingebauten Dezimaltyp gibt es nicht.
-
-</TabItem>
-<TabItem value="go">
-
-Die Ganzzahldivision schneidet wie in C# Richtung 0 ab. Einen eingebauten Dezimaltyp gibt es nicht.
-
-</TabItem>
-</FromLanguage>
-
 <details>
 <summary>Vertiefung: decimal, double und Division durch 0 (optional)</summary>
 

@@ -112,7 +112,7 @@ Misconceptions: off-by-one; the loop condition is checked only once; `else` belo
   - §12: relational and equality operators, conditional logical operators with short-circuit evaluation vs. the non-short-circuit logical operators, the conditional operator (both branches need a common type), boolean expressions.
   - §13: selection statements; switch statement rules: no implicit fall-through between sections, case guards, the default section, a switch section must not reach its end; the four iteration statements and when each one evaluates its condition (before vs. after the body); jump statements that leave or restart a loop; scope of loop variables.
   - §11 (simple part): constant patterns, relational patterns and the discard pattern in switch expressions; non-exhaustive switch expressions give a compiler warning and a runtime exception.
-- More misconceptions: `&&` and `&` are the same; a `case` falls through like in C/Java.
+- More misconceptions: `&&` and `&` are the same; a `case` continues into the next `case` without `break`.
 
 ### M3 Methoden (methods) ▶
 Definition, parameters, return · `return` vs. output · scope · overloading · local functions · optional/named parameters · `ref`/`out` (short).
