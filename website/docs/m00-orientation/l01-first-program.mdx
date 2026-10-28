@@ -41,11 +41,11 @@ Jede Lektion hat einen Abschnitt „Projektschritt“. Dort baust du SecLog um e
 
 Ein C#-Programm besteht aus <Term id="statement">Anweisungen</Term> (Statements). Jede Anweisung sagt dem Computer, was er tun soll, und endet mit einem Semikolon `;`. Der Computer führt sie nacheinander aus, von oben nach unten ([C#-Spezifikation, §13.3.2: Statement lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)).
 
-Eine Anweisung, die du sofort brauchst, ist `Console.WriteLine("Hello");`. Sie schreibt den Text in den Klammern als eine Zeile in die <Term id="console-output">Konsolenausgabe</Term>. Solch ein Aufruf ist ein Ausdruck, den du als Anweisung hinschreibst (Expression Statement, [§13.7](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)).
+Eine Anweisung, die du sofort brauchst, ist `Console.WriteLine("Hello");`. Sie schreibt den Text in den Klammern als eine Zeile in die <Term id="console-output">Konsolenausgabe</Term>.
 
 Der Text steht in Anführungszeichen. So ein Stück Text im Code heißt <Term id="literal">Literal</Term>; hier ein String-Literal. Mehr dazu kommt in Modul 1.
 
-Du musst dafür keine weiteren Zeilen drumherum schreiben. Bei <Term id="top-level-statements">Top-level Statements</Term> ist die Datei das Programm: Der Compiler macht aus den Anweisungen am Anfang der Datei den Startpunkt ([§7.1.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts)). Wie dieser Startpunkt genau aussieht, erfährst du in Modul 6.
+Du musst dafür keine weiteren Zeilen drumherum schreiben. Bei <Term id="top-level-statements">Top-level Statements</Term> ist die Datei das Programm: Der <Term id="compiler">Compiler</Term> (ein Programm, das deinen Code übersetzt und Fehler meldet, bevor das Programm läuft) macht aus den Anweisungen am Anfang der Datei den Startpunkt ([§7.1.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts)). Wie dieser Startpunkt genau aussieht, erfährst du in Modul 6.
 
 ## Vorhersagen, ausführen, vergleichen
 
@@ -71,7 +71,9 @@ Was passiert, wenn du die erste und die letzte Zeile tauschst? Probiere es im Ru
 <details>
 <summary>Vertiefung: Wo ist die Main-Methode? (optional)</summary>
 
-In älteren C#-Programmen siehst du eine Klasse mit einer Methode `Main`. Bei Top-level Statements erzeugt der Compiler diese Methode selbst. Eine Datei pro Projekt darf solche Anweisungen enthalten ([Top-level statements](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements)).
+<Forward concepts={['Klasse', 'Methode `Main`']} module="6" />
+
+In älteren C#-Programmen siehst du eine Klasse mit einer Methode `Main`. Bei Top-level Statements erzeugt der Compiler diese Methode selbst. Nur eine Datei eines Programms darf solche Anweisungen enthalten ([Top-level statements](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements)).
 
 </details>
 

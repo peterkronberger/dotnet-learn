@@ -19,7 +19,7 @@ import projectSolution from '!!raw-loader!@site/examples/m00/l02/seclog-profile-
 
 :::note[Lernziele]
 - Du ordnest Begriffe richtig zu: Sprache (C#), Laufzeitumgebung (CLR), Standardbibliothek (BCL), SDK, Compiler (Roslyn).
-- Du erkennst in einem Programm, was zur Sprache gehört (Schlüsselwörter wie `var`, `int`) und was aus der Bibliothek kommt (`Console`, `Math`).
+- Du erkennst in einem Programm, was zur Sprache gehört (Schlüsselwörter wie `int`) und was aus der Bibliothek kommt (`Console`, `Math`).
 - Du erklärst, warum es drei Quellen gibt (Standard, Entwurf auf Microsoft Learn, Feature-Spezifikationen) und welche du für welche Frage liest.
 :::
 
@@ -40,9 +40,13 @@ In der ersten Lektion hast du `Console.WriteLine("Hello");` geschrieben. Dahinte
 | Teil | Aufgabe |
 | --- | --- |
 | Runtime (<Term id="clr">CLR</Term>, Laufzeitumgebung) | führt den übersetzten Code aus |
-| Libraries (<Term id="bcl">BCL</Term>, Standardbibliothek) | fertige Typen und Methoden, zum Beispiel für JSON |
+| Libraries (<Term id="bcl">BCL</Term>, Standardbibliothek) | fertige Typen und <Term id="method">Methoden</Term>, zum Beispiel für JSON |
 | Compiler (<Term id="roslyn">Roslyn</Term> für C#) | übersetzt Quelltext in ausführbaren Code |
 | <Term id="sdk">SDK</Term> und Werkzeuge | bauen, testen und starten Projekte, zum Beispiel mit `dotnet build` |
+
+Eine Methode ist ein benanntes, fertiges Stück Code, das du mit seinem Namen und Klammern aufrufst, wie `WriteLine`.
+
+<Forward concepts={['Typen', '`int`, `string`, `bool`', '`typeof`']} module="1" />
 
 <Diagram
   caption="Von der Sprache zum laufenden Programm"
@@ -67,7 +71,7 @@ Wie aus dem Code ein laufendes Programm wird, erfährst du in Lektion 5. Hier ge
 
 Die Spezifikation schreibt vor, dass jede Implementierung von C# eine kleine Standardbibliothek mitbringt. Sie enthält nur Typen, die die Sprache selbst braucht. Von einer Implementierung wird erwartet, dass sie eine viel größere Bibliothek mitliefert. Die Typen, die du täglich benutzt, stammen aus dieser größeren Bibliothek von .NET.
 
-Ein Beispiel für die Grenze: Das Schlüsselwort `int` gehört zur Sprache. Die Spezifikation legt fest, dass solche einfachen Typen Aliase (andere Namen) für Typen im Namespace `System` sind. `typeof(int).FullName` fragt nach dem vollen Namen dieses Bibliothekstyps.
+Ein Beispiel für die Grenze: Das Schlüsselwort `int` gehört zur Sprache. Die Spezifikation legt fest, dass solche einfachen Typen Aliase (andere Namen) für Typen im Bereich `System` sind. `typeof(int).FullName` fragt nach dem vollen Namen dieses Bibliothekstyps.
 
 :::info[Vorhersage]
 Was geben die drei Zeilen aus? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
@@ -81,7 +85,7 @@ Was geben die drei Zeilen aus? Schreibe deinen Tipp für jede Zeile auf und füh
 Die Ausgabe ist `System.Int32`, `System.String` und `System.Boolean`.
 
 1. **Schlüsselwort lesen:** `int`, `string` und `bool` sind Schlüsselwörter der Sprache.
-2. **Alias auflösen:** Jedes Schlüsselwort steht für einen Typ der Bibliothek im Namespace `System`.
+2. **Alias auflösen:** Jedes Schlüsselwort steht für einen Typ der Bibliothek im Bereich `System`.
 3. **Namen ablesen:** `FullName` gibt den vollen Namen dieses Typs aus.
 
 Was passiert, wenn du `typeof(double)` einsetzt? Probiere es im Runner aus.
@@ -91,14 +95,14 @@ Was passiert, wenn du `typeof(double)` einsetzt? Probiere es im Runner aus.
 <details>
 <summary>Vertiefung: Warum gibt es Aliase? (optional)</summary>
 
-Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im Namespace `System` und enthält eine Tabelle der Zuordnungen (siehe [§8 Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). Die Pflicht-Bibliothek steht in [Annex C: Standard library](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/standard-library). Du kannst also `int` oder `System.Int32` schreiben. Beides meint denselben Typ.
+Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im Bereich `System` und enthält eine Tabelle der Zuordnungen (siehe [§8 Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). Die Pflicht-Bibliothek steht in [Annex C: Standard library](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/standard-library). Du kannst also `int` oder `System.Int32` schreiben. Beides meint denselben Typ.
 
 </details>
 
 ## Ein Programm zerlegen
 
 :::info[Vorhersage]
-Was gibt das folgende Programm aus? Überlege dabei, welche Wörter zur Sprache und welche zur Bibliothek gehören. Die Kommentare im Code verraten die Antwort. Lies sie erst nach deinem Tipp.
+Was gibt das folgende Programm aus? Überlege dabei, welche Wörter zur Sprache und welche zur Bibliothek gehören.
 :::
 
 <CSharpRunner id="m00-l02-seclog-line" code={seclogLine} predict expected={seclogLineOutput} />
@@ -108,11 +112,11 @@ Was gibt das folgende Programm aus? Überlege dabei, welche Wörter zur Sprache 
 
 Die Ausgabe ist `LOGIN FAILED USER=ALICE` und `5`.
 
-1. **Sprache erkennen:** `var`, `int`, `=` und `;` sind Teil der Sprache.
-2. **Bibliothek erkennen:** `Console`, `Math` und `ToUpper` sind Typen oder Methoden der Bibliothek.
+1. **Sprache erkennen:** Das Text-Literal in Anführungszeichen, die Zahlen-Literale, die Klammern, der Punkt `.` und das Semikolon `;` sind Teil der Sprache.
+2. **Bibliothek erkennen:** `Console`, `Math`, `ToUpper` und `Max` kommen aus der Bibliothek.
 3. **Ausgabe ablesen:** `ToUpper` macht aus dem Text Großbuchstaben. `Math.Max` gibt die größere der beiden Zahlen zurück, hier `5`.
 
-Was passiert, wenn du `Math.Max(attempts, 1)` schreibst? Probiere es im Runner aus.
+Was passiert, wenn du `Math.Max(3, 1)` schreibst? Probiere es im Runner aus.
 
 </details>
 
@@ -163,7 +167,7 @@ Faustregel: Frage zuerst den Entwurf auf Microsoft Learn. Steht das Feature dort
 
 ## Zusammenfassung
 
-C# ist eine Sprache. Ihre Regeln stehen in der Spezifikation, die nur die Sprache beschreibt. .NET ist die Plattform mit Compiler (Roslyn), Laufzeitumgebung (CLR), Standardbibliothek (BCL) und SDK. Schlüsselwörter wie `var` und `int` gehören zur Sprache, `Console` und `Math` zur Bibliothek. Für Sprachfragen gibt es drei Quellen: den ECMA-Standard, den Entwurf auf Microsoft Learn und die Feature-Spezifikationen.
+C# ist eine Sprache. Ihre Regeln stehen in der Spezifikation, die nur die Sprache beschreibt. .NET ist die Plattform mit Compiler (Roslyn), Laufzeitumgebung (CLR), Standardbibliothek (BCL) und SDK. Schlüsselwörter wie `int` gehören zur Sprache, `Console` und `Math` zur Bibliothek. Für Sprachfragen gibt es drei Quellen: den ECMA-Standard, den Entwurf auf Microsoft Learn und die Feature-Spezifikationen.
 
 ## Prüfe dein Wissen
 
