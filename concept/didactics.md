@@ -31,6 +31,7 @@ As of 2026-10-28. This file sets **which** learning methods the course uses, **w
 | Notional machine | Simplified but correct model of execution: memory visualizations, step-by-step view (where useful) | [Sorva 2013], [Guo 2013] |
 | Explanatory feedback | Every quiz/test response explains the *why* | [Hattie & Timperley 2007] |
 | Whole task with a red thread | One project (SecLog) that grows in every lesson; goal shown at the start (module box, announcement in m00-l01) | [Merrill 2002], [Vandewaetere 2015]; advance organizer [Ausubel 1960], evidence mixed |
+| Mark forward references | Order first; unavoidable forward references get a fixed note "… folgt in … Für dieses Beispiel ist das weitere Verständnis dafür nicht notwendig." | Reducing extraneous load [Sweller 2019]; the explicit note itself is a design decision (no study of this wording) |
 | Enhanced compiler messages | German explanation of common errors **in addition to** the original message | [Becker 2016]: fewer errors and repeated errors in a control-group study |
 
 ## Review grid: Merrill's First Principles
@@ -79,7 +80,7 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 - [Shen & Tamkin 2026] Shen, J. H., & Tamkin, A. (2026). How AI impacts skill formation. arXiv:2601.20245 (Anthropic; disclose the conflict of interest).
 - [Sorva 2013] Sorva, J. (2013). Notional machines and introductory programming education. *ACM Transactions on Computing Education, 13*(2). https://doi.org/10.1145/2483710.2483713
 - [Vandewaetere 2015] Vandewaetere, M., Manhaeve, D., Aertgeerts, B., Clarebout, G., van Merriënboer, J. J. G., & Roex, A. (2015). 4C/ID in medical education: How to design an educational program based on whole-task learning: AMEE Guide No. 93. *Medical Teacher, 37*(1), 4–20. https://doi.org/10.3109/0142159X.2014.928407 – Checked 2026-10-27.
-- [Sweller, van Merriënboer & Paas 2019] Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. *Educational Psychology Review, 31*(2), 261–292. https://doi.org/10.1007/s10648-019-09465-5
+- [Sweller 2019] (also written [Sweller, van Merriënboer & Paas 2019]) Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. *Educational Psychology Review, 31*(2), 261–292. https://doi.org/10.1007/s10648-019-09465-5 – Checked 2026-10-27.
 
 Not verified by us (check before use):
 

@@ -8,6 +8,7 @@ paths:
 - C# 14 / .NET 10, top-level statements, type declarations at the end of the file, nullable on.
 - Identifiers and comments in **English**. Program output is English too. Explanations belong in the lesson, not in the code.
 - One example per file; file name in English, kebab-case, descriptive (`integer-division.cs`).
+- An example may use only constructs that are explained up to its lesson or marked with a `<Forward>` note in the lesson. Code comments are a construct too (taught in module 1): do not put comments into examples of module 0.
 - Keep it short: as few lines as possible, only the current concept.
 - Keep lines short: at most about 80 characters per line, so code blocks and the runner rarely need horizontal scrolling or line wrapping.
 - Runnable examples must run on their own. Fragments that cannot run on their own end in `.snippet.cs` (CI skips them).

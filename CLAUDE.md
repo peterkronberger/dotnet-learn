@@ -83,6 +83,7 @@ A lesson is done when all points are met:
 14. Every information is described in detail before it is part of any quiz
 15. When finalizing a module, ensure that the lessons follow a cohesive thread throughout. Across all lessons, do not assume any programming-related information unless it has been explained beforehand—either in this module or in a preceding one. The SecLog thread follows `concept/project-seclog.md` (milestones and continuity rule).
 16. The PR contains the section "Verification" (table: statement · URL with clause or heading · date checked), see `concept/sources.md` level 0.
+17. Every programming term or construct that a lesson or its examples use is explained in this lesson or an earlier one, or it is marked with a `<Forward>` note at its first place in the lesson ("order first": prefer examples that need no forward reference). Quiz questions never need a concept that is only marked. See `concept/lesson-template.md`, "Forward references".
 
 In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
 
