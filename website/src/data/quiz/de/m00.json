@@ -449,7 +449,7 @@
           "right": ".NET 10"
         }
       ],
-      "explanation": "Seit C# 9 / .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. Das Projekt nutzt standardmäßig die C#-Version, die zum Target Framework passt."
+      "explanation": "Seit C# 9 / .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. Das Projekt nutzt standardmäßig die C#-Version, die zur .NET-Version passt, auf die es zielt."
     },
     {
       "id": "m00-l04-q4",
@@ -586,7 +586,7 @@
       "type": "output",
       "question": "Was gibt das Programm aus? Achte darauf, wann der Fehler auftritt.",
       "example": "m00/l05/statements-before-error.cs",
-      "explanation": "Der Compiler findet keinen Fehler, also startet das Programm. Die ersten beiden Zeilen laufen, dann tritt die Division durch null auf und `catch` fängt sie ab. Danach läuft das Programm weiter."
+      "explanation": "Der Compiler findet keinen Fehler, also startet das Programm. Die ersten beiden Zeilen laufen, dann tritt die Division durch null auf und das Programm meldet den Fehler. Danach läuft es weiter."
     },
     {
       "id": "m00-l05-q5",
@@ -628,7 +628,7 @@
           "correct": true
         }
       ],
-      "explanation": "Native-AOT-Programme starten schneller und laufen auch auf Rechnern ohne installierte .NET-Laufzeit. Der Preis sind Einschränkungen, zum Beispiel kein dynamisches Laden von Assemblies."
+      "explanation": "Native-AOT-Programme starten schneller und laufen auch auf Rechnern ohne installierte .NET-Laufzeit. Der Preis sind Einschränkungen, zum Beispiel kein Nachladen von Programmteilen zur Laufzeit."
     },
     {
       "id": "m00-l05-q7",
@@ -642,7 +642,7 @@
       "lesson": "m00-l05",
       "type": "explain",
       "question": "Transferfrage: Wo würdest du dein Wissen über Compilerfehler und Laufzeitfehler anwenden?",
-      "modelAnswer": "Beim Lesen von Fehlermeldungen: Kommt die Meldung vor dem Start, suche ich im Quelltext nach Syntax oder Typen. Kommt sie mitten im Lauf, etwa im SecLog-Programm beim Lesen einer Logzeile, prüfe ich, welche Daten die Anweisung bekommen hat."
+      "modelAnswer": "Beim Lesen von Fehlermeldungen: Kommt die Meldung vor dem Start, suche ich im Quelltext nach Tippfehlern oder fehlenden Zeichen. Kommt sie mitten im Lauf, etwa im SecLog-Programm beim Lesen einer Logzeile, prüfe ich, welche Daten die Anweisung bekommen hat."
     }
   ]
 }

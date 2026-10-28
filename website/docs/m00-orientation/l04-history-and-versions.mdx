@@ -31,7 +31,7 @@ import projectSolution from '!!raw-loader!@site/examples/m00/l04/seclog-profile-
 
 ## Jedes Jahr im November
 
-Seit C# 9 und .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. C# 9 erschien mit .NET 5 und ist die Standard-Sprachversion für jedes Projekt, das .NET 5 als Ziel hat. Diese Zuordnung gilt seitdem: Ein Projekt nutzt standardmäßig die C#-Version, die zu seinem Target Framework passt ([Configure language version](https://learn.microsoft.com/dotnet/csharp/language-reference/configure-language-version), Stand: 2026-10-28).
+Seit C# 9 und .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. C# 9 erschien mit .NET 5 und ist die Standard-Sprachversion für jedes Projekt, das .NET 5 als Ziel hat. Diese Zuordnung gilt seitdem: Ein Projekt nutzt standardmäßig die C#-Version, die zur .NET-Version passt, auf die es zielt ([Configure language version](https://learn.microsoft.com/dotnet/csharp/language-reference/configure-language-version), Stand: 2026-10-28).
 
 | C# erschien | C#-Version | .NET-Version | Support-Typ |
 | --- | --- | --- | --- |
@@ -63,14 +63,16 @@ Verbindlich sind die Daten auf der [.NET Support Policy](https://dotnet.microsof
 | .NET 9 | STS | November 2024 | 10. November 2026 |
 | .NET 10 | LTS | 11. November 2025 | 14. November 2028 |
 
+Als Faustregel kannst du das Support-Ende schätzen: Erscheinungsdatum plus drei Jahre bei LTS, plus 24 Monate bei STS. Für .NET 10 ergibt das den 11. November 2028, das offizielle Datum ist der 14. November 2028, also drei Tage später. Die Faustregel liefert nur eine Schätzung, verbindlich ist die Support-Policy.
+
 Für .NET 11 ist der 10. November 2026 geplant; es wäre eine STS-Version ([Bericht von Visual Studio Magazine](https://visualstudiomagazine.com/articles/2026/09/14/net-11-rc1-gets-go-live-support-ahead-of-november-launch.aspx), Stand: 2026-10-28, noch nicht offiziell bestätigt). Dieser Kurs bleibt bei C# 14 / .NET 10.
 
 ## Vorhersage und Lauf
 
-Das Programm schätzt das Support-Ende aus einem Erscheinungsdatum. Neu sind zwei Dinge: `DateOnly` ist ein Typ für ein Datum ohne Uhrzeit, und `new DateOnly(2025, 11, 11)` erzeugt den 11. November 2025. `{release:yyyy-MM-dd}` gibt das Datum als `2025-11-11` aus, unabhängig von der Landeseinstellung. Typen und Variablen kommen in Modul 1 ausführlich.
+Das Programm gibt die Fakten zu .NET 10 und .NET 9 aus, die in der Tabelle oben stehen. Es nutzt nur `Console.Write`, `Console.WriteLine` und Zeichenketten aus Lektion 1 und 3.
 
 :::info[Vorhersage]
-Was gibt das Programm aus? Rechne die Schätzungen im Kopf nach: LTS plus drei Jahre, STS plus 24 Monate. Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus. Wie groß ist der Unterschied zum offiziellen Datum?
+Wie viele Zeilen gibt das Programm aus, und welche Teile stehen zusammen in einer Zeile? Achte auf `Write` und `WriteLine` und auf den Aufruf ohne Argument. Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
 :::
 
 <CSharpRunner id="m00-l04-versions" code={versionSupport} predict expected={versionSupportOutput} />
@@ -78,22 +80,20 @@ Was gibt das Programm aus? Rechne die Schätzungen im Kopf nach: LTS plus drei J
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>
 
-Die Ausgabe sind fünf Zeilen.
+Die Ausgabe sind vier Zeilen.
 
-1. **Ausgangsdatum lesen:** `release` ist der 11. November 2025, das Erscheinungsdatum von .NET 10.
-2. **Regel anwenden:** `AddYears(3)` ergibt 2028-11-11, `AddMonths(24)` ergibt 2027-11-11.
-3. **Mit der Policy vergleichen:** Das offizielle Ende von .NET 10 ist 2028-11-14, also drei Tage später als die Schätzung. `DayNumber` zählt die Tage seit einem festen Anfangsdatum, darum ergibt die Differenz `3`.
+1. **Zeilen zusammensetzen:** `Write` bleibt in der Zeile, erst `WriteLine` beendet sie. Darum stehen „.NET 10“ und „ (LTS)“ zusammen.
+2. **Aufruf ohne Argument erkennen:** `Console.WriteLine();` beendet nur die Zeile „End of support: 2028-11-14“. Es entsteht keine leere Zeile, weil davor ein `Write` stand.
+3. **Fakten zuordnen:** Die dritte Zeile nennt das Support-Ende von .NET 10 (2028-11-14), die vierte das von .NET 9 (2026-11-10).
 
-Die Faustregel liefert nur eine Schätzung. Verbindlich ist die Support-Policy.
-
-Was passiert, wenn du `AddYears(3)` durch `AddYears(2)` ersetzt? Probiere es im Runner aus.
+Was passiert, wenn du das `Write` vor dem leeren `WriteLine()` durch `WriteLine` ersetzt? Probiere es im Runner aus.
 
 </details>
 
 <details>
 <summary>Vertiefung: Warum die Regel nur eine Schätzung ist (optional)</summary>
 
-LTS-Versionen werden mindestens drei Jahre unterstützt, oder ein Jahr nach dem Erscheinen der nächsten LTS-Version, falls dieses Datum später liegt ([Release-Typen und Support von .NET](https://learn.microsoft.com/dotnet/core/releases-and-support), Stand: 2026-10-28). „Drei Jahre“ ist also ein Minimum, und die genauen Tage legt die Support-Policy fest. Eine feste Rechenregel im Code ersetzt das Nachschlagen nicht.
+LTS-Versionen werden mindestens drei Jahre unterstützt, oder ein Jahr nach dem Erscheinen der nächsten LTS-Version, falls dieses Datum später liegt ([Release-Typen und Support von .NET](https://learn.microsoft.com/dotnet/core/releases-and-support), Stand: 2026-10-28). „Drei Jahre“ ist also ein Minimum, und die genauen Tage legt die Support-Policy fest. Eine feste Rechenregel ersetzt das Nachschlagen nicht.
 
 </details>
 
