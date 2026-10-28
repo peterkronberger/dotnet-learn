@@ -20,13 +20,26 @@ function splitLines(text) {
   return text.replace(/\r\n/g, '\n').replace(/\n+$/, '').split('\n');
 }
 
+// Height estimate before the runner has loaded (lazy iframe, WebAssembly start).
+// ESTIMATE_LINE_PX: editor font 0.92rem x line height 1.55 at a 16px root = 22.8px.
+// ESTIMATE_CHROME_PX: toolbar, editor padding, hint, gaps.
+// Values from the design of #129; not yet re-measured on /dev/runner-demo at 1280px.
+const ESTIMATE_LINE_PX = 23;
+const ESTIMATE_CHROME_PX = 190;
+const DEFAULT_SAMPLE_LINES = 12;
+
+function estimateHeight(code) {
+  const lineCount = code ? splitLines(code).length : DEFAULT_SAMPLE_LINES;
+  return ESTIMATE_CHROME_PX + ESTIMATE_LINE_PX * Math.max(lineCount, 3);
+}
+
 /**
  * Embeds the C# playground (Blazor WebAssembly + Roslyn, served under /runner/)
  * as an iframe and fills the editor with `code`.
  *
  * Props:
  *  - code:     start code (string)
- *  - height:   height in pixels (default 460)
+ *  - minHeight: minimum height in pixels, only for the full-page playground (default 0)
  *  - id:       stable key of this instance (default: automatic)
  *  - predict:  input field per output line; after running, ✓/✗ per line (needs `expected`)
  *  - expected: expected output, only sets the number of fields; the check uses the real output
@@ -35,11 +48,13 @@ function splitLines(text) {
  *  - onResult: callback with the `run-result` message of the runner
  *
  * The runner reports `{type: 'run-result', id, success, output, diagnostics, tests?}` by postMessage.
+ * It also reports `{type: 'resize', id, height}` (content height in CSS px); the iframe height follows it.
+ * Until the first report, the height is estimated from the line count of `code`.
  * Both sides check the origin; the page also checks the sender (iframe) and `id`.
  */
 export default function CSharpRunner({
   code = '',
-  height = 460,
+  minHeight = 0,
   id,
   predict = false,
   expected = '',
@@ -53,6 +68,7 @@ export default function CSharpRunner({
   const autoId = useId();
   const instanceId = id ?? autoId;
   const [result, setResult] = useState(null);
+  const [frameHeight, setFrameHeight] = useState(null);
   const [guesses, setGuesses] = useState({});
   const predictionLines = predict ? splitLines(expected) : [];
 
@@ -69,7 +85,14 @@ export default function CSharpRunner({
       if (event.origin !== window.location.origin) { return; }
       if (event.source !== frame.current?.contentWindow) { return; }
       const data = event.data;
-      if (!data || data.type !== 'run-result' || data.id !== instanceId) { return; }
+      if (!data || data.id !== instanceId) { return; }
+      if (data.type === 'resize' && typeof data.height === 'number' && data.height > 0) {
+        const el = frame.current;
+        const border = (el && el.offsetHeight - el.clientHeight) || 2;
+        setFrameHeight(Math.ceil(data.height) + border);
+        return;
+      }
+      if (data.type !== 'run-result') { return; }
       setResult(data);
       onResult?.(data);
     }
@@ -121,7 +144,7 @@ export default function CSharpRunner({
         src={src}
         title="Interaktiver C#-Playground"
         loading="lazy"
-        height={height}
+        style={{height: `${Math.max(minHeight, frameHeight ?? estimateHeight(code))}px`}}
         onLoad={syncTheme}
       />
       <p className={styles.note}>
