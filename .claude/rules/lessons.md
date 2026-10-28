@@ -12,6 +12,7 @@ paths:
 - Body text in German, informal "Du" form, matter-of-fact (`concept/style-and-language.md`). Code, identifiers and comments in English.
 - Do not write code inline. Import it from `website/examples/mXX/lYY/*.cs`.
 - Never type outputs by hand. Take them only from CI snapshots (`<name>.out.txt`, made by `bash tools/check-examples.sh`; rewrite them on purpose with `--update`).
+- Do not set a height on `<CSharpRunner>` (no `height`, no `minHeight`); the height is automatic.
 - Code that cannot run: a normal code block with a title, without a "not runnable" note.
 - Write learning goals as observable behavior. A task checks every learning goal.
 - Quiz questions live in `website/src/data/quiz/de/mXX.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="…" />`, no inline quiz.

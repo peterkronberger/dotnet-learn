@@ -13,5 +13,6 @@ paths:
 - `postMessage` only with an origin check (`window.location.origin`) in both directions.
 - Do not break the `<base href>` replacement and the fingerprint check in `.github/workflows/pages.yml`; keep `index.html` free of fingerprint placeholders.
 - UI texts are not hard-coded again; they will be translatable (backlog B5).
+- The editor must never scroll vertically; it grows with its content. The runner reports its content height to the page with `{type: 'resize', id, height}` (origin check as for `run-result`). Do not add elements with a fixed height or an inner scroll area.
 - Keep keyboard use (Tab, Esc, Ctrl/⌘+Enter) and the `aria-live` result area.
 - After changes: `dotnet build playground/Playground.csproj` and `cd website && npm run build`.
