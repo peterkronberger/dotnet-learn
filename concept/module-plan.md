@@ -378,7 +378,7 @@ Routing, handlers · binding and validation · status codes · middleware pipeli
 - More misconceptions: validation runs automatically without registration; middleware order does not matter.
 
 ### M18 Abschlussprojekt (final project)
-Full SecLog: domain logic, LINQ analysis and classifier ▶ automatically checked; EF Core and API parts ◻ as code-review tasks ("Finde 3 Probleme in diesem Endpoint" – find 3 problems in this endpoint, "Welches SQL entsteht?" – which SQL is produced?).
+Full SecLog: domain logic, LINQ analysis and message rating ▶ automatically checked; EF Core and API parts ◻ as code-review tasks ("Finde 3 Probleme in diesem Endpoint" – find 3 problems in this endpoint, "Welches SQL entsteht?" – which SQL is produced?).
 - *(new)* Review checklist that covers the whole course: nullability warnings, exception handling, disposal, async pitfalls, DI lifetimes, SQL injection, input validation, time zones, tests for business rules.
 
 ### M19 Programmieren mit KI (programming with AI) ◻/▶
@@ -410,11 +410,7 @@ Content of the specification or platform that the course leaves out, and why. "O
 
 ## Practice project SecLog
 
-- **Domain (purely defensive):** analyze login logs, detect brute-force patterns, manage incidents. No attack techniques.
-- **From M11:** phishing classifier (Naive Bayes in plain C#) on synthetic sample texts.
-- **Form:** optional extra exercises at the end of a lesson. New concepts are always shown first in small, self-contained examples.
-- **Data:** made-up sample data only. Mark rules like "5 failed attempts in 10 minutes" as a teaching simplification.
-- **Path:** M1–M5 console analysis with arrays/collections (from M5 with real timestamps) → M6–M8 domain model (incl. enums for event types and severity) → M7 business rules as exceptions, reading a log file → M11 LINQ analysis + classifier → M14 tests (incl. time windows with a fake time provider) → M16 persistence → M17 incident API → M18 final project.
+See `concept/project-seclog.md`.
 
 ## Sources of the spec review (as of 2026-10-25)
 

@@ -6,7 +6,7 @@ paths:
 
 # Rules for writing lessons
 
-- Follow `concept/lesson-template.md` exactly (11 steps, practice-example pattern in step 4).
+- Follow `concept/lesson-template.md` exactly (10 steps, practice-example pattern in step 4).
 - Before you finish, check the Definition of Done in `CLAUDE.md` point by point and tick it off in the PR.
 - Front matter: `title`, `sidebar_position`, `description`, `lesson_id` (`mXX-lYY`; review modules `wXX-lYY`, see `concept/module-plan.md`), `duration_min`.
 - Body text in German, informal "Du" form, matter-of-fact (`concept/style-and-language.md`). Code, identifiers and comments in English.
@@ -20,6 +20,9 @@ paths:
 - Every "Achtung" box (misconception) starts with `<Misconception id="…" />` as its first line and is linked to at least one wrong quiz answer.
 - After changing quiz data or misconception boxes, run `node tools/check-quiz.mjs`.
 - New technical terms: add an entry to `website/src/data/glossary/de.json` (format in its `README.md`) and link the first use in the lesson with `<Term id="…">`. Then run `node tools/check-quiz.mjs`.
+- Every lesson has a "Projektschritt" with the fixed frame (`concept/lesson-template.md`), or one sentence why not. The start code is byte-identical to the previous solution (`concept/project-seclog.md`, continuity rule). Check it with `diff` and say so in the PR.
+- The first lesson of a module starts with the box "Projekt: Was SecLog nach diesem Modul kann" (text from the milestone table).
+- SecLog is the only example project. Do not invent other projects or unrelated SecLog snippets.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
 - Sources (`concept/sources.md`):
   - No attribution phrases such as "laut Microsoft Learn", "die Quelle sagt" or "Microsoft beschreibt". State the fact directly. The forbidden list is in `concept/sources.md`, "Automatic check".

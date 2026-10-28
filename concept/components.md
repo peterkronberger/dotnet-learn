@@ -9,6 +9,7 @@ As of 2026-10-24. Status: **available** · **planned**. All components are regis
 | Learning goals | `:::note[Lernziele]` |
 | Prediction | `:::info[Vorhersage]` |
 | Misconception | `:::warning[Achtung]` |
+| Project goal of a module (first lesson of every module) | `:::tip[Projekt: Was SecLog nach diesem Modul kann]` |
 | Typical AI answer (module 19 only) | `:::note[Typische KI-Antwort (konstruiertes Beispiel)]` |
 
 Collapsible: `<details><summary>Lösung und Erklärung anzeigen</summary> … </details>` or `Vertiefung: … (optional)` (blank lines before and after the content).

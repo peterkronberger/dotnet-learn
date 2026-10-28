@@ -75,13 +75,13 @@ A lesson is done when all points are met:
 6. Technical statements in "Vertiefung" (deepening) sections are verified and cited as in `concept/sources.md` level 2 (clause as link text).
 7. Duration 15–25 min (estimated by word count and number of tasks).
 8. Every worked example has subgoal labels.
-9. At least one task has a real application context (mostly SecLog or the phishing classifier).
+9. Every lesson has a project step ("Projektschritt") that builds on the previous state of SecLog, or one sentence why not (`concept/project-seclog.md`).
 10. At least one transfer question ("Where would you use this?") or an extra project exercise.
 11. Every misconception box is linked to at least one wrong answer in the quiz.
 12. At least one task "In eigenen Worten erklären" (explain in your own words).
 13. Each information regarding C# is validated against the C# language specification on Microsoft Learn (verification: `concept/sources.md` level 0)
 14. Every information is described in detail before it is part of any quiz
-15. When finalizing a module, ensure that the lessons follow a cohesive thread throughout. Across all lessons, do not assume any programming-related information unless it has been explained beforehand—either in this module or in a preceding one.
+15. When finalizing a module, ensure that the lessons follow a cohesive thread throughout. Across all lessons, do not assume any programming-related information unless it has been explained beforehand—either in this module or in a preceding one. The SecLog thread follows `concept/project-seclog.md` (milestones and continuity rule).
 16. The PR contains the section "Verification" (table: statement · URL with clause or heading · date checked), see `concept/sources.md` level 0.
 
 In addition: `npm run build` passes, no dead links, new technical terms are in the glossary and linked with `<Term>` at first use, a "Weiterlesen" (further reading) section with 1–3 links to Microsoft Learn or the specification.
@@ -99,6 +99,7 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 @concept/didactics.md
 @concept/lesson-template.md
 @concept/module-plan.md
+@concept/project-seclog.md
 @concept/components.md
 @concept/style-and-language.md
 @concept/sources.md
