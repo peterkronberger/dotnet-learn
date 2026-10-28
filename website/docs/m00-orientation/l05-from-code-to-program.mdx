@@ -10,9 +10,9 @@ import CodeBlock from '@theme/CodeBlock';
 import beforeError from '!!raw-loader!@site/examples/m00/l05/statements-before-error.cs';
 import beforeErrorOutput from '!!raw-loader!@site/examples/m00/l05/statements-before-error.out.txt';
 import missingSemicolon from '!!raw-loader!@site/examples/m00/l05/missing-semicolon.snippet.cs';
-import modelTask from '!!raw-loader!@site/examples/m00/l05/seclog-model-task.cs';
-import modelTests from '!!raw-loader!@site/examples/m00/l05/seclog-model-task.tests.snippet.cs';
-import modelSolution from '!!raw-loader!@site/examples/m00/l05/seclog-model-solution.cs';
+import projectTask from '!!raw-loader!@site/examples/m00/l05/seclog-profile-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m00/l05/seclog-profile-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m00/l05/seclog-profile-solution.cs';
 
 # Vom Code zum laufenden Programm
 
@@ -108,26 +108,26 @@ Der JIT ist der Standard. Es gibt zwei Varianten, bei denen Maschinencode schon 
 | **ReadyToRun** | IL **und** vorab erzeugter Maschinencode | Weniger JIT-Arbeit beim Start. | Dateien werden größer, meist auf das Zwei- bis Dreifache (siehe [ReadyToRun deployment overview](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run#impact-of-using-the-readytorun-feature), Stand: 2026-10-28). Der JIT bleibt nötig, zum Beispiel für manche Methoden. |
 | **Native AOT** | Nur Maschinencode (mit der nötigen Laufzeit darin) | Schnellerer Start, kein JIT. | Läuft ohne installierte .NET-Laufzeit, aber mit Einschränkungen: zum Beispiel kein dynamisches Laden von Assemblies und kein Erzeugen von Code zur Laufzeit. |
 
-## Ändern und selbermachen
+## Projektschritt
 
-Das SecLog-Werkzeug soll auf einem kleinen Server ohne installierte .NET-Laufzeit schnell starten. Im Startcode steht ein Modell, das dazu nicht passt.
+**Stand bisher:** Der Steckbrief nennt Titel, Zweck, Sprache, Plattform, .NET-Variante, Version und Support-Ende.
 
-<CSharpRunner id="m00-l05-model" code={modelTask} tests={modelTests} />
+**Neue Anforderung:** SecLog soll auf einem kleinen Server ohne installierte .NET-Laufzeit schnell starten. Ergänze die letzte Zeile mit dem passenden Ausführungsmodell: `Execution model: Native AOT`.
 
-Aufgabe: Ändere nur die dritte Zeile so, dass sie das passende Modell nennt: `Choice: Native AOT`. Begründe es mit den zwei Zeilen „Need“.
+<CSharpRunner id="m00-l05-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-model-solution.cs">{modelSolution}</CodeBlock>
+<CodeBlock language="csharp" title="seclog-profile-solution.cs">{projectSolution}</CodeBlock>
 
 1. **Anforderungen sammeln:** schneller Start, keine installierte Laufzeit.
 2. **Modelle vergleichen:** Der JIT-Standard und ReadyToRun enthalten weiter IL und setzen die .NET-Laufzeit voraus. Native AOT kommt ohne JIT aus und läuft auch ohne installierte Laufzeit.
-3. **Preis prüfen:** Native AOT hat Einschränkungen. SecLog müsste vorher gegen sie geprüft werden.
-
-Das ist nur die Entscheidungsidee. Wie du ein Programm so veröffentlichst, steht in Modul 14.
+3. **Preis prüfen:** Native AOT hat Einschränkungen. SecLog müsste vorher gegen sie geprüft werden. Wie du ein Programm so veröffentlichst, steht in Modul 14.
 
 </details>
+
+**Neuer Stand:** Der Steckbrief ist vollständig: Zweck, Sprache und Plattform, .NET-Variante, Version mit Support-Ende und Ausführungsmodell.
 
 ## Typische Fehlvorstellungen
 

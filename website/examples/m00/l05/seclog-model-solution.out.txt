@@ -1,3 +1,0 @@
-Need: fast start
-Need: no installed runtime
-Choice: Native AOT

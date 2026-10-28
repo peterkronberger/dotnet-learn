@@ -1,3 +1,0 @@
-Target: Linux server
-Target: Windows laptop
-Choice: .NET 10

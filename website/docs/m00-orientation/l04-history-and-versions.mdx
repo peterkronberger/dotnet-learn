@@ -9,9 +9,9 @@ duration_min: 20
 import CodeBlock from '@theme/CodeBlock';
 import versionSupport from '!!raw-loader!@site/examples/m00/l04/version-support.cs';
 import versionSupportOutput from '!!raw-loader!@site/examples/m00/l04/version-support.out.txt';
-import supportTask from '!!raw-loader!@site/examples/m00/l04/seclog-support-task.cs';
-import supportTests from '!!raw-loader!@site/examples/m00/l04/seclog-support-task.tests.snippet.cs';
-import supportSolution from '!!raw-loader!@site/examples/m00/l04/seclog-support-solution.cs';
+import projectTask from '!!raw-loader!@site/examples/m00/l04/seclog-profile-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m00/l04/seclog-profile-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m00/l04/seclog-profile-solution.cs';
 
 # Geschichte und Versionen
 
@@ -97,24 +97,26 @@ LTS-Versionen werden mindestens drei Jahre unterstützt, oder ein Jahr nach dem 
 
 </details>
 
-## Ändern und selbermachen
+## Projektschritt
 
-Der SecLog-Server läuft auf .NET 8. Bis wann ist er unterstützt, und wann muss er auf .NET 10 wechseln? Das Programm prüft ein Datum gegen das Support-Ende.
+**Stand bisher:** Der Steckbrief nennt Titel, Zweck, Sprache, Plattform und .NET-Variante.
 
-<CSharpRunner id="m00-l04-support" code={supportTask} tests={supportTests} />
+**Neue Anforderung:** SecLog braucht eine unterstützte Version. Ergänze zwei Zeilen: `Version: .NET 10 (LTS)` und `End of support: 2028-11-14`. Das Support-Ende von .NET 10 steht auf der [Support-Richtlinie für .NET](https://dotnet.microsoft.com/platform/support/policy/dotnet-core) (Stand: 2026-10-28).
 
-Aufgabe: Ändere nur das Prüfdatum auf den 1. Dezember 2026, sodass das Programm `Supported: False` ausgibt. Das Support-Ende von .NET 8 ist der 10. November 2026 ([.NET Support Policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core)). Vereinfachung im Beispiel: Der Endtag selbst zählt schon als nicht mehr unterstützt.
+<CSharpRunner id="m00-l04-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-support-solution.cs">{supportSolution}</CodeBlock>
+<CodeBlock language="csharp" title="seclog-profile-solution.cs">{projectSolution}</CodeBlock>
 
-1. **Frage klären:** Ist .NET 8 am Prüfdatum noch unterstützt?
-2. **Datum vergleichen:** `checkDate < endOfSupport` ist nur wahr, wenn das Prüfdatum vor dem Ende liegt.
-3. **Folgern:** Am 1. Dezember 2026 ist das Ende vorbei. SecLog muss vorher auf eine unterstützte Version wechseln, zum Beispiel .NET 10 (LTS, bis 14. November 2028).
+1. **Version wählen:** .NET 10 ist eine LTS-Version und noch lange unterstützt. .NET 8 endet am 10. November 2026.
+2. **Datum nachschlagen:** Das Support-Ende von .NET 10 ist der 14. November 2028. Eine Rechenregel ersetzt das Nachschlagen nicht.
+3. **Zeilen ergänzen:** Zwei neue `Console.WriteLine`-Anweisungen unter den vorhandenen.
 
 </details>
+
+**Neuer Stand:** Der Steckbrief nennt zusätzlich Version und Support-Ende.
 
 ## Typische Fehlvorstellungen
 

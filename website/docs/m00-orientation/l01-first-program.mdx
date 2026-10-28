@@ -13,9 +13,9 @@ import writeVsWriteLine from '!!raw-loader!@site/examples/m00/l01/write-vs-write
 import writeVsWriteLineOutput from '!!raw-loader!@site/examples/m00/l01/write-vs-writeline.out.txt';
 import missingQuote from '!!raw-loader!@site/examples/m00/l01/missing-quote.snippet.cs';
 import missingSemicolon from '!!raw-loader!@site/examples/m00/l01/missing-semicolon.snippet.cs';
-import bannerTask from '!!raw-loader!@site/examples/m00/l01/seclog-banner-task.cs';
-import bannerTests from '!!raw-loader!@site/examples/m00/l01/seclog-banner-task.tests.snippet.cs';
-import bannerSolution from '!!raw-loader!@site/examples/m00/l01/seclog-banner-solution.cs';
+import projectTask from '!!raw-loader!@site/examples/m00/l01/seclog-profile-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m00/l01/seclog-profile-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m00/l01/seclog-profile-solution.cs';
 
 # Dein erstes Programm
 
@@ -26,6 +26,16 @@ import bannerSolution from '!!raw-loader!@site/examples/m00/l01/seclog-banner-so
 :::
 
 Das ist die erste Lektion des Kurses. Es gibt noch keinen Stoff, den du wiederholen könntest, darum fehlt hier der Rückblick. Am Ende prüft ein Quiz, was du behalten hast.
+
+## Das Kursprojekt: SecLog
+
+In diesem Kurs baust du ein einziges Projekt: <Term id="seclog">SecLog</Term>. SecLog ist ein Werkzeug, das ausgedachte Anmeldeprotokolle auswertet. Am Ende des Kurses liest es Protokollzeilen ein und weist ungültige zurück. Es erkennt verdächtige Muster, etwa viele fehlgeschlagene Anmeldungen kurz hintereinander. Es verwaltet gefundene Vorfälle und bewertet gemeldete Nachrichten als „möglicher Phishing-Versuch“. SecLog ist rein defensiv: Es zeigt keine Angriffstechniken.
+
+Jede Lektion hat einen Abschnitt „Projektschritt“. Dort baust du SecLog um einen kleinen Schritt aus, ausgehend vom Stand der letzten Lektion. Alle Daten im Kurs sind erfunden. Es gibt keine echten Personen, Passwörter oder Firmen.
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog gibt seinen Steckbrief aus: Zweck, Sprache und Plattform, .NET-Variante, Version mit Support-Ende und Ausführungsmodell.
+:::
 
 ## Ein Programm ist eine Folge von Anweisungen
 
@@ -99,20 +109,26 @@ Fehler gehören zum Lernen. Der Compiler meldet sie, bevor das Programm läuft. 
 
 Der Playground zeigt die Fehler als Liste mit Zeile und Spalte an. Die genaue Meldung lies im Playground selbst nach. Sie steht dort in der Sprache des Compilers.
 
-## Ändern und selbermachen
+## Projektschritt
 
-Das <Term id="seclog">SecLog</Term>-Werkzeug soll zuerst ein Banner und dann eine (erfundene) Log-Zeile ausgeben. Im Startcode stehen die beiden Anweisungen in der falschen Reihenfolge. Bringe sie in die richtige Reihenfolge.
+**Stand bisher:** Das ist der erste Projektschritt. SecLog gibt noch nichts aus.
 
-<CSharpRunner id="m00-l01-banner" code={bannerTask} tests={bannerTests} />
+**Neue Anforderung:** SecLog soll seinen Steckbrief ausgeben: zuerst den Titel, dann den Zweck. Im Startcode stehen die beiden Anweisungen in der falschen Reihenfolge. Bringe sie in die richtige Reihenfolge.
+
+<CSharpRunner id="m00-l01-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-banner-solution.cs">{bannerSolution}</CodeBlock>
+<CodeBlock language="csharp" title="seclog-profile-solution.cs">{projectSolution}</CodeBlock>
 
-Die Anweisungen laufen von oben nach unten. Das Banner muss also vor der Log-Zeile stehen.
+1. **Anweisungen finden:** Es gibt zwei `Console.WriteLine`-Anweisungen.
+2. **Reihenfolge festlegen:** Die Anweisungen laufen von oben nach unten. Der Titel muss also vor dem Zweck stehen.
+3. **Ausgabe prüfen:** Die Ausgabe hat zwei Zeilen: erst der Titel, dann der Zweck.
 
 </details>
+
+**Neuer Stand:** SecLog gibt einen Steckbrief mit Titel und Zweck aus.
 
 ## Typische Fehlvorstellungen
 

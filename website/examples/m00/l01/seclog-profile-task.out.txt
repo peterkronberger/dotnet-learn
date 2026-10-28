@@ -1,0 +1,2 @@
+Purpose: find suspicious logins in made-up login logs
+SecLog project profile

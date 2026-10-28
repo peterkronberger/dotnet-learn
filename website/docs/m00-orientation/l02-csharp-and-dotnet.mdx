@@ -11,9 +11,9 @@ import aliasTypes from '!!raw-loader!@site/examples/m00/l02/alias-types.cs';
 import aliasTypesOutput from '!!raw-loader!@site/examples/m00/l02/alias-types.out.txt';
 import seclogLine from '!!raw-loader!@site/examples/m00/l02/seclog-line.cs';
 import seclogLineOutput from '!!raw-loader!@site/examples/m00/l02/seclog-line.out.txt';
-import upperTask from '!!raw-loader!@site/examples/m00/l02/seclog-upper-task.cs';
-import upperTests from '!!raw-loader!@site/examples/m00/l02/seclog-upper-task.tests.snippet.cs';
-import upperSolution from '!!raw-loader!@site/examples/m00/l02/seclog-upper-solution.cs';
+import projectTask from '!!raw-loader!@site/examples/m00/l02/seclog-profile-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m00/l02/seclog-profile-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m00/l02/seclog-profile-solution.cs';
 
 # C# und .NET: Sprache und Plattform
 
@@ -95,10 +95,10 @@ Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im
 
 </details>
 
-## Ein SecLog-Programm zerlegen
+## Ein Programm zerlegen
 
 :::info[Vorhersage]
-Das folgende Programm gehört zu <Term id="seclog">SecLog</Term>. Was gibt es aus? Überlege dabei, welche Wörter zur Sprache und welche zur Bibliothek gehören. Die Kommentare im Code verraten die Antwort. Lies sie erst nach deinem Tipp.
+Was gibt das folgende Programm aus? Überlege dabei, welche Wörter zur Sprache und welche zur Bibliothek gehören. Die Kommentare im Code verraten die Antwort. Lies sie erst nach deinem Tipp.
 :::
 
 <CSharpRunner id="m00-l02-seclog-line" code={seclogLine} predict expected={seclogLineOutput} />
@@ -116,22 +116,26 @@ Was passiert, wenn du `Math.Max(attempts, 1)` schreibst? Probiere es im Runner a
 
 </details>
 
-## Ändern und selbermachen
+## Projektschritt
 
-Im Startcode fehlt die Umwandlung. Das Gerüst ist wie oben: eine Variable, dann zwei Ausgaben.
+**Stand bisher:** SecLog gibt Titel und Zweck aus.
 
-<CSharpRunner id="m00-l02-upper" code={upperTask} tests={upperTests} />
+**Neue Anforderung:** Der Steckbrief soll die Sprache und die Plattform nennen: `Language: C#` und `Platform: .NET`. Hänge die zwei Zeilen unter die vorhandenen. Die Sprache und die Plattform sind zwei verschiedene Dinge, darum bekommt jedes eine eigene Zeile.
 
-Aufgabe: Die erste Ausgabe soll die Log-Zeile in Großbuchstaben zeigen, die zweite die Anzahl ihrer Zeichen. Die Methode `ToUpper` und die Eigenschaft `Length` kommen beide aus der Bibliothek.
+<CSharpRunner id="m00-l02-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-upper-solution.cs">{upperSolution}</CodeBlock>
+<CodeBlock language="csharp" title="seclog-profile-solution.cs">{projectSolution}</CodeBlock>
 
-`line.ToUpper()` liefert einen neuen Text in Großbuchstaben. `line.Length` ist die Anzahl der Zeichen.
+1. **Trennen:** C# ist die Sprache, .NET ist die Plattform.
+2. **Zeilen schreiben:** Zwei neue `Console.WriteLine`-Anweisungen mit je einem Text in Anführungszeichen.
+3. **Reihenfolge prüfen:** Die neuen Zeilen stehen unter den alten, denn die Anweisungen laufen von oben nach unten.
 
 </details>
+
+**Neuer Stand:** Der Steckbrief nennt Titel, Zweck, Sprache und Plattform.
 
 ## Drei Quellen für „die Spezifikation“
 
