@@ -1,0 +1,14 @@
+{
+  "questions": [
+    {
+      "id": "fixture-l01-q1", "lesson": "fixture-l01", "type": "single",
+      "question": "Fixture for the position phrase check. Not shown on the site.",
+      "options": [
+        { "text": "Wie Antwort A, aber mit `int`" },
+        { "text": "Beide oben sind richtig", "correct": true },
+        { "text": "Keine der genannten" }
+      ],
+      "explanation": "Die erste Option ist falsch."
+    }
+  ]
+}

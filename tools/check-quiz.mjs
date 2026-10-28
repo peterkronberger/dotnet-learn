@@ -77,7 +77,11 @@ function validate(q) {
   if (q.type === 'single' || q.type === 'multi') {
     if (!Array.isArray(q.options) || q.options.length < 2) errors.push(`${w}: needs at least 2 options`);
     else {
-      q.options.forEach((o, i) => !o.text && errors.push(`${w}: option ${i} has no text`));
+      q.options.forEach((o, i) => {
+        if (!o.text) errors.push(`${w}: option ${i} has no text`);
+        if (o.pin !== undefined && o.pin !== 'last') errors.push(`${w}: option ${i}: pin must be "last"`);
+      });
+      if (q.options.every((o) => o.pin === 'last')) errors.push(`${w}: at least one option must not be pinned`);
       const correct = q.options.filter((o) => o.correct === true).length;
       if (q.type === 'single' && correct !== 1) errors.push(`${w}: single needs exactly one correct option`);
       if (q.type === 'multi' && correct < 1) errors.push(`${w}: multi needs at least one correct option`);
@@ -169,6 +173,43 @@ function validate(q) {
 }
 
 // Same rules as validateGlossary in website/src/data/glossary/index.js (duplicated to stay dependency-free).
+// Phrases that refer to the shown position of an option (German quiz texts). Case-insensitive.
+const POSITION_PHRASES = [
+  /\b(Antwort|Option|Möglichkeit|Auswahl|Aussage)\s+[A-F1-9]\b/i,
+  /\b(erste|zweite|dritte|vierte|fünfte|letzte|obere|untere|vorige|vorherige|nächste|obige|untenstehende|obenstehende)[nrsm]?\s+(Antwort|Option|Möglichkeit|Auswahl|Aussage)/i,
+  /\b(beide|alle|die)\s+(oben|unten)\b/i,
+  /\b(oben|unten)\s+(genannt|stehend|aufgeführt)/i,
+];
+// Summary options: allowed only with "pin": "last".
+const SUMMARY_OPTION = /\b(keine|alle)\s+(der\s+)?(genannten|obigen|anderen)\b|\bkeine\s+davon\b/i;
+
+// Returns a list of messages "<id>: <field>: <text excerpt>" for one question.
+function positionProblems(q) {
+  const problems = [];
+  const texts = [];
+  (q.options ?? []).forEach((o, i) => {
+    texts.push([`options[${i}].text`, o?.text]);
+    texts.push([`options[${i}].feedback`, o?.feedback]);
+  });
+  texts.push(['explanation', q.explanation]);
+  (q.wrongMatches ?? []).forEach((m, i) => texts.push([`wrongMatches[${i}].feedback`, m?.feedback]));
+  for (const [field, text] of texts) {
+    if (typeof text !== 'string') continue;
+    for (const re of POSITION_PHRASES) {
+      const m = text.match(re);
+      if (m) problems.push(`${q.id}: ${field}: position reference "${m[0]}"`);
+    }
+  }
+  if (q.type === 'single' || q.type === 'multi') {
+    (q.options ?? []).forEach((o, i) => {
+      if (typeof o?.text === 'string' && SUMMARY_OPTION.test(o.text) && o.pin !== 'last') {
+        problems.push(`${q.id}: options[${i}].text: summary option needs "pin": "last"`);
+      }
+    });
+  }
+  return problems;
+}
+
 function validateGlossary(terms) {
   if (!Array.isArray(terms)) return ['Glossary "terms" is not a list'];
   const errors = [];
@@ -312,6 +353,15 @@ for (const q of questions.filter((x) => x.locale === 'de')) {
 for (const g of glossaryLessons) {
   if (!lessonIds.has(g.lesson)) warnings.push(`glossary ${g.id}: lesson ${g.lesson} has no lesson_id in docs`);
 }
+
+// 4b. Position phrases (options are shown in random order)
+const positionErrors = questions.filter((x) => x.locale === 'de').flatMap(positionProblems);
+const fixtureFile = join(root, 'tools/fixtures/quiz-position-phrases.json');
+const fixtureQuestions = JSON.parse(readFileSync(fixtureFile, 'utf8')).questions ?? [];
+if (fixtureQuestions.flatMap(positionProblems).length === 0) {
+  positionErrors.push('position phrase self-test: fixture not detected');
+}
+check('quiz position phrases', positionErrors);
 
 // 5. Wording (concept/sources.md)
 const wordingFiles = [

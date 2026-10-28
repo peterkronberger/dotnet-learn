@@ -36,7 +36,9 @@ export function validateQuestion(q) {
     } else {
       q.options.forEach((o, i) => {
         if (!o || typeof o.text !== 'string' || !o.text) errors.push(`${where}: option ${i} has no text`);
+        if (o && o.pin !== undefined && o.pin !== 'last') errors.push(`${where}: option ${i}: pin must be "last"`);
       });
+      if (q.options.every((o) => o && o.pin === 'last')) errors.push(`${where}: at least one option must not be pinned`);
       const correct = q.options.filter((o) => o && o.correct === true).length;
       if (q.type === 'single' && correct !== 1) errors.push(`${where}: single needs exactly one correct option`);
       if (q.type === 'multi' && correct < 1) errors.push(`${where}: multi needs at least one correct option`);
