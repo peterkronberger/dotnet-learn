@@ -14,7 +14,7 @@
 
 - Informal "Du" form, matter-of-fact, friendly. Short sentences. One idea per paragraph.
 - No judging superlatives ("genial" = brilliant, "erschreckend" = alarming). No filler phrases.
-- **No comparisons with other programming languages.** The course teaches C# on its own terms. Lesson text, quiz and glossary texts, components and demo pages do not compare C# with other languages and do not explain C# through them. People with prior programming experience use the placement test and the optional deep dives. Exceptions: bibliographic data (titles of papers) and the task descriptions of studies (module 19), because changing them would falsify the source.
+- **No comparisons with other programming languages.** The course teaches C# on its own terms. Lesson text, quiz and glossary texts, components and demo pages do not compare C# with other languages and do not explain C# through them. People with prior programming experience use the placement test and the optional deep dives. Exceptions: bibliographic data (titles of papers) and the task descriptions of studies (module 19), because changing them would falsify the source. `tools/check-quiz.mjs` fails if the markup of the removed language-comparison box appears again in `website/docs` or `website/src/pages`.
 - Mistakes are a normal step in learning. Feedback explains instead of judging.
 - Checks are sober: ✓/✗, "Stimmt" (correct) / "Stimmt nicht – erwartet war …" (not correct – expected was …).
 

@@ -21,6 +21,12 @@ const FORBIDDEN_PHRASES = [
 // true: forbidden phrases are errors (exit code 1). Set by #126 after the module 0 cleanup.
 const WORDING_IS_ERROR = true;
 
+// Markup of the removed language-comparison box (#127, concept/style-and-language.md). Must not come back.
+const REMOVED_LANGUAGE_BOX = [
+  /<FromLanguage\b/g,
+  /^\s*#{1,6}\s*Kommst du aus\b/gi,
+];
+
 // Line-based on the raw text, so the line number is exact (also for JSON).
 function findForbiddenPhrases(file) {
   const found = [];
@@ -30,6 +36,20 @@ function findForbiddenPhrases(file) {
       for (const pattern of FORBIDDEN_PHRASES) {
         for (const m of line.matchAll(pattern)) {
           found.push(`${relative(root, file)}:${i + 1}: forbidden phrase "${m[0]}" (concept/sources.md)`);
+        }
+      }
+    });
+  return found;
+}
+
+function findRemovedLanguageBox(file) {
+  const found = [];
+  readFileSync(file, 'utf8')
+    .split(/\r?\n/)
+    .forEach((line, i) => {
+      for (const pattern of REMOVED_LANGUAGE_BOX) {
+        for (const m of line.matchAll(pattern)) {
+          found.push(`${relative(root, file)}:${i + 1}: removed language-comparison box "${m[0].trim()}" (concept/style-and-language.md)`);
         }
       }
     });
@@ -305,6 +325,12 @@ else {
   warnings.push(...wordingFindings);
   if (wordingFindings.length === 0) console.log('OK   wording');
 }
+
+// 6. No language comparison box (concept/style-and-language.md)
+const boxFiles = ['docs', 'src/pages'].flatMap((d) =>
+  ['.md', '.mdx', '.js'].flatMap((ext) => walk(join(website, d), ext)),
+);
+check('no language comparison box', boxFiles.flatMap(findRemovedLanguageBox));
 
 [...new Set(warnings)].forEach((w) => console.log(`WARN ${w}`));
 
