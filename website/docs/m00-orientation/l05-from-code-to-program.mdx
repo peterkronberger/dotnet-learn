@@ -75,7 +75,7 @@ Das Programm unten hat keinen Compilerfehler. Es teilt durch eine Variable, die 
 Welche Zeilen gibt das Programm aus, und in welcher Reihenfolge? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
 :::
 
-<CSharpRunner id="m00-l05-before-error" height={400} code={beforeError} predict expected={beforeErrorOutput} />
+<CSharpRunner id="m00-l05-before-error" code={beforeError} predict expected={beforeErrorOutput} />
 
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>
@@ -112,7 +112,7 @@ Der JIT ist der Standard. Es gibt zwei Varianten, bei denen Maschinencode schon 
 
 Das SecLog-Werkzeug soll auf einem kleinen Server ohne installierte .NET-Laufzeit schnell starten. Im Startcode steht ein Modell, das dazu nicht passt.
 
-<CSharpRunner id="m00-l05-model" height={360} code={modelTask} tests={modelTests} />
+<CSharpRunner id="m00-l05-model" code={modelTask} tests={modelTests} />
 
 Aufgabe: Ändere nur die dritte Zeile so, dass sie das passende Modell nennt: `Choice: Native AOT`. Begründe es mit den zwei Zeilen „Need“.
 

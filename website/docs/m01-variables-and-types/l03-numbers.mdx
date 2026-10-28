@@ -44,7 +44,7 @@ Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp
 
 Das erste Beispiel rechnet die durchschnittliche Sitzungsdauer aus. Es ist in vier <Term id="subgoal">Teilziele</Term> gegliedert: **1. Eingaben festlegen → 2. In den passenden Typ umwandeln → 3. Rechnen → 4. Ergebnis ausgeben**.
 
-<CSharpRunner id="m01-l03-average" height={380} code={averageSession} />
+<CSharpRunner id="m01-l03-average" code={averageSession} />
 
 Wenn beide <Term id="operand">Operanden</Term> `int` sind, ist auch das Ergebnis ein `int`. Der Nachkommateil wird abgeschnitten (Richtung 0). Mit `(double)totalMinutes / sessions` wird zuerst ein Operand umgewandelt (Teilziel 2), dann wird als <Term id="floating-point-type">Gleitkommazahl</Term> gerechnet (Teilziel 3).
 
@@ -54,7 +54,7 @@ Wenn beide <Term id="operand">Operanden</Term> `int` sind, ist auch das Ergebnis
 Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
 :::
 
-<CSharpRunner id="m01-l03-pitfalls" height={420} code={numericPitfalls} predict expected={numericPitfallsOutput} />
+<CSharpRunner id="m01-l03-pitfalls" code={numericPitfalls} predict expected={numericPitfallsOutput} />
 
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>
@@ -85,7 +85,7 @@ Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp
 
 Gleiche Teilziele, aber jetzt fehlen Teile im Code. Setze an den Stellen mit `___` den Typ, das <Term id="literal">Literal</Term>-Suffix und die Variablen ein. Für `decimal`-Literale gilt das Suffix `m`.
 
-<CSharpRunner id="m01-l03-license-gaps" height={420} code={licenseCostGaps} />
+<CSharpRunner id="m01-l03-license-gaps" code={licenseCostGaps} />
 
 <details>
 <summary>Lösung anzeigen</summary>
@@ -106,7 +106,7 @@ Quelle: [Floating-point numeric types](https://learn.microsoft.com/dotnet/csharp
 
 Im <Term id="seclog">SecLog</Term>-Projekt (Auswertung von Anmeldeversuchen) soll die Fehlerquote in Prozent berechnet werden. Mit `7` fehlgeschlagenen von `20` Versuchen sollte `35` herauskommen. Der Startcode gibt aber `0` aus. Behebe den Fehler. Bei `0` Versuchen soll die <Term id="method">Methode</Term> `0` zurückgeben.
 
-<CSharpRunner id="m01-l03-failure-rate" height={440} code={failureRateTask} tests={failureRateTests} />
+<CSharpRunner id="m01-l03-failure-rate" code={failureRateTask} tests={failureRateTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
