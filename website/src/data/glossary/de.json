@@ -245,7 +245,7 @@
       "related": [
         "floating-point-type"
       ],
-      "lesson": "m01-l03",
+      "lesson": "m00-l01",
       "source": {
         "title": "Floating-point numeric types",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types"
@@ -329,11 +329,11 @@
       "term": "Method",
       "german": "Methode",
       "category": "language",
-      "definition": "Ein benannter Codeblock, den du mit Namen aufrufen kannst. Er kann Werte entgegennehmen und einen Wert zurückgeben.",
+      "definition": "Ein benanntes Stück Code, das du mit seinem Namen und Klammern aufrufst, zum Beispiel `WriteLine`.",
       "aliases": [
         "Methoden"
       ],
-      "lesson": "m01-l03",
+      "lesson": "m00-l02",
       "source": {
         "title": "Methods",
         "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/methods"
@@ -477,14 +477,14 @@
       "id": "compiler",
       "term": "Compiler",
       "category": "platform",
-      "definition": "Ein Programm, das deinen Quelltext prüft und in eine andere Form übersetzt, bevor das Programm läuft. Der C#-Compiler erzeugt dabei IL und meldet Fehler wie falsche Typen früh.",
+      "definition": "Ein Programm, das deinen Quelltext prüft und in eine andere Form übersetzt, bevor das Programm läuft. Es meldet Fehler früh, zum Beispiel ein fehlendes Semikolon. Der C#-Compiler erzeugt dabei IL.",
       "related": [
         "roslyn",
         "static-typing",
         "il",
         "compile-error"
       ],
-      "lesson": "m00-l05",
+      "lesson": "m00-l01",
       "source": {
         "title": "Managed Execution Process",
         "url": "https://learn.microsoft.com/dotnet/standard/managed-execution-process"

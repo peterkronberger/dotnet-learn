@@ -110,7 +110,7 @@
         },
         {
           "left": "BCL",
-          "right": "Die Standardbibliothek mit Typen wie Console und Math"
+          "right": "Die Standardbibliothek mit fertigen Bausteinen wie Console und Math"
         },
         {
           "left": "SDK",
@@ -126,7 +126,7 @@
         },
         {
           "left": "C#",
-          "right": "Die Standardbibliothek mit Typen wie Console und Math",
+          "right": "Die Standardbibliothek mit fertigen Bausteinen wie Console und Math",
           "feedback": "Die Bibliothek gehört zu .NET, nicht zur Sprache. C# beschreibt nur Schreibweise und Bedeutung des Codes.",
           "misconception": "m00-l02-console-is-language"
         }
@@ -164,7 +164,7 @@
       "options": [
         {
           "text": "Aus der Sprache C#: `Console` ist ein Schlüsselwort.",
-          "feedback": "`Console` ist kein Schlüsselwort, sondern ein Typ der Standardbibliothek im Namespace `System`.",
+          "feedback": "`Console` ist kein Schlüsselwort, sondern ein fertiger Baustein der Standardbibliothek.",
           "misconception": "m00-l02-console-is-language"
         },
         {
@@ -173,35 +173,35 @@
         },
         {
           "text": "Aus dem Compiler Roslyn.",
-          "feedback": "Der Compiler übersetzt deinen Code. Typen wie `Console` stehen in der Bibliothek, die dein Programm benutzt."
+          "feedback": "Der Compiler übersetzt deinen Code. Bausteine wie `Console` stehen in der Bibliothek, die dein Programm benutzt."
         }
       ],
-      "explanation": "Schlüsselwörter wie `var` und `int` gehören zur Sprache. `Console` und `Math` sind Typen der Bibliothek. Die Spezifikation beschreibt die Sprache, nicht diese Bibliothek."
+      "explanation": "Schlüsselwörter wie `int` gehören zur Sprache. `Console` und `Math` sind Bausteine der Bibliothek. Die Spezifikation beschreibt die Sprache, nicht diese Bibliothek."
     },
     {
       "id": "m00-l02-q4",
       "lesson": "m00-l02",
       "type": "multi",
-      "question": "Im Code von `seclog-line.cs` stehen `var`, `int`, `Math` und `ToUpper`. Welche davon gehören zur Sprache C#, nicht zur Bibliothek? Wähle alle richtigen.",
+      "question": "Im Code von `seclog-line.cs` stehen das Text-Literal in Anführungszeichen, das Semikolon `;`, `Math` und `ToUpper`. Welche davon gehören zur Sprache C#, nicht zur Bibliothek? Wähle alle richtigen.",
       "options": [
         {
-          "text": "`var`",
+          "text": "Das Text-Literal in Anführungszeichen",
           "correct": true
         },
         {
-          "text": "`int`",
+          "text": "Das Semikolon `;`",
           "correct": true
         },
         {
           "text": "`Math`",
-          "feedback": "`Math` ist ein Typ der Bibliothek."
+          "feedback": "`Math` kommt aus der Bibliothek."
         },
         {
           "text": "`ToUpper`",
-          "feedback": "`ToUpper` ist eine Methode des Typs `string` aus der Bibliothek."
+          "feedback": "`ToUpper` ist eine Methode aus der Bibliothek."
         }
       ],
-      "explanation": "`var` und `int` sind Schlüsselwörter der Sprache. `Math` und `ToUpper` kommen aus der Bibliothek."
+      "explanation": "Text-Literale und das Semikolon sind Teil der Sprache. `Math` und `ToUpper` kommen aus der Bibliothek."
     },
     {
       "id": "m00-l02-q5",
@@ -236,7 +236,7 @@
       "lesson": "m00-l02",
       "type": "explain",
       "question": "Transferfrage: Wo ist es nützlich zu wissen, ob etwas zur Sprache oder zur Bibliothek gehört? Nenne ein Beispiel.",
-      "modelAnswer": "Bei Fehlern und bei der Suche nach Hilfe: Eine Frage zu `var` beantwortet die Sprachspezifikation. Eine Frage zu `Console` oder `string.ToUpper` beantwortet die Dokumentation der Bibliothek. Auch in einem SecLog-Programm hilft das: `var` kommt aus der Sprache, `ToUpper` aus der Bibliothek."
+      "modelAnswer": "Bei Fehlern und bei der Suche nach Hilfe: Eine Frage zum Semikolon oder zu Anführungszeichen beantwortet die Sprachspezifikation. Eine Frage zu `Console` oder `ToUpper` beantwortet die Dokumentation der Bibliothek. Auch in einem SecLog-Programm hilft das: Das Text-Literal kommt aus der Sprache, `ToUpper` aus der Bibliothek."
     },
     {
       "id": "m00-l03-q1",
