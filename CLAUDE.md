@@ -1,6 +1,6 @@
 # CLAUDE.md – dotnet-learn
 
-Learning site for C# and .NET: Docusaurus 3 (learning path, quizzes) + a Blazor WebAssembly playground with Roslyn (.NET 10), hosted on GitHub Pages. Audience: programming beginners **and** people switching from other languages. Teaching style: example-driven, scientifically grounded, fundamentals are explained.
+Learning site for C# and .NET: Docusaurus 3 (learning path, quizzes) + a Blazor WebAssembly playground with Roslyn (.NET 10), hosted on GitHub Pages. Audience: programming beginners **and** people with prior programming experience. Teaching style: example-driven, scientifically grounded, fundamentals are explained.
 
 This document is binding for all work in the repo – for humans and for Claude (also in the workflows `claude-architect.yml` / `claude-implement.yml`).
 
