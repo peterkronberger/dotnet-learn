@@ -33,13 +33,13 @@ import upperSolution from '!!raw-loader!@site/examples/m00/l02/seclog-upper-solu
 
 In der ersten Lektion hast du `Console.WriteLine("Hello");` geschrieben. Dahinter stecken mehrere Teile, die oft in einen Topf geworfen werden. Diese Lektion trennt sie.
 
-<Term id="csharp">C#</Term> ist eine **Sprache**: Sie legt fest, wie du Code schreibst und was er bedeutet. Das steht in der <Term id="language-specification">Sprachspezifikation</Term>. Sie beschreibt „die Form“ und „die Interpretation“ von C#-Programmen. Sie beschreibt nicht, wie ein Programm für einen Computer übersetzt oder gestartet wird ([Scope](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/scope)).
+<Term id="csharp">C#</Term> ist eine **Sprache**: Sie legt fest, wie du Code schreibst und was er bedeutet. Das steht in der <Term id="language-specification">Sprachspezifikation</Term>. Sie beschreibt, wie C#-Programme aussehen und was sie bedeuten. Sie beschreibt nicht, wie ein Programm für einen Computer übersetzt oder gestartet wird.
 
-<Term id="dotnet">.NET</Term> ist die **Plattform**, die C#-Programme ausführt. Microsoft nennt diese Komponenten ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)):
+<Term id="dotnet">.NET</Term> ist die **Plattform**, die C#-Programme ausführt. Zu .NET gehören diese Komponenten:
 
 | Teil | Aufgabe |
 | --- | --- |
-| Runtime (<Term id="clr">CLR</Term>, Laufzeitumgebung) | führt den übersetzten Code aus ([CLR overview](https://learn.microsoft.com/dotnet/standard/clr)) |
+| Runtime (<Term id="clr">CLR</Term>, Laufzeitumgebung) | führt den übersetzten Code aus |
 | Libraries (<Term id="bcl">BCL</Term>, Standardbibliothek) | fertige Typen und Methoden, zum Beispiel für JSON |
 | Compiler (<Term id="roslyn">Roslyn</Term> für C#) | übersetzt Quelltext in ausführbaren Code |
 | <Term id="sdk">SDK</Term> und Werkzeuge | bauen, testen und starten Projekte, zum Beispiel mit `dotnet build` |
@@ -65,9 +65,9 @@ Wie aus dem Code ein laufendes Programm wird, erfährst du in Lektion 5. Hier ge
 
 ## Sprache oder Bibliothek?
 
-Die Spezifikation schreibt vor, dass jede Implementierung von C# eine kleine Standardbibliothek mitbringt. Sie enthält nur Typen, die die Sprache selbst braucht. Eine Implementierung liefert laut Spezifikation normalerweise eine viel größere Bibliothek mit ([Annex C: Standard library](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/standard-library)). Die Typen, die du täglich benutzt, stammen aus dieser größeren Bibliothek von .NET.
+Die Spezifikation schreibt vor, dass jede Implementierung von C# eine kleine Standardbibliothek mitbringt. Sie enthält nur Typen, die die Sprache selbst braucht. Von einer Implementierung wird erwartet, dass sie eine viel größere Bibliothek mitliefert. Die Typen, die du täglich benutzt, stammen aus dieser größeren Bibliothek von .NET.
 
-Ein Beispiel für die Grenze: Das Schlüsselwort `int` gehört zur Sprache. Die Spezifikation sagt, dass solche einfachen Typen Aliase (andere Namen) für Typen im Namespace `System` sind ([Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). `typeof(int).FullName` fragt nach dem vollen Namen dieses Bibliothekstyps.
+Ein Beispiel für die Grenze: Das Schlüsselwort `int` gehört zur Sprache. Die Spezifikation legt fest, dass solche einfachen Typen Aliase (andere Namen) für Typen im Namespace `System` sind. `typeof(int).FullName` fragt nach dem vollen Namen dieses Bibliothekstyps.
 
 :::info[Vorhersage]
 Was geben die drei Zeilen aus? Schreibe deinen Tipp für jede Zeile auf und führe den Code dann aus.
@@ -91,7 +91,7 @@ Was passiert, wenn du `typeof(double)` einsetzt? Probiere es im Runner aus.
 <details>
 <summary>Vertiefung: Warum gibt es Aliase? (optional)</summary>
 
-Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im Namespace `System` und nennt eine Tabelle der Zuordnungen ([Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). Du kannst also `int` oder `System.Int32` schreiben. Beides meint denselben Typ.
+Die Spezifikation definiert die einfachen Typen als Aliase für Strukturtypen im Namespace `System` und enthält eine Tabelle der Zuordnungen (siehe [§8 Types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types)). Die Pflicht-Bibliothek steht in [Annex C: Standard library](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/standard-library). Du kannst also `int` oder `System.Int32` schreiben. Beides meint denselben Typ.
 
 </details>
 
@@ -138,8 +138,8 @@ Aufgabe: Die erste Ausgabe soll die Log-Zeile in Großbuchstaben zeigen, die zwe
 Wenn du genau wissen willst, was in C# erlaubt ist, gibt es drei Schichten:
 
 1. **ECMA-334:** der veröffentlichte Standard. Die neueste Ausgabe auf der Ecma-Seite ist die 7. Ausgabe (Dezember 2023); Ecma ordnet sie C# 7 zu ([ECMA-334](https://ecma-international.org/publications-and-standards/standards/ecma-334)). *Stand: 2026-10-25.*
-2. **Entwurf des Standards auf Microsoft Learn:** der Arbeitstext der nächsten Ausgabe. Er enthält schon spätere Features ([C#-Spezifikation](https://learn.microsoft.com/dotnet/csharp/specification/)).
-3. **Feature-Spezifikationen:** Der Standard liegt hinter der Implementierung zurück. Darum veröffentlicht Microsoft für neuere Features eigene Spezifikationen, bis der Standard sie aufnimmt ([Feature specifications](https://learn.microsoft.com/dotnet/csharp/specification/feature-spec-overview)).
+2. **Entwurf des Standards auf Microsoft Learn:** der Arbeitstext der nächsten Ausgabe. Er enthält schon spätere Features.
+3. **Feature-Spezifikationen:** Der Standard liegt hinter der Implementierung zurück. Darum gibt es für neuere Features eigene Spezifikationen, bis der Standard sie aufnimmt.
 
 Faustregel: Frage zuerst den Entwurf auf Microsoft Learn. Steht das Feature dort nicht, lies die Feature-Spezifikation. Für Fragen zu `Console`, `List<T>` oder anderen Bibliothekstypen hilft die Spezifikation nicht, dafür gibt es die Dokumentation der Bibliothek auf Microsoft Learn.
 
@@ -148,7 +148,7 @@ Faustregel: Frage zuerst den Entwurf auf Microsoft Learn. Steht das Feature dort
 :::warning[Achtung]
 <Misconception id="m00-l02-csharp-is-dotnet" />
 
-**„C# und .NET sind dasselbe.“** C# ist die Sprache. .NET ist die Plattform mit Laufzeitumgebung, Bibliothek, Compiler und SDK. .NET kann laut Microsoft auch Programme in anderen Sprachen ausführen, C# ist dabei die beliebteste ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)).
+**„C# und .NET sind dasselbe.“** C# ist die Sprache. .NET ist die Plattform mit Laufzeitumgebung, Bibliothek, Compiler und SDK. .NET kann auch Programme in anderen Sprachen ausführen. C# ist davon die beliebteste.
 :::
 
 :::warning[Achtung]

@@ -29,17 +29,15 @@ import choiceSolution from '!!raw-loader!@site/examples/m00/l03/seclog-choice-so
 
 ## Mehrere Varianten von .NET
 
-In Lektion 2 war <Term id="dotnet">.NET</Term> die Plattform, die C#-Programme ausführt. Es gibt sie in mehreren Varianten. Microsoft nennt sie *Implementierungen* und sagt, jede unterstütze „a different type of app for both historical and technical reasons“ ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)). Drei Namen brauchst du:
+In Lektion 2 war <Term id="dotnet">.NET</Term> die Plattform, die C#-Programme ausführt. Es gibt sie in mehreren Varianten, die *Implementierungen* heißen. Jede Implementierung ist aus historischen und technischen Gründen für andere Arten von Apps gedacht. Drei Namen brauchst du:
 
-| Name | Kurzbeschreibung laut Microsoft Learn |
+| Name | Kurzbeschreibung |
 | --- | --- |
 | <Term id="dotnet-framework">.NET Framework</Term> | Die ursprüngliche Variante, seit 2002. Gedacht für Windows-Apps und Webdienste, optimiert für Windows-Desktop-Anwendungen. Sie wird gewartet. |
 | <Term id="dotnet-core">.NET (Core)</Term> | Die moderne Variante: plattformübergreifend, Open Source, weiterentwickelt. Früher „.NET Core“ genannt, heute einfach „.NET“. |
 | <Term id="mono">Mono</Term> | Eine plattformübergreifende, quelloffene Implementierung von .NET Framework. |
 
-Quellen: [Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction), [.NET implementations](https://learn.microsoft.com/dotnet/fundamentals/implementations) und [Overview of .NET Framework](https://learn.microsoft.com/dotnet/framework/get-started/overview). *Stand: 2026-10-25.*
-
-Die Umbenennung heißt: Wenn heute jemand „.NET“ sagt, meint er in der Regel die moderne Variante, die ab .NET 5 so heißt. Microsoft schreibt: „.NET, previously referred to as .NET Core, is currently the primary implementation.“ ([.NET implementations](https://learn.microsoft.com/dotnet/fundamentals/implementations)). Für neue Projekte rät Microsoft: „for new development, use .NET instead of .NET Framework“ ([Overview of .NET Framework](https://learn.microsoft.com/dotnet/framework/get-started/overview)). Bestehende .NET-Framework-Apps musst du laut derselben Seite nicht migrieren.
+Die Umbenennung heißt: Wenn heute jemand „.NET“ sagt, meint er in der Regel die moderne Variante, die ab .NET 5 so heißt. Das heutige .NET, früher .NET Core genannt, ist derzeit die primäre Implementierung ([.NET implementations](https://learn.microsoft.com/dotnet/fundamentals/implementations), Stand: 2026-10-28). Für neue Projekte nimmst du .NET statt .NET Framework. Bestehende .NET-Framework-Apps musst du nicht migrieren.
 
 <Diagram
   caption="Die .NET-Familie im Überblick"
@@ -60,13 +58,13 @@ flowchart TB
 
 ## Zwei Namen, die oft verwechselt werden
 
-„.NET Core“ und <Term id="ef-core">Entity Framework Core</Term> (EF Core) klingen ähnlich, sind aber verschiedene Dinge. EF Core greift auf Datenbanken zu und ist laut Microsoft „a lightweight, extensible, open source and cross-platform version of the popular Entity Framework data access technology“ ([EF Core](https://learn.microsoft.com/ef/core/)). .NET Core ist die Plattform. EF Core ist eine Bibliothek, die darauf läuft. Ein „.NET Framework Core“ gibt es nicht.
+„.NET Core“ und <Term id="ef-core">Entity Framework Core</Term> (EF Core) klingen ähnlich, sind aber verschiedene Dinge. EF Core greift auf Datenbanken zu und ist eine leichtgewichtige, erweiterbare, quelloffene und plattformübergreifende Version der Datenzugriffstechnologie Entity Framework. .NET Core ist die Plattform. EF Core ist eine Bibliothek, die darauf läuft. Ein „.NET Framework Core“ gibt es nicht.
 
 ## .NET Standard und Mono in je einem Absatz
 
-<Term id="dotnet-standard">.NET Standard</Term> ist „a formal specification of .NET APIs that are available on multiple .NET implementations“. Es sollte Bibliotheken ermöglichen, die auf mehreren Varianten laufen. .NET 5 und neuer brauchen es in den meisten Fällen nicht mehr. Neue Versionen erscheinen nicht mehr ([.NET Standard overview](https://learn.microsoft.com/dotnet/standard/net-standard)). Du brauchst es als Anfänger nur zu erkennen, wenn du es in fremden Projekten siehst.
+<Term id="dotnet-standard">.NET Standard</Term> ist eine formale Spezifikation von .NET-Schnittstellen (APIs), die auf mehreren Implementierungen vorhanden sind. Es sollte Bibliotheken ermöglichen, die auf mehreren Varianten laufen. .NET 5 und neuer brauchen es in den meisten Fällen nicht mehr. Neue Versionen erscheinen nicht mehr (Stand: 2026-10-28, siehe [.NET Standard overview](https://learn.microsoft.com/dotnet/standard/net-standard)). Du brauchst es als Anfänger nur zu erkennen, wenn du es in fremden Projekten siehst.
 
-Mono begann als Community-Projekt. Es war laut Microsoft die Laufzeit, die Xamarin-Apps (inzwischen nicht mehr unterstützt) antrieb, und es dient auch Spielen mit der Unity-Engine ([.NET implementations](https://learn.microsoft.com/dotnet/fundamentals/implementations)). In diesem Kurs spielt Mono keine Rolle.
+Mono begann als Community-Projekt. Es war die Laufzeit, die Xamarin-Apps antrieb (Xamarin wird nicht mehr unterstützt), und es treibt auch Spiele mit der Unity-Engine an. In diesem Kurs spielt Mono keine Rolle.
 
 Technik, die es nur im .NET Framework gab (zum Beispiel AppDomains, Remoting, WCF-Server), behandelt der Kurs nicht. Sie gehört zur Geschichte.
 
@@ -97,7 +95,7 @@ Das SecLog-Werkzeug soll auf einem Linux-Server und auf Windows-Laptops laufen. 
 
 <CSharpRunner id="m00-l03-choice" height={320} code={choiceTask} tests={choiceTests} />
 
-Aufgabe: Ändere nur die dritte Zeile so, dass sie `Choice: .NET 10` ausgibt. Begründung: .NET Framework ist eine Windows-Technologie, das heutige .NET ist plattformübergreifend ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)).
+Aufgabe: Ändere nur die dritte Zeile so, dass sie `Choice: .NET 10` ausgibt. Begründung: .NET Framework ist eine Windows-Technologie, das heutige .NET ist plattformübergreifend.
 
 <details>
 <summary>Musterlösung anzeigen</summary>
@@ -119,7 +117,7 @@ Die Entscheidung folgt aus zwei Schritten: Erst die Anforderung (Linux und Windo
 :::warning[Achtung]
 <Misconception id="m00-l03-framework-is-current" />
 
-**„.NET Framework ist die aktuelle Version für neue Projekte.“** Das .NET Framework wird gewartet, aber für Neuentwicklung empfiehlt Microsoft das heutige .NET ([Overview of .NET Framework](https://learn.microsoft.com/dotnet/framework/get-started/overview)).
+**„.NET Framework ist die aktuelle Version für neue Projekte.“** Das .NET Framework wird gewartet, aber für Neuentwicklung nimmst du das heutige .NET.
 :::
 
 ## Kommst du aus …?
@@ -149,7 +147,7 @@ Go hat eine einzige Implementierung als Standard. Bei .NET musst du beim Lesen v
 
 ## Zusammenfassung
 
-Es gibt drei Namen: .NET Framework (ursprünglich, für Windows, gewartet), .NET Core (plattformübergreifend, Open Source) und ab .NET 5 einfach .NET. Mono ist eine Implementierung von .NET Framework, .NET Standard eine inzwischen abgeschlossene Spezifikation für gemeinsame Bibliotheken. EF Core ist eine Datenbankbibliothek und nicht die Plattform. Für neue Projekte empfiehlt Microsoft das heutige .NET.
+Es gibt drei Namen: .NET Framework (ursprünglich, für Windows, gewartet), .NET Core (plattformübergreifend, Open Source) und ab .NET 5 einfach .NET. Mono ist eine Implementierung von .NET Framework, .NET Standard eine inzwischen abgeschlossene Spezifikation für gemeinsame Bibliotheken. EF Core ist eine Datenbankbibliothek und nicht die Plattform. Für neue Projekte nimmst du das heutige .NET.
 
 ## Prüfe dein Wissen
 
