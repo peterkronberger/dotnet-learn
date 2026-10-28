@@ -33,7 +33,7 @@ Checks to run before a commit (the first two are the build checks from `CLAUDE.m
 cd website && npm run build                # learning site
 dotnet build playground/Playground.csproj  # playground
 bash tools/check-examples.sh               # compile all examples, compare outputs
-node tools/check-quiz.mjs                  # quiz data and links
+node tools/check-quiz.mjs                  # quiz data, links and wording
 ```
 
 Locally, the embedded preview shows the playground at the path `/dotnet-learn/runner/` of the Docusaurus site only if the playground was published first and copied to `website/build/runner`. For development it is enough to open the playground directly with `dotnet run`.
@@ -48,7 +48,7 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/les
 - Quiz: `<Quiz id="m01-l03-q1" />`. The question is stored in `website/src/data/quiz/de/mXX.json` (format: [`website/src/data/quiz/README.md`](website/src/data/quiz/README.md)). Inline props are no longer allowed; the build fails.
 - Misconception: `<Misconception id="m01-l03-int-division-rounds" />` as the first line in a `:::warning[Achtung]` box; one answer option points to it with `misconception`.
 - Reference lesson: none yet – the existing lessons are early implementations and are rebuilt (`concept/module-plan.md`, "Existing content"). Pattern: `concept/lesson-template.md`.
-- Check quiz data and MDX references: `node tools/check-quiz.mjs`.
+- Check quiz data, MDX references and forbidden attribution phrases (wording): `node tools/check-quiz.mjs`.
 - Version badge (only features from C# 12 / .NET 8, otherwise build error): `<Since csharp="12" dotnet="8" />` inline; with children (old code) as a collapsible "So schrieb man es vorher".
 - Glossary link: `<Term id="value-type" />` (renders "Value Type (Werttyp)") or `<Term id="value-type">Werttypen</Term>`, only at the first use of a term in a lesson. Entries: `website/src/data/glossary/de.json`. An unknown id fails `node tools/check-quiz.mjs` and the build.
 - Switcher box: `<FromLanguage>` with `<TabItem value="java|python|js|go|cpp">` as children (the component sets labels and order; the choice applies to all boxes via `groupId="from-language"`). Example: `website/src/pages/dev/components-demo.mdx`.

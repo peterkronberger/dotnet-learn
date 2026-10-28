@@ -11,6 +11,31 @@ const TYPES = ['single', 'multi', 'output', 'explain', 'parsons', 'cloze', 'find
 const failures = [];
 const warnings = [];
 
+// Forbidden attribution phrases (concept/sources.md, "Wording rules"). Keep in sync with the table there.
+const FORBIDDEN_PHRASES = [
+  /\blaut\s+(Microsoft|Quelle|derselben\s+Seite|Spezifikation|Presseberichten|Support-Policy|Dokumentation)/gi,
+  /\bdie\s+Quelle\s+sagt/gi,
+  /\bMicrosoft(\s+Learn)?\s+(schreibt|beschreibt|nennt|rät|sagt)\b/gi,
+  /\bgemäß\s+(der\s+)?Dokumentation/gi,
+];
+// false: findings are warnings. #126 sets this to true (error) after the module 0 cleanup.
+const WORDING_IS_ERROR = false;
+
+// Line-based on the raw text, so the line number is exact (also for JSON).
+function findForbiddenPhrases(file) {
+  const found = [];
+  readFileSync(file, 'utf8')
+    .split(/\r?\n/)
+    .forEach((line, i) => {
+      for (const pattern of FORBIDDEN_PHRASES) {
+        for (const m of line.matchAll(pattern)) {
+          found.push(`${relative(root, file)}:${i + 1}: forbidden phrase "${m[0]}" (concept/sources.md)`);
+        }
+      }
+    });
+  return found;
+}
+
 function walk(dir, ext, out = []) {
   for (const name of readdirSync(dir)) {
     const p = join(dir, name);
@@ -267,6 +292,20 @@ for (const q of questions.filter((x) => x.locale === 'de')) {
 for (const g of glossaryLessons) {
   if (!lessonIds.has(g.lesson)) warnings.push(`glossary ${g.id}: lesson ${g.lesson} has no lesson_id in docs`);
 }
+
+// 5. Wording (concept/sources.md)
+const wordingFiles = [
+  ...walk(join(website, 'docs'), '.mdx'),
+  ...walk(join(quizDir, 'de'), '.json'),
+  join(website, 'src/data/glossary/de.json'),
+];
+const wordingFindings = wordingFiles.flatMap(findForbiddenPhrases);
+if (WORDING_IS_ERROR) check('wording', wordingFindings);
+else {
+  warnings.push(...wordingFindings);
+  if (wordingFindings.length === 0) console.log('OK   wording');
+}
+
 [...new Set(warnings)].forEach((w) => console.log(`WARN ${w}`));
 
 process.exit(failures.length > 0 ? 1 : 0);
