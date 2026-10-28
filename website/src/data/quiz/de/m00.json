@@ -455,10 +455,10 @@
       "id": "m00-l04-q4",
       "lesson": "m00-l04",
       "type": "single",
-      "question": "SecLog läuft auf .NET 8. Das Support-Ende ist der 10. November 2026. Wie ist der Stand am 1. Dezember 2026?",
+      "question": "Ein älterer Server läuft auf .NET 8. Das Support-Ende ist der 10. November 2026. Wie ist der Stand am 1. Dezember 2026?",
       "options": [
         {
-          "text": "Support-Ende ist überschritten: .NET 8 bekommt keine Sicherheitsupdates mehr. SecLog sollte auf .NET 10 wechseln.",
+          "text": "Support-Ende ist überschritten: .NET 8 bekommt keine Sicherheitsupdates mehr. Der Server sollte auf .NET 10 wechseln.",
           "correct": true
         },
         {
@@ -466,7 +466,7 @@
           "feedback": "LTS bedeutet langer, aber nicht unbegrenzter Support. Das Datum zählt, nicht das Etikett."
         },
         {
-          "text": "Es kommt darauf an, ob SecLog neue Features nutzt.",
+          "text": "Es kommt darauf an, ob der Server neue Features nutzt.",
           "feedback": "Der Support hängt von der Version und dem Datum ab, nicht davon, welche Features dein Programm nutzt."
         }
       ],

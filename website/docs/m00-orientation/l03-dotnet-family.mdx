@@ -9,9 +9,9 @@ duration_min: 20
 import CodeBlock from '@theme/CodeBlock';
 import familyFacts from '!!raw-loader!@site/examples/m00/l03/family-facts.cs';
 import familyFactsOutput from '!!raw-loader!@site/examples/m00/l03/family-facts.out.txt';
-import choiceTask from '!!raw-loader!@site/examples/m00/l03/seclog-choice-task.cs';
-import choiceTests from '!!raw-loader!@site/examples/m00/l03/seclog-choice-task.tests.snippet.cs';
-import choiceSolution from '!!raw-loader!@site/examples/m00/l03/seclog-choice-solution.cs';
+import projectTask from '!!raw-loader!@site/examples/m00/l03/seclog-profile-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m00/l03/seclog-profile-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m00/l03/seclog-profile-solution.cs';
 
 # Die .NET-Familie
 
@@ -89,22 +89,26 @@ Was passiert, wenn du das erste `Write` durch `WriteLine` ersetzt? Probiere es i
 
 </details>
 
-## Ändern und selbermachen
+## Projektschritt
 
-Das SecLog-Werkzeug soll auf einem Linux-Server und auf Windows-Laptops laufen. Im Startcode steht eine Wahl, die dazu nicht passt.
+**Stand bisher:** Der Steckbrief nennt Titel, Zweck, Sprache und Plattform.
 
-<CSharpRunner id="m00-l03-choice" code={choiceTask} tests={choiceTests} />
+**Neue Anforderung:** SecLog soll auf einem Linux-Server und auf Windows-Laptops laufen. Ergänze eine Zeile, die die passende .NET-Variante nennt: `Variant: .NET (Linux server and Windows laptops)`.
 
-Aufgabe: Ändere nur die dritte Zeile so, dass sie `Choice: .NET 10` ausgibt. Begründung: .NET Framework ist eine Windows-Technologie, das heutige .NET ist plattformübergreifend.
+<CSharpRunner id="m00-l03-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-choice-solution.cs">{choiceSolution}</CodeBlock>
+<CodeBlock language="csharp" title="seclog-profile-solution.cs">{projectSolution}</CodeBlock>
 
-Die Entscheidung folgt aus zwei Schritten: Erst die Anforderung (Linux und Windows), dann die Variante, die beides abdeckt (das heutige .NET).
+1. **Anforderung klären:** SecLog muss auf Linux und auf Windows laufen.
+2. **Variante wählen:** Das .NET Framework ist eine Windows-Technologie. Das heutige .NET ist plattformübergreifend und deckt beides ab.
+3. **Zeile ergänzen:** Eine neue `Console.WriteLine`-Anweisung unter den vorhandenen.
 
 </details>
+
+**Neuer Stand:** Der Steckbrief nennt zusätzlich die .NET-Variante.
 
 ## Typische Fehlvorstellungen
 

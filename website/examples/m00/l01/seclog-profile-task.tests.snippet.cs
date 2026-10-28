@@ -1,4 +1,4 @@
-// Test code for seclog-support-task.cs. Runs the learner program and checks its output lines.
+// Test code for seclog-profile-task.cs. Runs the learner program and checks its output lines.
 public static class TaskTests
 {
     public static (string Name, bool Visible, bool Passed, string Feedback)[] Run()
@@ -6,9 +6,8 @@ public static class TaskTests
         var lines = RunProgram();
         return
         [
-            ("Four lines are printed", true, lines.Length == 4, "The program should print exactly four lines."),
-            ("Check date", true, lines.Length > 2 && lines[2] == "Check date: 2026-12-01", "The third line must be: Check date: 2026-12-01"),
-            ("Result", true, lines.Length > 3 && lines[3] == "Supported: False", "With this check date, the last line must be: Supported: False"),
+            ("Exactly 2 lines are printed", true, lines.Length == 2, "The program should print exactly 2 lines."),
+            ("New lines: title and purpose", true, lines.Length > 0 && lines[0] == "SecLog project profile" && lines.Length > 1 && lines[1] == "Purpose: find suspicious logins in made-up login logs", "The first two lines must be: SecLog project profile / Purpose: find suspicious logins in made-up login logs"),
         ];
     }
 

@@ -1,0 +1,5 @@
+SecLog project profile
+Purpose: find suspicious logins in made-up login logs
+Language: C#
+Platform: .NET
+Variant: .NET (Linux server and Windows laptops)

@@ -600,8 +600,8 @@
       "id": "seclog",
       "term": "SecLog",
       "category": "course",
-      "definition": "Das Übungsprojekt des Kurses: Du wertest ausgedachte Anmeldeprotokolle aus. Es ist rein defensiv.",
-      "lesson": "m01-l03"
+      "definition": "Das Übungsprojekt des Kurses: ein Werkzeug, das ausgedachte Anmeldeprotokolle auswertet, verdächtige Muster erkennt und Vorfälle verwaltet. Es wächst in jeder Lektion um einen Projektschritt. Alle Daten sind erfunden.",
+      "lesson": "m00-l01"
     },
     {
       "id": "learning-status",

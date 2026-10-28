@@ -1,2 +1,0 @@
-login failed user=alice
-login failed user=alice

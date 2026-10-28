@@ -1,2 +1,0 @@
-2026-01-01 08:00 login failed user=alice
-SecLog 0.1
