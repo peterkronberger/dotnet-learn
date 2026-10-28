@@ -67,7 +67,7 @@ import pitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
 Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
 :::
 
-<CSharpRunner height={420} code={pitfalls} />
+<CSharpRunner code={pitfalls} />
 
 <details>
 <summary>Lösung und Erklärung anzeigen</summary>

@@ -15,7 +15,7 @@ Collapsible: `<details><summary>Lösung und Erklärung anzeigen</summary> … </
 
 ## `<CSharpRunner>` – available, being extended
 
-Today: `code` (string), `height` (px, default 460). Embeds `/runner/` as an iframe, code as Base64url in the URL fragment, `loading="lazy"`, theme via `postMessage` (`{type: 'theme', value}`).
+Today: `code` (string). The height is automatic: the iframe is as high as the runner page (code, output, diagnostics, test results, step view), so nothing scrolls inside it. Before the runner has loaded, the iframe reserves a height estimated from the line count of `code`. Optional `minHeight` (px, default 0) only for the full-page playground; lessons never set a height. Embeds `/runner/` as an iframe, code as Base64url in the URL fragment, `loading="lazy"`, theme via `postMessage` (`{type: 'theme', value}`).
 
 Available (S7):
 - `id`: stable key of the instance (default: automatic). Matches `run-result` to the right instance.
@@ -35,11 +35,13 @@ Planned:
 Message protocol (S7, available; origin check `window.location.origin` in both directions, the page also checks `event.source` and `id`):
 - Page → runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>`
 - Runner → page: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
+- Runner → page: `{type: 'resize', id, height}` – sent whenever the content height of the runner page changes; the page sets the iframe height from it (same origin, `event.source` and `id` checks as for `run-result`).
 
 ## Playground (`playground/`) – available
 
 - `<textarea>` editor; Tab, Esc, Ctrl/⌘+Enter available. No autocompletion (decided).
 - Syntax colors, line highlight, error marking – available (S4): own tokenizer in `playground/wwwroot/js/editor.js` (no Prism). Overlay lines use the classes `pg-hl-line*`. They must not change text metrics (font, font weight, italic, ligatures, padding, border), or the cursor sits in the wrong place.
+- The editor grows with its code (minimum about 3 lines) and never scrolls vertically; long lines wrap. The highlight overlay keeps identical text metrics.
 - Loop guard (stop after about 3 s with a German message and line number) – available (S3). No guard in operators, accessors and expression bodies; `catch (Exception)` in user code catches it.
 - Compiler errors as a list with line/column (available) + German explanation of common errors in addition to the original message (planned).
 - Step-by-step visualization (variables, heap model), switchable per runner with `trace` – available (S5).
