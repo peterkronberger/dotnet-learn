@@ -30,11 +30,12 @@ As of 2026-10-28. This file sets **which** learning methods the course uses, **w
 | Address misconceptions on purpose | Box "Achtung"; quiz distractors taken from typical misconceptions | [Qian & Lehman 2017] |
 | Notional machine | Simplified but correct model of execution: memory visualizations, step-by-step view (where useful) | [Sorva 2013], [Guo 2013] |
 | Explanatory feedback | Every quiz/test response explains the *why* | [Hattie & Timperley 2007] |
+| Whole task with a red thread | One project (SecLog) that grows in every lesson; goal shown at the start (module box, announcement in m00-l01) | [Merrill 2002], [Vandewaetere 2015]; advance organizer [Ausubel 1960], evidence mixed |
 | Enhanced compiler messages | German explanation of common errors **in addition to** the original message | [Becker 2016]: fewer errors and repeated errors in a control-group study |
 
 ## Review grid: Merrill's First Principles
 
-Every lesson is checked against these five points [Merrill 2002]: real task (SecLog/classifier), activate prior knowledge (warm-up), demonstrate (example), apply with feedback (exercise), transfer (transfer question).
+Every lesson is checked against these five points [Merrill 2002]: real task (SecLog project step), activate prior knowledge (warm-up), demonstrate (example), apply with feedback (exercise), transfer (transfer question).
 
 ## Order of content
 
@@ -45,6 +46,7 @@ Every lesson is checked against these five points [Merrill 2002]: real task (Sec
 ## Limits (state them openly)
 
 - Much of the evidence comes from memory, school or mathematics settings. Transfer to programming is plausible but not directly shown for every method.
+- The evidence for whole tasks comes from medical and professional education, and the evidence for advance organizers is mixed. Transfer to a programming course is plausible but not shown directly.
 - The platform does not measure its own learning success (no tracking).
 
 ## AI and learning (for the paragraph on "Wie dieser Kurs funktioniert")
@@ -76,9 +78,12 @@ Verified (primary source or publisher/repository entry checked, as of 2026-10-22
 - [Sentance 2019] Sentance, S., Waite, J., & Kallia, M. (2019). Teaching computer programming with PRIMM: A sociocultural perspective. *Computer Science Education, 29*(2–3), 136–176. https://doi.org/10.1080/08993408.2019.1608781
 - [Shen & Tamkin 2026] Shen, J. H., & Tamkin, A. (2026). How AI impacts skill formation. arXiv:2601.20245 (Anthropic; disclose the conflict of interest).
 - [Sorva 2013] Sorva, J. (2013). Notional machines and introductory programming education. *ACM Transactions on Computing Education, 13*(2). https://doi.org/10.1145/2483710.2483713
+- [Vandewaetere 2015] Vandewaetere, M., Manhaeve, D., Aertgeerts, B., Clarebout, G., van Merriënboer, J. J. G., & Roex, A. (2015). 4C/ID in medical education: How to design an educational program based on whole-task learning: AMEE Guide No. 93. *Medical Teacher, 37*(1), 4–20. https://doi.org/10.3109/0142159X.2014.928407 – Checked 2026-10-27.
 - [Sweller, van Merriënboer & Paas 2019] Sweller, J., van Merriënboer, J. J. G., & Paas, F. (2019). Cognitive architecture and instructional design: 20 years later. *Educational Psychology Review, 31*(2), 261–292. https://doi.org/10.1007/s10648-019-09465-5
 
 Not verified by us (check before use):
 
 - [Sweller & Cooper 1985] Sweller, J., & Cooper, G. A. (1985). The use of worked examples as a substitute for problem solving in learning algebra. *Cognition and Instruction, 2*(1), 59–89. – Details taken from the MVP; DOI not checked.
+- [Ausubel 1960] Ausubel, D. P. (1960). The use of advance organizers in the learning and retention of meaningful verbal material. *Journal of Educational Psychology, 51*, 267–272. – Primary record not opened by us.
+- [Barnes & Clawson 1975] Review of advance-organizer studies. Numbers (12 of 32 studies positive) only from a secondary source; check the primary source before quoting.
 - Taken from `learning-principles.mdx` (MVP), not checked: Kornell, Hays & Bjork (2009); Sweller (1988); Mayer (2009); Shute (2008, Focus on formative feedback).

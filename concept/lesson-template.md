@@ -15,11 +15,11 @@ There is no reference lesson yet. The existing lessons are early implementations
 | 3 | Concept | Short text + small, isolated example | Only the current concept; no project context. First use of a technical term: `<Term id="…">`, entry in the glossary |
 | 4 | Practice example | **Practice-example pattern** (below) | Required, at least once |
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
-| 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |
+| 6 | Projektschritt (project step) | Fixed frame (section "Project step (Projektschritt)" below), `<CSharpRunner tests={…}>` | The automatically checked make task of the lesson, always on SecLog. Start code = previous solution (`concept/project-seclog.md`). A collapsed model solution is part of the frame; for ◻ lessons the runner is replaced by a `<CodeBlock>` |
 | 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes; `<Misconception id="…" />` as the first line of each box | Every box is linked to a quiz distractor |
 | 8 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a source as in `concept/sources.md` level 2 (case 3: clause as link text) |
 | 9 | Summary | 3–5 sentences | No new content |
-| 10 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": level 3 of `concept/sources.md` |
+| 10 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (optional extra exercise for more practice), "Weiterlesen" (further reading) | "Weiterlesen": level 3 of `concept/sources.md` |
 
 ## Practice-example pattern (required in step 4)
 
@@ -85,6 +85,32 @@ Was geben die vier Zeilen aus? Notiere deinen Tipp für jede Zeile und führe de
 
 Code that cannot run looks like a normal code block with a title. Because the code comes from a file, use `<CodeBlock language="csharp" title="…">{code}</CodeBlock>` (official Docusaurus component). The look is identical to ` ```csharp title="…" `.
 
-## SecLog extra exercises
+## Project step (Projektschritt)
 
-New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 10). Details: `concept/module-plan.md`.
+SecLog is the only example project (`concept/project-seclog.md`). New concepts are first shown in small, isolated examples (step 3); the project step comes after them. Step 5 may still contain other modify tasks. The optional extra exercise in step 10 is only for additional practice.
+
+Fixed frame (German, learner-facing):
+
+```mdx
+## Projektschritt
+
+**Stand bisher:** <1–2 sentences: what SecLog can do so far>
+
+**Neue Anforderung:** <what SecLog should do after this step>
+
+<CSharpRunner id="<lesson_id>-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+<CodeBlock language="csharp" title="seclog-<name>-solution.cs">{projectSolution}</CodeBlock>
+<explanation with subgoal labels>
+</details>
+
+**Neuer Stand:** <1–2 sentences: what SecLog can do now>
+```
+
+- If a lesson cannot add a real step, the section has one sentence instead: "In dieser Lektion kommt kein Projektschritt dazu, weil …". It does not invent an unrelated SecLog snippet.
+- For ◻ (not runnable) lessons, the runner is replaced by the existing fallback: a `<CodeBlock>` and a collapsed model solution (the code comes from a CI project).
+- File names: `website/examples/mXX/lYY/seclog-<name>-task.cs`, `seclog-<name>-task.tests.snippet.cs`, `seclog-<name>-solution.cs` and their `.out.txt` snapshots. `<name>` stays the same in a module.
+- Continuity rule (start code byte-identical to the previous solution) and the sample data: `concept/project-seclog.md`.
+- Module box: the first lesson of every module has `:::tip[Projekt: Was SecLog nach diesem Modul kann]` right after the learning goals, with 2–4 bullets from the milestone row of the module.

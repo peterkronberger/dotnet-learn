@@ -15,4 +15,4 @@ paths:
 - Output must not depend on culture (`InvariantCulture`): the playground uses `InvariantGlobalization`.
 - If the example should be runnable, use only namespaces that the playground has (`playground/Playground.csproj`, `ReferenceName`).
 - No endless loops, no real network or file access in runnable examples.
-- SecLog sample data is made up: no real people, IPs or credentials.
+- SecLog sample data comes from the canonical data set in `concept/project-seclog.md`. It is made up: no real people, no credentials; IP addresses only from RFC 5737 (`192.0.2.0/24`, `198.51.100.0/24`, `203.0.113.0/24`).
