@@ -17,10 +17,9 @@ There is no reference lesson yet. The existing lessons are early implementations
 | 5 | Gap example | Example with gaps, subgoal labels stay | Fading: the gaps are in the code |
 | 6 | Change and make it yourself | Automatically checked task | Automatically checked task with `<CSharpRunner tests={…}>`; a collapsed model solution only as a fallback, e.g. for topics that cannot run |
 | 7 | Misconceptions | `:::warning[Achtung]`, 1–3 short boxes; `<Misconception id="…" />` as the first line of each box | Every box is linked to a quiz distractor |
-| 8 | (Switcher box) | `<FromLanguage>` with tabs Java / Python / JS/TS / Go (C++ only where it fits) | Only differences to C#, do not explain C# again |
-| 9 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a source as in `concept/sources.md` level 2 (case 3: clause as link text) |
-| 10 | Summary | 3–5 sentences | No new content |
-| 11 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": level 3 of `concept/sources.md` |
+| 8 | (Deep dive) | `<details>` "Vertiefung: … (optional)" | Replaces "Unter der Haube" (under the hood); technical statements with a source as in `concept/sources.md` level 2 (case 3: clause as link text) |
+| 9 | Summary | 3–5 sentences | No new content |
+| 10 | Wrap-up | Quiz (→ Leitner pool), "In eigenen Worten erklären" (explain in your own words), transfer question, (SecLog extra exercise), "Weiterlesen" (further reading) | "Weiterlesen": level 3 of `concept/sources.md` |
 
 ## Practice-example pattern (required in step 4)
 
@@ -88,4 +87,4 @@ Code that cannot run looks like a normal code block with a title. Because the co
 
 ## SecLog extra exercises
 
-New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 11). Details: `concept/module-plan.md`.
+New concepts are **always** shown first in small, self-contained examples. The practice project SecLog comes afterwards as an optional extra exercise (step 10). Details: `concept/module-plan.md`.

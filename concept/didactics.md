@@ -1,13 +1,12 @@
 # Didactics – learning methods and evidence
 
-As of 2026-10-27. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
+As of 2026-10-28. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
 
 ## Two target groups, one core path
 
-- **Beginners** need detailed worked examples. **Switchers** (people coming from other languages) are slowed down by them (expertise reversal effect, [Kalyuga 2003]).
+- **Beginners** need detailed worked examples. **People with prior programming experience** are slowed down by them (expertise reversal effect, [Kalyuga 2003]).
 - So there is one shared core path plus:
   - **A placement test per module** (8–12 questions). At 80 % or more, the module counts as "known". Topics answered wrongly are recommended as single lessons. The module questions go straight into a higher Leitner box. The 80 % is a decision, not an empirical value.
-  - **Switcher boxes** "Kommst du aus …?" (do you come from …?) with tabs for Java, Python, JavaScript/TypeScript and Go (C++ only in places, e.g. memory, `struct`). The language is chosen once and stored locally.
   - **Optional deep dives** (collapsible), so beginners are not overloaded.
 
 ## Required methods
