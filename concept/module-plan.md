@@ -100,7 +100,7 @@ Expected misconceptions: `=` as comparison; integer division rounds; `"3" + 4` g
   - Implicitly typed local variables: the type is fixed at compile time (no dynamic typing).
 - **Library (not spec):** `Console` output and input, `int.Parse` vs. `TryParse` (TryParse needs `out` – forward reference to M3, use it as a recipe here), `Math`, composite formatting and format strings; culture dependency of formatting and parsing (playground: `InvariantGlobalization`).
 - More misconceptions: postfix increment returns the new value; `var` makes a variable dynamic; a cast rounds instead of truncating.
-- **Dependency:** console input needs the planned `stdin` parameter of `<CSharpRunner>` (`components.md`). Until then, the lesson part "console input" cannot have a runnable task.
+- **Dependency:** console input uses the `stdin` parameter of `<CSharpRunner>` (available, see `components.md`) and an `<name>.in.txt` file next to the example.
 
 ### M2 Kontrollfluss (control flow) ▶
 `if`/`else`, comparison and logic operators · `switch` expressions and simple patterns · `while`/`do` · `for`/`foreach` · `break`/`continue`.

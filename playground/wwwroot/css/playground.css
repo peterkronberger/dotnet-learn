@@ -164,6 +164,33 @@ body {
   display: block;
 }
 
+.pg-stdin {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.pg-stdin-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.pg-stdin-input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--surface);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  display: block;
+}
+
 .pg-editor-wrap {
   position: relative;
 }

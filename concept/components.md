@@ -25,16 +25,17 @@ Available (S7):
 - `onResult`: callback with the `run-result` message.
 - `code` comes from a `.cs` file (`import x from '!!raw-loader!@site/examples/…'`, S1). The former README limit "no backticks, backslashes, `${`" no longer applies.
 - `trace` (bool, S5): turns on the step view (variables, heap model).
+- `stdin` (string): pre-filled console input, read line by line by `Console.ReadLine()`; after the last line it returns `null`. Shown in the runner as a labeled input field ("Eingabe (Konsole)") below the editor; the learner can edit it and "Zurücksetzen" restores it. The field exists only if `stdin` is set (an empty string gives an empty field). Without `stdin`, `Console.In` is an empty reader, so `Console.ReadLine()` returns `null` at once. Works in normal, test and trace runs. Fragment key: `&stdin=<Base64url>`. Not on the full playground page.
+  - CI: an example `<name>.cs` may have `<name>.in.txt`; `check-examples.sh` feeds it as stdin (otherwise `/dev/null`). The lesson imports the same file with `raw-loader` and passes it as `stdin`.
 - Demo: `/dev/runner-demo`.
 - All dev showcase pages are listed on `/dev/` (`<DevNav />`, list in `website/src/components/DevNav/index.js`). Add new dev pages there.
 
 Planned:
-- `stdin` (string): pre-filled console input, read line by line by `Console.ReadLine()`. Shown in the runner as an input field below the editor.
 - Loading: unload instances that are scrolled far away, keep the typed code; runtime from the browser cache.
 - Language of the runner UI (today fixed German in `App.razor`) through a parameter (e.g. `#lang=de`) – for i18n.
 
 Message protocol (S7, available; origin check `window.location.origin` in both directions, the page also checks `event.source` and `id`):
-- Page → runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>`
+- Page → runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>&trace=1&stdin=<b64>`
 - Runner → page: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
 - Runner → page: `{type: 'resize', id, height}` – sent whenever the content height of the runner page changes; the page sets the iframe height from it (same origin, `event.source` and `id` checks as for `run-result`).
 

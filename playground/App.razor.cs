@@ -19,6 +19,8 @@ public partial class App
     private string? _compiledCode;
     private string? _instanceId;
     private string? _testsCode;
+    private string? _initialStdin;
+    private string _stdin = string.Empty;
     private bool _trace;
     private int _stepIndex;
 
@@ -28,7 +30,7 @@ public partial class App
     protected override void OnInitialized()
     {
         // The learning site passes example code as Base64url in the URL fragment (#code=...).
-        // More keys (spike S7): &id=<instance id>, &tests=<Base64url test code>; (spike S5): &trace=1.
+        // More keys (spike S7): &id=<instance id>, &tests=<Base64url test code>; (spike S5): &trace=1; &stdin=<Base64url console input> (an empty value means empty input).
         var fragment = Navigation.ToAbsoluteUri(Navigation.Uri).Fragment;
 
         if (fragment.StartsWith(FragmentPrefix, StringComparison.Ordinal))
@@ -55,6 +57,11 @@ public partial class App
                 else if (part.StartsWith("tests=", StringComparison.Ordinal))
                 {
                     _testsCode = CodeCodec.TryDecode(part[6..]);
+                }
+                else if (part.StartsWith("stdin=", StringComparison.Ordinal))
+                {
+                    _initialStdin = CodeCodec.TryDecode(part[6..]) ?? string.Empty;
+                    _stdin = _initialStdin;
                 }
             }
         }
@@ -119,7 +126,7 @@ public partial class App
 
         try
         {
-            _result = await Runner.RunAsync(_code, _testsCode, _trace);
+            _result = await Runner.RunAsync(_code, _testsCode, _trace, _stdin);
             _stepIndex = 0;
         }
         finally
@@ -133,8 +140,12 @@ public partial class App
     private void Reset()
     {
         _code = _initialCode;
+        _stdin = _initialStdin ?? string.Empty;
         _result = null;
     }
+
+    // The input field grows with its lines (no inner scrolling): lines + 1, at least 2.
+    private int StdinRows => Math.Max(2, _stdin.Replace("\r\n", "\n").Split('\n').Length + 1);
 
     private StepTrace? Trace => _result?.Trace is { Steps.Count: > 0 } trace ? trace : null;
 

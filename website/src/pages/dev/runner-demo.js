@@ -7,6 +7,8 @@ import predictDemoOutput from '!!raw-loader!@site/examples/dev/predict-demo.out.
 import palindromeTask from '!!raw-loader!@site/examples/dev/palindrome-task.cs';
 import palindromeTests from '!!raw-loader!@site/examples/dev/palindrome-task.tests.snippet.cs';
 import loopTrace from '!!raw-loader!@site/examples/dev/loop-trace.cs';
+import readName from '!!raw-loader!@site/examples/dev/read-name.cs';
+import readNameInput from '!!raw-loader!@site/examples/dev/read-name.in.txt';
 import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
 
 // Technical demo for spike S7, not learning content.
@@ -31,6 +33,12 @@ export default function RunnerDemo() {
         <CSharpRunner id="s5-loop" code={loopTrace} trace />
         <p>Wert- und Referenztypen: zwei Variablen können auf dasselbe Objekt zeigen.</p>
         <CSharpRunner id="s5-refs" code={referenceTypes} trace />
+        <h2>Konsoleneingabe (stdin)</h2>
+        <p>
+          Mit <code>stdin</code> zeigt der Runner ein Eingabefeld. Jede Zeile liest ein{' '}
+          <code>Console.ReadLine()</code>; nach der letzten Zeile liefert es <code>null</code>.
+        </p>
+        <CSharpRunner id="stdin-demo" code={readName} stdin={readNameInput} />
       </main>
     </Layout>
   );

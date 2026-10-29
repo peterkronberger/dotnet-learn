@@ -28,9 +28,17 @@ const ESTIMATE_LINE_PX = 23;
 const ESTIMATE_CHROME_PX = 190;
 const DEFAULT_SAMPLE_LINES = 12;
 
-function estimateHeight(code) {
+// ESTIMATE_STDIN_CHROME_PX: label, hint and gaps of the input field.
+const ESTIMATE_STDIN_CHROME_PX = 80;
+
+function estimateHeight(code, stdin) {
   const lineCount = code ? splitLines(code).length : DEFAULT_SAMPLE_LINES;
-  return ESTIMATE_CHROME_PX + ESTIMATE_LINE_PX * Math.max(lineCount, 3);
+  let height = ESTIMATE_CHROME_PX + ESTIMATE_LINE_PX * Math.max(lineCount, 3);
+  if (typeof stdin === 'string') {
+    const stdinRows = Math.max(2, stdin.replace(/\r\n/g, '\n').split('\n').length + 1);
+    height += ESTIMATE_STDIN_CHROME_PX + ESTIMATE_LINE_PX * stdinRows;
+  }
+  return height;
 }
 
 /**
@@ -44,6 +52,7 @@ function estimateHeight(code) {
  *  - predict:  input field per output line; after running, ✓/✗ per line (needs `expected`)
  *  - expected: expected output, only sets the number of fields; the check uses the real output
  *  - tests:    C# check code (see concept/components.md); the runner then runs the tests
+ *  - stdin:    console input (string); shows an input field, each line is read by one Console.ReadLine()
  *  - trace:    turn on the step view in the runner (variables, heap model)
  *  - onResult: callback with the `run-result` message of the runner
  *
@@ -60,6 +69,7 @@ export default function CSharpRunner({
   expected = '',
   tests,
   trace = false,
+  stdin,
   onResult,
 }) {
   const runnerUrl = useBaseUrl('/runner/');
@@ -105,6 +115,7 @@ export default function CSharpRunner({
     fragment = `#code=${encodeCode(code)}&id=${encodeURIComponent(instanceId)}`;
     if (tests) { fragment += `&tests=${encodeCode(tests)}`; }
     if (trace && !tests) { fragment += '&trace=1'; }
+    if (typeof stdin === 'string') { fragment += `&stdin=${encodeCode(stdin)}`; }
   }
   const src = `${runnerUrl}${fragment}`;
 
@@ -144,7 +155,7 @@ export default function CSharpRunner({
         src={src}
         title="Interaktiver C#-Playground"
         loading="lazy"
-        style={{height: `${Math.max(minHeight, frameHeight ?? estimateHeight(code))}px`}}
+        style={{height: `${Math.max(minHeight, frameHeight ?? estimateHeight(code, stdin))}px`}}
         onLoad={syncTheme}
       />
       <p className={styles.note}>

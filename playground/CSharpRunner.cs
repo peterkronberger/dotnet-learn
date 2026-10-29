@@ -78,7 +78,11 @@ public sealed class CSharpRunner
     /// Record every step (spike S5). Ignored when tests run. If the instrumented code does not
     /// compile, the program runs normally and <see cref="RunResult.TraceUnavailable"/> is set.
     /// </param>
-    public async Task<RunResult> RunAsync(string code, string? testsCode = null, bool trace = false)
+    /// <param name="stdin">
+    /// Pre-filled console input. Each line is read by one <c>Console.ReadLine()</c>; after the last line it
+    /// returns <c>null</c>. Without input, the reader is empty, so reading never blocks.
+    /// </param>
+    public async Task<RunResult> RunAsync(string code, string? testsCode = null, bool trace = false, string? stdin = null)
     {
         var started = Stopwatch.GetTimestamp();
 
@@ -138,8 +142,10 @@ public sealed class CSharpRunner
         IReadOnlyList<TestOutcome>? tests = null;
         var originalOut = Console.Out;
         var originalError = Console.Error;
+        var originalIn = Console.In;
         Console.SetOut(output);
         Console.SetError(output);
+        Console.SetIn(new StringReader(stdin ?? string.Empty));
 
         try
         {
@@ -194,6 +200,7 @@ public sealed class CSharpRunner
         {
             Console.SetOut(originalOut);
             Console.SetError(originalError);
+            Console.SetIn(originalIn);
         }
 
         return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started), tests,

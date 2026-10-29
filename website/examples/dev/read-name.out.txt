@@ -1,0 +1,3 @@
+First: Ada
+Second: Lovelace
+Third is null: True
