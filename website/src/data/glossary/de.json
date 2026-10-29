@@ -252,6 +252,64 @@
       }
     },
     {
+      "id": "comment",
+      "term": "Comment",
+      "german": "Kommentar",
+      "category": "language",
+      "definition": "Text im Quellcode, der für Menschen gedacht ist. Der Compiler ignoriert ihn. Ein einzeiliger Kommentar beginnt mit `//`, ein mehrzeiliger steht zwischen `/*` und `*/`.",
+      "aliases": [
+        "Kommentare"
+      ],
+      "related": [
+        "statement"
+      ],
+      "lesson": "m01-l01",
+      "source": {
+        "title": "Comments (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#633-comments"
+      }
+    },
+    {
+      "id": "escape-sequence",
+      "term": "Escape Sequence",
+      "german": "Escape-Sequenz",
+      "category": "language",
+      "definition": "Eine Zeichenfolge mit Backslash in einem String- oder Zeichen-Literal, die für ein einzelnes Zeichen steht, zum Beispiel `\\n` für einen Zeilenumbruch oder `\\t` für einen Tabulator.",
+      "aliases": [
+        "Escape-Sequenzen",
+        "Escape Sequences"
+      ],
+      "related": [
+        "literal",
+        "verbatim-string-literal"
+      ],
+      "lesson": "m01-l01",
+      "source": {
+        "title": "Character literals (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6455-character-literals"
+      }
+    },
+    {
+      "id": "verbatim-string-literal",
+      "term": "Verbatim String Literal",
+      "german": "wörtliches String-Literal",
+      "category": "language",
+      "definition": "Ein String-Literal, das mit `@\"` beginnt. Escape-Sequenzen werden nicht ausgewertet, ein Backslash bleibt Text. Ein Anführungszeichen schreibst du als `\"\"`. Es darf über mehrere Zeilen gehen.",
+      "aliases": [
+        "wörtliche Strings",
+        "Verbatim String"
+      ],
+      "related": [
+        "escape-sequence",
+        "literal"
+      ],
+      "lesson": "m01-l01",
+      "source": {
+        "title": "String literals (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6456-string-literals"
+      }
+    },
+    {
       "id": "operand",
       "term": "Operand",
       "category": "language",

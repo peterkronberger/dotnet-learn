@@ -1,1 +1,123 @@
-{ "module": "m01", "questions": [] }
+{
+  "module": "m01",
+  "questions": [
+    {
+      "id": "m01-l01-q1",
+      "lesson": "m01-l01",
+      "type": "single",
+      "question": "Im Programm steht die Zeile `// Console.WriteLine(\"B\");` zwischen zwei anderen `Console.WriteLine`-Anweisungen. Was passiert mit ihr?",
+      "options": [
+        {
+          "text": "Der Compiler ignoriert sie, es erscheint nichts in der Ausgabe.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm gibt `B` aus, denn der Text in der Anweisung bleibt gültig.",
+          "feedback": "Alles ab `//` bis zum Zeilenende ist ein Kommentar. Der Compiler übersetzt ihn nicht, also läuft die Anweisung darin nicht.",
+          "misconception": "m01-l01-comment-is-executed"
+        },
+        {
+          "text": "Das Programm gibt die ganze Zeile einschließlich `//` aus.",
+          "feedback": "Ein Kommentar wird nicht ausgegeben. Nur Text in einem String-Literal einer ausgeführten Anweisung erscheint in der Ausgabe.",
+          "misconception": "m01-l01-comment-is-executed"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `//` keine Anweisung ist.",
+          "feedback": "Kommentare sind erlaubt und stören den Compiler nicht.",
+          "misconception": "m01-l01-comment-is-executed"
+        }
+      ],
+      "explanation": "Ein einzeiliger Kommentar beginnt mit `//` und reicht bis zum Zeilenende. Der Compiler ignoriert ihn. Die Anweisung darin läuft nicht und erzeugt keine Ausgabe."
+    },
+    {
+      "id": "m01-l01-q2",
+      "lesson": "m01-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Kommentare.",
+      "example": "m01/l01/comments.cs",
+      "explanation": "Die Anweisungen in den beiden Kommentaren laufen nicht. Der mehrzeilige Kommentar reicht von `/*` bis `*/` über zwei Zeilen. Der Text hinter der letzten Anweisung ist ebenfalls ein Kommentar. Es bleiben `Line 1` und `Line 5`."
+    },
+    {
+      "id": "m01-l01-q3",
+      "lesson": "m01-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Rechne die Hexadezimal- und Binärliterale um.",
+      "example": "m01/l01/number-literals.cs",
+      "explanation": "`0xFF` ist 15 · 16 + 15 = 255. `0b1010` ist 8 + 2 = 10. Die Zifferntrennzeichen in `1_000_000` ändern den Wert nicht: Es erscheint `1000000`. `1e3` bedeutet 1 · 10³ und wird als `1000` ausgegeben. `'A'` ist ein Zeichen-Literal und erscheint als `A`."
+    },
+    {
+      "id": "m01-l01-q4",
+      "lesson": "m01-l01",
+      "type": "match",
+      "question": "Ordne jedes Literal seiner Art zu.",
+      "pairs": [
+        {
+          "left": "`42`",
+          "right": "Ganzzahl-Literal"
+        },
+        {
+          "left": "`1.5`",
+          "right": "Gleitkomma-Literal"
+        },
+        {
+          "left": "`'A'`",
+          "right": "Zeichen-Literal"
+        },
+        {
+          "left": "`\"A\"`",
+          "right": "String-Literal"
+        }
+      ],
+      "explanation": "Ganzzahlen haben keinen Dezimalpunkt. Gleitkommazahlen haben einen Punkt oder einen Exponenten. Ein Zeichen steht in einfachen Anführungszeichen, ein String in doppelten."
+    },
+    {
+      "id": "m01-l01-q5",
+      "lesson": "m01-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Escape-Sequenzen.",
+      "example": "m01/l01/escape-sequences.cs",
+      "explanation": "`\\t` ist ein Tabulator, `\\n` ein Zeilenumbruch, `\\\"` ein Anführungszeichen im Text und `\\\\` ein einzelner Backslash. Die Ausgabe hat fünf Zeilen, weil `\\n` die zweite Anweisung auf zwei Zeilen verteilt."
+    },
+    {
+      "id": "m01-l01-q6",
+      "lesson": "m01-l01",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(@\"A\\nB\");` aus?",
+      "options": [
+        {
+          "text": "`A\\nB` in einer Zeile, denn im wörtlichen String-Literal bleibt der Backslash Text.",
+          "correct": true
+        },
+        {
+          "text": "`A` und `B` in zwei Zeilen.",
+          "feedback": "Escape-Sequenzen wie `\\n` werden nur in regulären String-Literalen ausgewertet. Nach `@` stehen die Zeichen wörtlich im Text.",
+          "misconception": "m01-l01-escape-in-verbatim"
+        },
+        {
+          "text": "`AB` in einer Zeile, `\\n` wird einfach weggelassen.",
+          "feedback": "Nichts wird weggelassen. Im wörtlichen String-Literal bleiben Backslash und `n` im Text.",
+          "misconception": "m01-l01-escape-in-verbatim"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler wegen des Backslashs.",
+          "feedback": "Ein Backslash ist im wörtlichen String-Literal ein normales Zeichen und kein Fehler."
+        }
+      ],
+      "explanation": "Nach `@\"` wertet C# keine Escape-Sequenzen aus. Das ist praktisch für Pfade wie `@\"C:\\logs\\app.log\"`. Nur zwei Anführungszeichen hintereinander (`\"\"`) ergeben ein Anführungszeichen im Text."
+    },
+    {
+      "id": "m01-l01-q7",
+      "lesson": "m01-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Kommentar ist und was ein Literal ist. Sage auch, worin sich ein reguläres und ein wörtliches String-Literal unterscheiden.",
+      "modelAnswer": "Ein Kommentar ist Text für Menschen. Er beginnt mit `//` (bis zum Zeilenende) oder steht zwischen `/*` und `*/`. Der Compiler ignoriert ihn, er ändert die Ausgabe nicht.\n\nEin Literal ist ein Wert, der direkt im Code steht, zum Beispiel `42`, `1.5`, `'A'` oder `\"Hello\"`.\n\nIm regulären String-Literal werden Escape-Sequenzen wie `\\n` oder `\\t` ausgewertet. Das wörtliche String-Literal beginnt mit `@\"` und nimmt alle Zeichen so, wie sie dastehen. Nur `\"\"` ergibt ein Anführungszeichen."
+    },
+    {
+      "id": "m01-l01-q8",
+      "lesson": "m01-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du außer im SecLog-Projekt einen Kommentar schreiben oder ein wörtliches String-Literal verwenden?",
+      "modelAnswer": "Ein Kommentar erklärt, warum eine Stelle so gebaut ist, oder schaltet vorübergehend eine Zeile ab, während ich einen Fehler suche. Ein wörtliches String-Literal passt zu Windows-Pfaden wie `@\"C:\\logs\\app.log\"` in einem Log-Werkzeug, weil ich die Backslashes nicht verdoppeln muss."
+    }
+  ]
+}
