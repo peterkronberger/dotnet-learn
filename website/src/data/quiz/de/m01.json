@@ -118,6 +118,162 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du außer im SecLog-Projekt einen Kommentar schreiben oder ein wörtliches String-Literal verwenden?",
       "modelAnswer": "Ein Kommentar erklärt, warum eine Stelle so gebaut ist, oder schaltet vorübergehend eine Zeile ab, während ich einen Fehler suche. Ein wörtliches String-Literal passt zu Windows-Pfaden wie `@\"C:\\logs\\app.log\"` in einem Log-Werkzeug, weil ich die Backslashes nicht verdoppeln muss."
+    },
+    {
+      "id": "m01-l02-q1",
+      "lesson": "m01-l02",
+      "type": "single",
+      "question": "Was bewirkt die Anweisung `attempts = 5;`, wenn `attempts` eine `int`-Variable ist?",
+      "options": [
+        {
+          "text": "Sie speichert den Wert 5 in `attempts`. Der alte Wert wird überschrieben.",
+          "correct": true
+        },
+        {
+          "text": "Sie prüft, ob `attempts` gleich 5 ist, und merkt sich das Ergebnis.",
+          "feedback": "Das einzelne `=` ist die Zuweisung, es vergleicht nichts. Vergleiche lernst du in Modul 2 kennen.",
+          "misconception": "m01-l02-assignment-is-comparison"
+        },
+        {
+          "text": "Sie gibt `5` in der Konsole aus.",
+          "feedback": "Eine Zuweisung gibt nichts aus. Ausgeben kannst du den Wert danach mit `Console.WriteLine(attempts);`."
+        },
+        {
+          "text": "Sie legt fest, dass `attempts` und `5` ab jetzt immer gleich sind.",
+          "feedback": "Die Zuweisung wirkt einmal, in dem Moment, in dem die Zeile läuft. Eine spätere Zuweisung ändert den Wert wieder.",
+          "misconception": "m01-l02-assignment-is-comparison"
+        }
+      ],
+      "explanation": "Links vom `=` steht die Variable, rechts der neue Wert. Die Anweisung kopiert den Wert in den Speicherplatz der Variable. Sie vergleicht nichts und gibt nichts aus."
+    },
+    {
+      "id": "m01-l02-q2",
+      "lesson": "m01-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Verfolge die Zuweisungen Zeile für Zeile.",
+      "example": "m01/l02/assignment-trace.cs",
+      "explanation": "`attempts` startet mit 1 und bekommt dann 5. Die Zeile `int copy = attempts;` legt in `copy` eine Kopie des aktuellen Werts 5 an. Danach überschreibt `attempts = 2;` nur `attempts`. Es erscheinen `1`, `5`, `5` und `2`."
+    },
+    {
+      "id": "m01-l02-q3",
+      "lesson": "m01-l02",
+      "type": "single",
+      "question": "Ein Programm hat diese vier Zeilen:\n\n`int level = 1;`\n`level = 4;`\n`level = 2;`\n`Console.WriteLine(level);`\n\nWas wird ausgegeben?",
+      "options": [
+        {
+          "text": "`2`, der zuletzt zugewiesene Wert.",
+          "correct": true
+        },
+        {
+          "text": "`1 4 2`, alle Werte der Reihe nach.",
+          "feedback": "Eine Variable hält zu jedem Zeitpunkt genau einen Wert. Die früheren Werte sind überschrieben.",
+          "misconception": "m01-l02-variable-remembers-old-values"
+        },
+        {
+          "text": "`4`, der größte Wert.",
+          "feedback": "Die Größe spielt keine Rolle. Es zählt allein die letzte Zuweisung.",
+          "misconception": "m01-l02-variable-remembers-old-values"
+        },
+        {
+          "text": "`1`, denn die erste Zuweisung legt den Wert fest.",
+          "feedback": "Eine Variable kann beliebig oft neu zugewiesen werden. Der Typ bleibt gleich, der Wert ändert sich.",
+          "misconception": "m01-l02-variable-remembers-old-values"
+        }
+      ],
+      "explanation": "Jede Zuweisung überschreibt den vorherigen Wert. Nach der dritten Zeile enthält `level` nur noch 2."
+    },
+    {
+      "id": "m01-l02-q4",
+      "lesson": "m01-l02",
+      "type": "match",
+      "question": "Ordne jedem Wert den Typ zu, mit dem du ihn in einer Variable speicherst.",
+      "pairs": [
+        {
+          "left": "`42`",
+          "right": "`int`"
+        },
+        {
+          "left": "`3.5`",
+          "right": "`double`"
+        },
+        {
+          "left": "`true`",
+          "right": "`bool`"
+        },
+        {
+          "left": "`'x'`",
+          "right": "`char`"
+        },
+        {
+          "left": "`\"x\"`",
+          "right": "`string`"
+        }
+      ],
+      "explanation": "Ganzzahlen passen zu `int`, Zahlen mit Dezimalpunkt zu `double`. `true` und `false` sind die beiden Werte von `bool`. Ein einzelnes Zeichen in einfachen Anführungszeichen ist ein `char`, Text in doppelten Anführungszeichen ein `string`."
+    },
+    {
+      "id": "m01-l02-q5",
+      "lesson": "m01-l02",
+      "type": "single",
+      "question": "Welcher dieser Namen ist ein gültiger Variablenname?",
+      "options": [
+        {
+          "text": "`user_name`",
+          "correct": true
+        },
+        {
+          "text": "`event`",
+          "feedback": "`event` ist ein Schlüsselwort und deshalb reserviert. Nur mit vorangestelltem `@` wäre es ein Name."
+        },
+        {
+          "text": "`3rd_try`",
+          "feedback": "Ein Bezeichner darf nicht mit einer Ziffer beginnen."
+        },
+        {
+          "text": "`user-name`",
+          "feedback": "Der Bindestrich ist kein Teil von Bezeichnern. Der Compiler liest `user-name` als zwei Namen mit einem Zeichen dazwischen."
+        }
+      ],
+      "explanation": "Ein Bezeichner beginnt mit einem Buchstaben oder `_` und enthält danach Buchstaben, Ziffern oder `_`. Er darf kein Schlüsselwort sein."
+    },
+    {
+      "id": "m01-l02-q6",
+      "lesson": "m01-l02",
+      "type": "single",
+      "question": "In einem Programm stehen nur diese zwei Zeilen:\n\n`int attempts;`\n`Console.WriteLine(attempts);`\n\nWas passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `attempts` vor dem Lesen keinen Wert bekommen hat.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm gibt `0` aus, denn `int` beginnt bei 0.",
+          "feedback": "Lokale Variablen haben keinen Standardwert. Der Compiler lehnt das Lesen ohne vorherige Zuweisung ab."
+        },
+        {
+          "text": "Das Programm gibt eine leere Zeile aus.",
+          "feedback": "Es gibt keinen leeren Wert für `int`. Das Programm startet gar nicht erst."
+        },
+        {
+          "text": "Das Programm startet und bricht in der zweiten Zeile mit einem Fehler ab.",
+          "feedback": "Der Fehler wird schon beim Übersetzen gemeldet, bevor irgendeine Zeile läuft."
+        }
+      ],
+      "explanation": "Der Compiler prüft, ob jede Variable an jeder Lesestelle sicher einen Wert hat (Definite Assignment). Hier fehlt eine Zuweisung, also ist es ein Übersetzungsfehler."
+    },
+    {
+      "id": "m01-l02-q7",
+      "lesson": "m01-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was eine Variable ist und welche zwei Dinge der Compiler über sie festhält. Sage auch, warum er das Lesen einer Variable ohne vorherige Zuweisung ablehnt.",
+      "modelAnswer": "Eine Variable ist ein benannter Speicherplatz. Sie hat einen festen Typ, zum Beispiel `int` oder `string`, und hält zu jedem Zeitpunkt genau einen Wert. Eine neue Zuweisung überschreibt den alten Wert.\n\nDer Compiler merkt sich den Namen und den Typ. Eine lokale Variable hat keinen Standardwert. Deshalb lehnt er das Lesen vor der ersten Zuweisung ab: Es gäbe keinen Wert, den er lesen könnte."
+    },
+    {
+      "id": "m01-l02-q8",
+      "lesson": "m01-l02",
+      "type": "explain",
+      "question": "Transferfrage: Welche Werte eines Log-Werkzeugs würdest du in Variablen halten, und welchen Typ bekäme jeder?",
+      "modelAnswer": "Den Benutzernamen und die IP-Adresse als `string`, die Anzahl der fehlgeschlagenen Anmeldungen als `int`, das Ergebnis einer Prüfung wie „Konto gesperrt“ als `bool` und die Fehlerquote als `double`."
     }
   ]
 }

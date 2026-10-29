@@ -1,0 +1,10 @@
+int attempts = 3;
+double ratio = 0.5;
+bool isLocked = false;
+char grade = 'B';
+string user = "alice";
+Console.WriteLine(attempts);
+Console.WriteLine(ratio);
+Console.WriteLine(isLocked);
+Console.WriteLine(grade);
+Console.WriteLine(user);

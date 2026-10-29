@@ -1,10 +1,108 @@
 {
   "terms": [
     {
+      "id": "identifier",
+      "term": "Identifier",
+      "german": "Bezeichner",
+      "category": "language",
+      "definition": "Der Name einer Variable. Er beginnt mit einem Buchstaben oder `_`, enthält danach Buchstaben, Ziffern oder `_`, unterscheidet Groß- und Kleinschreibung und darf kein Schlüsselwort sein.",
+      "aliases": [
+        "Bezeichner",
+        "Variablenname"
+      ],
+      "related": [
+        "keyword",
+        "variable"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Identifiers (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#643-identifiers"
+      }
+    },
+    {
+      "id": "keyword",
+      "term": "Keyword",
+      "german": "Schlüsselwort",
+      "category": "language",
+      "definition": "Ein reserviertes Wort mit fester Bedeutung, zum Beispiel `int` oder `event`. Es kann nur mit vorangestelltem `@` ein Name sein.",
+      "aliases": [
+        "Schlüsselwörter",
+        "Keywords"
+      ],
+      "related": [
+        "identifier"
+      ],
+      "lesson": "m00-l02",
+      "source": {
+        "title": "Keywords (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#644-keywords"
+      }
+    },
+    {
+      "id": "declaration",
+      "term": "Declaration",
+      "german": "Deklaration",
+      "category": "language",
+      "definition": "Eine Anweisung, die eine Variable mit Typ und Name einführt, zum Beispiel `int count;`. Mit Anfangswert heißt sie Deklaration mit Initialisierung: `int count = 3;`.",
+      "aliases": [
+        "Deklarationen",
+        "Initialisierung"
+      ],
+      "related": [
+        "variable",
+        "assignment"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Local variable declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1362-local-variable-declarations"
+      }
+    },
+    {
+      "id": "assignment",
+      "term": "Assignment",
+      "german": "Zuweisung",
+      "category": "language",
+      "definition": "Die Anweisung `name = wert;` speichert einen Wert in einer Variable und überschreibt den alten Wert. Das einzelne `=` vergleicht nichts.",
+      "aliases": [
+        "Zuweisungen",
+        "zuweisen"
+      ],
+      "related": [
+        "variable",
+        "declaration"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Simple assignment (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions"
+      }
+    },
+    {
+      "id": "definite-assignment",
+      "term": "Definite Assignment",
+      "german": "sichere Zuweisung",
+      "category": "language",
+      "definition": "Der Compiler muss beweisen können, dass eine lokale Variable vor jedem Lesen einen Wert bekommen hat. Lokale Variablen haben keinen Standardwert. Kann der Compiler es nicht beweisen, meldet er einen Fehler.",
+      "aliases": [
+        "Definite-Assignment-Regel"
+      ],
+      "related": [
+        "variable",
+        "assignment"
+      ],
+      "lesson": "m01-l02",
+      "source": {
+        "title": "Definite assignment (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#94-definite-assignment"
+      }
+    },
+    {
       "id": "variable",
       "term": "Variable",
       "category": "language",
-      "definition": "Ein benannter Speicherplatz für einen Wert. Der Typ der Variable legt fest, welche Werte sie aufnehmen kann, zum Beispiel `int count = 3;`.",
+      "definition": "Ein benannter Speicherplatz mit festem Typ. Sie enthält zu jedem Zeitpunkt genau einen Wert, zum Beispiel `int count = 3;`. Eine neue Zuweisung überschreibt den alten Wert.",
       "aliases": [
         "Variablen"
       ],
@@ -116,7 +214,7 @@
       "term": "Static Typing",
       "german": "statische Typisierung",
       "category": "language",
-      "definition": "In C# kennt der Compiler den Typ jeder Variable schon vor dem Start des Programms. Typfehler meldet er deshalb früh.",
+      "definition": "In C# steht der Typ jeder Variable fest, bevor das Programm startet. Der Compiler meldet einen Wert des falschen Typs schon beim Übersetzen.",
       "related": [
         "type",
         "compiler"
@@ -132,7 +230,7 @@
       "term": "Built-in Type",
       "german": "eingebauter Typ",
       "category": "language",
-      "definition": "Ein Typ, den C# mit einem eigenen Schlüsselwort mitbringt, zum Beispiel `int`, `double`, `decimal`, `bool`, `char` und `string`.",
+      "definition": "Ein Typ, für den C# ein eigenes Schlüsselwort mitbringt: `int`, `long`, `double`, `decimal`, `bool`, `char` und `string`.",
       "aliases": [
         "eingebaute Typen"
       ],
