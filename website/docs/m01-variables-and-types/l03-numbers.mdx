@@ -1,0 +1,320 @@
+---
+title: Ganzzahlen, Gleitkommazahlen und decimal
+sidebar_position: 3
+description: "C# hat mehrere Zahlentypen mit verschiedenem Wertebereich und verschiedener Genauigkeit. Der Typ der Operanden entscheidet, ob eine Division abschneidet, mit double rechnet oder mit decimal exakt bleibt."
+lesson_id: m01-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import integerTypes from '!!raw-loader!@site/examples/m01/l03/integer-types.cs';
+import integerTypesOutput from '!!raw-loader!@site/examples/m01/l03/integer-types.out.txt';
+import integerDivision from '!!raw-loader!@site/examples/m01/l03/integer-division.cs';
+import integerDivisionOutput from '!!raw-loader!@site/examples/m01/l03/integer-division.out.txt';
+import integerDivisionByZero from '!!raw-loader!@site/examples/m01/l03/integer-division-by-zero.snippet.cs';
+import operandTypes from '!!raw-loader!@site/examples/m01/l03/operand-types.cs';
+import operandTypesOutput from '!!raw-loader!@site/examples/m01/l03/operand-types.out.txt';
+import specialValues from '!!raw-loader!@site/examples/m01/l03/special-values.cs';
+import specialValuesOutput from '!!raw-loader!@site/examples/m01/l03/special-values.out.txt';
+import roundOff from '!!raw-loader!@site/examples/m01/l03/round-off.cs';
+import roundOffOutput from '!!raw-loader!@site/examples/m01/l03/round-off.out.txt';
+import decimalWithoutSuffix from '!!raw-loader!@site/examples/m01/l03/decimal-without-suffix.snippet.cs';
+import mathRoundAbs from '!!raw-loader!@site/examples/m01/l03/math-round-abs.cs';
+import mathRoundAbsOutput from '!!raw-loader!@site/examples/m01/l03/math-round-abs.out.txt';
+import numberTypesGaps from '!!raw-loader!@site/examples/m01/l03/number-types-gaps.cs';
+import failureRateTrap from '!!raw-loader!@site/examples/m01/l03/failure-rate-trap.cs';
+import failureRateTrapOutput from '!!raw-loader!@site/examples/m01/l03/failure-rate-trap.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m01/l03/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l03/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l03/seclog-event-solution.cs';
+
+# Ganzzahlen, Gleitkommazahlen und decimal
+
+:::note[Lernziele]
+- Du wählst für eine Zahl den passenden Typ (`int`, `long`, `double`, `decimal`) und begründest die Wahl mit Wertebereich und Genauigkeit.
+- Du sagst das Ergebnis von `/` und `%` mit ganzen Zahlen voraus, auch mit negativen Operanden.
+- Du erklärst, warum `0.1 + 0.2` mit `double` nicht genau `0.3` ergibt und wann `decimal` die bessere Wahl ist.
+- Du erkennst, welchen Typ ein Literal mit Suffix (`L`, `f`, `m`) hat.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l02-q2" />
+
+<Quiz id="m01-l02-q4" />
+
+<Quiz id="m01-l01-q4" />
+
+## Zahlentypen haben einen Wertebereich
+
+Jeder Zahlentyp belegt eine feste Anzahl Bits. Daraus folgt ein fester Wertebereich: Was nicht hineinpasst, kann die Variable nicht speichern. Typen für ganze Zahlen heißen <Term id="integral-type">Ganzzahltypen (Integral Types)</Term>. Typen für Zahlen mit Nachkommateil heißen <Term id="floating-point-type">Gleitkommatypen (Floating-Point Types)</Term>. Dazu kommt `decimal`, ein eigener Typ für exakte Dezimalbrüche.
+
+| Typ | Art | Größe | Wertebereich oder Genauigkeit |
+| --- | --- | --- | --- |
+| `int` | Ganzzahl | 32 Bit | `-2147483648` bis `2147483647` |
+| `long` | Ganzzahl | 64 Bit | `-9223372036854775808` bis `9223372036854775807` |
+| `double` | Gleitkomma | 64 Bit | etwa ±1,7 × 10³⁰⁸, Genauigkeit 15–16 Stellen |
+| `decimal` | exakte Dezimalzahl | 128 Bit | etwa ±7,9 × 10²⁸, mindestens 28 Stellen |
+
+Es gibt weitere Typen: die Ganzzahltypen `sbyte`, `byte`, `short`, `ushort`, `uint` und `ulong` und den Gleitkommatyp `float` (32 Bit, 7 Stellen Genauigkeit). In dieser Lektion brauchst du sie nicht. Die Werte stehen in [§8.3.6 bis §8.3.8 der Spezifikation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#836-integral-types).
+
+### Literale und ihr Typ
+
+Auch ein <Term id="literal">Literal</Term> hat einen Typ. Ohne Suffix gilt:
+
+- Eine ganze Zahl ist ein `int`, solange der Wert hineinpasst.
+- Eine Zahl mit Dezimalpunkt ist ein `double`.
+
+Ein Suffix am Ende wählt einen anderen Typ:
+
+| Suffix | Typ | Beispiel |
+| --- | --- | --- |
+| `L` | `long` | `8000000000L` |
+| `f` | `float` | `1.5f` |
+| `d` | `double` | `1.5d` |
+| `m` | `decimal` | `19.99m` |
+
+Mit `U` und `UL` entstehen die Typen `uint` und `ulong`. Sie brauchst du hier nicht. Die Regeln stehen in [§6.4.5.3 Integer literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals) und §6.4.5.4 Real literals.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus? Welche der beiden Variablen könnte kein `int` sein?
+:::
+
+<CSharpRunner id="m01-l03-types" code={integerTypes} predict expected={integerTypesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `2147483647` und `8000000000`.
+
+1. **Größten `int` speichern:** `2147483647` ist der größte Wert, den ein `int` aufnimmt.
+2. **Typ wechseln:** `8000000000` ist größer. Es braucht 64 Bit, also den Typ `long`.
+3. **Suffix setzen:** Das `L` macht das Literal selbst zum `long`.
+
+Was passiert, wenn du `largestInt` den Wert `2147483648` gibst? Probiere es im Runner aus: Der Compiler meldet einen Fehler, weil der Wert nicht in einen `int` passt.
+
+</details>
+
+## Rechnen mit den Operatoren
+
+Die fünf Rechenoperatoren sind `+`, `-`, `*`, `/` und `%`. `+`, `-` und `*` verhalten sich wie in der Mathematik. `/` teilt, und `%` liefert den Rest einer Division. Die Werte, mit denen ein Operator rechnet, heißen <Term id="operand">Operanden (Operands)</Term>. In `7 / 2` sind `7` und `2` die Operanden.
+
+In diesem Kapitel steht in jedem Ausdruck nur ein Operator oder eine Klammer. Wie mehrere Operatoren zusammenspielen, folgt in der nächsten Lektion.
+
+### Ganzzahldivision und Rest
+
+Sind beide Operanden ganze Zahlen, ist auch das Ergebnis von `/` eine ganze Zahl. Das ist die <Term id="integer-division">Ganzzahldivision (Integer Division)</Term>. Der Nachkommateil wird abgeschnitten, in Richtung 0. Er wird nicht gerundet. Der Rest `%` ist so definiert, dass `x % y` gleich `x - (x / y) * y` ist ([§12.13.4 Remainder operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12134-remainder-operator)). Das Vorzeichen des Rests folgt dem linken Operanden.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Rechne `-7 / 2` ausdrücklich: Wohin wird abgeschnitten?
+:::
+
+<CSharpRunner id="m01-l03-division" code={integerDivision} predict expected={integerDivisionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `3`, `1`, `-3` und `-1`.
+
+1. **Positive Division:** 7 geteilt durch 2 ist 3,5. Der Nachkommateil entfällt, das Ergebnis ist `3`.
+2. **Positiver Rest:** `7 - 3 * 2` ist `1`.
+3. **Negative Division:** -7 geteilt durch 2 ist -3,5. Abgeschnitten wird in Richtung 0, das Ergebnis ist `-3` und nicht `-4`.
+4. **Negativer Rest:** `-7 - (-3) * 2` ist `-1`. Das Vorzeichen folgt dem linken Operanden `-7`.
+
+</details>
+
+Bei einer Ganzzahldivision durch 0 gibt es kein sinnvolles Ergebnis. Das Programm bricht mit einer <Term id="exception">Ausnahme (Exception)</Term> ab, hier `DivideByZeroException`.
+
+<CodeBlock language="csharp" title="integer-division-by-zero.snippet.cs">{integerDivisionByZero}</CodeBlock>
+
+### Der Typ der Operanden entscheidet
+
+Haben die Operanden verschiedene Zahlentypen, wandelt C# den kleineren Typ automatisch in den größeren um. Das heißt <Term id="numeric-promotion">numerische Anhebung (Numeric Promotion)</Term> ([§12.4.7.3 Binary numeric promotions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12473-binary-numeric-promotions)). Bei `int` und `double` wird mit `double` gerechnet, bei `int` und `decimal` mit `decimal`. `double` und `decimal` lassen sich nicht mischen, das lehnt der Compiler ab.
+
+:::info[Vorhersage]
+Alle vier Zeilen teilen 7 durch 2. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l03-operands" code={operandTypes} predict expected={operandTypesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `3`, `3.5`, `3.5` und `3.5`.
+
+1. **Beide `int`:** `7 / 2` ist eine Ganzzahldivision und ergibt `3`.
+2. **Ein `double`:** In `7.0 / 2` wird die `2` zu `2.0`. Es wird mit `double` gerechnet, das Ergebnis ist `3.5`.
+3. **Reihenfolge egal:** `7 / 2.0` verhält sich genauso. Es zählt nur, ob ein Operand `double` ist.
+4. **`decimal`:** `7m / 2` rechnet mit `decimal` und ergibt ebenfalls `3.5`.
+
+Um aus `int`-Werten eine Division mit Nachkommateil zu bekommen, muss also ein Operand ein `double` oder `decimal` sein.
+
+</details>
+
+### Sonderwerte bei double
+
+Ein `double` kennt Werte, die ein `int` nicht hat: positiv und negativ unendlich (Infinity) und <Term id="nan">NaN (Not a Number)</Term> für ein ungültiges Ergebnis. Eine Division durch 0 bricht bei `double` nicht ab ([§8.3.7 Floating-point types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#837-floating-point-types)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Die `0` ist ein `int`. Welcher Typ wird gerechnet?
+:::
+
+<CSharpRunner id="m01-l03-special" code={specialValues} predict expected={specialValuesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `Infinity`, `-Infinity` und `NaN`.
+
+1. **Anheben:** Die `0` wird zu `double`, es wird mit `double` gerechnet.
+2. **Unendlich:** Eine Zahl ungleich 0 geteilt durch 0 ergibt positiv oder negativ unendlich, je nach Vorzeichen.
+3. **Ungültig:** `0.0 / 0` hat kein sinnvolles Ergebnis und ergibt `NaN`.
+
+</details>
+
+## Warum 0.1 + 0.2 nicht 0.3 ergibt
+
+Ein `double` speichert Zahlen im Binärsystem, mit Potenzen von 2. Viele Dezimalbrüche wie 0,1 haben dort keine endliche Darstellung, genauso wie 1/3 im Dezimalsystem keine hat. Der Wert wird auf die nächste darstellbare Zahl gerundet. Das ist ein <Term id="round-off-error">Rundungsfehler (Round-off Error)</Term>. Der Typ <Term id="decimal-type">`decimal`</Term> speichert Dezimalbrüche dagegen exakt.
+
+:::info[Vorhersage]
+Beide Zeilen addieren 0,1 und 0,2. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l03-round-off" code={roundOff} predict expected={roundOffOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `0.30000000000000004` und `0.3`.
+
+1. **Näherung speichern:** `0.1` und `0.2` sind als `double` nur Näherungen.
+2. **Fehler übernimmt die Summe:** Die Summe der beiden Näherungen liegt knapp neben `0.3`.
+3. **Exakt rechnen:** Mit dem Suffix `m` sind beide Werte `decimal`. Sie sind exakt, die Summe ist genau `0.3`.
+
+Was passiert, wenn du in der zweiten Zeile das `m` weglässt? Probiere es aus: Dann steht dort wieder der `double`-Fehler.
+
+</details>
+
+Ein `decimal`-Literal braucht das Suffix `m`. Ohne `m` ist `19.99` ein `double`, und der Compiler lehnt die Zuweisung an einen `decimal` ab, weil `double` und `decimal` sich nicht mischen lassen.
+
+<CodeBlock language="csharp" title="decimal-without-suffix.snippet.cs">{decimalWithoutSuffix}</CodeBlock>
+
+Wann nimmst du welchen Typ? `decimal` für Geldbeträge und andere Werte, bei denen jede Dezimalstelle stimmen muss. `double` für Messwerte und Verhältnisse, bei denen eine winzige Abweichung nicht stört. `int` für Zähler wie die Anzahl fehlgeschlagener Anmeldungen. `long`, wenn der Wertebereich von `int` nicht reicht.
+
+<details>
+<summary>Vertiefung: Wie genau ist decimal? (optional)</summary>
+
+Ein `decimal` ist eine ganze Zahl, skaliert mit einer Zehnerpotenz. Er hat mindestens 28 Stellen Genauigkeit, bei Werten unter 1 sind es mindestens 28 Nachkommastellen ([§8.3.8 The Decimal type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#838-the-decimal-type)). Exakt sind aber nur Dezimalbrüche: `1m / 3` hat im Dezimalsystem keine endliche Darstellung und wird gerundet.
+
+Der Wertebereich ist deutlich kleiner als bei `double`. Das nimmst du für die Exaktheit in Kauf.
+
+</details>
+
+### Math.Round und Math.Abs
+
+`Math` bietet fertige Rechenfunktionen. `Math.Round(wert, stellen)` rundet auf die angegebene Zahl von Nachkommastellen. `Math.Abs(wert)` liefert den Betrag, also den Wert ohne Vorzeichen. Beide bekommen ihre Operanden in Klammern, wie du es von `Console.WriteLine` kennst. Mehrere Werte stehen durch Kommas getrennt ([Math-Klasse](https://learn.microsoft.com/dotnet/api/system.math)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Rechne zuerst im Kopf, bevor du den Runner startest.
+:::
+
+<CSharpRunner id="m01-l03-math" code={mathRoundAbs} predict expected={mathRoundAbsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `2.57` und `7`.
+
+1. **Runden:** `Math.Round(2.567, 2)` rundet auf zwei Nachkommastellen und ergibt `2.57`.
+2. **Betrag:** `Math.Abs(-7)` entfernt das Vorzeichen und ergibt `7`.
+
+</details>
+
+## Lückenbeispiel
+
+Ändere die drei Variablen nach den Kommentaren darüber. Lösche die Kommentare nicht.
+
+<CSharpRunner id="m01-l03-gaps" code={numberTypesGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **long:** `long population = 8000000000L;` Der Wert passt nicht in einen `int`, das Suffix `L` macht das Literal zum `long`.
+2. **decimal:** `decimal price = 19.99m;` Ein exakter Betrag ist ein `decimal`, das Literal braucht das Suffix `m`.
+3. **double:** `double ratio = 7.0 / 2;` Ein Operand muss ein `double` sein, sonst schneidet die Ganzzahldivision ab.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, die erste Ereigniszeile des Beispiel-Logs und danach Benutzer, IP-Adresse und Ereignistyp von Zeile 2.
+
+**Neue Anforderung:** Das Beispiel-Log hat 14 Ereignisse, davon 7 mit `login-failed`. SecLog soll die Fehlerquote in Prozent berechnen und ausgeben. Speichere beide Anzahlen in `int`-Variablen. Die Falle zuerst: Das folgende Programm rechnet `(failures / events) * 100`.
+
+<CSharpRunner id="m01-l03-trap" code={failureRateTrap} predict expected={failureRateTrapOutput} />
+
+Das Ergebnis ist `0`, denn `7 / 14` ist eine Ganzzahldivision (0,5 wird zu `0`). Rechne in SecLog stattdessen so, dass ein Operand ein `double` ist, zum Beispiel `(failures * 100.0) / events`. Speichere das Ergebnis in einer `double`-Variable `failureRate` und gib es nach der letzten Zeile aus: `Failure rate (%): ` mit `Console.Write`, dann den Wert mit `Console.WriteLine`. Schreibe einen Kommentar über die neuen Zeilen, der sagt, was sie tun.
+
+<CSharpRunner id="m01-l03-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Werte speichern:** Zwei `int`-Variablen für die Anzahl der Ereignisse und der Fehlschläge.
+2. **Typ der Rechnung wählen:** `failures * 100.0` hat einen `double`-Operanden, also rechnet C# mit `double`.
+3. **Teilen:** `/ events` teilt das `double`-Ergebnis durch den `int`, der angehoben wird. Das Ergebnis ist `50`.
+4. **Ausgeben:** `Console.Write` schreibt das Etikett, `Console.WriteLine` den Wert.
+
+</details>
+
+**Neuer Stand:** SecLog berechnet aus der Anzahl der Ereignisse und der Fehlschläge die Fehlerquote in Prozent und gibt sie aus.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l03-integer-division-rounds" />
+
+**„Die Ganzzahldivision rundet.“** Sie schneidet den Nachkommateil ab, in Richtung 0. `7 / 4` ergibt `1` und nicht `2`, und `-7 / 2` ergibt `-3` und nicht `-4`. Wer ein gerundetes oder genaues Ergebnis braucht, muss einen Operanden als `double` oder `decimal` schreiben.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l03-double-is-exact" />
+
+**„`double` speichert Dezimalbrüche exakt.“** Ein `double` speichert binär. Viele Dezimalbrüche wie `0.1` sind darin nur Näherungen, deshalb ergibt `0.1 + 0.2` den Wert `0.30000000000000004`. Für exakte Dezimalbrüche gibt es `decimal`.
+:::
+
+## Zusammenfassung
+
+C# hat Zahlentypen mit festem Wertebereich: `int` und `long` für ganze Zahlen, `double` für Zahlen mit Nachkommateil und `decimal` für exakte Dezimalbrüche. Ein Literal ohne Suffix ist ein `int` oder `double`, die Suffixe `L`, `f` und `m` wählen `long`, `float` und `decimal`. Der Typ der Operanden bestimmt die Rechnung. Zwei `int` ergeben eine Ganzzahldivision, die abschneidet. Ist ein Operand `double`, wird mit `double` gerechnet. Ein `double` rundet viele Dezimalbrüche, deshalb ist `0.1 + 0.2` nicht genau `0.3`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l03-q1" />
+
+<Quiz id="m01-l03-q2" />
+
+<Quiz id="m01-l03-q3" />
+
+<Quiz id="m01-l03-q4" />
+
+<Quiz id="m01-l03-q5" />
+
+<Quiz id="m01-l03-q6" />
+
+<Quiz id="m01-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m01-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Ganzzahltypen in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/integral-numeric-types)
+- Microsoft Learn: [Gleitkommatypen in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/floating-point-numeric-types)
+- Microsoft Learn: [C#-Spezifikation, Expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions)

@@ -274,6 +274,194 @@
       "type": "explain",
       "question": "Transferfrage: Welche Werte eines Log-Werkzeugs würdest du in Variablen halten, und welchen Typ bekäme jeder?",
       "modelAnswer": "Den Benutzernamen und die IP-Adresse als `string`, die Anzahl der fehlgeschlagenen Anmeldungen als `int`, das Ergebnis einer Prüfung wie „Konto gesperrt“ als `bool` und die Fehlerquote als `double`."
+    },
+    {
+      "id": "m01-l03-q1",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(7 / 4);` aus?",
+      "options": [
+        {
+          "text": "`1`",
+          "correct": true
+        },
+        {
+          "text": "`2`",
+          "misconception": "m01-l03-integer-division-rounds",
+          "feedback": "1,75 wird nicht auf 2 gerundet. Bei zwei `int` wird der Nachkommateil abgeschnitten."
+        },
+        {
+          "text": "`1.75`",
+          "feedback": "Ein `int` kann keinen Nachkommateil speichern. Das Ergebnis von `int / int` ist wieder ein `int`."
+        },
+        {
+          "text": "`1.0`",
+          "feedback": "Das Ergebnis ist ein `int` und wird ohne Nachkommastelle ausgegeben."
+        }
+      ],
+      "explanation": "Beide Operanden sind `int`, also ist es eine Ganzzahldivision. Der Nachkommateil von 1,75 wird abgeschnitten, das Ergebnis ist `1`."
+    },
+    {
+      "id": "m01-l03-q2",
+      "lesson": "m01-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Vorzeichen.",
+      "example": "m01/l03/quiz-remainder.cs",
+      "explanation": "Die Division schneidet in Richtung 0 ab: -9 / 4 ergibt -2 und 9 / -4 ergibt -2. Der Rest ist x - (x / y) * y. Sein Vorzeichen folgt dem linken Operanden: -9 % 4 ergibt -1 und 9 % -4 ergibt 1."
+    },
+    {
+      "id": "m01-l03-q3",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Welche Aussage über `0.1 + 0.2` mit `double` stimmt?",
+      "options": [
+        {
+          "text": "Das Ergebnis ist nicht genau `0.3`, weil `double` viele Dezimalbrüche nur ungefähr speichert.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis ist genau `0.3`, weil `double` Dezimalbrüche mit 15 Stellen exakt speichert.",
+          "misconception": "m01-l03-double-is-exact",
+          "feedback": "`double` speichert binär. Ein Bruch wie 0,1 hat dort keine endliche Darstellung und wird gerundet."
+        },
+        {
+          "text": "Das Ergebnis ist ungenau, weil `+` bei Dezimalzahlen fehlerhaft arbeitet.",
+          "feedback": "Der Operator rechnet richtig. Schon die Werte `0.1` und `0.2` sind im `double` nur Näherungen."
+        },
+        {
+          "text": "Das Ergebnis ist ungenau, weil die Zahlen zu groß für `double` sind.",
+          "feedback": "Die Zahlen sind klein. Es liegt an der binären Darstellung, nicht am Wertebereich."
+        }
+      ],
+      "explanation": "Die Werte 0,1 und 0,2 sind als `double` nur Näherungen. Die Summe ergibt `0.30000000000000004`. Mit `decimal` sind 0,1 und 0,2 exakt, die Summe ist genau `0.3`."
+    },
+    {
+      "id": "m01-l03-q4",
+      "lesson": "m01-l03",
+      "type": "match",
+      "question": "Ordne jedem Literal seinen Typ zu.",
+      "pairs": [
+        {
+          "left": "`5`",
+          "right": "`int`"
+        },
+        {
+          "left": "`5L`",
+          "right": "`long`"
+        },
+        {
+          "left": "`5.0`",
+          "right": "`double`"
+        },
+        {
+          "left": "`5.0f`",
+          "right": "`float`"
+        },
+        {
+          "left": "`5.0m`",
+          "right": "`decimal`"
+        }
+      ],
+      "wrongMatches": [
+        {
+          "left": "`5.0`",
+          "right": "`decimal`",
+          "feedback": "Ohne Suffix ist ein Literal mit Dezimalpunkt ein `double`. Für `decimal` brauchst du `m`.",
+          "misconception": "m01-l03-double-is-exact"
+        }
+      ],
+      "explanation": "Ein Literal ohne Suffix ist `int` (ganze Zahl) oder `double` (mit Dezimalpunkt). `L` macht es zu `long`, `f` zu `float`, `m` zu `decimal`."
+    },
+    {
+      "id": "m01-l03-q5",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Ein Programm speichert einen Geldbetrag wie `19.99` und rechnet damit. Welcher Typ passt am besten?",
+      "options": [
+        {
+          "text": "`decimal`, weil Dezimalbrüche wie `0.1` exakt gespeichert werden.",
+          "correct": true
+        },
+        {
+          "text": "`double`, weil er Dezimalbrüche exakt speichert.",
+          "misconception": "m01-l03-double-is-exact",
+          "feedback": "`double` speichert viele Dezimalbrüche nur ungefähr. Bei Geld summieren sich solche Fehler."
+        },
+        {
+          "text": "`int`, weil Geld immer eine ganze Zahl ist.",
+          "feedback": "Ein `int` hat keinen Nachkommateil. `19.99` passt nicht hinein."
+        },
+        {
+          "text": "`long`, weil er mehr Platz als `int` hat.",
+          "feedback": "`long` ist ein Ganzzahltyp und kann ebenfalls keinen Nachkommateil speichern."
+        }
+      ],
+      "explanation": "`decimal` speichert Dezimalbrüche exakt und hat mindestens 28 Stellen. Das passt zu Beträgen. `double` ist für Messwerte und Verhältnisse gedacht, bei denen kleine Abweichungen nicht stören."
+    },
+    {
+      "id": "m01-l03-q6",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(7 / 2.0);` aus?",
+      "options": [
+        {
+          "text": "`3.5`",
+          "correct": true
+        },
+        {
+          "text": "`3`",
+          "feedback": "Nur bei zwei `int`-Operanden wird abgeschnitten. Hier ist `2.0` ein `double`."
+        },
+        {
+          "text": "`4`",
+          "misconception": "m01-l03-integer-division-rounds",
+          "feedback": "Es wird nichts gerundet. Mit einem `double`-Operanden wird mit `double` gerechnet."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Typen verschieden sind.",
+          "feedback": "`int` und `double` dürfen gemischt werden. Der `int` wird zu `double`."
+        }
+      ],
+      "explanation": "Hat ein Operand den Typ `double`, wird der andere zu `double` angehoben und mit `double` gerechnet. Das Ergebnis ist `3.5`."
+    },
+    {
+      "id": "m01-l03-q7",
+      "lesson": "m01-l03",
+      "type": "single",
+      "question": "Ein Programm teilt `1` durch `0`. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "Mit `int` bricht das Programm zur Laufzeit mit einer Ausnahme ab, mit `double` ergibt `1.0 / 0` den Wert Infinity.",
+          "correct": true
+        },
+        {
+          "text": "Mit `int` und mit `double` meldet der Compiler einen Fehler.",
+          "feedback": "Der Compiler meldet keinen Fehler für eine Rechnung, deren Divisor erst zur Laufzeit feststeht. Bei `double` gibt es gar keinen Fehler."
+        },
+        {
+          "text": "Mit `int` ergibt die Rechnung `0`, mit `double` ebenfalls.",
+          "feedback": "Eine Division durch 0 ergibt nie `0`."
+        },
+        {
+          "text": "Mit `int` ergibt die Rechnung NaN, mit `double` Infinity.",
+          "feedback": "Ein `int` kennt weder NaN noch Infinity."
+        }
+      ],
+      "explanation": "Bei `int` ist die Division durch 0 eine `DivideByZeroException`. Ein `double` kennt die Sonderwerte Infinity, -Infinity und NaN, deshalb gibt es keinen Fehler."
+    },
+    {
+      "id": "m01-l03-q8",
+      "lesson": "m01-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `7 / 14 * 100` mit `int` den Wert `0` ergibt und wie du die Fehlerquote 50 Prozent richtig berechnest. Sage auch, warum `0.1 + 0.2` mit `double` nicht genau `0.3` ergibt.",
+      "modelAnswer": "`7 / 14` ist eine Ganzzahldivision. Der Nachkommateil von 0,5 wird abgeschnitten, das Ergebnis ist `0`, und `0 * 100` bleibt `0`. Mit einem `double`-Operanden wird mit `double` gerechnet: `7 * 100.0 / 14` ergibt `50`.\n\nEin `double` speichert binär. Dezimalbrüche wie 0,1 und 0,2 lassen sich dort nicht endlich darstellen und werden gerundet. Deshalb ist die Summe nur ungefähr `0.3`. `decimal` speichert Dezimalbrüche exakt."
+    },
+    {
+      "id": "m01-l03-q9",
+      "lesson": "m01-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Programm `decimal` statt `double` verwenden, und wo reicht `double`?",
+      "modelAnswer": "`decimal` für Geldbeträge und andere exakte Mengen, bei denen jede Dezimalstelle stimmen muss, zum Beispiel Preise und Rechnungssummen. `double` für Messwerte und Verhältnisse wie die Fehlerquote eines Logs, bei denen eine winzige Abweichung keine Rolle spielt."
     }
   ]
 }
