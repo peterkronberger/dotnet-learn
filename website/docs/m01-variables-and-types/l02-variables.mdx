@@ -1,0 +1,263 @@
+---
+title: Variablen und eingebaute Typen
+sidebar_position: 2
+description: "Eine Variable ist ein benannter Speicherplatz mit festem Typ. Du deklarierst Variablen von int bis string, verfolgst Zuweisungen und weißt, warum der Compiler das Lesen ohne vorherigen Wert ablehnt."
+lesson_id: m01-l02
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import builtInTypes from '!!raw-loader!@site/examples/m01/l02/built-in-types.cs';
+import builtInTypesOutput from '!!raw-loader!@site/examples/m01/l02/built-in-types.out.txt';
+import declareThenAssign from '!!raw-loader!@site/examples/m01/l02/declare-then-assign.cs';
+import writeAndWriteLine from '!!raw-loader!@site/examples/m01/l02/write-and-writeline.cs';
+import writeAndWriteLineOutput from '!!raw-loader!@site/examples/m01/l02/write-and-writeline.out.txt';
+import assignmentTrace from '!!raw-loader!@site/examples/m01/l02/assignment-trace.cs';
+import assignmentTraceOutput from '!!raw-loader!@site/examples/m01/l02/assignment-trace.out.txt';
+import caseSensitive from '!!raw-loader!@site/examples/m01/l02/case-sensitive.cs';
+import caseSensitiveOutput from '!!raw-loader!@site/examples/m01/l02/case-sensitive.out.txt';
+import keywordAsName from '!!raw-loader!@site/examples/m01/l02/keyword-as-name.snippet.cs';
+import unassigned from '!!raw-loader!@site/examples/m01/l02/unassigned.snippet.cs';
+import variablesGaps from '!!raw-loader!@site/examples/m01/l02/variables-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l02/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l02/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l02/seclog-event-solution.cs';
+
+# Variablen und eingebaute Typen
+
+:::note[Lernziele]
+- Du deklarierst Variablen der Typen `int`, `double`, `bool`, `char` und `string`, weist ihnen Werte zu und gibst sie aus.
+- Du verfolgst Zuweisungen Zeile für Zeile und sagst den aktuellen Wert einer Variable voraus.
+- Du wählst gültige Bezeichner und erkennst, warum ein Schlüsselwort wie `int` kein Variablenname sein kann.
+- Du erklärst, warum der Compiler das Lesen einer Variable ohne vorherige Zuweisung ablehnt.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l01-q4" />
+
+<Quiz id="m01-l01-q6" />
+
+<Quiz id="m00-l05-q3" />
+
+## Eine Variable ist ein benannter Speicherplatz
+
+Bisher standen Werte direkt im Code, als Literale. Ein Programm muss sich Werte aber merken und später wieder lesen. Dafür gibt es <Term id="variable">Variablen</Term>. Eine Variable ist ein benannter Speicherplatz. Sie hat einen festen <Term id="type">Typ (Type)</Term> und enthält zu jedem Zeitpunkt genau einen Wert.
+
+Der Typ legt fest, welche Werte in die Variable passen. In C# steht er schon beim Übersetzen fest, das heißt <Term id="static-typing">statische Typisierung (Static Typing)</Term>. Ein Wert des falschen Typs ist deshalb ein Fehler des Compilers und kein Fehler zur Laufzeit.
+
+Für die häufigsten Werte bringt C# <Term id="built-in-type">eingebaute Typen (Built-in Types)</Term> mit, jeweils mit einem eigenen Schlüsselwort:
+
+| Typ | Enthält | Beispielwerte |
+| --- | --- | --- |
+| `int` | Ganzzahl | `3`, `-12`, `0` |
+| `double` | Zahl mit Dezimalstellen | `0.5`, `3.14` |
+| `bool` | Wahrheitswert: nur `true` oder `false` | `true`, `false` |
+| `char` | genau ein Zeichen | `'B'`, `'7'` |
+| `string` | Text | `"alice"`, `"login-failed"` |
+
+Es gibt weitere Zahlentypen wie `long` und `decimal`. Sie folgen in der nächsten Lektion, ebenso die Größen und Wertebereiche. `true` und `false` sind die zwei Literale für `bool`.
+
+### Deklarieren und zuweisen
+
+Eine <Term id="declaration">Deklaration (Declaration)</Term> führt eine Variable ein: erst der Typ, dann der Name, am Ende ein `;`. Mit `=` und einem Wert gibst du ihr gleich den Anfangswert. Eine spätere <Term id="assignment">Zuweisung (Assignment)</Term> hat die Form `name = wert;`. Sie speichert den Wert und überschreibt den alten. Das einzelne `=` ist keine Gleichheit: Es sagt nicht „ist gleich“, sondern „speichere rechts in links“.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Achte darauf, wie `bool` und `char` erscheinen.
+:::
+
+<CSharpRunner id="m01-l02-types" code={builtInTypes} predict expected={builtInTypesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen: `3`, `0.5`, `False`, `B` und `alice`.
+
+1. **Deklarieren:** Jede der ersten fünf Zeilen führt eine Variable mit Typ, Name und Anfangswert ein.
+2. **Lesen:** `Console.WriteLine(attempts);` liest den Wert der Variable und gibt ihn aus. Die Anführungszeichen gehören zum Literal und nicht zum Wert: `alice` und `B` erscheinen ohne sie.
+3. **Wahrheitswert:** Ein `bool` wird als `True` oder `False` ausgegeben, mit großem Anfangsbuchstaben.
+
+Was passiert, wenn du in Zeile 1 `"3"` statt `3` schreibst? Probiere es im Runner aus: Ein Text passt nicht in eine `int`-Variable, der Compiler meldet einen Fehler.
+
+</details>
+
+### Erst deklarieren, später zuweisen
+
+Eine Deklaration darf auch ohne Anfangswert stehen. Der Wert kommt dann mit einer späteren Zuweisung. In einer Deklaration dürfen auch mehrere Variablen desselben Typs stehen, getrennt durch Kommas. In dieser Lektion schreibst du jede Variable in eine eigene Zeile.
+
+<CSharpRunner id="m01-l02-declare-then-assign" code={declareThenAssign} />
+
+### Write und WriteLine
+
+`Console.WriteLine` gibt den Wert aus und beendet die Zeile. `Console.Write` gibt den Wert aus und lässt die Zeile offen: Die nächste Ausgabe steht direkt dahinter. Damit schreibst du ein Etikett und den Wert einer Variable in dieselbe Zeile.
+
+:::info[Vorhersage]
+Wie viele Zeilen gibt das Programm aus, und was steht in ihnen?
+:::
+
+<CSharpRunner id="m01-l02-write" code={writeAndWriteLine} predict expected={writeAndWriteLineOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `Attempts: 3` und `ABC`.
+
+1. **Etikett:** `Console.Write("Attempts: ");` lässt die Zeile offen.
+2. **Wert:** `Console.WriteLine(attempts);` setzt den Wert dahinter und beendet die Zeile.
+3. **Mehrere Teile:** `A`, `B` und `C` werden hintereinander in dieselbe Zeile geschrieben. Erst `WriteLine` beendet sie.
+
+</details>
+
+## Zuweisungen Schritt für Schritt verfolgen
+
+Eine Variable enthält immer nur den letzten zugewiesenen Wert. Zum Vorhersagen gehst du das Programm Zeile für Zeile durch und notierst den aktuellen Wert jeder Variable. Rechts vom `=` darf auch eine andere Variable stehen: Dann wird ihr aktueller Wert kopiert.
+
+:::info[Vorhersage]
+Verfolge die Variablen `attempts` und `copy` Zeile für Zeile. Was gibt das Programm aus? Führe es danach aus und öffne die Schritt-Ansicht, um deine Notizen zu prüfen.
+:::
+
+<CSharpRunner id="m01-l02-trace" code={assignmentTrace} trace predict expected={assignmentTraceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `1`, `5`, `5` und `2`.
+
+1. **Anfangswert:** `attempts` ist 1, die erste Ausgabe ist `1`.
+2. **Überschreiben:** `attempts = 5;` ersetzt die 1. Die zweite Ausgabe ist `5`.
+3. **Kopieren:** `int copy = attempts;` legt `copy` mit dem aktuellen Wert 5 an. Die beiden Variablen sind danach unabhängig.
+4. **Weiter überschreiben:** `attempts = 2;` ändert nur `attempts`. `copy` bleibt 5, `attempts` ist 2.
+
+</details>
+
+## Bezeichner und Schlüsselwörter
+
+Der Name einer Variable heißt <Term id="identifier">Bezeichner (Identifier)</Term>. Für einen Bezeichner gelten diese Regeln ([§6.4.3 Identifiers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#643-identifiers)):
+
+- Er beginnt mit einem Buchstaben oder einem Unterstrich `_`.
+- Danach folgen Buchstaben, Ziffern oder Unterstriche. Leerzeichen und Bindestriche sind nicht erlaubt.
+- Groß- und Kleinschreibung zählen: `total` und `Total` sind zwei verschiedene Variablen.
+- Ein <Term id="keyword">Schlüsselwort (Keyword)</Term> wie `int`, `string` oder `event` ist reserviert und kein gültiger Name.
+
+Gute Namen sagen, was die Variable enthält: `attempts` statt `a`. Der Compiler prüft das nicht, aber du liest den Code später öfter, als du ihn schreibst.
+
+:::info[Vorhersage]
+Zwei Variablen heißen fast gleich. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l02-case" code={caseSensitive} predict expected={caseSensitiveOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `1` und `2`. `total` und `Total` sind zwei Bezeichner mit zwei getrennten Speicherplätzen.
+
+Wer `event` als Namen benutzt, bekommt einen Fehler, weil `event` ein Schlüsselwort ist:
+
+<CodeBlock language="csharp" title="keyword-as-name.snippet.cs">{keywordAsName}</CodeBlock>
+
+Ändere den Namen, zum Beispiel zu `eventType`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Das @-Präfix und kontextuelle Schlüsselwörter (optional)</summary>
+
+Mit einem vorangestellten `@` darf ein Schlüsselwort doch ein Name sein: `@event` ist ein gültiger Bezeichner. Das `@` gehört nicht zum Namen. Du brauchst es selten, die bessere Wahl ist fast immer ein anderes Wort ([§6.4.4 Keywords](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#644-keywords)).
+
+Daneben gibt es kontextuelle Schlüsselwörter. Sie haben nur an bestimmten Stellen eine besondere Bedeutung und sind sonst gewöhnliche Namen. Ein Beispiel ist `var`, das in einer späteren Lektion vorkommt.
+
+<Forward concepts={['`var`']} module="1" />
+
+</details>
+
+## Lesen ohne Wert: Der Compiler lehnt es ab
+
+Eine lokale Variable, die du ohne Anfangswert deklarierst, hat zunächst keinen Wert. Sie bekommt auch keinen Standardwert wie `0`. Der Compiler prüft deshalb, ob jede Variable an jeder Stelle, an der sie gelesen wird, vorher einen Wert bekommen hat. Das heißt <Term id="definite-assignment">Definite Assignment (sichere Zuweisung)</Term> ([§9.4 Definite assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#94-definite-assignment)). Kann er es nicht beweisen, meldet er einen Fehler, bevor das Programm startet.
+
+<CodeBlock language="csharp" title="unassigned.snippet.cs">{unassigned}</CodeBlock>
+
+In diesem Code wird `attempts` in Zeile 2 gelesen, ohne dass vorher ein Wert zugewiesen wurde. Die Lösung ist eine Zuweisung vor dem Lesen, wie im Beispiel „Erst deklarieren, später zuweisen“ oben. Probiere es dort aus: Lösche im Runner die Zeile `attempts = 3;` und führe das Programm aus.
+
+## Lückenbeispiel
+
+Gib jeder Variable den Wert aus dem Kommentar hinter ihrer Zeile. Lösche die Kommentare nicht, sie sagen dir, was gefragt ist.
+
+<CSharpRunner id="m01-l02-gaps" code={variablesGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **string:** `string user = "bob";` Text steht in doppelten Anführungszeichen.
+2. **int:** `int attempts = 3;` Eine Ganzzahl ohne Anführungszeichen.
+3. **bool:** `bool isLocked = true;` Ein `bool` kennt nur `true` und `false`.
+4. **char:** `char level = 'W';` Ein Zeichen in einfachen Anführungszeichen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, eine leere Zeile, die Überschrift `First event:` und die erste Zeile des Beispiel-Logs.
+
+**Neue Anforderung:** Zeile 2 des Beispiel-Logs ist `2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`. Speichere Benutzer (`bob`), IP-Adresse (`203.0.113.7`) und Ereignistyp (`login-failed`) in drei `string`-Variablen. Gib sie nach der ersten Ereigniszeile mit Etikett aus: `User: `, `IP: ` und `Event type: ` mit `Console.Write`, dann den Wert mit `Console.WriteLine`. Schreibe einen Kommentar über die neuen Zeilen, der sagt, was sie tun. Strings zusammenzusetzen lernst du erst später.
+
+<CSharpRunner id="m01-l02-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Variablen anlegen:** Drei Deklarationen mit Anfangswert, jeweils vom Typ `string`.
+2. **Etikett schreiben:** `Console.Write` lässt die Zeile offen.
+3. **Wert ausgeben:** `Console.WriteLine(user);` liest die Variable und beendet die Zeile.
+
+</details>
+
+**Neuer Stand:** SecLog speichert Benutzer, IP-Adresse und Ereignistyp eines Log-Ereignisses in Variablen und gibt sie mit Etikett aus.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l02-assignment-is-comparison" />
+
+**„`=` vergleicht zwei Werte.“** Das einzelne `=` ist die Zuweisung: Es speichert den Wert von rechts in der Variable links. Ein Vergleich hat einen eigenen Operator, den du in Modul 2 kennenlernst.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l02-variable-remembers-old-values" />
+
+**„Eine Variable merkt sich ihre früheren Werte.“** Eine Variable enthält immer genau einen Wert. Jede Zuweisung überschreibt den alten Wert, er ist danach weg. Eine Kopie bleibt nur, wenn du den Wert vorher in einer anderen Variable gespeichert hast.
+:::
+
+## Zusammenfassung
+
+Eine Variable ist ein benannter Speicherplatz mit festem Typ und genau einem Wert. Du deklarierst sie mit Typ und Namen und weist ihr mit `=` einen Wert zu. Eine neue Zuweisung überschreibt den alten Wert. Die eingebauten Typen `int`, `double`, `bool`, `char` und `string` decken Zahlen, Wahrheitswerte, Zeichen und Text ab. Ein Bezeichner beginnt mit Buchstabe oder `_`, unterscheidet Groß- und Kleinschreibung und darf kein Schlüsselwort sein. Der Compiler lehnt das Lesen einer Variable ab, die nicht sicher einen Wert bekommen hat.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l02-q1" />
+
+<Quiz id="m01-l02-q2" />
+
+<Quiz id="m01-l02-q3" />
+
+<Quiz id="m01-l02-q4" />
+
+<Quiz id="m01-l02-q5" />
+
+<Quiz id="m01-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m01-l02-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [C#-Spezifikation, Variables](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables)
+- Microsoft Learn: [Eingebaute Typen in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/built-in-types)
+- Microsoft Learn: [C#-Spezifikation, Lexical structure](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure)

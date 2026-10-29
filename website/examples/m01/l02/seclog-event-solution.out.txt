@@ -1,0 +1,14 @@
+SecLog project profile
+Purpose: find suspicious logins in made-up login logs
+Language: C#
+Platform: .NET
+Variant: .NET (Linux server and Windows laptops)
+Version: .NET 10 (LTS)
+End of support: 2028-11-14
+Execution model: Native AOT
+
+First event:
+2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+User: bob
+IP: 203.0.113.7
+Event type: login-failed
