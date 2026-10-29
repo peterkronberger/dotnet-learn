@@ -1,0 +1,273 @@
+---
+title: Anweisungen, Kommentare und Literale
+sidebar_position: 1
+description: "Ein Programm ist eine Folge von Anweisungen. Du schreibst Kommentare, die der Compiler ignoriert, und Werte als Literale: Zahlen, Zeichen und Strings mit Escape-Sequenzen."
+lesson_id: m01-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import comments from '!!raw-loader!@site/examples/m01/l01/comments.cs';
+import commentsOutput from '!!raw-loader!@site/examples/m01/l01/comments.out.txt';
+import numberLiterals from '!!raw-loader!@site/examples/m01/l01/number-literals.cs';
+import numberLiteralsOutput from '!!raw-loader!@site/examples/m01/l01/number-literals.out.txt';
+import escapeSequences from '!!raw-loader!@site/examples/m01/l01/escape-sequences.cs';
+import escapeSequencesOutput from '!!raw-loader!@site/examples/m01/l01/escape-sequences.out.txt';
+import verbatimStrings from '!!raw-loader!@site/examples/m01/l01/verbatim-strings.cs';
+import verbatimStringsOutput from '!!raw-loader!@site/examples/m01/l01/verbatim-strings.out.txt';
+import literalGaps from '!!raw-loader!@site/examples/m01/l01/literal-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l01/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l01/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l01/seclog-event-solution.cs';
+
+# Anweisungen, Kommentare und Literale
+
+:::note[Lernziele]
+- Du schreibst einzeilige und mehrzeilige Kommentare und sagst voraus, dass sie die Ausgabe nicht ändern.
+- Du erkennst Ganzzahl-, Gleitkomma-, Zeichen- und String-Literale und sagst die Ausgabe von Hexadezimal- und Binärliteralen sowie Literalen mit Zifferntrennzeichen voraus.
+- Du verwendest Escape-Sequenzen (`\n`, `\t`, `\"`, `\\`) und erklärst den Unterschied zwischen regulären und wörtlichen (`@"…"`) String-Literalen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- ein Log-Ereignis mit Benutzer, IP-Adresse und Ergebnis anzeigen
+- die Fehlerquote in Prozent berechnen
+- eine Zahl aus Text lesen
+:::
+
+## Rückblick
+
+<Quiz id="m00-l01-q3" />
+
+<Quiz id="m00-l01-q1" />
+
+<Quiz id="m00-l05-q3" />
+
+## Ein Programm ist eine Folge von Anweisungen
+
+Ein Programm besteht aus <Term id="statement">Anweisungen</Term>, die von oben nach unten laufen. Du kennst sie schon: `Console.WriteLine("Hello");` ist eine Anweisung. Eine Anweisung, die einen Aufruf wie diesen enthält und mit `;` endet, heißt Ausdrucksanweisung (Expression Statement). Die Anweisungen eines Programms bilden eine Folge, die der Reihe nach ausgeführt wird.
+
+In dieser Lektion kommen zwei Dinge dazu, die in Anweisungen vorkommen: Text für Menschen (Kommentare) und Werte, die direkt im Code stehen (Literale).
+
+## Kommentare
+
+Ein <Term id="comment">Kommentar (Comment)</Term> ist Text im Quellcode, den der Compiler ignoriert. Er ist für Menschen da: Er erklärt, warum eine Stelle so aussieht. C# kennt zwei Formen:
+
+- **Einzeilig:** beginnt mit `//` und reicht bis zum Ende der Zeile. Er darf auch hinter einer Anweisung stehen.
+- **Mehrzeilig:** beginnt mit `/*` und endet mit `*/`. Dazwischen darf beliebig viel Text stehen, auch über mehrere Zeilen.
+
+Kommentare lassen sich nicht ineinander verschachteln. Innerhalb eines Kommentars hat der jeweils andere Beginn kein besonderes Gewicht. Mehr dazu steht in der Vertiefung unten.
+
+Ein praktischer Nebeneffekt: Du kannst eine Anweisung „auskommentieren“, um sie vorübergehend abzuschalten. Der Compiler übersetzt sie dann nicht.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Schreibe deinen Tipp für jede Ausgabezeile in das Feld und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m01-l01-comments" code={comments} predict expected={commentsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `Line 1` und `Line 5`.
+
+1. **Kommentare finden:** Die erste Zeile ist ein einzeiliger Kommentar. Zeile 3 ist ebenfalls einer. Zeile 4 und 5 bilden zusammen einen mehrzeiligen Kommentar. Der Text hinter der letzten Anweisung ist wieder ein einzeiliger Kommentar.
+2. **Anweisungen finden:** Es bleiben zwei Anweisungen, die ausgeführt werden: `Line 1` und `Line 5`.
+3. **Ausgabe ablesen:** Auch die Anweisungen *in* den Kommentaren laufen nicht. Sie sind für den Compiler nur Text.
+
+Was passiert, wenn du in Zeile 3 die beiden `//` löschst? Probiere es im Runner aus: Dann ist es wieder eine Anweisung und `Line 2` erscheint.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wie genau endet ein Kommentar? (optional)</summary>
+
+Ein einzeiliger Kommentar endet am Zeilenende. Ein mehrzeiliger endet beim ersten `*/`. Deshalb verschachteln Kommentare nicht: In `/* a /* b */ c */` endet der Kommentar schon nach `b`, und `c */` ist dann Code, den der Compiler nicht versteht. Mit `//` vor jeder Zeile kannst du einen Block sicher auskommentieren, weil `/*` und `*/` in einem einzeiligen Kommentar nichts bedeuten ([§6.3.3 Comments](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#633-comments)).
+
+Es gibt auch Kommentare mit drei Schrägstrichen (`///`), die Dokumentation für Code beschreiben. Sie kommen in Modul 6.
+
+</details>
+
+## Literale: Werte im Code
+
+Ein <Term id="literal">Literal</Term> ist ein Wert, der direkt im Code steht. Den Text in `Console.WriteLine("Hello");` kennst du schon: `"Hello"` ist ein String-Literal. Es gibt weitere Arten:
+
+| Art | Beispiele | Merkmal |
+| --- | --- | --- |
+| Ganzzahl-Literal | `42`, `0xFF`, `0b1010`, `1_000_000` | Ziffern ohne Dezimalpunkt |
+| Gleitkomma-Literal | `1.5`, `1e3` | Dezimalpunkt oder Exponent |
+| Zeichen-Literal | `'A'` | genau ein Zeichen in einfachen Anführungszeichen |
+| String-Literal | `"Hello"` | Text in doppelten Anführungszeichen |
+
+### Ganzzahlen in drei Schreibweisen
+
+Dieselbe Zahl lässt sich auf drei Arten schreiben. Alle drei sind Ganzzahl-Literale.
+
+- **Dezimal:** die gewohnte Schreibweise mit den Ziffern 0 bis 9, zum Beispiel `255`.
+- **Hexadezimal:** beginnt mit `0x`. Das System hat die Basis 16 und die Ziffern 0 bis 9 sowie A bis F, wobei A für 10 steht und F für 15. `0xFF` ist 15 · 16 + 15 = 255.
+- **Binär:** beginnt mit `0b`. Das System hat die Basis 2 und nur die Ziffern 0 und 1. `0b1010` ist 1 · 8 + 0 · 4 + 1 · 2 + 0 · 1 = 10.
+
+Mit **Zifferntrennzeichen** machst du lange Zahlen lesbar: `1_000_000` ist eine Million. Der Unterstrich ändert den Wert nicht. Er darf zwischen Ziffern stehen, aber nicht am Ende der Zahl ([§6.4.5.3 Integer literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals)).
+
+### Gleitkomma und Zeichen
+
+Ein Gleitkomma-Literal hat einen Dezimalpunkt, zum Beispiel `1.5`. Mit dem Buchstaben `e` schreibst du einen Exponenten: `1e3` bedeutet 1 · 10³, also 1000. Nach dem Punkt müssen Ziffern stehen. Das Komma ist kein Dezimalzeichen im Code.
+
+Ein Zeichen-Literal steht in einfachen Anführungszeichen und enthält genau ein Zeichen: `'A'`. Der Unterschied zu `"A"` ist die Art des Werts. Die Ausgabe sieht gleich aus.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Rechne die Hexadezimal- und Binärliterale um. Achte auch auf `1e3`.
+:::
+
+<CSharpRunner id="m01-l01-numbers" code={numberLiterals} predict expected={numberLiteralsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind sieben Zeilen: `42`, `255`, `10`, `1000000`, `1.5`, `1000` und `A`.
+
+1. **Schreibweise erkennen:** `0xFF` ist hexadezimal, `0b1010` binär, `1_000_000` dezimal mit Trennzeichen.
+2. **Umrechnen:** 15 · 16 + 15 = 255 und 8 + 2 = 10. Die Unterstriche fallen weg: 1000000.
+3. **Gleitkomma lesen:** `1e3` ist 1 · 10³ und wird als `1000` ausgegeben. `1.5` bleibt `1.5`.
+4. **Zeichen:** `'A'` erscheint als `A`, ohne die einfachen Anführungszeichen.
+
+`Console.WriteLine` gibt den Wert aus, nicht die Schreibweise, in der du ihn geschrieben hast.
+
+</details>
+
+## Escape-Sequenzen
+
+Manche Zeichen kannst du nicht einfach in einen String tippen: den Zeilenumbruch, den Tabulator, das Anführungszeichen, das den String beendet. Dafür gibt es <Term id="escape-sequence">Escape-Sequenzen (Escape Sequences)</Term>. Sie beginnen mit einem Backslash `\` und stehen für ein einzelnes Zeichen:
+
+| Escape-Sequenz | Zeichen |
+| --- | --- |
+| `\n` | Zeilenumbruch |
+| `\t` | Tabulator |
+| `\"` | Anführungszeichen im Text |
+| `\\` | ein einzelner Backslash |
+
+Ein String-Literal, in dem Escape-Sequenzen gelten, heißt regulär. Die Escape-Sequenzen funktionieren auch in Zeichen-Literalen, zum Beispiel `'\t'`.
+
+:::info[Vorhersage]
+Wie viele Zeilen gibt das Programm aus, und was steht in ihnen?
+:::
+
+<CSharpRunner id="m01-l01-escapes" code={escapeSequences} predict expected={escapeSequencesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen.
+
+1. **Tabulator:** `\t` springt zur nächsten Tabulatorstelle. `Name:` und `Alice` stehen in einer Zeile mit Abstand.
+2. **Zeilenumbruch:** `\n` beendet die Zeile mitten im String. Eine Anweisung erzeugt deshalb zwei Zeilen, `Line 1` und `Line 2`.
+3. **Anführungszeichen:** `\"` schreibt ein `"` in den Text, ohne den String zu beenden.
+4. **Backslash:** `\\` schreibt einen einzelnen `\`. Aus `C:\\logs\\app.log` wird `C:\logs\app.log`.
+
+Was passiert, wenn du in der letzten Zeile einen der doppelten Backslashes durch einen einzelnen ersetzt, zum Beispiel `C:\logs\\app.log`? Probiere es im Runner aus: `\l` ist keine gültige Escape-Sequenz, der Compiler meldet einen Fehler.
+
+</details>
+
+## Wörtliche String-Literale
+
+Pfade wie `C:\logs\app.log` sind mit regulären Strings mühsam, weil jeder Backslash doppelt stehen muss. Ein <Term id="verbatim-string-literal">wörtliches String-Literal (Verbatim String Literal)</Term> beginnt mit `@"`. In ihm gelten keine Escape-Sequenzen: Ein Backslash ist ein normales Zeichen. Ein Anführungszeichen schreibst du als zwei hintereinander (`""`). Ein wörtliches String-Literal darf sich über mehrere Zeilen erstrecken ([§6.4.5.6 String literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6456-string-literals)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte auf die zweite Anweisung und auf die letzte, die über zwei Zeilen im Code geht.
+:::
+
+<CSharpRunner id="m01-l01-verbatim" code={verbatimStrings} predict expected={verbatimStringsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen.
+
+1. **Pfad:** Die Backslashes bleiben stehen, ohne verdoppelt zu werden: `C:\logs\app.log`.
+2. **Kein Zeilenumbruch:** `\n` ist hier kein Zeilenumbruch, sondern die zwei Zeichen `\` und `n`. Die Ausgabe ist `No \n line break here`.
+3. **Anführungszeichen:** `""` ergibt ein `"` im Text.
+4. **Mehrere Zeilen:** Der Zeilenumbruch im Quelltext gehört zum String. Die Ausgabe hat zwei Zeilen.
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die vier Werte so, dass die Ausgabe zu den Kommentaren passt. Die Zahlen schreibst du als Literale in der verlangten Form. Lösche die Kommentare nicht, sie sagen dir, was gefragt ist.
+
+<CSharpRunner id="m01-l01-gaps" code={literalGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Hexadezimal:** 255 ist 15 · 16 + 15, also `0xFF`.
+2. **Binär:** 5 ist 4 + 1, also `0b101`.
+3. **Trennzeichen:** `2_500_000`.
+4. **Wörtlich:** `@"C:\temp\log.txt"`. Ohne `@` müsstest du die Backslashes verdoppeln.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus: Zweck, Sprache, Plattform, .NET-Variante, Version, Support-Ende und Ausführungsmodell.
+
+**Neue Anforderung:** Nach dem Steckbrief soll SecLog eine leere Zeile ausgeben, dann die Überschrift `First event:` und dann die erste Zeile des Beispiel-Logs: `2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10`. Die Zeile ist ein einziges String-Literal. Schreibe einen Kommentar über die neuen Zeilen, der sagt, was sie tun. `Console.WriteLine()` ohne Klammerinhalt gibt eine leere Zeile aus.
+
+<CSharpRunner id="m01-l01-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Leere Zeile:** `Console.WriteLine();` ohne Text beendet nur die Zeile.
+2. **Kommentar:** Er steht über den neuen Zeilen und sagt, was sie tun. Er ändert die Ausgabe nicht.
+3. **Überschrift und Ereignis:** Beide sind String-Literale. Das Ereignis ist ein einziger Text, auch wenn es Leerzeichen und `=` enthält.
+
+</details>
+
+**Neuer Stand:** SecLog gibt nach dem Steckbrief die erste Zeile des Beispiel-Logs als Text aus.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l01-comment-is-executed" />
+
+**„Ein Kommentar wird auch ausgeführt oder ausgegeben.“** Der Compiler ignoriert Kommentare. Sie ändern weder das Verhalten noch die Ausgabe. Das gilt auch für Anweisungen, die in einem Kommentar stehen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l01-escape-in-verbatim" />
+
+**„`\n` macht auch in `@"…"` einen Zeilenumbruch.“** In einem wörtlichen String-Literal werden Escape-Sequenzen nicht ausgewertet. `@"A\nB"` besteht aus den vier Zeichen `A`, `\`, `n` und `B`. Einen Zeilenumbruch schreibst du dort als echten Umbruch im Quelltext.
+:::
+
+## Zusammenfassung
+
+Ein Programm ist eine Folge von Anweisungen, die von oben nach unten laufen. Kommentare mit `//` oder zwischen `/*` und `*/` ignoriert der Compiler. Literale schreiben Werte direkt in den Code: Ganzzahlen dezimal, hexadezimal (`0x`) oder binär (`0b`), mit `_` als Trennzeichen, Gleitkommazahlen mit Punkt oder Exponent, Zeichen in einfachen und Strings in doppelten Anführungszeichen. In regulären Strings stehen Escape-Sequenzen wie `\n`, `\t`, `\"` und `\\` für einzelne Zeichen. Wörtliche Strings mit `@"` nehmen alles so, wie es dasteht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l01-q1" />
+
+<Quiz id="m01-l01-q2" />
+
+<Quiz id="m01-l01-q3" />
+
+<Quiz id="m01-l01-q4" />
+
+<Quiz id="m01-l01-q5" />
+
+<Quiz id="m01-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m01-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [C#-Spezifikation, Lexical structure](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure)
+- Microsoft Learn: [Strings (C#-Programmierhandbuch)](https://learn.microsoft.com/dotnet/csharp/programming-guide/strings/)
+- Microsoft Learn: [C#-Spezifikation, Statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)

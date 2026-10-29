@@ -1,0 +1,5 @@
+Name:	Alice
+Line 1
+Line 2
+She said "hi"
+C:\logs\app.log

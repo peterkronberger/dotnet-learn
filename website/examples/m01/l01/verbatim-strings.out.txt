@@ -1,0 +1,5 @@
+C:\logs\app.log
+No \n line break here
+She said "hi"
+Line 1
+Line 2
