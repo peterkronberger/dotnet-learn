@@ -73,7 +73,7 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
 - Facts checked 2026-10-25 (support policy page, .NET Blog):
   - STS support is 24 months, starting with .NET 9 (announced 2025-09-16). LTS stays 3 years.
   - .NET 8 (LTS) and .NET 9 (STS) both reach end of support on **2026-11-10**. L4 must reflect this at the first review after that date.
-  - .NET 11 is planned for 2026-11-10 together with C# 15 (secondary source: Visual Studio Magazine, 2026-09-14). By the odd/even rule it is an STS release. The course base stays C# 14 / .NET 10 (LTS) – see `CLAUDE.md`.
+  - .NET 11 is planned for 2026-11-10 together with C# 15 (primary source: dotnet/core `releases.md` lists .NET 11 as STS with release date 2026-11-10, status Go-Live, checked 2026-10-28). By the odd/even rule it is an STS release. The course base stays C# 14 / .NET 10 (LTS) – see `CLAUDE.md`.
   - End of support for .NET 10 is **2028-11-14** (checked 2026-10-25, .NET support policy page, primary source). The EF Core 10 "What's new" page says 2028-11-10; that is not used.
 
 - **Placement test candidates** (component is planned; quiz format unchanged; every lesson covered at least once, no `explain` questions):
@@ -438,8 +438,8 @@ Primary sources:
 - Microsoft Learn, Host and deploy ASP.NET Core: https://learn.microsoft.com/aspnet/core/host-and-deploy/
 - Kolikant, Y. B.-D. (2001). Gardeners and cinema tickets: High school students' preconceptions of concurrency. *Computer Science Education, 11*(3), 221–245. https://doi.org/10.1076/csed.11.3.221.3831
 
-Secondary source:
-- Visual Studio Magazine, ".NET 11 RC1 gets go-live support ahead of November launch" (2026-09-14): https://visualstudiomagazine.com/articles/2026/09/14/net-11-rc1-gets-go-live-support-ahead-of-november-launch.aspx
+Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine article that could not be opened):
+- dotnet/core, .NET releases overview (checked 2026-10-28): https://github.com/dotnet/core/blob/main/releases.md
 
 Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
