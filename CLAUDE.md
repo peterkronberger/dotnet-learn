@@ -95,13 +95,18 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 - Pull requests (title and description) and commit messages are written in English.
 - Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
-## Concept (binding)
+## Concept (binding, read on demand)
 
-@concept/didactics.md
-@concept/lesson-template.md
-@concept/module-plan.md
-@concept/project-seclog.md
-@concept/components.md
-@concept/style-and-language.md
-@concept/sources.md
-@concept/ai-module.md
+The files below are binding but are **not** imported, to save tokens. Read a file with the Read tool before you work in its area. For lessons, `.claude/rules/lessons.md` already lists the key rules.
+
+| File | Read it when you ... |
+| --- | --- |
+| `concept/lesson-template.md` | write or review a lesson (flow, practice-example pattern, `<Forward>`, project step frame) |
+| `concept/module-plan.md` | write, split or review a module (lesson proposals, spec clauses, badges). It is large: search it for your module (`### M<N>`) instead of reading it all |
+| `concept/project-seclog.md` | add a project step or quiz/example data (continuity rule, milestones, sample data) |
+| `concept/sources.md` | verify facts, cite sources, write the PR "Verification" table, or touch the wording check |
+| `concept/style-and-language.md` | write German text, code style or accessibility-relevant UI |
+| `concept/components.md` | use or change a component (`<CSharpRunner>`, `<Quiz>`, `<Forward>`, `<Diagram>`, progress) |
+| `concept/didactics.md` | choose learning methods or edit "Wie dieser Kurs funktioniert" |
+| `concept/ai-module.md` | work on module 19 or any AI statement |
+| `concept/issue-blueprint.md` | split a module into issues (architect) |

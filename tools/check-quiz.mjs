@@ -24,8 +24,8 @@ const FORBIDDEN_PHRASES = [
 const WORDING_IS_ERROR = true;
 
 // Terms used before their introducing lesson (concept/lesson-template.md, "Forward references").
-// false: findings are warnings. The module 0 forward-reference issue sets it to true.
-const FORWARD_IS_ERROR = false;
+// true: findings are errors, except in the early-implementation lessons (EARLY_IMPLEMENTATIONS), which stay warnings.
+const FORWARD_IS_ERROR = true;
 const EARLY_IMPLEMENTATIONS = ['m01-l02', 'm01-l03', 'm02-l01'];
 
 // Markup of the removed language-comparison box (#127, concept/style-and-language.md). Must not come back.

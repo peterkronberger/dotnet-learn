@@ -557,8 +557,7 @@
       "id": "review",
       "term": "Rückblick",
       "category": "course",
-      "definition": "Fragen zu früheren Lektionen am Anfang einer Lektion. Sie lassen dich Gelerntes abrufen.",
-      "lesson": "m01-l03"
+      "definition": "Fragen zu früheren Lektionen am Anfang einer Lektion. Sie lassen dich Gelerntes abrufen."
     },
     {
       "id": "subgoal",
@@ -570,8 +569,7 @@
       ],
       "related": [
         "gap-example"
-      ],
-      "lesson": "m01-l03"
+      ]
     },
     {
       "id": "gap-example",
@@ -583,8 +581,7 @@
       ],
       "related": [
         "subgoal"
-      ],
-      "lesson": "m01-l03"
+      ]
     },
     {
       "id": "misconception",
@@ -593,8 +590,7 @@
       "definition": "Eine typische falsche Annahme, zum Beispiel „Ganzzahldivision rundet“. Sie steht in den „Achtung“-Kästen und wird im Quiz geprüft.",
       "aliases": [
         "Fehlvorstellungen"
-      ],
-      "lesson": "m01-l03"
+      ]
     },
     {
       "id": "seclog",
