@@ -61,7 +61,7 @@ import pitfalls from '!!raw-loader!@site/examples/m00/l01/hello-lines.cs';
 <CodeBlock language="csharp" title="Beispiel">{pitfalls}</CodeBlock>
 ```
 
-- **Runnable:** `<CSharpRunner code={…} />`. More props (details: `concept/components.md`): `predict` + `expected` (prediction field), `tests` (automatically checked task), `trace` (step view).
+- **Runnable:** `<CSharpRunner code={…} />`. More props (details: `concept/components.md`): `predict` + `expected` (prediction field), `tests` (automatically checked task), `trace` (step view), `stdin` (console input for `Console.ReadLine()`).
 - **Not runnable:** `<CodeBlock language="csharp" title="…">{code}</CodeBlock>`.
 - **Outputs:** The snapshot `<name>.out.txt` is created with `bash tools/check-examples.sh --update` (check the diff). `bash tools/check-examples.sh` compiles and compares all examples. `*.snippet.cs` files are skipped. EF Core, Minimal API and xUnit are projects under `website/examples/_ci/`.
 

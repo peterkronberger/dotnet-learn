@@ -5,7 +5,8 @@
 #   tools/check-examples.sh --update   rewrite the snapshots from the actual run
 #
 # Kinds of examples:
-#   *.cs            file-based app (`dotnet run file.cs`), output must match <name>.out.txt
+#   *.cs            file-based app (`dotnet run file.cs`), output must match <name>.out.txt.
+#                   Console input comes from <name>.in.txt if it exists, otherwise from /dev/null.
 #   *.snippet.cs    fragment, skipped (cannot run on its own)
 #   _ci/<name>/     regular project, run by _ci/<name>/run.sh, output must match _ci/<name>/expected.out.txt
 set -euo pipefail
@@ -56,7 +57,9 @@ while IFS= read -r -d '' file; do
     _ci/*) continue ;;
     *.snippet.cs) echo "SKIP  $rel (snippet)"; continue ;;
   esac
-  check "$rel" "${file%.cs}.out.txt" dotnet run "$file"
+  input="${file%.cs}.in.txt"
+  [[ -f "$input" ]] || input=/dev/null
+  check "$rel" "${file%.cs}.out.txt" dotnet run "$file" <"$input"
 done < <(find "$examples" -name '*.cs' -not -path '*/bin/*' -not -path '*/obj/*' -print0 | sort -z)
 
 # 2. CI projects (EF Core, Minimal API, xUnit)
