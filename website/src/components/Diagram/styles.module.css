@@ -10,6 +10,20 @@
   overflow-x: auto;
 }
 
+/* The theme wraps the SVG in a container that shrinks to its content. Mermaid sets the
+   SVG to width 100% (max-width = natural size), so a shrunken container made the
+   diagram tiny on desktop. A full-width container lets the SVG reach its natural size. */
+.diagram > :global(.docusaurus-mermaid-container) {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.diagram :global(.docusaurus-mermaid-container) svg {
+  min-width: min(100%, 40rem);
+  height: auto;
+}
+
 .caption {
   margin: 0.5rem 0;
   text-align: center;
