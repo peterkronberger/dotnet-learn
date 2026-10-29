@@ -55,7 +55,7 @@ test('glossarySections', () => {
 test('buildSearchIndex on the real site', () => {
   const index = buildSearchIndex({siteDir: path.join(__dirname, '..'), locale: 'de'});
   const ids = index.pages.map((p) => p.id);
-  assert.ok(ids.includes('doc:m01-variables-and-types/l03-numbers'));
+  assert.ok(ids.includes('doc:m00-orientation/l01-first-program'));
   assert.ok(ids.includes('glossary'));
   assert.ok(ids.includes('page:lernstand'));
   assert.strictEqual(new Set(ids).size, ids.length);

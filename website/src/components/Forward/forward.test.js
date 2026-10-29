@@ -20,7 +20,7 @@ test('invalid props throw a <Forward> error', () => {
     {concepts: ['a'], lesson: 'm00-l01', module: '1'},
     {concepts: ['a']},
     {concepts: ['a'], lesson: 'm99-l01'},
-    {concepts: ['a'], lesson: 'm01-l03'},
+    {concepts: ['a'], lesson: 'm02-l01'},
     {concepts: ['a'], module: '20'},
     {concepts: ['a'], module: 'x'},
     {concepts: ['a'], module: 1.5},
@@ -32,8 +32,8 @@ test('invalid props throw a <Forward> error', () => {
 });
 
 test('early-implementation lessons are rejected even if they exist', () => {
-  const all = new Set([...ids, 'm01-l02', 'm01-l03', 'm02-l01']);
-  for (const id of ['m01-l02', 'm01-l03', 'm02-l01']) {
+  const all = new Set([...ids, 'm02-l01']);
+  for (const id of ['m02-l01']) {
     assert.throws(() => validateForwardProps({concepts: ['a'], lesson: id}, all), /module="N"/);
   }
 });
