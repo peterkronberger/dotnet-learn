@@ -54,7 +54,7 @@ The rules and the Definition of Done in `CLAUDE.md` and the flow in `concept/les
 
 ```mdx
 import CodeBlock from '@theme/CodeBlock';
-import pitfalls from '!!raw-loader!@site/examples/m01/l03/numeric-pitfalls.cs';
+import pitfalls from '!!raw-loader!@site/examples/m00/l01/hello-lines.cs';
 
 <CSharpRunner height={420} code={pitfalls} />
 

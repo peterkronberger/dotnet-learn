@@ -1,5 +1,5 @@
 // Pure logic of the <Forward> component (no React), so it can be tested with `node --test`.
-const EARLY_IMPLEMENTATIONS = ['m01-l02', 'm01-l03', 'm02-l01'];
+const EARLY_IMPLEMENTATIONS = ['m02-l01'];
 
 const MIN_MODULE = 0;
 const MAX_MODULE = 19;

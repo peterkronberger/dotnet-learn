@@ -1,3 +1,0 @@
-$5
-C:\temp\new
-Backtick: `

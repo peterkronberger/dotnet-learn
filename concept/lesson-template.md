@@ -103,7 +103,7 @@ Syntax: exactly one of these two forms, on its own line with a blank line before
 
 - `concepts`: non-empty list of German display names in single quotes. A name wrapped in backticks is shown as code.
 - `lesson`: a `lesson_id` that exists; the build fails otherwise. `module`: module number from `concept/module-plan.md` (`0`–`19`), used when the target lesson does not exist yet.
-- **Early implementations:** the lessons `m01-l02`, `m01-l03` and `m02-l01` have ids that are not stable (`concept/module-plan.md`, "Existing content"). Never use them as `lesson` target; use `module`.
+- **Early implementations:** the lesson `m02-l01` has an id that is not stable (`concept/module-plan.md`, "Existing content"). Never use them as `lesson` target; use `module`.
 - **Placement:** at the first place in the lesson where the concept appears: normally directly before the runner or code block whose example uses it, or directly after the sentence that names the term.
 - **Concept ledger:** the glossary field `lesson` is the lesson that introduces a term. Terms that are first explained on "Wie dieser Kurs funktioniert" have no `lesson` field.
 - **Code constructs** without a glossary entry (for example `var`, `typeof`, comments `//`) are checked in review: the PR lists, per example file, every construct used and where it is explained (lesson) or marked (`<Forward>`).
