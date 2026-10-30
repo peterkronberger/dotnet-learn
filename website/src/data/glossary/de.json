@@ -553,18 +553,103 @@
       "term": "Cast",
       "german": "explizite Typumwandlung",
       "category": "language",
-      "definition": "Eine ausdrückliche Umwandlung in einen anderen Typ, geschrieben als `(double)a`. Sie wirkt nur auf den Ausdruck direkt dahinter.",
+      "definition": "Eine ausdrückliche Umwandlung in einen anderen Typ, geschrieben als `(int)x`. Sie wirkt nur auf den Ausdruck direkt dahinter. Bei `double` nach `int` werden die Nachkommastellen abgeschnitten, nicht gerundet.",
       "aliases": [
         "Casts",
-        "Typumwandlung"
+        "Typumwandlung",
+        "Cast-Ausdruck"
       ],
       "related": [
-        "operand"
+        "operand",
+        "explicit-conversion",
+        "implicit-conversion"
       ],
-      "lesson": "m01-l03",
+      "lesson": "m01-l07",
       "source": {
-        "title": "Type-testing operators and cast expressions",
-        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/type-testing-and-cast"
+        "title": "C# language specification: Cast expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1298-cast-expressions"
+      }
+    },
+    {
+      "id": "implicit-conversion",
+      "term": "Implicit Conversion",
+      "german": "implizite Umwandlung",
+      "category": "language",
+      "definition": "Eine Umwandlung, die der Compiler ohne Cast ausführt, zum Beispiel `int` nach `long` oder `double`. Bei den Zahlentypen geht dabei kein Wert verloren (nur bei `long` nach `double` kann die Genauigkeit sinken).",
+      "aliases": [
+        "implizite Typumwandlung",
+        "Widening"
+      ],
+      "related": [
+        "explicit-conversion",
+        "cast"
+      ],
+      "lesson": "m01-l07",
+      "source": {
+        "title": "C# language specification: Implicit numeric conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1023-implicit-numeric-conversions"
+      }
+    },
+    {
+      "id": "explicit-conversion",
+      "term": "Explicit Conversion",
+      "german": "explizite Umwandlung",
+      "category": "language",
+      "definition": "Eine Umwandlung, die einen Cast verlangt, weil Information verloren gehen kann, zum Beispiel `double` nach `int` oder `long` nach `int`. Der Compiler lehnt die Zuweisung ohne Cast ab.",
+      "aliases": [
+        "explizite Typumwandlung",
+        "Narrowing"
+      ],
+      "related": [
+        "implicit-conversion",
+        "cast",
+        "overflow"
+      ],
+      "lesson": "m01-l07",
+      "source": {
+        "title": "C# language specification: Explicit numeric conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1032-explicit-numeric-conversions"
+      }
+    },
+    {
+      "id": "overflow",
+      "term": "Overflow",
+      "german": "Überlauf",
+      "category": "language",
+      "definition": "Das Ergebnis einer Ganzzahlrechnung liegt außerhalb des Wertebereichs des Typs. Im Kontext `unchecked` läuft der Wert unbemerkt um, aus `int.MaxValue + 1` wird `-2147483648`.",
+      "aliases": [
+        "Überläufe",
+        "Integer-Überlauf"
+      ],
+      "related": [
+        "checked-context",
+        "explicit-conversion"
+      ],
+      "lesson": "m01-l07",
+      "source": {
+        "title": "C# language specification: The checked and unchecked operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12820-the-checked-and-unchecked-operators"
+      }
+    },
+    {
+      "id": "checked-context",
+      "term": "Checked Context",
+      "german": "geprüfter Kontext",
+      "category": "language",
+      "definition": "Ein Bereich, in dem ein Überlauf bei Ganzzahlen auffällt: zur Laufzeit mit einer `OverflowException`, bei Konstanten schon beim Kompilieren. Er wird mit `checked(…)` eingeschaltet, `unchecked(…)` schaltet ihn aus.",
+      "aliases": [
+        "checked",
+        "unchecked",
+        "Unchecked Context"
+      ],
+      "related": [
+        "overflow",
+        "exception"
+      ],
+      "lesson": "m01-l07",
+      "source": {
+        "title": "C# language specification: The checked and unchecked operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12820-the-checked-and-unchecked-operators"
       }
     },
     {

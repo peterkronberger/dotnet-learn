@@ -1034,6 +1034,207 @@
       "type": "explain",
       "question": "Transferfrage: Wo baut ein Programm Text aus Werten zusammen, etwa in einem Log-Werkzeug?",
       "modelAnswer": "Zum Beispiel bei Logzeilen (Zeitstempel, Ereignis, Benutzer und IP-Adresse zu einer Zeile), bei Meldungen an Benutzer („Benutzer bob hatte 5 Fehlversuche“) und bei Berichten mit Zahlen wie einer Fehlerquote mit einer Nachkommastelle. Überall werden Werte aus Variablen in einen Text eingesetzt, am lesbarsten mit Interpolation."
+    },
+    {
+      "id": "m01-l07-q1",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Welche Zuweisung kompiliert ohne Cast?",
+      "options": [
+        {
+          "text": "`int small = 42; long big = small;`",
+          "correct": true
+        },
+        {
+          "text": "`int whole = 19.99;`",
+          "feedback": "Ein `double` passt nicht in einen `int`, dabei gingen die Nachkommastellen verloren. Hier ist ein Cast nötig."
+        },
+        {
+          "text": "`long bigNumber = 5; int small = bigNumber;`",
+          "feedback": "Ein `long` hat einen größeren Wertebereich als `int`. Der Wert könnte nicht passen, deshalb verlangt der Compiler einen Cast."
+        },
+        {
+          "text": "`decimal price = 19.99;`",
+          "feedback": "Das Literal `19.99` hat den Typ `double`. Für `decimal` braucht es das Suffix `m`, also `19.99m`."
+        }
+      ],
+      "explanation": "Implizit wandelt C# nur, wenn kein Wert verloren gehen kann, zum Beispiel `int` nach `long`. Bei `double` nach `int` und `long` nach `int` ist ein Cast nötig."
+    },
+    {
+      "id": "m01-l07-q2",
+      "lesson": "m01-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m01/l07/quiz-cast.cs",
+      "explanation": "Ein Cast von `double` nach `int` schneidet den Nachkommateil ab, in Richtung null. Aus `2.9` wird `2` und aus `-2.9` wird `-2`."
+    },
+    {
+      "id": "m01-l07-q3",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Welchen Wert hat `(int)3.99`?",
+      "options": [
+        {
+          "text": "`3`",
+          "correct": true
+        },
+        {
+          "text": "`4`",
+          "misconception": "m01-l07-cast-rounds",
+          "feedback": "Der Cast rundet nicht auf. Er schneidet die Nachkommastellen ab."
+        },
+        {
+          "text": "`3.99`",
+          "feedback": "Das Ergebnis ist ein `int` und hat keine Nachkommastellen."
+        },
+        {
+          "text": "Einen Compilerfehler, weil `3.99` kein `int` ist.",
+          "feedback": "Mit dem Cast ist die Umwandlung erlaubt. Ohne Cast wäre es ein Fehler."
+        }
+      ],
+      "explanation": "Beim Cast von `double` nach `int` wird der Nachkommateil abgeschnitten. Aus `3.99` wird `3`. Runden würde `Math.Round` übernehmen."
+    },
+    {
+      "id": "m01-l07-q4",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Ein Programm enthält `int max = int.MaxValue;` und danach `int next = max + 1;`. Es gibt keine `checked`-Angabe und keine besonderen Compileroptionen. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm läuft weiter, `next` ist `-2147483648`.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm bricht mit einem Laufzeitfehler ab.",
+          "misconception": "m01-l07-overflow-always-error",
+          "feedback": "Ohne `checked` bemerkt das Programm den Überlauf nicht. Der Wert läuft still um."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler.",
+          "feedback": "`max` ist eine Variable, kein konstanter Ausdruck. Der Compiler kennt den Wert beim Übersetzen nicht als Konstante."
+        },
+        {
+          "text": "`next` ist `2147483648`, weil C# bei Bedarf einen größeren Typ nimmt.",
+          "feedback": "Ein `int` bleibt ein `int`. Er kann den Wert `2147483648` nicht speichern."
+        }
+      ],
+      "explanation": "Ganzzahlrechnungen mit Variablen sind standardmäßig `unchecked`. Der Wert läuft vom größten `int` zum kleinsten um: `-2147483648`."
+    },
+    {
+      "id": "m01-l07-q5",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Warum lehnt der Compiler `int next = int.MaxValue + 1;` schon beim Kompilieren ab?",
+      "options": [
+        {
+          "text": "Der Ausdruck besteht nur aus Konstanten. Er wird beim Kompilieren ausgewertet, und ein Überlauf ist dort immer ein Fehler.",
+          "correct": true
+        },
+        {
+          "text": "Weil `int.MaxValue` nur gelesen werden darf.",
+          "feedback": "Gelesen werden darf der Wert. Der Fehler entsteht durch den Überlauf der Rechnung."
+        },
+        {
+          "text": "Weil das Programm sonst abstürzen würde.",
+          "feedback": "Der Compiler prüft hier das Ergebnis der Rechnung. Ob ein Programm abstürzen würde, spielt für diesen Fehler keine Rolle."
+        },
+        {
+          "text": "Weil `+` bei `int` nicht erlaubt ist.",
+          "feedback": "`+` mit `int` ist erlaubt. Nur das Ergebnis passt nicht in den Typ."
+        }
+      ],
+      "explanation": "Ein konstanter Ausdruck wird beim Kompilieren ausgewertet und ist immer `checked`. Läuft er über, meldet der Compiler einen Fehler. Bei Variablen ist das erst zur Laufzeit möglich."
+    },
+    {
+      "id": "m01-l07-q6",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Was ändert `checked(max + 1)` gegenüber `max + 1`, wenn `max` den Wert `int.MaxValue` hat?",
+      "options": [
+        {
+          "text": "Der Überlauf wird bemerkt: Das Programm bricht mit einem Laufzeitfehler ab, statt den Wert umlaufen zu lassen.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis ist ein `long` und passt deshalb.",
+          "feedback": "`checked` ändert den Typ nicht. Es ändert nur, was bei einem Überlauf geschieht."
+        },
+        {
+          "text": "Das Ergebnis wird auf `int.MaxValue` begrenzt.",
+          "feedback": "Es wird nichts begrenzt. Ein Überlauf wird gemeldet."
+        },
+        {
+          "text": "Nichts, `checked` ist nur ein Hinweis für Leser.",
+          "feedback": "`checked` verändert das Verhalten des Programms."
+        }
+      ],
+      "explanation": "In einem `checked`-Kontext wird ein Überlauf zur Laufzeit gemeldet. Das Programm endet dann mit einem Laufzeitfehler."
+    },
+    {
+      "id": "m01-l07-q7",
+      "lesson": "m01-l07",
+      "type": "single",
+      "question": "Wie rundest du `double share = 35.714;` auf die nächste ganze Zahl und speicherst sie in einem `int`?",
+      "options": [
+        {
+          "text": "`int whole = (int)Math.Round(share);`",
+          "correct": true
+        },
+        {
+          "text": "`int whole = (int)share;`",
+          "misconception": "m01-l07-cast-rounds",
+          "feedback": "Der Cast allein schneidet ab. Das Ergebnis wäre `35`, nicht gerundet."
+        },
+        {
+          "text": "`int whole = Math.Round(share);`",
+          "feedback": "`Math.Round` liefert hier einen `double`. Ein `double` braucht für einen `int` einen Cast."
+        },
+        {
+          "text": "`int whole = share;`",
+          "feedback": "Ohne Cast lehnt der Compiler die Zuweisung ab."
+        }
+      ],
+      "explanation": "`Math.Round(share)` liefert `36.0` als `double`. Der Cast `(int)` wandelt das in den `int` `36`."
+    },
+    {
+      "id": "m01-l07-q8",
+      "lesson": "m01-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über `long big = 3000000000;` und `int small = (int)big;` ohne `checked` sind richtig?",
+      "options": [
+        {
+          "text": "Der Cast ist nötig, weil ein `long` nicht implizit nach `int` umgewandelt wird.",
+          "correct": true
+        },
+        {
+          "text": "`small` hat nicht den Wert `3000000000`, weil er nicht in einen `int` passt.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm bricht an dieser Stelle immer ab.",
+          "misconception": "m01-l07-overflow-always-error",
+          "feedback": "Ohne `checked` läuft der Wert still um. Das Programm läuft weiter."
+        },
+        {
+          "text": "`small` ist der auf `int.MaxValue` begrenzte Wert.",
+          "feedback": "Es wird nicht begrenzt. Die oberen Bits werden abgeschnitten."
+        }
+      ],
+      "explanation": "Der Cast von `long` nach `int` ist nötig und ohne `checked` erlaubt. Der Wert passt nicht, deshalb läuft er um (`-1294967296`), ohne dass das Programm es meldet."
+    },
+    {
+      "id": "m01-l07-q9",
+      "lesson": "m01-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wann C# eine Zahl ohne Cast umwandelt und wann ein Cast nötig ist. Was kann bei einem Cast passieren?",
+      "modelAnswer": "C# wandelt implizit um, wenn kein Wert verloren gehen kann, zum Beispiel von `int` nach `long` oder `double`. Wenn Information verloren gehen kann, etwa von `double` nach `int` oder von `long` nach `int`, verlangt der Compiler einen Cast. Das zeigt, dass du den Verlust bewusst in Kauf nimmst.\n\nBei `double` nach `int` werden die Nachkommastellen abgeschnitten, nicht gerundet. Passt ein Wert nicht in den Zieltyp, läuft er über. Ohne `checked` läuft er still um, mit `checked` meldet das Programm den Überlauf zur Laufzeit."
+    },
+    {
+      "id": "m01-l07-q10",
+      "lesson": "m01-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo kann ein Zähler in einem echten Programm sehr groß werden, und was würde ein Überlauf dort bedeuten?",
+      "modelAnswer": "Zum Beispiel ein Zähler für alle Zugriffe auf einen Server, für gesendete Bytes oder für Ereignisse in einem Log, der über Jahre läuft. Läuft ein `int` darüber, wird der Zähler plötzlich negativ oder klein. Statistiken und Alarmgrenzen stimmen dann nicht mehr, ohne dass jemand einen Fehler sieht. Ein größerer Typ wie `long` oder ein `checked`-Kontext vermeidet das."
     }
   ]
 }
