@@ -15,7 +15,7 @@ This document is binding for all work in the repo – for humans and for Claude 
 | `website/plugins/` | Local Docusaurus plugins (`lesson-index.js`) |
 | `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded by iframe |
 | `tools/` | `check-examples.sh` (S2), `check-quiz.mjs` (quiz data, links and wording) |
-| `concept/` | Learning concept (imported below) |
+| `concept/` | Learning concept and module digest (read on demand, see below) |
 | `.claude/rules/` | Path-scoped rules for lessons, examples and the playground |
 | `.github/workflows/` | `pages.yml` (build + deploy), `examples.yml` (example check), `claude-*.yml` (issue automation) |
 
@@ -95,6 +95,30 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 - Pull requests (title and description) and commit messages are written in English.
 - Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
+## Context budget (module work)
+
+The repo grows with every module. Work on module N (architect, lesson issue, module review) loads only what module N needs. Earlier modules are known through `concept/module-digest.md`, not through their files.
+
+Allowed for every role:
+
+- `CLAUDE.md`, the concept files that the "Concept" table names for the task, and `.claude/rules/*`.
+- `concept/module-plan.md`: only the section `### M<N>` (search it) and the rows of "Reference", "Deliberately not covered" and "Open questions" that name module N. Not the sections of other modules.
+- `concept/project-seclog.md`: the general rules and the milestone rows of module N-1 and N only.
+- `concept/module-digest.md` (whole file).
+- All files of module N itself (lessons, examples, its quiz file `de/<prefix>NN.json`).
+- Targeted lookups in shared or earlier files: `grep` for one id, term or path (for example a glossary id, a quiz id, a `"lesson": "mXX-` field). Read only the lines found.
+- One file of an earlier module only when the digest or the issue names it, for example the previous SecLog solution file for the continuity rule.
+
+Not allowed:
+
+- Reading lessons, examples or quiz files of earlier modules in full, or "for orientation".
+- Reading `website/src/data/glossary/de.json` or `concept/module-plan.md` in full.
+- Copying text of earlier modules into issues. Issues name ids and paths instead.
+
+If the digest is missing something that module N needs, look it up with a targeted search and add it to the digest in the module review of module N (or say so in the PR).
+
+Not limited: tasks that are not module work (tools, components, playground, workflows, the half-yearly review). A fix in an earlier module treats that module as module N. Running the checks (`bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `npm run build`) is always allowed.
+
 ## Concept (binding, read on demand)
 
 The files below are binding but are **not** imported, to save tokens. Read a file with the Read tool before you work in its area. For lessons, `.claude/rules/lessons.md` already lists the key rules.
@@ -103,6 +127,7 @@ The files below are binding but are **not** imported, to save tokens. Read a fil
 | --- | --- |
 | `concept/lesson-template.md` | write or review a lesson (flow, practice-example pattern, `<Forward>`, project step frame) |
 | `concept/module-plan.md` | write, split or review a module (lesson proposals, spec clauses, badges). It is large: search it for your module (`### M<N>`) instead of reading it all |
+| `concept/module-digest.md` | start work on a module (what earlier modules taught, SecLog end state); a module review adds its section |
 | `concept/project-seclog.md` | add a project step or quiz/example data (continuity rule, milestones, sample data) |
 | `concept/sources.md` | verify facts, cite sources, write the PR "Verification" table, or touch the wording check |
 | `concept/style-and-language.md` | write German text, code style or accessibility-relevant UI |

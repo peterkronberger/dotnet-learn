@@ -2,6 +2,8 @@
 
 As of 2026-10-25. Input: **only the module number** (`0`–`19`, or `W1`–`W4` for a review module). Everything else is derived from `concept/module-plan.md` and the rule files. This file only says *where* each value comes from and *which* issues to create; it does not repeat the rules.
 
+Load only the context allowed by `CLAUDE.md`, "Context budget (module work)".
+
 ## 1. Start (human)
 
 Create one issue and set the label `claude:auto-architect`:
@@ -30,11 +32,12 @@ The architect (`claude-architect.yml`) does the rest: it derives the content (se
 | ▶ / ◻ | Marker in the heading; a marker on a single line wins. |
 | Spec, library, badges, misconceptions | The `Spec`, `Library`, `Badge` and `misconceptions` lines of the section. Each item goes to exactly one lesson. Misconception id = `<lesson_id>-<English kebab-slug>`. |
 | Sources | Spec items: clause of the draft or feature specification ("Reference" in `module-plan.md`); library items: Microsoft Learn. Only pages that were opened; visible citation per `concept/sources.md`. |
-| Application context | The milestone row of this module in `concept/project-seclog.md`. |
+| Application context | The milestone row of this module in `concept/project-seclog.md`, and the SecLog end state in `concept/module-digest.md`. |
 | Out of scope | Rows of "Deliberately not covered" that name this module or its topics. |
 | Blockers | Lines of "Open questions" that name this module; components the lessons need that are "planned" in `components.md`; for ◻ the CI project in `website/examples/_ci/` named in the section. |
 | Example, quiz, glossary files | Paths from `CLAUDE.md` ("Repo structure", "Example folders") and `.claude/rules/*.md`: `website/examples/<prefix>NN/lYY/`, `website/src/data/quiz/de/<prefix>NN.json`, `website/src/data/glossary/de.json`. Example file names are chosen by the implementer (`.claude/rules/examples.md`). |
-| Warm-up questions | Quiz ids of earlier lessons (`website/src/data/quiz/de/*.json`). |
+| Warm-up questions | Quiz ids of earlier lessons: the lessons of `concept/module-digest.md` and of this module; find ids with `grep '"id": "<lesson_id>-q' website/src/data/quiz/de/*.json`. |
+| Taught so far / forward references | `concept/module-digest.md` (constructs, glossary ids, open forward references that target this module) plus the earlier lessons of this module. |
 | Lesson structure, DoD | `concept/lesson-template.md`, `CLAUDE.md` (Definition of Done, rules 1–11). Not copied into issues – referenced. |
 
 ## 2a. Existing content of the module
@@ -54,7 +57,7 @@ Order and chain (one PR per issue; every issue that changes a file another issue
 2. **CI project issue** – only for ◻ lessons whose CI project does not exist yet. Changes to `.github/workflows/` go to "What a human must do".
 3. **Scaffold issue**: remove the early implementation of the module (lesson files, `website/examples/<prefix>NN/`, the questions in `de/<prefix>NN.json`) and fix every reference to it (find them with a search for the old ids and paths, for example `website/plugins/search-index.test.js`, `README.md`, the `lesson` field in `de.json`); then `_category_.json`, empty quiz file, import in `website/src/data/quiz/index.js`, example folder. Glossary entries stay until the lesson that introduces the term rewrites them.
 4. **One lesson issue per lesson**, in sidebar order, each depending on the one before (the first on the scaffold).
-5. **Module review issue**: every spec item and misconception is taught in its lesson; no file of the early implementation is left; glossary entries that no new lesson introduces or links are removed or fixed; 8–12 questions marked as placement test candidates; `module-plan.md` updated (answered open questions removed).
+5. **Module review issue**: every spec item and misconception is taught in its lesson; no file of the early implementation is left; glossary entries that no new lesson introduces or links are removed or fixed; 8–12 questions marked as placement test candidates; `module-plan.md` updated (answered open questions removed); write the section `## M<N>` (or `## W<N>`) of `concept/module-digest.md` in the format of that file; remove open forward references of earlier modules that this module now teaches.
 
 Do not start a second module while one is in progress (shared `de.json`).
 
@@ -63,7 +66,7 @@ Do not start a second module while one is in progress (shared `de.json`).
 Use the sections that `claude-architect.yml` requires. Fill them only with values from section 2:
 
 - **Part of** `#<module issue>` · **Goal**: `lesson_id`, German title, core concept in one sentence.
-- **Context**: ▶/◻; 2–4 learning goals ("Du kannst …"); the spec and library items of this lesson with their sources; badges; misconceptions with their ids; warm-up quiz ids; project step: start state (path of the previous solution file) and the new requirement, from the milestone row; for the first lesson of a module also the text of the module box; constructs the examples may use (taught so far) and planned forward references with their target module; topics that belong to other lessons or are out of scope.
+- **Context**: ▶/◻; 2–4 learning goals ("Du kannst …"); the spec and library items of this lesson with their sources; badges; misconceptions with their ids; warm-up quiz ids; project step: start state (path of the previous solution file) and the new requirement, from the milestone row; for the first lesson of a module also the text of the module box; constructs the examples may use (taught so far: from `concept/module-digest.md` and the earlier lessons of this module; the issue names ids and paths, not copied text) and planned forward references with their target module; topics that belong to other lessons or are out of scope.
 - **Affected files**: lesson file, example folder, quiz file, `de.json` (paths from section 2).
 - **Interfaces**: front matter (`lesson_id`, `sidebar_position`, `duration_min`), quiz ids `<lesson_id>-q<n>`, misconception ids, new glossary ids.
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–10."
@@ -73,6 +76,6 @@ Use the sections that `claude-architect.yml` requires. Fill them only with value
 
 ## 5. Stop and ask (status `needs_human`)
 
-- The module section is missing or the previous module is not done.
+- The module section is missing or the previous module is not done (it has no section in `concept/module-digest.md`). Before the first rebuilt module review, M2 is the next module to rebuild and its previous module M1 has a digest section.
 - An open question or a "planned" component blocks a lesson and no decision issue can solve it.
 - Review modules: the open decision on which DoD points apply ("Location and naming" in `module-plan.md`) is not made yet.
