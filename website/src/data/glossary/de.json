@@ -153,14 +153,19 @@
       "term": "Integer Division",
       "german": "Ganzzahldivision",
       "category": "language",
-      "definition": "Teilst du zwei ganze Zahlen, ist auch das Ergebnis eine ganze Zahl. Der Nachkommateil entfällt: `7 / 2` ergibt `3`.",
+      "definition": "Teilst du zwei ganze Zahlen, ist das Ergebnis wieder eine ganze Zahl. Der Nachkommateil wird abgeschnitten, nicht gerundet: `7 / 2` ergibt `3` und `-7 / 2` ergibt `-3`.",
       "aliases": [
         "Ganzzahldivisionen"
       ],
+      "related": [
+        "integral-type",
+        "operand",
+        "numeric-promotion"
+      ],
       "lesson": "m01-l03",
       "source": {
-        "title": "Arithmetic operators",
-        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators"
+        "title": "C# language specification: Division operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12133-division-operator"
       }
     },
     {
@@ -297,7 +302,7 @@
       "term": "Integral Type",
       "german": "Ganzzahltyp",
       "category": "language",
-      "definition": "Ein Typ für ganze Zahlen ohne Nachkommateil, zum Beispiel `int`. Teilst du zwei Ganzzahlen, ist das Ergebnis wieder eine Ganzzahl.",
+      "definition": "Ein Typ für ganze Zahlen ohne Nachkommateil mit festem Wertebereich, zum Beispiel `int` (32 Bit) und `long` (64 Bit). Das Ergebnis einer Division zweier Ganzzahlen ist wieder eine Ganzzahl.",
       "aliases": [
         "Ganzzahltypen"
       ],
@@ -315,15 +320,14 @@
       "term": "Floating-Point Type",
       "german": "Gleitkommatyp",
       "category": "language",
-      "definition": "Ein Typ für Zahlen mit Nachkommateil. `double` speichert binär und ist für Messwerte gedacht, `decimal` genauer für Geldbeträge.",
+      "definition": "Ein Typ für Zahlen mit Nachkommateil. `double` speichert binär mit 15–16 Stellen Genauigkeit und eignet sich für Messwerte und Verhältnisse. Auch `float` gehört dazu.",
       "aliases": [
-        "double",
-        "decimal",
-        "Gleitkommazahl",
-        "Gleitkommazahlen"
+        "float"
       ],
       "related": [
         "round-off-error",
+        "decimal-type",
+        "nan",
         "literal"
       ],
       "lesson": "m01-l03",
@@ -411,17 +415,73 @@
       "id": "operand",
       "term": "Operand",
       "category": "language",
-      "definition": "Ein Wert, mit dem ein Operator rechnet. In `7 / 2` sind `7` und `2` die Operanden. Sind beide `int`, ist auch das Ergebnis ein `int`.",
+      "definition": "Ein Wert, mit dem ein Operator rechnet. In `7 / 2` sind `7` und `2` die Operanden. Die Typen der Operanden bestimmen, wie gerechnet wird.",
       "aliases": [
         "Operanden"
       ],
       "related": [
-        "integer-division"
+        "integer-division",
+        "numeric-promotion"
       ],
       "lesson": "m01-l03",
       "source": {
         "title": "Arithmetic operators",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators"
+      }
+    },
+    {
+      "id": "decimal-type",
+      "term": "decimal",
+      "category": "language",
+      "definition": "Ein 128-Bit-Typ für exakte Dezimalbrüche mit mindestens 28 Stellen. `0.1m` ist genau ein Zehntel. Er eignet sich für Geldbeträge. Das Literal braucht das Suffix `m`.",
+      "aliases": [
+        "decimal"
+      ],
+      "related": [
+        "floating-point-type",
+        "round-off-error"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "C# language specification: The Decimal type",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#838-the-decimal-type"
+      }
+    },
+    {
+      "id": "numeric-promotion",
+      "term": "Numeric Promotion",
+      "german": "numerische Anhebung",
+      "category": "language",
+      "definition": "Haben die Operanden einer Rechnung verschiedene Zahlentypen, wandelt C# den kleineren Typ automatisch in den größeren um. Bei `int` und `double` wird mit `double` gerechnet.",
+      "aliases": [
+        "Binary Numeric Promotion"
+      ],
+      "related": [
+        "operand",
+        "integer-division"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "C# language specification: Binary numeric promotions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12473-binary-numeric-promotions"
+      }
+    },
+    {
+      "id": "nan",
+      "term": "NaN",
+      "german": "keine Zahl",
+      "category": "language",
+      "definition": "Ein besonderer `double`-Wert für ein ungültiges Ergebnis, zum Beispiel `0.0 / 0`. Er steht für Not a Number. Eine Rechnung mit NaN ergibt wieder NaN.",
+      "aliases": [
+        "Not a Number"
+      ],
+      "related": [
+        "floating-point-type"
+      ],
+      "lesson": "m01-l03",
+      "source": {
+        "title": "C# language specification: Floating-point types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#837-floating-point-types"
       }
     },
     {
@@ -448,7 +508,7 @@
       "term": "Round-off Error",
       "german": "Rundungsfehler",
       "category": "language",
-      "definition": "Ein `double` kann viele Dezimalbrüche nur ungefähr speichern. Deshalb ist `0.1 + 0.2 == 0.3` mit `double` `False`.",
+      "definition": "Ein `double` kann viele Dezimalbrüche nur ungefähr speichern. Deshalb ergibt `0.1 + 0.2` mit `double` nicht genau `0.3`. Mit `decimal` ist die Rechnung exakt.",
       "aliases": [
         "Rundungsfehler"
       ],
