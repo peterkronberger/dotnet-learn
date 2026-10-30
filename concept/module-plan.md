@@ -21,7 +21,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 
 ## Existing content: early implementations
 
-M0 and the page "Wie dieser Kurs funktioniert" are rebuilt (module review 2026-10-25); no early M0 file is left. The M1 early files are removed (the module is an empty skeleton until the new lessons are added). The only lesson that still exists from the early implementation – M2 `l01-control-flow.mdx` – is an early implementation (MVP). They do not follow the current rules. Every module, including M1 and M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a).
+M0 (module review 2026-10-25), M1 (module review 2026-10-30) and the page "Wie dieser Kurs funktioniert" are rebuilt; no early M0 or M1 file is left. The only lesson that still exists from the early implementation – M2 `l01-control-flow.mdx` – is an early implementation (MVP). They do not follow the current rules. Every module, including M1 and M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a).
 
 ## Reference: which source counts as "the specification"
 
@@ -100,7 +100,17 @@ Expected misconceptions: `=` as comparison; integer division rounds; `"3" + 4` g
   - Implicitly typed local variables: the type is fixed at compile time (no dynamic typing).
 - **Library (not spec):** `Console` output and input, `int.Parse` vs. `TryParse` (TryParse needs `out` – forward reference to M3, use it as a recipe here), `Math`, composite formatting and format strings; culture dependency of formatting and parsing (playground: `InvariantGlobalization`).
 - More misconceptions: postfix increment returns the new value; `var` makes a variable dynamic; a cast rounds instead of truncating.
-- **Dependency:** console input uses the `stdin` parameter of `<CSharpRunner>` (available, see `components.md`) and an `<name>.in.txt` file next to the example.
+- **Dependency:** console input uses the `stdin` parameter of `<CSharpRunner>` (see `components.md`) and an `<name>.in.txt` file next to the example (used in `m01-l09`).
+- **Placement test candidates** (module review 2026-10-30; same rules as M0):
+  - `m01-l01-q1`, `m01-l01-q3`
+  - `m01-l02-q3`
+  - `m01-l03-q1`
+  - `m01-l04-q2`
+  - `m01-l05-q3`
+  - `m01-l06-q3`
+  - `m01-l07-q3`
+  - `m01-l08-q1`
+  - `m01-l09-q1`
 
 ### M2 Kontrollfluss (control flow) ▶
 `if`/`else`, comparison and logic operators · `switch` expressions and simple patterns · `while`/`do` · `for`/`foreach` · `break`/`continue`.
