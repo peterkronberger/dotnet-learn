@@ -1434,6 +1434,46 @@
         "title": "Implicitly typed local variable declarations (C# language specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13622-implicitly-typed-local-variable-declarations"
       }
+    },
+    {
+      "id": "parsing",
+      "term": "Parsing",
+      "german": "Text in einen Wert umwandeln",
+      "category": "platform",
+      "definition": "Das Umwandeln von Text in einen Wert eines anderen Typs, zum Beispiel von `\"42\"` in den `int` `42`. `int.Parse` beendet das Programm bei ungültigem Text, `int.TryParse` meldet den Misserfolg mit `false`.",
+      "aliases": [
+        "Parse",
+        "TryParse",
+        "parsen"
+      ],
+      "related": [
+        "culture",
+        "runtime-error"
+      ],
+      "lesson": "m01-l08",
+      "source": {
+        "title": "Parsing numeric strings in .NET",
+        "url": "https://learn.microsoft.com/dotnet/standard/base-types/parsing-numeric"
+      }
+    },
+    {
+      "id": "culture",
+      "term": "Culture",
+      "german": "Kultur",
+      "category": "platform",
+      "definition": "Die Regeln einer Sprache und Region für Zahlen, Datum und Text, zum Beispiel das Dezimaltrennzeichen. Parsen und Formatieren können davon abhängen.",
+      "aliases": [
+        "Kulturen",
+        "CultureInfo"
+      ],
+      "related": [
+        "parsing"
+      ],
+      "lesson": "m01-l06",
+      "source": {
+        "title": "CultureInfo class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo"
+      }
     }
   ]
 }

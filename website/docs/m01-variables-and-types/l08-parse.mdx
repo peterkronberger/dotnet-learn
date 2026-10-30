@@ -1,0 +1,210 @@
+---
+title: "Text in Zahlen umwandeln: Parse und TryParse"
+sidebar_position: 8
+description: "Eine Zahl als Text ist noch keine Zahl. int.Parse wandelt gültigen Text um und beendet das Programm bei ungültigem Text, int.TryParse meldet mit true oder false, ob es geklappt hat."
+lesson_id: m01-l08
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import parseBasics from '!!raw-loader!@site/examples/m01/l08/parse-basics.cs';
+import parseBasicsOutput from '!!raw-loader!@site/examples/m01/l08/parse-basics.out.txt';
+import parseAccepts from '!!raw-loader!@site/examples/m01/l08/parse-accepts.cs';
+import parseAcceptsOutput from '!!raw-loader!@site/examples/m01/l08/parse-accepts.out.txt';
+import parseFails from '!!raw-loader!@site/examples/m01/l08/parse-fails.snippet.cs';
+import tryParse from '!!raw-loader!@site/examples/m01/l08/tryparse.cs';
+import tryParseOutput from '!!raw-loader!@site/examples/m01/l08/tryparse.out.txt';
+import parseGaps from '!!raw-loader!@site/examples/m01/l08/parse-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l08/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l08/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l08/seclog-event-solution.cs';
+
+# Text in Zahlen umwandeln: Parse und TryParse
+
+:::note[Lernziele]
+- Du wandelst Text mit `int.Parse` und `double.Parse` in Zahlen um und rechnest damit.
+- Du sagst voraus, welche Texte `int.Parse` annimmt und bei welchen das Programm mit einem Laufzeitfehler endet (zum Beispiel `"3.5"`, `" 42 "`, `"sieben"`).
+- Du verwendest `int.TryParse` nach Rezept und liest am Rückgabewert ab, ob die Umwandlung geklappt hat.
+- Du erklärst, warum das Ergebnis des Parsens von der Kultur abhängen kann.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l06-q1" />
+
+<Quiz id="m01-l07-q3" />
+
+<Quiz id="m01-l07-q4" />
+
+## Eine Zahl als Text ist noch keine Zahl
+
+In der Lektion über Texte hast du gesehen, dass `"3" + 4` den Text `"34"` ergibt. Der Text `"3"` besteht aus dem Zeichen `3`, nicht aus der Zahl drei. Programme bekommen Zahlen oft als Text, zum Beispiel aus einer Datei, einem Formular oder einer Logzeile. Vor dem Rechnen muss der Text in eine Zahl umgewandelt werden.
+
+Diese Umwandlung heißt <Term id="parsing">Parsen (Parsing)</Term>. Für `int` und `double` gibt es dafür die Methoden `int.Parse` und `double.Parse`. Du übergibst den Text und bekommst die Zahl zurück ([Int32.Parse](https://learn.microsoft.com/dotnet/api/system.int32.parse)).
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus? Vergleiche die erste und die zweite Zeile.
+:::
+
+<CSharpRunner id="m01-l08-basics" code={parseBasics} predict expected={parseBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `34`, `7` und `39.98`.
+
+1. **Text verketten:** `text + 4` hängt das Zeichen `4` an den Text `"3"` an: `34`.
+2. **Text umwandeln:** `int.Parse(text)` liefert die Zahl `3`. Dann addiert `+` zwei Zahlen: `7`.
+3. **Mit Dezimalzahl:** `double.Parse("19.99")` liefert den `double` `19.99`. Mal zwei ergibt `39.98`.
+
+</details>
+
+## Welche Texte gültig sind
+
+`int.Parse` nimmt nur Text an, der eine ganze Zahl darstellt: Ziffern mit einem optionalen Vorzeichen. Leerzeichen davor und danach sind erlaubt. Alles andere ist ungültig, auch ein Dezimalpunkt.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Achte auf das Leerzeichen in der dritten Zeile und das `+` in der vierten.
+:::
+
+<CSharpRunner id="m01-l08-accepts" code={parseAccepts} predict expected={parseAcceptsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `42`, `-7`, `42` und `5`.
+
+1. **Nur Ziffern:** `"42"` ist gültig.
+2. **Vorzeichen:** `"-7"` und `"+5"` sind gültig. Ein `+` verändert den Wert nicht.
+3. **Leerzeichen:** `" 42 "` ist gültig. Leerzeichen am Anfang und am Ende werden ignoriert.
+
+Was passiert, wenn du in einer Zeile `"3.5"` oder `"sieben"` einsetzt? Probiere es im Runner aus: Das Programm endet an dieser Zeile mit einem <Term id="runtime-error">Laufzeitfehler</Term>. Die Zeilen davor sind schon ausgeführt. Genau das zeigt dieser Code:
+
+<CodeBlock language="csharp" title="parse-fails.snippet.cs">{parseFails}</CodeBlock>
+
+Das Programm gibt `Before` aus und endet dann mit einer `FormatException`. `After` erscheint nicht mehr.
+
+<Forward concepts={['Exceptions (Ausnahmen)']} module="7" />
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m01-l08-parse-accepts-decimals" />
+
+**„`int.Parse("3.5")` gibt `3` oder `4`.“** Weder noch: Der Text ist für `int.Parse` ungültig, und das Programm endet mit einem Laufzeitfehler. `int.Parse` schneidet nicht ab und rundet nicht. Willst du `3.5` als Zahl lesen, brauchst du `double.Parse("3.5")`. Danach kannst du mit einem Cast oder mit `Math.Round` weiterarbeiten.
+:::
+
+## TryParse: Das Ergebnis prüfen statt abzustürzen
+
+Kommt der Text von außen, kann er ungültig sein. `int.TryParse` wandelt ebenfalls um, beendet das Programm aber nicht. Die Methode gibt einen `bool` zurück: `true`, wenn die Umwandlung geklappt hat, sonst `false`. Die Zahl liefert sie über ein zweites Argument ([Int32.TryParse](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)).
+
+<Forward concepts={['`out`-Parameter']} module="3" />
+
+Nimm das Rezept `int.TryParse(text, out int number)` zunächst so hin: Danach gibt es eine neue Variable `number`. Bei `true` enthält sie die Zahl, bei `false` den Wert `0`. Wie ein Programm auf `false` reagiert, zeigt Modul 2 mit `if`. Hier gibst du beide Werte nur aus.
+
+:::info[Vorhersage]
+Welche sechs Zeilen gibt das Programm aus? Je Text: erst der `bool`, dann die Zahl.
+:::
+
+<CSharpRunner id="m01-l08-tryparse" code={tryParse} predict expected={tryParseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind sechs Zeilen: `True`, `42`, `False`, `0`, `False` und `0`.
+
+1. **Gültiger Text:** `"42"` klappt. Der `bool` ist `True`, `good` ist `42`.
+2. **Dezimalpunkt:** `"3.5"` ist für `int` ungültig. Der `bool` ist `False`, `decimalNumber` ist `0`.
+3. **Wort:** `"seven"` ist ungültig. Wieder `False` und `0`.
+
+Das Programm läuft in allen drei Fällen bis zum Ende weiter. Eine `0` allein sagt nicht, ob der Text `"0"` oder ein ungültiger Text war. Das erkennst du nur am `bool`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m01-l08-tryparse-keeps-old-value" />
+
+**„Nach einem fehlgeschlagenen `TryParse` behält die Variable ihren alten Wert.“** Bei `false` ist die Zahl immer `0`. Verlass dich nicht auf einen früheren Wert, sondern lies zuerst den `bool`.
+:::
+
+## Die Kultur beeinflusst das Ergebnis
+
+Wie eine Zahl als Text aussieht, hängt von der <Term id="culture">Kultur (Culture)</Term> ab: Manche Kulturen schreiben `3,5` statt `3.5`. `double.Parse` verwendet standardmäßig die Regeln der aktuellen Kultur. Derselbe Text kann also in einer Umgebung eine Zahl ergeben und in einer anderen ungültig sein oder etwas anderes bedeuten. Dieser Kurs zeigt keine kulturabhängigen Ergebnisse: Playground und Prüfung laufen kulturunabhängig (`InvariantGlobalization`), dort ist nur der Punkt das Dezimaltrennzeichen.
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze in den drei Zeilen mit `0` und `true` den Wert so, dass die Ausgabe `24`, `5` und `False` lautet.
+
+<CSharpRunner id="m01-l08-gaps" code={parseGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ganze Zahl:** `int count = int.Parse("12");` ergibt `12`, mal zwei `24`.
+2. **Dezimalzahl:** `double rate = double.Parse("2.5");` ergibt `2.5`, mal zwei `5`.
+3. **Prüfen:** `bool worked = int.TryParse("twelve", out int ignored);` ergibt `False`, weil ein Wort keine Zahl ist.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, das erste Ereignis, Benutzer, IP-Adresse und Ereignistyp, die Fehlerquote, Bobs fehlgeschlagene Anmeldungen und seinen Anteil, das Ereignis als Logzeile, die Fehlerquote mit einer Nachkommastelle und den Anteil erfolgreicher Anmeldungen als ganze Prozentzahl.
+
+**Neue Anforderung:** Die Zahl der fehlgeschlagenen Anmeldungen kommt als Text, als stünde sie in einem Bericht: `string failedText = "7";`. Wandle sie mit `int.Parse` um und berechne damit die Fehlerquote (`Failure rate from text (%): 50`). Prüfe außerdem den Text `"seven"` mit `int.TryParse` und gib aus, ob es geklappt hat und welche Zahl herauskam (`Second text worked: False`, `Second text number: 0`). Die bisherigen 20 Zeilen bleiben, die neuen kommen am Ende dazu.
+
+<CSharpRunner id="m01-l08-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Text umwandeln:** `int.Parse(failedText)` macht aus `"7"` die Zahl `7`.
+2. **Quote berechnen:** `failedFromText * 100.0 / events` rechnet mit `double` und ergibt `50`.
+3. **Zweiten Text prüfen:** `int.TryParse(badText, out int badNumber)` liefert `false`, weil `"seven"` ein Wort ist.
+4. **Beides ausgeben:** `parsed` ist `False`, `badNumber` ist `0`.
+
+</details>
+
+**Neuer Stand:** SecLog liest die Zahl der fehlgeschlagenen Anmeldungen aus einem Text und prüft einen zweiten Text, ohne abzustürzen.
+
+<details>
+<summary>Vertiefung: Was Parse sonst noch annimmt (optional)</summary>
+
+`int.Parse(string)` verwendet den Stil `NumberStyles.Integer`: Ziffern, ein führendes Vorzeichen sowie Leerzeichen davor und danach ([Int32.Parse](https://learn.microsoft.com/dotnet/api/system.int32.parse)). Ist der Text leer, ist er `null` oder passt die Zahl nicht in den Bereich eines `int`, scheitert `Parse` ebenfalls. `TryParse` meldet in allen diesen Fällen `false`. Mit weiteren Überladungen lassen sich Tausendertrennzeichen oder eine bestimmte Kultur festlegen.
+
+</details>
+
+## Zusammenfassung
+
+Ein Text wie `"3"` ist keine Zahl. `int.Parse` und `double.Parse` wandeln gültigen Text um. Für `int` sind Ziffern mit optionalem Vorzeichen und Leerzeichen davor und danach gültig, ein Dezimalpunkt nicht. Bei ungültigem Text endet das Programm mit einem Laufzeitfehler. `int.TryParse` gibt stattdessen `false` zurück und setzt die Zahl auf `0`. Das Ergebnis des Parsens kann von der Kultur abhängen, etwa beim Dezimaltrennzeichen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l08-q1" />
+
+<Quiz id="m01-l08-q2" />
+
+<Quiz id="m01-l08-q3" />
+
+<Quiz id="m01-l08-q4" />
+
+<Quiz id="m01-l08-q5" />
+
+<Quiz id="m01-l08-q6" />
+
+<Quiz id="m01-l08-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l08-q8" />
+
+### Transferfrage
+
+<Quiz id="m01-l08-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Int32.Parse](https://learn.microsoft.com/dotnet/api/system.int32.parse)
+- Microsoft Learn: [Int32.TryParse](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)
+- Microsoft Learn: [Parsing numeric strings in .NET](https://learn.microsoft.com/dotnet/standard/base-types/parsing-numeric)
