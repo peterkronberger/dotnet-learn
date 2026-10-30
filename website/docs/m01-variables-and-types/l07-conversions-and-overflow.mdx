@@ -1,0 +1,227 @@
+---
+title: Explizite Umwandlungen und Überlauf
+sidebar_position: 7
+description: "C# wandelt Zahlen nur dann ohne Cast um, wenn nichts verloren geht. Ein Cast schneidet Nachkommastellen ab, und ein Überlauf läuft unbemerkt um – außer im checked-Kontext."
+lesson_id: m01-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import widening from '!!raw-loader!@site/examples/m01/l07/widening.cs';
+import wideningOutput from '!!raw-loader!@site/examples/m01/l07/widening.out.txt';
+import narrowing from '!!raw-loader!@site/examples/m01/l07/narrowing.snippet.cs';
+import castTruncate from '!!raw-loader!@site/examples/m01/l07/cast-truncate.cs';
+import castTruncateOutput from '!!raw-loader!@site/examples/m01/l07/cast-truncate.out.txt';
+import overflowUnchecked from '!!raw-loader!@site/examples/m01/l07/overflow-unchecked.cs';
+import overflowUncheckedOutput from '!!raw-loader!@site/examples/m01/l07/overflow-unchecked.out.txt';
+import checkedOverflow from '!!raw-loader!@site/examples/m01/l07/checked-overflow.snippet.cs';
+import constantOverflow from '!!raw-loader!@site/examples/m01/l07/constant-overflow.snippet.cs';
+import conversionsGaps from '!!raw-loader!@site/examples/m01/l07/conversions-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l07/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l07/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l07/seclog-event-solution.cs';
+
+# Explizite Umwandlungen und Überlauf
+
+:::note[Lernziele]
+- Du entscheidest, ob eine Zuweisung zwischen zwei Zahlentypen ohne Cast kompiliert.
+- Du sagst das Ergebnis eines Casts von `double` nach `int` voraus (abschneiden, nicht runden) und rundest bei Bedarf mit `Math.Round`.
+- Du sagst voraus, was bei `int.MaxValue + 1` ohne und mit `checked` passiert.
+- Du erklärst, warum ein konstanter Ausdruck, der überläuft, schon beim Kompilieren abgelehnt wird.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l03-q1" />
+
+<Quiz id="m01-l03-q5" />
+
+<Quiz id="m01-l06-q3" />
+
+## Wann C# von selbst umwandelt
+
+Ein Wert hat einen Typ, und eine Variable nimmt nur Werte ihres Typs auf. Passt ein Wert zu einem anderen Zahlentyp, wandelt C# ihn manchmal um. Eine <Term id="implicit-conversion">implizite Umwandlung (Implicit Conversion)</Term> führt der Compiler ohne weitere Angabe aus. Sie ist nur erlaubt, wenn der Zieltyp jeden Wert des Quelltyps aufnehmen kann, zum Beispiel von `int` nach `long` oder nach `double`. Dann geht kein Wert verloren. Die Liste der erlaubten Umwandlungen steht in [§10.2.3 Implicit numeric conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1023-implicit-numeric-conversions).
+
+Eine Ausnahme gibt es: `long` nach `double` ist erlaubt, kann aber die Genauigkeit verringern. Ein `double` hat nur etwa 15 bis 17 gültige Stellen. Der Betrag des Werts bleibt dabei erhalten.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Achte auf die letzten beiden: Der `long`-Wert wird in einen `double` kopiert.
+:::
+
+<CSharpRunner id="m01-l07-widening" code={widening} predict expected={wideningOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `42`, `42`, `9007199254740993` und `9007199254740992`.
+
+1. **Zieltyp prüfen:** `long` und `double` können jeden `int`-Wert aufnehmen. Beide Zuweisungen brauchen keinen Cast.
+2. **Wert ausgeben:** `big` und `ratio` zeigen beide `42`. Der `double` hat keine Nachkommastellen, deshalb steht kein `.0` dabei.
+3. **Genauigkeit prüfen:** `9007199254740993` hat zu viele Stellen für einen `double`. Der gespeicherte Wert ist `9007199254740992`. Die Zuweisung kompiliert trotzdem, weil die Größenordnung erhalten bleibt.
+
+</details>
+
+## Wann ein Cast nötig ist
+
+Kann bei einer Umwandlung Information verloren gehen, lehnt der Compiler die Zuweisung ab. Das gilt zum Beispiel von `double` nach `int` und von `long` nach `int`.
+
+<CodeBlock language="csharp" title="narrowing.snippet.cs">{narrowing}</CodeBlock>
+
+Dieser Code kompiliert nicht. Der Compiler meldet, dass er einen `double` nicht implizit in einen `int` umwandeln kann. Mit einem <Term id="cast">Cast</Term> sagst du ausdrücklich, dass du die Umwandlung willst: Du schreibst den Zieltyp in runden Klammern vor den Ausdruck, `(int)price`. Das ist eine <Term id="explicit-conversion">explizite Umwandlung (Explicit Conversion)</Term>. Zwischen allen Zahlentypen ist sie mit einem Cast möglich ([§10.3.2 Explicit numeric conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1032-explicit-numeric-conversions)).
+
+Ein Cast von `double` nach `int` schneidet die Nachkommastellen ab, in Richtung null. Er rundet nicht. Wer runden will, ruft zuerst `Math.Round` auf. Du kennst die Methode aus der Lektion über Zahlen. Sie liefert einen `double`, deshalb braucht es danach noch den Cast.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Überlege dir besonders die zweite Zeile mit dem negativen Wert.
+:::
+
+<CSharpRunner id="m01-l07-cast" code={castTruncate} predict expected={castTruncateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `35`, `-3`, `36` und `36`.
+
+1. **Abschneiden:** `(int)share` verwirft `.714`. Aus `35.714` wird `35`.
+2. **Richtung null:** `(int)debt` verwirft `.99`. Aus `-3.99` wird `-3`, nicht `-4`. Abschneiden bewegt den Wert zur Null hin.
+3. **Runden:** `Math.Round(share)` liefert den `double` `36`. Die Ausgabe zeigt `36` ohne Nachkommastelle.
+4. **Runden und casten:** `(int)Math.Round(share)` ergibt den `int` `36`.
+
+Was passiert, wenn du `Math.Round` weglässt und `(int)share` in `Console.WriteLine($"{(int)share} %")` verwendest? Probiere es aus: Es bleibt bei `35`.
+
+</details>
+
+## Überlauf: Wenn ein Wert nicht mehr passt
+
+Jeder Ganzzahltyp hat einen festen Wertebereich. Ein `int` reicht von `int.MinValue` (`-2147483648`) bis `int.MaxValue` (`2147483647`). Liegt das Ergebnis einer Rechnung oder eines Casts außerhalb, entsteht ein <Term id="overflow">Überlauf (Overflow)</Term>.
+
+Was dann passiert, hängt vom <Term id="checked-context">Kontext (checked oder unchecked)</Term> ab ([§12.8.20 The checked and unchecked operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12820-the-checked-and-unchecked-operators)):
+
+- **`unchecked`:** Der Überlauf bleibt unbemerkt. Die überzähligen höchsten Bits fallen weg, der Wert läuft um. Das ist die Voreinstellung für Rechnungen, die erst zur Laufzeit feststehen. Ein Compilerschalter kann sie ändern, der Kurs verwendet ihn nicht.
+- **`checked`:** Der Überlauf fällt auf. Zur Laufzeit endet das Programm mit einem Laufzeitfehler, dem du in einem späteren Modul als `OverflowException` wieder begegnest. Du schaltest den Kontext mit `checked(…)` ein, zum Beispiel `checked(max + 1)`. Mit `unchecked(…)` schaltest du ihn aus.
+
+<Forward concepts={['Exceptions (Ausnahmen)']} module="7" />
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Was ist `max + 1`, wenn `max` der größte `int` ist? Und was bleibt von `3000000000` und `300` nach dem Cast?
+:::
+
+<CSharpRunner id="m01-l07-overflow" code={overflowUnchecked} predict expected={overflowUncheckedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `2147483647`, `-2147483648`, `-1294967296` und `44`.
+
+1. **Grenze erreichen:** `max` ist `int.MaxValue`, `2147483647`.
+2. **Überlaufen lassen:** `max + 1` liegt über dem Bereich. Ohne `checked` läuft der Wert zum kleinsten `int` um: `-2147483648`. Es gibt keine Meldung.
+3. **Cast auf kleineren Typ:** `(int)big` mit `3000000000` verwirft die oberen Bits. Es bleibt `-1294967296`. Auch hier meldet nichts den Überlauf.
+4. **Noch kleiner:** `(byte)count` mit `300`: Ein `byte` reicht von 0 bis 255. Es bleibt `44` (300 − 256).
+
+Was passiert, wenn du in der zweiten Rechnung `checked(max + 1)` schreibst? Ändere die Zeile im Runner und führe den Code aus: Das Programm endet mit einem Laufzeitfehler (`OverflowException`), statt `-2147483648` auszugeben. Genau das zeigt diese Zeile:
+
+<CodeBlock language="csharp" title="checked-overflow.snippet.cs">{checkedOverflow}</CodeBlock>
+
+</details>
+
+### Konstanten laufen nie unbemerkt über
+
+Ein Ausdruck aus lauter Konstanten steht schon beim Kompilieren fest, zum Beispiel `int.MaxValue + 1`. Für solche Ausdrücke ist der Kontext immer `checked`. Läuft einer über, meldet der Compiler einen Fehler und das Programm entsteht gar nicht ([§12.26 Constant expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1226-constant-expressions)).
+
+<CodeBlock language="csharp" title="constant-overflow.snippet.cs">{constantOverflow}</CodeBlock>
+
+Das ist ein Unterschied zum Beispiel oben: Dort stand `max` in einer Variablen. Der Compiler rechnet Variablen nicht aus, deshalb fällt der Überlauf erst zur Laufzeit an (und im `unchecked`-Kontext gar nicht).
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze in den Zeilen `int cut = 0;`, `int rounded = 0;` und `int next = max;` jeweils den Wert so, dass die Ausgabe `35.714`, `35`, `36` und `-2147483648` lautet.
+
+<CSharpRunner id="m01-l07-gaps" code={conversionsGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Abschneiden:** `int cut = (int)share;` verwirft `.714`: `35`.
+2. **Runden und casten:** `int rounded = (int)Math.Round(share);` ergibt `36`.
+3. **Umlaufen lassen:** `int next = max + 1;` läuft vom größten zum kleinsten `int` um: `-2147483648`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, das erste Ereignis, Benutzer, IP-Adresse und Ereignistyp von Zeile 2, die Fehlerquote, Bobs fehlgeschlagene Anmeldungen und seinen Anteil, das Ereignis als Logzeile und die Fehlerquote mit einer Nachkommastelle.
+
+**Neue Anforderung:** Im Beispiel-Log sind 5 von 14 Anmeldungen erfolgreich (Zeilen 1, 4, 8, 10 und 13). Gib ihren Anteil als ganze Prozentzahl zweimal aus: einmal mit einem Cast (abgeschnitten, `35`) und einmal mit `Math.Round` und einem Cast (gerundet, `36`). Jede Zeile bekommt eine Beschriftung, zum Beispiel `Success share, cut off (%): 35`, damit der Unterschied sichtbar wird. Die bisherigen 18 Zeilen bleiben, die neuen kommen am Ende dazu.
+
+<CSharpRunner id="m01-l07-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Anteil berechnen:** `successes * 100.0 / events` rechnet mit `double` und ergibt `35.714…`.
+2. **Abschneiden:** `(int)successRate` verwirft die Nachkommastellen: `35`.
+3. **Runden:** `(int)Math.Round(successRate)` rundet zuerst auf `36` und wandelt dann in `int`.
+4. **Beschriften:** Die Klammern um den Cast stehen in der Interpolation, damit der ganze Ausdruck eingesetzt wird.
+
+</details>
+
+**Neuer Stand:** SecLog zeigt den Anteil erfolgreicher Anmeldungen als ganze Prozentzahl, einmal abgeschnitten und einmal gerundet.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l07-cast-rounds" />
+
+**„Ein Cast nach `int` rundet.“** Der Cast schneidet die Nachkommastellen ab, in Richtung null. `(int)3.99` ist `3`, und `(int)-3.99` ist `-3`. Rundest du, verwendest du `Math.Round` und castest danach: `(int)Math.Round(3.99)` ist `4`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l07-overflow-always-error" />
+
+**„Ein Überlauf beendet immer das Programm.“** Ohne `checked` läuft der Wert unbemerkt um. `int.MaxValue + 1` mit einer Variablen ergibt `-2147483648`, ohne Meldung. Nur im `checked`-Kontext endet das Programm mit einem Laufzeitfehler, und nur bei Konstanten lehnt der Compiler den Überlauf ab.
+:::
+
+<details>
+<summary>Vertiefung: Cast und Fließkommazahlen (optional)</summary>
+
+Ein Cast von `double` nach `int` schneidet ab, weil die Spezifikation es so festlegt: Der Wert wird in Richtung null auf die nächste ganze Zahl gerundet. Liegt diese Zahl außerhalb des `int`-Bereichs, ist das Ergebnis im `unchecked`-Kontext ein unspezifizierter Wert, im `checked`-Kontext eine `OverflowException`. Das gilt auch für `NaN` und unendlich ([§10.3.2 Explicit numeric conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1032-explicit-numeric-conversions)). Bei Ganzzahl nach Ganzzahl im `unchecked`-Kontext werden die oberen Bits verworfen, wie im Beispiel mit `300` und `byte`.
+
+</details>
+
+## Zusammenfassung
+
+C# wandelt Zahlen implizit um, wenn der Zieltyp jeden Wert aufnehmen kann, zum Beispiel `int` nach `long`. Andernfalls verlangt der Compiler einen Cast wie `(int)x`. Ein Cast von `double` nach `int` schneidet die Nachkommastellen ab. Zum Runden kommt `Math.Round` davor. Liegt ein Ergebnis außerhalb des Wertebereichs, entsteht ein Überlauf. Ohne `checked` läuft der Wert unbemerkt um, mit `checked` endet das Programm mit einem Laufzeitfehler. Konstante Ausdrücke sind immer `checked` und werden schon beim Kompilieren abgelehnt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l07-q1" />
+
+<Quiz id="m01-l07-q2" />
+
+<Quiz id="m01-l07-q3" />
+
+<Quiz id="m01-l07-q4" />
+
+<Quiz id="m01-l07-q5" />
+
+<Quiz id="m01-l07-q6" />
+
+<Quiz id="m01-l07-q7" />
+
+<Quiz id="m01-l07-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l07-q9" />
+
+### Transferfrage
+
+<Quiz id="m01-l07-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [C#-Spezifikation, Conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions)
+- Microsoft Learn: [Checked and unchecked statements](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/checked-and-unchecked)
+- Microsoft Learn: [Math.Round](https://learn.microsoft.com/dotnet/api/system.math.round)
