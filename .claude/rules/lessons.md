@@ -18,6 +18,7 @@ paths:
 - Quiz questions live in `website/src/data/quiz/de/mXX.json` (format: `website/src/data/quiz/README.md`). In MDX only `<Quiz id="…" />`, no inline quiz.
 - Quiz options are shown in random order. They must not refer to their position (no "Antwort A", "die erste Option", "beide oben"). Options like "Keine der genannten" need `"pin": "last"` (format: `website/src/data/quiz/README.md`).
 - Order first: use only terms and constructs explained in this lesson or before. An unavoidable forward reference gets one `<Forward concepts={[…]} lesson="…" />` (or `module="N"`) at its first place (`concept/lesson-template.md`, "Forward references"). Never target an early-implementation lesson (`m01-l02`, `m01-l03`, `m02-l01`).
+- Learn what earlier modules taught from `concept/module-digest.md`; do not read their lessons in full (`CLAUDE.md`, "Context budget (module work)").
 - A quiz question must not need a concept that is only marked as a forward reference.
 - The glossary `lesson` field is the lesson that introduces the term. `node tools/check-quiz.mjs` checks `<Term>` links and quiz texts against it.
 - The PR lists, per example file, every construct used (keywords, operators, types, members, comments) and where it is explained (lesson) or marked (`<Forward>`).
