@@ -1235,6 +1235,187 @@
       "type": "explain",
       "question": "Transferfrage: Wo kann ein Zähler in einem echten Programm sehr groß werden, und was würde ein Überlauf dort bedeuten?",
       "modelAnswer": "Zum Beispiel ein Zähler für alle Zugriffe auf einen Server, für gesendete Bytes oder für Ereignisse in einem Log, der über Jahre läuft. Läuft ein `int` darüber, wird der Zähler plötzlich negativ oder klein. Statistiken und Alarmgrenzen stimmen dann nicht mehr, ohne dass jemand einen Fehler sieht. Ein größerer Typ wie `long` oder ein `checked`-Kontext vermeidet das."
+    },
+    {
+      "id": "m01-l08-q1",
+      "lesson": "m01-l08",
+      "type": "single",
+      "question": "Was passiert bei `int number = int.Parse(\"3.5\");`?",
+      "options": [
+        {
+          "text": "Das Programm endet an dieser Zeile mit einem Laufzeitfehler, weil der Text keine ganze Zahl ist.",
+          "correct": true
+        },
+        {
+          "text": "`number` ist `3`, der Nachkommateil wird abgeschnitten.",
+          "misconception": "m01-l08-parse-accepts-decimals",
+          "feedback": "Parse schneidet nichts ab. Ein Text mit Dezimalpunkt ist für `int.Parse` ungültig."
+        },
+        {
+          "text": "`number` ist `4`, der Wert wird gerundet.",
+          "misconception": "m01-l08-parse-accepts-decimals",
+          "feedback": "Parse rundet nicht. Der Text `3.5` wird für einen `int` abgelehnt."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler.",
+          "feedback": "Der Compiler prüft den Inhalt des Texts nicht. Der Fehler tritt erst zur Laufzeit auf."
+        }
+      ],
+      "explanation": "`int.Parse` akzeptiert nur Text, der eine ganze Zahl darstellt. Bei `3.5` endet das Programm mit einem Laufzeitfehler (`FormatException`)."
+    },
+    {
+      "id": "m01-l08-q2",
+      "lesson": "m01-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m01/l08/quiz-parse.cs",
+      "explanation": "`a + b` verkettet zwei Texte: `\"10\"` und `\"5\"` ergeben `\"105\"`. Mit `int.Parse` werden es zwei Zahlen, und `10 + 5` ist `15`."
+    },
+    {
+      "id": "m01-l08-q3",
+      "lesson": "m01-l08",
+      "type": "multi",
+      "question": "Welche der Texte wandelt `int.Parse` in eine Zahl um, ohne dass das Programm endet?",
+      "options": [
+        {
+          "text": "`\"42\"`",
+          "correct": true
+        },
+        {
+          "text": "`\" 42 \"` (mit Leerzeichen davor und danach)",
+          "correct": true
+        },
+        {
+          "text": "`\"-7\"`",
+          "correct": true
+        },
+        {
+          "text": "`\"3.5\"`",
+          "misconception": "m01-l08-parse-accepts-decimals",
+          "feedback": "Ein Dezimalpunkt gehört nicht zu einer ganzen Zahl."
+        },
+        {
+          "text": "`\"sieben\"`",
+          "feedback": "Wörter sind keine Ziffern. Parse kennt nur Ziffern mit optionalem Vorzeichen."
+        }
+      ],
+      "explanation": "`int.Parse(string)` erlaubt Ziffern mit optionalem Vorzeichen sowie Leerzeichen davor und danach. Alles andere endet mit einem Laufzeitfehler."
+    },
+    {
+      "id": "m01-l08-q4",
+      "lesson": "m01-l08",
+      "type": "single",
+      "question": "Nach `bool ok = int.TryParse(\"abc\", out int number);` – welche Werte haben `ok` und `number`?",
+      "options": [
+        {
+          "text": "`ok` ist `false`, `number` ist `0`.",
+          "correct": true
+        },
+        {
+          "text": "`ok` ist `false`, `number` behält den Wert, den die Variable vorher hatte.",
+          "misconception": "m01-l08-tryparse-keeps-old-value",
+          "feedback": "Bei einem Misserfolg setzt TryParse die Zahl auf `0`."
+        },
+        {
+          "text": "`ok` ist `true`, `number` ist `0`.",
+          "feedback": "`true` bedeutet, dass die Umwandlung geklappt hat. Bei `\"abc\"` ist das nicht der Fall."
+        },
+        {
+          "text": "Das Programm endet mit einem Laufzeitfehler.",
+          "feedback": "Das macht `Parse`. `TryParse` meldet den Misserfolg über den Rückgabewert."
+        }
+      ],
+      "explanation": "`TryParse` liefert `false` und setzt die Zahl auf `0`, wenn der Text ungültig ist. Das Programm läuft weiter."
+    },
+    {
+      "id": "m01-l08-q5",
+      "lesson": "m01-l08",
+      "type": "single",
+      "question": "Worin unterscheidet sich `int.TryParse` bei ungültigem Text von `int.Parse`?",
+      "options": [
+        {
+          "text": "`TryParse` beendet das Programm nicht, sondern gibt `false` zurück.",
+          "correct": true
+        },
+        {
+          "text": "`TryParse` wandelt auch `\"3.5\"` in `3` um.",
+          "misconception": "m01-l08-parse-accepts-decimals",
+          "feedback": "Beide akzeptieren dieselben Texte. `\"3.5\"` ist für beide ungültig."
+        },
+        {
+          "text": "`TryParse` akzeptiert auch Wörter wie `\"sieben\"`.",
+          "feedback": "Die Menge gültiger Texte ist gleich. Nur die Reaktion auf ungültigen Text unterscheidet sich."
+        },
+        {
+          "text": "`TryParse` rundet das Ergebnis.",
+          "feedback": "Keine der beiden Methoden rundet."
+        }
+      ],
+      "explanation": "Beide akzeptieren dieselben Texte. Bei ungültigem Text endet das Programm mit `Parse`, während `TryParse` `false` meldet."
+    },
+    {
+      "id": "m01-l08-q6",
+      "lesson": "m01-l08",
+      "type": "single",
+      "question": "Warum kann `double.Parse(\"3,5\")` je nach Umgebung ein anderes Ergebnis haben?",
+      "options": [
+        {
+          "text": "Die Kultur bestimmt das Dezimaltrennzeichen. Manche Kulturen lesen das Komma als Dezimaltrennzeichen, andere nicht.",
+          "correct": true
+        },
+        {
+          "text": "Weil `double` auf jedem Computer anders gespeichert wird.",
+          "feedback": "Die Speicherung ist gleich. Es geht um das Lesen des Texts."
+        },
+        {
+          "text": "Weil `Parse` zufällig rundet.",
+          "feedback": "Parse rundet nicht und arbeitet nicht zufällig."
+        },
+        {
+          "text": "Weil das Komma in C# immer ein Fehler ist.",
+          "feedback": "Ob das Komma gültig ist, hängt von der Kultur ab."
+        }
+      ],
+      "explanation": "Parse verwendet standardmäßig die Regeln der aktuellen Kultur. Playground und CI laufen kulturunabhängig (`InvariantGlobalization`), dort ist nur der Punkt das Dezimaltrennzeichen."
+    },
+    {
+      "id": "m01-l08-q7",
+      "lesson": "m01-l08",
+      "type": "single",
+      "question": "Welcher Ausdruck hat den Wert `7`?",
+      "options": [
+        {
+          "text": "`int.Parse(\"3\") + 4`",
+          "correct": true
+        },
+        {
+          "text": "`\"3\" + 4`",
+          "feedback": "Text plus Zahl verkettet zu dem Text `\"34\"`."
+        },
+        {
+          "text": "`\"3\" + \"4\"`",
+          "feedback": "Zwei Texte werden verkettet: `\"34\"`."
+        },
+        {
+          "text": "`int.Parse(\"3\" + 4)`",
+          "feedback": "Erst entsteht der Text `\"34\"`, dann wird er zur Zahl `34`."
+        }
+      ],
+      "explanation": "Erst `int.Parse(\"3\")` macht aus dem Text die Zahl `3`. Dann addiert `+` zwei Zahlen: `3 + 4` ist `7`."
+    },
+    {
+      "id": "m01-l08-q8",
+      "lesson": "m01-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `int.Parse` und `int.TryParse`. Wann verwendest du welche Methode?",
+      "modelAnswer": "Beide wandeln Text in eine ganze Zahl um und akzeptieren dieselben Texte: Ziffern mit optionalem Vorzeichen, Leerzeichen davor und danach. Bei ungültigem Text, etwa `\"3.5\"` oder `\"sieben\"`, endet das Programm mit `Parse` mit einem Laufzeitfehler. `TryParse` läuft weiter, gibt `false` zurück und setzt die Zahl auf `0`.\n\nIst der Text sicher gültig, genügt `Parse`. Kommt der Text von außen und kann falsch sein, verwendest du `TryParse` und prüfst den Rückgabewert."
+    },
+    {
+      "id": "m01-l08-q9",
+      "lesson": "m01-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo bekommt ein Programm Zahlen als Text, und was kann dabei schiefgehen?",
+      "modelAnswer": "Zum Beispiel aus Dateien, Webformularen, Konsoleneingaben und Logzeilen wie `failed=7`. Alles ist zunächst Text. Der Text kann leer sein, Buchstaben enthalten oder ein Dezimalkomma statt eines Punkts verwenden. Deshalb muss das Programm die Umwandlung prüfen, etwa mit `TryParse`."
     }
   ]
 }
