@@ -1,0 +1,11 @@
+int count = 10;
+count += 5;
+Console.WriteLine(count);
+count -= 3;
+Console.WriteLine(count);
+count *= 2;
+Console.WriteLine(count);
+count /= 5;
+Console.WriteLine(count);
+count %= 3;
+Console.WriteLine(count);

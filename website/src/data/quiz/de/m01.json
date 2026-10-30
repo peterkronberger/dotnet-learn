@@ -326,7 +326,7 @@
         },
         {
           "text": "Das Ergebnis ist ungenau, weil `+` bei Dezimalzahlen fehlerhaft arbeitet.",
-          "feedback": "Der Operator rechnet richtig. Schon die Werte `0.1` und `0.2` sind im `double` nur Näherungen."
+          "feedback": "Das `+` rechnet richtig. Schon die Werte `0.1` und `0.2` sind im `double` nur Näherungen."
         },
         {
           "text": "Das Ergebnis ist ungenau, weil die Zahlen zu groß für `double` sind.",
@@ -462,6 +462,176 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Programm `decimal` statt `double` verwenden, und wo reicht `double`?",
       "modelAnswer": "`decimal` für Geldbeträge und andere exakte Mengen, bei denen jede Dezimalstelle stimmen muss, zum Beispiel Preise und Rechnungssummen. `double` für Messwerte und Verhältnisse wie die Fehlerquote eines Logs, bei denen eine winzige Abweichung keine Rolle spielt."
+    },
+    {
+      "id": "m01-l04-q1",
+      "lesson": "m01-l04",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(2 + 3 * 4);` aus?",
+      "options": [
+        {
+          "text": "`14`",
+          "correct": true
+        },
+        {
+          "text": "`20`",
+          "misconception": "m01-l04-left-to-right-always",
+          "feedback": "`20` ergibt sich nur, wenn zuerst `2 + 3` gerechnet wird. `*` hat aber Vorrang vor `+`, also wird `3 * 4` zuerst ausgewertet."
+        },
+        {
+          "text": "`24`",
+          "feedback": "`2 + 3 * 4` enthält nur eine Multiplikation und eine Addition. Die Rechnung `2 * 3 * 4` kommt darin nicht vor."
+        },
+        {
+          "text": "`9`",
+          "feedback": "`9` wäre `2 + 3 + 4`. Der Operator zwischen `3` und `4` ist aber `*`."
+        }
+      ],
+      "explanation": "Die Multiplikation hat einen höheren Rang als die Addition. Erst wird `3 * 4` zu `12`, dann `2 + 12` zu `14`."
+    },
+    {
+      "id": "m01-l04-q2",
+      "lesson": "m01-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Werte jede Zeile nach Rangfolge und Assoziativität aus.",
+      "example": "m01/l04/quiz-evaluate.cs",
+      "explanation": "`8 - 2 - 3` wird von links nach rechts gerechnet: `6 - 3` ergibt `3`. Bei `8 / 2 * 3` stehen `/` und `*` auf gleicher Stufe, also links zuerst: `4 * 3` ergibt `12`. `8 + 2 * 3` ergibt `8 + 6`, also `14`. Bei `-8 % 3` wird zuerst das Vorzeichen angewendet, dann der Rest: Der Rest von `-8` geteilt durch `3` ist `-2`."
+    },
+    {
+      "id": "m01-l04-q3",
+      "lesson": "m01-l04",
+      "type": "single",
+      "question": "Nach `int x = 5; int y = x++;` – welche Werte haben `y` und `x`?",
+      "options": [
+        {
+          "text": "`y` ist `5`, `x` ist `6`.",
+          "correct": true
+        },
+        {
+          "text": "`y` ist `6`, `x` ist `6`.",
+          "misconception": "m01-l04-postfix-returns-new-value",
+          "feedback": "Der Ausdruck `x++` liefert den Wert von `x` vor der Erhöhung. Erst danach wird `x` um 1 größer."
+        },
+        {
+          "text": "`y` ist `5`, `x` ist `5`.",
+          "feedback": "`x++` ändert `x` immer, auch wenn der Ausdruck den alten Wert liefert."
+        },
+        {
+          "text": "`y` ist `6`, `x` ist `5`.",
+          "feedback": "Es ist umgekehrt: `y` bekommt den alten Wert, und `x` wird erhöht."
+        }
+      ],
+      "explanation": "`x++` liefert den alten Wert `5`, der in `y` landet. Als Nebenwirkung wird `x` um 1 größer und ist danach `6`."
+    },
+    {
+      "id": "m01-l04-q4",
+      "lesson": "m01-l04",
+      "type": "single",
+      "question": "Welchen Wert hat `count` nach `int count = 10; count -= 3; count *= 2;`?",
+      "options": [
+        {
+          "text": "`14`",
+          "correct": true
+        },
+        {
+          "text": "`4`",
+          "feedback": "`4` wäre `10 - 3 * 2`. Hier sind es aber zwei getrennte Anweisungen: Erst wird `count` zu `7`, dann zu `14`."
+        },
+        {
+          "text": "`7`",
+          "feedback": "`count -= 3` ergibt `7`. Danach folgt noch `count *= 2`."
+        },
+        {
+          "text": "`20`",
+          "feedback": "`count *= 2` multipliziert den aktuellen Wert `7`, nicht den alten Wert `10`."
+        }
+      ],
+      "explanation": "`count -= 3` ist `count = count - 3` und ergibt `7`. `count *= 2` ist `count = count * 2` und ergibt `14`."
+    },
+    {
+      "id": "m01-l04-q5",
+      "lesson": "m01-l04",
+      "type": "cloze",
+      "question": "Ergänze die Lücken, sodass das Programm `2 + 3 * 4 - 6 / 2` in Teilschritten auswertet. Die Ausgabe ist `11`.",
+      "example": "m01/l04/evaluation-steps.cs",
+      "blanks": [
+        {
+          "text": "3 * 4",
+          "accept": ["3 * 4", "4 * 3"],
+          "hint": "Die Multiplikation hat Vorrang vor der Addition."
+        },
+        {
+          "text": "sum - quotient",
+          "hint": "Danach wird von links nach rechts gerechnet: die Summe minus den Quotienten."
+        }
+      ],
+      "explanation": "Erst werden `3 * 4` und `6 / 2` ausgewertet, weil `*` und `/` Vorrang haben. Danach wird von links nach rechts addiert und subtrahiert: `2 + 12` ergibt `14`, `14 - 3` ergibt `11`."
+    },
+    {
+      "id": "m01-l04-q6",
+      "lesson": "m01-l04",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(100 / 10 / 5);` aus?",
+      "options": [
+        {
+          "text": "`2`",
+          "correct": true
+        },
+        {
+          "text": "`50`",
+          "misconception": "m01-l04-left-to-right-always",
+          "feedback": "`50` ergibt sich bei `100 / (10 / 5)`. Der Operator `/` wird aber von links nach rechts zusammengefasst: `(100 / 10) / 5`."
+        },
+        {
+          "text": "`0`",
+          "feedback": "`100 / 10` ist `10`, und `10 / 5` ist `2`. Nichts wird auf `0` abgeschnitten."
+        },
+        {
+          "text": "`200`",
+          "feedback": "Der Ausdruck enthält nur Divisionen, das Ergebnis wird nicht größer."
+        }
+      ],
+      "explanation": "Binäre Operatoren auf gleicher Stufe sind linksassoziativ. `100 / 10 / 5` bedeutet `(100 / 10) / 5`, also `10 / 5`, also `2`."
+    },
+    {
+      "id": "m01-l04-q7",
+      "lesson": "m01-l04",
+      "type": "single",
+      "question": "Welchen Wert hat `8 - 6 / 2 * 3`?",
+      "options": [
+        {
+          "text": "`-1`",
+          "correct": true
+        },
+        {
+          "text": "`3`",
+          "misconception": "m01-l04-left-to-right-always",
+          "feedback": "`3` ergibt sich, wenn von links nach rechts gerechnet wird: `(8 - 6) / 2 * 3`. `/` und `*` haben aber Vorrang vor `-`."
+        },
+        {
+          "text": "`7`",
+          "feedback": "`7` ergibt sich bei `8 - 6 / (2 * 3)`. `/` und `*` stehen auf gleicher Stufe und werden von links nach rechts gerechnet."
+        },
+        {
+          "text": "`5`",
+          "feedback": "Erst `6 / 2` ergibt `3`, dann `3 * 3` ergibt `9`. Von `8` bleibt `-1` übrig."
+        }
+      ],
+      "explanation": "Zuerst `6 / 2` zu `3`, dann `3 * 3` zu `9`, zuletzt `8 - 9` zu `-1`. Die Klammern, die die Absicht zeigen, wären `8 - ((6 / 2) * 3)`."
+    },
+    {
+      "id": "m01-l04-q8",
+      "lesson": "m01-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie C# `2 + 3 * 4 - 6 / 2` auswertet und was `x++` von `++x` unterscheidet.",
+      "modelAnswer": "`*` und `/` haben Vorrang vor `+` und `-`. Erst werden `3 * 4` zu `12` und `6 / 2` zu `3`. Danach wird von links nach rechts gerechnet: `2 + 12` ist `14`, `14 - 3` ist `11`.\n\nBeide Formen erhöhen `x` um 1. `x++` liefert als Wert des Ausdrucks den alten Wert von `x`, `++x` den neuen Wert. Nach beiden ist `x` um 1 größer."
+    },
+    {
+      "id": "m01-l04-q9",
+      "lesson": "m01-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo zählt ein Programm etwas Schritt für Schritt, oder bildet es eine laufende Summe?",
+      "modelAnswer": "Ein Zähler für fehlgeschlagene Anmeldungen, der pro Fehlschlag um 1 wächst (`count++`). Eine Summe, zu der pro Bestellposition der Preis addiert wird (`total += price`). Ein Punktestand in einem Spiel oder die Anzahl gelesener Zeilen einer Datei."
     }
   ]
 }

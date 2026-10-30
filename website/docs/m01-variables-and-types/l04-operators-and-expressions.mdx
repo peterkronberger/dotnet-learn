@@ -1,0 +1,294 @@
+---
+title: Operatoren und Ausdrücke
+sidebar_position: 4
+description: "Ein Ausdruck wird nach festen Regeln ausgewertet: Rangfolge und Assoziativität bestimmen die Reihenfolge. Zusammengesetzte Zuweisungen und ++ ändern eine Variable und liefern zugleich einen Wert."
+lesson_id: m01-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import precedence from '!!raw-loader!@site/examples/m01/l04/precedence.cs';
+import precedenceOutput from '!!raw-loader!@site/examples/m01/l04/precedence.out.txt';
+import associativity from '!!raw-loader!@site/examples/m01/l04/associativity.cs';
+import associativityOutput from '!!raw-loader!@site/examples/m01/l04/associativity.out.txt';
+import evaluationSteps from '!!raw-loader!@site/examples/m01/l04/evaluation-steps.cs';
+import evaluationStepsOutput from '!!raw-loader!@site/examples/m01/l04/evaluation-steps.out.txt';
+import expressionGaps from '!!raw-loader!@site/examples/m01/l04/expression-gaps.cs';
+import compoundAssignment from '!!raw-loader!@site/examples/m01/l04/compound-assignment.cs';
+import compoundAssignmentOutput from '!!raw-loader!@site/examples/m01/l04/compound-assignment.out.txt';
+import incrementForms from '!!raw-loader!@site/examples/m01/l04/increment-forms.cs';
+import incrementFormsOutput from '!!raw-loader!@site/examples/m01/l04/increment-forms.out.txt';
+import evaluationOrder from '!!raw-loader!@site/examples/m01/l04/evaluation-order.cs';
+import evaluationOrderOutput from '!!raw-loader!@site/examples/m01/l04/evaluation-order.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m01/l04/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l04/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l04/seclog-event-solution.cs';
+
+# Operatoren und Ausdrücke
+
+:::note[Lernziele]
+- Du wertest Ausdrücke mit mehreren Operatoren nach Rangfolge und Assoziativität aus und setzt Klammern, wo sie die Absicht klarer machen.
+- Du verwendest `+=`, `-=`, `*=`, `/=` und `%=` und sagst den neuen Wert der Variable voraus.
+- Du unterscheidest `x++` und `++x` und sagst voraus, welchen Wert der Ausdruck liefert und welchen Wert `x` danach hat.
+- Du zerlegst einen längeren Ausdruck in Teilausdrücke (Operand, Operator, Ergebnis).
+:::
+
+## Rückblick
+
+<Quiz id="m01-l03-q1" />
+
+<Quiz id="m01-l03-q2" />
+
+<Quiz id="m01-l02-q2" />
+
+## Ausdrücke bestehen aus Operanden und Operatoren
+
+Ein <Term id="expression">Ausdruck (Expression)</Term> ist ein Teil des Codes, der zu einem Wert ausgewertet wird. `7`, `count` und `2 + 3 * 4` sind Ausdrücke. Du kennst die Bausteine schon: Die Werte heißen Operanden. Das Zeichen, das sie verknüpft, ist ein <Term id="operator">Operator</Term>. Hat ein Operator zwei Operanden, ist er binär, wie das `+` in `2 + 3`. Hat er einen, ist er unär, wie das `-` in `-2`. Das unäre `+` lässt den Wert unverändert.
+
+Ein Ausdruck kann andere Ausdrücke enthalten. In `2 + 3 * 4` ist `3 * 4` ein Teilausdruck: Die Operanden sind `3` und `4`, der Operator ist `*`, das Ergebnis ist `12`. Dann ist `2 + 12` der nächste Teilausdruck mit dem Ergebnis `14`. Einen langen Ausdruck zu verstehen heißt, ihn in solche Teilausdrücke zu zerlegen.
+
+## Rangfolge: Welcher Operator rechnet zuerst?
+
+Die <Term id="operator-precedence">Rangfolge (Operator Precedence)</Term> legt fest, welcher Operator zuerst rechnet. Die Tabelle zeigt die Operatoren, die du bisher kennst, vom höchsten zum niedrigsten Rang ([§12.4.2 Operator precedence and associativity](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1242-operator-precedence-and-associativity)):
+
+| Rang | Operatoren | Art |
+| --- | --- | --- |
+| 1 (höchster) | `x++` `x--` | postfix |
+| 2 | `+x` `-x` `++x` `--x` | unär |
+| 3 | `*` `/` `%` | binär |
+| 4 | `+` `-` | binär |
+| 5 (niedrigster) | `=` `+=` `-=` `*=` `/=` `%=` | Zuweisung |
+
+Klammern gehen vor jeder Rangfolge: Was in `( )` steht, wird zuerst ausgewertet.
+
+:::info[Vorhersage]
+Was geben die vier Zeilen aus? Rechne jede Zeile in Teilausdrücken.
+:::
+
+<CSharpRunner id="m01-l04-precedence" code={precedence} predict expected={precedenceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `14`, `20`, `1` und `3`.
+
+1. **Punkt vor Strich:** In `2 + 3 * 4` rechnet `*` zuerst: `3 * 4` ist `12`, dann `2 + 12` ist `14`.
+2. **Klammern:** In `(2 + 3) * 4` steht die Addition in Klammern. `2 + 3` ist `5`, dann `5 * 4` ist `20`.
+3. **Unäres Minus:** In `-2 + 3` gehört das `-` als unärer Operator zur `2`. Es hat höheren Rang als `+`: `-2 + 3` ist `1`.
+4. **Mehrere Stufen:** In `10 - 4 * 2 + 1` rechnet `4 * 2` zuerst und ergibt `8`. Danach folgen `10 - 8` und `2 + 1`, das Ergebnis ist `3`.
+
+</details>
+
+## Assoziativität: Was gilt bei gleichem Rang?
+
+Stehen Operatoren mit gleichem Rang nebeneinander, entscheidet die Assoziativität. Binäre Operatoren wie `-` und `/` sind linksassoziativ: Sie rechnen von links nach rechts, `20 - 5 - 3` ist `(20 - 5) - 3`. Die Zuweisung `=` ist rechtsassoziativ, `a = b = 5` ist `a = (b = 5)`. Eine Zuweisung ist selbst ein Ausdruck, und ihr Wert ist der zugewiesene Wert ([§12.4.2](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1242-operator-precedence-and-associativity) und [§12.24.2 Simple assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12242-simple-assignment)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte bei den letzten beiden Zeilen darauf, wohin der Wert von `b = 5` fließt.
+:::
+
+<CSharpRunner id="m01-l04-associativity" code={associativity} predict expected={associativityOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind sechs Zeilen: `12`, `18`, `2`, `50`, `5` und `5`.
+
+1. **Linksassoziativ:** `20 - 5 - 3` ist `(20 - 5) - 3` und ergibt `12`.
+2. **Klammern ändern die Gruppe:** `20 - (5 - 3)` ergibt `18`.
+3. **Division:** `100 / 10 / 5` ist `(100 / 10) / 5`, also `2`. Mit Klammern `100 / (10 / 5)` ergibt es `50`.
+4. **Rechtsassoziativ:** `a = b = 5` weist zuerst `5` an `b` zu. Der Wert dieser Zuweisung ist `5` und geht an `a`. Beide Variablen enthalten `5`.
+
+</details>
+
+Wann setzt du Klammern, auch wenn die Rangfolge sie nicht verlangt? Immer dann, wenn sie die Absicht zeigen. `a + (b * c)` rechnet genauso wie `a + b * c`, ist aber auf einen Blick lesbar.
+
+## Gesamtbeispiel: Ein Ausdruck in Teilschritten
+
+Das Beispiel wertet `2 + 3 * 4 - 6 / 2` aus. Die Schritte sind:
+
+1. **Vorrang suchen:** `*` und `/` haben höheren Rang als `+` und `-`.
+2. **Hohe Ränge rechnen:** `3 * 4` ergibt `12`, `6 / 2` ergibt `3`. Der Ausdruck lautet jetzt `2 + 12 - 3`.
+3. **Von links nach rechts:** `2 + 12` ergibt `14`.
+4. **Letzten Operator anwenden:** `14 - 3` ergibt `11`.
+
+Das Programm macht dieselben Schritte mit je einer Variable pro Teilausdruck.
+
+:::info[Vorhersage]
+Welchen Wert hat `result`? Vergleiche mit deiner Rechnung aus den Schritten.
+:::
+
+<CSharpRunner id="m01-l04-steps" code={evaluationSteps} predict expected={evaluationStepsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist eine Zeile: `11`.
+
+1. **Hohe Ränge:** `product` ist `12`, `quotient` ist `3`.
+2. **Erste Stufe von links:** `sum` ist `2 + 12`, also `14`.
+3. **Zweite Stufe:** `result` ist `14 - 3`, also `11`.
+
+Was passiert, wenn du `6 / 2` durch `7 / 2` ersetzt? Probiere es aus: `7 / 2` ist eine Ganzzahldivision und ergibt `3`. Das Ergebnis bleibt `11`.
+
+</details>
+
+## Lückenbeispiel
+
+Dasselbe Verfahren, diesmal mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze die drei Nullen so, dass `2 + 3 * 4 - 6 / 2` Schritt für Schritt ausgewertet wird. Am Ende soll `result` den Wert `11` haben.
+
+<CSharpRunner id="m01-l04-gaps" code={expressionGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Division:** `int quotient = 6 / 2;` ergibt `3`.
+2. **Erste Stufe:** `int sum = 2 + product;` ergibt `14`.
+3. **Zweite Stufe:** `int result = sum - quotient;` ergibt `11`.
+
+</details>
+
+## Zusammengesetzte Zuweisung
+
+Oft soll sich ein Wert aus dem alten Wert derselben Variable ergeben. Statt `count = count + 5;` schreibst du `count += 5;`. Das ist die <Term id="compound-assignment">zusammengesetzte Zuweisung (Compound Assignment)</Term>. Es gibt sie für alle fünf Rechenoperatoren: `+=`, `-=`, `*=`, `/=` und `%=`. `x op= y` entspricht `x = x op y`, wobei `x` nur einmal ausgewertet wird ([§12.24.5 Compound assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12245-compound-assignment)). Für `int` gelten die Regeln der Ganzzahldivision aus der letzten Lektion weiter.
+
+:::info[Vorhersage]
+`count` startet bei `10`. Welchen Wert hat `count` nach jeder Anweisung?
+:::
+
+<CSharpRunner id="m01-l04-compound" code={compoundAssignment} predict expected={compoundAssignmentOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen: `15`, `12`, `24`, `4` und `1`.
+
+1. **Addieren:** `10 + 5` ergibt `15`.
+2. **Subtrahieren:** `15 - 3` ergibt `12`.
+3. **Multiplizieren:** `12 * 2` ergibt `24`.
+4. **Dividieren:** `24 / 5` ist eine Ganzzahldivision. Der Nachkommateil entfällt, das Ergebnis ist `4`.
+5. **Rest:** `4 % 3` ergibt `1`.
+
+</details>
+
+## Erhöhen und Verringern: x++ und ++x
+
+Um eine Variable um 1 zu erhöhen, gibt es den <Term id="increment-operator">Inkrement-Operator (Increment Operator)</Term> `++`. `--` verringert um 1. Beide gibt es in zwei Formen. Bei `x++` (postfix) ist der Wert des Ausdrucks der Wert von `x` **vor** der Änderung. Bei `++x` (prefix) ist es der Wert **nach** der Änderung. In beiden Fällen ist `x` danach um 1 größer ([§12.8.16 Postfix increment and decrement operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12816-postfix-increment-and-decrement-operators)).
+
+Ein Ausdruck mit `++` hat also zwei Wirkungen: Er liefert einen Wert, und er ändert die Variable.
+
+:::info[Vorhersage]
+`x` startet bei `5`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l04-increment" code={incrementForms} predict expected={incrementFormsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `5`, `6`, `7` und `7`.
+
+1. **Postfix:** `x++` liefert den alten Wert `5`, der in `before` landet. Danach ist `x` gleich `6`.
+2. **Prefix:** `++x` erhöht `x` auf `7` und liefert den neuen Wert `7`. Er landet in `after`.
+3. **Endstand:** `x` ist `7`.
+
+</details>
+
+Die Operanden eines Ausdrucks werden von links nach rechts ausgewertet ([§12.4.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1241-general)). Das zeigt sich, wenn ein Operand die Variable ändert, die der andere liest.
+
+:::info[Vorhersage]
+In `i++ + i` steht links der Operand `i++`, rechts `i`. Welche zwei Zeilen werden ausgegeben?
+:::
+
+<CSharpRunner id="m01-l04-order" code={evaluationOrder} predict expected={evaluationOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `3` und `2`.
+
+1. **Links zuerst:** `i++` liefert `1`, danach ist `i` gleich `2`.
+2. **Rechts danach:** Der Operand `i` hat jetzt den Wert `2`.
+3. **Addieren:** `1 + 2` ergibt `3`.
+
+Solche Ausdrücke sind schwer zu lesen. In eigenem Code schreibst du `++` lieber als eigene Anweisung.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, die erste Ereigniszeile des Beispiel-Logs, Benutzer, IP-Adresse und Ereignistyp von Zeile 2 und die Fehlerquote von 50 Prozent.
+
+**Neue Anforderung:** Bob hat im Beispiel-Log fünf fehlgeschlagene Anmeldungen (Zeilen 2, 3, 5, 6 und 7). Zähle sie mit einer `int`-Variable `bobFailures`, die bei `0` startet und mit `++` pro fehlgeschlagener Zeile von Bob wächst. Eine Anweisung pro Zeile genügt, Schleifen kommen in Modul 2. Gib die Anzahl mit dem Etikett `Failed logins of bob: ` aus. Berechne danach Bobs Anteil an allen Fehlschlägen (`failures`) in Prozent mit **einem** Ausdruck, runde auf zwei Nachkommastellen, speichere das Ergebnis in einer `double`-Variable `bobShare` und gib es mit dem Etikett `Share of bob (%): ` aus. Schreibe einen Kommentar über die neuen Zeilen. Überlege, ob dein Ausdruck Klammern braucht.
+
+<CSharpRunner id="m01-l04-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Zähler anlegen:** `int bobFailures = 0;` beginnt bei `0`.
+2. **Zählen:** Jedes `bobFailures++;` steht für eine fehlgeschlagene Zeile von Bob und erhöht den Zähler um 1. Nach fünf Anweisungen ist er `5`.
+3. **Ausdruck bilden:** `bobFailures * 100.0 / failures` braucht keine Klammern. `*` und `/` haben gleichen Rang und rechnen von links nach rechts: Erst ist `5 * 100.0` gleich `500`, ein `double`. Dann ist `500 / 7` gleich `71.42857…`.
+4. **Reihenfolge beachten:** Mit `bobFailures / failures * 100.0` käme `0` heraus, denn `5 / 7` wäre zuerst eine Ganzzahldivision. Hier entscheidet die Reihenfolge über das Ergebnis, und die `100.0` steht deshalb vorn.
+5. **Runden und ausgeben:** `Math.Round(…, 2)` ergibt `71.43`.
+
+</details>
+
+**Neuer Stand:** SecLog zählt Bobs fehlgeschlagene Anmeldungen mit einem Zähler und gibt seinen Anteil an allen Fehlschlägen in Prozent aus.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l04-postfix-returns-new-value" />
+
+**„`x++` liefert den neuen Wert.“** Bei `x++` ist der Wert des Ausdrucks der alte Wert von `x`. Nur die Variable ist danach um 1 größer. Mit `int x = 5; int y = x++;` ist `y` gleich `5` und `x` gleich `6`. Den neuen Wert liefert erst `++x`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l04-left-to-right-always" />
+
+**„C# rechnet immer von links nach rechts, wie ein Taschenrechner.“** Das gilt nur bei gleichem Rang. `2 + 3 * 4` ergibt `14` und nicht `20`, weil `*` Vorrang vor `+` hat. Nur wenn Operatoren gleichen Rang haben, wie `20 - 5 - 3`, wird von links nach rechts gerechnet.
+:::
+
+<details>
+<summary>Vertiefung: Wo die Regeln stehen (optional)</summary>
+
+Die Reihenfolge, in der die Operanden ausgewertet werden, ist von der Rangfolge unabhängig: Operanden werden immer von links nach rechts ausgewertet ([§12.4.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1241-general)). Die Rangfolge bestimmt nur, welcher Operator auf welche Operanden wirkt. Bei `x += y` gilt: `x` wird nur einmal ausgewertet. Das zählt, wenn `x` selbst ein Ausdruck mit Wirkung ist.
+
+</details>
+
+## Zusammenfassung
+
+Ein Ausdruck besteht aus Operanden und Operatoren und liefert einen Wert. Die Rangfolge bestimmt, welcher Operator zuerst rechnet: `*`, `/` und `%` vor `+` und `-`. Bei gleichem Rang rechnen binäre Operatoren von links nach rechts, die Zuweisung von rechts nach links. Klammern ändern die Gruppierung oder zeigen die Absicht. `+=`, `-=`, `*=`, `/=` und `%=` rechnen mit dem alten Wert der Variable und speichern das Ergebnis wieder darin. `x++` liefert den alten, `++x` den neuen Wert, und `x` ist danach in beiden Fällen um 1 größer.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l04-q1" />
+
+<Quiz id="m01-l04-q2" />
+
+<Quiz id="m01-l04-q3" />
+
+<Quiz id="m01-l04-q4" />
+
+<Quiz id="m01-l04-q5" />
+
+<Quiz id="m01-l04-q6" />
+
+<Quiz id="m01-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m01-l04-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Arithmetische Operatoren in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/arithmetic-operators)
+- Microsoft Learn: [Zuweisungsoperatoren in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/assignment-operator)
+- Microsoft Learn: [C#-Spezifikation, Expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions)
