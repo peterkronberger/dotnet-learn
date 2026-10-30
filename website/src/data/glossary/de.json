@@ -124,7 +124,6 @@
       "related": [
         "reference-type"
       ],
-      "lesson": "m01-l02",
       "source": {
         "title": "Value types (C# reference)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/value-types"
@@ -142,7 +141,6 @@
       "related": [
         "value-type"
       ],
-      "lesson": "m01-l02",
       "source": {
         "title": "Reference types (C# reference)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/reference-types"
