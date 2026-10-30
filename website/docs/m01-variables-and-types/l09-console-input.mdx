@@ -1,0 +1,202 @@
+---
+title: Konsoleneingabe
+sidebar_position: 9
+description: "Console.ReadLine() liest eine Zeile Eingabe als Text. Zum Rechnen wandelst du den Text mit Parse oder TryParse in eine Zahl um."
+lesson_id: m01-l09
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import readlineEcho from '!!raw-loader!@site/examples/m01/l09/readline-echo.cs';
+import readlineEchoInput from '!!raw-loader!@site/examples/m01/l09/readline-echo.in.txt';
+import readlineEchoOutput from '!!raw-loader!@site/examples/m01/l09/readline-echo.out.txt';
+import readlineLines from '!!raw-loader!@site/examples/m01/l09/readline-lines.cs';
+import readlineLinesInput from '!!raw-loader!@site/examples/m01/l09/readline-lines.in.txt';
+import readlineLinesOutput from '!!raw-loader!@site/examples/m01/l09/readline-lines.out.txt';
+import readlineNumber from '!!raw-loader!@site/examples/m01/l09/readline-number.cs';
+import readlineNumberInput from '!!raw-loader!@site/examples/m01/l09/readline-number.in.txt';
+import readlineNumberOutput from '!!raw-loader!@site/examples/m01/l09/readline-number.out.txt';
+import readlineGaps from '!!raw-loader!@site/examples/m01/l09/readline-gaps.cs';
+import readlineGapsInput from '!!raw-loader!@site/examples/m01/l09/readline-gaps.in.txt';
+import projectTask from '!!raw-loader!@site/examples/m01/l09/seclog-event-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m01/l09/seclog-event-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m01/l09/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l09/seclog-event-solution.cs';
+
+# Konsoleneingabe
+
+:::note[Lernziele]
+- Du liest mit `Console.ReadLine()` eine Zeile ein und gibst sie weiterverarbeitet aus.
+- Du sagst voraus, welche Eingabezeile welches `Console.ReadLine()` liest, wenn ein Programm mehrere Zeilen einliest.
+- Du wandelst eine eingelesene Zahl mit `int.TryParse` um und rechnest damit.
+- Du erklärst, warum `Console.ReadLine()` immer Text liefert, auch wenn eine Zahl eingegeben wird.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l02-q3" />
+
+<Quiz id="m01-l08-q4" />
+
+<Quiz id="m01-l08-q7" />
+
+## Eine Zeile einlesen
+
+Bisher stand jeder Wert fest im Programmtext. Echte Programme bekommen ihre Werte oft von außen, zum Beispiel vom Nutzer. Die <Term id="console-input">Konsoleneingabe (Console Input)</Term> liest Text, den der Nutzer in der Konsole tippt. `Console.ReadLine()` liest eine Zeile bis zum Zeilenumbruch und liefert sie ohne den Zeilenumbruch zurück ([Console.ReadLine](https://learn.microsoft.com/dotnet/api/system.console.readline)). Das Ergebnis speicherst du in einer Variable, hier mit `var`.
+
+In einem Konsolenfenster hält das Programm bei `Console.ReadLine()` an und wartet auf deine Eingabe. Im Runner dieser Seite steht die Eingabe schon vor dem Start fest: Sie steht im Feld „Eingabe (Konsole)“ unter dem Editor. Jede Zeile dort liest ein Aufruf von `Console.ReadLine()`.
+
+:::info[Vorhersage]
+Das Feld enthält die Zeile `alice`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l09-echo" code={readlineEcho} stdin={readlineEchoInput} predict expected={readlineEchoOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `Hello, alice!` und `alice`.
+
+1. **Zeile lesen:** `Console.ReadLine()` liefert den Text `alice`. Er steht jetzt in `name`.
+2. **Text verwenden:** Die Interpolation setzt `name` in den Satz ein. Die zweite Ausgabe gibt `name` allein aus.
+
+Was passiert, wenn du im Feld eine andere Zeile einträgst, zum Beispiel `bob`? Ändere das Feld und führe das Programm erneut aus.
+
+</details>
+
+## Mehrere Zeilen: Jeder Aufruf liest die nächste
+
+Ein Aufruf liest genau eine Zeile. Liest ein Programm mehrere Zeilen, liest der erste Aufruf die erste Zeile, der zweite Aufruf die zweite und so weiter. Eine Zeile, die kein Aufruf liest, bleibt ungelesen.
+
+:::info[Vorhersage]
+Das Feld enthält drei Zeilen: `login-failed`, `bob` und `203.0.113.7`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l09-lines" code={readlineLines} stdin={readlineLinesInput} predict expected={readlineLinesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `Second read: bob` und `First read: login-failed`.
+
+1. **Erster Aufruf:** `first` bekommt die erste Zeile, `login-failed`.
+2. **Zweiter Aufruf:** `second` bekommt die nächste Zeile, `bob`.
+3. **Ausgabe:** Die Ausgabe nennt die Variablen in umgekehrter Reihenfolge. Die Reihenfolge der Eingabe ändert das nicht.
+
+Die dritte Zeile, `203.0.113.7`, liest kein Aufruf. Sie bleibt ungelesen.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m01-l09-readline-reads-all" />
+
+**„Ein `Console.ReadLine()` liest die ganze Eingabe.“** Ein Aufruf liest nur eine Zeile. Für drei Zeilen brauchst du drei Aufrufe.
+:::
+
+## Die Eingabe ist immer Text
+
+Auch wenn du `42` eintippst, liefert `Console.ReadLine()` den Text `"42"`: die Zeichen `4` und `2`. Das Programm kann nicht wissen, ob du eine Zahl, ein Wort oder einen Namen meinst. Zum Rechnen brauchst du eine Zahl. Dafür wandelst du den Text mit dem Parsen aus der letzten Lektion um. `int.TryParse` nimmt den eingelesenen Text als erstes Argument an ([Int32.TryParse](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)).
+
+<Forward concepts={['`out`-Parameter']} module="3" />
+
+:::info[Vorhersage]
+Das Feld enthält die Zeile `42`. Welche drei Zeilen gibt das Programm aus? Vergleiche die erste und die dritte Zeile.
+:::
+
+<CSharpRunner id="m01-l09-number" code={readlineNumber} stdin={readlineNumberInput} predict expected={readlineNumberOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `421`, `True` und `43`.
+
+1. **Zeile lesen:** `text` ist der Text `"42"`.
+2. **Text verketten:** `text + 1` hängt das Zeichen `1` an: `421`.
+3. **Umwandeln und rechnen:** `int.TryParse` liefert `True` und die Zahl `42` in `number`. Dann gilt `number + 1`: `43`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m01-l09-readline-returns-number" />
+
+**„Tippe ich `42`, liefert `Console.ReadLine()` die Zahl 42.“** Das Ergebnis ist immer Text. Erst `int.Parse` oder `int.TryParse` macht daraus eine Zahl. Ohne Umwandlung verkettet `+` den Text, und aus `42` plus `1` wird `421`.
+:::
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Das Feld enthält `12`, `2.5` und `twelve`. Ersetze in den drei Zeilen mit `0` und `true` den Wert so, dass die Ausgabe `24`, `5` und `False` lautet. Verwende die Rezepte `int.TryParse(countText, out int count);`, `double.TryParse(rateText, out double rate);` und `bool worked = int.TryParse(thirdText, out int ignored);`.
+
+<CSharpRunner id="m01-l09-gaps" code={readlineGaps} stdin={readlineGapsInput} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ganze Zahl:** `int.TryParse(countText, out int count);` ergibt `12`, mal zwei `24`.
+2. **Dezimalzahl:** `double.TryParse(rateText, out double rate);` ergibt `2.5`, mal zwei `5`.
+3. **Prüfen:** `bool worked = int.TryParse(thirdText, out int ignored);` ergibt `False`, weil ein Wort keine Zahl ist.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, das erste Ereignis, Benutzer, IP-Adresse und Ereignistyp, Fehlerquoten, Bobs Anteil, das Ereignis als Logzeile und liest die Zahl der fehlgeschlagenen Anmeldungen aus einem festen Text.
+
+**Neue Anforderung:** Der Benutzername und die Zahl der fehlgeschlagenen Anmeldungen kommen aus der Eingabe (im Feld stehen `bob` und `5`) statt fest im Code. Lies den Benutzernamen mit `Console.ReadLine()` aus der ersten Zeile. Lies die Zahl aus der zweiten Zeile und wandle sie mit `int.TryParse` um. Die Zeile heißt jetzt `Failure rate from input (%): 35.7` (eine Nachkommastelle mit `:F1`). Die anderen Zeilen bleiben, die Ausgabe hat weiter 23 Zeilen.
+
+<CSharpRunner id="m01-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Benutzer lesen:** `var user = Console.ReadLine();` ersetzt den festen Text `"bob"`. Der Rest nutzt `user` weiter.
+2. **Zahl lesen:** Der zweite Aufruf liest `5` als Text.
+3. **Umwandeln:** `int.TryParse(failedText, out int failedFromInput);` macht daraus die Zahl `5`. Den `bool` brauchst du hier nicht, die Eingabe ist vorgegeben.
+4. **Rechnen und ausgeben:** `5 * 100.0 / 14` ergibt etwa `35.7`.
+
+</details>
+
+**Neuer Stand:** SecLog liest den Benutzer und die Zahl der fehlgeschlagenen Anmeldungen aus der Eingabe. Damit ist Modul 1 abgeschlossen: SecLog zeigt ein Ereignis, berechnet die Fehlerquote und liest eine Zahl aus Text.
+
+<details>
+<summary>Vertiefung: Wenn die Eingabe zu Ende ist (optional)</summary>
+
+`Console.ReadLine()` liefert die nächste Zeile ohne Zeilenumbruch. Gibt es keine weitere Zeile mehr, signalisiert die Methode das mit einem besonderen Rückgabewert, den Modul 4 behandelt. Der Rückgabetyp heißt deshalb `string?`, und `var` übernimmt ihn ([Console.ReadLine](https://learn.microsoft.com/dotnet/api/system.console.readline)).
+
+<Forward concepts={['`null`', 'Nullable-Referenztypen (`string?`)']} module="4" />
+
+</details>
+
+## Zusammenfassung
+
+`Console.ReadLine()` liest eine Zeile Eingabe ohne Zeilenumbruch. Mehrere Zeilen brauchen mehrere Aufrufe, jeder liest die nächste Zeile. Das Ergebnis ist immer Text, auch bei `42`. Zum Rechnen wandelst du den Text mit `int.Parse` oder `int.TryParse` um. Im Runner steht die Eingabe vor dem Start im Feld, im Konsolenfenster wartet das Programm auf dich.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l09-q1" />
+
+<Quiz id="m01-l09-q2" />
+
+<Quiz id="m01-l09-q3" />
+
+<Quiz id="m01-l09-q4" />
+
+<Quiz id="m01-l09-q5" />
+
+<Quiz id="m01-l09-q6" />
+
+<Quiz id="m01-l09-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l09-q8" />
+
+### Transferfrage
+
+<Quiz id="m01-l09-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Console.ReadLine](https://learn.microsoft.com/dotnet/api/system.console.readline)
+- Microsoft Learn: [Int32.TryParse](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)
