@@ -1,0 +1,5 @@
+User bob failed 5 times.
+Sum: 7
+Rate: 71.4 %
+[    5]
+[bob  ]

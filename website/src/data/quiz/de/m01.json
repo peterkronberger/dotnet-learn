@@ -557,7 +557,10 @@
       "blanks": [
         {
           "text": "3 * 4",
-          "accept": ["3 * 4", "4 * 3"],
+          "accept": [
+            "3 * 4",
+            "4 * 3"
+          ],
           "hint": "Die Multiplikation hat Vorrang vor der Addition."
         },
         {
@@ -832,6 +835,205 @@
       "type": "explain",
       "question": "Transferfrage: Welche Werte in einem Log-Werkzeug sind echte Konstanten, und welche sehen nur konstant aus?",
       "modelAnswer": "Echte Konstanten sind Werte, die sich durch die Sache selbst nie ändern, zum Beispiel die Sekunden pro Minute (`60`) oder ein festes Etikett für eine Ausgabe. Nur konstant aussehen kann zum Beispiel ein Schwellenwert, ab dem ein Benutzer als verdächtig gilt: Heute ist er `5`, aber ein Benutzer des Werkzeugs könnte ihn später ändern wollen. Das ist ein Wert, den das Programm einmal festlegt und der sich ändern darf, keine Konstante."
+    },
+    {
+      "id": "m01-l06-q1",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "Welchen Wert hat der Ausdruck `\"3\" + 4`?",
+      "options": [
+        {
+          "text": "Den Text `\"34\"`.",
+          "correct": true
+        },
+        {
+          "text": "Die Zahl `7`.",
+          "misconception": "m01-l06-string-plus-number-adds",
+          "feedback": "Ist ein Operand ein Text, verkettet `+` statt zu addieren. Die Zahl `4` wird in Text umgewandelt."
+        },
+        {
+          "text": "Einen Compilerfehler, weil Text und Zahl nicht zusammenpassen.",
+          "feedback": "Der Compiler wandelt die Zahl für die Verkettung in Text um. Es gibt keinen Fehler."
+        },
+        {
+          "text": "Den Text `\"3 + 4\"`.",
+          "feedback": "`+` bleibt nicht als Zeichen im Ergebnis stehen, es verkettet die beiden Werte."
+        }
+      ],
+      "explanation": "Ein Operand von `+` ist ein `string`. Deshalb wird `4` in den Text `\"4\"` umgewandelt und angehängt. Das Ergebnis ist `\"34\"`."
+    },
+    {
+      "id": "m01-l06-q2",
+      "lesson": "m01-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Werte jeden Ausdruck von links nach rechts aus.",
+      "example": "m01/l06/quiz-concat.cs",
+      "explanation": "`a + b` verkettet `\"2\"` und `3` zu `23`. Bei `b + b + a` wird zuerst `3 + 3` gerechnet (`6`), dann `6` und `\"2\"` verkettet: `62`. In der Interpolation steht `{b + b}` für `6`, danach folgt `{a}`: ebenfalls `62`."
+    },
+    {
+      "id": "m01-l06-q3",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "`double rate = 71.4286;` – was gibt `Console.WriteLine($\"{rate:F1} %\");` aus?",
+      "options": [
+        {
+          "text": "`71.4 %`",
+          "correct": true
+        },
+        {
+          "text": "`71.4286 %`",
+          "feedback": "Die Formatangabe `F1` begrenzt die Ausgabe auf eine Nachkommastelle."
+        },
+        {
+          "text": "`71 %`",
+          "feedback": "`F1` steht für eine Nachkommastelle, `F0` wäre keine."
+        },
+        {
+          "text": "`{rate:F1} %`",
+          "feedback": "Mit `$` vor dem Text werden die Klammern ausgewertet. Ohne `$` würde der Text unverändert erscheinen."
+        }
+      ],
+      "explanation": "Die Formatangabe nach dem Doppelpunkt bestimmt, wie die Zahl aussieht. `F1` zeigt eine Nachkommastelle, gerundet: `71.4`."
+    },
+    {
+      "id": "m01-l06-q4",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine($\"[{count,5}]\");` bei `int count = 42;` aus?",
+      "options": [
+        {
+          "text": "`[   42]`",
+          "correct": true
+        },
+        {
+          "text": "`[42   ]`",
+          "feedback": "Eine positive Breite füllt links auf, der Text steht rechtsbündig. Linksbündig wäre eine negative Breite wie `-5`."
+        },
+        {
+          "text": "`[42,5]`",
+          "feedback": "Das Komma gehört zur Syntax der Interpolation und steht nicht im Ergebnis."
+        },
+        {
+          "text": "`[42]`",
+          "feedback": "Die Zahl nach dem Komma ist die Mindestbreite. Kürzere Werte werden mit Leerzeichen aufgefüllt."
+        }
+      ],
+      "explanation": "`,5` setzt die Mindestbreite auf 5 Zeichen. `42` hat zwei Zeichen, also kommen drei Leerzeichen davor."
+    },
+    {
+      "id": "m01-l06-q5",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "Warum zeigen die Beispiele dieses Kurses `71.4` mit Punkt, obwohl eine Zahl in anderen Kulturen mit Komma geschrieben wird?",
+      "options": [
+        {
+          "text": "Die Formatierung hängt von der Kultur ab. Playground und CI laufen ohne landesspezifische Einstellungen (`InvariantGlobalization`), deshalb steht immer ein Punkt.",
+          "correct": true
+        },
+        {
+          "text": "C# schreibt Dezimalzahlen in jeder Umgebung mit Punkt.",
+          "feedback": "Die Ausgabe kann sich je nach Kultur ändern. Hier steht der Punkt nur, weil die Umgebung kulturunabhängig läuft."
+        },
+        {
+          "text": "Die Formatangabe `F1` erzwingt den Punkt.",
+          "feedback": "`F1` bestimmt die Zahl der Nachkommastellen, nicht das Trennzeichen."
+        },
+        {
+          "text": "Der Punkt ist ein Fehler im Playground.",
+          "feedback": "Das ist gewollt, damit die Ausgabe überall gleich ist."
+        }
+      ],
+      "explanation": "Wie eine Zahl als Text aussieht, kann von der Kultur abhängen. Playground und CI verwenden keine landesspezifischen Einstellungen, deshalb sind die gezeigten Ausgaben immer gleich."
+    },
+    {
+      "id": "m01-l06-q6",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "Nach `string name = \"bob\"; name.ToUpper();` – welchen Wert hat `name`?",
+      "options": [
+        {
+          "text": "`\"bob\"` – die Methode liefert einen neuen Text zurück, `name` bleibt gleich.",
+          "correct": true
+        },
+        {
+          "text": "`\"BOB\"` – die Methode ändert `name`.",
+          "misconception": "m01-l06-toupper-changes-variable",
+          "feedback": "`ToUpper()` liefert einen neuen Text. Ohne Zuweisung des Ergebnisses ändert sich `name` nicht."
+        },
+        {
+          "text": "`\"Bob\"`",
+          "feedback": "`ToUpper()` macht alle Buchstaben groß, und `name` wird nicht verändert."
+        },
+        {
+          "text": "Ein Fehler, weil das Ergebnis nicht verwendet wird.",
+          "feedback": "Das ist erlaubt. Das Ergebnis geht dann nur verloren."
+        }
+      ],
+      "explanation": "Ein Text wird nicht verändert. `name.ToUpper()` liefert einen neuen Text `\"BOB\"`. Um ihn zu behalten, speicherst du ihn, zum Beispiel mit `name = name.ToUpper();`."
+    },
+    {
+      "id": "m01-l06-q7",
+      "lesson": "m01-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über `string user = \"alice\";` sind richtig?",
+      "options": [
+        {
+          "text": "`user.Length` ist `5`.",
+          "correct": true
+        },
+        {
+          "text": "`user.ToUpper()` ergibt `\"ALICE\"`.",
+          "correct": true
+        },
+        {
+          "text": "`user.Length` ist ein Aufruf und braucht Klammern: `user.Length()`.",
+          "feedback": "`Length` wird ohne Klammern verwendet. `ToUpper()` ist dagegen ein Aufruf mit Klammern."
+        },
+        {
+          "text": "`user.Length` zählt die Wörter.",
+          "feedback": "`Length` zählt die Zeichen."
+        }
+      ],
+      "explanation": "Ein Text hat Mitglieder, die du mit einem Punkt verwendest. `Length` ist die Zahl der Zeichen (`5`), `ToUpper()` liefert den Text in Großbuchstaben."
+    },
+    {
+      "id": "m01-l06-q8",
+      "lesson": "m01-l06",
+      "type": "single",
+      "question": "Was ist der Vorteil eines Raw-String-Literals `\"\"\"…\"\"\"` gegenüber einem normalen Text-Literal?",
+      "options": [
+        {
+          "text": "Es darf über mehrere Zeilen gehen, und Anführungszeichen darin brauchen kein Escaping.",
+          "correct": true
+        },
+        {
+          "text": "Es berechnet Ausdrücke in geschweiften Klammern.",
+          "feedback": "Das tut die Interpolation mit `$`. Ein einfaches Raw-String-Literal behandelt geschweifte Klammern als normalen Text."
+        },
+        {
+          "text": "Es ist schneller zur Laufzeit.",
+          "feedback": "Es geht nur um die Schreibweise im Code."
+        },
+        {
+          "text": "Es kann nachträglich verändert werden.",
+          "feedback": "Auch hier wird ein Text nicht verändert."
+        }
+      ],
+      "explanation": "Zwischen den dreifachen Anführungszeichen steht der Text, wie er ist: über mehrere Zeilen, mit Anführungszeichen und ohne Escape-Sequenzen."
+    },
+    {
+      "id": "m01-l06-q9",
+      "lesson": "m01-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `1 + 2 + \"3\"` den Text `\"33\"` ergibt, `\"3\" + 1 + 2` aber `\"312\"`.",
+      "modelAnswer": "`+` wird von links nach rechts ausgewertet. Bei `1 + 2 + \"3\"` sind die ersten beiden Operanden Zahlen, also wird zuerst addiert: `3`. Erst dann trifft `+` auf den Text `\"3\"` und verkettet: `\"33\"`.\n\nBei `\"3\" + 1 + 2` ist schon der erste Operand ein Text. `\"3\" + 1` ergibt `\"31\"`, und das ist wieder ein Text. Danach wird `2` angehängt: `\"312\"`."
+    },
+    {
+      "id": "m01-l06-q10",
+      "lesson": "m01-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo baut ein Programm Text aus Werten zusammen, etwa in einem Log-Werkzeug?",
+      "modelAnswer": "Zum Beispiel bei Logzeilen (Zeitstempel, Ereignis, Benutzer und IP-Adresse zu einer Zeile), bei Meldungen an Benutzer („Benutzer bob hatte 5 Fehlversuche“) und bei Berichten mit Zahlen wie einer Fehlerquote mit einer Nachkommastelle. Überall werden Werte aus Variablen in einen Text eingesetzt, am lesbarsten mit Interpolation."
     }
   ]
 }
