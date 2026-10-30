@@ -1119,6 +1119,110 @@
         "exception"
       ],
       "lesson": "m00-l05"
+    },
+    {
+      "id": "expression",
+      "term": "Expression",
+      "german": "Ausdruck",
+      "category": "language",
+      "definition": "Ein Teil des Codes, der zu einem Wert ausgewertet wird, zum Beispiel `7`, `count` oder `2 + 3 * 4`. Ein Ausdruck besteht aus Operanden und Operatoren.",
+      "aliases": [
+        "Ausdruck",
+        "Ausdrücke",
+        "Expressions"
+      ],
+      "related": [
+        "operand",
+        "operator"
+      ],
+      "lesson": "m01-l04",
+      "source": {
+        "title": "Expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions"
+      }
+    },
+    {
+      "id": "operator",
+      "term": "Operator",
+      "category": "language",
+      "definition": "Ein Zeichen, das Operanden zu einem neuen Wert verknüpft. Ein unärer Operator hat einen Operanden (`-x`), ein binärer zwei (`x + y`).",
+      "aliases": [
+        "Operatoren"
+      ],
+      "related": [
+        "operand",
+        "expression",
+        "operator-precedence"
+      ],
+      "lesson": "m01-l04",
+      "source": {
+        "title": "Operators (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#124-operators"
+      }
+    },
+    {
+      "id": "operator-precedence",
+      "term": "Operator Precedence",
+      "german": "Rangfolge",
+      "category": "language",
+      "definition": "Die Regel, welcher Operator in einem Ausdruck zuerst rechnet. `*`, `/` und `%` haben Vorrang vor `+` und `-`. Bei gleichem Rang entscheidet die Assoziativität: Binäre Operatoren rechnen von links nach rechts, die Zuweisung von rechts nach links.",
+      "aliases": [
+        "Rangfolge",
+        "Vorrang",
+        "Assoziativität",
+        "Operatorrangfolge"
+      ],
+      "related": [
+        "operator",
+        "expression"
+      ],
+      "lesson": "m01-l04",
+      "source": {
+        "title": "Operator precedence and associativity (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1242-operator-precedence-and-associativity"
+      }
+    },
+    {
+      "id": "compound-assignment",
+      "term": "Compound Assignment",
+      "german": "zusammengesetzte Zuweisung",
+      "category": "language",
+      "definition": "Eine Zuweisung wie `x += 3`. Sie rechnet mit dem alten Wert von `x` und speichert das Ergebnis wieder in `x`. `x op= y` entspricht `x = x op y`, wobei `x` nur einmal ausgewertet wird.",
+      "aliases": [
+        "zusammengesetzte Zuweisung",
+        "Compound-Zuweisung"
+      ],
+      "related": [
+        "variable",
+        "expression"
+      ],
+      "lesson": "m01-l04",
+      "source": {
+        "title": "Compound assignment (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12245-compound-assignment"
+      }
+    },
+    {
+      "id": "increment-operator",
+      "term": "Increment Operator",
+      "german": "Inkrement-Operator",
+      "category": "language",
+      "definition": "Der Operator `++` erhöht eine Variable um 1, `--` verringert sie um 1. Bei `x++` ist der Wert des Ausdrucks der alte Wert von `x`, bei `++x` der neue.",
+      "aliases": [
+        "Inkrement",
+        "Dekrement",
+        "Decrement Operator",
+        "++"
+      ],
+      "related": [
+        "compound-assignment",
+        "variable"
+      ],
+      "lesson": "m01-l04",
+      "source": {
+        "title": "Postfix increment and decrement operators (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12816-postfix-increment-and-decrement-operators"
+      }
     }
   ]
 }
