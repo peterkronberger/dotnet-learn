@@ -1,0 +1,3 @@
+alice failed 3 times
+Rate: 43 %
+alice has 0 letters

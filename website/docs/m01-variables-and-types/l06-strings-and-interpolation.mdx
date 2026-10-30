@@ -1,0 +1,233 @@
+---
+title: Zeichenketten und Interpolation
+sidebar_position: 6
+description: "Texte werden mit + verkettet oder mit Interpolation zusammengesetzt. Eine Formatangabe bestimmt, wie Zahlen aussehen. Ein Text hat außerdem Mitglieder wie Length und ToUpper()."
+lesson_id: m01-l06
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import concat from '!!raw-loader!@site/examples/m01/l06/concat.cs';
+import concatOutput from '!!raw-loader!@site/examples/m01/l06/concat.out.txt';
+import interpolation from '!!raw-loader!@site/examples/m01/l06/interpolation.cs';
+import interpolationOutput from '!!raw-loader!@site/examples/m01/l06/interpolation.out.txt';
+import stringMembers from '!!raw-loader!@site/examples/m01/l06/string-members.cs';
+import stringMembersOutput from '!!raw-loader!@site/examples/m01/l06/string-members.out.txt';
+import rawString from '!!raw-loader!@site/examples/m01/l06/raw-string.cs';
+import composite from '!!raw-loader!@site/examples/m01/l06/composite.cs';
+import compositeOutput from '!!raw-loader!@site/examples/m01/l06/composite.out.txt';
+import stringsGaps from '!!raw-loader!@site/examples/m01/l06/strings-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l06/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l06/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l06/seclog-event-solution.cs';
+
+# Zeichenketten und Interpolation
+
+:::note[Lernziele]
+- Du sagst das Ergebnis von `+` mit Texten und Zahlen voraus, zum Beispiel `"3" + 4` und `1 + 2 + "3"`.
+- Du baust eine Ausgabe mit String-Interpolation und Formatangaben zusammen, zum Beispiel `{rate:F1}` und `{count,5}`.
+- Du verwendest `Length` und `ToUpper()` eines Textes.
+- Du schreibst mehrzeiligen Text als Raw-String-Literal (`"""…"""`).
+:::
+
+## Rückblick
+
+<Quiz id="m01-l05-q1" />
+
+<Quiz id="m01-l05-q3" />
+
+<Quiz id="m01-l04-q3" />
+
+## Texte mit + verketten
+
+Ein Text hat in C# den Typ `string`. Du kennst ihn aus den Textliteralen wie `"bob"`. Texte kannst du aneinanderhängen, mit demselben Operator `+`, den du von Zahlen kennst. Das heißt <Term id="string-concatenation">Verkettung (String Concatenation)</Term>. Steht links oder rechts von `+` ein `string`, wird der andere Operand in Text umgewandelt und angehängt. Eine Zahl wird dabei nicht addiert ([§12.12.5 Addition operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12125-addition-operator)).
+
+`+` wird von links nach rechts ausgewertet (Lektion über Operatoren). Deshalb kommt es auf die Reihenfolge an: Solange beide Operanden Zahlen sind, wird gerechnet. Erst wenn ein Text dazukommt, wird verkettet.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Notiere für jeden Ausdruck zuerst, welche Operanden das erste `+` hat.
+:::
+
+<CSharpRunner id="m01-l06-concat" code={concat} predict expected={concatOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `34`, `33`, `312` und `Failed logins: 7`.
+
+1. **Reihenfolge festlegen:** `+` wird von links nach rechts ausgewertet. Das erste `+` entscheidet, ob addiert oder verkettet wird.
+2. **`"3" + 4`:** Ein Operand ist ein Text. Die `4` wird zu `"4"`, das Ergebnis ist `"34"`.
+3. **`1 + 2 + "3"`:** Das erste `+` hat zwei Zahlen und addiert zu `3`. Das zweite `+` verkettet `3` und `"3"` zu `"33"`.
+4. **`"3" + 1 + 2`:** Das erste `+` verkettet zu `"31"`, das ist ein Text. Das zweite `+` hängt `2` an: `"312"`.
+5. **Beschriftung:** `"Failed logins: " + 7` ergibt `Failed logins: 7`.
+
+Was passiert, wenn du `"3" + (1 + 2)` schreibst? Probiere es aus: Die Klammern erzwingen, dass zuerst gerechnet wird. Das Ergebnis ist `33`.
+
+</details>
+
+## Interpolation: Text aus Werten bauen
+
+Lange Ketten aus `+` sind schwer zu lesen. Besser ist die <Term id="string-interpolation">String-Interpolation (String Interpolation)</Term>: Ein `$` steht vor dem Anführungszeichen, und in geschweiften Klammern steht ein Ausdruck, der ausgewertet und in den Text eingesetzt wird ([§12.8.3 Interpolated string expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions)). Das Beispiel `$"User {user} failed {count} times."` ist ein ganzer Satz mit zwei Lücken. Es gibt auch eine Form `$@"…"`, die die Interpolation mit einem wörtlichen Text verbindet. Der Kurs verwendet sie nicht.
+
+Hinter dem Ausdruck stehen zwei optionale Teile:
+
+- **Breite:** `{count,5}` füllt den Wert mit Leerzeichen auf mindestens 5 Zeichen auf. Eine positive Zahl richtet rechts aus, eine negative (`{user,-5}`) links.
+- **Formatangabe:** `{rate:F1}` bestimmt nach dem Doppelpunkt, wie der Wert als Text aussieht. Eine <Term id="format-string">Formatangabe (Format String)</Term> wie `F1` zeigt eine Zahl mit einer Nachkommastelle, gerundet ([Standard numeric format strings](https://learn.microsoft.com/dotnet/standard/base-types/standard-numeric-format-strings)).
+
+Soll ein Text eine geschweifte Klammer enthalten, schreibst du sie doppelt: `{{`.
+
+:::info[Vorhersage]
+Welche fünf Zeilen gibt das Programm aus? Überlege dir besonders die letzten drei: Wie viele Leerzeichen stehen in den eckigen Klammern?
+:::
+
+<CSharpRunner id="m01-l06-interpolation" code={interpolation} predict expected={interpolationOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind fünf Zeilen: `User bob failed 5 times.`, `Sum: 7`, `Rate: 71.4 %`, `[    5]` und `[bob  ]`.
+
+1. **Ausdrücke einsetzen:** `{user}` und `{count}` werden durch `bob` und `5` ersetzt. In `{count + 2}` steht ein ganzer Ausdruck: `5 + 2` ergibt `7`.
+2. **Formatieren:** `{rate:F1}` zeigt `71.4286` mit einer Nachkommastelle: `71.4`. Das ` %` danach ist normaler Text.
+3. **Rechts ausrichten:** `{count,5}` ist 5 Zeichen breit. Die `5` hat ein Zeichen, davor stehen vier Leerzeichen.
+4. **Links ausrichten:** `{user,-5}` ist 5 Zeichen breit, links ausgerichtet. Hinter `bob` stehen zwei Leerzeichen.
+
+</details>
+
+:::info[Hinweis]
+Wie eine Zahl als Text aussieht, kann von der Kultur abhängen. Manche Kulturen schreiben `71,4` statt `71.4`. Der Playground und die Prüfung dieses Kurses laufen kulturunabhängig (`InvariantGlobalization`), deshalb steht in allen Ausgaben ein Punkt.
+:::
+
+## Ein Text hat Mitglieder
+
+Ein `string` bringt eigene Fähigkeiten mit. Du verwendest sie mit einem Punkt hinter dem Namen. Hier genügt dir: Ein Text hat Mitglieder, und du rufst sie mit einem Punkt ab.
+
+<Forward concepts={['Member (Mitglied) eines Typs']} module="6" />
+
+- `name.Length` ist die Anzahl der Zeichen ([String.Length](https://learn.microsoft.com/dotnet/api/system.string.length)). Es steht ohne Klammern.
+- `name.ToUpper()` ist eine <Term id="method">Methode</Term>, die den Text in Großbuchstaben liefert ([String.ToUpper](https://learn.microsoft.com/dotnet/api/system.string.toupper)). Sie hat Klammern.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Achte auf die dritte Zeile.
+:::
+
+<CSharpRunner id="m01-l06-members" code={stringMembers} predict expected={stringMembersOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `3`, `BOB`, `bob` und `BOB`.
+
+1. **Länge abrufen:** `name.Length` zählt die Zeichen von `bob`: `3`.
+2. **Neuen Text erzeugen:** `name.ToUpper()` liefert einen neuen Text `BOB`.
+3. **Alten Text prüfen:** `name` ist unverändert `bob`. Die Methode gibt das Ergebnis zurück und ändert die Variable nicht.
+4. **Ergebnis speichern:** Erst `string shout = name.ToUpper();` hält das Ergebnis in einer Variable fest.
+
+</details>
+
+## Mehrzeiliger Text als Raw-String-Literal
+
+Ein normales Textliteral braucht für Anführungszeichen und Zeilenumbrüche <Term id="escape-sequence">Escape-Sequenzen</Term> wie `\"` und `\n`. Ein <Term id="raw-string-literal">Raw-String-Literal (Raw String Literal)</Term> beginnt und endet mit mindestens drei Anführungszeichen. Dazwischen steht der Text, wie er ist: über mehrere Zeilen, mit Anführungszeichen und ohne Escape-Sequenzen. Die Einrückung des schließenden `"""` wird von allen Zeilen entfernt ([§6.4.5.6 String literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6456-string-literals)). Raw-String-Literale gibt es ab C# 11. Es gibt sie auch als interpolierte Form, die der Kurs nicht verwendet.
+
+<CSharpRunner id="m01-l06-raw" code={rawString} />
+
+Die Ausgabe zeigt zwei Zeilen ohne Einrückung, die Anführungszeichen um `login-failed` stehen unverändert. Der Text beginnt in der Zeile nach den öffnenden `"""` und endet vor dem schließenden `"""`.
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze die Formatangabe `F0` und die `0` in den geschweiften Klammern so, dass die Ausgabe `alice failed 3 times`, `Rate: 42.9 %` und `alice has 5 letters` lautet.
+
+<CSharpRunner id="m01-l06-gaps" code={stringsGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Text aus Werten bauen:** Die erste Zeile ist vollständig und gibt `alice failed 3 times` aus.
+2. **Formatieren:** `{rate:F1}` zeigt `42.857` mit einer Nachkommastelle: `42.9`.
+3. **Länge einsetzen:** `{user.Length}` setzt die Anzahl der Zeichen ein: `5`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, die erste Ereigniszeile, Benutzer, IP-Adresse und Ereignistyp von Zeile 2, die Fehlerquote von 50 Prozent sowie Bobs fehlgeschlagene Anmeldungen und seinen Anteil daran.
+
+**Neue Anforderung:** Gib das Ereignis von Zeile 2 des Beispiel-Logs noch einmal als eine Zeile im Log-Format aus: `2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`. Baue sie mit Interpolation aus den Variablen. Gib danach die Fehlerquote mit einer Nachkommastelle und einem Prozentzeichen aus, zum Beispiel `Failure rate: 50.0 %`. Die bisherigen 16 Zeilen bleiben, die neuen kommen am Ende dazu.
+
+<CSharpRunner id="m01-l06-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Zeitstempel ablegen:** `string timestamp = "2026-03-02T08:01:40Z";` hält den Zeitstempel von Zeile 2 in einer Variable.
+2. **Logzeile bauen:** `$"{timestamp} {eventType} user={user} ip={ip}"` setzt die vier Variablen in das Log-Format ein. Text wie `user=` bleibt stehen.
+3. **Quote formatieren:** `{failureRate:F1}` zeigt `50` als `50.0`. Das ` %` danach ist normaler Text.
+
+</details>
+
+**Neuer Stand:** SecLog gibt das Ereignis jetzt auch als Zeile im Log-Format aus, zusammengesetzt aus seinen Variablen, und zeigt die Fehlerquote mit einer Nachkommastelle.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l06-string-plus-number-adds" />
+
+**„`"3" + 4` ergibt `7`.“** Sobald ein Operand ein Text ist, verkettet `+`. Die Zahl wird zu Text, das Ergebnis ist der Text `"34"`. Gerechnet wird nur, solange beide Operanden Zahlen sind. Bei `1 + 2 + "3"` wird deshalb zuerst addiert (`3`) und dann verkettet (`"33"`).
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l06-toupper-changes-variable" />
+
+**„`name.ToUpper()` ändert `name`.“** Die Methode liefert einen neuen Text in Großbuchstaben. Die Variable `name` bleibt, wie sie war. Willst du das Ergebnis behalten, speicherst du es: `name = name.ToUpper();`.
+:::
+
+<details>
+<summary>Vertiefung: Zusammengesetzte Formatierung (optional)</summary>
+
+Vor der Interpolation hat man Text mit nummerierten Platzhaltern gebaut: `Console.WriteLine("{0} has {1:F1}", user, rate)`. Die Zahl in der Klammer ist die Position des Werts in der Liste dahinter. Für Breite und Formatangabe gelten dieselben Regeln wie in der Interpolation ([Composite formatting](https://learn.microsoft.com/dotnet/standard/base-types/composite-formatting)). Beide Schreibweisen liefern hier dasselbe:
+
+<CodeBlock language="csharp" title="composite.cs">{composite}</CodeBlock>
+
+<CodeBlock language="text" title="Ausgabe">{compositeOutput}</CodeBlock>
+
+Die Interpolation ist lesbarer, weil der Ausdruck an der Stelle steht, an der sein Wert erscheint.
+
+</details>
+
+## Zusammenfassung
+
+Texte hängst du mit `+` aneinander. Ist ein Operand ein Text, wird der andere in Text umgewandelt, und bei mehreren `+` zählt die Reihenfolge von links nach rechts. Mit Interpolation (`$"…{x}…"`) setzt du Werte direkt in einen Text ein. Breite (`{x,5}`) und Formatangabe (`{x:F1}`) bestimmen, wie sie aussehen. Ein Text hat Mitglieder wie `Length` und `ToUpper()`, die einen neuen Wert liefern. Ein Raw-String-Literal (`"""…"""`) schreibt mehrzeiligen Text ohne Escape-Sequenzen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l06-q1" />
+
+<Quiz id="m01-l06-q2" />
+
+<Quiz id="m01-l06-q3" />
+
+<Quiz id="m01-l06-q4" />
+
+<Quiz id="m01-l06-q5" />
+
+<Quiz id="m01-l06-q6" />
+
+<Quiz id="m01-l06-q7" />
+
+<Quiz id="m01-l06-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l06-q9" />
+
+### Transferfrage
+
+<Quiz id="m01-l06-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [String interpolation using $](https://learn.microsoft.com/dotnet/csharp/language-reference/tokens/interpolated)
+- Microsoft Learn: [C#-Spezifikation, Lexical structure](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure)
+- Microsoft Learn: [Standard numeric format strings](https://learn.microsoft.com/dotnet/standard/base-types/standard-numeric-format-strings)

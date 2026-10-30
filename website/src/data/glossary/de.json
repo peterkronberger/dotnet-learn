@@ -273,14 +273,77 @@
       "term": "String Interpolation",
       "german": "interpolierter String",
       "category": "language",
-      "definition": "Ein Text mit `$` davor. Ausdrücke in geschweiften Klammern werden ausgewertet und in den Text eingesetzt, zum Beispiel `$\"Summe: {a + b}\"`.",
+      "definition": "Ein Text mit `$` davor. Ausdrücke in geschweiften Klammern werden ausgewertet und in den Text eingesetzt, zum Beispiel `$\"Summe: {a + b}\"`. Nach einem Komma steht die Mindestbreite, nach einem Doppelpunkt die Formatangabe.",
       "aliases": [
         "interpolierte Strings"
       ],
-      "lesson": "m01-l02",
+      "related": [
+        "format-string",
+        "string-concatenation"
+      ],
+      "lesson": "m01-l06",
       "source": {
-        "title": "String interpolation using $",
-        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/tokens/interpolated"
+        "title": "Interpolated string expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1283-interpolated-string-expressions"
+      }
+    },
+    {
+      "id": "string-concatenation",
+      "term": "String Concatenation",
+      "german": "Verkettung von Zeichenketten",
+      "category": "language",
+      "definition": "Das Aneinanderhängen von Texten mit dem Operator `+`. Ist ein Operand ein `string`, wird der andere in Text umgewandelt: `\"3\" + 4` ergibt `\"34\"`.",
+      "aliases": [
+        "Verkettung",
+        "Konkatenation"
+      ],
+      "related": [
+        "string-interpolation"
+      ],
+      "lesson": "m01-l06",
+      "source": {
+        "title": "Addition operator (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12125-addition-operator"
+      }
+    },
+    {
+      "id": "format-string",
+      "term": "Format String",
+      "german": "Formatangabe",
+      "category": "language",
+      "definition": "Eine Angabe nach dem Doppelpunkt in `{wert:Format}`, die bestimmt, wie ein Wert als Text aussieht. `F1` zeigt eine Zahl mit einer Nachkommastelle, `{rate:F1}` zum Beispiel `71.4`.",
+      "aliases": [
+        "Formatangaben",
+        "Formatzeichenfolge"
+      ],
+      "related": [
+        "string-interpolation"
+      ],
+      "lesson": "m01-l06",
+      "source": {
+        "title": "Standard numeric format strings",
+        "url": "https://learn.microsoft.com/dotnet/standard/base-types/standard-numeric-format-strings"
+      }
+    },
+    {
+      "id": "raw-string-literal",
+      "term": "Raw String Literal",
+      "german": "Rohtext-Literal",
+      "category": "language",
+      "definition": "Ein Text zwischen mindestens drei Anführungszeichen (`\"\"\"`), der über mehrere Zeilen gehen darf. Anführungszeichen und Backslashes darin brauchen kein Escaping.",
+      "aliases": [
+        "Raw-String-Literale",
+        "Raw String Literals"
+      ],
+      "related": [
+        "literal",
+        "escape-sequence",
+        "verbatim-string-literal"
+      ],
+      "lesson": "m01-l06",
+      "source": {
+        "title": "String literals (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6456-string-literals"
       }
     },
     {
