@@ -74,7 +74,8 @@ jobs:
                numbers). Each issue = exactly one pull request, small and testable on its own.
                Parallel pull requests that change the same files cause merge conflicts:
                if two issues change the same file, chain them with `Depends on #<number>`,
-               even if they are independent in content.
+               even if they are independent in content. For the creation of content for a new module, omit to create a separate task for each 
+               lesson in order to reduce overall token usage. 
                First write the body to a file with Write, then:
                `gh issue create --title "<title>" --body-file <file>`
                (WITHOUT --label – the workflow sets the labels.)
