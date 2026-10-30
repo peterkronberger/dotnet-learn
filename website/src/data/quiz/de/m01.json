@@ -632,6 +632,206 @@
       "type": "explain",
       "question": "Transferfrage: Wo zählt ein Programm etwas Schritt für Schritt, oder bildet es eine laufende Summe?",
       "modelAnswer": "Ein Zähler für fehlgeschlagene Anmeldungen, der pro Fehlschlag um 1 wächst (`count++`). Eine Summe, zu der pro Bestellposition der Preis addiert wird (`total += price`). Ein Punktestand in einem Spiel oder die Anzahl gelesener Zeilen einer Datei."
+    },
+    {
+      "id": "m01-l05-q1",
+      "lesson": "m01-l05",
+      "type": "single",
+      "question": "Was passiert mit diesem Code?\n\n`const int maxAttempts = 3;`\n`maxAttempts = 5;`",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, das Programm startet nicht.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm startet und `maxAttempts` hat danach den Wert `5`.",
+          "feedback": "Eine Konstante behält ihren Wert. Die Zuweisung wird schon beim Übersetzen abgelehnt."
+        },
+        {
+          "text": "Das Programm startet, die Zuweisung wird stillschweigend ignoriert.",
+          "feedback": "Der Compiler ignoriert die Zuweisung nicht, er lehnt sie mit einem Fehler ab."
+        },
+        {
+          "text": "Das Programm startet und bricht erst bei der Zuweisung mit einem Fehler ab.",
+          "feedback": "Der Fehler tritt nicht zur Laufzeit auf. Der Compiler erkennt die Zuweisung an eine Konstante schon beim Übersetzen."
+        }
+      ],
+      "explanation": "Eine Konstante ist ein Name für einen Wert, der sich nie ändert. Eine Zuweisung an sie ist ein Compilerfehler (CS0131)."
+    },
+    {
+      "id": "m01-l05-q2",
+      "lesson": "m01-l05",
+      "type": "find-bug",
+      "question": "Welche Zeile lässt sich nicht übersetzen?",
+      "example": "m01/l05/const-from-variable.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Eine normale Variable mit einem Anfangswert ist in Ordnung."
+        },
+        "2": {
+          "feedback": "Der Wert einer Konstante muss ein konstanter Ausdruck sein. `attempts` ist eine Variable und kann sich ändern, deshalb kennt der Compiler ihren Wert nicht.",
+          "misconception": "m01-l05-const-from-variable"
+        }
+      },
+      "explanation": "Eine Konstante bekommt ihren Wert beim Übersetzen. Eine normale Variable kann sich zur Laufzeit ändern und ist deshalb kein konstanter Ausdruck. Der Compiler meldet CS0133."
+    },
+    {
+      "id": "m01-l05-q3",
+      "lesson": "m01-l05",
+      "type": "single",
+      "question": "Was passiert mit diesem Code?\n\n`var x = 5;`\n`x = \"Text\";`",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `x` ein `int` ist und kein `string` aufnehmen kann.",
+          "correct": true
+        },
+        {
+          "text": "Es funktioniert: `var` erlaubt, dass `x` später einen anderen Typ bekommt.",
+          "misconception": "m01-l05-var-is-dynamic",
+          "feedback": "`var` bestimmt den Typ einmal beim Übersetzen aus dem Wert rechts. Danach ist `x` ein `int`, wie bei `int x = 5;`."
+        },
+        {
+          "text": "Der Compiler akzeptiert den Code, aber zur Laufzeit entsteht ein Fehler.",
+          "feedback": "Die Typprüfung findet beim Übersetzen statt, nicht erst zur Laufzeit."
+        },
+        {
+          "text": "Der Compiler wandelt `\"Text\"` automatisch in eine Zahl um.",
+          "feedback": "Ein Text lässt sich nicht automatisch in eine `int`-Zahl umwandeln. Der Compiler lehnt die Zuweisung ab."
+        }
+      ],
+      "explanation": "Mit `var x = 5;` legt der Compiler den Typ `int` fest, so als stünde dort `int x = 5;`. Die Zuweisung eines Textes passt nicht zu `int` und ist ein Compilerfehler (CS0029)."
+    },
+    {
+      "id": "m01-l05-q4",
+      "lesson": "m01-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Bestimme für jede Variable zuerst den Typ, den der Compiler festlegt.",
+      "example": "m01/l05/quiz-var-type.cs",
+      "explanation": "`a` und `b` sind `int`, deshalb ist `9 / 2` eine Ganzzahldivision und ergibt `4`. `c` ist ein `double`, also ergibt `9.0 / 2` den Wert `4.5`. Der Rest von `9 % 2` ist `1`."
+    },
+    {
+      "id": "m01-l05-q5",
+      "lesson": "m01-l05",
+      "type": "multi",
+      "question": "Gegeben sind `int n = 4;` und `const int k = 10;`. Welche Deklarationen lassen sich übersetzen?",
+      "options": [
+        {
+          "text": "`const int a = k * 2;`",
+          "correct": true,
+          "feedback": "`k` ist eine Konstante, `2` ein Literal. Der Compiler kann den Ausdruck beim Übersetzen auswerten."
+        },
+        {
+          "text": "`const int b = 7 / 2;`",
+          "correct": true,
+          "feedback": "Literale und Operatoren bilden einen konstanten Ausdruck. Das Ergebnis `3` steht beim Übersetzen fest."
+        },
+        {
+          "text": "`const int c = n * 2;`",
+          "misconception": "m01-l05-const-from-variable",
+          "feedback": "`n` ist eine normale Variable und kann sich ändern. Der Ausdruck ist deshalb nicht konstant."
+        },
+        {
+          "text": "`const int d = n;`",
+          "misconception": "m01-l05-const-from-variable",
+          "feedback": "Auch ein einzelner Variablenname ist kein konstanter Ausdruck."
+        }
+      ],
+      "explanation": "Ein konstanter Ausdruck besteht aus Literalen, anderen Konstanten und Operatoren darauf. Normale Variablen gehören nicht dazu."
+    },
+    {
+      "id": "m01-l05-q6",
+      "lesson": "m01-l05",
+      "type": "single",
+      "question": "Welche dieser Deklarationen lässt sich nicht übersetzen?",
+      "options": [
+        {
+          "text": "`var total;`",
+          "correct": true,
+          "feedback": "Ohne Anfangswert hat der Compiler nichts, woraus er den Typ bestimmen kann."
+        },
+        {
+          "text": "`var total = 0;`",
+          "feedback": "Der Wert `0` ist ein `int`-Literal. Der Compiler legt `int` fest."
+        },
+        {
+          "text": "`var total = 0.0;`",
+          "feedback": "Der Wert `0.0` ist ein `double`-Literal. Der Compiler legt `double` fest."
+        },
+        {
+          "text": "`var total = \"none\";`",
+          "feedback": "Der Wert `\"none\"` ist ein `string`. Der Compiler legt `string` fest."
+        }
+      ],
+      "explanation": "`var` braucht einen Anfangswert, weil der Compiler den Typ aus ihm bestimmt. Ohne Wert meldet er CS0818."
+    },
+    {
+      "id": "m01-l05-q7",
+      "lesson": "m01-l05",
+      "type": "single",
+      "question": "Welchen Typ legt der Compiler für `total` fest, und welchen Wert hat die Variable?\n\n`var total = 10 / 4;`",
+      "options": [
+        {
+          "text": "`int` mit dem Wert `2`.",
+          "correct": true
+        },
+        {
+          "text": "`double` mit dem Wert `2.5`.",
+          "feedback": "`var` macht aus einer Ganzzahldivision keine Division mit Nachkommastellen. Beide Operanden sind `int`, also ist das Ergebnis ein `int`."
+        },
+        {
+          "text": "`double` mit dem Wert `2`.",
+          "feedback": "Der Typ eines Ausdrucks aus zwei `int`-Werten ist `int`, nicht `double`."
+        },
+        {
+          "text": "Keinen festen Typ: `total` passt sich dem Wert an, der später zugewiesen wird.",
+          "misconception": "m01-l05-var-is-dynamic",
+          "feedback": "Der Typ wird einmal beim Übersetzen aus dem Ausdruck rechts bestimmt und ändert sich danach nicht mehr."
+        }
+      ],
+      "explanation": "Der Typ ist der Typ des Ausdrucks rechts vom `=`. `10 / 4` ist eine Division zweier `int`-Werte und ergibt den `int`-Wert `2`."
+    },
+    {
+      "id": "m01-l05-q8",
+      "lesson": "m01-l05",
+      "type": "single",
+      "question": "In welchem Fall macht `var` den Code besser lesbar?",
+      "options": [
+        {
+          "text": "Wenn der Typ rechts vom `=` sofort erkennbar ist, etwa bei `var name = \"bob\";`.",
+          "correct": true
+        },
+        {
+          "text": "Wenn sich der Typ der Variable später ändern soll.",
+          "misconception": "m01-l05-var-is-dynamic",
+          "feedback": "Der Typ einer mit `var` deklarierten Variable ändert sich nie. `var` spart nur das Hinschreiben."
+        },
+        {
+          "text": "Wenn die Variable zuerst ohne Wert deklariert werden soll.",
+          "feedback": "`var` braucht immer einen Anfangswert."
+        },
+        {
+          "text": "Immer, weil ein ausgeschriebener Typ langsamer ist.",
+          "feedback": "Der Compiler setzt den Typ ein. Zur Laufzeit gibt es keinen Unterschied zu einem ausgeschriebenen Typ."
+        }
+      ],
+      "explanation": "`var` und ein ausgeschriebener Typ erzeugen denselben Code. Es geht nur um Lesbarkeit: `var` passt, wenn der Typ rechts offensichtlich ist. Ist er es nicht, hilft der ausgeschriebene Typ dem Leser."
+    },
+    {
+      "id": "m01-l05-q9",
+      "lesson": "m01-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `const` und `var` unterscheidet und warum der Typ einer `var`-Variable fest ist.",
+      "modelAnswer": "`const` gibt einem Wert einen Namen, der sich nie ändert. Der Wert muss beim Übersetzen feststehen, also ein konstanter Ausdruck sein. Eine spätere Zuweisung ist ein Compilerfehler.\n\n`var` lässt den Compiler den Typ einer lokalen Variable aus dem Anfangswert bestimmen. Das passiert einmal beim Übersetzen. Danach ist es so, als stünde der Typ ausgeschrieben da. Die Variable kann ihren Wert ändern, aber nicht ihren Typ."
+    },
+    {
+      "id": "m01-l05-q10",
+      "lesson": "m01-l05",
+      "type": "explain",
+      "question": "Transferfrage: Welche Werte in einem Log-Werkzeug sind echte Konstanten, und welche sehen nur konstant aus?",
+      "modelAnswer": "Echte Konstanten sind Werte, die sich durch die Sache selbst nie ändern, zum Beispiel die Sekunden pro Minute (`60`) oder ein festes Etikett für eine Ausgabe. Nur konstant aussehen kann zum Beispiel ein Schwellenwert, ab dem ein Benutzer als verdächtig gilt: Heute ist er `5`, aber ein Benutzer des Werkzeugs könnte ihn später ändern wollen. Das ist ein Wert, den das Programm einmal festlegt und der sich ändern darf, keine Konstante."
     }
   ]
 }
