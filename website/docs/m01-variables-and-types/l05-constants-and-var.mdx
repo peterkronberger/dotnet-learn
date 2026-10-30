@@ -1,0 +1,212 @@
+---
+title: Konstanten und implizite Typisierung
+sidebar_position: 5
+description: "const gibt einem Wert einen Namen, der sich nie ändert und beim Übersetzen feststeht. var lässt den Compiler den Typ einer lokalen Variable aus dem Anfangswert bestimmen – der Typ bleibt trotzdem fest."
+lesson_id: m01-l05
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import constants from '!!raw-loader!@site/examples/m01/l05/constants.cs';
+import constantsOutput from '!!raw-loader!@site/examples/m01/l05/constants.out.txt';
+import constAssign from '!!raw-loader!@site/examples/m01/l05/const-assign.snippet.cs';
+import constFromVariable from '!!raw-loader!@site/examples/m01/l05/const-from-variable.snippet.cs';
+import inferType from '!!raw-loader!@site/examples/m01/l05/infer-type.cs';
+import inferTypeOutput from '!!raw-loader!@site/examples/m01/l05/infer-type.out.txt';
+import varReassign from '!!raw-loader!@site/examples/m01/l05/var-reassign.snippet.cs';
+import varNoInitializer from '!!raw-loader!@site/examples/m01/l05/var-no-initializer.snippet.cs';
+import constantsGaps from '!!raw-loader!@site/examples/m01/l05/constants-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m01/l05/seclog-event-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m01/l05/seclog-event-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m01/l05/seclog-event-solution.cs';
+
+# Konstanten und implizite Typisierung
+
+:::note[Lernziele]
+- Du deklarierst lokale Konstanten mit `const` und erklärst, warum eine spätere Zuweisung ein Compilerfehler ist.
+- Du bestimmst den Typ, den der Compiler für eine mit `var` deklarierte Variable festlegt.
+- Du erklärst, warum `var x = 5;` gefolgt von `x = "Text";` nicht kompiliert.
+- Du entscheidest, wann `var` oder ein ausgeschriebener Typ den Code lesbarer macht.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l04-q3" />
+
+<Quiz id="m01-l04-q4" />
+
+<Quiz id="m01-l02-q2" />
+
+## Konstanten: Ein Name für einen festen Wert
+
+Manche Werte ändern sich nie: Eine Minute hat 60 Sekunden. Mit einer Variable kannst du so einen Wert speichern, aber nichts hindert dich daran, ihn später aus Versehen zu überschreiben. Eine <Term id="constant">Konstante (Constant)</Term> verhindert das. Du deklarierst sie wie eine Variable, mit `const` vor dem Typ, und gibst den Wert sofort an: `const int secondsPerMinute = 60;`. Der Name steht dann für diesen einen Wert ([§13.6.3 Local constant declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1363-local-constant-declarations)).
+
+Der Wert einer Konstante muss ein <Term id="constant-expression">konstanter Ausdruck (Constant Expression)</Term> sein. Das ist ein Ausdruck, den der Compiler schon beim Übersetzen vollständig auswerten kann. Dazu gehören Literale, andere Konstanten und Operatoren darauf, auch Klammern ([§12.26 Constant expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1226-constant-expressions)). Eine normale Variable gehört nicht dazu: Ihr Wert kann sich zur Laufzeit ändern, der Compiler kennt ihn deshalb nicht im Voraus.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Rechne die Konstante `secondsPerHour` selbst aus.
+:::
+
+<CSharpRunner id="m01-l05-constants" code={constants} predict expected={constantsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `60`, `3600`, `4` und `7200`.
+
+1. **Konstanten festlegen:** `secondsPerMinute` und `minutesPerHour` sind `60`.
+2. **Konstante aus Konstanten:** `secondsPerMinute * minutesPerHour` ist ein konstanter Ausdruck. Der Compiler rechnet ihn beim Übersetzen aus: `60 * 60` ergibt `3600`.
+3. **Variable ändern:** `attempts` darf sich ändern. Aus `3` wird `3 + 1`, also `4`.
+4. **Konstante verwenden:** `secondsPerHour * 2` liest die Konstante nur und ergibt `7200`.
+
+Was passiert, wenn du am Ende `secondsPerHour = 1;` ergänzt? Probiere es aus: Der Compiler lehnt die Zeile ab, das Programm startet nicht.
+
+</details>
+
+Eine Zuweisung an eine Konstante ist ein <Term id="compile-error">Compilerfehler</Term>:
+
+<CodeBlock language="csharp" title="const-assign.snippet.cs">{constAssign}</CodeBlock>
+
+Der Compiler meldet für Zeile 2 den Fehler CS0131: Die linke Seite einer Zuweisung muss eine Variable, Property oder ein Indexer sein. Das Programm startet nicht. Der Fehler fällt also auf, bevor ein Nutzer ihn sieht. Das ist der Nutzen einer Konstante: Der Compiler wacht darüber, dass der Wert fest bleibt. Ein sprechender Name wie `secondsPerHour` ist außerdem besser lesbar als die nackte Zahl `3600`.
+
+Auch der Wert muss konstant sein:
+
+<CodeBlock language="csharp" title="const-from-variable.snippet.cs">{constFromVariable}</CodeBlock>
+
+Hier meldet der Compiler CS0133: Der Ausdruck, der `maxAttempts` zugewiesen wird, muss konstant sein. `attempts` ist eine Variable.
+
+## var: Der Compiler bestimmt den Typ
+
+Bisher hast du bei jeder Variable den Typ hingeschrieben: `int count = 7;`. Der Wert `7` zeigt aber schon, dass es ein `int` ist. Mit `var` überlässt du dem Compiler diese Arbeit: `var count = 7;`. Eine so deklarierte Variable ist eine <Term id="implicitly-typed-variable">implizit typisierte Variable (Implicitly Typed Variable)</Term>. Der Compiler übernimmt als Typ den Typ des Ausdrucks rechts vom `=` ([§13.6.2.2 Implicitly typed local variable declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13622-implicitly-typed-local-variable-declarations)). Dieses Bestimmen heißt <Term id="type-inference">Typinferenz (Type Inference)</Term>.
+
+`var` ist ein kontextuelles Schlüsselwort, das du aus der Lektion über Variablen als Beispiel kennst: Nur in einer Deklaration hat es diese Bedeutung, sonst ist es ein gewöhnlicher Name ([§6.4.4 Keywords](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#644-keywords)).
+
+Die Inferenz passiert beim Übersetzen, nicht beim Ausführen. `var count = 7;` und `int count = 7;` sind danach dasselbe. Der Typ steht fest wie bei jeder anderen Variable (statische Typisierung). Ein Wort `dynamic` gibt es auch, mit dem der Typ erst zur Laufzeit geprüft wird. Der Kurs verwendet es nicht.
+
+:::info[Vorhersage]
+Welchen Typ hat jede Variable, und welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m01-l05-infer" code={inferType} predict expected={inferTypeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `3`, `3.5` und `3`.
+
+1. **Typ bestimmen:** `7` und `2` sind `int`-Literale, also sind `count` und `divisor` vom Typ `int`. `7.0` ist ein `double`-Literal, also ist `ratio` ein `double`.
+2. **Operanden prüfen:** `count / divisor` teilt zwei `int`-Werte. Das ist eine Ganzzahldivision und ergibt `3`.
+3. **Gemischte Operanden:** `ratio / divisor` hat einen `double`-Operanden. Das Ergebnis ist ein `double`: `3.5`.
+4. **Typ bleibt:** `count` ist weiter ein `int`. `count = count / 2` rechnet `7 / 2` als Ganzzahldivision und speichert `3`.
+
+</details>
+
+Zwei Regeln folgen aus der Inferenz. Erstens braucht `var` einen Anfangswert, sonst hat der Compiler nichts, woraus er den Typ bestimmt. Zweitens passt der Typ danach nur noch zu Werten dieses Typs:
+
+<CodeBlock language="csharp" title="var-no-initializer.snippet.cs">{varNoInitializer}</CodeBlock>
+
+Das ist der Fehler CS0818: Implizit typisierte Variablen müssen initialisiert werden.
+
+<CodeBlock language="csharp" title="var-reassign.snippet.cs">{varReassign}</CodeBlock>
+
+Hier legt `var x = 5;` den Typ `int` fest. Die Zuweisung eines Textes in Zeile 2 meldet CS0029: Der Typ `string` lässt sich nicht implizit in `int` umwandeln. Es ist dieselbe Art Fehler wie bei `int x = "Text";`.
+
+## var oder ausgeschriebener Typ?
+
+Beide erzeugen denselben Code. Es geht nur um die Lesbarkeit für den Menschen. `var name = "bob";` ist gut lesbar, weil der Typ rechts offensichtlich ist, und es spart Schreibarbeit. Ein ausgeschriebener Typ hilft dem Leser, wenn der Typ rechts nicht auf einen Blick klar ist, etwa bei `double rate = failures * 100.0 / events;`. Im Zweifel gilt: Was der Leser sofort erkennen soll, schreibst du hin.
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze die zwei Nullen, die als Platzhalter stehen, so dass die Ausgabe `3600` und `1` lautet.
+
+<CSharpRunner id="m01-l05-gaps" code={constantsGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Konstante aus Konstante:** `const int secondsPerHour = secondsPerMinute * 60;` ergibt `3600`. Auch `60 * 60` ist ein konstanter Ausdruck.
+2. **Typ bestimmen lassen:** `var seconds = 90;` legt `int` fest.
+3. **Rechnen:** `90 / 60` ist eine Ganzzahldivision und ergibt `1`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, die erste Ereigniszeile des Beispiel-Logs, Benutzer, IP-Adresse und Ereignistyp von Zeile 2, die Fehlerquote von 50 Prozent sowie Bobs fehlgeschlagene Anmeldungen und seinen Anteil daran.
+
+**Neue Anforderung:** Die Zahlen des Beispiel-Logs ändern sich nicht: `14` Ereignisse und `7` Fehlschläge. Mache beide zu Konstanten mit `const int`. Deklariere außerdem mindestens eine lokale Variable, deren Typ aus dem Anfangswert offensichtlich ist, mit `var`, zum Beispiel `bobFailures`. Die Ausgabe bleibt exakt gleich.
+
+<CSharpRunner id="m01-l05-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Feste Zahlen finden:** `events` und `failures` bekommen ihren Wert einmal, und er ändert sich nie. Aus `int` wird `const int`.
+2. **Konstante Ausdrücke:** `14` und `7` sind Literale und damit konstante Ausdrücke.
+3. **Typ offensichtlich machen:** `var bobFailures = 0;` ist ein `int`, denn `0` ist ein `int`-Literal. `var failureRate = (failures * 100.0) / events;` und `var bobShare = Math.Round(…)` sind `double`: Ein Operand ist `100.0`, und `Math.Round` mit einem `double` liefert ein `double`.
+4. **Ausgabe prüfen:** `const` und `var` ändern weder Werte noch Typen. Die Ausgabe ist deshalb dieselbe: `50`, `5` und `71.43`.
+
+Die Texte `user`, `ip` und `eventType` bleiben ausgeschrieben. Auch `var` wäre möglich, hier ist es Geschmackssache.
+
+</details>
+
+**Neuer Stand:** SecLog hat die festen Zahlen des Beispiel-Logs als Konstanten und lässt den Compiler die Typen offensichtlicher Variablen bestimmen. Die Ausgabe ist unverändert.
+
+## Typische Fehlvorstellungen
+
+:::warning[Achtung]
+<Misconception id="m01-l05-var-is-dynamic" />
+
+**„`var` macht eine Variable dynamisch, sie kann später jeden Typ annehmen.“** `var` bestimmt den Typ einmal beim Übersetzen aus dem Anfangswert. Danach ist die Variable so streng typisiert wie bei `int x = 5;`. Nach `var x = 5;` ist `x = "Text";` ein Compilerfehler.
+:::
+
+:::warning[Achtung]
+<Misconception id="m01-l05-const-from-variable" />
+
+**„Eine `const` darf aus einer normalen Variable berechnet werden.“** Der Wert einer Konstante muss ein konstanter Ausdruck sein. Eine Variable kann sich zur Laufzeit ändern, deshalb ist `const int max = attempts;` ein Compilerfehler. Rechnen darfst du nur mit Literalen und anderen Konstanten.
+:::
+
+<details>
+<summary>Vertiefung: Konstanten werden beim Übersetzen ausgewertet (optional)</summary>
+
+Wo ein konstanter Ausdruck steht, wertet der Compiler ihn beim Übersetzen aus, mit denselben Regeln wie zur Laufzeit. Würde die Auswertung zur Laufzeit eine Ausnahme auslösen, ist es beim Übersetzen ein Fehler ([§12.26 Constant expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1226-constant-expressions)). Deshalb ist `const int x = 1 / 0;` ein Compilerfehler und kein Fehler zur Laufzeit.
+
+</details>
+
+## Zusammenfassung
+
+`const` gibt einem Wert einen Namen, der sich nie ändert. Der Wert muss ein konstanter Ausdruck sein, den der Compiler beim Übersetzen auswertet, mit Literalen, anderen Konstanten und Operatoren. Eine spätere Zuweisung ist ein Compilerfehler. `var` lässt den Compiler den Typ einer lokalen Variable aus dem Anfangswert bestimmen und braucht deshalb immer einen. Der Typ steht danach fest, `var` ist nicht dynamisch. Ob du `var` oder den Typ hinschreibst, entscheidet die Lesbarkeit.
+
+## Prüfe dein Wissen
+
+<Quiz id="m01-l05-q1" />
+
+<Quiz id="m01-l05-q2" />
+
+<Quiz id="m01-l05-q3" />
+
+<Quiz id="m01-l05-q4" />
+
+<Quiz id="m01-l05-q5" />
+
+<Quiz id="m01-l05-q6" />
+
+<Quiz id="m01-l05-q7" />
+
+<Quiz id="m01-l05-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m01-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m01-l05-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Deklarationsanweisungen in C#](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/declarations)
+- Microsoft Learn: [C#-Spezifikation, Statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements)
+- Microsoft Learn: [C#-Spezifikation, Expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions)
