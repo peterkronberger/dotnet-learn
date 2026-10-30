@@ -1474,6 +1474,26 @@
         "title": "CultureInfo class",
         "url": "https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo"
       }
+    },
+    {
+      "id": "console-input",
+      "term": "Console Input",
+      "german": "Konsoleneingabe",
+      "category": "platform",
+      "definition": "Text, den ein Programm von der Konsole liest. `Console.ReadLine()` liest eine Zeile ohne Zeilenumbruch und liefert sie immer als Text, auch wenn sie nur Ziffern enthält.",
+      "aliases": [
+        "ReadLine",
+        "Console.ReadLine",
+        "Eingabe"
+      ],
+      "related": [
+        "parsing"
+      ],
+      "lesson": "m01-l09",
+      "source": {
+        "title": "Console.ReadLine Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.console.readline"
+      }
     }
   ]
 }

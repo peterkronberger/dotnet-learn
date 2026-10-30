@@ -1416,6 +1416,196 @@
       "type": "explain",
       "question": "Transferfrage: Wo bekommt ein Programm Zahlen als Text, und was kann dabei schiefgehen?",
       "modelAnswer": "Zum Beispiel aus Dateien, Webformularen, Konsoleneingaben und Logzeilen wie `failed=7`. Alles ist zunächst Text. Der Text kann leer sein, Buchstaben enthalten oder ein Dezimalkomma statt eines Punkts verwenden. Deshalb muss das Programm die Umwandlung prüfen, etwa mit `TryParse`."
+    },
+    {
+      "id": "m01-l09-q1",
+      "lesson": "m01-l09",
+      "type": "single",
+      "question": "Der Nutzer tippt `42` und drückt die Eingabetaste. Was liefert `Console.ReadLine()`?",
+      "options": [
+        {
+          "text": "Den Text `\"42\"`, also die Zeichen `4` und `2`.",
+          "correct": true
+        },
+        {
+          "text": "Die Zahl `42` als `int`.",
+          "misconception": "m01-l09-readline-returns-number",
+          "feedback": "`Console.ReadLine()` liefert immer Text. Erst `int.Parse` oder `int.TryParse` macht daraus eine Zahl."
+        },
+        {
+          "text": "Die Zahl `42`, weil es nur Ziffern sind.",
+          "misconception": "m01-l09-readline-returns-number",
+          "feedback": "Das Programm sieht nicht nach, ob der Text wie eine Zahl aussieht. Das Ergebnis ist immer ein Text."
+        },
+        {
+          "text": "Den Text `\"42\"` mit dem Zeilenumbruch am Ende.",
+          "feedback": "Der Zeilenumbruch gehört nicht zum Ergebnis. `Console.ReadLine()` liefert die Zeile ohne ihn."
+        }
+      ],
+      "explanation": "Die Eingabe besteht aus Zeichen. `Console.ReadLine()` liefert die Zeile als Text ohne den Zeilenumbruch. Eine Zahl entsteht erst durch Parsen."
+    },
+    {
+      "id": "m01-l09-q2",
+      "lesson": "m01-l09",
+      "type": "single",
+      "question": "Die Eingabe besteht aus den zwei Zeilen `bob` und `5`. Das Programm ruft zweimal `var a = Console.ReadLine();` und `var b = Console.ReadLine();` auf, in dieser Reihenfolge. Welche Werte haben `a` und `b`?",
+      "options": [
+        {
+          "text": "`a` ist `\"bob\"`, `b` ist `\"5\"`.",
+          "correct": true
+        },
+        {
+          "text": "`a` ist `\"bob\"` und `\"5\"` zusammen, `b` ist leer.",
+          "misconception": "m01-l09-readline-reads-all",
+          "feedback": "Ein Aufruf liest nur eine Zeile. Die nächste Zeile liest erst der nächste Aufruf."
+        },
+        {
+          "text": "`a` ist `\"5\"`, `b` ist `\"bob\"`.",
+          "feedback": "Die Zeilen werden von oben nach unten gelesen. Der erste Aufruf bekommt die erste Zeile."
+        },
+        {
+          "text": "Beide sind `\"bob\"`, weil jeder Aufruf mit der ersten Zeile beginnt.",
+          "misconception": "m01-l09-readline-reads-all",
+          "feedback": "Der Reihenfolge nach geht es weiter: Jeder Aufruf liest die Zeile nach der zuletzt gelesenen."
+        }
+      ],
+      "explanation": "Jeder Aufruf von `Console.ReadLine()` liest die nächste noch ungelesene Zeile. Der erste bekommt `bob`, der zweite `5`."
+    },
+    {
+      "id": "m01-l09-q3",
+      "lesson": "m01-l09",
+      "type": "single",
+      "question": "Die Eingabe ist `7`. Was gibt `var t = Console.ReadLine(); Console.WriteLine(t + 1);` aus?",
+      "options": [
+        {
+          "text": "`71`",
+          "correct": true
+        },
+        {
+          "text": "`8`",
+          "misconception": "m01-l09-readline-returns-number",
+          "feedback": "`t` ist Text. Text plus Zahl hängt die Zahl als Zeichen an."
+        },
+        {
+          "text": "`7`",
+          "feedback": "Die `1` wird an den Text angehängt, sie verschwindet nicht."
+        },
+        {
+          "text": "Das Programm endet mit einem Laufzeitfehler.",
+          "feedback": "Text plus Zahl ist erlaubt und verkettet. Es gibt keinen Fehler."
+        }
+      ],
+      "explanation": "`t` ist der Text `\"7\"`. Das `+` verkettet Text und Zahl zu `\"71\"`. Für `8` müsste der Text vorher in eine Zahl umgewandelt werden."
+    },
+    {
+      "id": "m01-l09-q4",
+      "lesson": "m01-l09",
+      "type": "cloze",
+      "question": "Ergänze die Lücken: Das Programm liest zwei Zeilen, hängt sie als Text aneinander und addiert sie dann als Zahlen. Bei der Eingabe `10` und `5` ist die Ausgabe `105` und `15`.",
+      "example": "m01/l09/quiz-readline.cs",
+      "blanks": [
+        {
+          "text": "ReadLine",
+          "hint": "Die Methode von `Console`, die eine Zeile einliest."
+        },
+        {
+          "text": "TryParse",
+          "hint": "Die Methode, die Text in eine `int`-Zahl umwandelt und über `out` die Zahl liefert."
+        }
+      ],
+      "explanation": "`Console.ReadLine()` liest eine Zeile als Text. `int.TryParse` macht daraus eine Zahl, mit der `x + y` rechnet: `10 + 5` ist `15`."
+    },
+    {
+      "id": "m01-l09-q5",
+      "lesson": "m01-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über `Console.ReadLine()` stimmen?",
+      "options": [
+        {
+          "text": "Ein Aufruf liest genau eine Zeile.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis ist Text, auch wenn die Zeile nur Ziffern enthält.",
+          "correct": true
+        },
+        {
+          "text": "Der Zeilenumbruch am Ende der Zeile gehört nicht zum Ergebnis.",
+          "correct": true
+        },
+        {
+          "text": "Ein Aufruf liest die gesamte Eingabe mit allen Zeilen.",
+          "misconception": "m01-l09-readline-reads-all",
+          "feedback": "Mehrere Zeilen brauchen mehrere Aufrufe."
+        },
+        {
+          "text": "Enthält die Zeile nur Ziffern, ist das Ergebnis ein `int`.",
+          "misconception": "m01-l09-readline-returns-number",
+          "feedback": "Das Ergebnis ist immer Text. Die Umwandlung in einen `int` machst du mit Parse oder TryParse."
+        }
+      ],
+      "explanation": "Ein Aufruf von `Console.ReadLine()` liefert eine Zeile als Text ohne Zeilenumbruch."
+    },
+    {
+      "id": "m01-l09-q6",
+      "lesson": "m01-l09",
+      "type": "single",
+      "question": "Die Eingabe ist `5`. Was gibt `var t = Console.ReadLine(); bool ok = int.TryParse(t, out int n); Console.WriteLine(n * 2);` aus?",
+      "options": [
+        {
+          "text": "`10`",
+          "correct": true
+        },
+        {
+          "text": "`55`",
+          "misconception": "m01-l09-readline-returns-number",
+          "feedback": "`n` ist nach dem Parsen eine Zahl. Zahl mal 2 wird gerechnet und nicht verkettet."
+        },
+        {
+          "text": "`5`",
+          "feedback": "`n` wird mit 2 multipliziert, deshalb ist das Ergebnis nicht `5`."
+        },
+        {
+          "text": "`0`",
+          "feedback": "`0` wäre das Ergebnis bei ungültigem Text. Der Text `5` ist gültig."
+        }
+      ],
+      "explanation": "`int.TryParse` wandelt den Text `\"5\"` in die Zahl `5` um. Dann rechnet `n * 2` mit Zahlen: `10`."
+    },
+    {
+      "id": "m01-l09-q7",
+      "lesson": "m01-l09",
+      "type": "single",
+      "question": "Wie bekommt das Programm im Runner dieser Seite seine Eingabe?",
+      "options": [
+        {
+          "text": "Die Eingabe steht vor dem Start im Feld unter dem Editor. Das Programm liest daraus Zeile für Zeile.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm hält beim Aufruf an und wartet, bis du etwas tippst.",
+          "feedback": "So arbeitet ein echtes Konsolenfenster. Im Runner steht die Eingabe schon vor dem Start fest."
+        },
+        {
+          "text": "Das Programm fragt nach jeder Ausgabe automatisch nach einer neuen Zeile.",
+          "feedback": "Das Programm liest nur, wenn es `Console.ReadLine()` aufruft."
+        }
+      ],
+      "explanation": "Im Runner ist die Eingabe fest vor dem Lauf eingetragen. In einem echten Konsolenfenster wartet das Programm auf deine Eingabe."
+    },
+    {
+      "id": "m01-l09-q8",
+      "lesson": "m01-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `Console.ReadLine()` immer Text liefert, auch wenn du `42` eintippst, und wie dein Programm damit rechnet.",
+      "modelAnswer": "Die Eingabe besteht aus Zeichen. Das Programm weiß nicht, ob du eine Zahl, ein Wort oder einen Benutzernamen meinst. Deshalb liefert `Console.ReadLine()` die Zeile immer als Text, bei `42` die Zeichen `4` und `2`.\n\nZum Rechnen wandelt das Programm den Text mit `int.Parse` oder `int.TryParse` in eine Zahl um. Erst dann ergibt `+` zum Beispiel `43` statt `421`."
+    },
+    {
+      "id": "m01-l09-q9",
+      "lesson": "m01-l09",
+      "type": "explain",
+      "question": "Transferfrage: Welche Eingaben würde ein Logwerkzeug vom Nutzer lesen, und welche davon müsste es in eine Zahl umwandeln?",
+      "modelAnswer": "Zum Beispiel einen Benutzernamen, nach dem gesucht wird, oder eine IP-Adresse. Beide bleiben Text. Einen Schwellenwert wie „ab 5 fehlgeschlagenen Anmeldungen melden“ liest das Programm ebenfalls als Text und wandelt ihn in eine Zahl um, bevor es damit vergleicht oder rechnet."
     }
   ]
 }
