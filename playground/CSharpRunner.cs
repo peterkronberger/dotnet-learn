@@ -142,7 +142,10 @@ public sealed class CSharpRunner
         IReadOnlyList<TestOutcome>? tests = null;
         var originalOut = Console.Out;
         var originalError = Console.Error;
-        var originalIn = Console.In;
+        // Console.In is not supported in the browser (WebAssembly); reading it throws PlatformNotSupportedException.
+        TextReader? originalIn = null;
+        try { originalIn = Console.In; }
+        catch (PlatformNotSupportedException) { }
         Console.SetOut(output);
         Console.SetError(output);
         Console.SetIn(new StringReader(stdin ?? string.Empty));
@@ -200,7 +203,7 @@ public sealed class CSharpRunner
         {
             Console.SetOut(originalOut);
             Console.SetError(originalError);
-            Console.SetIn(originalIn);
+            Console.SetIn(originalIn ?? TextReader.Null);
         }
 
         return new RunResult(true, output.ToString(), diagnostics, Stopwatch.GetElapsedTime(started), tests,
