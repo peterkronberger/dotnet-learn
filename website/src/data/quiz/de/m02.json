@@ -223,6 +223,76 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Logwerkzeug den bedingten Operator einsetzen?",
       "modelAnswer": "Zum Beispiel, um in einer Meldung „1 Versuch“ oder „5 Versuche“ zu schreiben, je nachdem, wie viele es sind. Oder um einen Standardtext zu wählen, wenn ein Wert fehlt."
+    },
+    {
+      "id": "m02-l04-q1",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "`failed` ist 2. Welchen Wert liefert `failed switch { 0 => \"none\", < 3 => \"low\", _ => \"high\" }`?",
+      "options": [
+        { "text": "`\"low\"`", "correct": true },
+        { "text": "`\"none\"`", "feedback": "Das konstante Muster `0` passt nur zum Wert 0." },
+        { "text": "`\"high\"`", "feedback": "Der Platzhalter `_` gilt nur, wenn kein Zweig davor passt. Hier passt `< 3`." }
+      ],
+      "explanation": "Die Zweige werden von oben nach unten geprüft. Der erste passende gewinnt: 2 ist nicht 0, aber kleiner als 3."
+    },
+    {
+      "id": "m02-l04-q2",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Ein Switch-Ausdruck hat die Zweige `0 => \"none\"`, `< 3 => \"low\"` und `< 5 => \"medium\"`, aber keinen mit `_`. `failed` ist 7. Was passiert?",
+      "options": [
+        { "text": "Der Compiler warnt vorher, und zur Laufzeit löst das Programm eine Ausnahme aus.", "correct": true },
+        { "text": "Das Ergebnis ist `null` oder ein leerer Text.", "misconception": "m02-l04-missing-arm-gives-default", "feedback": "Ein Switch-Ausdruck ohne passenden Zweig liefert keinen Standardwert. Er löst eine Ausnahme aus." },
+        { "text": "Das Ergebnis ist der Wert des letzten Zweigs, `\"medium\"`.", "misconception": "m02-l04-missing-arm-gives-default", "feedback": "Der letzte Zweig gilt nur, wenn sein Muster passt. 7 ist nicht kleiner als 5." }
+      ],
+      "explanation": "Ein Switch-Ausdruck, der nicht alle Werte abdeckt, ist nicht erschöpfend. Der Compiler gibt eine Warnung aus, und ein nicht abgedeckter Wert löst zur Laufzeit eine Ausnahme aus. Ein Zweig mit `_` deckt alle übrigen Werte ab."
+    },
+    {
+      "id": "m02-l04-q3",
+      "lesson": "m02-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l04/first-match.cs",
+      "explanation": "4 passt zu zwei Zweigen: `4` und `> 2`. Der erste passende gewinnt, deshalb `exactly four`."
+    },
+    {
+      "id": "m02-l04-q4",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Welches Muster steht für „kleiner als 10“?",
+      "options": [
+        { "text": "`< 10`", "correct": true },
+        { "text": "`10`", "feedback": "Das ist ein konstantes Muster. Es passt nur zum Wert 10." },
+        { "text": "`_`", "feedback": "Der Platzhalter passt zu jedem Wert, nicht nur zu kleineren." }
+      ],
+      "explanation": "`< 10` ist ein relationales Muster und vergleicht den Wert mit einer Konstante. `10` ist ein konstantes Muster, `_` der Platzhalter für alle Werte."
+    },
+    {
+      "id": "m02-l04-q5",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Wofür steht `_` als letzter Zweig eines Switch-Ausdrucks?",
+      "options": [
+        { "text": "Für jeden Wert, der zu keinem Zweig davor passt.", "correct": true },
+        { "text": "Für den Wert 0.", "feedback": "Der Platzhalter passt zu jedem Wert, nicht nur zu 0." },
+        { "text": "Für einen Fehler, der den Ausdruck beendet.", "feedback": "Der Platzhalter ist ein normaler Zweig mit einem Ergebnis, kein Fehler." }
+      ],
+      "explanation": "`_` ist der Platzhalter (Discard). Er passt zu allem und macht den Switch-Ausdruck erschöpfend."
+    },
+    {
+      "id": "m02-l04-q6",
+      "lesson": "m02-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein Switch-Ausdruck seinen Wert bestimmt und warum ein Zweig mit `_` am Ende sinnvoll ist.",
+      "modelAnswer": "Der Switch-Ausdruck prüft die Zweige von oben nach unten und nimmt den Wert des ersten Zweigs, dessen Muster zum Wert passt.\n\nEin Zweig mit `_` am Ende fängt alle übrigen Werte auf. Ohne ihn gibt der Compiler eine Warnung aus, und ein nicht abgedeckter Wert löst zur Laufzeit eine Ausnahme aus."
+    },
+    {
+      "id": "m02-l04-q7",
+      "lesson": "m02-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Logwerkzeug einen Switch-Ausdruck einsetzen?",
+      "modelAnswer": "Zum Beispiel, um die Zahl fehlgeschlagener Anmeldungen einem Schweregrad zuzuordnen (keiner, niedrig, mittel, hoch). Oder um einem Ereignistyp wie `login-failed` einen Text oder eine Aktion zuzuordnen."
     }
   ]
 }

@@ -1,0 +1,194 @@
+---
+title: switch-Ausdrücke und einfache Muster
+sidebar_position: 4
+description: "Ein switch-Ausdruck ordnet einem Wert mit Zweigen und Mustern ein Ergebnis zu. Der erste passende Zweig gewinnt."
+lesson_id: m02-l04
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import switchBasic from '!!raw-loader!@site/examples/m02/l04/switch-basic.cs';
+import switchBasicOutput from '!!raw-loader!@site/examples/m02/l04/switch-basic.out.txt';
+import severityPatterns from '!!raw-loader!@site/examples/m02/l04/severity-patterns.cs';
+import severityPatternsInput from '!!raw-loader!@site/examples/m02/l04/severity-patterns.in.txt';
+import severityPatternsOutput from '!!raw-loader!@site/examples/m02/l04/severity-patterns.out.txt';
+import firstMatch from '!!raw-loader!@site/examples/m02/l04/first-match.cs';
+import firstMatchOutput from '!!raw-loader!@site/examples/m02/l04/first-match.out.txt';
+import missingArm from '!!raw-loader!@site/examples/m02/l04/missing-arm.snippet.cs';
+import switchGaps from '!!raw-loader!@site/examples/m02/l04/switch-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l04/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l04/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l04/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l04/seclog-analysis-solution.cs';
+
+# switch-Ausdrücke und einfache Muster
+
+:::note[Lernziele]
+- Du schreibst einen <Term id="switch-expression">Switch-Ausdruck (Switch Expression)</Term>, der einem Wert ein Ergebnis zuordnet.
+- Du verwendest konstante Muster, relationale Muster und den Platzhalter `_`.
+- Du sagst voraus, welcher Zweig gewinnt, wenn mehrere passen.
+- Du erklärst, was ohne passenden Zweig passiert.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l03-q2" />
+
+<Quiz id="m02-l02-q4" />
+
+<Quiz id="m01-l08-q2" />
+
+## Einen Wert mit Zweigen zuordnen
+
+Eine lange `else if`-Kette, die nur einen Wert wählt, ist umständlich. Ein Switch-Ausdruck ordnet einem Wert ein Ergebnis zu. Er hat den Wert vor dem Schlüsselwort `switch` und in geschweiften Klammern **Zweige** (Arms), durch Kommas getrennt. Jeder Zweig besteht aus einem <Term id="pattern">Muster (Pattern)</Term>, dem Pfeil `=>` und einem Ausdruck. Das Ergebnis ist der Ausdruck des ersten Zweigs, dessen Muster passt.
+
+Ein <Term id="constant-pattern">konstantes Muster (Constant Pattern)</Term> passt, wenn der Wert gleich einer Konstante ist, zum Beispiel `0` oder `"logout"`. Der <Term id="discard">Platzhalter (Discard)</Term> `_` passt zu jedem Wert.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l04-basic" code={switchBasic} predict expected={switchBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `close session`.
+
+1. **Wert:** `eventType` ist `"logout"`.
+2. **Zweige prüfen:** Die ersten beiden Muster passen nicht, das dritte schon.
+3. **Ergebnis:** Der Ausdruck `"close session"` wird zum Wert von `action`.
+
+Was passiert, wenn `eventType` den Wert `"reboot"` hat? Dann gewinnt der Zweig mit `_`.
+
+</details>
+
+## Relationale Muster
+
+Ein <Term id="relational-pattern">relationales Muster (Relational Pattern)</Term> vergleicht den Wert mit einer Konstante: `< 3`, `<= 3`, `> 3` oder `>= 3`. So ordnest du Zahlenbereiche zu. Das Programm liest `failed` aus der Eingabe, die im Runner im Feld steht.
+
+:::info[Vorhersage]
+Das Feld enthält die Zeile `4`. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l04-severity" code={severityPatterns} stdin={severityPatternsInput} predict expected={severityPatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `4 failures: medium`.
+
+1. **Zahl lesen:** `int.TryParse` macht aus dem Text `4` die Zahl 4.
+2. **Zweige von oben nach unten:** `0` passt nicht, `< 3` passt nicht, `< 5` passt.
+3. **Ergebnis:** `"medium"`. Der Zweig mit `_` wird nicht erreicht.
+
+Trage im Feld `0`, `2` und `9` ein und sage das Ergebnis jeweils voraus.
+
+</details>
+
+## Der erste passende Zweig gewinnt
+
+Die Zweige werden in der Reihenfolge im Code geprüft. Passen mehrere, gilt der erste. Ein Zweig, den ein früherer Zweig immer schon abdeckt, ist ein Fehler: Der Compiler meldet ihn.
+
+:::info[Vorhersage]
+`failed` ist 4. Zwei Muster passen. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l04-first" code={firstMatch} predict expected={firstMatchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `exactly four`.
+
+1. **Erster Zweig:** `4` passt zu 4.
+2. **Zweiter Zweig:** `> 2` würde auch passen, wird aber nicht mehr geprüft.
+
+</details>
+
+## Wenn kein Zweig passt
+
+Ein Switch-Ausdruck sollte jeden möglichen Wert abdecken: Er ist dann <Term id="exhaustive">erschöpfend (exhaustive)</Term>. Fehlt ein Fall, warnt der Compiler. Kommt zur Laufzeit ein Wert, den kein Zweig abdeckt, löst das Programm eine Ausnahme (Exception) aus und bricht ab.
+
+<CodeBlock language="csharp" title="missing-arm.snippet.cs">{missingArm}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m02-l04-missing-arm-gives-default" />
+
+**„Ohne passenden Zweig liefert der Switch-Ausdruck einen Standardwert.“** Es gibt keinen Standardwert. Du bekommst eine Compilerwarnung und zur Laufzeit eine Ausnahme. Beende den Switch-Ausdruck deshalb mit einem Zweig `_`.
+:::
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ergänze die zwei Zweige so, dass die Ausgabe `close session` und `medium` lautet. Du brauchst `"logout" => "close session",` und `< 5 => "medium",`.
+
+<CSharpRunner id="m02-l04-gaps" code={switchGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Konstante Muster:** Der Zweig `"logout" => "close session",` steht vor dem Zweig mit `_`.
+2. **Relationales Muster:** `< 5 => "medium",` steht nach `< 3` und vor `_`. Die Reihenfolge ist wichtig: Stünde `< 5` vor `< 3`, wäre `< 3` nie erreichbar, und der Compiler meldet einen Fehler.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog warnt, bewertet Ereignisse als verdächtig und formuliert die Zahl der Fehlschläge.
+
+**Neue Anforderung:** Bewerte `failedFromInput` als Schweregrad mit einem Switch-Ausdruck: `0` ist `none`, weniger als 3 ist `low`, weniger als 5 ist `medium`, sonst `high`. Gib `Severity: high` aus. Die Schwellen sind für den Unterricht erfunden. Die Ausgabe hat dann 29 Zeilen.
+
+<CSharpRunner id="m02-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Wert und Zweige:** `failedFromInput switch { … }` ordnet die Zahl einem Schweregrad zu.
+2. **Reihenfolge:** `0` kommt zuerst, dann die Grenzen `< 3` und `< 5` aufsteigend, zuletzt `_`.
+3. **Ausgeben:** Für 5 gewinnt `_`: `Severity: high`.
+
+</details>
+
+**Neuer Stand:** SecLog bewertet eine Anzahl fehlgeschlagener Anmeldungen als Schweregrad.
+
+## Zusammenfassung
+
+Ein Switch-Ausdruck liefert den Wert des ersten Zweigs, dessen Muster passt. Konstante Muster vergleichen mit einem festen Wert, relationale Muster mit `<`, `<=`, `>` und `>=`, `_` passt zu allem. Fehlt ein Fall, warnt der Compiler, und zur Laufzeit gibt es eine Ausnahme.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l04-q1" />
+
+<Quiz id="m02-l04-q2" />
+
+<Quiz id="m02-l04-q3" />
+
+<Quiz id="m02-l04-q4" />
+
+<Quiz id="m02-l04-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l04-q6" />
+
+### Transferfrage
+
+<Quiz id="m02-l04-q7" />
+
+<details>
+<summary>Vertiefung: Wo die Regeln stehen (optional)</summary>
+
+Der Switch-Ausdruck steht in [§12.12 Switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions).
+
+Konstante Muster beschreibt [§11.2.3 Constant pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns), relationale Muster [§11.2.9 Relational pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns) und den Platzhalter [§11.2.7 Discard pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns).
+
+Dass eine nicht erschöpfende Menge von Mustern eine Warnung auslöst, regelt [§11.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns).
+
+</details>
+
+## Weiterlesen
+
+- Microsoft Learn: [switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression)
+- Microsoft Learn: [Patterns](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns)
