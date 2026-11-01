@@ -283,6 +283,148 @@
       "type": "explain",
       "question": "Transferfrage: Welche zwei Bedingungen eines Log-Werkzeugs würdest du mit `&&` verbinden, und welche mit `||`?",
       "modelAnswer": "Mit `&&`: Ein Ereignis ist verdächtig, wenn der Typ `login-failed` ist und es mindestens 3 Fehlversuche gibt. Beide Bedingungen müssen gelten.\n\nMit `||`: Ein Benutzer wird beobachtet, wenn er `bob` oder `dave` heißt. Eine der beiden Bedingungen reicht."
+    },
+    {
+      "id": "m02-l03-q1",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "Was steht nach `int x = 7; string s = x % 2 == 0 ? \"even\" : \"odd\";` in `s`?",
+      "options": [
+        {
+          "text": "`\"odd\"`, weil `7 % 2` den Rest 1 ergibt und die Bedingung falsch ist.",
+          "correct": true
+        },
+        {
+          "text": "`\"even\"`, weil der erste Wert nach dem `?` immer gewählt wird.",
+          "feedback": "Der erste Wert gilt nur, wenn die Bedingung `true` ergibt. Hier ist sie `false`."
+        },
+        {
+          "text": "Beide Werte, durch ein Komma getrennt.",
+          "feedback": "Das Ergebnis ist ein einzelner Wert, entweder der eine oder der andere."
+        }
+      ],
+      "explanation": "`7 % 2` ist 1, also ist `x % 2 == 0` falsch. Der Operator `?:` liefert den Wert nach dem Doppelpunkt: `\"odd\"`."
+    },
+    {
+      "id": "m02-l03-q2",
+      "lesson": "m02-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l03/quiz-conditional.cs",
+      "explanation": "`flag` ist `false`, also gilt der Teil nach dem Doppelpunkt: `++b + 10` ergibt 11, `b` wird 1. Der Teil `++a` wird nicht ausgewertet, `a` bleibt 0."
+    },
+    {
+      "id": "m02-l03-q3",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "Bei `ok ? A : B` hat `ok` den Wert `true`. Welche Teile werden ausgewertet?",
+      "options": [
+        {
+          "text": "Nur `ok` und `A`.",
+          "correct": true
+        },
+        {
+          "text": "`ok`, `A` und `B`. Das Ergebnis ist dann `A`.",
+          "misconception": "m02-l03-both-branches-evaluated",
+          "feedback": "Der Operator wertet nur den gewählten Zweig aus. `B` wird nie berechnet, wenn `ok` wahr ist."
+        },
+        {
+          "text": "`ok` und `B`.",
+          "feedback": "`B` ist der Wert für den Fall `false`."
+        },
+        {
+          "text": "Erst `A` und `B`, dann entscheidet `ok`.",
+          "misconception": "m02-l03-both-branches-evaluated",
+          "feedback": "Die Bedingung wird zuerst ausgewertet. Danach wird nur ein Zweig berechnet."
+        }
+      ],
+      "explanation": "Zuerst wird die Bedingung ausgewertet. Danach wird nur der gewählte Zweig berechnet. Der andere läuft nie."
+    },
+    {
+      "id": "m02-l03-q4",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "Welchen Typ hat der Wert von `flag ? 1 : 2.5` mit `bool flag = true;`?",
+      "options": [
+        {
+          "text": "`double`: Die `1` wird in einen `double` umgewandelt.",
+          "correct": true
+        },
+        {
+          "text": "`int`, weil `flag` wahr ist und deshalb die `1` gewählt wird.",
+          "feedback": "Der Typ steht schon beim Übersetzen fest und hängt nicht vom Wert von `flag` ab."
+        },
+        {
+          "text": "Das Programm lässt sich nicht übersetzen, weil `int` und `double` verschieden sind.",
+          "feedback": "Von `int` zu `double` gibt es eine implizite Umwandlung. Deshalb ist `double` der gemeinsame Typ."
+        }
+      ],
+      "explanation": "Beide Zweige brauchen einen gemeinsamen Typ. Von `int` zu `double` geht es implizit, umgekehrt nicht. Der Typ ist deshalb `double`."
+    },
+    {
+      "id": "m02-l03-q5",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "Warum meldet der Compiler bei `var value = flag ? 1 : \"one\";` einen Fehler?",
+      "options": [
+        {
+          "text": "Zwischen `int` und `string` gibt es keine implizite Umwandlung, also gibt es keinen gemeinsamen Typ.",
+          "correct": true
+        },
+        {
+          "text": "Der Wert von `flag` ist nicht bekannt.",
+          "feedback": "Der Fehler entsteht beim Übersetzen und hat nichts mit dem Wert von `flag` zu tun."
+        },
+        {
+          "text": "`?:` darf nur Zahlen liefern.",
+          "feedback": "`?:` liefert auch Texte, wie in `x > 0 ? \"a\" : \"b\"`. Beide Zweige müssen aber zusammenpassen."
+        }
+      ],
+      "explanation": "Der Compiler braucht für den ganzen Ausdruck einen Typ. Findet er keinen gemeinsamen für beide Zweige, meldet er einen Fehler."
+    },
+    {
+      "id": "m02-l03-q6",
+      "lesson": "m02-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über den bedingten Operator `?:` stimmen?",
+      "options": [
+        {
+          "text": "Er ist ein Ausdruck und liefert einen Wert.",
+          "correct": true
+        },
+        {
+          "text": "Die Bedingung davor muss ein `bool` ergeben.",
+          "correct": true
+        },
+        {
+          "text": "Er wertet beide Zweige aus und wählt dann einen.",
+          "misconception": "m02-l03-both-branches-evaluated",
+          "feedback": "Nur der gewählte Zweig wird ausgewertet."
+        },
+        {
+          "text": "Er ersetzt ein `if`-`else`, wenn beide Zweige nur einen Wert liefern.",
+          "correct": true
+        },
+        {
+          "text": "Er eignet sich am besten für Entscheidungen mit vielen Fällen.",
+          "feedback": "Bei vielen Fällen ist eine `else if`-Kette lesbarer."
+        }
+      ],
+      "explanation": "`?:` wählt einen von zwei Werten in einem Ausdruck. Für Entscheidungen, die mehrere Anweisungen ausführen, oder für viele Fälle nimmst du `if` und `else`."
+    },
+    {
+      "id": "m02-l03-q7",
+      "lesson": "m02-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was der bedingte Operator macht und worin er sich von einer `if`-Anweisung unterscheidet.",
+      "modelAnswer": "Der bedingte Operator `bedingung ? a : b` ist ein Ausdruck. Er hat einen Wert: `a`, wenn die Bedingung wahr ist, sonst `b`. Nur der gewählte Zweig wird ausgewertet. Beide Zweige brauchen einen gemeinsamen Typ.\n\nEine `if`-Anweisung ist keine Wertquelle, sie führt Anweisungen aus. Mit `?:` wählst du einen Wert mitten in einem Ausdruck, etwa bei einer Zuweisung oder einer Ausgabe."
+    },
+    {
+      "id": "m02-l03-q8",
+      "lesson": "m02-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug mit `?:` zwischen zwei Texten oder Zahlen wählen?",
+      "modelAnswer": "Zum Beispiel wählt es in einer Meldung das Wort „attempt“ oder „attempts“, je nachdem ob die Anzahl 1 ist. Oder es nimmt als Obergrenze den kleineren von zwei Werten. In beiden Fällen wählt es einen Wert in einem Ausdruck."
     }
   ]
 }

@@ -1,0 +1,201 @@
+---
+title: Der bedingte Operator
+sidebar_position: 3
+description: "Wähle mit bedingung ? a : b mitten in einem Ausdruck einen von zwei Werten. Nur der gewählte Zweig wird ausgewertet, und beide Zweige brauchen einen gemeinsamen Typ."
+lesson_id: m02-l03
+duration_min: 18
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import conditionalBasic from '!!raw-loader!@site/examples/m02/l03/conditional-basic.cs';
+import conditionalBasicOutput from '!!raw-loader!@site/examples/m02/l03/conditional-basic.out.txt';
+import sameWithIf from '!!raw-loader!@site/examples/m02/l03/same-with-if.cs';
+import oneBranch from '!!raw-loader!@site/examples/m02/l03/one-branch.cs';
+import oneBranchOutput from '!!raw-loader!@site/examples/m02/l03/one-branch.out.txt';
+import commonType from '!!raw-loader!@site/examples/m02/l03/common-type.cs';
+import commonTypeOutput from '!!raw-loader!@site/examples/m02/l03/common-type.out.txt';
+import commonTypeError from '!!raw-loader!@site/examples/m02/l03/common-type-error.snippet.cs';
+import pluralGaps from '!!raw-loader!@site/examples/m02/l03/plural-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-solution.cs';
+
+# Der bedingte Operator
+
+:::note[Lernziele]
+- Du schreibst mit `bedingung ? a : b` einen Ausdruck, der einen von zwei Werten wählt, und sagst voraus, welcher es ist.
+- Du erklärst, dass nur der gewählte Zweig ausgewertet wird.
+- Du bestimmst den gemeinsamen Typ beider Zweige und erkennst, wann es keinen gibt.
+- Du entscheidest, wann `?:` besser passt als `if` und `else`.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l02-q3" />
+
+<Quiz id="m01-l04-q3" />
+
+<Quiz id="m01-l09-q3" />
+
+## Einen Wert wählen
+
+Ein `if` führt Anweisungen aus. Oft willst du aber nur einen **Wert** wählen, zum Beispiel einen Text für eine Variable. Dafür gibt es den <Term id="conditional-operator">bedingten Operator (Conditional Operator)</Term> `?:`. Er hat drei Teile: eine Bedingung, den Wert für `true` und den Wert für `false`.
+
+```text
+bedingung ? wertWennTrue : wertWennFalse
+```
+
+Der ganze Ausdruck hat einen Wert und kann dort stehen, wo ein Wert erwartet wird: rechts von `=`, in einer Ausgabe oder in einer Rechnung.
+
+:::info[Vorhersage]
+`failed` ist `5`. Welche zwei Zeilen gibt das Programm aus? Der Ausdruck `failed < 3 ? failed : 3` wählt den Wert für `true` oder den Wert für `false`.
+:::
+
+<CSharpRunner id="m02-l03-basic" code={conditionalBasic} predict expected={conditionalBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `high` und `3`.
+
+1. **Bedingung auswerten:** `failed >= 5` ist bei `5` wahr.
+2. **Zweig wählen:** Der Wert vor dem Doppelpunkt, `"high"`, wird zum Ergebnis.
+3. **Zweite Zeile:** `failed < 3` ist falsch, also gilt der Wert nach dem Doppelpunkt, `3`.
+
+</details>
+
+Dasselbe mit `if` und `else` braucht mehr Zeilen. Beide Fassungen geben das gleiche aus, aber `?:` ist ein Ausdruck, `if` eine Anweisung:
+
+<CodeBlock language="csharp" title="same-with-if.cs">{sameWithIf}</CodeBlock>
+
+Nimm `?:`, wenn beide Fälle nur einen Wert liefern. Sind es mehrere Anweisungen oder viele Fälle, ist `if` mit `else` lesbarer.
+
+## Nur ein Zweig wird ausgewertet
+
+Der Operator rechnet zuerst die Bedingung aus. Danach wertet er nur den Zweig aus, den er braucht. Der andere läuft nie.
+
+:::info[Vorhersage]
+`++yes` und `++no` erhöhen jeweils eine Zählvariable. Welche Werte haben `result`, `yes` und `no` nach der Auswertung?
+:::
+
+<CSharpRunner id="m02-l03-one-branch" code={oneBranch} predict expected={oneBranchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `result: 1, yes: 1, no: 0`.
+
+1. **Bedingung:** `ok` ist `true`.
+2. **Gewählter Zweig:** `++yes` läuft. `yes` wird 1 und ist das Ergebnis.
+3. **Anderer Zweig:** `++no` wird nicht ausgewertet. `no` bleibt 0.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l03-both-branches-evaluated" />
+
+**„Der Operator berechnet beide Zweige und wählt dann einen.“** Es wird nur der gewählte Zweig ausgewertet. Das ist wichtig, wenn ein Zweig sonst einen Fehler auslösen würde oder etwas verändert wie `++no`.
+:::
+
+## Beide Zweige brauchen einen gemeinsamen Typ
+
+Der Compiler legt den Typ des ganzen Ausdrucks beim Übersetzen fest, nicht erst beim Laufen. Dafür müssen beide Zweige zu einem gemeinsamen Typ passen. Gibt es von einem Typ eine implizite Umwandlung (<Term id="implicit-conversion">implizite Umwandlung</Term>) in den anderen, wird dieser der Typ des Ausdrucks.
+
+:::info[Vorhersage]
+`flag ? 1 : 2.5` hat bei `flag = true` den Zweig `1` gewählt. Was gibt `value / 2` aus: `0` oder `0.5`?
+:::
+
+<CSharpRunner id="m02-l03-common-type" code={commonType} predict expected={commonTypeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0.5`.
+
+1. **Gemeinsamer Typ:** `1` ist ein `int`, `2.5` ein `double`. Von `int` zu `double` gibt es eine implizite Umwandlung, also ist der Typ `double`.
+2. **Umwandlung:** Auch wenn `1` gewählt wird, ist der Wert `1.0` vom Typ `double`.
+3. **Rechnen:** `1.0 / 2` ist eine Division mit Kommazahlen: `0.5`. Eine Ganzzahldivision `1 / 2` wäre `0`.
+
+</details>
+
+Gibt es keine solche Umwandlung, meldet der Compiler einen Fehler. Für `int` und `string` ist das so:
+
+<CodeBlock language="csharp" title="common-type-error.snippet.cs">{commonTypeError}</CodeBlock>
+
+Der Compiler meldet für Zeile 2 den Fehler CS0173: Der Typ des bedingten Ausdrucks lässt sich nicht bestimmen, weil es keine implizite Umwandlung zwischen `int` und `string` gibt.
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Ersetze `""` durch einen bedingten Ausdruck, sodass die Ausgabe `1 failed attempt` lautet. Setze danach `failed` auf `3`: Die Ausgabe muss `3 failed attempts` sein. Verwende `failed == 1 ? "attempt" : "attempts"`.
+
+<CSharpRunner id="m02-l03-gaps" code={pluralGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Bedingung:** `failed == 1` fragt nach genau einem Versuch.
+2. **Werte:** `"attempt"` für `true`, `"attempts"` für `false`.
+
+`string word = failed == 1 ? "attempt" : "attempts";`
+
+</details>
+
+<details>
+<summary>Vertiefung: Mehrere ?: hintereinander (optional)</summary>
+
+Der Operator ist rechtsassoziativ: `a ? b : c ? d : e` bedeutet `a ? b : (c ? d : e)`. Die Bedingung muss in einen `bool` umwandelbar sein. Nur eines von `x` und `y` wird ausgewertet, nie beide ([§12.21 Conditional operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1221-conditional-operator)). Verkettete Operatoren werden schnell schwer lesbar. Bei mehr als zwei Fällen ist eine `else if`-Kette übersichtlicher.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog meldet einen Alarm ab fünf Fehlversuchen und stuft ein Ereignis als verdächtig ein.
+
+**Neue Anforderung:** SecLog soll die Zahl der Fehlversuche in einem Satz ausgeben und dabei das richtige Wort wählen. Gib am Ende eine Zeile wie `5 failed attempts` aus. Bei genau `1` heißt es `1 failed attempt`. Wähle das Wort mit dem bedingten Operator. Die Ausgabe hat jetzt 26 Zeilen.
+
+<CSharpRunner id="m02-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Bedingung:** `failedFromInput == 1` fragt nach genau einem Versuch.
+2. **Wort wählen:** `"attempt"` bei `true`, sonst `"attempts"`. Beide Zweige sind `string`, der gemeinsame Typ ist `string`.
+3. **Ausgeben:** Die Interpolation setzt die Zahl und das gewählte Wort ein. Bei `5` ist die Ausgabe `5 failed attempts`.
+
+</details>
+
+**Neuer Stand:** SecLog gibt die Zahl der Fehlversuche in einem grammatisch richtigen Satz aus.
+
+## Zusammenfassung
+
+`bedingung ? a : b` ist ein Ausdruck mit einem Wert: `a` bei `true`, sonst `b`. Nur der gewählte Zweig wird ausgewertet. Beide Zweige brauchen einen gemeinsamen Typ; gibt es keinen, meldet der Compiler einen Fehler. Für einen Wert in einem Ausdruck passt `?:`, für Anweisungen oder viele Fälle `if` mit `else`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l03-q1" />
+
+<Quiz id="m02-l03-q2" />
+
+<Quiz id="m02-l03-q3" />
+
+<Quiz id="m02-l03-q4" />
+
+<Quiz id="m02-l03-q5" />
+
+<Quiz id="m02-l03-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [?-Operator (bedingter Operator)](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/conditional-operator)
+- Microsoft Learn: [Auswahlanweisungen (if, switch)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)
