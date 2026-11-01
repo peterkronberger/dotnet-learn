@@ -76,6 +76,80 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Logwerkzeug eine Bedingung mit `if` und `else` einsetzen?",
       "modelAnswer": "Zum Beispiel, um bei einer Anzahl fehlgeschlagener Anmeldungen ab einem Schwellenwert eine Warnung auszugeben und sonst nichts zu melden. Oder um nur Zeilen mit dem Ereignistyp `login-failed` weiterzuverarbeiten."
+    },
+    {
+      "id": "m02-l02-q1",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "`a` ist `true`, `b` ist `false`. Welchen Wert hat `a && b`?",
+      "options": [
+        { "text": "`false`", "correct": true },
+        { "text": "`true`", "feedback": "`&&` ist nur `true`, wenn beide Seiten `true` sind. Hier ist `b` `false`." }
+      ],
+      "explanation": "`&&` (und) verlangt, dass beide Seiten `true` sind. `||` (oder) genügt eine wahre Seite."
+    },
+    {
+      "id": "m02-l02-q2",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "`stop` ist `false`, `checks` ist 0. Was ist nach `bool r = stop & (++checks > 0);` der Wert von `checks`?",
+      "options": [
+        { "text": "1", "correct": true },
+        { "text": "0", "misconception": "m02-l02-and-same-as-ampersand", "feedback": "Das wäre bei `&&` so. Der Operator `&` wertet immer beide Seiten aus, auch wenn die linke Seite schon `false` ist." },
+        { "text": "2", "feedback": "Die rechte Seite wird nur einmal ausgewertet, `++checks` erhöht den Wert nur um 1." }
+      ],
+      "explanation": "`&` und `&&` liefern bei `bool`-Werten dasselbe Ergebnis. Aber nur `&&` überspringt die rechte Seite, wenn die linke `false` ist. `&` wertet beide Seiten immer aus."
+    },
+    {
+      "id": "m02-l02-q3",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Wann wertet `x || y` den Ausdruck `y` nicht aus?",
+      "options": [
+        { "text": "Wenn `x` den Wert `true` hat.", "correct": true },
+        { "text": "Wenn `x` den Wert `false` hat.", "feedback": "Bei `false` links hängt das Ergebnis von `y` ab, also muss `y` ausgewertet werden." },
+        { "text": "Nie, `||` wertet immer beide Seiten aus.", "misconception": "m02-l02-and-same-as-ampersand", "feedback": "Nur `|` und `&` werten immer beide Seiten aus. `||` und `&&` hören auf, sobald das Ergebnis feststeht." }
+      ],
+      "explanation": "Ist die linke Seite von `||` schon `true`, steht das Ergebnis fest. Die rechte Seite wird übersprungen (Kurzschlussauswertung)."
+    },
+    {
+      "id": "m02-l02-q4",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "`a` ist `true`, `b` ist `false`, `c` ist `false`. Welchen Wert hat `a || b && c`?",
+      "options": [
+        { "text": "`true`, weil `&&` vor `||` kommt: `b && c` ist `false`, und `true || false` ist `true`.", "correct": true },
+        { "text": "`false`, weil von links nach rechts erst `a || b` und dann `&& c` gerechnet wird.", "feedback": "`&&` bindet stärker als `||`. Erst `b && c` auswerten, dann `a || …`. Mit Klammern erzwingst du die andere Reihenfolge." }
+      ],
+      "explanation": "Die Rangfolge ist `!`, dann `&&`, dann `||`. Mit Klammern legst du eine andere Reihenfolge fest."
+    },
+    {
+      "id": "m02-l02-q5",
+      "lesson": "m02-l02",
+      "type": "multi",
+      "question": "Welche Ausdrücke sind `true`, wenn `a` den Wert `true` und `b` den Wert `false` hat?",
+      "options": [
+        { "text": "`a || b`", "correct": true },
+        { "text": "`a ^ b`", "correct": true },
+        { "text": "`!b`", "correct": true },
+        { "text": "`a && b`", "feedback": "`&&` braucht zwei wahre Seiten." },
+        { "text": "`a ^ !b`", "feedback": "`^` ist `true`, wenn genau eine Seite `true` ist. Hier sind beide Seiten `true`." }
+      ],
+      "explanation": "`^` ist `true`, wenn genau eine Seite `true` ist. `!` kehrt einen Wert um."
+    },
+    {
+      "id": "m02-l02-q6",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Kurzschlussauswertung bei `&&` bedeutet und wann der Unterschied zu `&` sichtbar wird.",
+      "modelAnswer": "Bei `&&` steht das Ergebnis fest, sobald die linke Seite `false` ist. Dann wertet das Programm die rechte Seite gar nicht aus. `&` wertet bei `bool`-Werten immer beide Seiten aus.\n\nDas Ergebnis ist bei beiden gleich. Sichtbar wird der Unterschied, wenn die rechte Seite etwas bewirkt, zum Beispiel einen Zähler erhöht, oder einen Fehler auslösen könnte."
+    },
+    {
+      "id": "m02-l02-q7",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Transferfrage: Welche Regel für ein Logwerkzeug würdest du mit `&&` formulieren und welche mit `||`?",
+      "modelAnswer": "Mit `&&`: Ein Ereignis ist verdächtig, wenn der Typ `login-failed` ist und die Zahl der Fehlschläge mindestens 3 beträgt. Beide Bedingungen müssen gelten.\n\nMit `||`: Ein Benutzer steht auf der Beobachtungsliste, wenn er `bob` oder `dave` heißt. Eine Bedingung genügt."
     }
   ]
 }

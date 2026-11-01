@@ -1,0 +1,3 @@
+a=False, checks=0
+b=False, checks=1
+c=True, checks=1
