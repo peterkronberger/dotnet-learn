@@ -12,6 +12,7 @@ import {
   recordAnswer,
   reopenLesson,
 } from './leitner';
+import { applyPlacementPass, evaluatePlacement, placementResult, resetPlacement } from './placement';
 import { createMemoryStorage, emptyProgress, loadProgress, saveProgress } from './storage';
 import { activityBuckets, activitySum, isoWeek, lessonOverview, nextLesson, stageTotals } from './summary';
 
@@ -205,6 +206,81 @@ const TESTS = [
     expectEqual(isoWeek('2026-12-31'), 53, '2026-12-31');
     expectEqual(isoWeek('2027-01-03'), 53, '2027-01-03 (Sunday)');
     expectEqual(isoWeek('2027-01-04'), 1, '2027-01-04 (Monday)');
+  }],
+  ['Placement: evaluatePlacement pass rule (at most 1 wrong, partial counts as wrong)', () => {
+    const rep = (n, r) => Array(n).fill(r);
+    const passed = (a) => evaluatePlacement(a).passed;
+    check(passed(rep(8, 'correct')), '8 correct');
+    check(passed([...rep(7, 'correct'), 'wrong']), '7 correct + 1 wrong');
+    check(passed([...rep(7, 'correct'), 'partial']), '7 correct + 1 partial');
+    check(!passed([...rep(6, 'correct'), 'partial', 'wrong']), '6 correct + partial + wrong');
+    check(!passed([...rep(6, 'correct'), 'partial', 'partial']), '6 correct + 2 partial');
+    check(!passed([]), 'empty');
+    expectEqual(evaluatePlacement([...rep(7, 'correct'), 'wrong']), { correct: 7, total: 8, passed: true }, 'counts');
+  }],
+  ['Placement: applyPlacementPass marks open lessons, keeps done ones, leaves questions and activity', () => {
+    const base = completeLesson(sample(), 'm01-l01', '2026-10-20');
+    const before = JSON.stringify(base);
+    const result = { correct: 7, total: 8, passed: true };
+    const p = applyPlacementPass(base, 'm01', ['m01-l01', 'm01-l02'], result, '2026-11-01');
+    expectEqual(p.lessons['m01-l01'], { completedAt: '2026-10-20' }, 'hand-completed lesson');
+    expectEqual(p.lessons['m01-l02'], { completedAt: '2026-11-01', via: 'placement' }, 'placement lesson');
+    expectEqual(p.placement.m01, { date: '2026-11-01', correct: 7, total: 8, passed: true }, 'placement');
+    expectEqual(placementResult(p, 'm01'), p.placement.m01, 'placementResult');
+    expectEqual(placementResult(p, 'm02'), null, 'placementResult none');
+    check(p.questions === base.questions && p.activity === base.activity, 'questions and activity are the same objects');
+    expectEqual(JSON.stringify(base), before, 'input unchanged');
+  }],
+  ['Placement: applyPlacementPass throws for a result that is not passed', () => {
+    let thrown = false;
+    try {
+      applyPlacementPass(emptyProgress(), 'm01', ['m01-l01'], { correct: 6, total: 8, passed: false }, '2026-11-01');
+    } catch {
+      thrown = true;
+    }
+    check(thrown, 'should throw');
+  }],
+  ['Placement: resetPlacement removes only placement lessons of that module', () => {
+    let p = completeLesson(emptyProgress(), 'm01-l01', '2026-10-20');
+    const pass = { correct: 8, total: 8, passed: true };
+    p = applyPlacementPass(p, 'm00', ['m00-l01'], pass, '2026-10-21');
+    p = applyPlacementPass(p, 'm01', ['m01-l01', 'm01-l02'], pass, '2026-11-01');
+    const r = resetPlacement(p, 'm01');
+    expectEqual(r.lessons, { 'm01-l01': { completedAt: '2026-10-20' }, 'm00-l01': { completedAt: '2026-10-21', via: 'placement' } }, 'lessons');
+    expectEqual(Object.keys(r.placement), ['m00'], 'placement');
+    check(r.questions === p.questions && r.activity === p.activity, 'questions and activity unchanged');
+    check('m01' in p.placement, 'input unchanged');
+  }],
+  ['Placement: export → import keeps placement and via', () => {
+    const p = applyPlacementPass(sample(), 'm01', ['m01-l03'], { correct: 8, total: 8, passed: true }, '2026-11-01');
+    const r = parseImport(serializeProgress(p));
+    check(r.ok, 'import ok');
+    expectEqual(r.progress, p, 'state');
+  }],
+  ['Placement: invalid via and placement values are rejected', () => {
+    const entry = { date: '2026-11-01', correct: 7, total: 8, passed: true };
+    const base = { version: 1, questions: {} };
+    const cases = {
+      'via hand': { lessons: { 'm01-l01': { completedAt: '2026-10-24', via: 'hand' } } },
+      'placement as array': { placement: [] },
+      'correct > total': { placement: { m01: { ...entry, correct: 9 } } },
+      'total 0': { placement: { m01: { ...entry, correct: 0, total: 0 } } },
+      'passed "yes"': { placement: { m01: { ...entry, passed: 'yes' } } },
+      'module key "M 1"': { placement: { 'M 1': entry } },
+      'date invalid': { placement: { m01: { ...entry, date: '2026-02-30' } } },
+    };
+    for (const [name, patch] of Object.entries(cases)) {
+      const r = validateProgress({ ...base, ...patch });
+      check(!r.ok, `${name}: should be invalid`);
+      check(typeof r.error === 'string' && r.error.length > 0, `${name}: error text missing`);
+    }
+  }],
+  ['Placement: old file without placement is valid and gets an empty placement', () => {
+    const r = validateProgress({ version: 1, questions: {}, lessons: { 'm01-l01': { completedAt: '2026-10-24' } } });
+    check(r.ok, 'ok');
+    expectEqual(r.progress.placement, {}, 'placement');
+    expectEqual(r.progress.lessons, { 'm01-l01': { completedAt: '2026-10-24' } }, 'lessons without via');
+    expectEqual(emptyProgress(), { version: 1, questions: {}, lessons: {}, activity: {}, placement: {} }, 'emptyProgress');
   }],
 ];
 

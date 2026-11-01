@@ -2,7 +2,7 @@ import { PROGRESS_EVENT, PROGRESS_KEY } from './config';
 import { validateProgress } from './exportImport';
 
 export function emptyProgress() {
-  return { version: 1, questions: {}, lessons: {}, activity: {} };
+  return { version: 1, questions: {}, lessons: {}, activity: {}, placement: {} };
 }
 
 // null on SSR or when access throws (blocked storage, private mode).
