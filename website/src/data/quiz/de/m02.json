@@ -99,6 +99,100 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Programm, das Logs prüft, würdest du `if` und `else` verwenden? Nenne zwei Beispiele.",
       "modelAnswer": "Zum Beispiel: Ein Alarm wird nur ausgegeben, wenn die Zahl der fehlgeschlagenen Anmeldungen einen Grenzwert erreicht. Oder: Eine Logzeile wird nur gezählt, wenn der Ereignistyp `login-failed` ist. Auch das Einordnen in „niedrig“, „mittel“ und „hoch“ ist eine `else if`-Kette."
+    },
+    {
+      "id": "m02-l02-q1",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Welchen Wert hat `true && false`?",
+      "options": [
+        { "text": "`false`", "correct": true },
+        { "text": "`true`", "feedback": "`&&` ist nur `true`, wenn beide Seiten `true` sind. Das ist `||`: Dort genügt eine Seite." },
+        { "text": "Einen Fehler, weil die Seiten verschieden sind.", "feedback": "Beide Seiten sind `bool`. Der Ausdruck ist gültig." }
+      ],
+      "explanation": "`&&` (und) liefert `true`, wenn beide Seiten `true` sind. Hier ist die rechte Seite `false`."
+    },
+    {
+      "id": "m02-l02-q2",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Welchen Wert hat `!(5 > 3)`?",
+      "options": [
+        { "text": "`false`", "correct": true },
+        { "text": "`true`", "feedback": "`5 > 3` ist `true`. `!` dreht den Wert um." },
+        { "text": "`-5`", "feedback": "`!` arbeitet mit `bool`, nicht mit Zahlen." }
+      ],
+      "explanation": "Erst wird `5 > 3` zu `true` ausgewertet, dann dreht `!` den Wert zu `false` um."
+    },
+    {
+      "id": "m02-l02-q3",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Welchen Wert hat `true || false && false`?",
+      "options": [
+        { "text": "`true`", "correct": true },
+        { "text": "`false`", "feedback": "Das wäre das Ergebnis, wenn `||` zuerst ausgewertet würde. `&&` bindet aber stärker: Erst `false && false`, dann `true || false`." }
+      ],
+      "explanation": "Die Rangfolge ist `!`, dann `&&`, dann `||`. Also gilt `true || (false && false)`, und das ist `true`."
+    },
+    {
+      "id": "m02-l02-q4",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Nach `int n = 0; bool r = false && ++n > 0;` – welchen Wert hat `n`?",
+      "options": [
+        { "text": "`0`", "correct": true },
+        { "text": "`1`", "misconception": "m02-l02-and-same-as-ampersand", "feedback": "`&&` wertet die rechte Seite nicht aus, wenn die linke schon `false` ist. Erst `&` würde `++n` immer ausführen." },
+        { "text": "`-1`", "feedback": "`++` erhöht den Wert, es verringert ihn nicht." }
+      ],
+      "explanation": "Bei `&&` steht das Ergebnis nach der linken Seite `false` fest. Die rechte Seite läuft nicht, also bleibt `n` bei `0`."
+    },
+    {
+      "id": "m02-l02-q5",
+      "lesson": "m02-l02",
+      "type": "multi",
+      "question": "Welche Aussagen über `&&` und `&` bei `bool`-Werten stimmen?",
+      "options": [
+        { "text": "Beide liefern `true`, wenn beide Seiten `true` sind.", "correct": true },
+        { "text": "`&` wertet beide Seiten immer aus.", "correct": true },
+        { "text": "`&&` wertet die rechte Seite nicht aus, wenn die linke `false` ist.", "correct": true },
+        { "text": "`&&` und `&` verhalten sich in jedem Programm gleich.", "misconception": "m02-l02-and-same-as-ampersand", "feedback": "Das Ergebnis ist gleich, aber der Ablauf nicht: Hat die rechte Seite eine Wirkung (zum Beispiel `++n`), unterscheiden sich die Programme." }
+      ],
+      "explanation": "Das Ergebnis von `&&` und `&` ist bei `bool` gleich. `&&` wertet die rechte Seite aber nur aus, wenn sie nötig ist. `&` wertet immer beide Seiten aus."
+    },
+    {
+      "id": "m02-l02-q6",
+      "lesson": "m02-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, welche Seiten ausgewertet werden.",
+      "example": "m02/l02/quiz-short-circuit.cs",
+      "explanation": "Die erste Zeile überspringt wegen `||` die rechte Seite. Bei `|` werden beide Seiten ausgewertet, also zählt `++count` zweimal: `2`. Alle drei Werte sind `true`, also gibt die zweite Zeile `True` aus."
+    },
+    {
+      "id": "m02-l02-q7",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Welche Bedingung trifft zu, wenn der Ereignistyp `login-failed` ist und mindestens 3 Fehlversuche vorliegen?",
+      "options": [
+        { "text": "`eventType == \"login-failed\" && failed >= 3`", "correct": true },
+        { "text": "`eventType == \"login-failed\" || failed >= 3`", "feedback": "`||` genügt schon, wenn eine Seite wahr ist. Hier sollen aber beide Bedingungen gelten." },
+        { "text": "`eventType == \"login-failed\" && failed > 3`", "feedback": "`> 3` schließt genau `3` Fehlversuche aus. „Mindestens 3“ ist `>= 3`." }
+      ],
+      "explanation": "„Und“ heißt `&&`, „mindestens“ heißt `>=`."
+    },
+    {
+      "id": "m02-l02-q8",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `&&` und `&` bei `bool`-Werten.",
+      "modelAnswer": "Beide liefern `true`, wenn beide Seiten `true` sind. `&&` wertet die rechte Seite nur aus, wenn die linke `true` ist, sonst steht das Ergebnis schon fest. Das nennt man Kurzschlussauswertung. `&` wertet immer beide Seiten aus.\n\nDer Unterschied zeigt sich, wenn die rechte Seite etwas bewirkt, zum Beispiel einen Zähler erhöht."
+    },
+    {
+      "id": "m02-l02-q9",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Transferfrage: Nenne zwei Regeln aus einem Sicherheits-Tool, die du mit `&&`, `||` oder `!` ausdrücken würdest.",
+      "modelAnswer": "Zum Beispiel: „Ereignistyp ist `login-failed` und die Zahl der Fehlversuche ist mindestens 3“ ist eine `&&`-Regel. „Der Benutzer ist `bob` oder `dave`“ ist eine `||`-Regel. „Die IP-Adresse ist nicht auf der Erlaubnisliste“ ist eine `!`-Regel."
     }
   ]
 }

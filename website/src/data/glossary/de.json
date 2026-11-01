@@ -1539,6 +1539,47 @@
         "title": "Comparison operators",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/comparison-operators"
       }
+    },
+    {
+      "id": "logical-operator",
+      "term": "Logical Operator",
+      "german": "logischer Operator",
+      "category": "language",
+      "definition": "Ein Operator, der `bool`-Werte verknüpft: `&&` (und), `||` (oder), `!` (nicht) sowie `&`, `|` und `^` ohne Abkürzung.",
+      "aliases": [
+        "logische Operatoren",
+        "&&",
+        "||",
+        "Negation"
+      ],
+      "related": [
+        "short-circuit-evaluation",
+        "boolean-expression"
+      ],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
+    },
+    {
+      "id": "short-circuit-evaluation",
+      "term": "Short-circuit Evaluation",
+      "german": "Kurzschlussauswertung",
+      "category": "language",
+      "definition": "`&&` und `||` werten den rechten Operanden nur aus, wenn der linke das Ergebnis noch nicht festlegt. `&` und `|` werten immer beide Seiten aus.",
+      "aliases": [
+        "Kurzschlussauswertung",
+        "verkürzte Auswertung"
+      ],
+      "related": [
+        "logical-operator"
+      ],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
     }
   ]
 }
