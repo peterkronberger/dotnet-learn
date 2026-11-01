@@ -1,0 +1,207 @@
+---
+title: "Bedingungen verknüpfen: logische Operatoren"
+sidebar_position: 2
+description: "Verknüpfe Bedingungen mit && (und), || (oder) und ! (nicht), und lerne, warum && und || die rechte Seite manchmal auslassen."
+lesson_id: m02-l02
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import andOrNot from '!!raw-loader!@site/examples/m02/l02/and-or-not.cs';
+import andOrNotOutput from '!!raw-loader!@site/examples/m02/l02/and-or-not.out.txt';
+import precedence from '!!raw-loader!@site/examples/m02/l02/precedence.cs';
+import precedenceOutput from '!!raw-loader!@site/examples/m02/l02/precedence.out.txt';
+import shortCircuit from '!!raw-loader!@site/examples/m02/l02/short-circuit.cs';
+import shortCircuitOutput from '!!raw-loader!@site/examples/m02/l02/short-circuit.out.txt';
+import guard from '!!raw-loader!@site/examples/m02/l02/guard.cs';
+import boolOperators from '!!raw-loader!@site/examples/m02/l02/bool-operators.cs';
+import suspiciousGaps from '!!raw-loader!@site/examples/m02/l02/suspicious-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l02/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l02/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l02/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l02/seclog-analysis-solution.cs';
+
+# Bedingungen verknüpfen: logische Operatoren
+
+:::note[Lernziele]
+- Du verknüpfst Bedingungen mit `&&`, `||` und `!` und sagst das Ergebnis voraus.
+- Du liest einen Ausdruck mit `!`, `&&` und `||` ohne Klammern richtig, auch bei gemischten Operatoren.
+- Du erklärst, wann `&&` und `||` die rechte Seite nicht auswerten, und nutzt das als Schutz.
+- Du nennst den Unterschied zwischen `&&` und `&` bei `bool`-Werten.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l04-q1" />
+
+<Quiz id="m01-l04-q6" />
+
+<Quiz id="m01-l09-q2" />
+
+## Und, oder, nicht
+
+Oft reicht ein einzelner Vergleich nicht. Ein Ereignis ist zum Beispiel verdächtig, wenn der Typ `login-failed` ist **und** es mindestens drei Fehlversuche gab. Die <Term id="logical-operator">logischen Operatoren (Logical Operators)</Term> verknüpfen `bool`-Werte zu einem neuen `bool`:
+
+| Operator | Bedeutung | Ergebnis ist `true`, wenn … |
+| --- | --- | --- |
+| `&&` | und | beide Seiten `true` sind |
+| `\|\|` | oder | mindestens eine Seite `true` ist |
+| `!` | nicht | der Operand `false` ist (kehrt um) |
+
+`!` steht vor einem Wert, `&&` und `||` stehen zwischen zwei Werten.
+
+:::info[Vorhersage]
+`failed` ist `4`, `user` ist `"bob"`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l02-basics" code={andOrNot} predict expected={andOrNotOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `True`, `True`, `True` und `False`.
+
+1. **`failed >= 3 && user == "bob"`:** Beide Seiten sind wahr, also `True`.
+2. **`failed >= 5 || user == "bob"`:** Die linke Seite ist falsch, die rechte wahr. Bei „oder“ reicht eine: `True`.
+3. **`!(failed >= 5)`:** Die Klammer ist `false`, `!` kehrt sie um: `True`.
+4. **`failed >= 5 && user == "bob"`:** Die linke Seite ist falsch, „und“ braucht beide: `False`.
+
+</details>
+
+## Welcher Operator rechnet zuerst?
+
+`!` bindet am stärksten, danach folgt `&&`, zuletzt `||`. Das ist die <Term id="operator-precedence">Rangfolge (Operator Precedence)</Term> aus Modul 1, jetzt für Logik: Wie bei „Punkt vor Strich“ gruppiert `&&` stärker als `||`. Vergleiche wie `>=` und `==` rechnen vor `&&` und `||`. Im Zweifel setzt du Klammern.
+
+:::info[Vorhersage]
+`a` ist `true`, `b` und `c` sind `false`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l02-precedence" code={precedence} predict expected={precedenceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `True`, `False` und `False`.
+
+1. **`a || b && c`:** `&&` rechnet zuerst: `b && c` ist `false`. Dann `a || false`: `True`.
+2. **`(a || b) && c`:** Die Klammer rechnet zuerst und ergibt `true`. Dann `true && c`: `False`.
+3. **`!a || b`:** `!` bindet nur an `a`: `false || false` ergibt `False`.
+
+</details>
+
+## Kurzschluss: die rechte Seite wird manchmal ausgelassen
+
+Bei `false && …` steht das Ergebnis schon fest: „und“ braucht beide Seiten wahr. Bei `true || …` steht es auch fest. Deshalb werten `&&` und `||` die rechte Seite nur aus, wenn sie nötig ist. Das heißt <Term id="short-circuit-evaluation">Kurzschlussauswertung (Short-Circuit Evaluation)</Term>.
+
+Du kannst das sehen, wenn die rechte Seite etwas verändert. Hier zählt `++checks` mit, wie oft die rechte Seite ausgewertet wurde.
+
+:::info[Vorhersage]
+Wie oft wird die rechte Seite jeweils ausgewertet? Welchen Wert hat `checks` nach jeder der drei Zeilen?
+:::
+
+<CSharpRunner id="m02-l02-short-circuit" code={shortCircuit} predict expected={shortCircuitOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen: `&& result: False, checks: 0`, `|| result: True, checks: 0` und `& result: False, checks: 1`.
+
+1. **`ready && (++checks > 0)`:** `ready` ist `false`. Das Ergebnis steht fest, `++checks` läuft nicht. `checks` bleibt `0`.
+2. **`done || (++checks > 0)`:** `done` ist `true`. Auch hier entfällt die rechte Seite, `checks` bleibt `0`.
+3. **`ready & (++checks > 0)`:** `&` wertet beide Seiten immer aus. `++checks` läuft, `checks` wird `1`, obwohl das Ergebnis schon feststand.
+
+</details>
+
+Die Kurzschlussauswertung ist nützlich als Schutz: Die linke Bedingung sorgt dafür, dass die rechte nur dann läuft, wenn sie sicher ist. Eine Division durch null löst in diesem Beispiel einen Fehler aus (eine <Term id="exception">Ausnahme, Exception</Term>), wenn sie ausgeführt würde.
+
+<CSharpRunner id="m02-l02-guard" code={guard} />
+
+Die Ausgabe ist `False`. `total != 0` ist falsch, also wird `failed * 100 / total` nie berechnet.
+
+## & und | bei bool
+
+`&`, `|` und `^` gibt es auch für `bool`-Werte. `&` und `|` liefern dasselbe Ergebnis wie `&&` und `||`, werten aber immer beide Seiten aus. `^` ist „genau eine Seite ist wahr“.
+
+<CSharpRunner id="m02-l02-bool-ops" code={boolOperators} />
+
+Die Ausgabe ist `False`, `True`, `True` und `False`: `true & false` ist falsch, `true | false` ist wahr, `true ^ false` ist wahr, und `true ^ true` ist falsch, weil beide Seiten gleich sind.
+
+:::warning[Achtung]
+<Misconception id="m02-l02-and-same-as-ampersand" />
+
+**„`&&` und `&` sind dasselbe.“** Bei `bool` liefern beide dasselbe Ergebnis, aber `&` wertet die rechte Seite immer aus. Steht dort eine Berechnung mit Nebenwirkung oder ein Fehler wie die Division durch null, macht das einen Unterschied. Für Bedingungen nimmst du in der Regel `&&` und `||`.
+:::
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ersetze die drei `false` so, dass die Ausgabe `Failure: True, many: True` und `Suspicious: True` lautet. Verwende dafür `eventType == "login-failed"`, `failed >= 3` und `isFailure && isMany`. Setze danach `failed` auf `2`: Jetzt ist `Suspicious` falsch.
+
+<CSharpRunner id="m02-l02-gaps" code={suspiciousGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ereignistyp:** `bool isFailure = eventType == "login-failed";`
+2. **Anzahl:** `bool isMany = failed >= 3;`
+3. **Verknüpfen:** `bool suspicious = isFailure && isMany;`
+
+</details>
+
+<details>
+<summary>Vertiefung: Die Regeln in der Spezifikation (optional)</summary>
+
+`x && y` verhält sich wie `x & y`, außer dass `y` nur ausgewertet wird, wenn `x` nicht `false` ist. `x || y` verhält sich wie `x | y`, außer dass `y` nur ausgewertet wird, wenn `x` nicht `true` ist ([§12.17 Conditional logical operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1217-conditional-logical-operators)). Das vordefinierte `!` kehrt `true` und `false` um ([§12.9.4 Logical negation operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1294-logical-negation-operator)).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest den Benutzer und die Zahl der fehlgeschlagenen Anmeldungen und meldet einen Alarm ab fünf Fehlversuchen.
+
+**Neue Anforderung:** SecLog soll ein Ereignis als verdächtig einstufen, wenn der Ereignistyp `login-failed` ist **und** `failedFromInput` mindestens `3` ist. Gib am Ende die Zeile `Suspicious: True` oder `Suspicious: False` aus (der Wert des `bool`). Die Ausgabe hat jetzt 25 Zeilen. Die Regel ist für den Unterricht vereinfacht.
+
+<CSharpRunner id="m02-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Bedingungen vergleichen:** `eventType == "login-failed"` und `failedFromInput >= 3` sind zwei Vergleiche.
+2. **Verknüpfen:** `&&` verlangt beide. Beim Wert `5` und dem Typ `login-failed` ist das Ergebnis `true`.
+3. **Ausgeben:** Die Interpolation schreibt den `bool` als `True`.
+
+</details>
+
+**Neuer Stand:** SecLog stuft ein Ereignis mit zwei verknüpften Bedingungen als verdächtig ein.
+
+## Zusammenfassung
+
+`&&` ist wahr, wenn beide Seiten wahr sind, `||`, wenn mindestens eine wahr ist, und `!` kehrt einen Wert um. `!` bindet vor `&&`, und `&&` bindet vor `||`. `&&` und `||` werten die rechte Seite nur aus, wenn das Ergebnis noch nicht feststeht. `&` und `|` liefern bei `bool` dasselbe Ergebnis, werten aber immer beide Seiten aus.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l02-q1" />
+
+<Quiz id="m02-l02-q2" />
+
+<Quiz id="m02-l02-q3" />
+
+<Quiz id="m02-l02-q4" />
+
+<Quiz id="m02-l02-q5" />
+
+<Quiz id="m02-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l02-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Boolesche logische Operatoren](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators)
+- Microsoft Learn: [Operatorrangfolge](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/#operator-precedence)

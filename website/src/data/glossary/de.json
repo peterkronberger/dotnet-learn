@@ -707,12 +707,14 @@
       "term": "Selection Statement",
       "german": "Verzweigung",
       "category": "language",
-      "definition": "Eine Anweisung, die Code nur unter einer Bedingung ausführt, zum Beispiel `if` und `else` oder `switch`.",
+      "definition": "Eine Anweisung, die aus mehreren Anweisungen anhand einer Bedingung eine auswählt, die ausgeführt wird. `if` und `else` sind das einfachste Beispiel, `switch` ein weiteres.",
       "aliases": [
         "Verzweigungen",
-        "if"
+        "if",
+        "if-Anweisung"
       ],
       "related": [
+        "boolean-expression",
         "loop",
         "switch-expression"
       ],
@@ -1491,6 +1493,109 @@
       "source": {
         "title": "Console.ReadLine Method",
         "url": "https://learn.microsoft.com/dotnet/api/system.console.readline"
+      }
+    },
+    {
+      "id": "boolean-expression",
+      "term": "Boolean Expression",
+      "german": "boolescher Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck, dessen Ergebnis ein `bool` ist, also `true` oder `false`. Die Bedingung von `if` ist ein boolescher Ausdruck.",
+      "aliases": [
+        "Bedingung",
+        "boolescher Ausdruck"
+      ],
+      "related": [
+        "comparison-operator",
+        "selection-statement"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Boolean expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1227-boolean-expressions"
+      }
+    },
+    {
+      "id": "comparison-operator",
+      "term": "Comparison Operator",
+      "german": "Vergleichsoperator",
+      "category": "language",
+      "definition": "Ein Operator, der zwei Werte vergleicht und einen `bool` liefert: `==`, `!=`, `<`, `>`, `<=` und `>=`.",
+      "aliases": [
+        "Vergleichsoperatoren",
+        "relationaler Operator",
+        "Gleichheitsoperator"
+      ],
+      "related": [
+        "boolean-expression",
+        "operator"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Comparison operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/comparison-operators"
+      }
+    },
+    {
+      "id": "logical-operator",
+      "term": "Logical Operator",
+      "german": "logischer Operator",
+      "category": "language",
+      "definition": "Ein Operator, der `bool`-Werte verknüpft: `&&` (und), `||` (oder), `!` (nicht). `&`, `|` und `^` verknüpfen `bool`-Werte ebenfalls, werten aber immer beide Seiten aus.",
+      "aliases": [
+        "logische Operatoren",
+        "&&",
+        "||",
+        "Negation"
+      ],
+      "related": [
+        "short-circuit-evaluation",
+        "boolean-expression"
+      ],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
+    },
+    {
+      "id": "short-circuit-evaluation",
+      "term": "Short-Circuit Evaluation",
+      "german": "Kurzschlussauswertung",
+      "category": "language",
+      "definition": "`&&` und `||` werten die rechte Seite nur aus, wenn die linke das Ergebnis noch nicht festlegt. Bei `false && …` und `true || …` entfällt die rechte Seite.",
+      "aliases": [
+        "Kurzschlussauswertung",
+        "Short-Circuiting"
+      ],
+      "related": [
+        "logical-operator"
+      ],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Conditional logical operators (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1217-conditional-logical-operators"
+      }
+    },
+    {
+      "id": "conditional-operator",
+      "term": "Conditional Operator",
+      "german": "bedingter Operator",
+      "category": "language",
+      "definition": "Der Operator `?:` wählt in einem Ausdruck einen von zwei Werten: `bedingung ? wertA : wertB`. Nur der gewählte Teil wird ausgewertet.",
+      "aliases": [
+        "bedingter Operator",
+        "?:",
+        "ternärer Operator"
+      ],
+      "related": [
+        "boolean-expression",
+        "selection-statement"
+      ],
+      "lesson": "m02-l03",
+      "source": {
+        "title": "?: operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/conditional-operator"
       }
     }
   ]
