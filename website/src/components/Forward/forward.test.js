@@ -1,6 +1,6 @@
 const test = require('node:test');
 const assert = require('node:assert');
-const {validateForwardProps, conceptParts} = require('./forward');
+const {EARLY_IMPLEMENTATIONS, validateForwardProps, conceptParts} = require('./forward');
 
 const ids = new Set(['m00-l01', 'm00-l05']);
 
@@ -20,7 +20,6 @@ test('invalid props throw a <Forward> error', () => {
     {concepts: ['a'], lesson: 'm00-l01', module: '1'},
     {concepts: ['a']},
     {concepts: ['a'], lesson: 'm99-l01'},
-    {concepts: ['a'], lesson: 'm02-l01'},
     {concepts: ['a'], module: '20'},
     {concepts: ['a'], module: 'x'},
     {concepts: ['a'], module: 1.5},
@@ -32,8 +31,8 @@ test('invalid props throw a <Forward> error', () => {
 });
 
 test('early-implementation lessons are rejected even if they exist', () => {
-  const all = new Set([...ids, 'm02-l01']);
-  for (const id of ['m02-l01']) {
+  const all = new Set([...ids, ...EARLY_IMPLEMENTATIONS]);
+  for (const id of EARLY_IMPLEMENTATIONS) {
     assert.throws(() => validateForwardProps({concepts: ['a'], lesson: id}, all), /module="N"/);
   }
 });
