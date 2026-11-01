@@ -76,12 +76,7 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
   - .NET 11 is planned for 2026-11-10 together with C# 15 (primary source: dotnet/core `releases.md` lists .NET 11 as STS with release date 2026-11-10, status Go-Live, checked 2026-10-28). By the odd/even rule it is an STS release. The course base stays C# 14 / .NET 10 (LTS) – see `CLAUDE.md`.
   - End of support for .NET 10 is **2028-11-14** (checked 2026-10-25, .NET support policy page, primary source). The EF Core 10 "What's new" page says 2028-11-10; that is not used.
 
-- **Placement test candidates** (component is planned; quiz format unchanged; every lesson covered at least once, no `explain` questions):
-  - `m00-l01-q1`, `m00-l01-q3`
-  - `m00-l02-q2`, `m00-l02-q3`, `m00-l02-q5`
-  - `m00-l03-q1`, `m00-l03-q2`
-  - `m00-l04-q1`, `m00-l04-q4`
-  - `m00-l05-q2`, `m00-l05-q3`
+- **Placement test:** marked in `website/src/data/quiz/de/m00.json` (`"placement": true`).
 
 ### M1 Erste Programme, Variablen, Typen (first programs, variables, types) ▶
 Statements and output · variables and built-in types · integer, floating point, `decimal` · strings and interpolation (*use* objects: `Length`, `ToUpper`) · type conversion and `Parse` · console input (through the runner's input field).
@@ -101,16 +96,7 @@ Expected misconceptions: `=` as comparison; integer division rounds; `"3" + 4` g
 - **Library (not spec):** `Console` output and input, `int.Parse` vs. `TryParse` (TryParse needs `out` – forward reference to M3, use it as a recipe here), `Math`, composite formatting and format strings; culture dependency of formatting and parsing (playground: `InvariantGlobalization`).
 - More misconceptions: postfix increment returns the new value; `var` makes a variable dynamic; a cast rounds instead of truncating.
 - **Dependency:** console input uses the `stdin` parameter of `<CSharpRunner>` (see `components.md`) and an `<name>.in.txt` file next to the example (used in `m01-l09`).
-- **Placement test candidates** (module review 2026-10-30; same rules as M0):
-  - `m01-l01-q1`, `m01-l01-q3`
-  - `m01-l02-q3`
-  - `m01-l03-q1`
-  - `m01-l04-q2`
-  - `m01-l05-q3`
-  - `m01-l06-q3`
-  - `m01-l07-q3`
-  - `m01-l08-q1`
-  - `m01-l09-q1`
+- **Placement test:** marked in `website/src/data/quiz/de/m01.json` (`"placement": true`).
 
 ### M2 Kontrollfluss (control flow) ▶
 `if`/`else`, comparison and logic operators · `switch` expressions and simple patterns · `while`/`do` · `for`/`foreach` · `break`/`continue`.

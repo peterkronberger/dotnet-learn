@@ -5,6 +5,7 @@
       "id": "m00-l01-q1",
       "lesson": "m00-l01",
       "type": "output",
+      "placement": true,
       "question": "Was gibt das Programm aus? Achte auf `Write` und `WriteLine`.",
       "example": "m00/l01/quiz-order.cs",
       "explanation": "`Console.Write(\"B\")` beendet die Zeile nicht. Das nächste `WriteLine(\"C\")` schreibt direkt dahinter, also steht `BC` in einer Zeile. Erst dieses `WriteLine` beginnt danach eine neue Zeile."
@@ -36,6 +37,7 @@
       "id": "m00-l01-q3",
       "lesson": "m00-l01",
       "type": "single",
+      "placement": true,
       "question": "Du vertauschst die beiden Zeilen `Console.WriteLine(\"A\");` und `Console.WriteLine(\"B\");`. Was ändert sich?",
       "options": [
         {
@@ -137,6 +139,7 @@
       "id": "m00-l02-q2",
       "lesson": "m00-l02",
       "type": "single",
+      "placement": true,
       "question": "Ein Freund sagt: „C# und .NET sind dasselbe.“ Was stimmt?",
       "options": [
         {
@@ -207,6 +210,7 @@
       "id": "m00-l02-q5",
       "lesson": "m00-l02",
       "type": "single",
+      "placement": true,
       "question": "Du willst wissen, was die Sprache C# für ein neues Feature aus C# 14 genau festlegt. Welche Quelle liest du zuerst?",
       "options": [
         {
@@ -242,6 +246,7 @@
       "id": "m00-l03-q1",
       "lesson": "m00-l03",
       "type": "single",
+      "placement": true,
       "question": "Ein Kollege sagt: „Wir nutzen .NET Core für die Datenbank.“ Was stimmt?",
       "options": [
         {
@@ -384,6 +389,7 @@
       "id": "m00-l04-q1",
       "lesson": "m00-l04",
       "type": "single",
+      "placement": true,
       "question": "Ein Kollege sagt: „.NET 9 ist eine STS-Version, also eine Vorabversion. Dafür nehmen wir sie nicht in Produktion.“ Was stimmt?",
       "options": [
         {
@@ -455,6 +461,7 @@
       "id": "m00-l04-q4",
       "lesson": "m00-l04",
       "type": "single",
+      "placement": true,
       "question": "Ein älterer Server läuft auf .NET 8. Das Support-Ende ist der 10. November 2026. Wie ist der Stand am 1. Dezember 2026?",
       "options": [
         {
@@ -538,6 +545,7 @@
       "id": "m00-l05-q2",
       "lesson": "m00-l05",
       "type": "single",
+      "placement": true,
       "question": "Was erzeugt der C#-Compiler im Normalfall aus deinem Quelltext?",
       "options": [
         {

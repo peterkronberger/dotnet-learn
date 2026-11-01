@@ -10,9 +10,25 @@ One file per module and language: `de/mXX.json`. New files must be imported in `
 | `lesson` | yes | `mXX-lYY` |
 | `type` | yes | `single`, `multi`, `output`, `explain`, `parsons`, `cloze`, `find-bug`, `match` |
 | `question` | yes | Question text |
+| `placement` | no | `true` marks a placement question of its module (see "Placement test") |
+| `placementLessons` | no | Only with `placement: true`: extra lessons of the same module that the question also covers, e.g. `["m01-l05"]` |
 | `explanation` | `single`/`multi`/`output`/`parsons`/`cloze`/`find-bug`/`match` | Explains the *why* |
 
 Texts: inline code with backticks, paragraphs with `\n\n`, no other Markdown.
+
+## Placement test
+
+`"placement": true` marks a question as a placement question of its module (the module is the prefix of `lesson`, `m01-l03` → `m01`). Placement questions stay normal lesson questions and are still shown in their lesson with `<Quiz id>`. `placementLessons` lists extra lessons of the **same module** that the question also covers (use it when a module has more than 8 lessons). The result page links `lesson` plus all `placementLessons`.
+
+Rules for every module with at least one placement question (checked by `node tools/check-quiz.mjs` and, for the fields, at build time):
+
+- Exactly 8 placement questions.
+- No `explain` question.
+- Every lesson of the module (every `lesson_id` in `website/docs` with the prefix `<module>-l`) is covered by the `lesson` or the `placementLessons` of a placement question.
+- Every id in `placementLessons` exists, belongs to the same module and is not the question's own `lesson`.
+- Choose self-contained questions: they must be answerable without the lesson page or a runner.
+
+A module without placement questions has no placement test. The pass rule is set by the component: 8 questions, at most 1 wrong. `getPlacementQuestions(locale, moduleKey)` in `index.js` returns the questions of one module in lesson order.
 
 ## Answer order
 
