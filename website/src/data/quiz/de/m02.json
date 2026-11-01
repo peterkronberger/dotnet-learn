@@ -425,6 +425,149 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug mit `?:` zwischen zwei Texten oder Zahlen wählen?",
       "modelAnswer": "Zum Beispiel wählt es in einer Meldung das Wort „attempt“ oder „attempts“, je nachdem ob die Anzahl 1 ist. Oder es nimmt als Obergrenze den kleineren von zwei Werten. In beiden Fällen wählt es einen Wert in einem Ausdruck."
+    },
+    {
+      "id": "m02-l04-q1",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Welchen Wert hat `text` nach `int n = 3; string text = n switch { 1 => \"one\", 3 => \"three\", _ => \"other\" };`?",
+      "options": [
+        {
+          "text": "`\"three\"`, weil das konstante Muster `3` zum Wert passt.",
+          "correct": true
+        },
+        {
+          "text": "`\"other\"`, weil `_` immer gewinnt.",
+          "feedback": "`_` passt zwar auf alles, wird aber nur gewählt, wenn kein Zweig davor passt."
+        },
+        {
+          "text": "`\"one\"`, weil der erste Zweig immer gewählt wird.",
+          "feedback": "Der erste Zweig gilt nur, wenn sein Muster passt. Hier ist `n` nicht `1`."
+        }
+      ],
+      "explanation": "Die Zweige werden von oben nach unten geprüft. `1` passt nicht, `3` passt. Damit ist das Ergebnis `\"three\"`."
+    },
+    {
+      "id": "m02-l04-q2",
+      "lesson": "m02-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l04/quiz-severity.cs",
+      "explanation": "`value` ist `5`. Der Zweig `> 5` passt nicht, weil `5` nicht größer als `5` ist. Der Zweig `>= 5` passt, also ist das Ergebnis `B`."
+    },
+    {
+      "id": "m02-l04-q3",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Ein switch-Ausdruck auf einen `int` hat die Zweige `0`, `< 3` und `< 5`, aber keinen Auffangzweig. Was passiert für den Wert `7`?",
+      "options": [
+        {
+          "text": "Zur Laufzeit wird eine Ausnahme ausgelöst, und der Compiler hat vorher gewarnt.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis ist `null` oder der Standardwert des Typs.",
+          "misconception": "m02-l04-missing-arm-gives-default",
+          "feedback": "Es gibt keinen Standardwert. Ein Wert ohne passenden Zweig löst eine Ausnahme aus."
+        },
+        {
+          "text": "Der letzte Zweig `< 5` wird ersatzweise gewählt.",
+          "misconception": "m02-l04-missing-arm-gives-default",
+          "feedback": "Ein Zweig gilt nur, wenn sein Muster passt. `7 < 5` ist falsch."
+        },
+        {
+          "text": "Der switch-Ausdruck liefert still den Wert `0`.",
+          "misconception": "m02-l04-missing-arm-gives-default",
+          "feedback": "Es gibt keinen stillen Standardwert. Das Programm bricht mit einer Ausnahme ab."
+        }
+      ],
+      "explanation": "Der Compiler warnt, dass der Ausdruck nicht alle Werte behandelt. Trifft ein Wert keinen Zweig, löst das Programm zur Laufzeit eine `SwitchExpressionException` aus."
+    },
+    {
+      "id": "m02-l04-q4",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "Wozu dient der Zweig `_ => …` am Ende eines switch-Ausdrucks?",
+      "options": [
+        {
+          "text": "Er passt auf jeden Wert und macht den Ausdruck vollständig.",
+          "correct": true
+        },
+        {
+          "text": "Er markiert das Ende des Ausdrucks und liefert nie ein Ergebnis.",
+          "feedback": "Der Zweig hat wie jeder andere ein Ergebnis hinter `=>`."
+        },
+        {
+          "text": "Er passt nur auf den Wert `0`.",
+          "feedback": "`_` passt auf jeden Wert. Für `0` schreibst du das konstante Muster `0`."
+        }
+      ],
+      "explanation": "Der Platzhalter `_` passt auf alles. Am Ende fängt er alle Werte auf, die kein Zweig davor getroffen hat."
+    },
+    {
+      "id": "m02-l04-q5",
+      "lesson": "m02-l04",
+      "type": "single",
+      "question": "`failed` ist `4`. Welches Ergebnis liefert `failed switch { < 5 => \"medium\", < 3 => \"low\", _ => \"high\" }`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil der Zweig `< 3` nie erreicht wird.",
+          "correct": true
+        },
+        {
+          "text": "`\"medium\"`, weil `4 < 5` zuerst passt, und der Ausdruck ist gültig.",
+          "feedback": "Der erste Zweig würde passen. Der Compiler lehnt den Code aber ab, weil `< 3` von `< 5` schon abgedeckt ist."
+        },
+        {
+          "text": "`\"low\"`, weil der kleinste Grenzwert gewinnt.",
+          "feedback": "Es gewinnt nicht der kleinste Grenzwert, sondern der erste passende Zweig von oben."
+        }
+      ],
+      "explanation": "Jeder Wert unter 3 ist auch unter 5. Der Zweig `< 3` kann deshalb nie gewählt werden, und der Compiler meldet das als Fehler. Stelle die strengere Bedingung nach oben."
+    },
+    {
+      "id": "m02-l04-q6",
+      "lesson": "m02-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über den switch-Ausdruck stimmen?",
+      "options": [
+        {
+          "text": "Er ist ein Ausdruck und liefert einen Wert.",
+          "correct": true
+        },
+        {
+          "text": "Die Zweige werden von oben nach unten geprüft, der erste passende gewinnt.",
+          "correct": true
+        },
+        {
+          "text": "Relationale Muster wie `>= 5` sind erlaubt.",
+          "correct": true
+        },
+        {
+          "text": "Ohne passenden Zweig ist das Ergebnis ein Standardwert.",
+          "misconception": "m02-l04-missing-arm-gives-default",
+          "feedback": "Ohne passenden Zweig löst das Programm eine Ausnahme aus."
+        },
+        {
+          "text": "Alle passenden Zweige werden ausgeführt.",
+          "feedback": "Nur der erste passende Zweig liefert das Ergebnis."
+        }
+      ],
+      "explanation": "Ein switch-Ausdruck wählt mit dem ersten passenden Muster ein Ergebnis. Für Werte ohne passenden Zweig brauchst du `_`."
+    },
+    {
+      "id": "m02-l04-q7",
+      "lesson": "m02-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein switch-Ausdruck den passenden Zweig findet und was passiert, wenn keiner passt.",
+      "modelAnswer": "Der Ausdruck prüft die Zweige von oben nach unten. Jeder Zweig hat ein Muster, zum Beispiel eine Konstante oder einen Vergleich wie `< 3`. Der erste Zweig, dessen Muster passt, liefert das Ergebnis. Weitere Zweige werden nicht mehr geprüft.\n\nPasst kein Zweig, warnt der Compiler, und zur Laufzeit wird eine Ausnahme ausgelöst. Mit `_` als letztem Zweig passt immer etwas."
+    },
+    {
+      "id": "m02-l04-q8",
+      "lesson": "m02-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug einen switch-Ausdruck verwenden, um einem Wert ein Ergebnis zuzuordnen?",
+      "modelAnswer": "Zum Beispiel ordnet es der Anzahl der Fehlversuche einen Schweregrad zu: 0 ist none, unter 3 ist low und so weiter. Oder es ordnet einem Ereignistyp wie login-failed eine Kategorie zu. Immer wird aus einem Wert ein anderer Wert."
     }
   ]
 }
