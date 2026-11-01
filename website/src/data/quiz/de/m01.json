@@ -41,6 +41,7 @@
       "id": "m01-l01-q3",
       "lesson": "m01-l01",
       "type": "output",
+      "placement": true,
       "question": "Was gibt das Programm aus? Rechne die Hexadezimal- und Binärliterale um.",
       "example": "m01/l01/number-literals.cs",
       "explanation": "`0xFF` ist 15 · 16 + 15 = 255. `0b1010` ist 8 + 2 = 10. Die Zifferntrennzeichen in `1_000_000` ändern den Wert nicht: Es erscheint `1000000`. `1e3` bedeutet 1 · 10³ und wird als `1000` ausgegeben. `'A'` ist ein Zeichen-Literal und erscheint als `A`."
@@ -158,6 +159,7 @@
       "id": "m01-l02-q3",
       "lesson": "m01-l02",
       "type": "single",
+      "placement": true,
       "question": "Ein Programm hat diese vier Zeilen:\n\n`int level = 1;`\n`level = 4;`\n`level = 2;`\n`Console.WriteLine(level);`\n\nWas wird ausgegeben?",
       "options": [
         {
@@ -493,6 +495,8 @@
       "id": "m01-l04-q2",
       "lesson": "m01-l04",
       "type": "output",
+      "placement": true,
+      "placementLessons": ["m01-l03"],
       "question": "Was gibt das Programm aus? Werte jede Zeile nach Rangfolge und Assoziativität aus.",
       "example": "m01/l04/quiz-evaluate.cs",
       "explanation": "`8 - 2 - 3` wird von links nach rechts gerechnet: `6 - 3` ergibt `3`. Bei `8 / 2 * 3` stehen `/` und `*` auf gleicher Stufe, also links zuerst: `4 * 3` ergibt `12`. `8 + 2 * 3` ergibt `8 + 6`, also `14`. Bei `-8 % 3` wird zuerst das Vorzeichen angewendet, dann der Rest: Der Rest von `-8` geteilt durch `3` ist `-2`."
@@ -685,6 +689,7 @@
       "id": "m01-l05-q3",
       "lesson": "m01-l05",
       "type": "single",
+      "placement": true,
       "question": "Was passiert mit diesem Code?\n\n`var x = 5;`\n`x = \"Text\";`",
       "options": [
         {
@@ -874,6 +879,7 @@
       "id": "m01-l06-q3",
       "lesson": "m01-l06",
       "type": "single",
+      "placement": true,
       "question": "`double rate = 71.4286;` – was gibt `Console.WriteLine($\"{rate:F1} %\");` aus?",
       "options": [
         {
@@ -1072,6 +1078,7 @@
       "id": "m01-l07-q3",
       "lesson": "m01-l07",
       "type": "single",
+      "placement": true,
       "question": "Welchen Wert hat `(int)3.99`?",
       "options": [
         {
@@ -1240,6 +1247,7 @@
       "id": "m01-l08-q1",
       "lesson": "m01-l08",
       "type": "single",
+      "placement": true,
       "question": "Was passiert bei `int number = int.Parse(\"3.5\");`?",
       "options": [
         {
@@ -1421,6 +1429,7 @@
       "id": "m01-l09-q1",
       "lesson": "m01-l09",
       "type": "single",
+      "placement": true,
       "question": "Der Nutzer tippt `42` und drückt die Eingabetaste. Was liefert `Console.ReadLine()`?",
       "options": [
         {

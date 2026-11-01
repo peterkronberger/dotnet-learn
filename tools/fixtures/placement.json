@@ -1,0 +1,70 @@
+{
+  "lessonIds": [
+    "x01-l01",
+    "x01-l02",
+    "x01-l03",
+    "x01-l04",
+    "x01-l05",
+    "x01-l06",
+    "x01-l07",
+    "x01-l08",
+    "x02-l01"
+  ],
+  "questions": [
+    {
+      "id": "x01-l01-q1",
+      "lesson": "x01-l01",
+      "type": "single",
+      "placement": true
+    },
+    {
+      "id": "x01-l02-q1",
+      "lesson": "x01-l02",
+      "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "x01-l10"
+      ]
+    },
+    {
+      "id": "x01-l03-q1",
+      "lesson": "x01-l03",
+      "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "x02-l01"
+      ]
+    },
+    {
+      "id": "x01-l04-q1",
+      "lesson": "x01-l04",
+      "type": "single",
+      "placement": true
+    },
+    {
+      "id": "x01-l05-q1",
+      "lesson": "x01-l05",
+      "type": "single",
+      "placement": true
+    },
+    {
+      "id": "x01-l06-q1",
+      "lesson": "x01-l06",
+      "type": "single",
+      "placement": true
+    },
+    {
+      "id": "x01-l07-q1",
+      "lesson": "x01-l07",
+      "type": "explain",
+      "placement": true
+    }
+  ],
+  "expected": [
+    "x01: expected 8 placement questions, found 7",
+    "x01: x01-l07-q1 is an explain question",
+    "x01: lesson x01-l08 is not covered",
+    "x01: x01-l02-q1: placementLessons id x01-l10 does not exist",
+    "x01: x01-l03-q1: placementLessons id x02-l01 belongs to another module"
+  ]
+}

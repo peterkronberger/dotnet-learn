@@ -121,6 +121,20 @@ export function validateQuestion(q) {
       });
     }
   }
+  if (q.placement !== undefined && q.placement !== true) errors.push(`${where}: placement must be true`);
+  if (q.placement === true && q.type === 'explain') errors.push(`${where}: explain questions cannot be placement questions`);
+  if (q.placementLessons !== undefined) {
+    const pl = q.placementLessons;
+    if (q.placement !== true) errors.push(`${where}: placementLessons needs placement: true`);
+    if (!Array.isArray(pl) || pl.length < 1 || pl.some((l) => typeof l !== 'string' || !LESSON_PATTERN.test(l))) {
+      errors.push(`${where}: placementLessons must be a non-empty list of lesson ids`);
+    } else {
+      if (new Set(pl).size !== pl.length) errors.push(`${where}: placementLessons has duplicates`);
+      if (pl.includes(q.lesson)) errors.push(`${where}: placementLessons must not contain the question's own lesson`);
+      const moduleKey = typeof q.lesson === 'string' ? q.lesson.split('-l')[0] : '';
+      if (pl.some((l) => l.split('-l')[0] !== moduleKey)) errors.push(`${where}: placementLessons must belong to the same module`);
+    }
+  }
   if (q.type === 'explain' && (typeof q.modelAnswer !== 'string' || !q.modelAnswer)) {
     errors.push(`${where}: explain needs modelAnswer`);
   }
@@ -153,4 +167,14 @@ export function getQuestion(locale, id) {
 
 export function getAllQuestions(locale) {
   return [...(INDEX[locale] ?? INDEX[DEFAULT_LOCALE]).values()];
+}
+
+// Placement questions of one module ('m01'), sorted by lesson order (lesson number, then data order).
+export function getPlacementQuestions(locale, moduleKey) {
+  const lessonNumber = (q) => Number(q.lesson.split('-l')[1]);
+  return getAllQuestions(locale)
+    .map((q, index) => ({q, index}))
+    .filter(({q}) => q.placement === true && q.lesson.split('-l')[0] === moduleKey)
+    .sort((a, b) => lessonNumber(a.q) - lessonNumber(b.q) || a.index - b.index)
+    .map(({q}) => q);
 }

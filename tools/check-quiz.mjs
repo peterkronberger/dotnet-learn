@@ -174,6 +174,20 @@ function validate(q) {
       });
     }
   }
+  if (q.placement !== undefined && q.placement !== true) errors.push(`${w}: placement must be true`);
+  if (q.placement === true && q.type === 'explain') errors.push(`${w}: explain questions cannot be placement questions`);
+  if (q.placementLessons !== undefined) {
+    const pl = q.placementLessons;
+    if (q.placement !== true) errors.push(`${w}: placementLessons needs placement: true`);
+    if (!Array.isArray(pl) || pl.length < 1 || pl.some((l) => typeof l !== 'string' || !/^[a-z0-9]+-l\d+$/.test(l))) {
+      errors.push(`${w}: placementLessons must be a non-empty list of lesson ids`);
+    } else {
+      if (new Set(pl).size !== pl.length) errors.push(`${w}: placementLessons has duplicates`);
+      if (pl.includes(q.lesson)) errors.push(`${w}: placementLessons must not contain the question's own lesson`);
+      const moduleKey = String(q.lesson).split('-l')[0];
+      if (pl.some((l) => l.split('-l')[0] !== moduleKey)) errors.push(`${w}: placementLessons must belong to the same module`);
+    }
+  }
   if (q.type === 'explain' && !q.modelAnswer) errors.push(`${w}: explain needs modelAnswer`);
   if (['single', 'multi', 'output', 'parsons', 'cloze', 'find-bug', 'match'].includes(q.type) && !q.explanation) errors.push(`${w}: explanation is required`);
   return errors;
@@ -324,6 +338,32 @@ function forwardProblems({lessons, terms, questions}) {
   return problems;
 }
 
+// questions: de questions; lessonIds: Set of lesson_id values from the docs.
+// Returns a list of messages, one per problem, each starting with "<moduleKey>: ".
+function placementProblems(questions, lessonIds) {
+  const problems = [];
+  const moduleOf = (id) => String(id).split('-l')[0];
+  const modules = new Set(questions.filter((q) => q.placement === true).map((q) => moduleOf(q.lesson)));
+  for (const m of modules) {
+    const placed = questions.filter((q) => q.placement === true && moduleOf(q.lesson) === m);
+    if (placed.length !== 8) problems.push(`${m}: expected 8 placement questions, found ${placed.length}`);
+    const covered = new Set();
+    for (const q of placed) {
+      if (q.type === 'explain') problems.push(`${m}: ${q.id} is an explain question`);
+      covered.add(q.lesson);
+      for (const x of q.placementLessons ?? []) {
+        if (moduleOf(x) !== m) problems.push(`${m}: ${q.id}: placementLessons id ${x} belongs to another module`);
+        else if (!lessonIds.has(x)) problems.push(`${m}: ${q.id}: placementLessons id ${x} does not exist`);
+        else covered.add(x);
+      }
+    }
+    for (const id of [...lessonIds].filter((l) => moduleOf(l) === m).sort()) {
+      if (!covered.has(id)) problems.push(`${m}: lesson ${id} is not covered by a placement question`);
+    }
+  }
+  return problems;
+}
+
 function check(name, errors) {
   if (errors.length === 0) console.log(`OK   ${name}`);
   else {
@@ -438,6 +478,20 @@ if (fixtureQuestions.flatMap(positionProblems).length === 0) {
   positionErrors.push('position phrase self-test: fixture not detected');
 }
 check('quiz position phrases', positionErrors);
+
+// 4c. Placement tests (#219)
+const fixturePlacement = JSON.parse(readFileSync(join(root, 'tools/fixtures/placement.json'), 'utf8'));
+const placementSelfTest = [];
+const placementFixtureFindings = placementProblems(fixturePlacement.questions, new Set(fixturePlacement.lessonIds));
+for (const prefix of fixturePlacement.expected) {
+  const n = placementFixtureFindings.filter((m) => m.startsWith(prefix)).length;
+  if (n !== 1) placementSelfTest.push(`placement self-test: expected exactly one finding for "${prefix}", got ${n}`);
+}
+for (const m of placementFixtureFindings) {
+  if (!fixturePlacement.expected.some((prefix) => m.startsWith(prefix))) placementSelfTest.push(`placement self-test: unexpected finding "${m}"`);
+}
+check('placement self-test', placementSelfTest);
+check('placement tests', placementProblems(questions.filter((x) => x.locale === 'de'), lessonIds));
 
 // 5. Wording (concept/sources.md)
 const wordingFiles = [
