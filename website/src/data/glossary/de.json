@@ -866,6 +866,63 @@
       }
     },
     {
+      "id": "switch-statement",
+      "term": "Switch Statement",
+      "german": "switch-Anweisung",
+      "category": "language",
+      "definition": "Eine Anweisung, die je nach Wert eine von mehreren Anweisungslisten ausführt. Sie besteht aus Abschnitten mit `case`-Labels und einem optionalen `default`. Jeder Abschnitt endet mit `break;`.",
+      "aliases": [
+        "switch-Anweisungen"
+      ],
+      "related": [
+        "switch-expression",
+        "case-guard",
+        "fall-through"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "The switch statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement"
+      }
+    },
+    {
+      "id": "case-guard",
+      "term": "Case Guard",
+      "german": "zusätzliche Bedingung mit `when`",
+      "category": "language",
+      "definition": "Eine Bedingung hinter `when`, die zu einem Muster dazukommt. Das Label passt nur, wenn das Muster passt und die Bedingung `true` ist.",
+      "aliases": [
+        "Guard"
+      ],
+      "related": [
+        "switch-statement",
+        "pattern"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements – case guards",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#case-guards"
+      }
+    },
+    {
+      "id": "fall-through",
+      "term": "Fall-through",
+      "german": "Durchfallen",
+      "category": "language",
+      "definition": "Das Weiterlaufen am Ende eines switch-Abschnitts in den nächsten Abschnitt. In C# ist das ein Compilerfehler: Jeder Abschnitt muss mit `break;` oder einer anderen Sprunganweisung enden.",
+      "aliases": [
+        "Durchfallen"
+      ],
+      "related": [
+        "switch-statement"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements – the switch statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement"
+      }
+    },
+    {
       "id": "collection",
       "term": "Collection",
       "german": "Sammlung",

@@ -568,6 +568,149 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug einen switch-Ausdruck verwenden, um einem Wert ein Ergebnis zuzuordnen?",
       "modelAnswer": "Zum Beispiel ordnet es der Anzahl der Fehlversuche einen Schweregrad zu: 0 ist none, unter 3 ist low und so weiter. Oder es ordnet einem Ereignistyp wie login-failed eine Kategorie zu. Immer wird aus einem Wert ein anderer Wert."
+    },
+    {
+      "id": "m02-l05-q1",
+      "lesson": "m02-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l05/quiz-sections.cs",
+      "explanation": "`n` ist `2`. Das Label `case 2:` teilt sich den Abschnitt mit `case 3:`. Der Abschnitt gibt `B` aus, `break;` beendet die Anweisung, danach folgt `!`."
+    },
+    {
+      "id": "m02-l05-q2",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "Was passiert in C#, wenn am Ende eines `case`-Abschnitts das `break;` fehlt und danach ein weiterer Abschnitt folgt?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Ausführung nicht in den nächsten Abschnitt durchfallen darf.",
+          "correct": true
+        },
+        {
+          "text": "Der nächste Abschnitt wird ohne Prüfung seines Labels mit ausgeführt.",
+          "misconception": "m02-l05-case-falls-through",
+          "feedback": "Dieses Durchfallen gibt es in C# nicht. Der Code lässt sich gar nicht übersetzen."
+        },
+        {
+          "text": "Das Programm läuft, überspringt aber den nächsten Abschnitt.",
+          "misconception": "m02-l05-case-falls-through",
+          "feedback": "Der Compiler akzeptiert einen Abschnitt ohne sicheres Ende nicht."
+        },
+        {
+          "text": "Das `break;` wird automatisch ergänzt.",
+          "feedback": "Der Compiler ergänzt nichts. Du musst den Abschnitt selbst beenden."
+        }
+      ],
+      "explanation": "Das Ende eines Abschnitts darf nicht erreichbar sein. Fehlt `break;`, meldet der Compiler einen Fehler."
+    },
+    {
+      "id": "m02-l05-q3",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "Wie sorgst du dafür, dass `\"login-success\"` und `\"logout\"` dieselbe Aktion auslösen?",
+      "options": [
+        {
+          "text": "Du schreibst beide Labels direkt untereinander vor einen gemeinsamen Abschnitt.",
+          "correct": true
+        },
+        {
+          "text": "Du lässt bei `\"login-success\"` das `break;` weg, damit es in `\"logout\"` durchfällt.",
+          "misconception": "m02-l05-case-falls-through",
+          "feedback": "Durchfallen von einem Abschnitt mit Anweisungen in den nächsten ist in C# ein Fehler."
+        },
+        {
+          "text": "Du schreibst zwei switch-Anweisungen hintereinander.",
+          "feedback": "Das geht, ist aber unnötig. Mehrere Labels vor einem Abschnitt reichen."
+        }
+      ],
+      "explanation": "Mehrere Labels können zu einem Abschnitt gehören. Der Abschnitt gilt für alle diese Werte und endet mit `break;`."
+    },
+    {
+      "id": "m02-l05-q4",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "`switch (level)` hat nur die Labels `case 1:` und `case 2:` (mit `break;`) und kein `default`. `level` ist `9`. Was passiert?",
+      "options": [
+        {
+          "text": "Kein Abschnitt wird ausgeführt, und das Programm läuft hinter der switch-Anweisung weiter.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm bricht mit einer Ausnahme ab.",
+          "feedback": "Die Ausnahme gibt es beim switch-Ausdruck. Die switch-Anweisung führt dann einfach nichts aus."
+        },
+        {
+          "text": "Der letzte Abschnitt `case 2:` wird ersatzweise ausgeführt.",
+          "feedback": "Ein Abschnitt läuft nur, wenn sein Label passt."
+        }
+      ],
+      "explanation": "Passt kein Label und gibt es kein `default`, wird kein Abschnitt ausgeführt. Das Programm macht dahinter weiter."
+    },
+    {
+      "id": "m02-l05-q5",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "Was bewirkt `case \"bob\" when failed >= 5:`?",
+      "options": [
+        {
+          "text": "Der Abschnitt läuft nur, wenn der Wert `\"bob\"` ist und `failed >= 5` wahr ist.",
+          "correct": true
+        },
+        {
+          "text": "Der Abschnitt läuft, wenn der Wert `\"bob\"` ist oder `failed >= 5` wahr ist.",
+          "feedback": "Muster und Guard müssen beide zutreffen, nicht nur eines."
+        },
+        {
+          "text": "Der Abschnitt läuft immer, `when` ist nur ein Kommentar.",
+          "feedback": "`when` ist eine echte Bedingung. Ist sie falsch, passt das Label nicht."
+        }
+      ],
+      "explanation": "Ein Case Guard ist eine zusätzliche Bedingung hinter `when`. Das Label passt nur, wenn Muster und Guard zutreffen."
+    },
+    {
+      "id": "m02-l05-q6",
+      "lesson": "m02-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über die switch-Anweisung stimmen?",
+      "options": [
+        {
+          "text": "Sie führt Anweisungslisten aus und liefert keinen Wert.",
+          "correct": true
+        },
+        {
+          "text": "Mehrere Labels können zu einem Abschnitt gehören.",
+          "correct": true
+        },
+        {
+          "text": "Der Abschnitt `default` fängt Werte auf, die zu keinem anderen Label passen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Abschnitt ohne `break;` läuft in den nächsten weiter.",
+          "misconception": "m02-l05-case-falls-through",
+          "feedback": "Das ist in C# ein Fehler."
+        },
+        {
+          "text": "Sie liefert einen Wert, den du einer Variablen zuweisen kannst.",
+          "feedback": "Das kann der switch-Ausdruck. Die Anweisung führt nur Anweisungen aus."
+        }
+      ],
+      "explanation": "Die switch-Anweisung wählt einen Abschnitt und führt seine Anweisungen aus. Jeder Abschnitt endet mit `break;`."
+    },
+    {
+      "id": "m02-l05-q7",
+      "lesson": "m02-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine switch-Anweisung einen Abschnitt auswählt und warum jeder Abschnitt mit `break;` endet.",
+      "modelAnswer": "Die switch-Anweisung prüft die Labels von oben nach unten. Der erste Abschnitt, dessen Label zum Wert passt (und dessen `when`-Bedingung wahr ist), wird ausgeführt. Passt keines, läuft `default`, falls es ihn gibt.\n\nJeder Abschnitt endet mit `break;`, das die switch-Anweisung beendet. In C# darf die Ausführung nicht in den nächsten Abschnitt durchfallen. Sonst meldet der Compiler einen Fehler."
+    },
+    {
+      "id": "m02-l05-q8",
+      "lesson": "m02-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug eine switch-Anweisung statt eines switch-Ausdrucks nehmen?",
+      "modelAnswer": "Zum Beispiel bei einem Ereignistyp, bei dem jeder Fall mehrere Dinge tut: Bei login-failed zählt es den Fehlversuch und gibt eine Meldung aus, bei logout schreibt es nur eine Zeile. Es führt je Fall Anweisungen aus, statt nur einen Wert zu berechnen."
     }
   ]
 }
