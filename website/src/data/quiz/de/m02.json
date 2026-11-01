@@ -1,1 +1,146 @@
-{ "module": "m02", "questions": [] }
+{
+  "module": "m02",
+  "questions": [
+    {
+      "id": "m02-l01-q1",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Was gibt `int x = 5; Console.WriteLine(x > 5);` aus?",
+      "options": [
+        {
+          "text": "`False`",
+          "correct": true
+        },
+        {
+          "text": "`True`",
+          "feedback": "`>` heißt „echt größer“. 5 ist nicht größer als 5. Für „größer oder gleich“ gibt es `>=`."
+        },
+        {
+          "text": "`5`",
+          "feedback": "Ein Vergleich liefert keinen der beiden Werte, sondern einen `bool`."
+        }
+      ],
+      "explanation": "`x > 5` fragt, ob `x` echt größer als 5 ist. Bei `x = 5` stimmt das nicht, das Ergebnis ist `False`."
+    },
+    {
+      "id": "m02-l01-q2",
+      "lesson": "m02-l01",
+      "type": "multi",
+      "question": "Welche Ausdrücke sind boolesche Ausdrücke, wenn `failed` ein `int` und `user` ein `string` ist?",
+      "options": [
+        {
+          "text": "`failed >= 5`",
+          "correct": true
+        },
+        {
+          "text": "`user == \"bob\"`",
+          "correct": true
+        },
+        {
+          "text": "`failed + 1`",
+          "feedback": "Das Ergebnis ist eine Zahl (`int`), kein `bool`."
+        },
+        {
+          "text": "`failed != 0`",
+          "correct": true
+        },
+        {
+          "text": "`user`",
+          "feedback": "Eine Variable vom Typ `string` ist ein Text, kein `bool`."
+        }
+      ],
+      "explanation": "Ein boolescher Ausdruck liefert `true` oder `false`. Jeder Vergleich tut das. Eine Summe oder ein Text sind keine booleschen Ausdrücke."
+    },
+    {
+      "id": "m02-l01-q3",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "In `if (a > 0) if (b > 10) F(); else G();` steht das `else` direkt unter dem äußeren `if`. Zu welchem `if` gehört es?",
+      "options": [
+        {
+          "text": "Zum inneren `if (b > 10)`, dem nächsten `if` davor, das noch kein `else` hat.",
+          "correct": true
+        },
+        {
+          "text": "Zum äußeren `if (a > 0)`, weil es unter ihm steht.",
+          "misconception": "m02-l01-else-wrong-if",
+          "feedback": "Die Einrückung zählt für den Compiler nicht. Das `else` gehört zum nächsten `if` davor ohne `else`."
+        },
+        {
+          "text": "Zum ersten `if` im Programm, denn ein `else` gehört immer dazu.",
+          "misconception": "m02-l01-else-wrong-if",
+          "feedback": "Ein `else` gehört zum nächsten `if` davor, das noch kein `else` hat, nicht zum ersten `if` des Programms."
+        },
+        {
+          "text": "Zu beiden `if` zugleich.",
+          "feedback": "Ein `else` gehört genau zu einem `if`."
+        }
+      ],
+      "explanation": "Das `else` gehört zum nächstgelegenen `if` davor, das noch kein `else` hat. Geschweifte Klammern machen die Zuordnung sichtbar."
+    },
+    {
+      "id": "m02-l01-q4",
+      "lesson": "m02-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l01/quiz-chain.cs",
+      "explanation": "Die Bedingungen werden von oben nach unten geprüft. `score > 5` ist falsch, `score > 2` ist wahr: Der Block mit `B` läuft. Die restlichen Zweige werden übersprungen, auch `score > 4`. `E` steht nach der ganzen Kette und läuft immer."
+    },
+    {
+      "id": "m02-l01-q5",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Was ergibt `\"bob\" == \"Bob\"`?",
+      "options": [
+        {
+          "text": "`False`, weil `b` und `B` verschiedene Zeichen sind.",
+          "correct": true
+        },
+        {
+          "text": "`True`, weil beide Wörter gleich klingen.",
+          "feedback": "`==` vergleicht die Zeichen eines Textes, nicht den Klang. Groß- und Kleinbuchstaben sind verschiedene Zeichen."
+        },
+        {
+          "text": "`True`, weil `==` Groß- und Kleinschreibung ignoriert.",
+          "feedback": "`==` unterscheidet Groß- und Kleinschreibung."
+        }
+      ],
+      "explanation": "Zwei Texte sind gleich, wenn sie dieselben Zeichen in derselben Reihenfolge haben. `b` und `B` sind verschiedene Zeichen."
+    },
+    {
+      "id": "m02-l01-q6",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "`int failed = 0; if (failed > 0) Console.WriteLine(\"A\"); Console.WriteLine(\"B\");` – was passiert?",
+      "options": [
+        {
+          "text": "Es erscheint nur `B`. Zum `if` gehört nur die eine Anweisung direkt dahinter.",
+          "correct": true
+        },
+        {
+          "text": "Es erscheint nichts, denn beide Anweisungen gehören zum `if`.",
+          "feedback": "Ohne geschweifte Klammern gehört nur die nächste Anweisung zum `if`."
+        },
+        {
+          "text": "Es erscheinen `A` und `B`.",
+          "feedback": "`failed > 0` ist falsch. `A` erscheint deshalb nicht."
+        }
+      ],
+      "explanation": "Ohne Block gehört nur die nächste Anweisung zum `if`. Die zweite Zeile läuft immer. Mit `{ }` fasst du mehrere Anweisungen zusammen."
+    },
+    {
+      "id": "m02-l01-q7",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `if`, `else if` und `else` zusammenarbeiten. Sage auch, welcher Block läuft, wenn mehrere Bedingungen wahr sind.",
+      "modelAnswer": "Ein `if` prüft eine Bedingung, einen Ausdruck mit dem Ergebnis `true` oder `false`. Ist sie wahr, läuft der Block dahinter. Sonst wird die nächste Bedingung (`else if`) geprüft. Der `else`-Block läuft nur, wenn keine Bedingung wahr war.\n\nDie Kette wird von oben nach unten geprüft. Der erste Block mit wahrer Bedingung läuft, alle weiteren werden übersprungen, auch wenn ihre Bedingung ebenfalls wahr wäre."
+    },
+    {
+      "id": "m02-l01-q8",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug zwischen zwei Wegen wählen? Nenne eine Bedingung als Vergleich.",
+      "modelAnswer": "Zum Beispiel meldet es einen Alarm, wenn die Zahl der fehlgeschlagenen Anmeldungen mindestens 5 ist (`failed >= 5`), und sonst nicht. Oder es behandelt einen Benutzer anders, wenn `user == \"admin\"` gilt. Die Bedingung ist jeweils ein Vergleich, der `true` oder `false` ergibt."
+    }
+  ]
+}

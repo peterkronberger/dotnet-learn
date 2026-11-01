@@ -1,0 +1,240 @@
+---
+title: Entscheidungen mit if und else
+sidebar_position: 1
+description: "Vergleiche zwei Werte und führe einen Block nur aus, wenn das Ergebnis true ist: if, else if, else und die Frage, zu welchem if ein else gehört."
+lesson_id: m02-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import compareNumbers from '!!raw-loader!@site/examples/m02/l01/compare-numbers.cs';
+import compareNumbersOutput from '!!raw-loader!@site/examples/m02/l01/compare-numbers.out.txt';
+import compareText from '!!raw-loader!@site/examples/m02/l01/compare-text.cs';
+import ifElse from '!!raw-loader!@site/examples/m02/l01/if-else.cs';
+import ifElseOutput from '!!raw-loader!@site/examples/m02/l01/if-else.out.txt';
+import elseIfChain from '!!raw-loader!@site/examples/m02/l01/else-if-chain.cs';
+import elseIfGaps from '!!raw-loader!@site/examples/m02/l01/else-if-gaps.cs';
+import noBraces from '!!raw-loader!@site/examples/m02/l01/no-braces.cs';
+import noBracesOutput from '!!raw-loader!@site/examples/m02/l01/no-braces.out.txt';
+import danglingElse from '!!raw-loader!@site/examples/m02/l01/dangling-else.cs';
+import danglingElseOutput from '!!raw-loader!@site/examples/m02/l01/dangling-else.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m02/l01/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l01/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l01/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l01/seclog-analysis-solution.cs';
+
+# Entscheidungen mit if und else
+
+:::note[Lernziele]
+- Du sagst das Ergebnis eines Vergleichs mit `==`, `!=`, `<`, `>`, `<=` und `>=` voraus, auch für Texte und Zeichen.
+- Du schreibst eine `if`-Anweisung mit `else` und eine `else if`-Kette und sagst voraus, welcher Block läuft.
+- Du bestimmst, zu welchem `if` ein `else` gehört, und setzt geschweifte Klammern, um es eindeutig zu machen.
+- Du erklärst, warum von einer `else if`-Kette höchstens ein Block läuft.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- eine Anzahl fehlgeschlagener Anmeldungen als Schweregrad bewerten
+- je nach Ereignistyp anders reagieren
+- mehrere Ereignisse mit Schleifen durchgehen
+:::
+
+## Rückblick
+
+<Quiz id="m01-l02-q1" />
+
+<Quiz id="m01-l04-q4" />
+
+<Quiz id="m01-l08-q4" />
+
+## Vergleiche liefern true oder false
+
+Bisher läuft ein Programm Zeile für Zeile von oben nach unten. Jetzt soll es entscheiden: Ein Alarm erscheint nur, wenn es genug fehlgeschlagene Anmeldungen gibt. Dafür braucht das Programm zuerst eine Frage, die mit „ja“ oder „nein“ zu beantworten ist. In C# ist das ein <Term id="boolean-expression">boolescher Ausdruck (Boolean Expression)</Term>: ein Ausdruck, dessen Ergebnis ein `bool` ist, also `true` oder `false`. Man nennt ihn auch Bedingung (condition).
+
+Die einfachsten booleschen Ausdrücke sind Vergleiche. Ein <Term id="comparison-operator">Vergleichsoperator (Comparison Operator)</Term> vergleicht zwei Werte und liefert einen `bool`:
+
+| Operator | Bedeutung |
+| --- | --- |
+| `==` | gleich |
+| `!=` | ungleich |
+| `<` und `>` | kleiner und größer |
+| `<=` und `>=` | kleiner oder gleich, größer oder gleich |
+
+Achte auf das doppelte Gleichheitszeichen: `=` weist einen Wert zu, `==` vergleicht.
+
+:::info[Vorhersage]
+`attempts` hat den Wert `3`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l01-compare" code={compareNumbers} predict expected={compareNumbersOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind vier Zeilen: `True`, `True`, `False` und `True`.
+
+1. **`attempts < 5`:** 3 ist kleiner als 5, also `True`.
+2. **`attempts >= 3`:** 3 ist gleich 3, also gilt „größer oder gleich“: `True`.
+3. **`attempts == 4`:** 3 ist nicht 4, also `False`.
+4. **`attempts != 4`:** 3 ist ungleich 4, also `True`.
+
+</details>
+
+`==` und `!=` vergleichen auch Zeichen (`char`) und Texte (`string`). Zwei Texte sind gleich, wenn sie dieselben Zeichen in derselben Reihenfolge haben. Groß- und Kleinbuchstaben sind verschiedene Zeichen.
+
+<CSharpRunner id="m02-l01-compare-text" code={compareText} />
+
+Die Ausgabe ist `True`, `False`, `True` und `True`: `"bob"` und `"Bob"` sind verschieden, weil `b` und `B` verschiedene Zeichen sind.
+
+## if und else
+
+Die <Term id="selection-statement">Verzweigung (Selection Statement)</Term> `if` führt einen Block nur aus, wenn die Bedingung `true` ergibt. Ein Block ist eine Gruppe von Anweisungen in geschweiften Klammern `{ }`. Die Bedingung steht in runden Klammern hinter `if`. Mit `else` gibst du einen zweiten Block an, der läuft, wenn die Bedingung `false` ergibt. Danach geht das Programm mit der nächsten Anweisung nach dem `if` weiter.
+
+:::info[Vorhersage]
+`failed` hat den Wert `3`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l01-if-else" code={ifElse} predict expected={ifElseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `No alert` und `Check done`.
+
+1. **Bedingung auswerten:** `failed >= 5` ergibt bei `3` den Wert `false`.
+2. **Block wählen:** Der `if`-Block wird übersprungen, der `else`-Block läuft.
+3. **Weitermachen:** `Check done` steht nach dem `if` und läuft immer.
+
+Was passiert, wenn du `failed` auf `5` setzt? Ändere den Wert und führe das Programm erneut aus.
+
+</details>
+
+## Mehrere Fälle: die else-if-Kette
+
+Mit `else if` hängst du weitere Bedingungen an. Das Programm prüft sie von oben nach unten und führt den Block der ersten wahren Bedingung aus. Alle weiteren Blöcke werden übersprungen, auch wenn ihre Bedingung ebenfalls wahr wäre. Der letzte `else`-Block läuft, wenn keine Bedingung wahr war.
+
+Das Beispiel zeigt die drei Schritte als Kommentare:
+
+<CSharpRunner id="m02-l01-chain" code={elseIfChain} />
+
+Bei `failed = 4` ist die erste Bedingung falsch und die zweite wahr. Die Ausgabe ist `Some failures`.
+
+Jetzt du. In diesem Beispiel stehen die Bedingungen noch nicht. Ersetze beide `false` so, dass `many` bei fünf oder mehr Fehlversuchen wahr ist und `some` bei einem oder mehr. Dann gibt das Programm für `failed = 2` die Zeile `Some failures` aus. Ändere danach `failed` auf `0`, `5` und `9` und prüfe jedes Mal die Ausgabe.
+
+<CSharpRunner id="m02-l01-gaps" code={elseIfGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **many:** `bool many = failed >= 5;`
+2. **some:** `bool some = failed >= 1;`
+
+Bei `failed = 2` ist `many` falsch und `some` wahr. Die Ausgabe ist `Some failures`.
+
+</details>
+
+## Zu welchem if gehört ein else?
+
+Ohne geschweifte Klammern gehört zu einem `if` nur die eine Anweisung direkt dahinter. Die Einrückung ändert daran nichts. Sie dient nur dem Menschen.
+
+:::info[Vorhersage]
+`failed` hat den Wert `0`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l01-no-braces" code={noBraces} predict expected={noBracesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist eine Zeile: `Check done`.
+
+1. **Bedingung auswerten:** `failed > 0` ergibt `false`. Die Anweisung direkt dahinter wird übersprungen.
+2. **Nächste Anweisung:** `Console.WriteLine("Check done");` gehört nicht mehr zum `if`. Sie läuft immer, obwohl sie eingerückt ist.
+
+</details>
+
+Dasselbe gilt für `else`. Wenn zwei `if` ineinander stehen und nur eines ein `else` hat, musst du wissen, zu welchem es gehört.
+
+:::info[Vorhersage]
+`failed` hat den Wert `1`, `events` den Wert `5`. Welche Zeile gibt das Programm aus? Das `else` steht unter dem äußeren `if`.
+:::
+
+<CSharpRunner id="m02-l01-dangling" code={danglingElse} predict expected={danglingElseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist eine Zeile: `else branch`.
+
+1. **Äußeres `if`:** `failed > 0` ist wahr, also wird die Anweisung dahinter ausgeführt, das innere `if`.
+2. **Inneres `if`:** `events > 10` ist falsch.
+3. **Das `else`:** Es gehört zum inneren `if`, dem nächsten `if` davor ohne `else`. Deshalb läuft es jetzt.
+
+Hätte das `else` zum äußeren `if` gehört, bliebe die Ausgabe leer.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l01-else-wrong-if" />
+
+**„Ein `else` gehört zu dem `if`, unter dem es eingerückt ist.“** Der Compiler liest die Einrückung nicht. Ein `else` gehört zum nächsten `if` davor, das noch kein `else` hat. Setze geschweifte Klammern, dann ist die Zuordnung sichtbar, und die Einrückung stimmt mit der Wirkung überein.
+:::
+
+<details>
+<summary>Vertiefung: Die Regel in der Spezifikation (optional)</summary>
+
+Die Bedingung einer `if`-Anweisung muss ein boolescher Ausdruck sein ([§12.27 Boolean expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1227-boolean-expressions)). Ein `else` wird dem lexikalisch nächsten vorangehenden `if` zugeordnet, das die Grammatik zulässt. Die Spezifikation zeigt das an `if (x) if (y) F(); else G();` ([§13.8.2 The if statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1382-the-if-statement)). Zwei Texte sind gleich, wenn sie gleich lang sind und an jeder Stelle dasselbe Zeichen haben ([§12.15.8 String equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12158-string-equality-operators)).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt seinen Steckbrief aus, zeigt ein Ereignis, rechnet Fehlerquoten und liest den Benutzer und die Zahl der fehlgeschlagenen Anmeldungen aus der Eingabe (im Feld stehen `bob` und `5`).
+
+**Neue Anforderung:** SecLog soll bewerten, ob die Zahl `failedFromInput` hoch ist. Gib am Ende die Zeile `Alert: many failed logins` aus, wenn `failedFromInput` mindestens `5` ist, sonst die Zeile `No alert`. Die anderen Zeilen bleiben, die Ausgabe hat jetzt 24 Zeilen. Der Grenzwert 5 ist für den Unterricht erfunden.
+
+<CSharpRunner id="m02-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Bedingung formulieren:** `failedFromInput >= 5` vergleicht die eingelesene Zahl mit dem Grenzwert. Bei `5` ist sie wahr, weil `>=` auch Gleichheit zulässt.
+2. **Alarm ausgeben:** Der `if`-Block schreibt `Alert: many failed logins`.
+3. **Sonst-Fall:** Der `else`-Block schreibt `No alert`. Ändere die Eingabe auf `4`, um ihn zu sehen.
+
+</details>
+
+**Neuer Stand:** SecLog bewertet die Zahl der fehlgeschlagenen Anmeldungen mit einem Grenzwert und meldet einen Alarm.
+
+## Zusammenfassung
+
+Ein Vergleich mit `==`, `!=`, `<`, `>`, `<=` oder `>=` liefert einen `bool`. Ein `if` führt seinen Block nur aus, wenn die Bedingung `true` ergibt, ein `else` fängt den anderen Fall auf. Eine `else if`-Kette prüft von oben nach unten und führt höchstens einen Block aus. Ohne geschweifte Klammern gehört nur eine Anweisung zum `if`, und ein `else` gehört zum nächsten `if` davor ohne `else`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l01-q1" />
+
+<Quiz id="m02-l01-q2" />
+
+<Quiz id="m02-l01-q3" />
+
+<Quiz id="m02-l01-q4" />
+
+<Quiz id="m02-l01-q5" />
+
+<Quiz id="m02-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Auswahlanweisungen (if, switch)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)
+- Microsoft Learn: [Vergleichsoperatoren](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/comparison-operators)
+- Microsoft Learn: [Gleichheitsoperatoren](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/equality-operators)
