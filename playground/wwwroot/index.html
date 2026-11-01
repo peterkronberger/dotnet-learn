@@ -37,6 +37,18 @@
                 if (window.parent && window.parent !== window) {
                     window.parent.postMessage(message, window.location.origin);
                 }
+            },
+            // Typed code and input for the page (so it can unload this runner and keep the state).
+            // Edits are debounced; a change of the running flag is sent at once.
+            reportState: function (id, code, stdin, running) {
+                var message = { type: 'state', id: id, code: code, stdin: stdin, running: running };
+                clearTimeout(window.pgBridge._stateTimer);
+                if (running !== window.pgBridge._lastRunning) {
+                    window.pgBridge._lastRunning = running;
+                    window.pgBridge.report(message);
+                } else {
+                    window.pgBridge._stateTimer = setTimeout(function () { window.pgBridge.report(message); }, 300);
+                }
             }
         };
 

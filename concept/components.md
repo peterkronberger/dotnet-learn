@@ -27,16 +27,18 @@ Available (S7):
 - `trace` (bool, S5): turns on the step view (variables, heap model).
 - `stdin` (string): pre-filled console input, read line by line by `Console.ReadLine()`; after the last line it returns `null`. Shown in the runner as a labeled input field ("Eingabe (Konsole)") below the editor; the learner can edit it and "Zurücksetzen" restores it. The field exists only if `stdin` is set (an empty string gives an empty field). Without `stdin`, `Console.In` is an empty reader, so `Console.ReadLine()` returns `null` at once. Works in normal, test and trace runs. Fragment key: `&stdin=<Base64url>`. Not on the full playground page.
   - CI: an example `<name>.cs` may have `<name>.in.txt`; `check-examples.sh` feeds it as stdin (otherwise `/dev/null`). The lesson imports the same file with `raw-loader` and passes it as `stdin`.
-- Demo: `/dev/runner-demo`.
+- Unloading (available): the iframe is only mounted while its placeholder is near the viewport (`IntersectionObserver`, load distance 1250px). A loaded runner farther away than about 3 viewport heights (`UNLOAD_MARGIN` in `index.js`, an assumption, adjustable) is unloaded: the iframe is removed and a placeholder with the last known height and a German text for screen readers stays (no layout shift). It loads again when it comes near. Kept: the typed code and the edited `stdin`; "Zurücksetzen" still restores the originals. Lost: output, diagnostics, test results, step view (the learner runs again). Prediction inputs live on the page and stay. A runner with the keyboard focus or a running program is never unloaded (the unload is checked again on focus change and on the next message).
+- Demo: `/dev/runner-demo` (section "Entladen" with many runners).
 - All dev showcase pages are listed on `/dev/` (`<DevNav />`, list in `website/src/components/DevNav/index.js`). Add new dev pages there.
 
 Planned:
-- Loading: unload instances that are scrolled far away, keep the typed code; runtime from the browser cache.
+- Loading: runtime from the browser cache.
 - Language of the runner UI (today fixed German in `App.razor`) through a parameter (e.g. `#lang=de`) – for i18n.
 
 Message protocol (S7, available; origin check `window.location.origin` in both directions, the page also checks `event.source` and `id`):
-- Page → runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>&trace=1&stdin=<b64>`
+- Page → runner: `{type: 'theme', value}`; configuration in the fragment: `#code=<b64>&id=<id>&tests=<b64>&trace=1&stdin=<b64>&cur=<b64>&curin=<b64>` (`cur`/`curin`: code and input kept by the page after an unload; `code`/`stdin` stay the originals for "Zurücksetzen")
 - Runner → page: `{type: 'run-result', id, success, output, diagnostics: [{isError, text, line}], tests?: [{name, visible, passed, feedback}]}`
+- Runner → page: `{type: 'state', id, code, stdin, running}` – typed code, console input (`null` without `stdin` field) and whether a program runs; edits are debounced (300 ms), a change of `running` is sent at once. The page keeps the last one for the next load.
 - Runner → page: `{type: 'resize', id, height}` – sent whenever the content height of the runner page changes; the page sets the iframe height from it (same origin, `event.source` and `id` checks as for `run-result`).
 
 ## Playground (`playground/`) – available
