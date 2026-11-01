@@ -26,7 +26,7 @@ const WORDING_IS_ERROR = true;
 // Terms used before their introducing lesson (concept/lesson-template.md, "Forward references").
 // true: findings are errors, except in the early-implementation lessons (EARLY_IMPLEMENTATIONS), which stay warnings.
 const FORWARD_IS_ERROR = true;
-const EARLY_IMPLEMENTATIONS = ['m02-l01'];
+const EARLY_IMPLEMENTATIONS = [];
 
 // Markup of the removed language-comparison box (#127, concept/style-and-language.md). Must not come back.
 const REMOVED_LANGUAGE_BOX = [

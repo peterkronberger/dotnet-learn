@@ -21,7 +21,7 @@ Lesson titles and text are German. German titles below are the real learner-faci
 
 ## Existing content: early implementations
 
-M0 (module review 2026-10-25), M1 (module review 2026-10-30) and the page "Wie dieser Kurs funktioniert" are rebuilt; no early M0 or M1 file is left. The only lesson that still exists from the early implementation – M2 `l01-control-flow.mdx` – is an early implementation (MVP). They do not follow the current rules. Every module, including M1 and M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a).
+M0 (module review 2026-10-25), M1 (module review 2026-10-30) and the page "Wie dieser Kurs funktioniert" are rebuilt; the M2 early lesson (`l01-control-flow.mdx`) is removed. No early file is left (module 2 is an empty skeleton until its new lessons are merged). Early implementations did not follow the current rules. Every module, including M2, is **rebuilt completely** from this plan; existing files, ids and quiz questions are not kept because they exist (`concept/issue-blueprint.md`, section 2a).
 
 ## Reference: which source counts as "the specification"
 
