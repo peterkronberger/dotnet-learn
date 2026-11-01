@@ -1,0 +1,25 @@
+SecLog project profile
+Purpose: find suspicious logins in made-up login logs
+Language: C#
+Platform: .NET
+Variant: .NET (Linux server and Windows laptops)
+Version: .NET 10 (LTS)
+End of support: 2028-11-14
+Execution model: Native AOT
+
+First event:
+2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+User: bob
+IP: 203.0.113.7
+Event type: login-failed
+Failure rate (%): 50
+Failed logins of bob: 5
+Share of bob (%): 71.43
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Failure rate: 50.0 %
+Success share, cut off (%): 35
+Success share, rounded (%): 36
+Failure rate from input (%): 35.7
+Second text worked: False
+Second text number: 0
+Alert: many failed logins

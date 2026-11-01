@@ -1,1 +1,104 @@
-{ "module": "m02", "questions": [] }
+{
+  "module": "m02",
+  "questions": [
+    {
+      "id": "m02-l01-q1",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Welchen Wert hat der Ausdruck `5 >= 5`?",
+      "options": [
+        { "text": "`true`", "correct": true },
+        { "text": "`false`", "feedback": "`>=` bedeutet „größer als oder gleich“. Beide Zahlen sind gleich, also ist die Aussage wahr." },
+        { "text": "`5`", "feedback": "Ein Vergleich liefert keine Zahl, sondern `true` oder `false`." },
+        { "text": "Der Ausdruck ist ein Fehler.", "feedback": "Der Ausdruck ist gültig. Zwei Zahlen lassen sich immer vergleichen." }
+      ],
+      "explanation": "Ein Vergleichsoperator liefert immer einen `bool`. Bei `>=` genügt es, dass die Werte gleich sind."
+    },
+    {
+      "id": "m02-l01-q2",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Welche Zeile prüft, ob `attempts` gleich `3` ist?",
+      "options": [
+        { "text": "`attempts == 3`", "correct": true },
+        { "text": "`attempts = 3`", "misconception": "m01-l02-assignment-is-comparison", "feedback": "Ein einzelnes `=` weist zu: `attempts` bekommt den Wert `3`. Verglichen wird mit `==`." },
+        { "text": "`attempts => 3`", "feedback": "Das ist kein Vergleichsoperator. „Größer oder gleich“ schreibst du `>=`." },
+        { "text": "`attempts === 3`", "feedback": "Diesen Operator gibt es in C# nicht. Der Gleichheitsvergleich hat zwei Gleichheitszeichen." }
+      ],
+      "explanation": "`==` vergleicht und liefert `true` oder `false`. `=` weist einen Wert zu."
+    },
+    {
+      "id": "m02-l01-q3",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Was liefert `\"Login\" == \"login\"`?",
+      "options": [
+        { "text": "`false`", "correct": true },
+        { "text": "`true`", "feedback": "Der Vergleich prüft Zeichen für Zeichen, auch Groß- und Kleinschreibung. `L` und `l` sind verschiedene Zeichen." },
+        { "text": "Einen Fehler, weil `==` nur Zahlen vergleicht.", "feedback": "`==` vergleicht auch Texte und einzelne Zeichen." }
+      ],
+      "explanation": "Zwei Texte sind gleich, wenn sie aus denselben Zeichen in derselben Reihenfolge bestehen. Groß- und Kleinbuchstaben sind verschieden."
+    },
+    {
+      "id": "m02-l01-q4",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Der Code lautet:\n\n`if (n >= 3) Console.WriteLine(\"A\"); else if (n >= 5) Console.WriteLine(\"B\");`\n\nWas wird bei `n = 7` ausgegeben?",
+      "options": [
+        { "text": "`A`", "correct": true },
+        { "text": "`B`", "feedback": "Die Kette prüft von oben nach unten. Die erste Bedingung `n >= 3` ist schon wahr, danach wird nichts mehr geprüft." },
+        { "text": "`A` und danach `B`", "feedback": "Von den Teilen einer `if`-`else if`-Kette läuft höchstens einer." },
+        { "text": "Nichts.", "feedback": "`7 >= 3` ist wahr, also läuft der erste Teil." }
+      ],
+      "explanation": "Die Bedingungen werden von oben nach unten geprüft. Der erste wahre Teil läuft, die übrigen werden übersprungen."
+    },
+    {
+      "id": "m02-l01-q5",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Ein `else` steht ohne geschweifte Klammern nach zwei verschachtelten `if` und ist so eingerückt, dass es zum äußeren `if` zu gehören scheint. Zu welchem `if` gehört es?",
+      "options": [
+        { "text": "Zum nächsten davor stehenden `if`, das noch kein `else` hat – hier das innere.", "correct": true },
+        { "text": "Zum äußeren `if`, weil die Einrückung es so zeigt.", "misconception": "m02-l01-else-wrong-if", "feedback": "Der Compiler ignoriert die Einrückung. Sie hilft nur dem Leser und kann täuschen." },
+        { "text": "Zum ersten `if` im Code, denn ein `else` gehört immer dorthin.", "misconception": "m02-l01-else-wrong-if", "feedback": "Es gibt keine Regel „erstes `if`“. Entscheidend ist das nächste davor stehende `if` ohne `else`." },
+        { "text": "Zu keinem. Das ist ein Fehler.", "feedback": "Der Code ist gültig. Das `else` gehört zum inneren `if`." }
+      ],
+      "explanation": "Ein `else` gehört zum nächsten davor stehenden `if`, das noch kein `else` hat. Mit geschweiften Klammern legst du die Zugehörigkeit selbst fest."
+    },
+    {
+      "id": "m02-l01-q6",
+      "lesson": "m02-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, zu welchem `if` das erste `else` gehört.",
+      "example": "m02/l01/quiz-else-pairing.cs",
+      "explanation": "`12 > 3` und `12 > 10` sind beide wahr. Also läuft die Ausgabe des inneren `if`: `blocked`. Beide `else`-Teile werden übersprungen. `done` steht außerhalb und läuft immer."
+    },
+    {
+      "id": "m02-l01-q7",
+      "lesson": "m02-l01",
+      "type": "multi",
+      "question": "Welche der Ausdrücke sind boolesche Ausdrücke, also als Bedingung für `if` geeignet?",
+      "options": [
+        { "text": "`failed >= 5`", "correct": true },
+        { "text": "`user == \"bob\"`", "correct": true },
+        { "text": "`failed + 5`", "feedback": "Das Ergebnis ist eine Zahl. `if` verlangt `true` oder `false`." },
+        { "text": "`user`", "feedback": "Ein Text allein ist kein `bool`. Du musst ihn vergleichen, etwa mit `==`." }
+      ],
+      "explanation": "Eine Bedingung muss den Wert `true` oder `false` haben. Vergleiche liefern einen `bool`, Rechnungen und Texte nicht."
+    },
+    {
+      "id": "m02-l01-q8",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `if`, `else if` und `else` zusammenarbeiten und welcher Teil läuft.",
+      "modelAnswer": "Das Programm prüft die Bedingungen von oben nach unten. Der Block hinter der ersten Bedingung, die `true` ist, läuft. Alle übrigen Teile der Kette werden übersprungen. Ist keine Bedingung wahr, läuft der `else`-Block, falls es einen gibt.\n\nDeshalb ist die Reihenfolge wichtig: Die strengere Bedingung (zum Beispiel `>= 5`) steht vor der weiteren (`>= 3`)."
+    },
+    {
+      "id": "m02-l01-q9",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm, das Logs prüft, würdest du `if` und `else` verwenden? Nenne zwei Beispiele.",
+      "modelAnswer": "Zum Beispiel: Ein Alarm wird nur ausgegeben, wenn die Zahl der fehlgeschlagenen Anmeldungen einen Grenzwert erreicht. Oder: Eine Logzeile wird nur gezählt, wenn der Ereignistyp `login-failed` ist. Auch das Einordnen in „niedrig“, „mittel“ und „hoch“ ist eine `else if`-Kette."
+    }
+  ]
+}

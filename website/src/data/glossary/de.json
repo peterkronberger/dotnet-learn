@@ -707,12 +707,15 @@
       "term": "Selection Statement",
       "german": "Verzweigung",
       "category": "language",
-      "definition": "Eine Anweisung, die Code nur unter einer Bedingung ausführt, zum Beispiel `if` und `else` oder `switch`.",
+      "definition": "Eine Anweisung, die abhängig von einer Bedingung entscheidet, welche Anweisung läuft. `if` führt einen Block nur aus, wenn die Bedingung `true` ist; `else` gibt den Block für den anderen Fall an. `switch` ist die zweite Form.",
       "aliases": [
         "Verzweigungen",
-        "if"
+        "if",
+        "else"
       ],
       "related": [
+        "boolean-expression",
+        "comparison-operator",
         "loop",
         "switch-expression"
       ],
@@ -1491,6 +1494,50 @@
       "source": {
         "title": "Console.ReadLine Method",
         "url": "https://learn.microsoft.com/dotnet/api/system.console.readline"
+      }
+    },
+    {
+      "id": "boolean-expression",
+      "term": "Boolean Expression",
+      "german": "boolescher Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck, dessen Wert `true` oder `false` ist, zum Beispiel `attempts > 3`. `if` und die Schleifen verlangen einen solchen Ausdruck als Bedingung.",
+      "aliases": [
+        "Bedingung",
+        "boolesche Bedingung"
+      ],
+      "related": [
+        "comparison-operator",
+        "selection-statement",
+        "expression"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Boolean expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions"
+      }
+    },
+    {
+      "id": "comparison-operator",
+      "term": "Comparison Operator",
+      "german": "Vergleichsoperator",
+      "category": "language",
+      "definition": "Ein Operator, der zwei Werte vergleicht und `true` oder `false` liefert: `==`, `!=`, `<`, `>`, `<=` und `>=`.",
+      "aliases": [
+        "Vergleichsoperatoren",
+        "==",
+        "!=",
+        "Gleichheitsoperator",
+        "relationaler Operator"
+      ],
+      "related": [
+        "boolean-expression",
+        "operator"
+      ],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Comparison operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/comparison-operators"
       }
     }
   ]
