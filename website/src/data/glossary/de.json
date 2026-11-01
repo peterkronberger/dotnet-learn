@@ -735,7 +735,7 @@
         "selection-statement",
         "collection"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l06",
       "source": {
         "title": "Iteration statements",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
@@ -754,7 +754,7 @@
         "pattern",
         "discard"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "switch expression",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression"
@@ -772,7 +772,7 @@
       "related": [
         "switch-expression"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "Patterns",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns"
@@ -790,7 +790,7 @@
       "related": [
         "switch-expression"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "Discards",
         "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/functional/discards"
@@ -813,6 +813,225 @@
       "source": {
         "title": "Collections",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/collections"
+      }
+    },
+    {
+      "id": "boolean-expression",
+      "term": "Boolean Expression",
+      "german": "boolescher Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck, dessen Wert vom Typ `bool` ist, also `true` oder `false`. Bedingungen von `if` und Schleifen sind boolesche Ausdrücke.",
+      "aliases": ["Bedingung", "boolesche Ausdrücke"],
+      "related": ["comparison-operator", "selection-statement"],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
+    },
+    {
+      "id": "comparison-operator",
+      "term": "Comparison Operator",
+      "german": "Vergleichsoperator",
+      "category": "language",
+      "definition": "Ein Operator, der zwei Werte vergleicht und einen `bool` liefert: `<`, `>`, `<=`, `>=`, `==` und `!=`.",
+      "aliases": ["Vergleichsoperatoren"],
+      "related": ["boolean-expression"],
+      "lesson": "m02-l01",
+      "source": {
+        "title": "Comparison operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/comparison-operators"
+      }
+    },
+    {
+      "id": "logical-operator",
+      "term": "Logical Operator",
+      "german": "logischer Operator",
+      "category": "language",
+      "definition": "Ein Operator, der `bool`-Werte verknüpft: `&&` (und), `||` (oder) und `!` (nicht). `&`, `|` und `^` arbeiten auch mit `bool`.",
+      "aliases": ["logische Operatoren"],
+      "related": ["short-circuit-evaluation", "boolean-expression"],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
+    },
+    {
+      "id": "short-circuit-evaluation",
+      "term": "Short-circuit Evaluation",
+      "german": "Kurzschlussauswertung",
+      "category": "language",
+      "definition": "`&&` und `||` werten die rechte Seite nur aus, wenn die linke das Ergebnis noch nicht festlegt.",
+      "aliases": ["Kurzschluss"],
+      "related": ["logical-operator"],
+      "lesson": "m02-l02",
+      "source": {
+        "title": "Boolean logical operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/boolean-logical-operators"
+      }
+    },
+    {
+      "id": "conditional-operator",
+      "term": "Conditional Operator",
+      "german": "bedingter Operator",
+      "category": "language",
+      "definition": "Der Operator `?:` wählt abhängig von einer Bedingung einen von zwei Werten: `Bedingung ? Wert1 : Wert2`. Nur der gewählte Zweig wird ausgewertet.",
+      "aliases": ["?:", "ternärer Operator"],
+      "related": ["boolean-expression"],
+      "lesson": "m02-l03",
+      "source": {
+        "title": "?: operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/conditional-operator"
+      }
+    },
+    {
+      "id": "constant-pattern",
+      "term": "Constant Pattern",
+      "german": "konstantes Muster",
+      "category": "language",
+      "definition": "Ein Muster, das passt, wenn der Wert gleich einer Konstante ist, zum Beispiel `0` oder `\"logout\"`.",
+      "aliases": ["konstante Muster"],
+      "related": ["pattern", "relational-pattern"],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "Patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns"
+      }
+    },
+    {
+      "id": "relational-pattern",
+      "term": "Relational Pattern",
+      "german": "relationales Muster",
+      "category": "language",
+      "definition": "Ein Muster, das einen Wert mit einer Konstante vergleicht: `< 3`, `<= 3`, `> 3` oder `>= 3`.",
+      "aliases": ["relationale Muster"],
+      "related": ["pattern", "constant-pattern"],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "Patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns"
+      }
+    },
+    {
+      "id": "exhaustive",
+      "term": "Exhaustive",
+      "german": "erschöpfend",
+      "category": "language",
+      "definition": "Ein Switch-Ausdruck ist erschöpfend, wenn jeder mögliche Wert zu einem Zweig passt. Sonst gibt der Compiler eine Warnung, und zur Laufzeit kann eine Ausnahme auftreten.",
+      "aliases": ["erschöpfender Switch-Ausdruck"],
+      "related": ["switch-expression", "discard"],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "switch expression",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression"
+      }
+    },
+    {
+      "id": "switch-statement",
+      "term": "Switch Statement",
+      "german": "switch-Anweisung",
+      "category": "language",
+      "definition": "Eine Anweisung, die abhängig von einem Wert genau eine von mehreren Anweisungslisten (Abschnitten) ausführt.",
+      "aliases": ["switch-Anweisungen"],
+      "related": ["switch-expression", "case-guard", "fall-through"],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements"
+      }
+    },
+    {
+      "id": "case-guard",
+      "term": "Case Guard",
+      "german": "Fallbedingung",
+      "category": "language",
+      "definition": "Eine zusätzliche Bedingung mit `when` hinter einem `case`-Label. Der Abschnitt läuft nur, wenn das Label passt und die Bedingung `true` ist.",
+      "aliases": ["when"],
+      "related": ["switch-statement"],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements"
+      }
+    },
+    {
+      "id": "fall-through",
+      "term": "Fall-through",
+      "german": "Durchfallen",
+      "category": "language",
+      "definition": "Das Weiterlaufen in den nächsten Abschnitt eines `switch`. C# verbietet das: Das Ende eines Abschnitts darf nicht erreichbar sein.",
+      "related": ["switch-statement"],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements"
+      }
+    },
+    {
+      "id": "iteration",
+      "term": "Iteration",
+      "german": "Durchlauf",
+      "category": "language",
+      "definition": "Ein einzelner Durchlauf des Schleifenkörpers. Eine Schleife mit fünf Durchläufen führt den Körper fünfmal aus.",
+      "aliases": ["Durchlauf", "Iterationen"],
+      "related": ["loop"],
+      "lesson": "m02-l06",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "loop-variable",
+      "term": "Loop Variable",
+      "german": "Schleifenvariable",
+      "category": "language",
+      "definition": "Eine Variable, die eine Schleife steuert oder bei jedem Durchlauf einen anderen Wert hat, zum Beispiel `i` in `for` oder das Element in `foreach`.",
+      "aliases": ["Schleifenvariablen", "Laufvariable"],
+      "related": ["loop", "iteration"],
+      "lesson": "m02-l07",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "off-by-one-error",
+      "term": "Off-by-one Error",
+      "german": "Um-eins-daneben-Fehler",
+      "category": "course",
+      "definition": "Ein Fehler, bei dem eine Schleife einmal zu oft oder einmal zu selten läuft, zum Beispiel durch `<=` statt `<` oder einen falschen Startwert.",
+      "aliases": ["off-by-one"],
+      "related": ["loop-variable"],
+      "lesson": "m02-l07"
+    },
+    {
+      "id": "jump-statement",
+      "term": "Jump Statement",
+      "german": "Sprunganweisung",
+      "category": "language",
+      "definition": "Eine Anweisung, die den Ablauf an eine andere Stelle verlegt. `break` verlässt eine Schleife, `continue` springt zum nächsten Durchlauf.",
+      "aliases": ["Sprunganweisungen"],
+      "related": ["loop"],
+      "lesson": "m02-l08",
+      "source": {
+        "title": "Jump statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements"
+      }
+    },
+    {
+      "id": "nested-loop",
+      "term": "Nested Loop",
+      "german": "verschachtelte Schleife",
+      "category": "language",
+      "definition": "Eine Schleife im Körper einer anderen Schleife. Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett durch.",
+      "aliases": ["verschachtelte Schleifen"],
+      "related": ["loop"],
+      "lesson": "m02-l09",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
       }
     },
     {

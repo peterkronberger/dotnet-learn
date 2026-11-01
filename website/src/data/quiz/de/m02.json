@@ -1,1 +1,81 @@
-{ "module": "m02", "questions": [] }
+{
+  "module": "m02",
+  "questions": [
+    {
+      "id": "m02-l01-q1",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Welchen Wert hat der Ausdruck `5 >= 5`?",
+      "options": [
+        { "text": "`true`", "correct": true },
+        { "text": "`false`", "feedback": "`>=` bedeutet „größer als oder gleich“. Beide Seiten sind gleich, also stimmt der Vergleich." },
+        { "text": "`5`", "feedback": "Ein Vergleich liefert keinen der beiden Werte, sondern einen `bool`: `true` oder `false`." }
+      ],
+      "explanation": "Ein Vergleichsoperator liefert immer einen `bool`. `>=` ist `true`, wenn der linke Wert größer ist oder beide Werte gleich sind."
+    },
+    {
+      "id": "m02-l01-q2",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Ein Programm soll prüfen, ob `eventType` gleich `\"login-failed\"` ist. Welche Bedingung tut das?",
+      "options": [
+        { "text": "`eventType == \"login-failed\"`", "correct": true },
+        { "text": "`eventType = \"login-failed\"`", "feedback": "Ein einzelnes `=` weist einen Wert zu und vergleicht nicht. Zum Vergleichen brauchst du `==`." },
+        { "text": "`eventType != \"login-failed\"`", "feedback": "`!=` prüft auf Ungleichheit und ist `true`, wenn die Texte verschieden sind." }
+      ],
+      "explanation": "`==` vergleicht zwei Werte und liefert einen `bool`. Bei Texten ist das Ergebnis `true`, wenn beide Texte Zeichen für Zeichen gleich sind."
+    },
+    {
+      "id": "m02-l01-q3",
+      "lesson": "m02-l01",
+      "type": "multi",
+      "question": "Welche der folgenden Ausdrücke haben den Typ `bool` und dürfen deshalb als Bedingung in `if (…)` stehen?",
+      "options": [
+        { "text": "`attempts > 3`", "correct": true },
+        { "text": "`user == \"bob\"`", "correct": true },
+        { "text": "`attempts + 3`", "feedback": "Das Ergebnis ist eine Zahl, kein `bool`. Eine Bedingung braucht `true` oder `false`." },
+        { "text": "`\"bob\"`", "feedback": "Ein Text ist kein `bool`. Als Bedingung gibt es einen Compilerfehler." }
+      ],
+      "explanation": "Die Bedingung eines `if` muss ein `bool` sein. Vergleiche liefern einen `bool`, Rechenausdrücke und Texte nicht."
+    },
+    {
+      "id": "m02-l01-q4",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "Im Code steht `if (a > 3) if (locked) Console.WriteLine(\"X\"); else Console.WriteLine(\"Y\");`, ohne geschweifte Klammern, `else` eingerückt unter dem ersten `if`. Zu welchem `if` gehört das `else`?",
+      "options": [
+        { "text": "Zu `if (locked)`, dem nächsten `if` ohne `else`.", "correct": true },
+        { "text": "Zu `if (a > 3)`, weil das `else` unter dem ersten `if` eingerückt ist.", "misconception": "m02-l01-else-wrong-if", "feedback": "Die Einrückung zählt für den Compiler nicht. Ein `else` gehört zum nächsten `if` davor, das noch kein `else` hat." },
+        { "text": "Zu `if (a > 3)`, weil dieses `if` zuerst im Code steht.", "misconception": "m02-l01-else-wrong-if", "feedback": "Die Reihenfolge im Code entscheidet nicht über die erste Stelle. Das `else` gehört zum nächsten `if` ohne `else`." }
+      ],
+      "explanation": "Ein `else` gehört immer zum nächsten `if` davor, das noch kein `else` hat. Mit geschweiften Klammern legst du die Zuordnung selbst fest."
+    },
+    {
+      "id": "m02-l01-q5",
+      "lesson": "m02-l01",
+      "type": "single",
+      "question": "`attempts` hat den Wert 4. Welche Zeile gibt `if (attempts >= 5) { A } else if (attempts >= 3) { B } else { C }` aus?",
+      "options": [
+        { "text": "Nur `B`.", "correct": true },
+        { "text": "`B` und `C`.", "feedback": "Von einer `else if`-Kette läuft höchstens ein Block. Nach dem ersten wahren Block endet sie." },
+        { "text": "`A` und `B`.", "feedback": "Die erste Bedingung `attempts >= 5` ist `false`, also läuft `A` nicht." },
+        { "text": "Nur `C`.", "feedback": "`C` läuft nur, wenn keine Bedingung davor `true` war. Hier ist `attempts >= 3` wahr." }
+      ],
+      "explanation": "Die Bedingungen werden von oben nach unten geprüft. Der erste Block mit wahrer Bedingung läuft, der Rest der Kette wird übersprungen."
+    },
+    {
+      "id": "m02-l01-q6",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein `if` mit `else` entscheidet, welcher Block läuft.",
+      "modelAnswer": "Das Programm wertet die Bedingung aus. Sie ist ein Ausdruck vom Typ `bool`. Ist das Ergebnis `true`, läuft der Block hinter dem `if`. Ist es `false`, läuft der Block hinter dem `else`, falls einer da ist. Danach geht das Programm mit der nächsten Anweisung nach dem ganzen `if` weiter."
+    },
+    {
+      "id": "m02-l01-q7",
+      "lesson": "m02-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Logwerkzeug eine Bedingung mit `if` und `else` einsetzen?",
+      "modelAnswer": "Zum Beispiel, um bei einer Anzahl fehlgeschlagener Anmeldungen ab einem Schwellenwert eine Warnung auszugeben und sonst nichts zu melden. Oder um nur Zeilen mit dem Ereignistyp `login-failed` weiterzuverarbeiten."
+    }
+  ]
+}
