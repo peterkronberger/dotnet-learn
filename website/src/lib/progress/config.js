@@ -9,6 +9,13 @@ export const MAX_LESSON_ID_LENGTH = 40;
 // Same pattern as the `lesson` field of quiz questions (src/data/quiz/index.js).
 export const LESSON_ID_PATTERN = /^[a-z0-9]+-l\d+$/;
 
+// Placement test (see placement.js).
+export const PLACEMENT_QUESTION_COUNT = 8;
+export const PLACEMENT_MAX_WRONG = 1; // a decision, not an empirical value
+export const PLACEMENT_VIA = 'placement';
+export const MODULE_KEY_PATTERN = /^[a-z0-9]+$/;
+export const MAX_MODULE_KEY_LENGTH = 20;
+
 // Display stages for the Leitner boxes (index = box - 1).
 // The limits are a decision, not an empirical value – like the intervals above.
 export const STAGE_BY_BOX = ['shaky', 'building', 'building', 'solid', 'solid'];
