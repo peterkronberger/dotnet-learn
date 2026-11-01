@@ -141,6 +141,148 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug zwischen zwei Wegen wählen? Nenne eine Bedingung als Vergleich.",
       "modelAnswer": "Zum Beispiel meldet es einen Alarm, wenn die Zahl der fehlgeschlagenen Anmeldungen mindestens 5 ist (`failed >= 5`), und sonst nicht. Oder es behandelt einen Benutzer anders, wenn `user == \"admin\"` gilt. Die Bedingung ist jeweils ein Vergleich, der `true` oder `false` ergibt."
+    },
+    {
+      "id": "m02-l02-q1",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Was ergibt `true || false && false`?",
+      "options": [
+        {
+          "text": "`true`, weil `&&` vor `||` rechnet: `false && false` ist `false`, und `true || false` ist `true`.",
+          "correct": true
+        },
+        {
+          "text": "`false`, weil `||` von links rechnet: `true || false` ist `true`, und `true && false` ist `false`.",
+          "feedback": "`&&` hat Vorrang vor `||`. Der Ausdruck ist `true || (false && false)`."
+        },
+        {
+          "text": "Der Ausdruck ist ohne Klammern ungültig.",
+          "feedback": "Die Rangfolge der Operatoren legt fest, wie der Ausdruck ohne Klammern gelesen wird."
+        }
+      ],
+      "explanation": "`!` bindet am stärksten, dann folgt `&&`, dann `||`. Der Ausdruck ist `true || (false && false)` und damit `true`."
+    },
+    {
+      "id": "m02-l02-q2",
+      "lesson": "m02-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l02/quiz-short.cs",
+      "explanation": "`a` ist `true`, deshalb braucht `a || …` die rechte Seite nicht: `b` ist `true`, `count` bleibt 0. `!a` ist `false`. `&` wertet trotzdem beide Seiten aus, also läuft `++count` und `count` wird 1. `c` ist `false`."
+    },
+    {
+      "id": "m02-l02-q3",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Was ist bei `bool`-Werten der Unterschied zwischen `&` und `&&`?",
+      "options": [
+        {
+          "text": "`&` wertet immer beide Seiten aus. `&&` lässt die rechte Seite weg, wenn die linke schon `false` ist.",
+          "correct": true
+        },
+        {
+          "text": "Es gibt keinen Unterschied, beide sind „und“.",
+          "misconception": "m02-l02-and-same-as-ampersand",
+          "feedback": "Das Ergebnis ist gleich, aber nicht der Ablauf: `&` wertet die rechte Seite immer aus, `&&` nur bei Bedarf."
+        },
+        {
+          "text": "`&` ist nur für Zahlen erlaubt, `&&` für `bool`.",
+          "misconception": "m02-l02-and-same-as-ampersand",
+          "feedback": "`&` ist auch für `bool` definiert. Es wertet beide Seiten aus."
+        },
+        {
+          "text": "`&&` ist „und“, `&` ist „oder“.",
+          "feedback": "„Oder“ ist `||` (mit Kurzschluss) und `|` (ohne)."
+        }
+      ],
+      "explanation": "Beide liefern bei `bool` dasselbe Ergebnis. Der Unterschied liegt im Ablauf: `&&` und `||` hören auf, sobald das Ergebnis feststeht. `&` und `|` werten beide Seiten immer aus."
+    },
+    {
+      "id": "m02-l02-q4",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "`total` ist `0`. Was passiert bei `total != 0 && failed * 100 / total > 50`?",
+      "options": [
+        {
+          "text": "Das Ergebnis ist `false`. Die Division wird nicht ausgeführt.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm bricht mit einem Fehler bei der Division durch null ab.",
+          "misconception": "m02-l02-and-same-as-ampersand",
+          "feedback": "Die linke Seite ist `false`. Dann steht das Ergebnis von `&&` fest, und die rechte Seite wird nicht ausgewertet. Mit `&` käme der Fehler."
+        },
+        {
+          "text": "Das Ergebnis ist `true`, weil `0` kleiner als 50 ist.",
+          "feedback": "Die rechte Seite wird nicht einmal berechnet. Das Ergebnis ist `false`."
+        }
+      ],
+      "explanation": "Bei `false && …` steht das Ergebnis schon nach der linken Seite fest. So schützt die linke Bedingung die rechte Seite."
+    },
+    {
+      "id": "m02-l02-q5",
+      "lesson": "m02-l02",
+      "type": "single",
+      "question": "Welcher Ausdruck ist gleichwertig zu `!(x > 3)`?",
+      "options": [
+        {
+          "text": "`x <= 3`",
+          "correct": true
+        },
+        {
+          "text": "`x < 3`",
+          "feedback": "Bei `x = 3` ist `x > 3` falsch, die Negation also wahr. `x < 3` ist bei 3 aber falsch."
+        },
+        {
+          "text": "`x >= 3`",
+          "feedback": "Bei `x = 3` ist `x >= 3` wahr, `!(x > 3)` ist dort aber auch wahr. Bei `x = 4` ist `x >= 3` wahr, `!(x > 3)` aber falsch."
+        }
+      ],
+      "explanation": "`!` kehrt `true` und `false` um. „Nicht größer als 3“ heißt „kleiner oder gleich 3“."
+    },
+    {
+      "id": "m02-l02-q6",
+      "lesson": "m02-l02",
+      "type": "multi",
+      "question": "Welche Ausdrücke ergeben `true`, wenn `a` den Wert `true` und `b` den Wert `false` hat?",
+      "options": [
+        {
+          "text": "`a && !b`",
+          "correct": true
+        },
+        {
+          "text": "`a ^ b`",
+          "correct": true
+        },
+        {
+          "text": "`a & b`",
+          "feedback": "`&` ist nur `true`, wenn beide Seiten `true` sind."
+        },
+        {
+          "text": "`!a || b`",
+          "feedback": "`!a` ist `false` und `b` ist `false`. Das Ergebnis ist `false`."
+        },
+        {
+          "text": "`a || b`",
+          "correct": true
+        }
+      ],
+      "explanation": "`^` ist wahr, wenn genau eine Seite wahr ist. `||` ist wahr, wenn mindestens eine Seite wahr ist. `a && !b` ist wahr, weil `!b` wahr ist."
+    },
+    {
+      "id": "m02-l02-q7",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Kurzschlussauswertung ist und wann `&&` die rechte Seite nicht auswertet.",
+      "modelAnswer": "`&&` und `||` hören auf, sobald das Ergebnis feststeht. Bei `&&` steht es nach einer linken Seite mit `false` fest, denn „und“ braucht beide Seiten wahr. Bei `||` steht es nach einer linken Seite mit `true` fest.\n\nDie rechte Seite wird dann nicht ausgewertet. `&` und `|` werten dagegen beide Seiten immer aus."
+    },
+    {
+      "id": "m02-l02-q8",
+      "lesson": "m02-l02",
+      "type": "explain",
+      "question": "Transferfrage: Welche zwei Bedingungen eines Log-Werkzeugs würdest du mit `&&` verbinden, und welche mit `||`?",
+      "modelAnswer": "Mit `&&`: Ein Ereignis ist verdächtig, wenn der Typ `login-failed` ist und es mindestens 3 Fehlversuche gibt. Beide Bedingungen müssen gelten.\n\nMit `||`: Ein Benutzer wird beobachtet, wenn er `bob` oder `dave` heißt. Eine der beiden Bedingungen reicht."
     }
   ]
 }
