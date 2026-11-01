@@ -1,0 +1,167 @@
+---
+title: Die switch-Anweisung
+sidebar_position: 5
+description: "Die switch-Anweisung führt je nach Wert genau eine von mehreren Anweisungslisten aus. Jeder Abschnitt endet mit break."
+lesson_id: m02-l05
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import switchStatement from '!!raw-loader!@site/examples/m02/l05/switch-statement.cs';
+import switchStatementOutput from '!!raw-loader!@site/examples/m02/l05/switch-statement.out.txt';
+import caseGuard from '!!raw-loader!@site/examples/m02/l05/case-guard.cs';
+import caseGuardOutput from '!!raw-loader!@site/examples/m02/l05/case-guard.out.txt';
+import missingBreak from '!!raw-loader!@site/examples/m02/l05/missing-break.snippet.cs';
+import switchGaps from '!!raw-loader!@site/examples/m02/l05/switch-statement-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-solution.cs';
+
+# Die switch-Anweisung
+
+:::note[Lernziele]
+- Du schreibst eine <Term id="switch-statement">switch-Anweisung (Switch Statement)</Term> mit Abschnitten, mehreren Labels und `default`.
+- Du erklärst, warum jeder Abschnitt mit `break` endet.
+- Du verwendest eine <Term id="case-guard">Fallbedingung (Case Guard)</Term> mit `when`.
+- Du unterscheidest die Anweisung vom Switch-Ausdruck.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l04-q2" />
+
+<Quiz id="m02-l01-q4" />
+
+<Quiz id="m02-l03-q3" />
+
+## Abschnitte und Labels
+
+Der Switch-Ausdruck der letzten Lektion liefert einen Wert. Die `switch`-Anweisung führt dagegen Anweisungen aus: Sie wählt anhand eines Werts **einen** Abschnitt (Switch Section) aus und führt dessen Anweisungsliste aus. Ein Abschnitt beginnt mit einem oder mehreren Labels (`case Wert:`) und enthält Anweisungen. Der Abschnitt `default:` läuft, wenn kein Label passt. Mehrere Labels können untereinander vor einer gemeinsamen Anweisungsliste stehen.
+
+Jeder Abschnitt muss mit einer Sprunganweisung wie `break` enden. `break` verlässt die ganze `switch`-Anweisung, und das Programm macht danach weiter.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l05-basic" code={switchStatement} predict expected={switchStatementOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `No action` und `Done`.
+
+1. **Label suchen:** `"logout"` passt zum zweiten Label des Abschnitts mit `"login-success"`.
+2. **Abschnitt ausführen:** Die gemeinsame Anweisungsliste gibt `No action` aus.
+3. **Verlassen:** `break` beendet das `switch`, danach läuft `Console.WriteLine("Done");`.
+
+Was passiert, wenn `eventType` den Wert `"reboot"` hat? Dann läuft der Abschnitt `default`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l05-case-falls-through" />
+
+**„Ohne `break` läuft ein `case` in den nächsten weiter.“** In C# gibt es dieses <Term id="fall-through">Durchfallen (Fall-through)</Term> nicht. Das Ende eines Abschnitts darf nicht erreichbar sein, sonst meldet der Compiler einen Fehler.
+:::
+
+<CodeBlock language="csharp" title="missing-break.snippet.cs">{missingBreak}</CodeBlock>
+
+Der erste Abschnitt endet ohne `break`: Der Compiler meldet, dass die Kontrolle nicht von einem `case`-Label zum nächsten laufen darf.
+
+## Fallbedingungen mit when
+
+Mit `when` fügst du einem Label eine Bedingung hinzu. Der Abschnitt läuft nur, wenn das Label passt und die Bedingung `true` ist. Die Abschnitte werden von oben nach unten geprüft. Setze den Abschnitt mit der Fallbedingung deshalb vor den allgemeineren.
+
+:::info[Vorhersage]
+`failed` ist 6. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l05-guard" code={caseGuard} predict expected={caseGuardOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Raise an alert`.
+
+1. **Erster Abschnitt:** Das Label passt, und `failed >= 5` ist `true`. Der Abschnitt läuft.
+2. **Rest:** Die weiteren Abschnitte werden nicht mehr geprüft.
+
+Setze `failed` auf 3. Dann ist die Bedingung `false`, und der zweite Abschnitt läuft.
+
+</details>
+
+Zur Vollständigkeit: C# kennt auch die Sprunganweisung `goto`, mit der ein Programm zu einem Label springt. Sie kommt in diesem Kurs nicht vor ([goto-Anweisung](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements)).
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ergänze die zwei Stellen so, dass die Ausgabe `Close session`, `No alert` und `2` lautet. Du brauchst den Abschnitt `case "logout":` mit `break` und die Fallbedingung `when failed >= 5`.
+
+<CSharpRunner id="m02-l05-gaps" code={switchGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Abschnitt ergänzen:** `case "logout":`, darunter `Console.WriteLine("Close session");` und `break;`.
+2. **Fallbedingung:** `case "login-failed" when failed >= 5:` passt bei 2 nicht, also läuft `default` und gibt `No alert` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bewertet die Zahl der Fehlschläge als Schweregrad.
+
+**Neue Anforderung:** Reagiere je nach `eventType` mit einer `switch`-Anweisung: Bei `login-failed` gibt SecLog `Action: count the failure` aus, bei `login-success` und `logout` (gemeinsamer Abschnitt) `Action: no action`, sonst `Action: unknown event type`. Die Ausgabe hat dann 30 Zeilen.
+
+<CSharpRunner id="m02-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Wert wählen:** `switch (eventType)` vergleicht den Ereignistyp mit den Labels.
+2. **Abschnitte:** `login-failed` hat einen eigenen Abschnitt, `login-success` und `logout` teilen sich einen.
+3. **Enden:** Jeder Abschnitt endet mit `break`, auch `default`.
+
+</details>
+
+**Neuer Stand:** SecLog reagiert je nach Ereignistyp anders.
+
+## Zusammenfassung
+
+Die `switch`-Anweisung führt genau einen Abschnitt aus, den ein Label oder `default` auswählt. Mehrere Labels können einen Abschnitt teilen, `when` fügt eine Bedingung hinzu. Jeder Abschnitt endet mit `break`: Durchfallen ist in C# nicht erlaubt. Der Switch-Ausdruck liefert einen Wert, die Anweisung führt Code aus.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l05-q1" />
+
+<Quiz id="m02-l05-q2" />
+
+<Quiz id="m02-l05-q3" />
+
+<Quiz id="m02-l05-q4" />
+
+<Quiz id="m02-l05-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l05-q6" />
+
+### Transferfrage
+
+<Quiz id="m02-l05-q7" />
+
+<details>
+<summary>Vertiefung: Wo die Regeln stehen (optional)</summary>
+
+Die `switch`-Anweisung steht in [§13.8.3 The switch statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements).
+
+Die Sprunganweisungen `break` und `goto` sind in [§13.10.2 The break statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements) und [§13.10.4 The goto statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements) beschrieben.
+
+</details>
+
+## Weiterlesen
+
+- Microsoft Learn: [Selection statements](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)

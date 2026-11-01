@@ -293,6 +293,76 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Logwerkzeug einen Switch-Ausdruck einsetzen?",
       "modelAnswer": "Zum Beispiel, um die Zahl fehlgeschlagener Anmeldungen einem Schweregrad zuzuordnen (keiner, niedrig, mittel, hoch). Oder um einem Ereignistyp wie `login-failed` einen Text oder eine Aktion zuzuordnen."
+    },
+    {
+      "id": "m02-l05-q1",
+      "lesson": "m02-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l05/switch-statement.cs",
+      "explanation": "`\"logout\"` und `\"login-success\"` teilen sich einen Abschnitt. Dieser gibt `No action` aus und endet mit `break`. Danach läuft die Anweisung nach dem `switch`: `Done`."
+    },
+    {
+      "id": "m02-l05-q2",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "In einer `switch`-Anweisung endet ein Abschnitt nach `Console.WriteLine(\"A\");` ohne `break`, danach folgt der Abschnitt `case \"x\":`. Was passiert?",
+      "options": [
+        { "text": "Das Programm lässt sich nicht übersetzen: Der Abschnitt darf an seinem Ende nicht weiterlaufen.", "correct": true },
+        { "text": "Das Programm läuft in den nächsten Abschnitt weiter und führt ihn auch aus.", "misconception": "m02-l05-case-falls-through", "feedback": "In C# gibt es kein stilles Weiterlaufen. Der Compiler meldet einen Fehler, wenn das Ende eines Abschnitts erreichbar ist." },
+        { "text": "Das Programm führt den nächsten Abschnitt nur aus, wenn dessen Label passt.", "misconception": "m02-l05-case-falls-through", "feedback": "Das Label des nächsten Abschnitts wird nicht geprüft. Der Code lässt sich gar nicht übersetzen." }
+      ],
+      "explanation": "Das Ende der Anweisungsliste eines Abschnitts darf nicht erreichbar sein. Du beendest jeden Abschnitt mit `break` (oder einer anderen Sprunganweisung)."
+    },
+    {
+      "id": "m02-l05-q3",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "Wie teilen sich `\"login-success\"` und `\"logout\"` denselben Code in einer `switch`-Anweisung?",
+      "options": [
+        { "text": "Beide `case`-Labels stehen untereinander vor derselben Anweisungsliste.", "correct": true },
+        { "text": "Der erste Abschnitt hat keinen `break` und läuft in den zweiten.", "misconception": "m02-l05-case-falls-through", "feedback": "Ein Abschnitt ohne Anweisungen und ohne `break` ist erlaubt, weil mehrere Labels zu einer Liste gehören. Ein Abschnitt mit Anweisungen braucht `break`." },
+        { "text": "Beide Werte werden mit `||` in einem Label verknüpft.", "feedback": "Ein Label ist ein Muster, keine Bedingung mit `||`. Mehrere Labels schreibst du untereinander." }
+      ],
+      "explanation": "Mehrere Labels können zu einem Abschnitt gehören. Der Code darunter läuft für jedes dieser Labels."
+    },
+    {
+      "id": "m02-l05-q4",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "`eventType` ist `\"login-failed\"`, `failed` ist 3. Welcher Abschnitt läuft? Die Abschnitte stehen in dieser Reihenfolge: `case \"login-failed\" when failed >= 5:`, `case \"login-failed\":`, `default:`.",
+      "options": [
+        { "text": "Der Abschnitt mit `case \"login-failed\":` ohne `when`.", "correct": true },
+        { "text": "Der Abschnitt mit `when failed >= 5`.", "feedback": "Die Bedingung nach `when` ist bei 3 `false`. Dann passt der Abschnitt nicht." },
+        { "text": "Der Abschnitt mit `default:`.", "feedback": "`default` läuft nur, wenn kein anderes Label passt. Das zweite Label passt." }
+      ],
+      "explanation": "Ein Abschnitt mit `when` läuft nur, wenn das Label passt und die Bedingung `true` ist. Sonst wird der nächste Abschnitt geprüft."
+    },
+    {
+      "id": "m02-l05-q5",
+      "lesson": "m02-l05",
+      "type": "single",
+      "question": "Was unterscheidet die `switch`-Anweisung vom Switch-Ausdruck?",
+      "options": [
+        { "text": "Die Anweisung führt Anweisungslisten aus, der Ausdruck liefert einen Wert.", "correct": true },
+        { "text": "Die Anweisung liefert einen Wert, der Ausdruck führt Anweisungen aus.", "feedback": "Es ist umgekehrt: Der Ausdruck hat einen Wert, die Anweisung führt Code aus." },
+        { "text": "Es gibt keinen Unterschied, nur die Schreibweise ist anders.", "feedback": "Der Ausdruck liefert einen Wert, die Anweisung nicht. Außerdem brauchen Abschnitte der Anweisung ein `break`." }
+      ],
+      "explanation": "Die `switch`-Anweisung wählt eine Anweisungsliste aus und führt sie aus. Der Switch-Ausdruck wählt einen Wert."
+    },
+    {
+      "id": "m02-l05-q6",
+      "lesson": "m02-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine `switch`-Anweisung entscheidet, welcher Abschnitt läuft, und warum jeder Abschnitt mit `break` endet.",
+      "modelAnswer": "Die `switch`-Anweisung vergleicht den Wert mit den `case`-Labels von oben nach unten. Passt ein Label (und eine eventuelle `when`-Bedingung), läuft dessen Anweisungsliste. Passt keines, läuft `default`, falls es existiert.\n\nJeder Abschnitt endet mit `break`, weil C# kein Weiterlaufen in den nächsten Abschnitt erlaubt. Das Ende eines Abschnitts muss nicht erreichbar sein."
+    },
+    {
+      "id": "m02-l05-q7",
+      "lesson": "m02-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Logwerkzeug eine `switch`-Anweisung statt eines Switch-Ausdrucks nehmen?",
+      "modelAnswer": "Zum Beispiel, wenn je nach Ereignistyp mehrere Anweisungen laufen sollen: einen Zähler erhöhen, etwas ausgeben und eine Meldung schreiben. Ein Switch-Ausdruck liefert nur einen Wert, die Anweisung führt ganze Blöcke aus."
     }
   ]
 }
