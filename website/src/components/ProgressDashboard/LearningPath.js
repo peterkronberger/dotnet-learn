@@ -19,7 +19,10 @@ function groupByModule(lessons) {
 function statusText(lesson) {
   let text;
   if (lesson.status === 'done') {
-    text = translate({id: 'lernstand.path.done', message: 'Abgeschlossen am {date}'}, {date: formatDate(lesson.completedAt)});
+    text =
+      lesson.completedVia === 'placement'
+        ? translate({id: 'lernstand.path.donePlacement', message: 'Abgeschlossen am {date} · per Einstufungstest'}, {date: formatDate(lesson.completedAt)})
+        : translate({id: 'lernstand.path.done', message: 'Abgeschlossen am {date}'}, {date: formatDate(lesson.completedAt)});
   } else if (lesson.status === 'started') {
     text = translate({id: 'lernstand.path.started', message: 'Angefangen · zuletzt am {date}'}, {date: formatDate(lesson.lastActivity)});
   } else {

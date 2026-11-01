@@ -58,19 +58,19 @@ Available:
 - Answer order: `single`/`multi` options, the `parsons` line pool and the `match` right entries are shuffled on every mount and every retry (shared helper `website/src/components/Quiz/shuffle.js`, shuffle after mount in a layout effect, so the server render matches the first client render). Options with `"pin": "last"` stay at the end. Evaluation maps back to the original option.
 - Every answer option can carry a `misconception` reference. `<Misconception id="…" />` is the anchor in the "Achtung" box (DoD point 11). `node tools/check-quiz.mjs` checks IDs and links.
 - Feedback always explains the *why*.
+- `deferred` prop of the question components: the answer is reported to the parent (used by `<PlacementTest>`) instead of being checked and stored at once; no feedback and no Leitner entry until the parent evaluates.
 
-## Learning progress – available (placement test planned)
+## Learning progress – available
 
 Available:
-- One versioned store `dotnet-learn:v1:progress` in localStorage, all access in `try/catch`. Fields: `questions` (Leitner state per question), `lessons` (`{completedAt}` per `lesson_id`, set by the button "Lektion abschließen" at the end of every lesson) and `activity` (`{answered, correct, partial}` per day, no time limit). The old keys `dotnet-learn:quiz:*` are no longer migrated (there was no stored data yet).
+- One versioned store `dotnet-learn:v1:progress` in localStorage, all access in `try/catch`. Fields: `questions` (Leitner state per question), `lessons` (`{completedAt}` per `lesson_id`, set by the button "Lektion abschließen" at the end of every lesson; `via: "placement"` marks a lesson completed by the placement test), `placement` (`{date, correct, total, passed}` per module key, stored only on a pass) and `activity` (`{answered, correct, partial}` per day, no time limit). The old keys `dotnet-learn:quiz:*` are no longer migrated (there was no stored data yet).
 - **Leitner system** with 5 boxes; start values of the intervals 1 · 2 · 4 · 8 · 16 days (assumption, adjustable). For display, the boxes form three stages: box 1 "wackelig" (shaky), box 2–3 "im Aufbau" (building), box 4–5 "gefestigt" (solid) – a decision, not an empirical value.
 - **Page "Lernstand"** (`/dashboard`, navbar): Heute (next lesson with learning goals, due reviews with an inline session), Überblick (key figures), Lernpfad (lessons per module with status), Wissensstand (stages and boxes), Aktivität (chart and table: 4 weeks / 3 months / all), Deine Daten (export/import). No streaks, points or badges. The start page shows a teaser card.
 - **Lesson index:** the local plugin `website/plugins/lesson-index.js` reads every doc with `lesson_id` at build time (title, `description`, `duration_min`, the bullet points of `:::note[Lernziele]`, module label from `_category_.json`). The learning goals stay in the lesson; new lessons appear automatically.
 - **Export/import** as a JSON file (with lessons and activity).
 - Test page `/dev/progress-selftest`.
 
-Planned:
-- **Placement test** per module (8–12 questions, ≥ 80 % → "known", questions go to a higher box).
+- **Placement test** – available: `<PlacementTest module="N" />` (registered in `MDXComponents.js`). Place: the first lesson of the module, after "Lernziele". Flow: the questions are deferred question components (no feedback while answering), the evaluation comes at the end (pass = at most 1 wrong answer), then retake and reset. Data: `"placement": true` on the questions and `placementLessons` in the quiz data, checked by `check-quiz.mjs`. Option A: the answers are not stored in the Leitner system; on a pass every lesson of the module gets `via: "placement"`. A lesson completed this way shows "· per Einstufungstest" in "Lernpfad" and in `<LessonComplete>` (`completedVia` in `lessonOverview`).
 
 ## More components
 
