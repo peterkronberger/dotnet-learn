@@ -30,7 +30,9 @@ function Content({lessonId}) {
             </span>
             <div className={styles.text}>
               <p className={styles.titleDone}>
-                {translate({id: 'lesson.complete.doneOn', message: 'Abgeschlossen am {date}'}, {date: formatDate(entry.completedAt)})}
+                {entry.via === 'placement'
+                  ? translate({id: 'lesson.complete.doneOnPlacement', message: 'Abgeschlossen am {date} · per Einstufungstest'}, {date: formatDate(entry.completedAt)})
+                  : translate({id: 'lesson.complete.doneOn', message: 'Abgeschlossen am {date}'}, {date: formatDate(entry.completedAt)})}
               </p>
               {next && (
                 <p>

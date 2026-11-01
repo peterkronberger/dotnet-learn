@@ -6,7 +6,7 @@ As of 2026-10-28. This file sets **which** learning methods the course uses, **w
 
 - **Beginners** need detailed worked examples. **People with prior programming experience** are slowed down by them (expertise reversal effect, [Kalyuga 2003]).
 - So there is one shared core path plus:
-  - **A placement test per module** (8–12 questions). At 80 % or more, the module counts as "known". Topics answered wrongly are recommended as single lessons. The module questions go straight into a higher Leitner box. The 80 % is a decision, not an empirical value.
+  - **A placement test per module**: exactly 8 questions in the first lesson of the module (opt-in, closed by default). Pass = at most 1 wrong answer (`partial` counts as wrong). On a pass, every lesson of the module is completed with the marker `via: "placement"`. Wrong answers recommend their lessons. The answers are not stored in the Leitner system (Option A: the lesson quizzes of a skipped module are never due until the learner answers them). The threshold is a decision, not an empirical value. Binomial reasoning: a learner with 90 % ability per question passes with 8 of 8 in 43 % and with at least 7 of 8 in 81 % of the tries; a learner with 60 % ability reaches 7 of 8 in only 11 %.
   - **Optional deep dives** (collapsible), so beginners are not overloaded.
 
 ## Required methods

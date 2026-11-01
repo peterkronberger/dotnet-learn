@@ -47,10 +47,11 @@ export function lessonOverview(lessons, questionIds, progress) {
     }
     const answered = ids.length - stages.open;
     const completedAt = done[lesson.id] ? done[lesson.id].completedAt : null;
+    const completedVia = done[lesson.id] && done[lesson.id].via === 'placement' ? 'placement' : null;
     let status = 'open';
     if (completedAt) status = 'done';
     else if (answered > 0) status = 'started';
-    return { ...lesson, status, completedAt, lastActivity, stages, answered, total: ids.length };
+    return { ...lesson, status, completedAt, completedVia, lastActivity, stages, answered, total: ids.length };
   });
 }
 

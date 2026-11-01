@@ -191,6 +191,14 @@ const TESTS = [
     p = completeLesson(p, 'm02-l01', '2026-10-26');
     check(nextLesson(lessonOverview(lessons, ids, p)) === null, 'all done → null');
   }],
+  ['Overview: completedVia marks placement lessons', () => {
+    const lessons = [{ id: 'm01-l01' }, { id: 'm01-l02' }, { id: 'm01-l03' }];
+    const p = emptyProgress();
+    p.lessons = { 'm01-l01': { completedAt: '2026-11-01', via: 'placement' }, 'm01-l02': { completedAt: '2026-11-01' } };
+    const o = lessonOverview(lessons, {}, p);
+    expectEqual(o.map((l) => l.status), ['done', 'done', 'open'], 'status');
+    expectEqual(o.map((l) => l.completedVia), ['placement', null, null], 'completedVia');
+  }],
   ['Activity buckets: 28 days, 13 weeks, months', () => {
     const p = sample();
     const days = activityBuckets(p, '2026-10-25', '4w');
