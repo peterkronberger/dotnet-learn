@@ -1,0 +1,72 @@
+/* Card with a thick left border; clearly different from the "Vertiefung" <details> boxes. */
+.box {
+  margin: 1.5rem 0;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid var(--dl-border);
+  border-left: 0.4rem solid var(--ifm-color-primary);
+  border-radius: var(--ifm-global-radius);
+  background: var(--dl-card-accent-bg, var(--dl-surface-alt));
+  color: var(--dl-text, inherit);
+}
+
+.title {
+  margin-top: 0;
+  font-size: 1.25rem;
+}
+
+.questions {
+  margin: 1.25rem 0 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.question {
+  margin-bottom: 1rem;
+}
+
+.questionHeading {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  color: var(--dl-text-muted, inherit);
+}
+
+.status {
+  margin: 0.5rem 0;
+  color: var(--dl-text-muted, inherit);
+}
+
+.evaluation {
+  margin-top: 1.25rem;
+}
+
+.resultHeading {
+  margin-top: 0;
+}
+
+.resultHeading:focus {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.wrongList {
+  list-style: none;
+  padding-left: 0;
+}
+
+.wrongItem {
+  margin: 0.75rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--dl-border);
+  border-left: 0.3rem solid var(--dl-bad);
+  border-radius: 0.5rem;
+  background: var(--dl-surface);
+}
+
+.wrongQuestion {
+  font-weight: 700;
+}
+
+.hint {
+  margin: 0.75rem 0 0;
+  color: var(--dl-text-muted, inherit);
+}

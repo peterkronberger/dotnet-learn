@@ -9,6 +9,7 @@ import Term from '@site/src/components/Term';
 import DevNav from '@site/src/components/DevNav';
 import Diagram from '@site/src/components/Diagram';
 import Forward from '@site/src/components/Forward';
+import PlacementTest from '@site/src/components/PlacementTest';
 
 // Components are available in all .mdx files without an import.
 export default {
@@ -23,4 +24,5 @@ export default {
   DevNav,
   Diagram,
   Forward,
+  PlacementTest,
 };
