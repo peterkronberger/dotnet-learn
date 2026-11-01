@@ -1,0 +1,181 @@
+---
+title: Der bedingte Operator
+sidebar_position: 3
+description: "Der Operator ?: wählt innerhalb eines Ausdrucks einen von zwei Werten. Nur der gewählte Zweig wird ausgewertet."
+lesson_id: m02-l03
+duration_min: 15
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import conditionalBasics from '!!raw-loader!@site/examples/m02/l03/conditional-basics.cs';
+import conditionalBasicsOutput from '!!raw-loader!@site/examples/m02/l03/conditional-basics.out.txt';
+import oneBranch from '!!raw-loader!@site/examples/m02/l03/one-branch.cs';
+import oneBranchOutput from '!!raw-loader!@site/examples/m02/l03/one-branch.out.txt';
+import commonType from '!!raw-loader!@site/examples/m02/l03/common-type.cs';
+import commonTypeOutput from '!!raw-loader!@site/examples/m02/l03/common-type.out.txt';
+import incompatible from '!!raw-loader!@site/examples/m02/l03/incompatible-branches.snippet.cs';
+import conditionalGaps from '!!raw-loader!@site/examples/m02/l03/conditional-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l03/seclog-analysis-solution.cs';
+
+# Der bedingte Operator
+
+:::note[Lernziele]
+- Du schreibst mit dem <Term id="conditional-operator">bedingten Operator (Conditional Operator)</Term> `?:` einen Ausdruck, der einen von zwei Werten liefert.
+- Du sagst voraus, welcher Zweig ausgewertet wird.
+- Du erkennst, wann zwei Zweige keinen gemeinsamen Typ haben.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l02-q2" />
+
+<Quiz id="m02-l01-q2" />
+
+<Quiz id="m01-l06-q1" />
+
+## Einen Wert wählen
+
+Ein `if` führt Anweisungen aus. Manchmal soll aber nur ein Wert gewählt werden, zum Beispiel das Wort „attempt“ oder „attempts“ in einer Meldung. Dafür gibt es den bedingten Operator `?:` mit drei Teilen: `Bedingung ? Wert1 : Wert2`. Ist die Bedingung `true`, ist das Ergebnis `Wert1`, sonst `Wert2`. Anders als ein `if` ist `?:` ein Ausdruck: Er hat einen Wert, den du einer Variable zuweisen oder weiterverwenden kannst.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l03-basics" code={conditionalBasics} predict expected={conditionalBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1 attempt` und `5 attempts`.
+
+1. **Bedingung prüfen:** `attempts == 1` ist beim ersten Mal `true`, beim zweiten Mal `false`.
+2. **Wert wählen:** Bei `true` gilt `"attempt"`, bei `false` `"attempts"`.
+3. **Weiterverwenden:** Die Interpolation setzt das gewählte Wort ein.
+
+Was passiert, wenn du `attempts` auf `0` setzt? Sage die Ausgabe voraus.
+
+</details>
+
+## Nur ein Zweig wird ausgewertet
+
+Der Operator wertet nur den gewählten Zweig aus. Im Beispiel erhöht `++checks` einen Zähler, sobald der zweite Zweig läuft.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus? Achte auf `checks`.
+:::
+
+<CSharpRunner id="m02-l03-branch" code={oneBranch} predict expected={oneBranchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `result=10, checks=0` und `result=1, checks=1`.
+
+1. **Bedingung `true`:** Der erste Zweig liefert 10. `++checks` läuft nicht, `checks` bleibt 0.
+2. **Bedingung `false`:** Nur der zweite Zweig läuft, `checks` wird 1 und ist das Ergebnis.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l03-both-branches-evaluated" />
+
+**„Beide Zweige von `?:` werden ausgewertet.“** Es läuft nur der Zweig, den die Bedingung wählt. Der andere bleibt unberührt, auch wenn er einen Zähler erhöhen würde.
+:::
+
+## Ein gemeinsamer Typ für beide Zweige
+
+Der Ausdruck hat einen einzigen Typ. Beide Zweige müssen deshalb zu einem gemeinsamen Typ passen. Ein `int` und ein `double` haben den gemeinsamen Typ `double`, denn ein `int` lässt sich implizit in `double` umwandeln (Lektion „Explizite Umwandlungen und Überlauf“).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der Zweig `1` wird gewählt.
+:::
+
+<CSharpRunner id="m02-l03-type" code={commonType} predict expected={commonTypeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0.5`.
+
+1. **Gemeinsamer Typ:** `1` ist ein `int`, `2.5` ein `double`. Der Ausdruck hat den Typ `double`.
+2. **Wert:** Gewählt wird `1`, als `double` also `1.0`.
+3. **Rechnen:** `1.0 / 2` ergibt `0.5`. Mit einem `int` käme `0` heraus.
+
+</details>
+
+Haben die Zweige keinen gemeinsamen Typ, meldet der Compiler einen Fehler:
+
+<CodeBlock language="csharp" title="incompatible-branches.snippet.cs">{incompatible}</CodeBlock>
+
+## Lückenbeispiel
+
+Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleiben. Ändere die drei Zeilen so, dass die Ausgabe `1 attempt`, `14` und `ok` lautet. Du brauchst `failed == 1`, `failed > total` und vertauschte Zweige.
+
+<CSharpRunner id="m02-l03-gaps" code={conditionalGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Wort wählen:** `failed == 1 ? "attempt" : "attempts"` ergibt `attempt`.
+2. **Größeren Wert wählen:** `failed > total ? failed : total` ergibt 14.
+3. **Status wählen:** `failed >= 5 ? "alert" : "ok"` ergibt bei 1 `ok`. Die Zweige sind vertauscht.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog warnt bei vielen fehlgeschlagenen Anmeldungen und bewertet ein Ereignis als verdächtig.
+
+**Neue Anforderung:** Gib die Zahl der fehlgeschlagenen Anmeldungen mit dem passenden Wort aus: `5 failed attempts`, bei genau 1 `1 failed attempt`. Wähle das Wort mit dem bedingten Operator. Die Ausgabe hat dann 27 Zeilen.
+
+<CSharpRunner id="m02-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Wort wählen:** `failedFromInput == 1 ? "attempt" : "attempts"` ergibt bei 5 `attempts`.
+2. **Ausgeben:** Die Interpolation setzt Zahl und Wort in den Satz ein.
+
+</details>
+
+**Neuer Stand:** SecLog formuliert die Zahl der Fehlschläge grammatisch richtig.
+
+## Zusammenfassung
+
+`Bedingung ? Wert1 : Wert2` liefert `Wert1` bei `true`, sonst `Wert2`. Der Operator ist ein Ausdruck und wertet nur den gewählten Zweig aus. Beide Zweige brauchen einen gemeinsamen Typ. Für mehrere Anweisungen nimmst du `if` und `else`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l03-q1" />
+
+<Quiz id="m02-l03-q2" />
+
+<Quiz id="m02-l03-q3" />
+
+<Quiz id="m02-l03-q4" />
+
+<Quiz id="m02-l03-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l03-q6" />
+
+### Transferfrage
+
+<Quiz id="m02-l03-q7" />
+
+<details>
+<summary>Vertiefung: Wo die Regel steht (optional)</summary>
+
+Der bedingte Operator ist in [§12.21 Conditional operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions) beschrieben.
+
+</details>
+
+## Weiterlesen
+
+- Microsoft Learn: [?: operator](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/conditional-operator)

@@ -150,6 +150,79 @@
       "type": "explain",
       "question": "Transferfrage: Welche Regel für ein Logwerkzeug würdest du mit `&&` formulieren und welche mit `||`?",
       "modelAnswer": "Mit `&&`: Ein Ereignis ist verdächtig, wenn der Typ `login-failed` ist und die Zahl der Fehlschläge mindestens 3 beträgt. Beide Bedingungen müssen gelten.\n\nMit `||`: Ein Benutzer steht auf der Beobachtungsliste, wenn er `bob` oder `dave` heißt. Eine Bedingung genügt."
+    },
+    {
+      "id": "m02-l03-q1",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "`n` ist 4. Welchen Wert hat `n > 3 ? \"many\" : \"few\"`?",
+      "options": [
+        { "text": "`\"many\"`", "correct": true },
+        { "text": "`\"few\"`", "feedback": "Die Bedingung `n > 3` ist bei 4 `true`, also gilt der Wert vor dem Doppelpunkt." },
+        { "text": "`true`", "feedback": "Der Operator liefert einen der beiden Werte, nicht das Ergebnis der Bedingung." }
+      ],
+      "explanation": "`Bedingung ? A : B` liefert `A`, wenn die Bedingung `true` ist, sonst `B`."
+    },
+    {
+      "id": "m02-l03-q2",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "`n` ist 0. Welchen Wert hat `n` nach `int r = true ? 1 : ++n;`?",
+      "options": [
+        { "text": "0", "correct": true },
+        { "text": "1", "misconception": "m02-l03-both-branches-evaluated", "feedback": "Das wäre so, wenn beide Zweige ausgewertet würden. Es wird nur der Zweig ausgewertet, den die Bedingung wählt." }
+      ],
+      "explanation": "Der Operator `?:` wertet nur einen Zweig aus. `++n` im nicht gewählten Zweig läuft nie."
+    },
+    {
+      "id": "m02-l03-q3",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "`flag` ist `false`. Welchen Wert hat `flag ? 1 : 2.5` und welchen Typ hat der Ausdruck?",
+      "options": [
+        { "text": "2.5 vom Typ `double`", "correct": true },
+        { "text": "2.5 vom Typ `int`", "feedback": "Ein `int` kann 2.5 nicht darstellen. Der gemeinsame Typ von `1` und `2.5` ist `double`." },
+        { "text": "Das ist ein Compilerfehler, weil `1` und `2.5` verschiedene Typen haben.", "feedback": "Der Compiler wandelt `1` implizit in `double` um. Ein Fehler entsteht nur, wenn kein gemeinsamer Typ existiert, zum Beispiel bei `int` und `string`." }
+      ],
+      "explanation": "Beide Zweige brauchen einen gemeinsamen Typ. Ein `int` lässt sich implizit in `double` umwandeln, der Ausdruck hat deshalb den Typ `double`."
+    },
+    {
+      "id": "m02-l03-q4",
+      "lesson": "m02-l03",
+      "type": "multi",
+      "question": "Welche Ausdrücke sind erlaubt, wenn `n` ein `int` ist?",
+      "options": [
+        { "text": "`n > 0 ? \"yes\" : \"no\"`", "correct": true },
+        { "text": "`n > 0 ? 1 : 0`", "correct": true },
+        { "text": "`n > 0 ? 1 : \"no\"`", "feedback": "`int` und `string` haben keinen gemeinsamen Typ." },
+        { "text": "`n ? 1 : 0`", "feedback": "Die Bedingung muss ein `bool` sein, `n` ist ein `int`." }
+      ],
+      "explanation": "Die Bedingung ist ein `bool`, und beide Zweige haben einen gemeinsamen Typ."
+    },
+    {
+      "id": "m02-l03-q5",
+      "lesson": "m02-l03",
+      "type": "single",
+      "question": "Wofür ist `?:` besser geeignet als `if`/`else`?",
+      "options": [
+        { "text": "Wenn ein Wert mitten in einem Ausdruck oder einer Zuweisung gewählt werden soll.", "correct": true },
+        { "text": "Wenn mehrere Anweisungen in einem Zweig laufen sollen.", "feedback": "Die Zweige von `?:` sind Werte, keine Anweisungslisten. Dafür brauchst du `if` und `else` mit Blöcken." }
+      ],
+      "explanation": "`?:` ist ein Ausdruck und liefert einen Wert. `if` ist eine Anweisung und führt Blöcke aus."
+    },
+    {
+      "id": "m02-l03-q6",
+      "lesson": "m02-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was der bedingte Operator macht und welche Zweige dabei ausgewertet werden.",
+      "modelAnswer": "Der Operator `?:` prüft eine Bedingung vom Typ `bool` und liefert dann einen von zwei Werten: den ersten bei `true`, den zweiten bei `false`.\n\nNur der gewählte Zweig wird ausgewertet. Beide Zweige brauchen einen gemeinsamen Typ."
+    },
+    {
+      "id": "m02-l03-q7",
+      "lesson": "m02-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Logwerkzeug den bedingten Operator einsetzen?",
+      "modelAnswer": "Zum Beispiel, um in einer Meldung „1 Versuch“ oder „5 Versuche“ zu schreiben, je nachdem, wie viele es sind. Oder um einen Standardtext zu wählen, wenn ein Wert fehlt."
     }
   ]
 }
