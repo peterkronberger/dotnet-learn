@@ -4,26 +4,8 @@ import {getQuestion, validateQuestion} from '@site/src/data/quiz';
 import useProgress from '@site/src/lib/progress/useProgress';
 import {recordAnswer} from '@site/src/lib/progress/leitner';
 import {toLocalDate} from '@site/src/lib/progress/dates';
-import SingleChoice from './SingleChoice';
-import MultiChoice from './MultiChoice';
-import OutputQuestion from './OutputQuestion';
-import ExplainQuestion from './ExplainQuestion';
-import ParsonsQuestion from './ParsonsQuestion';
-import ClozeQuestion from './ClozeQuestion';
-import FindBugQuestion from './FindBugQuestion';
-import MatchQuestion from './MatchQuestion';
+import {COMPONENTS} from './types';
 import ProgressHint from './ProgressHint';
-
-const COMPONENTS = {
-  single: SingleChoice,
-  multi: MultiChoice,
-  output: OutputQuestion,
-  explain: ExplainQuestion,
-  parsons: ParsonsQuestion,
-  cloze: ClozeQuestion,
-  'find-bug': FindBugQuestion,
-  match: MatchQuestion,
-};
 
 /**
  * Renders a question from the data files in src/data/quiz.

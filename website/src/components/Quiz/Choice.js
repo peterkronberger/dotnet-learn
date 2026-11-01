@@ -3,15 +3,18 @@ import clsx from 'clsx';
 import Translate from '@docusaurus/Translate';
 import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import styles from './styles.module.css';
 
 // Shared implementation of `single` (radio group) and `multi` (checkboxes).
-export default function Choice({question, multi, onResult}) {
+export default function Choice({question, multi, onResult, deferred = false}) {
   const groupName = useId();
   const [selected, setSelected] = useState([]);
   const [result, setResult] = useState(null);
   const checked = result !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
   const options = question.options;
   const pinnedLast = options.flatMap((o, i) => (o.pin === 'last' ? [i] : []));
   const {order, ready, reshuffle} = useShuffledOrder(options.length, {pinnedLast});
@@ -37,19 +40,25 @@ export default function Choice({question, multi, onResult}) {
     reshuffle();
   }
 
+  function edit() {
+    requestFocus();
+    setResult(null);
+    onResult(null);
+  }
+
   // Feedback of wrongly set options (and missing correct ones for multi).
-  const notes = checked
+  const notes = reveal
     ? options
         .filter((o, i) => Boolean(o.correct) !== selected.includes(i))
         .map((o) => o.feedback)
         .filter(Boolean)
     : [];
-  const misconceptions = checked
+  const misconceptions = reveal
     ? selected.map((i) => options[i].misconception).filter(Boolean)
     : [];
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
         <div className={clsx(!ready && styles.shuffling)}>
@@ -62,8 +71,8 @@ export default function Choice({question, multi, onResult}) {
               key={index}
               className={clsx(
                 styles.option,
-                checked && isCorrect && styles.optionCorrect,
-                checked && isSelected && !isCorrect && styles.optionWrong,
+                reveal && isCorrect && styles.optionCorrect,
+                reveal && isSelected && !isCorrect && styles.optionWrong,
               )}>
               <input
                 type={multi ? 'checkbox' : 'radio'}
@@ -73,8 +82,8 @@ export default function Choice({question, multi, onResult}) {
               />
               <span>
                 {renderInline(option.text)}
-                {checked && isCorrect && <span className={styles.mark}> ✓</span>}
-                {checked && isSelected && !isCorrect && <span className={styles.mark}> ✗</span>}
+                {reveal && isCorrect && <span className={styles.mark}> ✓</span>}
+                {reveal && isSelected && !isCorrect && <span className={styles.mark}> ✗</span>}
               </span>
             </label>
           );
@@ -86,6 +95,9 @@ export default function Choice({question, multi, onResult}) {
           <Translate id="quiz.multiHint">Mehrere Antworten können richtig sein.</Translate>
         </p>
       )}
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={selected.length > 0} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary" disabled={selected.length === 0}>
@@ -98,8 +110,9 @@ export default function Choice({question, multi, onResult}) {
           </button>
         )}
       </div>
+      )}
       <Feedback
-        result={result}
+        result={reveal ? result : null}
         notes={notes}
         explanation={question.explanation}
         misconceptions={misconceptions}

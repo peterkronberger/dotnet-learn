@@ -2,6 +2,7 @@ import React, {useId, useState} from 'react';
 import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import {getExample} from '../../data/quiz/examples';
 import {findBugLines} from '../../data/quiz/findBug';
@@ -9,7 +10,7 @@ import styles from './styles.module.css';
 
 const t = (id, message, values) => translate({id, message}, values);
 
-export default function FindBugQuestion({question, onResult}) {
+export default function FindBugQuestion({question, onResult, deferred = false}) {
   const example = getExample(question.example);
   if (!example) {
     throw new Error(`Quiz "${question.id}": example "${question.example}" not found`);
@@ -21,6 +22,8 @@ export default function FindBugQuestion({question, onResult}) {
   const [selected, setSelected] = useState([]);
   const [result, setResult] = useState(null);
   const checked = result !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
 
   function toggle(n) {
     setSelected((prev) => (single ? [n] : prev.includes(n) ? prev.filter((i) => i !== n) : [...prev, n]));
@@ -40,17 +43,23 @@ export default function FindBugQuestion({question, onResult}) {
     setResult(null);
   }
 
+  function edit() {
+    requestFocus();
+    setResult(null);
+    onResult(null);
+  }
+
   const lineFeedback = question.lineFeedback ?? {};
   const sortedSelected = [...selected].sort((a, b) => a - b);
-  const notes = checked
+  const notes = reveal
     ? sortedSelected
         .filter((n) => lineFeedback[n] && lineFeedback[n].feedback)
         .map((n) => `${t('quiz.findBug.line', 'Zeile {n}', {n})}: ${lineFeedback[n].feedback}`)
     : [];
-  const misconceptions = checked
+  const misconceptions = reveal
     ? sortedSelected.map((n) => lineFeedback[n] && lineFeedback[n].misconception).filter(Boolean)
     : [];
-  const missed = checked ? bugLines.filter((n) => !selected.includes(n)) : [];
+  const missed = reveal ? bugLines.filter((n) => !selected.includes(n)) : [];
   if (missed.length > 0 && !single) {
     notes.push(
       t('quiz.findBug.missed', 'Noch nicht gefunden: {lines}', {
@@ -60,7 +69,7 @@ export default function FindBugQuestion({question, onResult}) {
   }
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
         {!single && (
@@ -78,8 +87,8 @@ export default function FindBugQuestion({question, onResult}) {
                 key={n}
                 className={clsx(
                   styles.bugLine,
-                  checked && isBug && styles.optionCorrect,
-                  checked && isSelected && !isBug && styles.optionWrong,
+                  reveal && isBug && styles.optionCorrect,
+                  reveal && isSelected && !isBug && styles.optionWrong,
                 )}>
                 <input
                   type={single ? 'radio' : 'checkbox'}
@@ -94,13 +103,13 @@ export default function FindBugQuestion({question, onResult}) {
                 <code className={styles.bugText} aria-hidden="true">
                   {code || ' '}
                 </code>
-                {checked && isBug && (
+                {reveal && isBug && (
                   <span className={clsx(styles.mark, styles.markOk)}>
                     {' '}
                     ✓ <Translate id="quiz.findBug.isBug">Fehlerhaft</Translate>
                   </span>
                 )}
-                {checked && isSelected && !isBug && (
+                {reveal && isSelected && !isBug && (
                   <span className={clsx(styles.mark, styles.markBad)}>
                     {' '}
                     ✗ <Translate id="quiz.findBug.noBug">Kein Fehler</Translate>
@@ -111,6 +120,9 @@ export default function FindBugQuestion({question, onResult}) {
           })}
         </div>
       </fieldset>
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={selected.length > 0} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary" disabled={selected.length === 0}>
@@ -123,7 +135,8 @@ export default function FindBugQuestion({question, onResult}) {
           </button>
         )}
       </div>
-      <Feedback result={result} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
+      )}
+      <Feedback result={reveal ? result : null} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
     </form>
   );
 }

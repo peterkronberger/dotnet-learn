@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import {getExample} from '../../data/quiz/examples';
 import {splitCloze, normalizeBlank, clozeCode} from '../../data/quiz/cloze';
@@ -11,7 +12,7 @@ export {splitCloze};
 
 const t = (id, message, values) => translate({id, message}, values);
 
-export default function ClozeQuestion({question, onResult}) {
+export default function ClozeQuestion({question, onResult, deferred = false}) {
   const example = getExample(question.example);
   if (!example) {
     throw new Error(`Quiz "${question.id}": example "${question.example}" or its .out.txt not found`);
@@ -23,6 +24,8 @@ export default function ClozeQuestion({question, onResult}) {
   const [failedTries, setFailedTries] = useState(0);
   const [showSolution, setShowSolution] = useState(false);
   const checked = marks !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
   const result = checked ? (marks.every(Boolean) ? 'correct' : 'wrong') : null;
 
   const label = (n) => t('quiz.cloze.blankLabel', 'Lücke {n} von {total}', {n: n + 1, total: blanks.length});
@@ -34,13 +37,19 @@ export default function ClozeQuestion({question, onResult}) {
       (blank.accept ?? [blank.text]).map(normalizeBlank).includes(normalizeBlank(values[i])),
     );
     setMarks(next);
-    if (!next.every(Boolean)) setFailedTries(failedTries + 1);
+    if (!deferred && !next.every(Boolean)) setFailedTries(failedTries + 1);
     onResult(next.every(Boolean) ? 'correct' : 'wrong');
+  }
+
+  function edit() {
+    requestFocus();
+    setMarks(null);
+    onResult(null);
   }
 
   const notes = [];
   const misconceptions = [];
-  if (checked) {
+  if (reveal) {
     blanks.forEach((blank, i) => {
       if (marks[i]) return;
       const wrong = (blank.wrongAnswers ?? []).find((w) => normalizeBlank(w.text) === normalizeBlank(values[i]));
@@ -51,7 +60,7 @@ export default function ClozeQuestion({question, onResult}) {
   }
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <p className={styles.question}>{renderInline(question.question)}</p>
       <pre className={styles.clozeCode}>
         <code>
@@ -62,7 +71,7 @@ export default function ClozeQuestion({question, onResult}) {
               <React.Fragment key={i}>
                 <input
                   type="text"
-                  className={clsx(styles.clozeInput, checked && (marks[n] ? styles.clozeOk : styles.clozeBad))}
+                  className={clsx(styles.clozeInput, reveal && (marks[n] ? styles.clozeOk : styles.clozeBad))}
                   size={Math.max(3, blanks[n].text.length)}
                   value={values[n]}
                   readOnly={checked}
@@ -72,7 +81,7 @@ export default function ClozeQuestion({question, onResult}) {
                   aria-label={label(n)}
                   onChange={(e) => setValues(values.map((v, j) => (j === n ? e.target.value : v)))}
                 />
-                {checked && (
+                {reveal && (
                   <span className={clsx(styles.mark, marks[n] ? styles.markOk : styles.markBad)}>
                     {marks[n] ? ' ✓ Stimmt' : ' ✗ Stimmt nicht'}
                   </span>
@@ -83,6 +92,9 @@ export default function ClozeQuestion({question, onResult}) {
         </code>
       </pre>
 
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={values.some((v) => v.trim() !== '')} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary">
@@ -95,7 +107,8 @@ export default function ClozeQuestion({question, onResult}) {
           </button>
         )}
       </div>
-      {checked && result === 'wrong' && failedTries >= 2 && (
+      )}
+      {reveal && result === 'wrong' && failedTries >= 2 && (
         <div className={styles.actions}>
           <button
             type="button"
@@ -110,7 +123,7 @@ export default function ClozeQuestion({question, onResult}) {
           </button>
         </div>
       )}
-      {showSolution && (
+      {reveal && showSolution && (
         <div role="region" aria-label={t('quiz.cloze.solutionLabel', 'Lösung')}>
           <ul>
             {blanks.map((blank, i) => (
@@ -121,7 +134,7 @@ export default function ClozeQuestion({question, onResult}) {
           </ul>
         </div>
       )}
-      <Feedback result={result} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
+      <Feedback result={reveal ? result : null} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
     </form>
   );
 }
