@@ -45,7 +45,7 @@ Message protocol (S7, available; origin check `window.location.origin` in both d
 - Syntax colors, line highlight, error marking – available (S4): own tokenizer in `playground/wwwroot/js/editor.js` (no Prism). Overlay lines use the classes `pg-hl-line*`. They must not change text metrics (font, font weight, italic, ligatures, padding, border), or the cursor sits in the wrong place.
 - The editor grows with its code (minimum about 3 lines) and never scrolls vertically; long lines wrap. The highlight overlay keeps identical text metrics.
 - Loop guard (stop after about 3 s with a German message and line number) – available (S3). No guard in operators, accessors and expression bodies; `catch (Exception)` in user code catches it.
-- Compiler errors as a list with line/column (available) + German explanation of common errors in addition to the original message (planned).
+- Compiler errors as a list with line/column (available).
 - Step-by-step visualization (variables, heap model), switchable per runner with `trace` – available (S5).
 - Fixed preloaded packages (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – available (S6); Configuration and Hosting are missing. No free NuGet install.
 - `InvariantGlobalization=true`: numbers always appear with a dot (`3.5`). CI must run with `InvariantCulture` so that shown outputs match.

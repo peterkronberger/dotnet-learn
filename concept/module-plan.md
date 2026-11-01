@@ -181,7 +181,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 `try`/`catch`/`finally` · `throw` · custom exceptions · validating business rules · `using`/`IDisposable` (short).
 - *(new)* Lesson "Reading a stack trace" (debugging skill; runtime errors vs. compile errors vs. logic errors).
 - *(new)* Lesson "Exception or not?": exceptions vs. the Try-pattern vs. return values (Microsoft design guidelines, not spec).
-- *(new)* Lesson "Reading and writing files" (◻ or ▶, see note).
+- *(new)* Lesson "Reading and writing files" (▶).
 - **Spec:**
   - §21: causes of exceptions, the `System.Exception` class, how an exception is handled (search for a matching catch clause outward through the call stack, finally blocks run on the way), common exception classes defined by the standard.
   - §13: try statement forms, order of catch clauses (more specific first, compile error otherwise), exception filters, rethrow without losing the stack trace vs. throwing the caught object again, the using statement and using declarations (C# 8), disposal order.
@@ -189,7 +189,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
   - §15 (deep dive): finalizers and why application code rarely needs them; the dispose pattern.
   - Link to M1: overflow exceptions in checked context.
 - **Library (not spec):** argument guard helpers (throw helpers on exception types), `IDisposable`, best practices for exceptions (Microsoft Learn), `System.IO` (`File`, `Path`, streams, text encoding), `IOException` family.
-- **Note:** check whether the playground (Blazor WebAssembly) supports an in-memory file system well enough for runnable file examples. If not, the file lesson uses normal code blocks with CI-produced output.
+- **Note (decision 2026-11-01):** runnable file examples may use an in-memory file system of the playground. Files do not need to survive a reload. One technical check for the M7 work: verify in the playground that the `System.IO` APIs used in the lesson work. If not, the lesson falls back to normal code blocks with CI-produced output.
 - More misconceptions: `finally` runs only when there was no exception; catching `Exception` everywhere is safe practice.
 
 ### M8 OOP II ▶
@@ -440,7 +440,7 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
-- Playground support for files (M7) and System.Text.Json (M17): check before deciding ▶ or ◻.
+- Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7 are decided: in-memory file system, ▶.)
 - M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
 - M8: current wording of the .NET design guidelines on sealing and the id of the analysis rule that suggests sealing internal types.
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.

@@ -32,7 +32,6 @@ As of 2026-10-28. This file sets **which** learning methods the course uses, **w
 | Explanatory feedback | Every quiz/test response explains the *why* | [Hattie & Timperley 2007] |
 | Whole task with a red thread | One project (SecLog) that grows in every lesson; goal shown at the start (module box, announcement in m00-l01) | [Merrill 2002], [Vandewaetere 2015]; advance organizer [Ausubel 1960], evidence mixed |
 | Mark forward references | Order first; unavoidable forward references get a fixed note "… folgt in … Für dieses Beispiel ist das weitere Verständnis dafür nicht notwendig." | Reducing extraneous load [Sweller 2019]; the explicit note itself is a design decision (no study of this wording) |
-| Enhanced compiler messages | German explanation of common errors **in addition to** the original message | [Becker 2016]: fewer errors and repeated errors in a control-group study |
 
 ## Review grid: Merrill's First Principles
 
@@ -61,7 +60,6 @@ Verified (bibliographic record checked, as of 2026-10-29). All 25 entries were c
 - [Sweller & Cooper 1985] Sweller, J., & Cooper, G. A. (1985). The use of worked examples as a substitute for problem solving in learning algebra. *Cognition and Instruction, 2*(1), 59–89. https://doi.org/10.1207/s1532690xci0201_3 – Checked 2026-10-28 (Crossref).
 - [Ausubel 1960] Ausubel, D. P. (1960). The use of advance organizers in the learning and retention of meaningful verbal material. *Journal of Educational Psychology, 51*(5), 267–272. https://doi.org/10.1037/h0046669 – Bibliographic record checked 2026-10-28 (Crossref).
 - [Attali & Bar-Hillel 2003] Attali, Y., & Bar-Hillel, M. (2003). Guess where: The position of correct answers in multiple-choice test items as a psychometric variable. *Journal of Educational Measurement, 40*(2), 109–128. https://doi.org/10.1111/j.1745-3984.2003.tb01099.x – Test makers and test takers both favor middle positions. Checked 2026-10-27 (Hebrew University research portal).
-- [Becker 2016] Becker, B. A., Glanville, G., Iwashima, R., McDonnell, C., Goslin, K., & Mooney, C. (2016). Effective compiler error message enhancement for novice programming students. *Computer Science Education, 26*(2–3), 148–175.
 - [Brod 2021] Brod, G. (2021). Predicting as a learning strategy. *Psychonomic Bulletin & Review, 28*(6), 1839–1847. https://doi.org/10.3758/s13423-021-01904-1
 - [Brod 2022] Brod, G., Greve, A., Jolles, D., Theobald, M., & Galeano-Keiner, E. M. (2022). Explicitly predicting outcomes enhances learning of expectancy-violating information. *Psychonomic Bulletin & Review, 29*(6), 2192–2201. https://doi.org/10.3758/s13423-022-02124-x – Limitation: studies fact learning.
 - [Cepeda 2006] Cepeda, N. J., Pashler, H., Vul, E., Wixted, J. T., & Rohrer, D. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin, 132*(3), 354–380. https://doi.org/10.1037/0033-2909.132.3.354
