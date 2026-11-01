@@ -729,15 +729,35 @@
       "term": "Loop",
       "german": "Schleife",
       "category": "language",
-      "definition": "Eine Anweisung, die Code wiederholt ausführt. In C# gibt es `for`, `foreach`, `while` und `do … while`.",
+      "definition": "Eine Anweisung, die einen Block wiederholt ausführt, solange eine Bedingung wahr ist. `while` prüft die Bedingung vor jedem Durchlauf, `do` danach. Weitere Schleifen sind `for` und `foreach`.",
       "aliases": [
         "Schleifen"
       ],
       "related": [
         "selection-statement",
+        "iteration",
         "collection"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l06",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "iteration",
+      "term": "Iteration",
+      "german": "Durchlauf",
+      "category": "language",
+      "definition": "Ein einzelner Durchlauf des Blocks einer Schleife. Vor jeder Iteration wird die Bedingung der Schleife geprüft (bei `do`: danach).",
+      "aliases": [
+        "Iterationen",
+        "Durchlauf"
+      ],
+      "related": [
+        "loop"
+      ],
+      "lesson": "m02-l06",
       "source": {
         "title": "Iteration statements",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"

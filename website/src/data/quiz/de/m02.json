@@ -711,6 +711,149 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug eine switch-Anweisung statt eines switch-Ausdrucks nehmen?",
       "modelAnswer": "Zum Beispiel bei einem Ereignistyp, bei dem jeder Fall mehrere Dinge tut: Bei login-failed zählt es den Fehlversuch und gibt eine Meldung aus, bei logout schreibt es nur eine Zeile. Es führt je Fall Anweisungen aus, statt nur einen Wert zu berechnen."
+    },
+    {
+      "id": "m02-l06-q1",
+      "lesson": "m02-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l06/quiz-loops.cs",
+      "explanation": "Die `do`-Schleife läuft einmal: `runs` wird 1, `n` wird 11. Danach ist `n < 5` falsch. Die `while`-Schleife prüft die Bedingung vor dem Block, der Block läuft nullmal. Die Ausgabe ist `11 1`."
+    },
+    {
+      "id": "m02-l06-q2",
+      "lesson": "m02-l06",
+      "type": "single",
+      "question": "`int n = 0; while (n < 3) { n += 2; }` Welchen Wert hat `n` nach der Schleife?",
+      "options": [
+        {
+          "text": "`4`, weil die Bedingung vor jedem Durchlauf geprüft wird: nach `2` ist sie noch wahr.",
+          "correct": true
+        },
+        {
+          "text": "`2`, weil die Bedingung nur einmal am Anfang geprüft wird und der Block dann einmal läuft.",
+          "misconception": "m02-l06-condition-checked-once",
+          "feedback": "Die Bedingung wird vor jedem Durchlauf neu geprüft. Bei `n = 2` ist `2 < 3` noch wahr."
+        },
+        {
+          "text": "`3`, weil die Schleife genau beim Wert 3 anhält.",
+          "misconception": "m02-l06-condition-checked-once",
+          "feedback": "Die Schleife stoppt nicht mitten im Block. `n` springt von `2` auf `4`."
+        },
+        {
+          "text": "`0`, weil der Block nie läuft.",
+          "feedback": "`0 < 3` ist wahr, der Block läuft."
+        }
+      ],
+      "explanation": "Durchlauf 1: `0 < 3`, `n` wird 2. Durchlauf 2: `2 < 3`, `n` wird 4. Dann ist `4 < 3` falsch."
+    },
+    {
+      "id": "m02-l06-q3",
+      "lesson": "m02-l06",
+      "type": "single",
+      "question": "Wie oft läuft der Block von `int n = 5; do { n++; } while (n < 3);`?",
+      "options": [
+        {
+          "text": "Genau einmal, weil die Bedingung erst nach dem Block geprüft wird.",
+          "correct": true
+        },
+        {
+          "text": "Nullmal, weil `5 < 3` falsch ist.",
+          "feedback": "Das gilt für `while`. Bei `do` läuft der Block zuerst."
+        },
+        {
+          "text": "Endlos, weil `n` nie kleiner als 3 wird.",
+          "feedback": "Die Bedingung ist falsch, deshalb endet die Schleife nach dem ersten Durchlauf."
+        }
+      ],
+      "explanation": "Die `do`-Schleife führt den Block aus und prüft danach die Bedingung. Sie läuft mindestens einmal."
+    },
+    {
+      "id": "m02-l06-q4",
+      "lesson": "m02-l06",
+      "type": "single",
+      "question": "Ein Programm liest Zeilen mit `while (line != \"stop\")` und die Eingabe endet, ohne dass `stop` vorkommt. Was passiert?",
+      "options": [
+        {
+          "text": "Am Ende der Eingabe liefert `ReadLine()` keinen Text mehr. Das ist nicht gleich `\"stop\"`, die Bedingung bleibt wahr, und die Schleife endet nie.",
+          "correct": true
+        },
+        {
+          "text": "Die Schleife endet automatisch, wenn keine Zeilen mehr da sind.",
+          "feedback": "Die Schleife endet nur, wenn ihre Bedingung falsch wird. Das Ende der Eingabe allein ändert nichts."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler.",
+          "feedback": "Der Code ist gültig. Das Problem zeigt sich erst beim Ausführen."
+        }
+      ],
+      "explanation": "Prüfe auf den erwarteten Wert, zum Beispiel `line == \"ok\"`. Am Ende der Eingabe ist diese Bedingung falsch, und die Schleife endet."
+    },
+    {
+      "id": "m02-l06-q5",
+      "lesson": "m02-l06",
+      "type": "single",
+      "question": "Eine `while`-Schleife läuft endlos. Was ist die wahrscheinlichste Ursache?",
+      "options": [
+        {
+          "text": "Der Block ändert nichts, das die Bedingung irgendwann falsch macht.",
+          "correct": true
+        },
+        {
+          "text": "Die Bedingung wird nur einmal geprüft und bleibt deshalb wahr.",
+          "misconception": "m02-l06-condition-checked-once",
+          "feedback": "Die Bedingung wird vor jedem Durchlauf geprüft. Sie bleibt nur wahr, weil sich nichts ändert."
+        },
+        {
+          "text": "`while` läuft grundsätzlich unendlich oft.",
+          "feedback": "Eine `while`-Schleife endet, sobald ihre Bedingung falsch wird."
+        }
+      ],
+      "explanation": "Wird die Bedingung nie falsch, endet die Schleife nie. Ändere im Block etwas, das in der Bedingung vorkommt."
+    },
+    {
+      "id": "m02-l06-q6",
+      "lesson": "m02-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über `while` und `do` stimmen?",
+      "options": [
+        {
+          "text": "Bei `while` kann der Block nullmal laufen.",
+          "correct": true
+        },
+        {
+          "text": "Bei `do` läuft der Block mindestens einmal.",
+          "correct": true
+        },
+        {
+          "text": "Die Bedingung wird vor jedem Durchlauf des `while`-Blocks geprüft.",
+          "correct": true
+        },
+        {
+          "text": "Die Bedingung wird nur einmal geprüft, danach läuft der Block immer weiter.",
+          "misconception": "m02-l06-condition-checked-once",
+          "feedback": "Die Bedingung wird bei jedem Durchlauf neu ausgewertet."
+        },
+        {
+          "text": "Eine Schleife endet, sobald der Block einmal gelaufen ist.",
+          "feedback": "Der Block läuft so lange, wie die Bedingung wahr ist."
+        }
+      ],
+      "explanation": "`while` prüft vor dem Block, `do` danach. Beide wiederholen den Block, solange die Bedingung `true` ist."
+    },
+    {
+      "id": "m02-l06-q7",
+      "lesson": "m02-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine `while`-Schleife arbeitet und wann sie endet. Nenne auch den Unterschied zur `do`-Schleife.",
+      "modelAnswer": "Eine `while`-Schleife prüft ihre Bedingung vor jedem Durchlauf. Ist sie wahr, läuft der Block, dann wird die Bedingung erneut geprüft. Ist sie falsch, endet die Schleife und das Programm macht dahinter weiter. Darum kann der Block auch nullmal laufen. Der Block muss etwas ändern, damit die Bedingung irgendwann falsch wird.\n\nBei `do` steht die Prüfung hinter dem Block. Der Block läuft deshalb mindestens einmal."
+    },
+    {
+      "id": "m02-l06-q8",
+      "lesson": "m02-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug eine `while`-Schleife nutzen?",
+      "modelAnswer": "Zum Beispiel zählt es mit `while` aufeinanderfolgende Fehlversuche, solange die nächste Zeile ein login-failed ist. Oder es liest Zeilen ein, bis eine bestimmte Zeile kommt. Die Zahl der Wiederholungen steht vorher nicht fest, die Schleife läuft, solange die Bedingung gilt."
     }
   ]
 }
