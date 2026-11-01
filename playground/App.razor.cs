@@ -23,6 +23,9 @@ public partial class App
     private string _stdin = string.Empty;
     private bool _trace;
     private int _stepIndex;
+    private string? _keptCode;
+    private string? _keptStdin;
+    private string? _reportedState;
 
     private const int RowHeight = 28;
     private const int ArrowWidth = 72;
@@ -63,7 +66,50 @@ public partial class App
                     _initialStdin = CodeCodec.TryDecode(part[6..]) ?? string.Empty;
                     _stdin = _initialStdin;
                 }
+                else if (part.StartsWith("cur=", StringComparison.Ordinal))
+                {
+                    _keptCode = CodeCodec.TryDecode(part[4..]);
+                }
+                else if (part.StartsWith("curin=", StringComparison.Ordinal))
+                {
+                    _keptStdin = CodeCodec.TryDecode(part[6..]) ?? string.Empty;
+                }
             }
+
+            // State kept by the learning page after an unload: start with it; "Zurücksetzen" still restores the originals.
+            if (_keptCode is not null)
+            {
+                _code = _keptCode;
+            }
+
+            if (_keptStdin is not null && _initialStdin is not null)
+            {
+                _stdin = _keptStdin;
+            }
+        }
+    }
+
+    // Reports the typed code and input (and whether a run is active) to the embedding page,
+    // so that it can unload this runner and start it again with the same state. Only on change.
+    private async Task ReportStateAsync()
+    {
+        var stdin = _initialStdin is null ? null : _stdin;
+        var key = $"{_running}|{_code}|{stdin}";
+
+        if (key == _reportedState)
+        {
+            return;
+        }
+
+        _reportedState = key;
+
+        try
+        {
+            await Js.InvokeVoidAsync("pgBridge.reportState", _instanceId, _code, stdin, _running);
+        }
+        catch (JSException)
+        {
+            // Standalone use: no embedding page to report to.
         }
     }
 
@@ -107,6 +153,8 @@ public partial class App
         {
             // The editor still works as a plain textarea without the overlay.
         }
+
+        await ReportStateAsync();
     }
 
     private async Task RunAsync()

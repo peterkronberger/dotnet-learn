@@ -39,6 +39,18 @@ export default function RunnerDemo() {
           <code>Console.ReadLine()</code>; nach der letzten Zeile liefert es <code>null</code>.
         </p>
         <CSharpRunner id="stdin-demo" code={readName} stdin={readNameInput} />
+        <h2>Entladen weit entfernter Runner</h2>
+        <p>
+          Runner, die weit außerhalb des Fensters liegen (etwa drei Bildschirmhöhen), werden entladen und beim
+          Zurückscrollen wieder geladen. Dein getippter Code und die Eingabe bleiben erhalten, die Ausgabe nicht.
+          Ändere den Code im ersten Runner, scrolle weit nach unten und wieder zurück.
+        </p>
+        {Array.from({length: 12}, (_, index) => (
+          <React.Fragment key={index}>
+            <p>Runner {index + 1} von 12</p>
+            <CSharpRunner id={`unload-demo-${index}`} code={loopTrace} />
+          </React.Fragment>
+        ))}
       </main>
     </Layout>
   );
