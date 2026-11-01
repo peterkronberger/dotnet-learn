@@ -2,19 +2,22 @@ import React, {useId, useState} from 'react';
 import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import {useShuffledOrder} from './shuffle';
 import styles from './styles.module.css';
 
 const t = (id, message, values) => translate({id, message}, values);
 
-export default function MatchQuestion({question, onResult}) {
+export default function MatchQuestion({question, onResult, deferred = false}) {
   const baseId = useId();
   const {order, reshuffle} = useShuffledOrder(question.pairs.length);
   const rights = order.map((i) => question.pairs[i].right);
   const [chosen, setChosen] = useState(() => question.pairs.map(() => ''));
   const [result, setResult] = useState(null);
   const checked = result !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
   const complete = chosen.every((c) => c !== '');
 
   function check(event) {
@@ -31,10 +34,16 @@ export default function MatchQuestion({question, onResult}) {
     reshuffle();
   }
 
+  function edit() {
+    requestFocus();
+    setResult(null);
+    onResult(null);
+  }
+
   const wrongMatches = question.wrongMatches ?? [];
   const notes = [];
   const misconceptions = [];
-  if (checked) {
+  if (reveal) {
     question.pairs.forEach((p, i) => {
       if (chosen[i] === p.right) return;
       const w = wrongMatches.find((m) => m.left === p.left && m.right === chosen[i]);
@@ -44,7 +53,7 @@ export default function MatchQuestion({question, onResult}) {
   }
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
         <div className={styles.matchRows}>
@@ -58,7 +67,7 @@ export default function MatchQuestion({question, onResult}) {
                 </label>
                 <select
                   id={selectId}
-                  className={clsx(styles.matchSelect, checked && (ok ? styles.optionCorrect : styles.optionWrong))}
+                  className={clsx(styles.matchSelect, reveal && (ok ? styles.optionCorrect : styles.optionWrong))}
                   value={chosen[i]}
                   onChange={(e) => setChosen((prev) => prev.map((c, j) => (j === i ? e.target.value : c)))}>
                   <option value="">{t('quiz.match.choose', 'Bitte wählen')}</option>
@@ -68,12 +77,12 @@ export default function MatchQuestion({question, onResult}) {
                     </option>
                   ))}
                 </select>
-                {checked && ok && (
+                {reveal && ok && (
                   <span className={clsx(styles.mark, styles.markOk)}>
                     ✓ <Translate id="quiz.match.right">Stimmt</Translate>
                   </span>
                 )}
-                {checked && !ok && (
+                {reveal && !ok && (
                   <span className={clsx(styles.mark, styles.markBad)}>
                     ✗ {t('quiz.match.wrong', 'Stimmt nicht – richtig ist: {answer}', {answer: pair.right})}
                   </span>
@@ -83,6 +92,9 @@ export default function MatchQuestion({question, onResult}) {
           })}
         </div>
       </fieldset>
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={complete} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary" disabled={!complete}>
@@ -95,7 +107,8 @@ export default function MatchQuestion({question, onResult}) {
           </button>
         )}
       </div>
-      <Feedback result={result} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
+      )}
+      <Feedback result={reveal ? result : null} notes={notes} explanation={question.explanation} misconceptions={misconceptions} />
     </form>
   );
 }

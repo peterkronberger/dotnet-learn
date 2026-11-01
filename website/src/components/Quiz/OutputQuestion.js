@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import CodeBlock from '@theme/CodeBlock';
 import Translate from '@docusaurus/Translate';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import {getExample} from '../../data/quiz/examples';
 import styles from './styles.module.css';
@@ -17,7 +18,7 @@ export function normalizeOutput(text) {
     .replace(/\n+$/, '');
 }
 
-export default function OutputQuestion({question, onResult}) {
+export default function OutputQuestion({question, onResult, deferred = false}) {
   const inputId = useId();
   const example = getExample(question.example);
   if (!example) {
@@ -26,6 +27,8 @@ export default function OutputQuestion({question, onResult}) {
   const [answer, setAnswer] = useState('');
   const [result, setResult] = useState(null);
   const checked = result !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
 
   function check(event) {
     event.preventDefault();
@@ -39,12 +42,18 @@ export default function OutputQuestion({question, onResult}) {
     setResult(null);
   }
 
+  function edit() {
+    requestFocus();
+    setResult(null);
+    onResult(null);
+  }
+
   const given = normalizeOutput(answer).split('\n');
   const actual = normalizeOutput(example.expected).split('\n');
   const rows = Math.max(given.length, actual.length);
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <p className={styles.question}>{renderInline(question.question)}</p>
       <CodeBlock language="csharp">{example.code.replace(/\n+$/, '')}</CodeBlock>
       <label htmlFor={inputId}>
@@ -58,6 +67,9 @@ export default function OutputQuestion({question, onResult}) {
         readOnly={checked}
         onChange={(e) => setAnswer(e.target.value)}
       />
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={answer.trim() !== ''} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary" disabled={answer.trim() === ''}>
@@ -70,7 +82,8 @@ export default function OutputQuestion({question, onResult}) {
           </button>
         )}
       </div>
-      {checked && result === 'wrong' && (
+      )}
+      {reveal && result === 'wrong' && (
         <table className={styles.compare}>
           <thead>
             <tr>
@@ -93,7 +106,7 @@ export default function OutputQuestion({question, onResult}) {
           </tbody>
         </table>
       )}
-      <Feedback result={result} explanation={question.explanation} />
+      <Feedback result={reveal ? result : null} explanation={question.explanation} />
     </form>
   );
 }

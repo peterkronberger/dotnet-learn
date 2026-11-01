@@ -270,3 +270,7 @@
 .shuffling {
   visibility: hidden;
 }
+
+.deferredStatus {
+  margin: 0;
+}

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import Translate, {translate} from '@docusaurus/Translate';
 import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
+import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
 import {getExample} from '../../data/quiz/examples';
 import styles from './styles.module.css';
@@ -17,7 +18,7 @@ export function solutionLines(code) {
 
 const t = (id, message, values) => translate({id, message}, values);
 
-export default function ParsonsQuestion({question, onResult}) {
+export default function ParsonsQuestion({question, onResult, deferred = false}) {
   const example = getExample(question.example);
   if (!example) {
     throw new Error(`Quiz "${question.id}": example "${question.example}" or its .out.txt not found`);
@@ -35,6 +36,8 @@ export default function ParsonsQuestion({question, onResult}) {
   const buttons = useRef({});
   const pendingFocus = useRef(null);
   const checked = result !== null;
+  const reveal = checked && !deferred;
+  const {formRef, requestFocus} = useEditFocus();
   const available = order.filter((id) => !chosen.includes(id));
 
   // Keeps the focus on the moved line after the list was re-rendered.
@@ -106,8 +109,15 @@ export default function ParsonsQuestion({question, onResult}) {
     reshuffle();
   }
 
+  function edit() {
+    requestFocus();
+    setResult(null);
+    setAnnouncement('');
+    onResult(null);
+  }
+
   const rows = Math.max(chosen.length, correct.length);
-  const misconceptions = checked
+  const misconceptions = reveal
     ? chosen
         .filter((id) => id >= correct.length)
         .map((id) => distractorMisconceptions[items[id].text])
@@ -136,7 +146,7 @@ export default function ParsonsQuestion({question, onResult}) {
   }
 
   return (
-    <form className={styles.quiz} onSubmit={check}>
+    <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <p className={styles.question}>{renderInline(question.question)}</p>
       <p className={styles.hint}>
         <Translate id="quiz.parsons.hint">
@@ -174,7 +184,7 @@ export default function ParsonsQuestion({question, onResult}) {
               {lineButton(id, 'down', 'Nach unten', 'quiz.parsons.down', () => move(id, 1))}
               {lineButton(id, 'remove', 'Entfernen', 'quiz.parsons.remove', () => remove(id))}
             </span>
-            {checked && (
+            {reveal && (
               <span className={clsx(styles.mark, isRight(id, index) ? styles.markOk : styles.markBad)}>
                 {isRight(id, index) ? `✓ Stimmt (Position ${index + 1})` : `✗ Stimmt nicht (Position ${index + 1})`}
               </span>
@@ -192,6 +202,9 @@ export default function ParsonsQuestion({question, onResult}) {
         {announcement}
       </p>
 
+      {deferred ? (
+        <DeferredActions saved={checked} canSave={chosen.length > 0} onEdit={edit} />
+      ) : (
       <div className={styles.actions}>
         {!checked && (
           <button type="submit" className="button button--primary" disabled={chosen.length === 0}>
@@ -204,8 +217,9 @@ export default function ParsonsQuestion({question, onResult}) {
           </button>
         )}
       </div>
+      )}
 
-      {checked && result === 'wrong' && (
+      {reveal && result === 'wrong' && (
         <table className={styles.compare}>
           <thead>
             <tr>
@@ -232,7 +246,7 @@ export default function ParsonsQuestion({question, onResult}) {
           </tbody>
         </table>
       )}
-      <Feedback result={result} explanation={question.explanation} misconceptions={misconceptions} />
+      <Feedback result={reveal ? result : null} explanation={question.explanation} misconceptions={misconceptions} />
     </form>
   );
 }

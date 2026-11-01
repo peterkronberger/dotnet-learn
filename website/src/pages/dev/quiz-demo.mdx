@@ -2,6 +2,8 @@
 title: Demo Quiz-Typen
 ---
 
+import DeferredDemo from '@site/src/components/Quiz/DeferredDemo';
+
 <DevNav />
 
 # Demo: Quiz-Typen
@@ -44,3 +46,15 @@ Die Division zweier `int` ergibt nie einen Nachkommateil.
 ## match
 
 <Quiz id="dev-l01-q8" />
+
+## Deferred-Modus
+
+Im Deferred-Modus wird die Antwort nur gespeichert: kein ✓/✗, kein Feedback, keine Erklärung. Diese Demo schreibt nichts in den Fortschritt.
+
+### single (deferred)
+
+<DeferredDemo id="dev-l01-q1" />
+
+### output (deferred)
+
+<DeferredDemo id="dev-l01-q3" />
