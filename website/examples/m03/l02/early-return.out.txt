@@ -1,0 +1,3 @@
+none
+count is not zero
+some

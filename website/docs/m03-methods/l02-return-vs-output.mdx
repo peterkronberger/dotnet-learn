@@ -1,0 +1,192 @@
+---
+title: return oder Ausgabe?
+sidebar_position: 2
+description: "return gibt einen Wert an den Aufrufer, ausgegeben wird nur mit Console.WriteLine. Außerdem: return beendet die Methode sofort, und => ist die Kurzform für eine Methode mit einem Ausdruck."
+lesson_id: m03-l02
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import returnVsPrint from '!!raw-loader!@site/examples/m03/l02/return-vs-print.cs';
+import returnVsPrintOutput from '!!raw-loader!@site/examples/m03/l02/return-vs-print.out.txt';
+import earlyReturn from '!!raw-loader!@site/examples/m03/l02/early-return.cs';
+import earlyReturnOutput from '!!raw-loader!@site/examples/m03/l02/early-return.out.txt';
+import expressionBody from '!!raw-loader!@site/examples/m03/l02/expression-body.cs';
+import expressionBodyOutput from '!!raw-loader!@site/examples/m03/l02/expression-body.out.txt';
+import missingReturn from '!!raw-loader!@site/examples/m03/l02/missing-return-error.snippet.cs';
+import cubeGaps from '!!raw-loader!@site/examples/m03/l02/cube-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l02/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l02/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l02/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l02/seclog-methods-solution.cs';
+
+# return oder Ausgabe?
+
+:::note[Lernziele]
+- Du kannst erklären, warum `return` nichts ausgibt.
+- Du kannst einen Rückgabewert im Aufrufer speichern, ausgeben oder weiterrechnen.
+- Du kannst eine Methode mit Ausdruckskörper (`=>`) schreiben und lesen.
+- Du kannst erklären, warum ein `return` die Methode sofort beendet.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l01-q3" />
+
+<Quiz id="m03-l01-q5" />
+
+<Quiz id="m02-l03-q3" />
+
+## Der Rückgabewert gehört dem Aufrufer
+
+Die <Term id="return-statement">return-Anweisung (Return Statement)</Term> beendet die Methode und gibt den <Term id="return-value">Rückgabewert (Return Value)</Term> an die Stelle zurück, die sie aufgerufen hat. Der Aufruf selbst hat dann diesen Wert, wie ein Ausdruck. Was der Aufrufer damit tut, entscheidet er selbst: speichern, ausgeben, weiterrechnen oder nichts davon.
+
+Ausgeben tut `return` nichts. In die Konsole schreibt nur `Console.Write` oder `Console.WriteLine`.
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen in der Konsole, und in welcher Reihenfolge? Der Aufruf `Square(4);` steht allein in einer Zeile.
+:::
+
+<CSharpRunner id="m03-l02-return" code={returnVsPrint} predict expected={returnVsPrintOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Before the print`, `25`, `10` und `End`.
+
+1. **Speichern:** `Square(5)` liefert `25`. Der Wert wird in `result` gespeichert. Es erscheint noch nichts.
+2. **Ausgeben:** Erst `Console.WriteLine(result)` schreibt `25`.
+3. **Weiterrechnen:** `Square(3) + 1` rechnet mit dem Rückgabewert `9` und gibt `10` aus.
+4. **Verwerfen:** `Square(4);` liefert `16`, aber niemand benutzt den Wert. Die Zeile gibt nichts aus.
+
+**Was passiert, wenn du in `Square` die Ausgabe `Console.WriteLine(number * number)` ergänzt?** Dann gibt die Methode bei jedem Aufruf etwas aus, auch bei `Square(4);`. Der Rückgabewert bleibt davon unabhängig.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l02-return-prints" />
+
+**„`return` gibt den Wert aus.“** `return` gibt den Wert nur an den Aufrufer weiter. Ausgegeben wird er erst, wenn der Aufrufer ihn an `Console.WriteLine` übergibt. Eine Methode, die rechnet, und eine Methode, die ausgibt, sind zwei verschiedene Aufgaben.
+:::
+
+## return beendet die Methode
+
+Sobald `return` läuft, ist die Methode zu Ende. Alle Anweisungen dahinter laufen in diesem Aufruf nicht mehr. Eine Methode darf mehrere `return` enthalten, zum Beispiel eines pro Fall.
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen für `Describe(0)` und für `Describe(7)`? Erscheint `count is not zero` einmal, zweimal oder nie?
+:::
+
+<CSharpRunner id="m03-l02-early" code={earlyReturn} predict expected={earlyReturnOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `none`, `count is not zero` und `some`.
+
+1. **Aufruf mit `0`:** Die Bedingung stimmt, `return "none";` beendet die Methode. Die Zeile `count is not zero` wird nicht erreicht.
+2. **Aufruf mit `7`:** Die Bedingung stimmt nicht. Der Rumpf läuft weiter: Er gibt die Zeile aus und liefert `"some"`.
+3. **Reihenfolge:** Die Ausgabe der Zeile `count is not zero` kommt vor `some`, weil die Methode zuerst fertig sein muss, bevor `WriteLine` den Wert bekommt.
+
+</details>
+
+Bei einem Rückgabetyp ungleich `void` muss jeder Weg durch die Methode mit einem `return` samt Wert enden. Sonst meldet der Compiler einen Fehler, wie in diesem Fragment:
+
+<CodeBlock language="csharp" title="missing-return-error.snippet.cs">{missingReturn}</CodeBlock>
+
+Trifft das `if` nicht zu, endet die Methode ohne Wert. Das lässt der Compiler nicht zu.
+
+## Ausdruckskörper
+
+Besteht der Rumpf nur aus `return` und einem Ausdruck, gibt es eine Kurzform: den <Term id="expression-body">Ausdruckskörper (Expression Body)</Term>. Statt `{ return Ausdruck; }` schreibst du `=> Ausdruck;`. Beide Formen bedeuten dasselbe.
+
+:::info[Vorhersage]
+Welche Werte geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m03-l02-expression" code={expressionBody} predict expected={expressionBodyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `36`, `36`, `True` und `False`.
+
+1. **Gleiche Wirkung:** `SquareBlock` und `SquareShort` liefern beide `36`.
+2. **Kurzform lesen:** Das `=>` ersetzt `{ return` und `}`. Der Ausdruck dahinter ist der Rückgabewert.
+3. **Bedingung als Wert:** `number % 2 == 0` ist ein `bool`-Ausdruck, `IsEven` gibt ihn direkt zurück.
+
+</details>
+
+## Lückenbeispiel
+
+Die Methode `Cube` ist mit einem Block geschrieben. Schreibe sie als Ausdruckskörper. Die Ausgabe `8` und `27` bleibt gleich.
+
+<CSharpRunner id="m03-l02-gaps" code={cubeGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Rumpf ersetzen:** `int Cube(int number) => number * number * number;`
+
+Die Klammern des Blocks und das Wort `return` entfallen, am Ende steht `;`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Die return-Anweisung gibt die Kontrolle an den Aufrufer zurück ([§13.10.5 The return statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13105-the-return-statement)). Der Endpunkt des Rumpfs einer Methode, die einen Wert berechnet, darf nicht erreichbar sein ([§13.2 Blocks](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#132-blocks)). Ein Ausdruckskörper besteht aus `=>`, einem Ausdruck und `;` ([§15.6.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1561-general)).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bewertet die Schwere mit der Methode `RateSeverity`. Das Wort „attempt“ oder „attempts“ wählt noch der Operator `?:` im Programm.
+
+**Neue Anforderung:** Die Wahl des Worts soll in die Methode `string AttemptWord(int count)` umziehen, geschrieben als Ausdruckskörper mit `=>`. Die vorhandene Zeile benutzt sie. Eine neue Zeile gibt die Fehlversuche von bob mit dem Wort aus: `5 failed attempts`. Die Ausgabe hat jetzt 43 Zeilen.
+
+<CSharpRunner id="m03-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Ausdruck verschieben:** Der Operator `?:` zieht hinter das `=>` der Methode `AttemptWord`. Die Variable `attemptWord` entfällt.
+2. **Aufrufen und ausgeben:** `AttemptWord(failedFromInput)` steht direkt in der Interpolation. Der Rückgabewert wird sofort ausgegeben.
+3. **Wiederverwenden:** Die zweite Zeile ruft dieselbe Methode mit `bobFailures` auf.
+
+</details>
+
+**Neuer Stand:** SecLog hat zwei kleine Methoden, die einen Wert zurückgeben und selbst nichts ausgeben.
+
+## Zusammenfassung
+
+`return` beendet die Methode und gibt den Wert an den Aufrufer. Ausgeben tut `return` nichts, der Aufrufer speichert, gibt aus oder rechnet damit weiter. Danach laufende Anweisungen im Rumpf werden übersprungen. Bei einem Rückgabetyp ungleich `void` braucht jeder Weg ein `return` mit Wert. Besteht der Rumpf nur aus einem Ausdruck, schreibst du ihn mit `=>`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l02-q1" />
+
+<Quiz id="m03-l02-q2" />
+
+<Quiz id="m03-l02-q3" />
+
+<Quiz id="m03-l02-q4" />
+
+<Quiz id="m03-l02-q5" />
+
+<Quiz id="m03-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l02-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Ausdruckskörper-Member](https://learn.microsoft.com/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
+- C#-Spezifikation: [§13.10.5 The return statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13105-the-return-statement)

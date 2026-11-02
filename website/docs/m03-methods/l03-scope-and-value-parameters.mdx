@@ -1,0 +1,183 @@
+---
+title: Gültigkeitsbereich und Wertparameter
+sidebar_position: 3
+description: "Ein Name gilt nur in seinem Block oder seiner Methode. Ein Wertparameter ist eine Kopie des Arguments, eine Zuweisung daran ändert die Variable des Aufrufers nicht."
+lesson_id: m03-l03
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import scopeError from '!!raw-loader!@site/examples/m03/l03/scope-block-error.snippet.cs';
+import sameName from '!!raw-loader!@site/examples/m03/l03/same-name-twice.cs';
+import sameNameOutput from '!!raw-loader!@site/examples/m03/l03/same-name-twice.out.txt';
+import valueParameter from '!!raw-loader!@site/examples/m03/l03/value-parameter.cs';
+import valueParameterOutput from '!!raw-loader!@site/examples/m03/l03/value-parameter.out.txt';
+import captureTopLevel from '!!raw-loader!@site/examples/m03/l03/capture-top-level.cs';
+import resetGaps from '!!raw-loader!@site/examples/m03/l03/reset-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l03/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l03/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l03/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l03/seclog-methods-solution.cs';
+
+# Gültigkeitsbereich und Wertparameter
+
+:::note[Lernziele]
+- Du kannst bestimmen, wo ein Name gültig ist (Block, Methode).
+- Du kannst erklären, warum zwei Methoden denselben Variablennamen benutzen dürfen.
+- Du kannst vorhersagen, dass eine Zuweisung an einen Wertparameter die Variable des Aufrufers nicht ändert.
+- Du kannst erkennen, dass eine Methode in einem Programm mit Top-Level-Anweisungen Variablen außerhalb sehen kann, und erklären, warum Parameter klarer sind.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l01-q1" />
+
+<Quiz id="m03-l02-q1" />
+
+<Quiz id="m02-l07-q5" />
+
+## Wo gilt ein Name?
+
+Der <Term id="scope">Gültigkeitsbereich (Scope)</Term> eines Namens ist der Teil des Programmtexts, in dem du ihn benutzen kannst. Eine <Term id="local-variable">lokale Variable (Local Variable)</Term> gilt ab ihrer Deklaration bis zur schließenden Klammer des Blocks, in dem sie steht. Ein Parameter gilt im Rumpf seiner Methode und ist dort wie eine lokale Variable.
+
+Außerhalb ihres Bereichs ist der Name unbekannt. Im Fragment unten wird `doubled` im Block der Schleife deklariert und danach außerhalb benutzt. Das lässt der Compiler nicht zu.
+
+<CodeBlock language="csharp" title="scope-block-error.snippet.cs">{scopeError}</CodeBlock>
+
+Wo ein Name nur einmal vorkommen darf, hängt vom <Term id="declaration-space">Deklarationsraum (Declaration Space)</Term> ab. Der Rumpf einer Methode ist ein eigener Raum. Zwei Methoden, die sich nicht umschließen, haben getrennte Räume. Darum darf derselbe Name in beiden stehen.
+
+:::info[Vorhersage]
+Beide Methoden deklarieren eine Variable `result`. Läuft das Programm, und welche Werte gibt es aus?
+:::
+
+<CSharpRunner id="m03-l03-names" code={sameName} predict expected={sameNameOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5` und `6`.
+
+1. **Getrennte Räume:** `result` in `Sum` und `result` in `Product` sind zwei verschiedene Variablen. Keine kennt die andere.
+2. **Eigene Parameter:** Auch `a` und `b` sind zweimal da, jeweils nur in ihrer Methode gültig.
+3. **Werte:** `Sum(2, 3)` liefert `5`, `Product(2, 3)` liefert `6`.
+
+**Was passiert, wenn du in einer Methode zweimal `int result` deklarierst?** Dann stehen zwei gleiche Namen im selben Raum, und der Compiler meldet einen Fehler.
+
+</details>
+
+## Wertparameter sind Kopien
+
+Ein Parameter ohne besonderen Zusatz heißt <Term id="value-parameter">Wertparameter (Value Parameter)</Term>. Er ist eine neue lokale Variable, die beim Aufruf eine Kopie des Arguments bekommt. Die Methode darf ihm neue Werte zuweisen. Das ändert nur die Kopie, nicht die Variable, die der Aufrufer als Argument übergeben hat.
+
+:::info[Vorhersage]
+`failures` ist `3`. Welche Werte gibt das Programm in den drei Zeilen aus?
+:::
+
+<CSharpRunner id="m03-l03-value" code={valueParameter} predict expected={valueParameterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Inside AddOne: 4`, `After the call: 3` und `After the assignment: 4`.
+
+1. **Kopie anlegen:** Beim Aufruf `AddOne(failures)` entsteht `number` mit dem Wert `3`.
+2. **Kopie ändern:** `number = number + 1` ändert nur `number` auf `4`.
+3. **Aufrufer prüfen:** `failures` ist weiter `3`.
+4. **Wert zurückgeben:** Soll der Aufrufer etwas Neues bekommen, liefert die Methode es mit `return`. Dann weist `failures = AddedOne(failures)` es der Variablen zu.
+
+**Was passiert, wenn der Aufrufer den Rückgabewert nicht zuweist?** Dann geht der neue Wert verloren. `failures` bleibt `3`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l03-method-changes-caller-variable" />
+
+**„Eine Methode ändert die Variable des Aufrufers, wenn sie ihrem Parameter etwas zuweist.“** Der Parameter ist eine Kopie. Die Zuweisung wirkt nur in der Methode. Für einen neuen Wert beim Aufrufer brauchst du `return` und eine Zuweisung im Aufrufer.
+:::
+
+Die Beispiele hier benutzen Zahlen, Wahrheitswerte und Texte als Argumente. Wie sich Werte mit Verweis verhalten, folgt in Modul 4.
+
+<Forward concepts={['Werte mit Verweis als Argument']} module="4" />
+
+## Lückenbeispiel
+
+Die Methode `Reset` soll `attempts` auf `0` setzen, aber die Ausgabe ist `5`. Ändere das Programm so, dass es `0` ausgibt. Nutze dazu `return` und eine Zuweisung im Aufrufer.
+
+<CSharpRunner id="m03-l03-gaps" code={resetGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Wert zurückgeben:** `int Reset(int value) { return 0; }`
+2. **Zuweisen:** `attempts = Reset(attempts);`
+
+Der Parameter `value` bekommt nur eine Kopie. Erst die Zuweisung im Aufrufer bringt den neuen Wert in `attempts`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Methoden sehen Variablen außerhalb (optional)</summary>
+
+In einem Programm mit Top-Level-Anweisungen kann eine Methode am Ende der Datei Variablen lesen und ändern, die darüber stehen. Das Programm unten zählt so `counter` hoch, ohne dass `CountUp` einen Parameter hat.
+
+<CSharpRunner id="m03-l03-capture" code={captureTopLevel} />
+
+Dieser Kurs übergibt Werte lieber als Parameter. Dann zeigt die Kopfzeile der Methode, was sie braucht, und du kannst sie ohne Blick auf den Rest des Programms verstehen. Lokale Funktionen mit `static` verbieten den Zugriff nach außen.
+
+<Forward concepts={['lokale Funktionen', '`static`']} module="3" />
+
+Die Regeln zu Gültigkeit und Verdeckung von Namen stehen in [§7.6.1 Scopes General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#761-general) und [§7.6.2.2 Hiding through nesting](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#7622-hiding-through-nesting). Wertparameter beschreibt [§15.6.2.2 Value parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15622-value-parameters).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bewertet die Schwere mit `RateSeverity` und wählt das Wort mit `AttemptWord`. Ob ein Ereignis verdächtig ist, steht noch als Ausdruck im Programm.
+
+**Neue Anforderung:** Die Prüfung soll in die Methode `bool IsSuspicious(string eventType, int failures)` umziehen. Die Zeile `Suspicious: …` ruft sie mit `eventType` und `failedFromInput` auf. Eine neue Zeile prüft einen zweiten Fall: `IsSuspicious("login-success", failedFromInput)` und gibt `Suspicious for login-success: False` aus. Die Ausgabe hat jetzt 44 Zeilen.
+
+<CSharpRunner id="m03-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Parameter statt Variablen:** Die Methode bekommt Ereignistyp und Fehlerzahl als Parameter. Sie liest keine Variablen des Programms.
+2. **Ausdruck zurückgeben:** Der boolesche Ausdruck steht hinter `return`.
+3. **Zweimal aufrufen:** Der erste Aufruf liefert `True` (ein `login-failed` mit 5 Fehlern), der zweite `False`, weil der Ereignistyp nicht `login-failed` ist.
+
+</details>
+
+**Neuer Stand:** SecLog prüft Ereignisse mit einer Methode, die nur ihre Parameter benutzt. Das Aufteilen in Methoden ist damit gestartet: Bewerten, Wort wählen, prüfen.
+
+## Zusammenfassung
+
+Ein Name gilt vom Ort seiner Deklaration bis zum Ende seines Blocks, ein Parameter im Rumpf seiner Methode. Getrennte Methoden haben getrennte Deklarationsräume und dürfen dieselben Namen benutzen. Ein Wertparameter ist eine Kopie des Arguments, eine Zuweisung daran ändert die Variable des Aufrufers nicht. Einen neuen Wert bekommt der Aufrufer über `return`. Parameter machen sichtbar, was eine Methode braucht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l03-q1" />
+
+<Quiz id="m03-l03-q2" />
+
+<Quiz id="m03-l03-q3" />
+
+<Quiz id="m03-l03-q4" />
+
+<Quiz id="m03-l03-q5" />
+
+<Quiz id="m03-l03-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Methoden in C#](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/methods)
+- C#-Spezifikation: [§7.6 Scopes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#76-scopes)

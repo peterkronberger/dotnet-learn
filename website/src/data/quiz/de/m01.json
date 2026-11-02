@@ -268,7 +268,7 @@
       "lesson": "m01-l02",
       "type": "explain",
       "question": "Erkläre in eigenen Worten, was eine Variable ist und welche zwei Dinge der Compiler über sie festhält. Sage auch, warum er das Lesen einer Variable ohne vorherige Zuweisung ablehnt.",
-      "modelAnswer": "Eine Variable ist ein benannter Speicherplatz. Sie hat einen festen Typ, zum Beispiel `int` oder `string`, und hält zu jedem Zeitpunkt genau einen Wert. Eine neue Zuweisung überschreibt den alten Wert.\n\nDer Compiler merkt sich den Namen und den Typ. Eine lokale Variable hat keinen Standardwert. Deshalb lehnt er das Lesen vor der ersten Zuweisung ab: Es gäbe keinen Wert, den er lesen könnte."
+      "modelAnswer": "Eine Variable ist ein benannter Speicherplatz. Sie hat einen festen Typ, zum Beispiel `int` oder `string`, und hält zu jedem Zeitpunkt genau einen Wert. Eine neue Zuweisung überschreibt den alten Wert.\n\nDer Compiler merkt sich den Namen und den Typ. Eine Variable im Programm hat keinen Standardwert. Deshalb lehnt er das Lesen vor der ersten Zuweisung ab: Es gäbe keinen Wert, den er lesen könnte."
     },
     {
       "id": "m01-l02-q8",
@@ -1330,7 +1330,7 @@
         },
         {
           "text": "Das Programm endet mit einem Laufzeitfehler.",
-          "feedback": "Das macht `Parse`. `TryParse` meldet den Misserfolg über den Rückgabewert."
+          "feedback": "Das macht `Parse`. `TryParse` meldet den Misserfolg mit einem `bool`-Ergebnis."
         }
       ],
       "explanation": "`TryParse` liefert `false` und setzt die Zahl auf `0`, wenn der Text ungültig ist. Das Programm läuft weiter."
@@ -1416,7 +1416,7 @@
       "lesson": "m01-l08",
       "type": "explain",
       "question": "Erkläre in eigenen Worten den Unterschied zwischen `int.Parse` und `int.TryParse`. Wann verwendest du welche Methode?",
-      "modelAnswer": "Beide wandeln Text in eine ganze Zahl um und akzeptieren dieselben Texte: Ziffern mit optionalem Vorzeichen, Leerzeichen davor und danach. Bei ungültigem Text, etwa `\"3.5\"` oder `\"sieben\"`, endet das Programm mit `Parse` mit einem Laufzeitfehler. `TryParse` läuft weiter, gibt `false` zurück und setzt die Zahl auf `0`.\n\nIst der Text sicher gültig, genügt `Parse`. Kommt der Text von außen und kann falsch sein, verwendest du `TryParse` und prüfst den Rückgabewert."
+      "modelAnswer": "Beide wandeln Text in eine ganze Zahl um und akzeptieren dieselben Texte: Ziffern mit optionalem Vorzeichen, Leerzeichen davor und danach. Bei ungültigem Text, etwa `\"3.5\"` oder `\"sieben\"`, endet das Programm mit `Parse` mit einem Laufzeitfehler. `TryParse` läuft weiter, gibt `false` zurück und setzt die Zahl auf `0`.\n\nIst der Text sicher gültig, genügt `Parse`. Kommt der Text von außen und kann falsch sein, verwendest du `TryParse` und prüfst das `bool`-Ergebnis."
     },
     {
       "id": "m01-l08-q9",

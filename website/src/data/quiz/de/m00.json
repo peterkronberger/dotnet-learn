@@ -27,7 +27,7 @@
         },
         {
           "text": "Das Programm gibt eine leere Zeile aus.",
-          "feedback": "Eine leere Zeile entsteht nur mit `Console.WriteLine()` ohne Argument. Hier kommt es gar nicht zum Start, weil der Code nicht kompiliert.",
+          "feedback": "Eine leere Zeile entsteht nur mit `Console.WriteLine()` ohne Text in den Klammern. Hier kommt es gar nicht zum Start, weil der Code nicht kompiliert.",
           "misconception": "m00-l01-text-without-quotes"
         }
       ],

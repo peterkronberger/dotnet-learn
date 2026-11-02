@@ -985,7 +985,7 @@
           "feedback": "Sie ist schreibgeschützt."
         }
       ],
-      "explanation": "Der Gültigkeitsbereich der Variablen endet mit der Schleife. Deshalb kann derselbe Name nacheinander wiederverwendet werden."
+      "explanation": "Die Variable gilt nur bis zum Ende der Schleife. Deshalb kann derselbe Name nacheinander wiederverwendet werden."
     },
     {
       "id": "m02-l07-q7",
