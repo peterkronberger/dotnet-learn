@@ -10,6 +10,8 @@ import loopTrace from '!!raw-loader!@site/examples/dev/loop-trace.cs';
 import readName from '!!raw-loader!@site/examples/dev/read-name.cs';
 import readNameInput from '!!raw-loader!@site/examples/dev/read-name.in.txt';
 import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
+import foldedDemo from '!!raw-loader!@site/examples/dev/folded-demo.cs';
+import FoldedCode from '@site/src/components/FoldedCode';
 
 // Technical demo for spike S7, not learning content.
 export default function RunnerDemo() {
@@ -39,6 +41,14 @@ export default function RunnerDemo() {
           <code>Console.ReadLine()</code>; nach der letzten Zeile liefert es <code>null</code>.
         </p>
         <CSharpRunner id="stdin-demo" code={readName} stdin={readNameInput} />
+        <h2>Ausgeblendeter Code</h2>
+        <p>
+          Unveränderte Teile eines längeren Programms sind im Runner durch eine Zeile ersetzt. Beim Ausführen
+          läuft trotzdem der ganze Code.
+        </p>
+        <CSharpRunner id="fold-demo" code={foldedDemo} />
+        <p>Dieselbe Datei als Musterlösung: Die ausgeblendeten Blöcke lassen sich einzeln aufklappen.</p>
+        <FoldedCode code={foldedDemo} title="folded-demo.cs" />
         <h2>Entladen weit entfernter Runner</h2>
         <p>
           Runner, die weit außerhalb des Fensters liegen (etwa drei Bildschirmhöhen), werden entladen und beim
