@@ -54,6 +54,7 @@
     {
       "id": "m02-l01-q3",
       "lesson": "m02-l01",
+      "placement": true,
       "type": "single",
       "question": "In `if (a > 0) if (b > 10) F(); else G();` steht das `else` direkt unter dem äußeren `if`. Zu welchem `if` gehört es?",
       "options": [
@@ -201,6 +202,7 @@
     {
       "id": "m02-l02-q4",
       "lesson": "m02-l02",
+      "placement": true,
       "type": "single",
       "question": "`total` ist `0`. Was passiert bei `total != 0 && failed * 100 / total > 50`?",
       "options": [
@@ -316,6 +318,7 @@
     {
       "id": "m02-l03-q3",
       "lesson": "m02-l03",
+      "placement": true,
       "type": "single",
       "question": "Bei `ok ? A : B` hat `ok` den Wert `true`. Welche Teile werden ausgewertet?",
       "options": [
@@ -507,6 +510,7 @@
     {
       "id": "m02-l04-q5",
       "lesson": "m02-l04",
+      "placement": true,
       "type": "single",
       "question": "`failed` ist `4`. Welches Ergebnis liefert `failed switch { < 5 => \"medium\", < 3 => \"low\", _ => \"high\" }`?",
       "options": [
@@ -580,6 +584,7 @@
     {
       "id": "m02-l05-q2",
       "lesson": "m02-l05",
+      "placement": true,
       "type": "single",
       "question": "Was passiert in C#, wenn am Ende eines `case`-Abschnitts das `break;` fehlt und danach ein weiterer Abschnitt folgt?",
       "options": [
@@ -750,6 +755,7 @@
     {
       "id": "m02-l06-q3",
       "lesson": "m02-l06",
+      "placement": true,
       "type": "single",
       "question": "Wie oft läuft der Block von `int n = 5; do { n++; } while (n < 3);`?",
       "options": [
@@ -866,6 +872,7 @@
     {
       "id": "m02-l07-q2",
       "lesson": "m02-l07",
+      "placement": true,
       "type": "single",
       "question": "Wie oft läuft der Block von `for (int i = 1; i <= 5; i++)`?",
       "options": [
@@ -1188,6 +1195,8 @@
     {
       "id": "m02-l09-q4",
       "lesson": "m02-l09",
+      "placement": true,
+      "placementLessons": ["m02-l08"],
       "type": "single",
       "question": "Ein Programm findet in der inneren Schleife ein Ergebnis und schreibt dort `break;`, weil es alles beenden will. Danach läuft die äußere Schleife aber weiter. Was ist die Ursache?",
       "options": [
