@@ -25,6 +25,15 @@
         Endlosschleifen und endlose Rekursion werden nach etwa 3 Sekunden abgebrochen; währenddessen ist der Tab blockiert, weil der Code im Hauptthread des Browsers läuft.
     </p>
 
+    @if (_folded.HasFolds)
+    {
+        <p class="pg-hint">Zeilen mit ⋯ stehen für unveränderten Code, der beim Ausführen mitläuft. Lass diese Zeilen stehen.</p>
+        <details class="pg-full">
+            <summary>Ganzen Code anzeigen (nur lesen)</summary>
+            <pre class="pg-full-code">@FullCode</pre>
+        </details>
+    }
+
     @if (_initialStdin is not null)
     {
         <div class="pg-stdin">

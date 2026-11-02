@@ -21,6 +21,7 @@
   --line-current: rgba(79, 70, 229, 0.1);
   --line-err: #fee4e2;
   --line-warn: #fef3c7;
+  --line-fold: #e8eaf8;
   --mono: ui-monospace, SFMono-Regular, 'Cascadia Code', 'JetBrains Mono', Menlo, Consolas, monospace;
   --sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
@@ -47,6 +48,7 @@
     --line-current: rgba(165, 180, 252, 0.14);
     --line-err: #4a1d1d;
     --line-warn: #3d3010;
+    --line-fold: #262c58;
   }
 }
 
@@ -72,6 +74,7 @@
   --line-current: rgba(165, 180, 252, 0.14);
   --line-err: #4a1d1d;
   --line-warn: #3d3010;
+  --line-fold: #262c58;
 }
 
 :root[data-theme='light'] {
@@ -250,6 +253,21 @@ body {
 .pg-hl-line-current { background: var(--line-current); }
 .pg-hl-line-warn { background: var(--line-warn); box-shadow: inset 3px 0 0 var(--warn); }
 .pg-hl-line-err { background: var(--line-err); box-shadow: inset 3px 0 0 var(--err); }
+.pg-hl-fold { background: var(--line-fold); }
+
+/* Read-only view of the full program (folds): grows with its content, no inner scrolling. */
+.pg-full { margin: 0.5rem 0; }
+.pg-full summary { cursor: pointer; }
+.pg-full-code {
+  margin: 0.5rem 0 0;
+  padding: 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  font-family: var(--mono);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
 
 .tok-keyword { color: var(--tok-keyword); }
 .tok-string { color: var(--tok-string); }

@@ -12,6 +12,7 @@ public partial class App
     [Inject] private CSharpRunner Runner { get; set; } = default!;
     [Inject] private IJSRuntime Js { get; set; } = default!;
 
+    private FoldedCode _folded = new(Samples.Default, []);
     private string _initialCode = Samples.Default;
     private string _code = Samples.Default;
     private bool _running;
@@ -43,8 +44,10 @@ public partial class App
 
             if (!string.IsNullOrWhiteSpace(decoded))
             {
-                _initialCode = decoded;
-                _code = decoded;
+                // Hidden blocks (fold markers) become placeholder lines; the originals stay in _folded.
+                _folded = CodeFolds.Parse(decoded);
+                _initialCode = _folded.Visible;
+                _code = _folded.Visible;
             }
 
             foreach (var part in parts.Skip(1))
@@ -174,7 +177,7 @@ public partial class App
 
         try
         {
-            _result = await Runner.RunAsync(_code, _testsCode, _trace, _stdin);
+            _result = _folded.HasFolds ? await RunFoldedAsync() : await Runner.RunAsync(_code, _testsCode, _trace, _stdin);
             _stepIndex = 0;
         }
         finally
@@ -183,6 +186,38 @@ public partial class App
         }
 
         await ReportAsync(_result);
+    }
+
+    // Puts the hidden blocks back and runs the full program. Diagnostic lines are mapped to the typed code.
+    // The step view needs all lines, so trace is off when folds exist.
+    private async Task<RunResult> RunFoldedAsync()
+    {
+        var expanded = CodeFolds.Expand(_code, _folded.Folds);
+
+        if (!expanded.Success)
+        {
+            return new RunResult(false, string.Empty, [new DiagnosticLine(true, expanded.Error!)], TimeSpan.Zero);
+        }
+
+        var result = await Runner.RunAsync(expanded.Code, _testsCode, false, _stdin);
+        var mapped = result.Diagnostics.Select(d => d.Line is { } line
+            ? d with { Line = expanded.MapLine(line), Text = DiagnosticLineText().Replace(d.Text, m => $"(Zeile {expanded.MapLine(int.Parse(m.Groups[1].Value))},") }
+            : d).ToList();
+
+        return result with { Diagnostics = mapped };
+    }
+
+    [System.Text.RegularExpressions.GeneratedRegex(@"\(Zeile (\d+),")]
+    private static partial System.Text.RegularExpressions.Regex DiagnosticLineText();
+
+    // The full program as it runs (read-only view), or the error text if a placeholder is missing.
+    private string FullCode
+    {
+        get
+        {
+            var expanded = CodeFolds.Expand(_code, _folded.Folds);
+            return expanded.Success ? expanded.Code : expanded.Error!;
+        }
     }
 
     private void Reset()
