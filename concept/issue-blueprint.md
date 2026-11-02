@@ -26,19 +26,19 @@ The architect (`claude-architect.yml`) does the rest: it derives the content (se
 | Module title (German) | The heading text after `M<N>`, without the part in parentheses and without ▶/◻. |
 | Module folder | `<prefix>NN-<slug>`, slug = short English kebab-case name of the topic (from the English part in parentheses, otherwise from the heading). An existing folder name is kept if it fits this rule. Review modules: `wNN-review-<slug>` (`module-plan.md`, "Location and naming"). |
 | `_category_.json` | Label "Modul <N> – <German title>" (review: "Wiederholung <N> – Module A–B"), `position` = `<N>` (review: decimal from "Location and naming"). |
-| Lessons | Only from the plan, never from existing files (section 2a). In plan order: the topics of the first line of the section (separated by `·`) and every line `*(new)* Lesson "…"`. Every other `*(new)*` line and every `Spec`/`Library` item goes into the lesson it fits. Split or merge so that each lesson has one core concept and 15–25 min (`CLAUDE.md` rule 8). |
+| Lessons | Only from the plan, never from existing files (section 2a). In plan order: the topics of the first line of the section (separated by `·`) and every line `*(new)* Lesson "…"`. Every other `*(new)*` line and every `Spec`/`Library` item goes into the lesson it fits. Split or merge so that each lesson has one core concept and 15–25 min (`CLAUDE.md` rule 8). Review modules: exactly 2 lessons from the lesson proposals in `### W<N>`, no split or merge. |
 | `lesson_id`, file | Numbered from `l01` in sidebar order: `<prefix>NN-lYY`, file `lYY-<slug>.mdx`, slug = English kebab-case from the lesson name. |
 | Lesson title (German) | German translation of the lesson name in the plan (lines already in German stay as they are). |
 | ▶ / ◻ | Marker in the heading; a marker on a single line wins. |
-| Spec, library, badges, misconceptions | The `Spec`, `Library`, `Badge` and `misconceptions` lines of the section. Each item goes to exactly one lesson. Misconception id = `<lesson_id>-<English kebab-slug>`. |
-| Sources | Spec items: clause of the draft or feature specification ("Reference" in `module-plan.md`); library items: Microsoft Learn. Only pages that were opened; visible citation per `concept/sources.md`. |
-| Application context | The milestone row of this module in `concept/project-seclog.md`, and the SecLog end state in `concept/module-digest.md`. |
+| Spec, library, badges, misconceptions | The `Spec`, `Library`, `Badge` and `misconceptions` lines of the section. Each item goes to exactly one lesson. Misconception id = `<lesson_id>-<English kebab-slug>`. Review modules: no spec, library or badge items; misconceptions = the ids listed in `### W<N>`, no new ids. |
+| Sources | Spec items: clause of the draft or feature specification ("Reference" in `module-plan.md`); library items: Microsoft Learn. Only pages that were opened; visible citation per `concept/sources.md`. Review modules: none new. |
+| Application context | The milestone row of this module in `concept/project-seclog.md`, and the SecLog end state in `concept/module-digest.md`. Review modules: the SecLog end state of the last covered module, read only. |
 | Out of scope | Rows of "Deliberately not covered" that name this module or its topics. |
 | Blockers | Lines of "Open questions" that name this module; components the lessons need that are "planned" in `components.md`; for ◻ the CI project in `website/examples/_ci/` named in the section. |
 | Example, quiz, glossary files | Paths from `CLAUDE.md` ("Repo structure", "Example folders") and `.claude/rules/*.md`: `website/examples/<prefix>NN/lYY/`, `website/src/data/quiz/de/<prefix>NN.json`, `website/src/data/glossary/de.json`. Example file names are chosen by the implementer (`.claude/rules/examples.md`). |
-| Warm-up questions | Quiz ids of earlier lessons: the lessons of `concept/module-digest.md` and of this module; find ids with `grep '"id": "<lesson_id>-q' website/src/data/quiz/de/*.json`. |
-| Taught so far / forward references | `concept/module-digest.md` (constructs, glossary ids, open forward references that target this module) plus the earlier lessons of this module. |
-| Lesson structure, DoD | `concept/lesson-template.md`, `CLAUDE.md` (Definition of Done, rules 1–11). Not copied into issues – referenced. |
+| Warm-up questions | Quiz ids of earlier lessons: the lessons of `concept/module-digest.md` and of this module; find ids with `grep '"id": "<lesson_id>-q' website/src/data/quiz/de/*.json`. Review modules: none, the whole lesson is retrieval. |
+| Taught so far / forward references | `concept/module-digest.md` (constructs, glossary ids, open forward references that target this module) plus the earlier lessons of this module. Review modules: the digest sections of the covered modules and earlier. |
+| Lesson structure, DoD | `concept/lesson-template.md`, `CLAUDE.md` (Definition of Done, rules 1–11). Not copied into issues – referenced. Review modules: `concept/lesson-template.md`, "Review lesson". |
 
 ## 2a. Existing content of the module
 
@@ -53,11 +53,15 @@ Content that already exists for the module (today M0–M2) is an **early impleme
 
 Order and chain (one PR per issue; every issue that changes a file another issue also changes gets `Depends on #<number>` – `de.json` and the quiz file are shared by all lessons, so lessons are one chain):
 
+Review modules (`W<N>`): no decision issue for the DoD and no CI project issue. The scaffold issue has no early implementation to remove. There are exactly 2 lesson issues. `Module W1` also gets the component issue for the optional-review note (shown in `w01-l01` when all covered modules were completed by a placement test) before the first lesson issue.
+
 1. **Decision/research issue** per blocker from "Open questions" (label `needs-human:decision` if a human must decide). Everything else depends on it.
 2. **CI project issue** – only for ◻ lessons whose CI project does not exist yet. Changes to `.github/workflows/` go to "What a human must do".
 3. **Scaffold issue**: remove the early implementation of the module (lesson files, `website/examples/<prefix>NN/`, the questions in `de/<prefix>NN.json`) and fix every reference to it (find them with a search for the old ids and paths, for example `website/plugins/search-index.test.js`, `README.md`, the `lesson` field in `de.json`); then `_category_.json`, empty quiz file, import in `website/src/data/quiz/index.js`, example folder. Glossary entries stay until the lesson that introduces the term rewrites them.
 4. **Lesson issues with at most three lessons each** (a long issue risks a timeout). Group the lessons in sidebar order: lessons 1–3 in the first issue, 4–6 in the second, and so on; a last group may have one or two lessons. A module with up to three lessons gets one lesson issue. Title: `Module <N>: write lessons <a>–<b> (<short topics>)`, or `Module <N>: write lesson <a> (<topic>)` for a single lesson. Each issue depends on the one before (the first on the scaffold). Inside an issue the lessons are written one after the other, in sidebar order; each lesson is its own commit and meets the Definition of Done on its own.
 5. **Module review issue**: every spec item and misconception is taught in its lesson; no file of the early implementation is left; glossary entries that no new lesson introduces or links are removed or fixed; exactly 8 questions marked with `"placement": true` in the quiz data (no `explain`; together they cover every lesson of the module, extra lessons in `placementLessons`; `node tools/check-quiz.mjs` checks it); `module-plan.md` updated (answered open questions removed); write the section `## M<N>` (or `## W<N>`) of `concept/module-digest.md` in the format of that file; remove open forward references of earlier modules that this module now teaches.
+   - Module review of a review module: no placement questions (the "exactly 8" rule does not apply). Write `## W<N>` in `module-digest.md` (lessons and quiz id range; no constructs, glossary terms or misconception anchors, because there are none).
+   - Module review of a covered module M1–M14: add the part of this module to `### W<K>` in `module-plan.md` (4–6 concepts that are easy to confuse with concepts of the other covered modules, and 3–5 misconception ids of this module that match them).
 
 Do not start a second module while one is in progress (shared `de.json`).
 
@@ -70,6 +74,7 @@ Use the sections that `claude-architect.yml` requires. Fill them only with value
 - **Affected files**: lesson file, example folder, quiz file, `de.json` (paths from section 2).
 - **Interfaces**: front matter (`lesson_id`, `sidebar_position`, `duration_min`), quiz ids `<lesson_id>-q<n>`, misconception ids, new glossary ids.
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–10."
+- **Review lessons**: the Context names the concepts and misconception ids of this lesson (from `### W<N>`), the task forms, and "no project step". The Acceptance criteria point to `concept/lesson-template.md`, "Review lesson" instead of DoD 1–17.
 - **Acceptance criteria**: "For every lesson of this issue: Definition of Done 1–17 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
 - **Tests**: `bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `cd website && npm run build`.
 - **Not part of this issue**: lessons of other issues, components, playground.
@@ -78,4 +83,4 @@ Use the sections that `claude-architect.yml` requires. Fill them only with value
 
 - The module section is missing or the previous module is not done (it has no section in `concept/module-digest.md`). Before the first rebuilt module review, M2 is the next module to rebuild and its previous module M1 has a digest section.
 - An open question or a "planned" component blocks a lesson and no decision issue can solve it.
-- Review modules: the open decision on which DoD points apply ("Location and naming" in `module-plan.md`) is not made yet.
+- Review modules: a covered module has no section in `module-digest.md`, or `### W<N>` lacks the part of a covered module.

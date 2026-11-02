@@ -65,7 +65,7 @@ Before every commit: run both build checks. If one fails, do not commit.
 
 ## Definition of Done – lesson
 
-A lesson is done when all points are met:
+A lesson is done when all points are met. Review lessons (W1–W4) apply the Definition of Done as written in `concept/lesson-template.md`, "Review lesson".
 
 1. Every learning goal is covered by at least one quiz or exercise task.
 2. All code examples pass the CI check (compile, outputs match).
@@ -117,6 +117,8 @@ Not allowed:
 
 If the digest is missing something that module N needs, look it up with a targeted search and add it to the digest in the module review of module N (or say so in the PR).
 
+Review modules: work on `W<N>` that covers M<A>–M<B> may read the digest sections `## M<A>` … `## M<B>` (the whole digest is already allowed), the section `### W<N>` of `concept/module-plan.md`, and targeted lookups by id (misconception box: `grep -n 'Misconception id="<id>"' -A10 website/docs`; quiz ids; example paths named in the digest). Lessons, examples and quiz files of the covered modules are not read in full.
+
 Not limited: tasks that are not module work (tools, components, playground, workflows, the half-yearly review). A fix in an earlier module treats that module as module N. Running the checks (`bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `npm run build`) is always allowed.
 
 ## Concept (binding, read on demand)
@@ -125,7 +127,7 @@ The files below are binding but are **not** imported, to save tokens. Read a fil
 
 | File | Read it when you ... |
 | --- | --- |
-| `concept/lesson-template.md` | write or review a lesson (flow, practice-example pattern, `<Forward>`, project step frame) |
+| `concept/lesson-template.md` | write or review a lesson or a review lesson (flow, practice-example pattern, `<Forward>`, project step frame) |
 | `concept/module-plan.md` | write, split or review a module (lesson proposals, spec clauses, badges). It is large: search it for your module (`### M<N>`) instead of reading it all |
 | `concept/module-digest.md` | start work on a module (what earlier modules taught, SecLog end state); a module review adds its section |
 | `concept/project-seclog.md` | add a project step or quiz/example data (continuity rule, milestones, sample data) |

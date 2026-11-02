@@ -145,3 +145,59 @@ Fixed frame (German, learner-facing):
 - File names: `website/examples/mXX/lYY/seclog-<name>-task.cs`, `seclog-<name>-task.tests.snippet.cs`, `seclog-<name>-solution.cs` and their `.out.txt` snapshots. `<name>` stays the same in a module.
 - Continuity rule (start code byte-identical to the previous solution) and the sample data: `concept/project-seclog.md`.
 - Module box: the first lesson of every module has `:::tip[Projekt: Was SecLog nach diesem Modul kann]` right after the learning goals, with 2–4 bullets from the milestone row of the module.
+
+## Review lesson
+
+Review modules W1–W4 (`module-plan.md`, "Location and naming") bring no new content. Their lessons (`wNN-lYY`) follow this section instead of the 10 steps above. Decided 2026-11-02 (#234).
+
+### Lesson cut
+
+Exactly 2 lessons per review module, 15–25 min each, cut by mixed sets, not by topic:
+
+- `l01`: mixed reading and tracing set (quiz types `single`, `output`, `find-bug`, runner tasks with prediction).
+- `l02`: mixed writing set plus a short mixed final set (quiz types `cloze`, `parsons`, small runner modify/make tasks, a few `single`/`output`).
+
+Coverage: W1 = M1–M4, W2 = M5–M8, W3 = M9–M11, W4 = M12–M14. The concepts and misconception ids of a review module are listed in `### W<N>` of `module-plan.md`.
+
+### Flow
+
+| # | Step | Form | Note |
+| --- | --- | --- | --- |
+| 1 | Learning goals ("Lernziele") | `:::note[Lernziele]`, 2–4 points | "Du kannst …" / "Du erkennst …" |
+| 2 | Task blocks | Sequence of task blocks (below) | Retrieval practice for the whole lesson; no warm-up and no new concept text |
+| 3 | Project step | The fixed sentence (below) | Replaces the "Projektschritt" frame |
+| 4 | Wrap-up | "In eigenen Worten erklären" task, transfer question, "Weiterlesen" | See the DoD rule below |
+
+### Task block
+
+Every task is a block with a neutral heading `### Aufgabe <n>`. Never use the topic name, because the name would give away the recognition step.
+
+1. Recognition step: a `single` question "Welches Konzept brauchst du hier?" with 3–4 concept names from the covered modules as options. The `explanation` names the concept and the original lesson.
+2. The task itself: a quiz question, or a runner task with the pattern prediction → runner → solution and explanation (see "Practice-example pattern").
+
+Two neighbouring task blocks never come from the same covered module.
+
+### Definition of Done for review lessons
+
+Numbers are the points of the Definition of Done in `CLAUDE.md`.
+
+- 1 applies: every learning goal has a task.
+- 2 applies: examples live under `website/examples/wNN/lYY/` and are CI checked.
+- 3 applies as: retrieval practice (the whole lesson), the PRIMM pattern for every runner task, questions enter the Leitner system (spaced repetition). No worked example with fading.
+- 4 and 11: no "Achtung" box and no new `<Misconception>` anchor. Wrong answers link to misconception ids of the original lessons (the ids listed in `### W<N>`). Every id listed there is linked by at least one wrong answer in the review module, and every review lesson links at least one.
+- 5: skipped. There are no new features and no `<Since>` badge; a badge the original lesson had is not repeated.
+- 6, 13, 16: skipped for new facts, because a review lesson states no new facts. Explanations in feedback must match the original lessons (check with a targeted lookup of the misconception box or the quiz id). If a PR states a fact that is not in an original lesson, DoD 6/13/16 apply to that fact. Otherwise the PR says "no new facts" instead of the Verification table.
+- 7 applies: 15–25 min.
+- 8: not applicable (no worked example). Solutions of runner tasks reuse the subgoal labels of the original lesson where it had them.
+- 9: no project step. The lesson has the fixed sentence: "In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt." Tasks may use SecLog data and the SecLog end state of the last covered module, but do not change SecLog (`concept/project-seclog.md`).
+- 10 applies: at least one transfer question.
+- 12 applies: at least one `explain` task "In eigenen Worten erklären", for example: how do you recognize which concept a task needs?
+- 14 and 17 apply in a strict form: only concepts that the covered modules or earlier modules taught. No `<Forward>` notes.
+- 15 applies to the module as a whole.
+- Glossary: no new terms. `<Term>` links to existing glossary ids are allowed.
+- "Weiterlesen": 1–3 Microsoft Learn or specification links that the covered lessons already use (no new sources).
+
+### Quiz data
+
+- File `website/src/data/quiz/de/wNN.json`, ids `wNN-lYY-qN`, `lesson` = `wNN-lYY`. Question ids of the module are never reused.
+- No `<PlacementTest>` and no `"placement": true` questions (`tools/check-quiz.mjs` only checks modules that have placement questions).
