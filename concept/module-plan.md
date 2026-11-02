@@ -165,7 +165,14 @@ Mixes M1–M4. Folder `w01-review-basics/`, quiz file `de/w01.json`, position 4.
     - `while` vs. `do … while` vs. `for`, and off-by-one (`m02-l06`, `m02-l07`)
     - `break` vs. `continue`; in nested loops `break` leaves only the inner loop (`m02-l08`, `m02-l09`)
   - Misconception ids: m02-l02-and-same-as-ampersand, m02-l05-case-falls-through, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
-- **M3**: Filled by the module review of M3.
+- **M3** (from `module-digest.md` `## M3`):
+  - Concepts:
+    - value parameter vs. `ref` / `out` (`m03-l03`, `m03-l08`)
+    - `return` vs. `Console.WriteLine` (`m03-l02`)
+    - overloading vs. optional parameters (`m03-l05`, `m03-l06`)
+    - tuple vs. `out` for several results (`m03-l08`, `m03-l09`)
+    - recursion vs. loop, base case (`m03-l10`; loops in `m02-l06`, `m02-l07`)
+  - Misconception ids: m03-l02-return-prints, m03-l03-method-changes-caller-variable, m03-l05-return-type-overloads, m03-l08-out-may-stay-unassigned, m03-l10-no-base-case
 - **M4**: Filled by the module review of M4.
 - ▶: all parts are runnable. Mix concepts across modules, for example loop counters with integer division, or `TryParse` with an `if` check.
 

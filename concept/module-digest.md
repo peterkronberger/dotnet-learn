@@ -53,12 +53,11 @@ Each module section has these fields:
 - **Open forward references:**
   - Member (Mitglied) eines Typs → M6 (`m01-l06`)
   - Exceptions (Ausnahmen) → M7 (`m01-l07`, `m01-l08`)
-  - `out` parameter → M3 (`m01-l08`, `m01-l09`)
   - `null`, nullable reference types (`string?`) → M4 (`m01-l09`)
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
   - `if` is taught in `m02-l01` (M1 only pointed to it). In M1, `bool` only stores `true`/`false` and the result of `TryParse`.
-  - `TryParse` and `out` are used as a recipe. The `bool` result is ignored in the `m01-l09` SecLog solution. Module 3 explains `out`.
+  - `TryParse` and `out` are used as a recipe. The `bool` result is ignored in the `m01-l09` SecLog solution. `out` is explained in `m03-l08`.
   - `var name = Console.ReadLine()` (`m01-l09`) hides that the type can be `string?`. Module 4 must correct this.
 
 ## M2 Kontrollfluss
@@ -84,3 +83,32 @@ Each module section has these fields:
   - SecLog still holds data in single variables; the bar chart of `m02-l09` takes names and counts from `switch` expressions as a stand-in for arrays (M5).
   - `foreach` is taught only over a `string`. `switch` on `string` uses constant labels; type, property and list patterns are not taught.
   - `Console.ReadLine()` loops (`m02-l06`) compare with `==` and ignore `null`; module 4 must correct this.
+
+## M3 Methoden
+
+- **Lessons:**
+  - `m03-l01` Methoden definieren und aufrufen – a declaration runs nothing; a call jumps into the body; parameter vs. argument; arguments are evaluated left to right.
+  - `m03-l02` return oder Ausgabe? – `return` hands a value to the caller, `Console.WriteLine` prints; `void`; early return; expression body `=>`.
+  - `m03-l03` Gültigkeitsbereich und Wertparameter – scope and declaration space; a value parameter is a copy.
+  - `m03-l04` Lokale Funktionen – a method inside a method; capture; `static` local functions; declaration order does not matter.
+  - `m03-l05` Methoden überladen – signature, overloading, simple overload resolution; the return type is not part of the signature.
+  - `m03-l06` Optionale und benannte Argumente – default values are constants; named arguments in any order.
+  - `m03-l07` Beliebig viele Argumente: params – parameter array, must be last; `params` collections (C# 13).
+  - `m03-l08` ref, out und in – reference, output and input parameters; `out` must be assigned before return.
+  - `m03-l09` Tupel: mehrere Werte zurückgeben – tuple types, element names, deconstruction; tuples are value types.
+  - `m03-l10` Rekursion und der Aufrufstapel – base case, recursive case, call stack, stack overflow; recursion vs. loop.
+- **Constructs taught:** method declaration with parameters and return type, call, argument order, `void` (`m03-l01`), `return`, `=>` expression body (`m03-l02`), scope, value parameters (`m03-l03`), local functions, `static` local functions (`m03-l04`), overloads (`m03-l05`), default values, `name: value` arguments (`m03-l06`), `params` (`m03-l07`), `ref` / `out` / `in`, `out int x`, `out _` (`m03-l08`), tuple types `(T A, T B)`, tuple literals, `var (a, b) = …` (`m03-l09`), recursive calls (`m03-l10`).
+- **Glossary terms:** parameter, argument, return-type, void, method-call, return-value, return-statement, expression-body, scope, local-variable, value-parameter, declaration-space, local-function, static-local-function, capture, signature, overloading, overload-resolution, optional-parameter, default-argument, named-argument, parameter-array, reference-parameter, output-parameter, input-parameter, tuple, tuple-element, deconstruction, recursion, base-case, call-stack, stack-overflow
+- **Misconception ids:** m03-l01-declaration-runs-code, m03-l02-return-prints, m03-l03-method-changes-caller-variable, m03-l04-declare-before-call, m03-l05-return-type-overloads, m03-l06-default-from-variable, m03-l07-params-not-last, m03-l08-out-may-stay-unassigned, m03-l09-tuple-is-reference-type, m03-l10-no-base-case
+- **Open forward references:**
+  - Werte mit Verweis als Argument → M4 (`m03-l03`)
+  - Werte, die fehlen können (`null`) → M4 (`m03-l06`)
+  - Werttyp und Referenztyp → M4 (`m03-l09`)
+  - die erzeugte Methode `Main`, Klassen → M6 (`m03-l04`)
+  - `static class`, `public static` → M6 (`m03-l05`)
+  - Arrays (`int[]`), Sammlungen → M5 (`m03-l07`)
+- **SecLog end state:** `website/examples/m03/l10/seclog-methods-solution.cs` – the M2 end state split into methods: check a line, read the user (`TryReadUser` with `out`), return user and IP together as a tuple (`ReadUserAndIp`), overloaded report lines, optional IP argument, static local helper, recursion. Each task file equals the previous solution.
+- **Notes for later modules:**
+  - Methods in examples are local functions in top-level code. Overloads live in a `static class` (Forward to M6).
+  - `user` from `Console.ReadLine()` is never passed to a `string` parameter until M4.
+  - `TryParse` can now be used with its `bool` result (`m03-l08`).

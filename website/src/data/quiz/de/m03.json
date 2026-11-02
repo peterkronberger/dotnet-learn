@@ -154,6 +154,8 @@
     {
       "id": "m03-l02-q1",
       "lesson": "m03-l02",
+      "placement": true,
+      "placementLessons": ["m03-l01"],
       "type": "single",
       "question": "Die Methode `int Square(int n) { return n * n; }` ist deklariert. Das Programm enthält nur die Anweisung `Square(4);`. Was erscheint in der Konsole?",
       "options": [
@@ -310,6 +312,7 @@
     {
       "id": "m03-l03-q3",
       "lesson": "m03-l03",
+      "placement": true,
       "type": "single",
       "question": "Es gilt `int attempts = 5;`, dann folgt der Aufruf `Reset(attempts);`. Die Methode ist `void Reset(int value) { value = 0; }`. Welchen Wert hat `attempts` danach?",
       "options": [
@@ -427,6 +430,7 @@
     {
       "id": "m03-l04-q1",
       "lesson": "m03-l04",
+      "placement": true,
       "type": "single",
       "question": "Die lokale Funktion `Word` steht im Rumpf von `Label`, und zwar unter der Zeile, die `Word(count)` aufruft. Was passiert?",
       "options": [
@@ -661,6 +665,7 @@
     {
       "id": "m03-l05-q6",
       "lesson": "m03-l05",
+      "placement": true,
       "type": "single",
       "question": "`Math.Abs(-3)` liefert `3` und `Math.Abs(-2.5)` liefert `2.5`. Warum geht beides mit demselben Methodennamen?",
       "options": [
@@ -701,6 +706,7 @@
     {
       "id": "m03-l06-q1",
       "lesson": "m03-l06",
+      "placement": true,
       "type": "single",
       "question": "Die lokale Variable `fallback` hat den Wert `3`. Ein Parameter wird als `int max = fallback` deklariert. Was sagt der Compiler?",
       "options": [
@@ -843,6 +849,7 @@
     {
       "id": "m03-l07-q1",
       "lesson": "m03-l07",
+      "placement": true,
       "type": "single",
       "question": "Die Methode ist `int Sum(params int[] numbers)`. Welche Aussage über die Aufrufe `Sum()`, `Sum(4)` und `Sum(4, 5, 6)` stimmt?",
       "options": [
@@ -981,6 +988,8 @@
     {
       "id": "m03-l08-q1",
       "lesson": "m03-l08",
+      "placement": true,
+      "placementLessons": ["m03-l09"],
       "type": "single",
       "question": "Warum hat `int.TryParse(text, out int number)` einen `out`-Parameter?",
       "options": [
@@ -1296,6 +1305,7 @@
     {
       "id": "m03-l10-q3",
       "lesson": "m03-l10",
+      "placement": true,
       "type": "single",
       "question": "`Show(3)` gibt `enter 3` aus, ruft `Show(2)` auf und gibt danach `leave 3` aus. `Show(2)` verhält sich ebenso mit `Show(1)`. Warum erscheint `leave 1` vor `leave 2`?",
       "options": [
