@@ -1,0 +1,3 @@
+int 3
+double 40
+double 3.5

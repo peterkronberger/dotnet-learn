@@ -7,8 +7,8 @@ public static class TaskTests
         return
         [
             ("Exactly 45 lines are printed", true, lines.Length == 45, "The output has 45 lines (an empty line does not count). Add exactly one new line: the description of the IP address."),
-            ("Earlier lines stay unchanged", true, lines.Length > 44 && lines[0] == "SecLog project profile" && lines[24] == "Suspicious: True" && lines[38] == "Dots in IP: 3" && lines[44] == "dave |#", "All earlier lines must stay as they are."),
-            ("IP address described", true, lines.Length > 39 && lines[39] == "203.0.113.7 has 3 dots", "Write a method DescribeIp with a static local function that counts a character. Print its result right after the 'Dots in IP:' line."),
+            ("Earlier lines stay unchanged", true, lines.Length > 44 && lines[0] == "SecLog project profile" && lines[24] == "Suspicious: True" && lines[37] == "Dots in IP: 3" && lines[44] == "dave |#", "All earlier lines must stay as they are."),
+            ("IP address described", true, lines.Length > 38 && lines[38] == "203.0.113.7 has 3 dots", "Write a method DescribeIp with a static local function that counts a character. Print its result right after the 'Dots in IP:' line."),
         ];
     }
 

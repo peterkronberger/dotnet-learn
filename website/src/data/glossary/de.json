@@ -2100,6 +2100,66 @@
         "title": "Local function declarations (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations"
       }
+    },
+    {
+      "id": "signature",
+      "term": "Signature",
+      "german": "Signatur",
+      "category": "language",
+      "definition": "Der Teil einer Methode, an dem der Compiler sie erkennt: Name sowie Anzahl, Typen und Reihenfolge der Parameter. Rückgabetyp und Parameternamen gehören nicht dazu.",
+      "aliases": [
+        "Signaturen",
+        "Methodensignatur"
+      ],
+      "related": [
+        "overloading",
+        "parameter"
+      ],
+      "lesson": "m03-l05",
+      "source": {
+        "title": "Signatures and overloading (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading"
+      }
+    },
+    {
+      "id": "overloading",
+      "term": "Overloading",
+      "german": "Überladen",
+      "category": "language",
+      "definition": "Mehrere Methoden im selben Typ tragen denselben Namen und unterscheiden sich in der Signatur. Jede dieser Methoden heißt Überladung (Overload).",
+      "aliases": [
+        "Überladung",
+        "Überladungen",
+        "Overload"
+      ],
+      "related": [
+        "signature",
+        "overload-resolution"
+      ],
+      "lesson": "m03-l05",
+      "source": {
+        "title": "Signatures and overloading (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading"
+      }
+    },
+    {
+      "id": "overload-resolution",
+      "term": "Overload Resolution",
+      "german": "Auswahl der Überladung",
+      "category": "language",
+      "definition": "Der Compiler wählt beim Übersetzen anhand der Argumente die beste Überladung. Ein genauer Treffer gewinnt vor einem Treffer mit impliziter Umwandlung. Gibt es keine passende, ist das ein Fehler.",
+      "aliases": [
+        "Überladungsauflösung"
+      ],
+      "related": [
+        "overloading",
+        "implicit-conversion"
+      ],
+      "lesson": "m03-l05",
+      "source": {
+        "title": "Overload resolution (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1264-overload-resolution"
+      }
     }
   ]
 }

@@ -1,0 +1,182 @@
+---
+title: Methoden überladen
+sidebar_position: 5
+description: "Mehrere Methoden dürfen denselben Namen haben, wenn ihre Parameterlisten sich unterscheiden. Der Compiler wählt die passende Überladung."
+lesson_id: m03-l05
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import overloads from '!!raw-loader!@site/examples/m03/l05/overloads.cs';
+import overloadsOutput from '!!raw-loader!@site/examples/m03/l05/overloads.out.txt';
+import returnTypeError from '!!raw-loader!@site/examples/m03/l05/return-type-error.snippet.cs';
+import resolution from '!!raw-loader!@site/examples/m03/l05/resolution.cs';
+import resolutionOutput from '!!raw-loader!@site/examples/m03/l05/resolution.out.txt';
+import libraryOverloads from '!!raw-loader!@site/examples/m03/l05/library-overloads.cs';
+import overloadGaps from '!!raw-loader!@site/examples/m03/l05/overload-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l05/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l05/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l05/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l05/seclog-methods-solution.cs';
+
+# Methoden überladen
+
+:::note[Lernziele]
+- Du kannst zwei Überladungen einer Methode schreiben.
+- Du kannst die Signatur einer Methode bestimmen und sagen, dass der Rückgabetyp nicht dazugehört.
+- Du kannst in einfachen Fällen vorhersagen, welche Überladung der Compiler wählt.
+- Du kannst Überladungen in der Bibliothek erkennen (`Console.WriteLine`, `Math.Abs`).
+:::
+
+## Rückblick
+
+<Quiz id="m03-l02-q1" />
+
+<Quiz id="m03-l04-q1" />
+
+<Quiz id="m01-l07-q1" />
+
+## Ein Name, mehrere Methoden
+
+Bisher hatte jede Methode einen eigenen Namen. C# erlaubt aber, mehrere Methoden mit demselben Namen zu schreiben, wenn der Compiler sie anhand ihrer Parameter unterscheiden kann. Das heißt <Term id="overloading">Überladen (Overloading)</Term>. Jede der Methoden ist eine Überladung (Overload).
+
+Was der Compiler vergleicht, ist die <Term id="signature">Signatur (Signature)</Term> einer Methode: der Name, die Anzahl der Parameter und ihre Typen in der Reihenfolge der Liste. Die Namen der Parameter und der Rückgabetyp gehören nicht dazu. Zwei Methoden im selben Typ müssen sich in der Signatur unterscheiden.
+
+Überladene Methoden brauchen hier einen Rahmen, in dem sie stehen. Die Beispiele benutzen dafür eine `static class`. Aufgerufen wird mit dem Namen der Klasse und einem Punkt, wie bei `Math.Max` aus Modul 0.
+
+<Forward concepts={['`static class`', '`public static`']} module="6" />
+
+Lokale Funktionen lassen sich nicht überladen: Ihr Name muss in ihrem Block eindeutig sein. Darum stehen die überladenen Methoden in einer Klasse.
+
+:::info[Vorhersage]
+`Display` hat drei Methoden namens `Show`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m03-l05-overloads" code={overloads} predict expected={overloadsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `int 7`, `double 2.5` und `string ok`.
+
+1. **Signaturen vergleichen:** Die drei Methoden unterscheiden sich im Typ ihres Parameters (`int`, `double`, `string`).
+2. **Argumenttyp bestimmen:** `7` ist ein `int`, `2.5` ein `double`, `"ok"` ein `string`.
+3. **Überladung wählen:** Jedes Argument passt genau zu einer Überladung.
+
+**Was passiert, wenn du `Show(true)` aufrufst?** Keine Überladung nimmt einen `bool`. Der Compiler meldet einen Fehler.
+
+</details>
+
+## Welche Überladung wählt der Compiler?
+
+Der Compiler wählt beim Übersetzen anhand der Argumente die beste Überladung (<Term id="overload-resolution">Overload Resolution</Term>). Passt eine Überladung genau, gewinnt sie. Passt keine genau, prüft er, in welche Parametertypen sich das Argument <Term id="implicit-conversion">implizit umwandeln</Term> lässt. Gibt es mehrere, gewinnt der Typ, in den sich der andere implizit umwandeln lässt. Ein `int` passt zum Beispiel zu `long` und zu `double`. Weil sich `long` in `double` umwandeln lässt und nicht umgekehrt, gewinnt `long`. Gibt es keine passende Überladung, meldet der Compiler einen Fehler.
+
+:::info[Vorhersage]
+`Display` hat nur Überladungen für `int` und `double`. Welche wird für `3`, für `total` (ein `long`) und für `3.5` gewählt?
+:::
+
+<CSharpRunner id="m03-l05-resolution" code={resolution} predict expected={resolutionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `int 3`, `double 40` und `double 3.5`.
+
+1. **Genauer Treffer:** `3` ist ein `int` und passt zur `int`-Überladung.
+2. **Umwandlung suchen:** Ein `long` lässt sich nicht implizit in `int` umwandeln (es könnte zu groß sein), wohl aber in `double`. Also gewinnt `double`.
+3. **Genauer Treffer:** `3.5` ist ein `double`.
+
+**Was passiert, wenn du die `double`-Überladung löschst?** Dann passt für `total` und `3.5` nichts mehr, und der Compiler meldet Fehler.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l05-return-type-overloads" />
+
+**„Zwei Methoden dürfen sich nur im Rückgabetyp unterscheiden.“** Das stimmt nicht. Der Rückgabetyp gehört nicht zur Signatur. Im Fragment haben beide `Value`-Methoden dieselbe Signatur. Der Compiler meldet, dass der Typ schon eine Methode mit diesen Parametern hat. Auch andere Parameternamen reichen nicht, es müssen Anzahl oder Typen der Parameter verschieden sein.
+:::
+
+<CodeBlock language="csharp" title="return-type-error.snippet.cs">{returnTypeError}</CodeBlock>
+
+## Überladungen in der Bibliothek
+
+Du kennst Überladungen schon: `Math.Abs` gibt es für `int`, `double` und weitere Typen, `Console.WriteLine` für viele Typen. Darum funktioniert derselbe Name mit verschiedenen Argumenten.
+
+<CSharpRunner id="m03-l05-library" code={libraryOverloads} />
+
+Dass jeweils die richtige Überladung läuft, siehst du an der Ausgabe: `Math.Abs(-3)` bleibt eine ganze Zahl, `Math.Abs(-2.5)` ein `double`.
+
+## Lückenbeispiel
+
+`Display` hat nur eine Überladung für `double`. Darum druckt der erste Aufruf `double 7`. Füge eine zweite Überladung `Show(int value)` hinzu, die `int` und den Wert ausgibt. Dann soll das Programm `int 7` und `double 7.5` ausgeben.
+
+<CSharpRunner id="m03-l05-gaps" code={overloadGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zweite Methode schreiben:** `public static string Show(int value) => $"int {value}";`
+2. **Signatur unterscheiden:** Der Parametertyp `int` macht die Signatur anders als `Show(double)`.
+3. **Prüfen:** `Show(7)` passt jetzt genau zur `int`-Überladung, `Show(7.5)` weiter zu `double`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Signatur und Auswahl in der Spezifikation (optional)</summary>
+
+Die Signatur einer Methode besteht aus Name, Zahl der Typparameter sowie Typ und Übergabeart jedes Parameters. Rückgabetyp und Parameternamen gehören nicht dazu (siehe [§7.5 Signatures and overloading](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading)). Die Auswahl beschreibt [§12.6.4 Overload resolution](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1264-overload-resolution). Dass überladene lokale Funktionen nicht erlaubt sind, steht in [§13.6.4 Local function declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt Zahlen und Raten mit einzelnen `Console.WriteLine`-Aufrufen aus und beschreibt IP-Adressen mit `DescribeIp`.
+
+**Neue Anforderung:** Am Ende der Datei steht eine `static class Report` mit zwei Überladungen `public static string Line(string label, int value)` und `public static string Line(string label, double value)`. Die `double`-Überladung formatiert den Wert mit `F1`. Direkt nach `Digits in IP:` geben zwei neue Zeilen `Report.Line("Failures", failures)` und `Report.Line("Failure rate (%)", failureRate)` aus. Die Ausgabe hat jetzt 47 Zeilen.
+
+<CSharpRunner id="m03-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Rahmen schreiben:** Die Klasse `Report` steht am Ende der Datei, nach den Methoden.
+2. **Zwei Überladungen:** Beide heißen `Line`. Sie unterscheiden sich im Typ des zweiten Parameters.
+3. **Aufrufen:** `failures` ist ein `int` und wählt die erste Überladung (`Failures: 7`). `failureRate` ist ein `double` und wählt die zweite (`Failure rate (%): 50.0`).
+
+</details>
+
+**Neuer Stand:** SecLog formatiert Berichtszeilen mit überladenen Methoden. Der Typ des Wertes bestimmt das Format.
+
+## Zusammenfassung
+
+Mehrere Methoden dürfen denselben Namen haben, wenn sich ihre Signaturen unterscheiden. Zur Signatur gehören Name sowie Anzahl und Typen der Parameter, nicht der Rückgabetyp und nicht die Parameternamen. Der Compiler wählt die Überladung, die zu den Argumenten am besten passt: ein genauer Treffer vor einer Umwandlung. Lokale Funktionen lassen sich nicht überladen. In der Bibliothek sind viele Methoden überladen, zum Beispiel `Math.Abs` und `Console.WriteLine`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m03-l05-q2" />
+
+<Quiz id="m03-l05-q3" />
+
+<Quiz id="m03-l05-q4" />
+
+<Quiz id="m03-l05-q5" />
+
+<Quiz id="m03-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Math.Abs, Überladungen](https://learn.microsoft.com/dotnet/api/system.math.abs)
+- Microsoft Learn: [Console.WriteLine, Überladungen](https://learn.microsoft.com/dotnet/api/system.console.writeline)
+- C#-Spezifikation: [§7.5 Signatures and overloading](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading)

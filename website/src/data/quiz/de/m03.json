@@ -554,6 +554,149 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Log-Werkzeug würdest du eine lokale Funktion statt einer normalen Methode schreiben?",
       "modelAnswer": "Wenn eine kleine Hilfsrechnung nur von einer einzigen Methode gebraucht wird, zum Beispiel das Zählen eines Zeichens in `DescribeIp`. Dann bleibt sie versteckt, und keine andere Stelle im Programm kann sie versehentlich aufrufen oder von ihr abhängen."
+    },
+    {
+      "id": "m03-l05-q1",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "Eine Klasse soll `int Value(string text)` und `double Value(string text)` enthalten. Was sagt der Compiler?",
+      "options": [
+        {
+          "text": "Das ist ein Fehler. Beide Methoden haben dieselbe Signatur, nur der Rückgabetyp unterscheidet sich.",
+          "correct": true
+        },
+        {
+          "text": "Das ist erlaubt. Der Compiler wählt nach dem Typ, den der Aufrufer erwartet.",
+          "feedback": "Der Compiler wählt nur anhand der Argumente. Der Rückgabetyp gehört nicht zur Signatur.",
+          "misconception": "m03-l05-return-type-overloads"
+        },
+        {
+          "text": "Das ist erlaubt, solange die Methoden `static` sind.",
+          "feedback": "`static` ändert die Signatur nicht. Es müssen Anzahl oder Typen der Parameter verschieden sein."
+        },
+        {
+          "text": "Das ist erlaubt, solange der Rückgabetyp `int` oder `double` ist.",
+          "feedback": "Auch dann bleibt die Signatur gleich. Die Art des Rückgabetyps spielt keine Rolle.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      ],
+      "explanation": "Die Signatur besteht aus dem Namen und den Parametern. Zwei Methoden mit gleicher Signatur im selben Typ sind ein Fehler, auch wenn die Rückgabetypen verschieden sind."
+    },
+    {
+      "id": "m03-l05-q2",
+      "lesson": "m03-l05",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Die Zeile hat dieselbe Signatur wie eine andere Methode.",
+      "example": "m03/l05/return-type-error.snippet.cs",
+      "bugLines": [
+        5
+      ],
+      "lineFeedback": {
+        "5": {
+          "feedback": "Name und Parametertyp sind wie bei der Methode darüber. Der andere Rückgabetyp macht die Signatur nicht anders.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      },
+      "explanation": "Der Rückgabetyp gehört nicht zur Signatur. Beide Methoden heißen `Value` und nehmen einen `string`."
+    },
+    {
+      "id": "m03-l05-q3",
+      "lesson": "m03-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l05/quiz-overload.cs",
+      "explanation": "`2` ist ein `int`. Es gibt keine `int`-Überladung. Der Wert lässt sich implizit in `long` und in `double` umwandeln. Weil sich `long` in `double` umwandeln lässt und nicht umgekehrt, gewinnt `long`. `2.0` ist ein `double` und passt genau."
+    },
+    {
+      "id": "m03-l05-q4",
+      "lesson": "m03-l05",
+      "type": "multi",
+      "question": "Welche Angaben gehören zur Signatur einer Methode?",
+      "options": [
+        {
+          "text": "Der Name der Methode.",
+          "correct": true
+        },
+        {
+          "text": "Die Typen der Parameter in der Reihenfolge der Liste.",
+          "correct": true
+        },
+        {
+          "text": "Der Rückgabetyp.",
+          "feedback": "Der Rückgabetyp gehört nicht zur Signatur.",
+          "misconception": "m03-l05-return-type-overloads"
+        },
+        {
+          "text": "Die Namen der Parameter.",
+          "feedback": "Die Namen der Parameter gehören nicht zur Signatur. `Show(int a)` und `Show(int b)` haben dieselbe Signatur."
+        }
+      ],
+      "explanation": "Name, Anzahl und Typen der Parameter bilden die Signatur. Rückgabetyp und Parameternamen zählen nicht."
+    },
+    {
+      "id": "m03-l05-q5",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "Die Klasse `Display` hat `Show(int value)` und `Show(double value)`. `long total = 40;` ist deklariert. Welche Überladung ruft `Display.Show(total)` auf?",
+      "options": [
+        {
+          "text": "Die mit `double`, weil sich `long` implizit in `double` umwandeln lässt.",
+          "correct": true
+        },
+        {
+          "text": "Die mit `int`, weil `40` eine ganze Zahl ist.",
+          "feedback": "Ein `long` lässt sich nicht implizit in `int` umwandeln, es könnte zu groß sein."
+        },
+        {
+          "text": "Keine, der Aufruf ist ein Fehler.",
+          "feedback": "Die `double`-Überladung passt über eine implizite Umwandlung."
+        },
+        {
+          "text": "Beide nacheinander.",
+          "feedback": "Ein Aufruf führt immer genau eine Überladung aus."
+        }
+      ],
+      "explanation": "Eine genaue Überladung für `long` fehlt. Nur die Umwandlung `long` zu `double` ist implizit möglich."
+    },
+    {
+      "id": "m03-l05-q6",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "`Math.Abs(-3)` liefert `3` und `Math.Abs(-2.5)` liefert `2.5`. Warum geht beides mit demselben Methodennamen?",
+      "options": [
+        {
+          "text": "`Math.Abs` ist überladen, es gibt Versionen für `int`, `double` und weitere Typen.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler ändert den Typ des Arguments, bis es passt.",
+          "feedback": "Er wählt eine passende Überladung. Er ändert die Argumente nicht nach Belieben."
+        },
+        {
+          "text": "`Math.Abs` hat einen optionalen Parameter für den Typ.",
+          "feedback": "Optionale Parameter lernst du in der nächsten Lektion. Sie legen keinen Typ fest."
+        },
+        {
+          "text": "Der Rückgabetyp entscheidet, welcher Code läuft.",
+          "feedback": "Der Rückgabetyp gehört nicht zur Signatur. Die Argumente entscheiden.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      ],
+      "explanation": "Mehrere Methoden dürfen denselben Namen haben, wenn ihre Parameter sich unterscheiden. Der Compiler wählt nach dem Typ des Arguments."
+    },
+    {
+      "id": "m03-l05-q7",
+      "lesson": "m03-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, woran der Compiler zwei Überladungen unterscheidet und warum der Rückgabetyp nicht reicht.",
+      "modelAnswer": "Der Compiler vergleicht die Signaturen: Name, Anzahl und Typen der Parameter. Beim Aufruf sieht er nur die Argumente und wählt die Überladung, die dazu am besten passt. Der Rückgabetyp steht nicht im Aufruf, deshalb kann er nicht entscheiden. Darum gehört er nicht zur Signatur. Zwei Methoden, die sich nur darin unterscheiden, sind ein Fehler."
+    },
+    {
+      "id": "m03-l05-q8",
+      "lesson": "m03-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug ist eine überladene Methode praktisch?",
+      "modelAnswer": "Zum Beispiel bei einer Methode `Line`, die einen Berichtswert ausgibt: Für ganze Zahlen wie die Zahl der Fehler schreibt sie den Wert direkt, für Kommazahlen wie die Fehlerrate formatiert sie ihn mit einer Nachkommastelle. Der Aufrufer benutzt immer denselben Namen, und der Typ des Wertes wählt die passende Variante."
     }
   ]
 }
