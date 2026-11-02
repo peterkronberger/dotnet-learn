@@ -854,6 +854,145 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug eine `while`-Schleife nutzen?",
       "modelAnswer": "Zum Beispiel zählt es mit `while` aufeinanderfolgende Fehlversuche, solange die nächste Zeile ein login-failed ist. Oder es liest Zeilen ein, bis eine bestimmte Zeile kommt. Die Zahl der Wiederholungen steht vorher nicht fest, die Schleife läuft, solange die Bedingung gilt."
+    },
+    {
+      "id": "m02-l07-q1",
+      "lesson": "m02-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l07/quiz-for.cs",
+      "explanation": "Der Zähler `i` nimmt die Werte `2`, `5` und `8` an. Danach ist `i` gleich `11`, und `11 < 10` ist falsch. Die Summe ist `2 + 5 + 8 = 15`."
+    },
+    {
+      "id": "m02-l07-q2",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Wie oft läuft der Block von `for (int i = 1; i <= 5; i++)`?",
+      "options": [
+        {
+          "text": "Fünfmal, mit `i` gleich `1`, `2`, `3`, `4` und `5`.",
+          "correct": true
+        },
+        {
+          "text": "Viermal, weil die Schleife bei `5` stoppt, bevor der Block läuft.",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Bedingung ist `i <= 5`. Bei `i` gleich `5` ist sie noch wahr, der Block läuft."
+        },
+        {
+          "text": "Sechsmal, weil `i` auch den Wert `0` annimmt.",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Der Zähler startet bei `1`, nicht bei `0`."
+        }
+      ],
+      "explanation": "Start bei `1`, Bedingung `i <= 5`: Die Werte `1` bis `5` sind fünf Werte."
+    },
+    {
+      "id": "m02-l07-q3",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Ein Programm soll genau 10 Zeilen ausgeben. Welche Schleife ist richtig?",
+      "options": [
+        {
+          "text": "`for (int i = 0; i < 10; i++)`",
+          "correct": true
+        },
+        {
+          "text": "`for (int i = 0; i <= 10; i++)`",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Werte `0` bis `10` sind elf Werte. Die Schleife läuft einmal zu oft."
+        },
+        {
+          "text": "`for (int i = 1; i < 10; i++)`",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Werte `1` bis `9` sind nur neun Werte. Die Schleife läuft einmal zu selten."
+        }
+      ],
+      "explanation": "Bei Start `0` und `<` läuft die Schleife genau so oft, wie die Grenze angibt. Bei Start `1` brauchst du `<=`."
+    },
+    {
+      "id": "m02-l07-q4",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "In welcher Reihenfolge arbeitet `for (int i = 0; i < 3; i++) { … }`?",
+      "options": [
+        {
+          "text": "Startanweisung einmal, dann Bedingung prüfen, Block ausführen, Zähler ändern, wieder Bedingung prüfen.",
+          "correct": true
+        },
+        {
+          "text": "Bei jedem Durchlauf läuft zuerst die Startanweisung, dann die Bedingung, dann der Block.",
+          "feedback": "Die Startanweisung läuft nur einmal, vor dem ersten Durchlauf."
+        },
+        {
+          "text": "Block ausführen, dann Bedingung prüfen, dann Zähler ändern.",
+          "feedback": "Bei `for` wird die Bedingung vor dem Block geprüft. Der Block kann deshalb auch nullmal laufen."
+        }
+      ],
+      "explanation": "Die drei Teile im Kopf sind Start, Bedingung und Änderung. Der Start läuft einmal, die Änderung nach jedem Durchlauf des Blocks."
+    },
+    {
+      "id": "m02-l07-q5",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Was geschieht bei `foreach (char c in \"abc\") { c = 'x'; }`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Variable von `foreach` nur gelesen werden darf.",
+          "correct": true
+        },
+        {
+          "text": "Der Text wird zu `xxx`.",
+          "feedback": "Die Variable ist eine Kopie des aktuellen Zeichens, und sie ist schreibgeschützt. Der Text selbst ändert sich nie."
+        },
+        {
+          "text": "Nur das erste Zeichen wird ersetzt.",
+          "feedback": "Die Zuweisung wird nicht übersetzt, das Programm läuft gar nicht."
+        }
+      ],
+      "explanation": "Die Variable einer `foreach`-Schleife ist schreibgeschützt. Eine Zuweisung an sie ist ein Übersetzungsfehler."
+    },
+    {
+      "id": "m02-l07-q6",
+      "lesson": "m02-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über Schleifenvariablen stimmen?",
+      "options": [
+        {
+          "text": "Eine Variable, die im Kopf von `for` deklariert wird, gilt nur in dieser Schleife.",
+          "correct": true
+        },
+        {
+          "text": "Zwei aufeinanderfolgende `for`-Schleifen dürfen beide eine Variable `i` deklarieren.",
+          "correct": true
+        },
+        {
+          "text": "Bei `foreach` über einen Text ist die Variable ein `char`.",
+          "correct": true
+        },
+        {
+          "text": "Nach der Schleife kannst du den Zähler `i` weiter benutzen.",
+          "feedback": "Die Variable gilt nur innerhalb der Schleife. Danach ist der Name unbekannt."
+        },
+        {
+          "text": "Die Schleifenvariable von `foreach` darf im Block verändert werden.",
+          "feedback": "Sie ist schreibgeschützt."
+        }
+      ],
+      "explanation": "Der Gültigkeitsbereich der Variablen endet mit der Schleife. Deshalb kann derselbe Name nacheinander wiederverwendet werden."
+    },
+    {
+      "id": "m02-l07-q7",
+      "lesson": "m02-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine `for`-Schleife arbeitet. Nenne die drei Teile im Kopf und wann jeder läuft.",
+      "modelAnswer": "Im Kopf stehen Start, Bedingung und Änderung. Der Start läuft einmal vor dem ersten Durchlauf und legt meist den Zähler an. Dann wird die Bedingung geprüft. Ist sie wahr, läuft der Block, danach die Änderung (meist `i++`), und die Bedingung wird erneut geprüft. Ist sie falsch, endet die Schleife.\n\nDer Zähler gilt nur in der Schleife. Ob die Schleife richtig oft läuft, hängt von Startwert und Vergleich (`<` oder `<=`) ab."
+    },
+    {
+      "id": "m02-l07-q8",
+      "lesson": "m02-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug `for` und wo `foreach` nutzen?",
+      "modelAnswer": "`for` passt, wenn die Zahl der Wiederholungen bekannt ist, zum Beispiel eine Zeile pro Fehlversuch von 1 bis zur Anzahl. `foreach` passt, wenn jedes Element einer Folge einmal drankommt, zum Beispiel jedes Zeichen einer IP-Adresse, um die Punkte zu zählen."
     }
   ]
 }

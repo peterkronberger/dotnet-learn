@@ -1741,6 +1741,84 @@
         "title": "?: operator",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/conditional-operator"
       }
+    },
+    {
+      "id": "loop-variable",
+      "term": "Loop Variable",
+      "german": "Schleifenvariable",
+      "category": "language",
+      "definition": "Eine Variable, die eine Schleife steuert oder durchläuft. Bei `for` ist es meist der Zähler, bei `foreach` der Wert des aktuellen Elements. Sie gilt nur innerhalb der Schleife.",
+      "aliases": [
+        "Schleifenvariablen",
+        "Zählvariable"
+      ],
+      "related": [
+        "loop",
+        "iteration"
+      ],
+      "lesson": "m02-l07",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "off-by-one-error",
+      "term": "Off-by-one Error",
+      "german": "Um-eins-daneben-Fehler",
+      "category": "language",
+      "definition": "Ein Fehler, bei dem eine Schleife einmal zu oft oder einmal zu selten läuft, zum Beispiel weil `<=` statt `<` steht oder der Zähler bei `1` statt bei `0` beginnt.",
+      "aliases": [
+        "Off-by-one-Fehler"
+      ],
+      "related": [
+        "loop",
+        "loop-variable"
+      ],
+      "lesson": "m02-l07",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "jump-statement",
+      "term": "Jump Statement",
+      "german": "Sprunganweisung",
+      "category": "language",
+      "definition": "Eine Anweisung, die den Ablauf an eine andere Stelle verlegt. `break` verlässt die nächste Schleife oder switch-Anweisung, `continue` springt zum nächsten Durchlauf der Schleife.",
+      "aliases": [
+        "Sprunganweisungen"
+      ],
+      "related": [
+        "loop",
+        "iteration"
+      ],
+      "lesson": "m02-l08",
+      "source": {
+        "title": "Jump statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements"
+      }
+    },
+    {
+      "id": "nested-loop",
+      "term": "Nested Loop",
+      "german": "Verschachtelte Schleife",
+      "category": "language",
+      "definition": "Eine Schleife im Block einer anderen Schleife. Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett durch.",
+      "aliases": [
+        "verschachtelte Schleifen",
+        "Nested Loops"
+      ],
+      "related": [
+        "loop",
+        "loop-variable"
+      ],
+      "lesson": "m02-l09",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
     }
   ]
 }
