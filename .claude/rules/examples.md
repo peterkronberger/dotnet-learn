@@ -11,6 +11,7 @@ paths:
 - An example may use only constructs that are explained up to its lesson or marked with a `<Forward>` note in the lesson. Code comments are a construct too (taught in module 1): do not put comments into examples of module 0.
 - Keep it short: as few lines as possible, only the current concept.
 - Keep lines short: at most about 80 characters per line, so code blocks and the runner rarely need horizontal scrolling or line wrapping.
+- Fold markers (`// @fold-start` / `// @fold-end`) hide unchanged code in the runner. SecLog task files with more than 40 lines get them from module 1 on; rules in `concept/project-seclog.md`, "Short task files".
 - Runnable examples must run on their own. Fragments that cannot run on their own end in `.snippet.cs` (CI skips them).
 - Examples that need NuGet packages (EF Core, Minimal API, xUnit, DI/logging) are projects under `website/examples/_ci/<name>/` with `run.sh` and `expected.out.txt`.
 - Input for `Console.ReadLine()` goes into `<name>.in.txt` next to the example. CI feeds it, and the lesson passes it as `stdin` to `<CSharpRunner>`.

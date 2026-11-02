@@ -1,6 +1,6 @@
 # Project SecLog – the one example project
 
-As of 2026-10-28. This file is binding for all lessons, quizzes and issues. SecLog is the **only** example project of the course. It grows in every lesson. There is no second project (the former phishing classifier is the SecLog feature "message rating", see M11).
+As of 2026-11-02. This file is binding for all lessons, quizzes and issues. SecLog is the **only** example project of the course. It grows in every lesson. There is no second project (the former phishing classifier is the SecLog feature "message rating", see M11).
 
 ## Vision
 
@@ -26,15 +26,24 @@ No attack techniques are shown. Writing security primitives is out of scope (`co
   ```
 
 - **Project step ("Projektschritt").** Every lesson has a section "Projektschritt" (step 6 of the lesson template) with the fixed frame from `concept/lesson-template.md`, section "Project step (Projektschritt)". If a lesson cannot add a real step, the section has one sentence: "In dieser Lektion kommt kein Projektschritt dazu, weil …". It does not invent an unrelated SecLog snippet.
+- **Short task files (folds).** SecLog stays **one** growing program and CI runs the full file. Only the view in the lesson gets shorter: fold markers hide unchanged blocks in the runner, and `<FoldedCode>` shows the model solution with the same folds.
+  1. **When to fold.** From module 1 on, a project task file with more than 40 lines gets folds. Module 0 never has folds (no comments in M0). Shorter files may stay without folds.
+  2. **What stays visible** ("relevant previous code"): (a) the place where the learner adds or changes code, (b) the earlier blocks that the new requirement directly uses (for example the variable it reads, the method it calls, the block it changes), (c) nothing else. Aim: at most about 40 visible lines, placeholder lines included.
+  3. **Where folds start and end.** Syntax: `// @fold-start` and `// @fold-end`. Only around whole statements, whole methods or whole type declarations, never inside an expression. Prefer the line before an English summary comment as fold start, so every visible part starts with its comment. The `// @fold-start` line has the indentation of the hidden code.
+  4. **Task and solution.** The solution file has the same folds as its task file; the new code is visible. The next lesson chooses new folds for its task (`cp` the previous solution, then move the markers).
+  5. **Placement of new code.** A requirement names the place by the comment of a visible block ("nach dem Block *Print the counts …*"). New code goes into a visible part. A requirement never asks to change folded code; if it must, unfold that block.
+  6. **No trace with folds.** A runner with `trace` and fold markers fails the build.
+  7. **Context budget.** An issue for a lesson names the previous solution file; the implementer reads only that file.
+  The checks are in `tools/check-seclog.mjs` (fold markers and the chain).
 - **New concepts first.** A concept is shown in a small, isolated example (step 3) before the project step uses it.
 - **File names.** `website/examples/mXX/lYY/seclog-<name>-task.cs`, `seclog-<name>-task.tests.snippet.cs`, `seclog-<name>-solution.cs` and their `.out.txt` snapshots. `<name>` is chosen per module and stays the same inside the module (for example `profile` in M0).
 - **Review modules (W1–W4) and M19** add no step. Their tasks may use the current state of SecLog, but they do not change it.
 
 ## Continuity rule
 
-The start code of a project task (`seclog-<name>-task.cs`) is **byte-identical** to the solution file of the previous project step (`seclog-<name>-solution.cs` of the previous lesson that had a step). The new requirement is only in the lesson text ("Neue Anforderung"), not in a code comment.
+The start code of a project task (`seclog-<name>-task.cs`) is **identical, after removing the fold marker lines** (`// @fold-start`, `// @fold-end`), to the solution file of the previous project step (`seclog-<name>-solution.cs` of the previous lesson that had a step). The new requirement is only in the lesson text ("Neue Anforderung"), not in a code comment.
 
-Check: `diff <previous solution> <new task>` is empty, and `diff <new task> <new solution>` shows only the new requirement. The PR says that the check was done.
+Check: `node tools/check-seclog.mjs` (it also runs in `bash tools/check-examples.sh`). `diff <new task> <new solution>` shows only the new requirement (and the same folds). The PR says that the check was done.
 
 Exceptions:
 
