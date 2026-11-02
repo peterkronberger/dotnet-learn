@@ -1,6 +1,7 @@
 import deM00 from './de/m00.json';
 import deM01 from './de/m01.json';
 import deM02 from './de/m02.json';
+import deM03 from './de/m03.json';
 import deDev from './de/dev.json';
 import {getExample} from './examples';
 import {splitCloze, clozeCode} from './cloze';
@@ -11,7 +12,7 @@ export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons'
 const DEFAULT_LOCALE = 'de';
 
 const FILES = {
-  de: [deM00, deM01, deM02, deDev],
+  de: [deM00, deM01, deM02, deM03, deDev],
 };
 
 const LESSON_PATTERN = /^[a-z0-9]+-l\d+$/;
