@@ -1,0 +1,10 @@
+SecLog report
+Source: sample log
+
+Failed logins:
+alice: 1
+bob: 3
+carol: 0
+
+Users with more than 1 failure:
+bob
