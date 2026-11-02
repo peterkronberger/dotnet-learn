@@ -1,6 +1,6 @@
 # Didactics – learning methods and evidence
 
-As of 2026-11-01. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
+As of 2026-11-02. This file sets **which** learning methods the course uses, **why** (evidence) and **how** they are built. Learners see this reasoning on the page "Wie dieser Kurs funktioniert" (how this course works) (`website/docs/m00-orientation/how-this-course-works.mdx`).
 
 ## Two target groups, one core path
 
@@ -24,7 +24,7 @@ As of 2026-11-01. This file sets **which** learning methods the course uses, **w
 
 | Method | Implementation | Evidence |
 | --- | --- | --- |
-| Mixed practice (interleaving) | Review modules after about 3–4 modules. First recognize which concept is asked for | [Dunlosky 2013]; evidence mostly from mathematics, not tested directly for programming |
+| Mixed practice (interleaving) | Review modules W1–W4 after 3–4 modules, 2 lessons each; every task starts with a recognition step; tasks of the same module are never next to each other (design decision) | [Dunlosky 2013]; [Brunmair & Richter 2019] (meta-analysis: moderate overall benefit, depends on the material and on the similarity of the categories). Limits: not tested directly for programming; the recognition step and the order rule are design decisions derived from interleaving, not study results |
 | Parsons problems | Put code lines in order (with a keyboard alternative). Distractors are allowed (design decision, see rule below) | [Parsons & Haden 2006] (origin of the format, no evaluation); [Denny 2008] (in CS1 exam data, Parsons scores correlate with code-writing scores); [Ericson 2017] (faster than fixing or writing code, no significant difference in learning or in retention after one week). Limits: effectiveness is not replicated enough [Du 2020], [Ericson 2022]; evidence on distractors is mixed (see rule below) |
 | Read/trace before writing | First read code and predict the output, then write. Task "In eigenen Worten erklären" (explain in your own words) | [Lopez 2008]: tracing **and** explaining together predict the ability to write |
 | Address misconceptions on purpose | Box "Achtung"; quiz distractors taken from typical misconceptions | [Qian & Lehman 2017] |
@@ -54,6 +54,7 @@ Every lesson is checked against these five points [Merrill 2002]: real task (Sec
 
 - Much of the evidence comes from memory, school or mathematics settings. Transfer to programming is plausible but not directly shown for every method.
 - The evidence for whole tasks comes from medical and professional education, and the evidence for advance organizers is mixed. Transfer to a programming course is plausible but not shown directly.
+- Interleaving: the meta-analysis [Brunmair & Richter 2019] covers 59 studies on paintings, mathematics, texts, words and others. The benefit depends on the material: smaller for mathematics than for visual material, not significant for expository texts, and blocked practice was better for word-based material. It is larger when categories are similar to each other. None of this is a direct test for programming; whether code concepts behave like these materials is open.
 - The platform does not measure its own learning success (no tracking).
 
 ## AI and learning (for the paragraph on "Wie dieser Kurs funktioniert")
@@ -95,5 +96,7 @@ Verified (bibliographic record checked, as of 2026-10-29; the Parsons entries on
 - [Smith 2024] Smith, D. H., Poulsen, S., Emeka, C., Wu, Z., Haynes-Magyar, C., & Zilles, C. (2024). Distractors make you pay attention: Investigating the learning outcomes of including distractor blocks in Parsons problems. *ICER '24* (Vol. 1), 177–191. https://doi.org/10.1145/3632620.3671114 – Record checked 2026-11-01 (Crossref); abstract read.
 - [Du 2020] Du, Y., Luxton-Reilly, A., & Denny, P. (2020). A review of research on Parsons problems. *ACE 2020*, 195–202. https://doi.org/10.1145/3373165.3373187 – Record checked 2026-11-01 (Crossref, DBLP). No primary abstract readable; cited only for: effectiveness uncertain, replications lacking.
 - [Ericson 2022] Ericson, B. J., Denny, P., Prather, J., et al. (2022). Parsons problems and beyond: Systematic literature review and empirical study designs. *ITiCSE-WGR '22*, 191–234. https://doi.org/10.1145/3571785.3574127 – Record checked 2026-11-01 (Crossref); abstract read (open post-print). Review of more than 1,000 articles; few replications.
+
+- [Brunmair & Richter 2019] Brunmair, M., & Richter, T. (2019). Similarity matters: A meta-analysis of interleaved learning and its moderators. *Psychological Bulletin, 145*(11), 1029–1052. https://doi.org/10.1037/bul0000209 – Record checked 2026-11-02 (Crossref, PubMed PMID 31556629); abstract read. 59 studies; moderate overall effect (Hedges' g = 0.42); depends on material and similarity of the categories.
 
 Removed on 2026-10-28 because no primary record could be checked (do not use before verifying): Barnes & Clawson (1975), Kornell, Hays & Bjork (2009), Sweller (1988), Mayer (2009), Shute (2008).
