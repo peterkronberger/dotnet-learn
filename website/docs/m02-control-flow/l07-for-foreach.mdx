@@ -1,0 +1,201 @@
+---
+title: Zählschleifen mit for und Durchlaufen mit foreach
+sidebar_position: 7
+description: "for wiederholt einen Block eine bekannte Anzahl von Malen, foreach läuft einmal über jedes Zeichen eines Textes. Du lernst die drei Teile des for-Kopfes und den Off-by-one-Fehler kennen."
+lesson_id: m02-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import forBasic from '!!raw-loader!@site/examples/m02/l07/for-basic.cs';
+import forBasicOutput from '!!raw-loader!@site/examples/m02/l07/for-basic.out.txt';
+import offByOne from '!!raw-loader!@site/examples/m02/l07/off-by-one.cs';
+import offByOneOutput from '!!raw-loader!@site/examples/m02/l07/off-by-one.out.txt';
+import foreachString from '!!raw-loader!@site/examples/m02/l07/foreach-string.cs';
+import foreachStringOutput from '!!raw-loader!@site/examples/m02/l07/foreach-string.out.txt';
+import foreachReadonly from '!!raw-loader!@site/examples/m02/l07/foreach-readonly.snippet.cs';
+import sumGaps from '!!raw-loader!@site/examples/m02/l07/sum-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l07/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l07/seclog-analysis-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l07/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l07/seclog-analysis-solution.cs';
+
+# Zählschleifen mit for und Durchlaufen mit foreach
+
+:::note[Lernziele]
+- Du schreibst eine `for`-Schleife und sagst voraus, wie oft ihr Block läuft.
+- Du nennst die drei Teile im Kopf von `for` und die Reihenfolge, in der sie laufen.
+- Du erkennst einen Off-by-one-Fehler an Startwert und Vergleich.
+- Du gehst mit `foreach` über die Zeichen eines Textes und erklärst, warum die Variable nur gelesen wird.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l06-q2" />
+
+<Quiz id="m02-l03-q3" />
+
+<Quiz id="m01-l04-q3" />
+
+## for: eine Schleife mit eingebautem Zähler
+
+Bei einer `while`-Schleife stehen Start, Bedingung und Änderung des Zählers an drei verschiedenen Stellen. Die `for`-Schleife schreibt sie in einen Kopf, getrennt durch Semikolons:
+
+- **Start:** `int round = 1` läuft einmal, bevor die Schleife beginnt. Es legt die <Term id="loop-variable">Schleifenvariable (Loop Variable)</Term> an.
+- **Bedingung:** `round <= 3` wird vor jedem Durchlauf geprüft, wie bei `while`.
+- **Änderung:** `round++` läuft nach jedem Durchlauf des Blocks.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Welchen Wert hat `round` im letzten Durchlauf?
+:::
+
+<CSharpRunner id="m02-l07-for" code={forBasic} predict expected={forBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Round 1`, `Round 2`, `Round 3` und `done`.
+
+1. **Start:** `round` wird `1`. Das passiert nur einmal.
+2. **Bedingung prüfen:** `1 <= 3` ist wahr, der Block läuft und gibt `Round 1` aus.
+3. **Ändern und erneut prüfen:** `round++` setzt `round` auf `2`, dann wird wieder geprüft. Das wiederholt sich bis `3`.
+4. **Ende:** Nach dem dritten Durchlauf ist `round` gleich `4`. Die Bedingung ist falsch, die Schleife endet, und `done` wird ausgegeben.
+
+**Was passiert, wenn du `round` nach der Schleife ausgibst?** Der Compiler meldet einen Fehler. Die Variable gilt nur in der Schleife. Deshalb darf eine zweite `for`-Schleife den Namen `round` noch einmal deklarieren.
+
+</details>
+
+## Der Klassiker: einmal zu oft, einmal zu selten
+
+Ob eine Schleife richtig oft läuft, entscheiden zwei Dinge: der Startwert und der Vergleich. Ein Fehler um genau eins heißt <Term id="off-by-one-error">Off-by-one-Fehler</Term>.
+
+:::info[Vorhersage]
+Drei Schleifen zählen, wie oft ihr Block läuft: `i` von `0` mit `<`, von `1` mit `<=` und von `0` mit `<=`, jeweils bis `3`. Welche drei Zahlen stehen in der Ausgabe?
+:::
+
+<CSharpRunner id="m02-l07-off-by-one" code={offByOne} predict expected={offByOneOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3 3 4`.
+
+1. **Start bei 0 mit `<`:** Die Werte sind `0`, `1`, `2`. Das sind drei Werte.
+2. **Start bei 1 mit `<=`:** Die Werte sind `1`, `2`, `3`. Das sind auch drei Werte.
+3. **Start bei 0 mit `<=`:** Die Werte sind `0`, `1`, `2`, `3`. Das sind vier Werte, die Schleife läuft einmal zu oft.
+
+Faustregel: Bei Start `0` und `<` gibt die Grenze die Anzahl der Durchläufe an.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l07-off-by-one" />
+
+**„`<=` und `<` machen keinen großen Unterschied, und ob ich bei 0 oder 1 starte, ist egal.“** Beides ändert die Zahl der Durchläufe um eins. Zähle im Zweifel die Werte der Schleifenvariablen von Hand auf.
+:::
+
+## foreach: einmal pro Zeichen
+
+Manchmal willst du nicht zählen, sondern jedes Element einer Folge einmal bearbeiten. Ein `string` ist eine Folge von `char`-Werten. Die `foreach`-Schleife nimmt nacheinander jedes Zeichen in eine Variable und führt für jedes den Block aus. Du musst keinen Zähler anlegen und keine Grenze angeben.
+
+Die Variable von `foreach` darf im Block nur gelesen werden. Eine Zuweisung an sie übersetzt der Compiler nicht.
+
+:::info[Vorhersage]
+Wie oft steht im Text `banana` der Buchstabe `a`? Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l07-foreach" code={foreachString} predict expected={foreachStringOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3 times a`.
+
+1. **Zeichen holen:** Der erste Durchlauf hat `letter` gleich `'b'`, der zweite `'a'`, und so weiter, bis zum letzten Zeichen.
+2. **Prüfen:** `letter == 'a'` vergleicht zwei `char`-Werte. Ist es wahr, zählt der Block `count` hoch.
+3. **Ende:** Nach dem sechsten Zeichen endet die Schleife von selbst.
+
+**Was passiert, wenn du in den Block `letter = 'x';` schreibst?** Der Code lässt sich nicht übersetzen:
+
+<CodeBlock language="csharp" title="foreach-readonly.snippet.cs">{foreachReadonly}</CodeBlock>
+
+Der Text selbst bleibt unverändert, `foreach` liest ihn nur.
+
+</details>
+
+`foreach` funktioniert auch bei Sammlungen wie Arrays und Listen. Wie sie aufgebaut sind, lernst du in Modul 5.
+
+## Lückenbeispiel
+
+Das Programm soll die Summe der Zahlen `1` bis `4` ausgeben. Das ist `10`. Ändere den Startwert und die Bedingung im Kopf der Schleife, sodass genau diese vier Zahlen addiert werden.
+
+<CSharpRunner id="m02-l07-gaps" code={sumGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Start:** `int i = 1`
+2. **Bedingung:** `i <= 4`
+
+Die Ausgabe ist dann `10`. Mit dem Startwert `0` und `i < 4` addiert das Programm `0 + 1 + 2 + 3` und gibt `6` aus.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Der Start läuft einmal, danach wird die Bedingung ausgewertet. Ist sie wahr (oder fehlt sie), läuft der Block, dann die Änderung, und die Bedingung wird erneut ausgewertet ([§13.9.4 The for statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1394-the-for-statement)). Die Variable von `foreach` ist im Block schreibgeschützt ([§13.9.5 The foreach statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1395-the-foreach-statement)). Beide Schleifen sind viel älter als C# 12 und brauchen kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt aufeinanderfolgende Fehlversuche in einer Folge von Ereignissen.
+
+**Neue Anforderung:** SecLog soll die Fehlversuche von `bob` einzeln auflisten und die IP-Adresse untersuchen. Gib mit einer `for`-Schleife die Zeilen `Attempt 1` bis `Attempt 5` aus, eine pro Fehlversuch (`bobFailures`). Zähle danach mit `foreach` über `ip` die Punkte und gib `Dots in IP: 3` aus. Die Ausgabe hat jetzt 35 Zeilen.
+
+<CSharpRunner id="m02-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Zählen mit for:** Der Zähler `attempt` startet bei `1` und läuft bis `bobFailures`. Mit `<=` kommt auch der letzte Fehlversuch dran.
+2. **Vorbereiten:** Der Zähler `dots` startet bei `0`.
+3. **Durchlaufen mit foreach:** Die Schleife nimmt jedes Zeichen von `ip` in `symbol`.
+4. **Prüfen und zählen:** Ist das Zeichen ein Punkt, zählt `dots` hoch. Danach steht `Dots in IP: 3` in der Ausgabe.
+
+</details>
+
+**Neuer Stand:** SecLog listet Fehlversuche einzeln auf und untersucht die Zeichen einer IP-Adresse.
+
+## Zusammenfassung
+
+Die `for`-Schleife fasst Start, Bedingung und Änderung in einem Kopf zusammen. Der Start läuft einmal, die Bedingung vor jedem Durchlauf, die Änderung nach jedem Durchlauf. Startwert und Vergleich bestimmen, wie oft der Block läuft. Ein Fehler um eins ist der häufigste Fehler bei Zählschleifen. Die Schleifenvariable gilt nur in der Schleife. `foreach` nimmt nacheinander jedes Zeichen eines Textes in eine Variable, die nur gelesen werden darf.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l07-q1" />
+
+<Quiz id="m02-l07-q2" />
+
+<Quiz id="m02-l07-q3" />
+
+<Quiz id="m02-l07-q4" />
+
+<Quiz id="m02-l07-q5" />
+
+<Quiz id="m02-l07-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Iterationsanweisungen (for, foreach, do, while)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements)

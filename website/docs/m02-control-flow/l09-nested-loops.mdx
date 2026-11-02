@@ -1,0 +1,185 @@
+---
+title: Verschachtelte Schleifen
+sidebar_position: 9
+description: "Eine Schleife in einer Schleife: Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett durch. break und continue wirken nur auf die innere."
+lesson_id: m02-l09
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import nestedRectangle from '!!raw-loader!@site/examples/m02/l09/nested-rectangle.cs';
+import nestedRectangleOutput from '!!raw-loader!@site/examples/m02/l09/nested-rectangle.out.txt';
+import nestedCount from '!!raw-loader!@site/examples/m02/l09/nested-count.cs';
+import nestedCountOutput from '!!raw-loader!@site/examples/m02/l09/nested-count.out.txt';
+import breakInner from '!!raw-loader!@site/examples/m02/l09/break-inner.cs';
+import breakInnerOutput from '!!raw-loader!@site/examples/m02/l09/break-inner.out.txt';
+import triangleGaps from '!!raw-loader!@site/examples/m02/l09/triangle-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-solution.cs';
+
+# Verschachtelte Schleifen
+
+:::note[Lernziele]
+- Du schreibst eine Schleife in eine andere und sagst voraus, wie oft der innere Block insgesamt läuft.
+- Du erklärst, dass die innere Schleife bei jedem Durchlauf der äußeren neu startet.
+- Du sagst voraus, dass `break` und `continue` in der inneren Schleife nur die innere betreffen.
+- Du gibst mit zwei Schleifen ein Zeichenmuster aus.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l08-q2" />
+
+<Quiz id="m02-l07-q2" />
+
+<Quiz id="m02-l04-q4" />
+
+## Eine Schleife in einer Schleife
+
+Der Block einer Schleife darf jede Anweisung enthalten, also auch eine weitere Schleife. Man nennt das <Term id="nested-loop">verschachtelte Schleifen (Nested Loops)</Term>. Die äußere Schleife wählt zum Beispiel die Zeile, die innere läuft über die Spalten dieser Zeile.
+
+Die innere Schleife läuft bei **jedem** Durchlauf der äußeren komplett von vorn durch: Ihr Start läuft jedes Mal neu. Die beiden Schleifenvariablen brauchen verschiedene Namen, weil die äußere im inneren Block noch gilt. `Console.Write` gibt Text ohne Zeilenumbruch aus, `Console.WriteLine()` ohne Text beendet die Zeile.
+
+:::info[Vorhersage]
+Wie sieht die Ausgabe aus? Wie viele Zeilen sind es, und wie viele `*` stehen in jeder?
+:::
+
+<CSharpRunner id="m02-l09-rectangle" code={nestedRectangle} predict expected={nestedRectangleOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind drei Zeilen mit je vier Sternen.
+
+1. **Zeile wählen:** Die äußere Schleife setzt `row` auf `1`, `2` und `3`.
+2. **Zeile füllen:** Die innere Schleife gibt für `column` von `1` bis `4` je ein `*` aus, ohne Zeilenumbruch.
+3. **Zeile beenden:** Nach der inneren Schleife beendet `Console.WriteLine();` die Zeile. Dann folgt der nächste Durchlauf der äußeren Schleife.
+
+**Was passiert, wenn `Console.WriteLine();` in der inneren Schleife steht?** Dann endet jede Zeile nach einem Stern, es sind zwölf Zeilen mit je einem `*`.
+
+</details>
+
+## Wie oft läuft der innere Block?
+
+Die Zahl der Durchläufe des inneren Blocks ist das Produkt: Durchläufe der äußeren Schleife mal Durchläufe der inneren.
+
+:::info[Vorhersage]
+Die äußere Schleife läuft dreimal, die innere zweimal pro Durchlauf. In welcher Reihenfolge erscheinen die Zeilen, und welche Zahl steht in der letzten?
+:::
+
+<CSharpRunner id="m02-l09-count" code={nestedCount} predict expected={nestedCountOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind sechs Zeilen von `outer 1, step 1` bis `outer 3, step 2` und zuletzt `inner block ran 6 times`.
+
+1. **Äußerer Durchlauf 1:** Die innere Schleife gibt `step 1` und `step 2` aus.
+2. **Äußerer Durchlauf 2 und 3:** Die innere Schleife startet jedes Mal neu bei `step 1`.
+3. **Summe:** 3 × 2 = 6 Durchläufe des inneren Blocks.
+
+</details>
+
+## break wirkt nur auf die innere Schleife
+
+`break` und `continue` betreffen immer die **innerste** Schleife, in der sie stehen. Ein `break` in der inneren Schleife verlässt nur diese. Die äußere Schleife macht danach mit ihrem nächsten Durchlauf weiter.
+
+:::info[Vorhersage]
+Die innere Schleife bricht bei `column == 2` ab. Welche Zeilen erscheinen? Läuft die äußere Schleife trotzdem dreimal?
+:::
+
+<CSharpRunner id="m02-l09-break" code={breakInner} predict expected={breakInnerOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `row 1, column 1`, `row 2, column 1`, `row 3, column 1` und `done`.
+
+1. **Innen abbrechen:** In jedem äußeren Durchlauf gibt die innere Schleife `column 1` aus. Bei `column` gleich `2` verlässt `break` sie.
+2. **Außen weitermachen:** Die äußere Schleife läuft dreimal, weil das `break` sie nicht betrifft.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l09-break-leaves-all-loops" />
+
+**„Ein `break` in der inneren Schleife beendet auch die äußere.“** Es verlässt nur die innere Schleife. Die äußere läuft weiter. Willst du auch die äußere beenden, brauchst du dort eine eigene Prüfung mit `break`.
+:::
+
+## Lückenbeispiel
+
+Das Programm soll ein Dreieck ausgeben: `#`, `##`, `###` in drei Zeilen. Zurzeit gibt es drei Zeilen mit je `###` aus. Ändere die Bedingung der inneren Schleife, sodass sie bis zum Wert von `row` läuft.
+
+<CSharpRunner id="m02-l09-gaps" code={triangleGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Innere Grenze:** `for (int column = 1; column <= row; column++)`
+
+In Zeile 1 läuft die innere Schleife einmal, in Zeile 2 zweimal, in Zeile 3 dreimal.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Der Block einer Schleife ist eine Anweisung wie jede andere, deshalb darf er wieder eine Schleife enthalten ([§13.9 Iteration statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#139-iteration-statements)). `break` und `continue` wirken auf die nächste umgebende Anweisung ([§13.10.2 The break statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13102-the-break-statement)). Eine Variable im Kopf von `for` gilt im ganzen `for`, also auch in einer inneren Schleife ([§13.9.4 The for statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1394-the-for-statement)). Verschachtelte Schleifen sind viel älter als C# 12 und brauchen kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest Datum und Ziffern aus Zeitstempel und IP-Adresse.
+
+**Neue Anforderung:** SecLog soll die Fehlversuche pro Nutzer als Balkendiagramm aus Text zeigen. Die Daten kommen aus dem Beispiel-Log: alice 1, bob 5, carol 0, dave 1. Eine äußere `for`-Schleife läuft über die Nutzernummern `1` bis `4`. Ein switch-Ausdruck liefert für die Nummer den Namen und ein zweiter die Anzahl. Eine innere Schleife gibt pro Fehlversuch ein `#` aus. Eine Zeile sieht so aus: `bob |#####`. Die Ausgabe hat jetzt 41 Zeilen.
+
+<CSharpRunner id="m02-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Nutzer wählen:** Die äußere Schleife zählt `userNumber` von `1` bis `4`.
+2. **Werte holen:** Je ein switch-Ausdruck übersetzt die Nummer in den Namen und in die Zahl der Fehlversuche.
+3. **Balken zeichnen:** `Console.Write` gibt den Namen und das Trennzeichen ohne Zeilenumbruch aus. Die innere Schleife gibt `count`-mal ein `#` aus. Bei `carol` mit `0` läuft sie nullmal.
+4. **Zeile beenden:** `Console.WriteLine();` nach der inneren Schleife beendet die Zeile.
+
+</details>
+
+**Neuer Stand:** SecLog zeigt die Fehlversuche pro Nutzer als Balkendiagramm. Das Modul „Kontrollfluss“ ist damit abgeschlossen: SecLog bewertet Fehlversuche, wählt Aktionen und geht Ereignisse mit Schleifen durch.
+
+Verschachtelte Schleifen sind außerdem die Grundlage für zweidimensionale Arrays in Modul 5.
+
+## Zusammenfassung
+
+Eine verschachtelte Schleife steht im Block einer anderen Schleife. Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett von vorn durch, die Zahl der Durchläufe des inneren Blocks ist das Produkt beider Anzahlen. Die beiden Schleifenvariablen haben verschiedene Namen. `break` und `continue` betreffen nur die innerste Schleife, in der sie stehen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l09-q1" />
+
+<Quiz id="m02-l09-q2" />
+
+<Quiz id="m02-l09-q3" />
+
+<Quiz id="m02-l09-q4" />
+
+<Quiz id="m02-l09-q5" />
+
+<Quiz id="m02-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l09-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Iterationsanweisungen (for, foreach, do, while)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements)

@@ -854,6 +854,423 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug eine `while`-Schleife nutzen?",
       "modelAnswer": "Zum Beispiel zählt es mit `while` aufeinanderfolgende Fehlversuche, solange die nächste Zeile ein login-failed ist. Oder es liest Zeilen ein, bis eine bestimmte Zeile kommt. Die Zahl der Wiederholungen steht vorher nicht fest, die Schleife läuft, solange die Bedingung gilt."
+    },
+    {
+      "id": "m02-l07-q1",
+      "lesson": "m02-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l07/quiz-for.cs",
+      "explanation": "Der Zähler `i` nimmt die Werte `2`, `5` und `8` an. Danach ist `i` gleich `11`, und `11 < 10` ist falsch. Die Summe ist `2 + 5 + 8 = 15`."
+    },
+    {
+      "id": "m02-l07-q2",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Wie oft läuft der Block von `for (int i = 1; i <= 5; i++)`?",
+      "options": [
+        {
+          "text": "Fünfmal, mit `i` gleich `1`, `2`, `3`, `4` und `5`.",
+          "correct": true
+        },
+        {
+          "text": "Viermal, weil die Schleife bei `5` stoppt, bevor der Block läuft.",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Bedingung ist `i <= 5`. Bei `i` gleich `5` ist sie noch wahr, der Block läuft."
+        },
+        {
+          "text": "Sechsmal, weil `i` auch den Wert `0` annimmt.",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Der Zähler startet bei `1`, nicht bei `0`."
+        }
+      ],
+      "explanation": "Start bei `1`, Bedingung `i <= 5`: Die Werte `1` bis `5` sind fünf Werte."
+    },
+    {
+      "id": "m02-l07-q3",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Ein Programm soll genau 10 Zeilen ausgeben. Welche Schleife ist richtig?",
+      "options": [
+        {
+          "text": "`for (int i = 0; i < 10; i++)`",
+          "correct": true
+        },
+        {
+          "text": "`for (int i = 0; i <= 10; i++)`",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Werte `0` bis `10` sind elf Werte. Die Schleife läuft einmal zu oft."
+        },
+        {
+          "text": "`for (int i = 1; i < 10; i++)`",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "Die Werte `1` bis `9` sind nur neun Werte. Die Schleife läuft einmal zu selten."
+        }
+      ],
+      "explanation": "Bei Start `0` und `<` läuft die Schleife genau so oft, wie die Grenze angibt. Bei Start `1` brauchst du `<=`."
+    },
+    {
+      "id": "m02-l07-q4",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "In welcher Reihenfolge arbeitet `for (int i = 0; i < 3; i++) { … }`?",
+      "options": [
+        {
+          "text": "Startanweisung einmal, dann Bedingung prüfen, Block ausführen, Zähler ändern, wieder Bedingung prüfen.",
+          "correct": true
+        },
+        {
+          "text": "Bei jedem Durchlauf läuft zuerst die Startanweisung, dann die Bedingung, dann der Block.",
+          "feedback": "Die Startanweisung läuft nur einmal, vor dem ersten Durchlauf."
+        },
+        {
+          "text": "Block ausführen, dann Bedingung prüfen, dann Zähler ändern.",
+          "feedback": "Bei `for` wird die Bedingung vor dem Block geprüft. Der Block kann deshalb auch nullmal laufen."
+        }
+      ],
+      "explanation": "Die drei Teile im Kopf sind Start, Bedingung und Änderung. Der Start läuft einmal, die Änderung nach jedem Durchlauf des Blocks."
+    },
+    {
+      "id": "m02-l07-q5",
+      "lesson": "m02-l07",
+      "type": "single",
+      "question": "Was geschieht bei `foreach (char c in \"abc\") { c = 'x'; }`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Variable von `foreach` nur gelesen werden darf.",
+          "correct": true
+        },
+        {
+          "text": "Der Text wird zu `xxx`.",
+          "feedback": "Die Variable ist eine Kopie des aktuellen Zeichens, und sie ist schreibgeschützt. Der Text selbst ändert sich nie."
+        },
+        {
+          "text": "Nur das erste Zeichen wird ersetzt.",
+          "feedback": "Die Zuweisung wird nicht übersetzt, das Programm läuft gar nicht."
+        }
+      ],
+      "explanation": "Die Variable einer `foreach`-Schleife ist schreibgeschützt. Eine Zuweisung an sie ist ein Übersetzungsfehler."
+    },
+    {
+      "id": "m02-l07-q6",
+      "lesson": "m02-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über Schleifenvariablen stimmen?",
+      "options": [
+        {
+          "text": "Eine Variable, die im Kopf von `for` deklariert wird, gilt nur in dieser Schleife.",
+          "correct": true
+        },
+        {
+          "text": "Zwei aufeinanderfolgende `for`-Schleifen dürfen beide eine Variable `i` deklarieren.",
+          "correct": true
+        },
+        {
+          "text": "Bei `foreach` über einen Text ist die Variable ein `char`.",
+          "correct": true
+        },
+        {
+          "text": "Nach der Schleife kannst du den Zähler `i` weiter benutzen.",
+          "feedback": "Die Variable gilt nur innerhalb der Schleife. Danach ist der Name unbekannt."
+        },
+        {
+          "text": "Die Schleifenvariable von `foreach` darf im Block verändert werden.",
+          "feedback": "Sie ist schreibgeschützt."
+        }
+      ],
+      "explanation": "Der Gültigkeitsbereich der Variablen endet mit der Schleife. Deshalb kann derselbe Name nacheinander wiederverwendet werden."
+    },
+    {
+      "id": "m02-l07-q7",
+      "lesson": "m02-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine `for`-Schleife arbeitet. Nenne die drei Teile im Kopf und wann jeder läuft.",
+      "modelAnswer": "Im Kopf stehen Start, Bedingung und Änderung. Der Start läuft einmal vor dem ersten Durchlauf und legt meist den Zähler an. Dann wird die Bedingung geprüft. Ist sie wahr, läuft der Block, danach die Änderung (meist `i++`), und die Bedingung wird erneut geprüft. Ist sie falsch, endet die Schleife.\n\nDer Zähler gilt nur in der Schleife. Ob die Schleife richtig oft läuft, hängt von Startwert und Vergleich (`<` oder `<=`) ab."
+    },
+    {
+      "id": "m02-l07-q8",
+      "lesson": "m02-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug `for` und wo `foreach` nutzen?",
+      "modelAnswer": "`for` passt, wenn die Zahl der Wiederholungen bekannt ist, zum Beispiel eine Zeile pro Fehlversuch von 1 bis zur Anzahl. `foreach` passt, wenn jedes Element einer Folge einmal drankommt, zum Beispiel jedes Zeichen einer IP-Adresse, um die Punkte zu zählen."
+    },
+    {
+      "id": "m02-l08-q1",
+      "lesson": "m02-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l08/quiz-jumps.cs",
+      "explanation": "Bei `i` gleich `1` wird addiert (`sum` ist 1). Bei `2` überspringt `continue` den Rest des Durchlaufs. Bei `3` und `4` wird addiert (`sum` ist 8). Bei `5` beendet `break` die Schleife. `6` wird nie erreicht. Die Ausgabe ist `8`."
+    },
+    {
+      "id": "m02-l08-q2",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "Was bewirkt `continue` in einer Schleife?",
+      "options": [
+        {
+          "text": "Es überspringt den Rest des aktuellen Durchlaufs, die Schleife macht mit dem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Es beendet die Schleife, und das Programm macht hinter der Schleife weiter.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "Das macht `break`. `continue` beendet nur den aktuellen Durchlauf."
+        },
+        {
+          "text": "Es beendet das ganze Programm.",
+          "feedback": "`continue` wirkt nur auf die Schleife, in der es steht."
+        }
+      ],
+      "explanation": "`continue` springt zur nächsten Iteration. Bei `for` läuft vorher noch die Änderung des Zählers, und die Bedingung wird geprüft."
+    },
+    {
+      "id": "m02-l08-q3",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "`foreach (char c in \"12x45\")` zählt mit `n++` jedes Zeichen. Im Block steht davor `if (c == 'x') { continue; }`. Welchen Wert hat `n` danach?",
+      "options": [
+        {
+          "text": "`4`, weil nur das Zeichen `x` übersprungen wird und die Schleife weiterläuft.",
+          "correct": true
+        },
+        {
+          "text": "`2`, weil die Schleife bei `x` endet.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "Bei `break` wäre es `2`. `continue` beendet die Schleife nicht."
+        },
+        {
+          "text": "`5`, weil `continue` nichts bewirkt.",
+          "feedback": "Bei `x` wird `n++` übersprungen, deshalb zählt `n` nur vier Zeichen."
+        }
+      ],
+      "explanation": "`continue` überspringt `n++` nur für das Zeichen `x`. Die Zeichen `4` und `5` kommen danach noch dran."
+    },
+    {
+      "id": "m02-l08-q4",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "Eine Schleife soll aufhören, sobald sie das gesuchte Zeichen gefunden hat. Was nimmst du?",
+      "options": [
+        {
+          "text": "`break;`",
+          "correct": true
+        },
+        {
+          "text": "`continue;`",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "`continue` springt nur zum nächsten Durchlauf. Die Schleife sucht weiter."
+        },
+        {
+          "text": "Nichts, eine Schleife endet von selbst, sobald ein Zeichen passt.",
+          "feedback": "Die Schleife endet nur, wenn ihre Bedingung falsch wird, bei `foreach` erst nach dem letzten Element."
+        }
+      ],
+      "explanation": "`break` verlässt die nächste umgebende Schleife sofort. Danach läuft die Anweisung hinter der Schleife."
+    },
+    {
+      "id": "m02-l08-q5",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "In einer `for`-Schleife steht eine `switch`-Anweisung. In einem Abschnitt steht `break;`. Was beendet dieses `break`?",
+      "options": [
+        {
+          "text": "Nur die `switch`-Anweisung. Die `for`-Schleife läuft mit dem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Die `for`-Schleife.",
+          "feedback": "`break` wirkt auf die nächste umgebende Schleife oder `switch`-Anweisung. Hier ist das die `switch`-Anweisung."
+        },
+        {
+          "text": "Beide, erst die `switch`-Anweisung und dann die Schleife.",
+          "feedback": "Ein `break` beendet immer nur eine Anweisung, die innerste."
+        }
+      ],
+      "explanation": "`break` gehört zur innersten umgebenden Anweisung, die es beenden kann. Im switch-Abschnitt ist das der switch."
+    },
+    {
+      "id": "m02-l08-q6",
+      "lesson": "m02-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über `break` und `continue` stimmen?",
+      "options": [
+        {
+          "text": "`break` beendet die Schleife sofort.",
+          "correct": true
+        },
+        {
+          "text": "`continue` überspringt den Rest des aktuellen Durchlaufs.",
+          "correct": true
+        },
+        {
+          "text": "Nach `continue` kann die Schleife noch weitere Durchläufe haben.",
+          "correct": true
+        },
+        {
+          "text": "`continue` beendet die Schleife wie `break`.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "`continue` führt zum nächsten Durchlauf, `break` verlässt die Schleife."
+        },
+        {
+          "text": "`break` startet die Schleife von vorn.",
+          "feedback": "Die Schleife wird verlassen, nicht neu gestartet."
+        }
+      ],
+      "explanation": "`break` verlässt die Schleife, `continue` springt zum nächsten Durchlauf."
+    },
+    {
+      "id": "m02-l08-q7",
+      "lesson": "m02-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `break` und `continue` in einer Schleife.",
+      "modelAnswer": "`break` beendet die Schleife sofort. Das Programm macht mit der Anweisung hinter der Schleife weiter, auch wenn die Bedingung noch wahr wäre.\n\n`continue` beendet nur den aktuellen Durchlauf. Der Rest des Blocks wird übersprungen, und die Schleife macht mit dem nächsten Durchlauf weiter. Bei `for` läuft vorher die Änderung des Zählers, und die Bedingung wird geprüft."
+    },
+    {
+      "id": "m02-l08-q8",
+      "lesson": "m02-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug `break` und wo `continue` nutzen?",
+      "modelAnswer": "`break` passt, wenn die Suche fertig ist, zum Beispiel beim Lesen eines Zeitstempels bis zum Buchstaben `T`, weil danach nichts mehr gebraucht wird. `continue` passt, wenn einzelne Elemente übersprungen werden sollen, zum Beispiel Punkte in einer IP-Adresse oder Zeilen, die kein Ereignis enthalten."
+    },
+    {
+      "id": "m02-l09-q1",
+      "lesson": "m02-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l09/quiz-nested.cs",
+      "explanation": "Bei `a` gleich `1` läuft die innere Schleife für `b` gleich `1` und zählt. Bei `a` gleich `2` und `3` zählt sie für `b` gleich `1`, bei `b` gleich `2` beendet `break` nur die innere Schleife. Die äußere Schleife läuft weiter. Insgesamt wird dreimal gezählt, die Ausgabe ist `3`."
+    },
+    {
+      "id": "m02-l09-q2",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Eine äußere Schleife läuft 4-mal, die innere 5-mal pro Durchlauf der äußeren. Wie oft läuft der Block der inneren Schleife insgesamt?",
+      "options": [
+        {
+          "text": "20-mal, weil die innere Schleife bei jedem äußeren Durchlauf komplett läuft.",
+          "correct": true
+        },
+        {
+          "text": "9-mal, die Zahlen werden addiert.",
+          "feedback": "Die innere Schleife läuft in jedem der 4 äußeren Durchläufe neu 5-mal, also wird multipliziert."
+        },
+        {
+          "text": "5-mal, weil die innere Schleife nur einmal startet.",
+          "feedback": "Sie startet bei jedem äußeren Durchlauf neu."
+        }
+      ],
+      "explanation": "Die innere Schleife läuft bei jedem Schritt der äußeren von vorn: 4 × 5 = 20 Durchläufe."
+    },
+    {
+      "id": "m02-l09-q3",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "In der inneren von zwei verschachtelten `for`-Schleifen steht `break;`. Was passiert?",
+      "options": [
+        {
+          "text": "Nur die innere Schleife endet. Die äußere macht mit ihrem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Beide Schleifen enden.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "`break` wirkt nur auf die nächste umgebende Schleife, also auf die innere."
+        },
+        {
+          "text": "Nur die äußere Schleife endet.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Die innere Schleife ist die nächste umgebende Schleife des `break`. Die äußere läuft weiter."
+        }
+      ],
+      "explanation": "`break` und `continue` betreffen immer die innerste Schleife, in der sie stehen."
+    },
+    {
+      "id": "m02-l09-q4",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Ein Programm findet in der inneren Schleife ein Ergebnis und schreibt dort `break;`, weil es alles beenden will. Danach läuft die äußere Schleife aber weiter. Was ist die Ursache?",
+      "options": [
+        {
+          "text": "`break` hat nur die innere Schleife verlassen.",
+          "correct": true
+        },
+        {
+          "text": "`break` beendet immer alle Schleifen, der Fehler liegt woanders.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "`break` verlässt nur die nächste umgebende Schleife."
+        },
+        {
+          "text": "Die äußere Schleife ignoriert ein `break` der inneren Schleife.",
+          "feedback": "Die äußere Schleife bekommt davon nichts mit. Das `break` gehört zur inneren."
+        }
+      ],
+      "explanation": "Um die äußere Schleife zu beenden, brauchst du dort ein eigenes `break`, zum Beispiel mit einer Hilfsvariable, die du in der äußeren Schleife prüfst."
+    },
+    {
+      "id": "m02-l09-q5",
+      "lesson": "m02-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über verschachtelte Schleifen stimmen?",
+      "options": [
+        {
+          "text": "Die innere Schleife startet bei jedem Durchlauf der äußeren neu.",
+          "correct": true
+        },
+        {
+          "text": "Die beiden Schleifenvariablen brauchen verschiedene Namen.",
+          "correct": true
+        },
+        {
+          "text": "`continue` in der inneren Schleife springt zum nächsten Durchlauf der inneren Schleife.",
+          "correct": true
+        },
+        {
+          "text": "Ein `break` in der inneren Schleife beendet auch die äußere.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Es beendet nur die innere."
+        },
+        {
+          "text": "Die innere Schleife läuft nur beim ersten Durchlauf der äußeren.",
+          "feedback": "Sie läuft bei jedem Durchlauf der äußeren komplett."
+        }
+      ],
+      "explanation": "Die innere Schleife gehört zum Block der äußeren und läuft deshalb jedes Mal neu. Die Namen müssen verschieden sein, weil die äußere Variable im inneren Block noch gilt."
+    },
+    {
+      "id": "m02-l09-q6",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Welche Ausgabe erzeugt `for (int r = 1; r <= 3; r++) { for (int c = 1; c <= r; c++) { Console.Write(\"#\"); } Console.WriteLine(); }`?",
+      "options": [
+        {
+          "text": "Drei Zeilen mit `#`, `##` und `###`.",
+          "correct": true
+        },
+        {
+          "text": "Drei Zeilen mit je `###`.",
+          "feedback": "Die innere Grenze ist `r`, nicht `3`. Sie wächst mit der Zeile."
+        },
+        {
+          "text": "Eine Zeile mit `######`.",
+          "feedback": "`Console.WriteLine();` beendet am Ende jedes äußeren Durchlaufs die Zeile."
+        }
+      ],
+      "explanation": "In Zeile 1 läuft die innere Schleife einmal, in Zeile 2 zweimal, in Zeile 3 dreimal."
+    },
+    {
+      "id": "m02-l09-q7",
+      "lesson": "m02-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie verschachtelte Schleifen ablaufen und was ein `break` in der inneren Schleife bewirkt.",
+      "modelAnswer": "Bei verschachtelten Schleifen steht eine Schleife im Block einer anderen. Bei jedem Durchlauf der äußeren Schleife läuft die innere komplett von vorn durch. Ein `break` in der inneren Schleife beendet nur die innere. Die äußere macht mit ihrem nächsten Durchlauf weiter. Das gilt auch für `continue`."
+    },
+    {
+      "id": "m02-l09-q8",
+      "lesson": "m02-l09",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du verschachtelte Schleifen nutzen?",
+      "modelAnswer": "Zum Beispiel für ein Balkendiagramm: Die äußere Schleife geht über die Nutzer, die innere gibt pro Fehlversuch ein Zeichen aus. Auch für Tabellen mit Zeilen und Spalten oder für alle Paare aus zwei Folgen. In Modul 5 bilden sie die Grundlage für zweidimensionale Arrays."
     }
   ]
 }
