@@ -9,6 +9,7 @@
 #                   Console input comes from <name>.in.txt if it exists, otherwise from /dev/null.
 #   *.snippet.cs    fragment, skipped (cannot run on its own)
 #   _ci/<name>/     regular project, run by _ci/<name>/run.sh, output must match _ci/<name>/expected.out.txt
+# At the end, tools/check-seclog.mjs checks the fold markers and the SecLog continuity chain.
 set -euo pipefail
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -70,4 +71,9 @@ for dir in "$examples"/_ci/*/; do
 done
 
 echo "Checked: $checked, failed: $failed"
-[[ $failed -eq 0 ]]
+
+# 3. Fold markers and SecLog continuity chain (also with --update)
+seclog_ok=true
+node "$root/tools/check-seclog.mjs" || seclog_ok=false
+
+[[ $failed -eq 0 ]] && $seclog_ok
