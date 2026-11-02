@@ -4,6 +4,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import {useColorMode} from '@docusaurus/theme-common';
 import Translate from '@docusaurus/Translate';
 import styles from './styles.module.css';
+import {parseFolds, visibleCode} from './folds';
 
 // Base64url (UTF-8), so that any code can be passed in the URL fragment.
 // The fragment is never sent to the server.
@@ -32,7 +33,7 @@ const DEFAULT_SAMPLE_LINES = 12;
 const ESTIMATE_STDIN_CHROME_PX = 80;
 
 function estimateHeight(code, stdin) {
-  const lineCount = code ? splitLines(code).length : DEFAULT_SAMPLE_LINES;
+  const lineCount = code ? splitLines(visibleCode(code)).length : DEFAULT_SAMPLE_LINES;
   let height = ESTIMATE_CHROME_PX + ESTIMATE_LINE_PX * Math.max(lineCount, 3);
   if (typeof stdin === 'string') {
     const stdinRows = Math.max(2, stdin.replace(/\r\n/g, '\n').split('\n').length + 1);
@@ -97,6 +98,9 @@ export default function CSharpRunner({
   stdin,
   onResult,
 }) {
+  if (trace && code && parseFolds(code).hasFolds) {
+    throw new Error('<CSharpRunner>: trace cannot be used with fold markers (// @fold-start).');
+  }
   const runnerUrl = useBaseUrl('/runner/');
   const {colorMode} = useColorMode();
   const frame = useRef(null);
