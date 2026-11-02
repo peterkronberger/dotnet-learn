@@ -1,0 +1,224 @@
+---
+title: Die switch-Anweisung
+sidebar_position: 5
+description: "Führe mit switch eine von mehreren Anweisungslisten aus, je nach Wert. Jeder Abschnitt endet mit break, ein Durchfallen gibt es in C# nicht."
+lesson_id: m02-l05
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import switchBasic from '!!raw-loader!@site/examples/m02/l05/switch-basic.cs';
+import switchBasicOutput from '!!raw-loader!@site/examples/m02/l05/switch-basic.out.txt';
+import severalLabels from '!!raw-loader!@site/examples/m02/l05/several-labels.cs';
+import severalLabelsOutput from '!!raw-loader!@site/examples/m02/l05/several-labels.out.txt';
+import caseGuard from '!!raw-loader!@site/examples/m02/l05/case-guard.cs';
+import caseGuardOutput from '!!raw-loader!@site/examples/m02/l05/case-guard.out.txt';
+import missingBreak from '!!raw-loader!@site/examples/m02/l05/missing-break.snippet.cs';
+import noMatch from '!!raw-loader!@site/examples/m02/l05/no-match.cs';
+import noMatchOutput from '!!raw-loader!@site/examples/m02/l05/no-match.out.txt';
+import assignInSections from '!!raw-loader!@site/examples/m02/l05/assign-in-sections.cs';
+import guardGaps from '!!raw-loader!@site/examples/m02/l05/guard-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l05/seclog-analysis-solution.cs';
+
+# Die switch-Anweisung
+
+:::note[Lernziele]
+- Du schreibst eine <Term id="switch-statement">switch-Anweisung</Term> mit Abschnitten, `break` und `default`.
+- Du fasst mehrere Werte in einem Abschnitt zusammen und schränkst einen Abschnitt mit `when` ein.
+- Du erklärst, warum ein Abschnitt in C# nicht in den nächsten durchfällt.
+- Du entscheidest, wann die switch-Anweisung und wann der switch-Ausdruck passt.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l04-q1" />
+
+<Quiz id="m02-l02-q1" />
+
+<Quiz id="m01-l09-q3" />
+
+## Anweisungen je nach Wert ausführen
+
+Der switch-Ausdruck aus der letzten Lektion liefert einen Wert. Manchmal sollst du aber je nach Wert **Anweisungen** ausführen, zum Beispiel mehrere Zeilen ausgeben. Dafür gibt es die switch-Anweisung (Switch Statement).
+
+Sie besteht aus dem Wert in Klammern und einem Block mit **Abschnitten** (sections). Jeder Abschnitt hat ein oder mehrere **Labels** (`case …:`) und eine Liste von Anweisungen. Die Muster der Labels sind dieselben wie im switch-Ausdruck, zum Beispiel Konstanten. Die Anweisung führt den Abschnitt aus, dessen Label als Erstes von oben passt. Das Label `default:` passt, wenn kein anderes Label passt. Jeder Abschnitt endet mit `break;`. Das beendet die switch-Anweisung, und das Programm macht danach weiter.
+
+:::info[Vorhersage]
+`level` ist `2`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m02-l05-basic" code={switchBasic} predict expected={switchBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind zwei Zeilen: `medium` und `check soon`.
+
+1. **Wert prüfen:** `level` ist `2`. Das Label `case 1:` passt nicht.
+2. **Abschnitt wählen:** `case 2:` passt. Beide Anweisungen des Abschnitts laufen, in der Reihenfolge des Textes.
+3. **Beenden:** `break;` verlässt die switch-Anweisung. `default` kommt nicht zum Zug.
+
+**Was passiert, wenn `level` den Wert `7` hat?** Dann passt kein Label, und `default` gibt `unknown` aus.
+
+</details>
+
+## Mehrere Labels und case guards
+
+Mehrere Labels können vor **einem** Abschnitt stehen. Dann gilt der Abschnitt für alle diese Werte. Auch relationale Muster wie `case > 10:` sind als Label erlaubt.
+
+:::info[Vorhersage]
+`failed` ist `1`. Welche Zeile wird ausgegeben?
+:::
+
+<CSharpRunner id="m02-l05-labels" code={severalLabels} predict expected={severalLabelsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `few`.
+
+1. **Labels prüfen:** `case 0:` passt nicht, `case 1:` passt.
+2. **Gemeinsamer Abschnitt:** Die drei Labels `0`, `1` und `2` gehören zu demselben Abschnitt. Er gibt `few` aus.
+3. **Beenden:** `break;` am Ende des Abschnitts beendet die switch-Anweisung.
+
+</details>
+
+Manchmal reicht ein Muster nicht. Dann hängst du an das Label eine zusätzliche Bedingung mit `when`. Diese Bedingung heißt <Term id="case-guard">Case Guard</Term>. Das Label passt nur, wenn das Muster passt **und** die Bedingung `true` ist.
+
+:::info[Vorhersage]
+`eventType` ist `login-failed`, `failed` ist `6`. Beide Labels mit `"login-failed"` passen zum Muster. Welche Zeile wird ausgegeben?
+:::
+
+<CSharpRunner id="m02-l05-guard" code={caseGuard} predict expected={caseGuardOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `alert`.
+
+1. **Erstes Label:** Das Muster `"login-failed"` passt, und `failed >= 5` ist wahr. Damit passt das Label.
+2. **Reihenfolge:** Das zweite Label mit demselben Muster wird nicht mehr geprüft. Es fängt nur die Fälle ab, in denen der Guard falsch war.
+3. **Wichtig:** Der Guard steht oben. Stünde das Label ohne Guard zuerst, wäre das zweite nie erreichbar.
+
+</details>
+
+## Kein Durchfallen
+
+Jeder Abschnitt muss so enden, dass das Ende nicht erreicht wird, in der Regel mit `break;`. Läuft die Ausführung am Ende eines Abschnitts in den nächsten Abschnitt hinein, ist das ein Fehler. Dieses Durchfallen heißt <Term id="fall-through">Fall-through</Term>.
+
+<CodeBlock language="csharp" title="missing-break.snippet.cs">{missingBreak}</CodeBlock>
+
+Der Compiler meldet für Zeile 4 den Fehler CS0163: Die Ausführung kann nicht von einem case-Label in ein anderes durchfallen.
+
+:::warning[Achtung]
+<Misconception id="m02-l05-case-falls-through" />
+
+**„Ohne `break` läuft der Code in den nächsten `case` weiter.“** In C# gibt es das nicht: Ein Abschnitt, dessen Ende erreichbar ist, wird nicht übersetzt. Wenn mehrere Werte dasselbe tun sollen, schreibst du mehrere Labels vor einen Abschnitt.:::
+
+Es gibt auch die Anweisung `goto`, mit der du in einen anderen Abschnitt springen kannst. Sie wird hier nur genannt, weil sie selten gebraucht wird. Mehr steht bei den [Sprunganweisungen](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements#the-goto-statement).
+
+## Wenn nichts passt, und Anweisung gegen Ausdruck
+
+Passt kein Label und gibt es kein `default`, wird kein Abschnitt ausgeführt. Das Programm macht hinter der switch-Anweisung weiter. Das ist anders als beim switch-Ausdruck, der in diesem Fall eine Ausnahme auslöst.
+
+:::info[Vorhersage]
+`level` ist `9`, und es gibt weder ein passendes Label noch `default`. Welche Zeilen werden ausgegeben?
+:::
+
+<CSharpRunner id="m02-l05-no-match" code={noMatch} predict expected={noMatchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `done`.
+
+1. **Labels prüfen:** Weder `case 1:` noch `case 2:` passt auf `9`.
+2. **Kein default:** Es wird kein Abschnitt ausgeführt, und es gibt keinen Fehler.
+3. **Weiter:** Die Zeile nach der switch-Anweisung läuft normal.
+
+</details>
+
+Wähle zwischen den beiden Formen nach dem Zweck. Die switch-Anweisung führt Anweisungen aus. Der switch-Ausdruck liefert einen Wert. Dasselbe wie hier in Abschnitten schreibst du mit dem Ausdruck kürzer:
+
+<CodeBlock language="csharp" title="assign-in-sections.cs">{assignInSections}</CodeBlock>
+
+Jeder Abschnitt setzt nur `name`. Dafür ist der switch-Ausdruck aus der letzten Lektion besser geeignet. Die Anweisung lohnt sich, wenn ein Abschnitt mehrere Anweisungen hat, etwa mehrere Ausgaben.
+
+## Lückenbeispiel
+
+Ergänze einen Abschnitt vor `case "bob":`, sodass `bob` mit mindestens 5 Fehlversuchen die Ausgabe `lock bob` bekommt. Setze danach `failed` auf `2`: Dann muss wieder `watch bob (2 failures)` erscheinen.
+
+<CSharpRunner id="m02-l05-gaps" code={guardGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Label mit Guard:** `case "bob" when failed >= 5:`
+2. **Anweisung:** `Console.WriteLine("lock bob");`
+3. **Beenden:** `break;`
+4. **Reihenfolge:** Der Abschnitt mit Guard steht vor dem ohne Guard.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Eine switch-Anweisung führt die Anweisungsliste des ersten Abschnitts aus, dessen Label passt und dessen Guard wahr ist. Ein Label, dessen Muster von den Labels davor schon abgedeckt ist, ist ein Fehler ([§13.8.3 The switch statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1383-the-switch-statement)). Der Platzhalter `_` allein ist als Label nicht erlaubt; dafür gibt es `default` ([§11.2.7 Discard pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1127-discard-pattern)). Die switch-Anweisung ist wie die Muster in ihren Labels älter als C# 12 und braucht kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bewertet die Zahl der Fehlversuche als Schweregrad.
+
+**Neue Anforderung:** SecLog soll je nach Ereignistyp anders reagieren. Wähle mit einer switch-Anweisung auf `eventType` eine Aktion: Bei `login-failed` gibt SecLog `Action: count the failure` aus. `login-success` und `logout` teilen sich einen Abschnitt und geben `Action: none` aus. Alles andere gibt `Action: unknown event type` aus. Die Ausgabe hat jetzt 28 Zeilen.
+
+<CSharpRunner id="m02-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Wert angeben:** `switch (eventType)` wählt aus, welcher Abschnitt läuft.
+2. **Abschnitte:** Ein Abschnitt für `"login-failed"`, ein gemeinsamer Abschnitt mit zwei Labels für `"login-success"` und `"logout"`.
+3. **Auffangen:** `default` behandelt jeden anderen Ereignistyp.
+4. **Beenden:** Jeder Abschnitt endet mit `break;`.
+
+</details>
+
+**Neuer Stand:** SecLog wählt je nach Ereignistyp eine Aktion.
+
+## Zusammenfassung
+
+Die switch-Anweisung führt je nach Wert eine Anweisungsliste aus. Abschnitte haben ein oder mehrere Labels, `default` fängt den Rest ab, und jeder Abschnitt endet mit `break;`. Mit `when` schränkst du ein Label zusätzlich ein. Ein Durchfallen in den nächsten Abschnitt ist in C# ein Fehler. Ohne passendes Label und ohne `default` passiert nichts. Für einen Wert nimmst du den switch-Ausdruck, für mehrere Anweisungen die switch-Anweisung.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l05-q1" />
+
+<Quiz id="m02-l05-q2" />
+
+<Quiz id="m02-l05-q3" />
+
+<Quiz id="m02-l05-q4" />
+
+<Quiz id="m02-l05-q5" />
+
+<Quiz id="m02-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Auswahlanweisungen (if, switch)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)
+- Microsoft Learn: [switch-Ausdruck](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression)

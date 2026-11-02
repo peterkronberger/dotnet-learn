@@ -729,15 +729,35 @@
       "term": "Loop",
       "german": "Schleife",
       "category": "language",
-      "definition": "Eine Anweisung, die Code wiederholt ausführt. In C# gibt es `for`, `foreach`, `while` und `do … while`.",
+      "definition": "Eine Anweisung, die einen Block wiederholt ausführt, solange eine Bedingung wahr ist. `while` prüft die Bedingung vor jedem Durchlauf, `do` danach. Weitere Schleifen sind `for` und `foreach`.",
       "aliases": [
         "Schleifen"
       ],
       "related": [
         "selection-statement",
+        "iteration",
         "collection"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l06",
+      "source": {
+        "title": "Iteration statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
+      }
+    },
+    {
+      "id": "iteration",
+      "term": "Iteration",
+      "german": "Durchlauf",
+      "category": "language",
+      "definition": "Ein einzelner Durchlauf des Blocks einer Schleife. Vor jeder Iteration wird die Bedingung der Schleife geprüft (bei `do`: danach).",
+      "aliases": [
+        "Iterationen",
+        "Durchlauf"
+      ],
+      "related": [
+        "loop"
+      ],
+      "lesson": "m02-l06",
       "source": {
         "title": "Iteration statements",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
@@ -748,15 +768,18 @@
       "term": "Switch Expression",
       "german": "Switch-Ausdruck",
       "category": "language",
-      "definition": "Ein Ausdruck, der abhängig vom passenden Muster einen Wert liefert. Die Muster werden von oben nach unten geprüft, das erste passende gewinnt.",
+      "definition": "Ein Ausdruck, der einen Wert liefert: Links steht der geprüfte Wert, dann `switch` und Zweige aus Muster, `=>` und Ergebnis. Die Zweige werden von oben nach unten geprüft, der erste passende gewinnt.",
       "aliases": [
         "Switch-Ausdrücke"
       ],
       "related": [
         "pattern",
-        "discard"
+        "discard",
+        "constant-pattern",
+        "relational-pattern",
+        "exhaustive"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "switch expression",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression"
@@ -767,14 +790,17 @@
       "term": "Pattern",
       "german": "Muster",
       "category": "language",
-      "definition": "Eine Form, gegen die ein Wert geprüft wird, zum Beispiel in einem Switch-Ausdruck. Passt der Wert, gilt der zugehörige Zweig.",
+      "definition": "Eine Form, gegen die ein Wert geprüft wird, zum Beispiel in einem Switch-Ausdruck. Passt der Wert, gilt der zugehörige Zweig. Einfache Muster sind Konstanten, Vergleiche wie `< 3` und der Platzhalter `_`.",
       "aliases": [
         "Muster"
       ],
       "related": [
-        "switch-expression"
+        "switch-expression",
+        "constant-pattern",
+        "relational-pattern",
+        "discard"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "Patterns",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns"
@@ -790,12 +816,130 @@
         "Unterstrich"
       ],
       "related": [
-        "switch-expression"
+        "switch-expression",
+        "pattern"
       ],
-      "lesson": "m02-l01",
+      "lesson": "m02-l04",
       "source": {
         "title": "Discards",
         "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/functional/discards"
+      }
+    },
+    {
+      "id": "relational-pattern",
+      "term": "Relational Pattern",
+      "german": "relationales Muster",
+      "category": "language",
+      "definition": "Ein Muster, das den Wert mit `<`, `<=`, `>` oder `>=` gegen eine Konstante vergleicht, zum Beispiel `>= 5`. Es passt, wenn der Vergleich wahr ist.",
+      "aliases": [
+        "relationale Muster"
+      ],
+      "related": [
+        "pattern",
+        "constant-pattern",
+        "switch-expression"
+      ],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "Patterns – relational patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#relational-patterns"
+      }
+    },
+    {
+      "id": "constant-pattern",
+      "term": "Constant Pattern",
+      "german": "konstantes Muster",
+      "category": "language",
+      "definition": "Ein Muster aus einer Konstante, zum Beispiel `0` oder `\"logout\"`. Es passt, wenn der Wert gleich der Konstante ist.",
+      "aliases": [
+        "konstante Muster"
+      ],
+      "related": [
+        "pattern",
+        "relational-pattern",
+        "switch-expression"
+      ],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "Patterns – constant pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#constant-pattern"
+      }
+    },
+    {
+      "id": "exhaustive",
+      "term": "Exhaustive",
+      "german": "alle Werte abgedeckt",
+      "category": "language",
+      "definition": "Ein Switch-Ausdruck ist exhaustive (alle Werte abgedeckt), wenn für jeden möglichen Wert ein Zweig passt. Sonst warnt der Compiler, und ein nicht passender Wert löst zur Laufzeit eine Ausnahme aus.",
+      "aliases": [
+        "exhaustiv",
+        "vollständiger switch"
+      ],
+      "related": [
+        "switch-expression",
+        "discard"
+      ],
+      "lesson": "m02-l04",
+      "source": {
+        "title": "switch expression – nonexhaustive switch expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression#nonexhaustive-switch-expressions"
+      }
+    },
+    {
+      "id": "switch-statement",
+      "term": "Switch Statement",
+      "german": "switch-Anweisung",
+      "category": "language",
+      "definition": "Eine Anweisung, die je nach Wert eine von mehreren Anweisungslisten ausführt. Sie besteht aus Abschnitten mit `case`-Labels und einem optionalen `default`. Jeder Abschnitt endet mit `break;`.",
+      "aliases": [
+        "switch-Anweisungen"
+      ],
+      "related": [
+        "switch-expression",
+        "case-guard",
+        "fall-through"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "The switch statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement"
+      }
+    },
+    {
+      "id": "case-guard",
+      "term": "Case Guard",
+      "german": "zusätzliche Bedingung mit `when`",
+      "category": "language",
+      "definition": "Eine Bedingung hinter `when`, die zu einem Muster dazukommt. Das Label passt nur, wenn das Muster passt und die Bedingung `true` ist.",
+      "aliases": [
+        "Guard"
+      ],
+      "related": [
+        "switch-statement",
+        "pattern"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements – case guards",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#case-guards"
+      }
+    },
+    {
+      "id": "fall-through",
+      "term": "Fall-through",
+      "german": "Durchfallen",
+      "category": "language",
+      "definition": "Das Weiterlaufen am Ende eines switch-Abschnitts in den nächsten Abschnitt. In C# ist das ein Compilerfehler: Jeder Abschnitt muss mit `break;` oder einer anderen Sprunganweisung enden.",
+      "aliases": [
+        "Durchfallen"
+      ],
+      "related": [
+        "switch-statement"
+      ],
+      "lesson": "m02-l05",
+      "source": {
+        "title": "Selection statements – the switch statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements#the-switch-statement"
       }
     },
     {

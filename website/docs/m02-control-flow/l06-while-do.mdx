@@ -1,0 +1,214 @@
+---
+title: Schleifen mit while und do
+sidebar_position: 6
+description: "Wiederhole einen Block, solange eine Bedingung wahr ist. while prüft die Bedingung vor jedem Durchlauf, do prüft sie danach und läuft mindestens einmal."
+lesson_id: m02-l06
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import whileBasic from '!!raw-loader!@site/examples/m02/l06/while-basic.cs';
+import whileBasicOutput from '!!raw-loader!@site/examples/m02/l06/while-basic.out.txt';
+import conditionEachTime from '!!raw-loader!@site/examples/m02/l06/condition-each-time.cs';
+import conditionEachTimeOutput from '!!raw-loader!@site/examples/m02/l06/condition-each-time.out.txt';
+import whileZero from '!!raw-loader!@site/examples/m02/l06/while-zero-times.cs';
+import whileZeroOutput from '!!raw-loader!@site/examples/m02/l06/while-zero-times.out.txt';
+import doOnce from '!!raw-loader!@site/examples/m02/l06/do-once.cs';
+import doOnceOutput from '!!raw-loader!@site/examples/m02/l06/do-once.out.txt';
+import readWhileOk from '!!raw-loader!@site/examples/m02/l06/read-while-ok.cs';
+import readWhileOkInput from '!!raw-loader!@site/examples/m02/l06/read-while-ok.in.txt';
+import readWhileOkOutput from '!!raw-loader!@site/examples/m02/l06/read-while-ok.out.txt';
+import countdownGaps from '!!raw-loader!@site/examples/m02/l06/countdown-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l06/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l06/seclog-analysis-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l06/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l06/seclog-analysis-solution.cs';
+
+# Schleifen mit while und do
+
+:::note[Lernziele]
+- Du schreibst eine `while`-Schleife und sagst voraus, wie oft ihr Block läuft.
+- Du erklärst, dass die Bedingung vor jedem Durchlauf neu geprüft wird.
+- Du nennst den Unterschied zwischen `while` und `do`: Die `do`-Schleife läuft mindestens einmal.
+- Du liest mit einer Schleife Zeilen ein und sorgst dafür, dass sie am Ende der Eingabe endet.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l05-q3" />
+
+<Quiz id="m02-l04-q4" />
+
+<Quiz id="m01-l04-q2" />
+
+## Wiederholen, solange die Bedingung wahr ist
+
+Bisher läuft jede Anweisung höchstens einmal. Eine <Term id="loop">Schleife (Loop)</Term> wiederholt einen Block. Die `while`-Schleife besteht aus einer Bedingung in Klammern und dem Block. Solange die Bedingung `true` ergibt, läuft der Block. Jeder Durchlauf des Blocks heißt <Term id="iteration">Iteration</Term>.
+
+Damit die Schleife irgendwann endet, muss der Block etwas ändern, das die Bedingung beeinflusst. Hier erhöht `step++` die Zählvariable.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Wie oft läuft der Block?
+:::
+
+<CSharpRunner id="m02-l06-while" code={whileBasic} predict expected={whileBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Step 1`, `Step 2`, `Step 3` und `done`.
+
+1. **Bedingung prüfen:** `step <= 3` ist bei `1` wahr, der Block läuft.
+2. **Block ausführen und ändern:** Der Block gibt `Step 1` aus und erhöht `step` auf `2`.
+3. **Erneut prüfen:** Zurück zur Bedingung. Das wiederholt sich bei `2` und `3`. Bei `4` ist sie falsch, die Schleife endet.
+4. **Weitermachen:** Die Anweisung nach der Schleife gibt `done` aus.
+
+**Was passiert, wenn du `step++;` weglässt?** Dann bleibt `step` bei `1`, die Bedingung bleibt wahr, und die Schleife endet nie. Der Runner bricht nach etwa drei Sekunden ab.
+
+</details>
+
+## Die Bedingung wird jedes Mal neu geprüft
+
+Die Bedingung gehört zur Schleife, nicht zum Start. Vor **jedem** Durchlauf wird sie neu ausgewertet, mit den aktuellen Werten der Variablen.
+
+:::info[Vorhersage]
+`failed` steigt in jedem Durchlauf um `2`. Die Bedingung ist `failed < 3`. Wie viele Zeilen `failed is …` werden ausgegeben?
+:::
+
+<CSharpRunner id="m02-l06-each-time" code={conditionEachTime} predict expected={conditionEachTimeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe sind `failed is 2`, `failed is 4` und `loop ended`.
+
+1. **Erste Prüfung:** `0 < 3` ist wahr, der Block setzt `failed` auf `2`.
+2. **Zweite Prüfung:** `2 < 3` ist wieder wahr, der Block setzt `failed` auf `4`.
+3. **Dritte Prüfung:** `4 < 3` ist falsch, die Schleife endet. Der Block ist nicht mitten im Durchlauf abgebrochen worden: `4` wurde noch ausgegeben, weil die Bedingung erst vor dem nächsten Durchlauf geprüft wird.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l06-condition-checked-once" />
+
+**„Die Bedingung wird nur einmal am Anfang geprüft.“** Sie wird vor jedem Durchlauf geprüft. Ändert sich im Block ein Wert, kann die Schleife deshalb mitten im Ablauf enden. Wird die Bedingung nie falsch, läuft die Schleife endlos.
+:::
+
+## do: erst ausführen, dann prüfen
+
+Bei `while` kann der Block auch **nullmal** laufen, wenn die Bedingung gleich am Anfang falsch ist. Die `do`-Schleife prüft die Bedingung erst **nach** dem Block. Sie läuft deshalb mindestens einmal. Hinter dem `while (…)` steht ein Semikolon.
+
+:::info[Vorhersage]
+In beiden Programmen ist `n` am Anfang `5`, und die Bedingung `n < 3` ist falsch. Das erste benutzt `while`, das zweite `do`. Welche Zeilen geben sie aus?
+:::
+
+<CSharpRunner id="m02-l06-while-zero" code={whileZero} predict expected={whileZeroOutput} />
+
+<CSharpRunner id="m02-l06-do-once" code={doOnce} predict expected={doOnceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die `while`-Schleife gibt nur `n is 5` aus. Die `do`-Schleife gibt `body runs` und `n is 6` aus.
+
+1. **while:** Die Bedingung wird zuerst geprüft. `5 < 3` ist falsch, der Block läuft nullmal.
+2. **do:** Der Block läuft zuerst: Er gibt `body runs` aus und erhöht `n` auf `6`.
+3. **do, danach:** Erst jetzt wird `6 < 3` geprüft. Es ist falsch, die Schleife endet.
+
+</details>
+
+## Zeilen lesen, bis etwas anderes kommt
+
+Eine typische Schleife liest Zeilen. Du liest die erste Zeile vor der Schleife, prüfst sie in der Bedingung und liest am Ende des Blocks die nächste. `Console.ReadLine()` liefert am Ende der Eingabe keinen Text mehr, sondern "keinen Wert". Dieser Wert ist nicht gleich `"ok"`, die Bedingung wird also falsch und die Schleife endet. Eine Bedingung wie `line != "stop"` wäre dann sogar wahr und die Schleife liefe endlos. Prüfe darum auf den Wert, den du erwartest.
+
+<Forward concepts={['`null` (der Wert „kein Wert“)']} module="4" />
+
+:::info[Vorhersage]
+Die Eingabe hat fünf Zeilen: `ok`, `ok`, `ok`, `bye`, `ok`. Welche Zahl steht in der Ausgabe?
+:::
+
+<CSharpRunner id="m02-l06-read" code={readWhileOk} stdin={readWhileOkInput} predict expected={readWhileOkOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3 ok lines`.
+
+1. **Vorbereiten:** Die erste Zeile wird vor der Schleife gelesen, der Zähler ist `0`.
+2. **Wiederholen:** Solange die Zeile `ok` ist, zählt der Block hoch und liest die nächste Zeile.
+3. **Beenden:** Bei `bye` ist die Bedingung falsch. Die letzte Zeile `ok` wird nie gelesen.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm soll von `3` bis `1` herunterzählen und dann `liftoff` ausgeben. Ändere die Bedingung so, dass die Schleife läuft, solange `n` über `0` liegt. Zähle `n` im Block um `1` herunter. Die Ausgabe muss `3`, `2`, `1` und `liftoff` sein.
+
+<CSharpRunner id="m02-l06-gaps" code={countdownGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Bedingung:** `while (n > 0)`
+2. **Ändern:** `n--;` nach der Ausgabe im Block. Ohne diese Zeile endet die Schleife nie.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Bei `while` wird die Bedingung vor jeder Ausführung des Blocks ausgewertet, bei `do` danach ([§13.9.2 The while statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1392-the-while-statement), [§13.9.3 The do statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1393-the-do-statement)). Beide Schleifen sind viel älter als C# 12 und brauchen kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog wählt je nach Ereignistyp eine Aktion.
+
+**Neue Anforderung:** SecLog soll mehrere Ereignisse durchgehen. Lies weitere Zeilen mit Ereignistypen, solange die Zeile `login-failed` ist, und zähle sie. Das ist die Zahl der aufeinanderfolgenden Fehlversuche (Failure Streak). Gib `Failure streak: 5` aus. Die Eingabe im Runner hat nach `bob` und `5` fünfmal `login-failed` und dann `login-success`. Die Schleife muss am Ende der Eingabe enden. Die Ausgabe hat jetzt 29 Zeilen.
+
+<CSharpRunner id="m02-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Vorbereiten:** Lies die erste Zeile und setze den Zähler `streak` auf `0`.
+2. **Bedingung:** `nextEvent == "login-failed"` ist wahr, solange Fehlversuche kommen. Am Ende der Eingabe ist sie falsch, die Schleife endet.
+3. **Block:** Zähle hoch und lies die nächste Zeile. Ohne diese Zeile endet die Schleife nie.
+4. **Ausgeben:** Nach der Schleife steht `Failure streak: 5`.
+
+</details>
+
+**Neuer Stand:** SecLog zählt aufeinanderfolgende Fehlversuche in einer Folge von Ereignissen.
+
+## Zusammenfassung
+
+Eine `while`-Schleife wiederholt ihren Block, solange die Bedingung wahr ist. Die Bedingung wird vor jedem Durchlauf neu geprüft, deshalb kann der Block auch nullmal laufen. Der Block muss etwas ändern, damit die Bedingung irgendwann falsch wird. Die `do`-Schleife prüft die Bedingung nach dem Block und läuft mindestens einmal. Beim Lesen von Zeilen prüfst du auf den erwarteten Wert, damit die Schleife am Ende der Eingabe endet.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l06-q1" />
+
+<Quiz id="m02-l06-q2" />
+
+<Quiz id="m02-l06-q3" />
+
+<Quiz id="m02-l06-q4" />
+
+<Quiz id="m02-l06-q5" />
+
+<Quiz id="m02-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Iterationsanweisungen (for, foreach, do, while)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements)
