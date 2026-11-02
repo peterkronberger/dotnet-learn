@@ -56,23 +56,23 @@ Order and chain (one PR per issue; every issue that changes a file another issue
 1. **Decision/research issue** per blocker from "Open questions" (label `needs-human:decision` if a human must decide). Everything else depends on it.
 2. **CI project issue** – only for ◻ lessons whose CI project does not exist yet. Changes to `.github/workflows/` go to "What a human must do".
 3. **Scaffold issue**: remove the early implementation of the module (lesson files, `website/examples/<prefix>NN/`, the questions in `de/<prefix>NN.json`) and fix every reference to it (find them with a search for the old ids and paths, for example `website/plugins/search-index.test.js`, `README.md`, the `lesson` field in `de.json`); then `_category_.json`, empty quiz file, import in `website/src/data/quiz/index.js`, example folder. Glossary entries stay until the lesson that introduces the term rewrites them.
-4. **One lesson issue per lesson**, in sidebar order, each depending on the one before (the first on the scaffold).
+4. **Lesson issues with at most three lessons each** (a long issue risks a timeout). Group the lessons in sidebar order: lessons 1–3 in the first issue, 4–6 in the second, and so on; a last group may have one or two lessons. A module with up to three lessons gets one lesson issue. Title: `Module <N>: write lessons <a>–<b> (<short topics>)`, or `Module <N>: write lesson <a> (<topic>)` for a single lesson. Each issue depends on the one before (the first on the scaffold). Inside an issue the lessons are written one after the other, in sidebar order; each lesson is its own commit and meets the Definition of Done on its own.
 5. **Module review issue**: every spec item and misconception is taught in its lesson; no file of the early implementation is left; glossary entries that no new lesson introduces or links are removed or fixed; exactly 8 questions marked with `"placement": true` in the quiz data (no `explain`; together they cover every lesson of the module, extra lessons in `placementLessons`; `node tools/check-quiz.mjs` checks it); `module-plan.md` updated (answered open questions removed); write the section `## M<N>` (or `## W<N>`) of `concept/module-digest.md` in the format of that file; remove open forward references of earlier modules that this module now teaches.
 
 Do not start a second module while one is in progress (shared `de.json`).
 
 ## 4. Content of a lesson issue
 
-Use the sections that `claude-architect.yml` requires. Fill them only with values from section 2:
+Use the sections that `claude-architect.yml` requires. Fill them only with values from section 2. An issue covers up to three lessons (section 3, item 4): repeat the lesson-specific parts (Goal, Context, Affected files, Interfaces) once per lesson, in sidebar order; the other parts are written once.
 
 - **Part of** `#<module issue>` · **Goal**: `lesson_id`, German title, core concept in one sentence.
 - **Context**: ▶/◻; 2–4 learning goals ("Du kannst …"); the spec and library items of this lesson with their sources; badges; misconceptions with their ids; warm-up quiz ids; project step: start state (path of the previous solution file) and the new requirement, from the milestone row; for the first lesson of a module also the text of the module box; constructs the examples may use (taught so far: from `concept/module-digest.md` and the earlier lessons of this module; the issue names ids and paths, not copied text) and planned forward references with their target module; topics that belong to other lessons or are out of scope.
 - **Affected files**: lesson file, example folder, quiz file, `de.json` (paths from section 2).
 - **Interfaces**: front matter (`lesson_id`, `sidebar_position`, `duration_min`), quiz ids `<lesson_id>-q<n>`, misconception ids, new glossary ids.
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–10."
-- **Acceptance criteria**: "Definition of Done 1–17 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
+- **Acceptance criteria**: "For every lesson of this issue: Definition of Done 1–17 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
 - **Tests**: `bash tools/check-examples.sh`, `node tools/check-quiz.mjs`, `cd website && npm run build`.
-- **Not part of this issue**: other lessons, components, playground.
+- **Not part of this issue**: lessons of other issues, components, playground.
 
 ## 5. Stop and ask (status `needs_human`)
 
