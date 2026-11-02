@@ -1132,6 +1132,145 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug `break` und wo `continue` nutzen?",
       "modelAnswer": "`break` passt, wenn die Suche fertig ist, zum Beispiel beim Lesen eines Zeitstempels bis zum Buchstaben `T`, weil danach nichts mehr gebraucht wird. `continue` passt, wenn einzelne Elemente übersprungen werden sollen, zum Beispiel Punkte in einer IP-Adresse oder Zeilen, die kein Ereignis enthalten."
+    },
+    {
+      "id": "m02-l09-q1",
+      "lesson": "m02-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l09/quiz-nested.cs",
+      "explanation": "Bei `a` gleich `1` läuft die innere Schleife für `b` gleich `1` und zählt. Bei `a` gleich `2` und `3` zählt sie für `b` gleich `1`, bei `b` gleich `2` beendet `break` nur die innere Schleife. Die äußere Schleife läuft weiter. Insgesamt wird dreimal gezählt, die Ausgabe ist `3`."
+    },
+    {
+      "id": "m02-l09-q2",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Eine äußere Schleife läuft 4-mal, die innere 5-mal pro Durchlauf der äußeren. Wie oft läuft der Block der inneren Schleife insgesamt?",
+      "options": [
+        {
+          "text": "20-mal, weil die innere Schleife bei jedem äußeren Durchlauf komplett läuft.",
+          "correct": true
+        },
+        {
+          "text": "9-mal, die Zahlen werden addiert.",
+          "feedback": "Die innere Schleife läuft in jedem der 4 äußeren Durchläufe neu 5-mal, also wird multipliziert."
+        },
+        {
+          "text": "5-mal, weil die innere Schleife nur einmal startet.",
+          "feedback": "Sie startet bei jedem äußeren Durchlauf neu."
+        }
+      ],
+      "explanation": "Die innere Schleife läuft bei jedem Schritt der äußeren von vorn: 4 × 5 = 20 Durchläufe."
+    },
+    {
+      "id": "m02-l09-q3",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "In der inneren von zwei verschachtelten `for`-Schleifen steht `break;`. Was passiert?",
+      "options": [
+        {
+          "text": "Nur die innere Schleife endet. Die äußere macht mit ihrem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Beide Schleifen enden.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "`break` wirkt nur auf die nächste umgebende Schleife, also auf die innere."
+        },
+        {
+          "text": "Nur die äußere Schleife endet.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Die innere Schleife ist die nächste umgebende Schleife des `break`. Die äußere läuft weiter."
+        }
+      ],
+      "explanation": "`break` und `continue` betreffen immer die innerste Schleife, in der sie stehen."
+    },
+    {
+      "id": "m02-l09-q4",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Ein Programm findet in der inneren Schleife ein Ergebnis und schreibt dort `break;`, weil es alles beenden will. Danach läuft die äußere Schleife aber weiter. Was ist die Ursache?",
+      "options": [
+        {
+          "text": "`break` hat nur die innere Schleife verlassen.",
+          "correct": true
+        },
+        {
+          "text": "`break` beendet immer alle Schleifen, der Fehler liegt woanders.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "`break` verlässt nur die nächste umgebende Schleife."
+        },
+        {
+          "text": "Die äußere Schleife ignoriert ein `break` der inneren Schleife.",
+          "feedback": "Die äußere Schleife bekommt davon nichts mit. Das `break` gehört zur inneren."
+        }
+      ],
+      "explanation": "Um die äußere Schleife zu beenden, brauchst du dort ein eigenes `break`, zum Beispiel mit einer Hilfsvariable, die du in der äußeren Schleife prüfst."
+    },
+    {
+      "id": "m02-l09-q5",
+      "lesson": "m02-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über verschachtelte Schleifen stimmen?",
+      "options": [
+        {
+          "text": "Die innere Schleife startet bei jedem Durchlauf der äußeren neu.",
+          "correct": true
+        },
+        {
+          "text": "Die beiden Schleifenvariablen brauchen verschiedene Namen.",
+          "correct": true
+        },
+        {
+          "text": "`continue` in der inneren Schleife springt zum nächsten Durchlauf der inneren Schleife.",
+          "correct": true
+        },
+        {
+          "text": "Ein `break` in der inneren Schleife beendet auch die äußere.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Es beendet nur die innere."
+        },
+        {
+          "text": "Die innere Schleife läuft nur beim ersten Durchlauf der äußeren.",
+          "feedback": "Sie läuft bei jedem Durchlauf der äußeren komplett."
+        }
+      ],
+      "explanation": "Die innere Schleife gehört zum Block der äußeren und läuft deshalb jedes Mal neu. Die Namen müssen verschieden sein, weil die äußere Variable im inneren Block noch gilt."
+    },
+    {
+      "id": "m02-l09-q6",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Welche Ausgabe erzeugt `for (int r = 1; r <= 3; r++) { for (int c = 1; c <= r; c++) { Console.Write(\"#\"); } Console.WriteLine(); }`?",
+      "options": [
+        {
+          "text": "Drei Zeilen mit `#`, `##` und `###`.",
+          "correct": true
+        },
+        {
+          "text": "Drei Zeilen mit je `###`.",
+          "feedback": "Die innere Grenze ist `r`, nicht `3`. Sie wächst mit der Zeile."
+        },
+        {
+          "text": "Eine Zeile mit `######`.",
+          "feedback": "`Console.WriteLine();` beendet am Ende jedes äußeren Durchlaufs die Zeile."
+        }
+      ],
+      "explanation": "In Zeile 1 läuft die innere Schleife einmal, in Zeile 2 zweimal, in Zeile 3 dreimal."
+    },
+    {
+      "id": "m02-l09-q7",
+      "lesson": "m02-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie verschachtelte Schleifen ablaufen und was ein `break` in der inneren Schleife bewirkt.",
+      "modelAnswer": "Bei verschachtelten Schleifen steht eine Schleife im Block einer anderen. Bei jedem Durchlauf der äußeren Schleife läuft die innere komplett von vorn durch. Ein `break` in der inneren Schleife beendet nur die innere. Die äußere macht mit ihrem nächsten Durchlauf weiter. Das gilt auch für `continue`."
+    },
+    {
+      "id": "m02-l09-q8",
+      "lesson": "m02-l09",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du verschachtelte Schleifen nutzen?",
+      "modelAnswer": "Zum Beispiel für ein Balkendiagramm: Die äußere Schleife geht über die Nutzer, die innere gibt pro Fehlversuch ein Zeichen aus. Auch für Tabellen mit Zeilen und Spalten oder für alle Paare aus zwei Folgen. In Modul 5 bilden sie die Grundlage für zweidimensionale Arrays."
     }
   ]
 }
