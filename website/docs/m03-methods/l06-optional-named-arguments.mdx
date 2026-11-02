@@ -1,0 +1,177 @@
+---
+title: Optionale und benannte Argumente
+sidebar_position: 6
+description: "Ein Parameter kann einen konstanten Standardwert haben. Ein Argument kann über den Namen seines Parameters übergeben werden."
+lesson_id: m03-l06
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import optionalParameter from '!!raw-loader!@site/examples/m03/l06/optional-parameter.cs';
+import optionalParameterOutput from '!!raw-loader!@site/examples/m03/l06/optional-parameter.out.txt';
+import namedArguments from '!!raw-loader!@site/examples/m03/l06/named-arguments.cs';
+import namedArgumentsOutput from '!!raw-loader!@site/examples/m03/l06/named-arguments.out.txt';
+import defaultError from '!!raw-loader!@site/examples/m03/l06/default-from-variable.snippet.cs';
+import optionalGaps from '!!raw-loader!@site/examples/m03/l06/optional-gaps.cs';
+import namedOrder from '!!raw-loader!@site/examples/m03/l06/named-order.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l06/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l06/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l06/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l06/seclog-methods-solution.cs';
+
+# Optionale und benannte Argumente
+
+:::note[Lernziele]
+- Du kannst einen optionalen Parameter mit Standardwert deklarieren.
+- Du kannst erklären, warum ein Standardwert eine Konstante sein muss.
+- Du kannst Argumente mit Namen übergeben und die Reihenfolge ändern.
+- Du kannst einen Aufruf mit optionalen und benannten Argumenten vorhersagen.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l03-q3" />
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m01-l05-q2" />
+
+## Parameter mit Standardwert
+
+Oft soll ein Wert fast immer gleich sein. Ein <Term id="optional-parameter">optionaler Parameter (Optional Parameter)</Term> bekommt dazu in der Kopfzeile einen Standardwert, das <Term id="default-argument">Default Argument (Standardargument)</Term>. Beim Aufruf darfst du das Argument weglassen. Die Methode benutzt dann den Standardwert.
+
+Ein Standardwert muss ein <Term id="constant-expression">konstanter Ausdruck</Term> sein, also ein Wert, den der Compiler schon beim Übersetzen kennt, etwa ein Literal oder eine `const`-Konstante. Optionale Parameter stehen hinter den Pflichtparametern.
+
+:::info[Vorhersage]
+`greeting` hat den Standardwert `"hello"`. Was geben die beiden Aufrufe aus?
+:::
+
+<CSharpRunner id="m03-l06-optional" code={optionalParameter} predict expected={optionalParameterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `hello, alice` und `welcome, bob`.
+
+1. **Pflichtparameter füllen:** `name` hat keinen Standardwert und braucht in jedem Aufruf ein Argument.
+2. **Optionalen Parameter prüfen:** Im ersten Aufruf fehlt das Argument für `greeting`. Der Compiler setzt `"hello"` ein.
+3. **Argument hat Vorrang:** Im zweiten Aufruf steht `"welcome"` an der Stelle von `greeting`. Der Standardwert wird nicht benutzt.
+
+**Was passiert, wenn du `Greet()` ohne Argument aufrufst?** Dann fehlt das Argument für den Pflichtparameter `name`, und der Compiler meldet einen Fehler.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l06-default-from-variable" />
+
+**„Ein Standardwert darf eine beliebige Variable oder ein Methodenaufruf sein.“** Das stimmt nicht. Der Standardwert muss schon beim Übersetzen feststehen. Darum muss er ein konstanter Ausdruck sein. Eine Variable wie `fallback` im Fragment ist es nicht, eine `const`-Konstante schon. Das kennst du von `const` aus Modul 1.
+:::
+
+<CodeBlock language="csharp" title="default-from-variable.snippet.cs">{defaultError}</CodeBlock>
+
+## Argumente mit Namen
+
+Beim Aufruf kannst du vor ein Argument den Namen seines Parameters und einen Doppelpunkt schreiben. Das ist ein <Term id="named-argument">benanntes Argument (Named Argument)</Term>. Mit Namen ist die Reihenfolge der Argumente frei, und der Aufruf zeigt, was jeder Wert bedeutet. Bei optionalen Parametern kannst du so einen überspringen und nur einen späteren setzen.
+
+Zwei Regeln gelten. Ein Argument ohne Namen darf nicht hinter einem benannten Argument stehen, das nicht an der Stelle seines Parameters steht. Und eine Lücke wie `Line("Rate", , "%")` gibt es nicht. Wer einen Parameter in der Mitte weglässt, benennt die späteren.
+
+:::info[Vorhersage]
+`unit` ist optional. Was geben die drei Aufrufe aus?
+:::
+
+<CSharpRunner id="m03-l06-named" code={namedArguments} predict expected={namedArgumentsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Failures: 7`, `Failures: 7` und `Rate: 50%`.
+
+1. **Nach Namen zuordnen:** Im zweiten Aufruf gehört `value: 7` zu `value` und `label: "Failures"` zu `label`, egal in welcher Reihenfolge sie stehen.
+2. **Standardwert nutzen:** In den ersten beiden Aufrufen fehlt `unit`. Der Standardwert ist der leere Text, also steht nichts hinter der Zahl.
+3. **Optionalen Parameter setzen:** Im dritten Aufruf steht `unit: "%"` hinter den Pflichtargumenten.
+
+**Was passiert, wenn du `Line(label: "Rate", 50)` schreibst?** Das benannte Argument steht an der Stelle seines Parameters. Der Aufruf ist erlaubt. `Line(value: 50, "Rate")` ist dagegen ein Fehler, weil `value` nicht an erster Stelle steht und danach ein Argument ohne Namen folgt.
+
+</details>
+
+## Lückenbeispiel
+
+Beide Aufrufe von `Greet` geben `"hello"` mit. Mache `greeting` zu einem optionalen Parameter mit dem Standardwert `"hello"` und lasse das Argument in beiden Aufrufen weg. Füge dann einen dritten Aufruf hinzu, der mit benannten Argumenten `welcome, carol` ausgibt: `greeting` steht zuerst.
+
+<CSharpRunner id="m03-l06-gaps" code={optionalGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Standardwert setzen:** `string Greet(string name, string greeting = "hello")`
+2. **Aufrufe kürzen:** `Greet("alice")` und `Greet("bob")`
+3. **Benannt aufrufen:** `Console.WriteLine(Greet(greeting: "welcome", name: "carol"));`
+
+</details>
+
+<details>
+<summary>Vertiefung: Reihenfolge der Auswertung (optional)</summary>
+
+Die Argumente werden in der Reihenfolge ausgewertet, in der sie im Aufruf stehen, von links nach rechts. Die Namen ändern nur die Zuordnung zu den Parametern, nicht diese Reihenfolge. Das Programm zeigt es: `Next("B")` steht zuerst und läuft zuerst, obwohl sein Parameter `second` heißt.
+
+<CSharpRunner id="m03-l06-order" code={namedOrder} />
+
+Die Regeln stehen in [§12.6.2.3 Run-time evaluation of argument lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12623-run-time-evaluation-of-argument-lists). Optionale Parameter und Standardwerte beschreibt [§15.6.2.1 Method parameters, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15621-general).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog baut die Logzeile eines Ereignisses noch als Interpolation im Hauptteil und gibt Berichtszeilen mit `Report.Line` aus.
+
+**Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `string FormatEvent(string timestamp, string eventType, string user, string ip = "unknown")`. Direkt nach den `Report.Line`-Zeilen geben zwei neue Zeilen aus: `FormatEvent(timestamp, eventType, "bob", ip)` (dieselbe Logzeile wie bisher) und ein Aufruf mit benannten Argumenten ohne IP: `FormatEvent(user: "carol", eventType: "logout", timestamp: "2026-03-02T08:42:11Z")`. Die Ausgabe hat jetzt 49 Zeilen.
+
+Der Benutzer steht hier als Text `"bob"` im Aufruf. Die Variable `user` aus der Eingabe kannst du noch nicht übergeben. Warum, klärt Modul 4.
+
+<Forward concepts={['Werte, die fehlen können (`null`)']} module="4" />
+
+<CSharpRunner id="m03-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Methode mit Standardwert schreiben:** `ip` steht als letzter Parameter mit dem Standardwert `"unknown"`.
+2. **Vollständig aufrufen:** Der erste Aufruf übergibt alle vier Argumente und ergibt die Logzeile von Ereignis 2.
+3. **Benannt und ohne IP aufrufen:** Der zweite Aufruf nennt die drei Pflichtparameter in anderer Reihenfolge. Für `ip` gilt der Standardwert, also `ip=unknown`.
+
+</details>
+
+**Neuer Stand:** SecLog baut Logzeilen mit einer Methode. Eine fehlende IP-Adresse füllt der Standardwert.
+
+## Zusammenfassung
+
+Ein optionaler Parameter hat in der Kopfzeile einen Standardwert. Der Wert muss ein konstanter Ausdruck sein, und optionale Parameter stehen hinter den Pflichtparametern. Beim Aufruf darfst du das Argument weglassen. Mit `name: wert` übergibst du ein Argument über den Namen seines Parameters und kannst die Reihenfolge ändern oder optionale Parameter überspringen. Die Argumente werden trotzdem in der geschriebenen Reihenfolge ausgewertet.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l06-q1" />
+
+<Quiz id="m03-l06-q2" />
+
+<Quiz id="m03-l06-q3" />
+
+<Quiz id="m03-l06-q4" />
+
+<Quiz id="m03-l06-q5" />
+
+<Quiz id="m03-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Benannte und optionale Argumente](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/named-and-optional-arguments)
+- C#-Spezifikation: [§12.6.2 Argument lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1262-argument-lists)

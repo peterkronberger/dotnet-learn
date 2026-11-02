@@ -697,6 +697,148 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Log-Werkzeug ist eine überladene Methode praktisch?",
       "modelAnswer": "Zum Beispiel bei einer Methode `Line`, die einen Berichtswert ausgibt: Für ganze Zahlen wie die Zahl der Fehler schreibt sie den Wert direkt, für Kommazahlen wie die Fehlerrate formatiert sie ihn mit einer Nachkommastelle. Der Aufrufer benutzt immer denselben Namen, und der Typ des Wertes wählt die passende Variante."
+    },
+    {
+      "id": "m03-l06-q1",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Die lokale Variable `fallback` hat den Wert `3`. Ein Parameter wird als `int max = fallback` deklariert. Was sagt der Compiler?",
+      "options": [
+        {
+          "text": "Das ist ein Fehler. Der Standardwert muss ein konstanter Ausdruck sein.",
+          "correct": true
+        },
+        {
+          "text": "Das ist erlaubt. Beim Aufruf wird der aktuelle Wert von `fallback` benutzt.",
+          "feedback": "Ein Standardwert wird nicht beim Aufruf aus einer Variablen gelesen. Er muss beim Übersetzen feststehen.",
+          "misconception": "m03-l06-default-from-variable"
+        },
+        {
+          "text": "Das ist erlaubt, weil `fallback` vor der Methode deklariert ist.",
+          "feedback": "Die Reihenfolge ändert nichts. Eine Variable ist kein konstanter Ausdruck.",
+          "misconception": "m03-l06-default-from-variable"
+        },
+        {
+          "text": "Das ist erlaubt, aber nur mit `static` vor der Methode.",
+          "feedback": "`static` hat mit Standardwerten nichts zu tun."
+        }
+      ],
+      "explanation": "Ein Standardwert ist ein konstanter Ausdruck, zum Beispiel ein Literal oder eine `const`-Konstante. Eine Variable ist es nicht."
+    },
+    {
+      "id": "m03-l06-q2",
+      "lesson": "m03-l06",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt den Standardwert ab.",
+      "example": "m03/l06/default-from-variable.snippet.cs",
+      "bugLines": [
+        4
+      ],
+      "lineFeedback": {
+        "4": {
+          "feedback": "`fallback` ist eine Variable, kein konstanter Ausdruck. Ein Literal wie `3` oder eine `const`-Konstante wäre erlaubt.",
+          "misconception": "m03-l06-default-from-variable"
+        }
+      },
+      "explanation": "Der Standardwert eines optionalen Parameters muss ein konstanter Ausdruck sein."
+    },
+    {
+      "id": "m03-l06-q3",
+      "lesson": "m03-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l06/quiz-optional.cs",
+      "explanation": "Im ersten Aufruf gilt der Standardwert `level = 1`. Im zweiten setzt `level: 2` den optionalen Parameter. Im dritten ordnen die Namen `level` und `text` zu, obwohl die Reihenfolge anders ist."
+    },
+    {
+      "id": "m03-l06-q4",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Gegeben ist `string Greet(string name, string greeting = \"hello\")`. Welcher Aufruf lässt sich nicht übersetzen?",
+      "options": [
+        {
+          "text": "`Greet(greeting: \"hi\", \"bob\")`",
+          "correct": true
+        },
+        {
+          "text": "`Greet(\"bob\")`",
+          "feedback": "Das Argument für den optionalen Parameter darf fehlen."
+        },
+        {
+          "text": "`Greet(greeting: \"hi\", name: \"bob\")`",
+          "feedback": "Mit Namen ist die Reihenfolge frei."
+        },
+        {
+          "text": "`Greet(\"bob\", greeting: \"hi\")`",
+          "feedback": "Ein benanntes Argument darf hinter einem Argument ohne Namen stehen."
+        }
+      ],
+      "explanation": "`greeting: \"hi\"` steht an erster Stelle, aber `greeting` ist der zweite Parameter. Danach darf kein Argument ohne Namen folgen. Mit `name: \"bob\"` wäre der Aufruf gültig."
+    },
+    {
+      "id": "m03-l06-q5",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Welche Kopfzeile lässt sich nicht übersetzen?",
+      "options": [
+        {
+          "text": "`string Make(int first = 1, int second)`",
+          "correct": true
+        },
+        {
+          "text": "`string Make(int first, int second = 2)`",
+          "feedback": "Der optionale Parameter steht hinter dem Pflichtparameter. Das ist erlaubt."
+        },
+        {
+          "text": "`string Make(int first = 1, int second = 2)`",
+          "feedback": "Beide Parameter sind optional. Das ist erlaubt."
+        },
+        {
+          "text": "`string Make(int first, int second)`",
+          "feedback": "Ohne Standardwerte sind beide Parameter Pflicht. Das ist erlaubt."
+        }
+      ],
+      "explanation": "Ein Pflichtparameter darf nicht hinter einem optionalen Parameter stehen."
+    },
+    {
+      "id": "m03-l06-q6",
+      "lesson": "m03-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über optionale und benannte Argumente stimmen?",
+      "options": [
+        {
+          "text": "Mit einem benannten Argument kannst du einen optionalen Parameter in der Mitte überspringen und einen späteren setzen.",
+          "correct": true
+        },
+        {
+          "text": "Die Argumente werden in der Reihenfolge ausgewertet, in der sie im Aufruf stehen.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert eines Parameters muss ein konstanter Ausdruck sein.",
+          "correct": true
+        },
+        {
+          "text": "Als Standardwert darf ein Methodenaufruf wie `Math.Max(1, 3)` stehen.",
+          "feedback": "Ein Methodenaufruf ist kein konstanter Ausdruck.",
+          "misconception": "m03-l06-default-from-variable"
+        }
+      ],
+      "explanation": "Namen ordnen Argumente den Parametern zu. Die Reihenfolge der Auswertung bleibt die geschriebene."
+    },
+    {
+      "id": "m03-l06-q7",
+      "lesson": "m03-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wofür optionale Parameter und benannte Argumente gut sind und warum der Standardwert eine Konstante sein muss.",
+      "modelAnswer": "Ein optionaler Parameter hat einen Standardwert. Wer den Wert nicht angibt, bekommt ihn. So bleiben Aufrufe kurz, wenn ein Wert fast immer gleich ist. Mit einem benannten Argument gibt man den Parameternamen an. Das macht Aufrufe lesbar, erlaubt eine andere Reihenfolge und das Überspringen optionaler Parameter. Der Standardwert muss schon beim Übersetzen feststehen, deshalb ist nur ein konstanter Ausdruck erlaubt und keine Variable."
+    },
+    {
+      "id": "m03-l06-q8",
+      "lesson": "m03-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug passt ein optionaler Parameter, und wo helfen benannte Argumente?",
+      "modelAnswer": "Ein optionaler Parameter passt zu einer IP-Adresse, die in manchen Logzeilen fehlt: Der Standardwert `\"unknown\"` füllt die Lücke. Benannte Argumente helfen bei Methoden mit mehreren Texten wie Zeitstempel, Ereignistyp und Benutzer. Im Aufruf steht dann, welcher Text was ist, und man vertauscht sie nicht aus Versehen."
     }
   ]
 }

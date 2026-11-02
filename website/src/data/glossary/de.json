@@ -2160,6 +2160,64 @@
         "title": "Overload resolution (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1264-overload-resolution"
       }
+    },
+    {
+      "id": "optional-parameter",
+      "term": "Optional Parameter",
+      "german": "optionaler Parameter",
+      "category": "language",
+      "definition": "Ein Parameter mit Standardwert in der Kopfzeile, zum Beispiel `string ip = \"unknown\"`. Beim Aufruf darf sein Argument fehlen. Optionale Parameter stehen hinter den Pflichtparametern.",
+      "aliases": [
+        "optionale Parameter"
+      ],
+      "related": [
+        "default-argument",
+        "named-argument"
+      ],
+      "lesson": "m03-l06",
+      "source": {
+        "title": "Method parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15621-general"
+      }
+    },
+    {
+      "id": "default-argument",
+      "term": "Default Argument",
+      "german": "Standardargument",
+      "category": "language",
+      "definition": "Der Standardwert eines optionalen Parameters. Er muss ein konstanter Ausdruck sein und wird benutzt, wenn der Aufruf das Argument weglässt.",
+      "aliases": [
+        "Standardwert eines Parameters",
+        "Default-Argument"
+      ],
+      "related": [
+        "optional-parameter",
+        "constant-expression"
+      ],
+      "lesson": "m03-l06",
+      "source": {
+        "title": "Method parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15621-general"
+      }
+    },
+    {
+      "id": "named-argument",
+      "term": "Named Argument",
+      "german": "benanntes Argument",
+      "category": "language",
+      "definition": "Ein Argument, vor dem der Name seines Parameters und ein Doppelpunkt stehen, zum Beispiel `ip: \"unknown\"`. So ist die Reihenfolge der Argumente frei.",
+      "aliases": [
+        "benannte Argumente"
+      ],
+      "related": [
+        "optional-parameter",
+        "argument"
+      ],
+      "lesson": "m03-l06",
+      "source": {
+        "title": "Argument lists (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1262-argument-lists"
+      }
     }
   ]
 }
