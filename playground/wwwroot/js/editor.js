@@ -56,6 +56,9 @@
         return lines;
     }
 
+    // Placeholder line of a hidden block (built by CodeFolds.Placeholder in the runner); only its background color differs.
+    var FOLD_LINE = /^\s*\/\/ ⋯ Block \d+: \d+ Zeilen ausgeblendet ⋯\s*$/;
+
     var state = { errors: [], warnings: [], currentLine: 0 };
 
     function lineOf(textarea) {
@@ -69,12 +72,14 @@
         if (!textarea || !pre) { return; }
 
         var lines = highlightLines(textarea.value);
+        var rawLines = textarea.value.split('\n');
         var html = '';
         for (var i = 0; i < lines.length; i++) {
             var n = i + 1;
             var cls = 'pg-hl-line';
             if (state.errors.indexOf(n) >= 0) { cls += ' pg-hl-line-err'; }
             else if (state.warnings.indexOf(n) >= 0) { cls += ' pg-hl-line-warn'; }
+            if (FOLD_LINE.test(rawLines[i])) { cls += ' pg-hl-fold'; }
             if (n === state.currentLine) { cls += ' pg-hl-line-current'; }
             html += '<span class="' + cls + '">' + lines[i] + '</span>';
         }
