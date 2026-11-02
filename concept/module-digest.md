@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-10-30. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-02. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -57,6 +57,30 @@ Each module section has these fields:
   - `null`, nullable reference types (`string?`) → M4 (`m01-l09`)
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
-  - `if` is not taught in M1; `m01-l08` points to module 2 for it. `bool` only stores `true`/`false` and the result of `TryParse`.
+  - `if` is taught in `m02-l01` (M1 only pointed to it). In M1, `bool` only stores `true`/`false` and the result of `TryParse`.
   - `TryParse` and `out` are used as a recipe. The `bool` result is ignored in the `m01-l09` SecLog solution. Module 3 explains `out`.
   - `var name = Console.ReadLine()` (`m01-l09`) hides that the type can be `string?`. Module 4 must correct this.
+
+## M2 Kontrollfluss
+
+- **Lessons:**
+  - `m02-l01` Entscheidungen mit if und else – comparisons give `bool`; `if`, `else`, `else if`; the `else` belongs to the nearest `if`.
+  - `m02-l02` Bedingungen verknüpfen: logische Operatoren – `&&`, `||`, `!`, precedence, short-circuit, `&`/`|` on `bool`.
+  - `m02-l03` Der bedingte Operator – `?:` chooses a value; one branch is evaluated; common type.
+  - `m02-l04` switch-Ausdrücke und einfache Muster – `switch` expression with constant, relational and discard patterns.
+  - `m02-l05` Die switch-Anweisung – sections, several labels, `when` guard, no fall-through, `default`.
+  - `m02-l06` Schleifen mit while und do – `while` checks before, `do` after the body.
+  - `m02-l07` Zählschleifen mit for und Durchlaufen mit foreach – `for` header parts, off-by-one, `foreach` over a `string`.
+  - `m02-l08` Schleifen steuern: break und continue – leave a loop or skip one iteration.
+  - `m02-l09` Verschachtelte Schleifen – inner block runs outer x inner times; `break` leaves only the inner loop.
+- **Constructs taught:** `==` `!=` `<` `>` `<=` `>=` (`m02-l01`), `if`/`else`/`else if` and `{ }` blocks (`m02-l01`), `&&` `||` `!` and short-circuit (`m02-l02`), `&` `|` on `bool` (`m02-l02`), `?:` (`m02-l03`), `switch` expression with constant, `<`-relational and `_` patterns (`m02-l04`), `switch` statement with `case`, `default`, several labels, `when` (`m02-l05`), `while` (`m02-l06`), `do … while` (`m02-l06`), `for` (`m02-l07`), `foreach` over a `string` (`m02-l07`), `break` (`m02-l05`, `m02-l08`), `continue` (`m02-l08`), nested loops (`m02-l09`).
+- **Glossary terms:** selection-statement, boolean-expression, comparison-operator (`m02-l01`), logical-operator, short-circuit-evaluation (`m02-l02`), conditional-operator (`m02-l03`), switch-expression, pattern, discard, relational-pattern, constant-pattern, exhaustive (`m02-l04`), switch-statement, case-guard, fall-through (`m02-l05`), loop, iteration (`m02-l06`), loop-variable, off-by-one-error (`m02-l07`), jump-statement (`m02-l08`), nested-loop (`m02-l09`). `collection` has no `lesson` field yet (belongs to M5).
+- **Misconception ids:** m02-l01-else-wrong-if, m02-l02-and-same-as-ampersand, m02-l03-both-branches-evaluated, m02-l04-missing-arm-gives-default, m02-l05-case-falls-through, m02-l06-condition-checked-once, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
+- **Open forward references:**
+  - `null` (der Wert „kein Wert“) → M4 (`m02-l06`; `Console.ReadLine()` can return `null`)
+  - Sammlungen (Arrays, Listen) with `foreach` → M5 (`m02-l07`, plain text, no `<Forward>`)
+- **SecLog end state:** `website/examples/m02/l09/seclog-analysis-solution.cs` – the M1 end state plus (each lesson only adds code): alert for many failed logins, `suspicious` flag, singular/plural word, severity (`switch` expression), action per event type (`switch` statement), failure streak read with `while`, per-attempt lines (`for`) and dot count (`foreach`), date part (`break`) and digit count (`continue`), bar chart of failures per user (nested loops).
+- **Notes for later modules:**
+  - SecLog still holds data in single variables; the bar chart of `m02-l09` takes names and counts from `switch` expressions as a stand-in for arrays (M5).
+  - `foreach` is taught only over a `string`. `switch` on `string` uses constant labels; type, property and list patterns are not taught.
+  - `Console.ReadLine()` loops (`m02-l06`) compare with `==` and ignore `null`; module 4 must correct this.
