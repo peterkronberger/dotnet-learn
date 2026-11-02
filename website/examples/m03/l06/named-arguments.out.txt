@@ -1,0 +1,3 @@
+Failures: 7
+Failures: 7
+Rate: 50%

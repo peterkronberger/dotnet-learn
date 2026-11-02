@@ -423,6 +423,422 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Log-Werkzeug ist es nützlich, dass zwei Methoden denselben Variablennamen benutzen dürfen?",
       "modelAnswer": "Wenn mehrere kleine Methoden Zwischenergebnisse berechnen, zum Beispiel `result` oder `count`. Man muss keine Namen wie `result1` und `result2` erfinden, weil jede Methode ihren eigenen Bereich hat. Das macht es möglich, Methoden unabhängig zu schreiben und zu ändern."
+    },
+    {
+      "id": "m03-l04-q1",
+      "lesson": "m03-l04",
+      "type": "single",
+      "question": "Die lokale Funktion `Word` steht im Rumpf von `Label`, und zwar unter der Zeile, die `Word(count)` aufruft. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm läuft. Eine lokale Funktion gilt im ganzen Block, in dem sie steht.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `Word` erst nach dem Aufruf deklariert wird.",
+          "feedback": "Bei lokalen Funktionen ist die Reihenfolge egal. Sie gelten im ganzen Block.",
+          "misconception": "m03-l04-declare-before-call"
+        },
+        {
+          "text": "Das Programm läuft nur, wenn `Word` als `static` markiert ist.",
+          "feedback": "`static` hat mit der Reihenfolge nichts zu tun. Es verbietet nur den Zugriff auf Variablen der umgebenden Methode."
+        },
+        {
+          "text": "Der Aufruf liefert den Standardwert des Rückgabetyps.",
+          "feedback": "Es gibt keinen Standardwert. Die Funktion läuft normal und liefert ihr Ergebnis."
+        }
+      ],
+      "explanation": "Eine lokale Funktion wird im Blockbereich deklariert und gilt im ganzen Block. Du darfst sie schon oberhalb ihrer Deklaration aufrufen."
+    },
+    {
+      "id": "m03-l04-q2",
+      "lesson": "m03-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler kennt den Namen dort nicht.",
+      "example": "m03/l04/local-function-scope-error.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "`Word` ist eine lokale Funktion von `Label`. Außerhalb von `Label` ist der Name unbekannt."
+        }
+      },
+      "explanation": "Eine lokale Funktion ist nur im Block der umgebenden Methode sichtbar."
+    },
+    {
+      "id": "m03-l04-q3",
+      "lesson": "m03-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l04/quiz-local.cs",
+      "explanation": "`Twice(4)` ruft die lokale Funktion `Double` zweimal mit `4` auf. Jeder Aufruf liefert `8`, die Summe ist `16`."
+    },
+    {
+      "id": "m03-l04-q4",
+      "lesson": "m03-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt den Zugriff dort ab.",
+      "example": "m03/l04/static-capture-error.snippet.cs",
+      "bugLines": [
+        10
+      ],
+      "lineFeedback": {
+        "10": {
+          "feedback": "Eine statische lokale Funktion darf `net` und `tax` der umgebenden Methode nicht benutzen. Sie müssten als Parameter hineinkommen."
+        }
+      },
+      "explanation": "`static` verbietet das Erfassen von lokalen Variablen und Parametern der umgebenden Methode."
+    },
+    {
+      "id": "m03-l04-q5",
+      "lesson": "m03-l04",
+      "type": "single",
+      "question": "Ein Programm hat Top-Level-Anweisungen und am Ende der Datei eine Methode `void Hello()`. Was ist `Hello` technisch?",
+      "options": [
+        {
+          "text": "Eine lokale Funktion der Methode, die der Compiler aus den Top-Level-Anweisungen erzeugt.",
+          "correct": true
+        },
+        {
+          "text": "Eine Variable vom Typ `string`.",
+          "feedback": "Eine Methode ist keine Variable. Sie enthält Anweisungen und wird aufgerufen."
+        },
+        {
+          "text": "Eine Methode, die nirgends sichtbar ist.",
+          "feedback": "Sie ist im ganzen Programm der Datei sichtbar, auch oberhalb ihrer Deklaration."
+        },
+        {
+          "text": "Eine statische lokale Funktion.",
+          "feedback": "Ohne den Modifizierer `static` ist sie nicht statisch. Sie darf deshalb Variablen des Programms erfassen."
+        }
+      ],
+      "explanation": "Die Top-Level-Anweisungen stehen in einer vom Compiler erzeugten Methode. Methoden, die du dazwischen oder am Ende schreibst, sind lokale Funktionen davon."
+    },
+    {
+      "id": "m03-l04-q6",
+      "lesson": "m03-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über lokale Funktionen stimmen?",
+      "options": [
+        {
+          "text": "Eine lokale Funktion ist nur in der umgebenden Methode sichtbar.",
+          "correct": true
+        },
+        {
+          "text": "Ohne `static` darf eine lokale Funktion Variablen der umgebenden Methode benutzen.",
+          "correct": true
+        },
+        {
+          "text": "Mit `static` muss eine lokale Funktion alles, was sie braucht, als Parameter bekommen.",
+          "correct": true
+        },
+        {
+          "text": "Eine lokale Funktion muss oberhalb ihres ersten Aufrufs stehen.",
+          "feedback": "Sie gilt im ganzen Block und darf auch oberhalb ihrer Deklaration aufgerufen werden.",
+          "misconception": "m03-l04-declare-before-call"
+        }
+      ],
+      "explanation": "Sichtbar ist eine lokale Funktion im Block der Methode. `static` verbietet das Erfassen von Variablen. Die Reihenfolge von Aufruf und Deklaration spielt keine Rolle."
+    },
+    {
+      "id": "m03-l04-q7",
+      "lesson": "m03-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `static` vor einer lokalen Funktion bewirkt und warum das nützlich ist.",
+      "modelAnswer": "Eine lokale Funktion ohne `static` kann Variablen und Parameter der umgebenden Methode direkt benutzen. Mit `static` verbietet der Compiler das. Die Funktion bekommt alles über ihre Parameter. Das ist nützlich, weil ihre Kopfzeile dann zeigt, was sie braucht, und sie keine Variable der umgebenden Methode versehentlich liest oder ändert."
+    },
+    {
+      "id": "m03-l04-q8",
+      "lesson": "m03-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug würdest du eine lokale Funktion statt einer normalen Methode schreiben?",
+      "modelAnswer": "Wenn eine kleine Hilfsrechnung nur von einer einzigen Methode gebraucht wird, zum Beispiel das Zählen eines Zeichens in `DescribeIp`. Dann bleibt sie versteckt, und keine andere Stelle im Programm kann sie versehentlich aufrufen oder von ihr abhängen."
+    },
+    {
+      "id": "m03-l05-q1",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "Eine Klasse soll `int Value(string text)` und `double Value(string text)` enthalten. Was sagt der Compiler?",
+      "options": [
+        {
+          "text": "Das ist ein Fehler. Beide Methoden haben dieselbe Signatur, nur der Rückgabetyp unterscheidet sich.",
+          "correct": true
+        },
+        {
+          "text": "Das ist erlaubt. Der Compiler wählt nach dem Typ, den der Aufrufer erwartet.",
+          "feedback": "Der Compiler wählt nur anhand der Argumente. Der Rückgabetyp gehört nicht zur Signatur.",
+          "misconception": "m03-l05-return-type-overloads"
+        },
+        {
+          "text": "Das ist erlaubt, solange die Methoden `static` sind.",
+          "feedback": "`static` ändert die Signatur nicht. Es müssen Anzahl oder Typen der Parameter verschieden sein."
+        },
+        {
+          "text": "Das ist erlaubt, solange der Rückgabetyp `int` oder `double` ist.",
+          "feedback": "Auch dann bleibt die Signatur gleich. Die Art des Rückgabetyps spielt keine Rolle.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      ],
+      "explanation": "Die Signatur besteht aus dem Namen und den Parametern. Zwei Methoden mit gleicher Signatur im selben Typ sind ein Fehler, auch wenn die Rückgabetypen verschieden sind."
+    },
+    {
+      "id": "m03-l05-q2",
+      "lesson": "m03-l05",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Die Zeile hat dieselbe Signatur wie eine andere Methode.",
+      "example": "m03/l05/return-type-error.snippet.cs",
+      "bugLines": [
+        5
+      ],
+      "lineFeedback": {
+        "5": {
+          "feedback": "Name und Parametertyp sind wie bei der Methode darüber. Der andere Rückgabetyp macht die Signatur nicht anders.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      },
+      "explanation": "Der Rückgabetyp gehört nicht zur Signatur. Beide Methoden heißen `Value` und nehmen einen `string`."
+    },
+    {
+      "id": "m03-l05-q3",
+      "lesson": "m03-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l05/quiz-overload.cs",
+      "explanation": "`2` ist ein `int`. Es gibt keine `int`-Überladung. Der Wert lässt sich implizit in `long` und in `double` umwandeln. Weil sich `long` in `double` umwandeln lässt und nicht umgekehrt, gewinnt `long`. `2.0` ist ein `double` und passt genau."
+    },
+    {
+      "id": "m03-l05-q4",
+      "lesson": "m03-l05",
+      "type": "multi",
+      "question": "Welche Angaben gehören zur Signatur einer Methode?",
+      "options": [
+        {
+          "text": "Der Name der Methode.",
+          "correct": true
+        },
+        {
+          "text": "Die Typen der Parameter in der Reihenfolge der Liste.",
+          "correct": true
+        },
+        {
+          "text": "Der Rückgabetyp.",
+          "feedback": "Der Rückgabetyp gehört nicht zur Signatur.",
+          "misconception": "m03-l05-return-type-overloads"
+        },
+        {
+          "text": "Die Namen der Parameter.",
+          "feedback": "Die Namen der Parameter gehören nicht zur Signatur. `Show(int a)` und `Show(int b)` haben dieselbe Signatur."
+        }
+      ],
+      "explanation": "Name, Anzahl und Typen der Parameter bilden die Signatur. Rückgabetyp und Parameternamen zählen nicht."
+    },
+    {
+      "id": "m03-l05-q5",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "Die Klasse `Display` hat `Show(int value)` und `Show(double value)`. `long total = 40;` ist deklariert. Welche Überladung ruft `Display.Show(total)` auf?",
+      "options": [
+        {
+          "text": "Die mit `double`, weil sich `long` implizit in `double` umwandeln lässt.",
+          "correct": true
+        },
+        {
+          "text": "Die mit `int`, weil `40` eine ganze Zahl ist.",
+          "feedback": "Ein `long` lässt sich nicht implizit in `int` umwandeln, es könnte zu groß sein."
+        },
+        {
+          "text": "Keine, der Aufruf ist ein Fehler.",
+          "feedback": "Die `double`-Überladung passt über eine implizite Umwandlung."
+        },
+        {
+          "text": "Beide nacheinander.",
+          "feedback": "Ein Aufruf führt immer genau eine Überladung aus."
+        }
+      ],
+      "explanation": "Eine genaue Überladung für `long` fehlt. Nur die Umwandlung `long` zu `double` ist implizit möglich."
+    },
+    {
+      "id": "m03-l05-q6",
+      "lesson": "m03-l05",
+      "type": "single",
+      "question": "`Math.Abs(-3)` liefert `3` und `Math.Abs(-2.5)` liefert `2.5`. Warum geht beides mit demselben Methodennamen?",
+      "options": [
+        {
+          "text": "`Math.Abs` ist überladen, es gibt Versionen für `int`, `double` und weitere Typen.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler ändert den Typ des Arguments, bis es passt.",
+          "feedback": "Er wählt eine passende Überladung. Er ändert die Argumente nicht nach Belieben."
+        },
+        {
+          "text": "`Math.Abs` hat einen optionalen Parameter für den Typ.",
+          "feedback": "Optionale Parameter lernst du in der nächsten Lektion. Sie legen keinen Typ fest."
+        },
+        {
+          "text": "Der Rückgabetyp entscheidet, welcher Code läuft.",
+          "feedback": "Der Rückgabetyp gehört nicht zur Signatur. Die Argumente entscheiden.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      ],
+      "explanation": "Mehrere Methoden dürfen denselben Namen haben, wenn ihre Parameter sich unterscheiden. Der Compiler wählt nach dem Typ des Arguments."
+    },
+    {
+      "id": "m03-l05-q7",
+      "lesson": "m03-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, woran der Compiler zwei Überladungen unterscheidet und warum der Rückgabetyp nicht reicht.",
+      "modelAnswer": "Der Compiler vergleicht die Signaturen: Name, Anzahl und Typen der Parameter. Beim Aufruf sieht er nur die Argumente und wählt die Überladung, die dazu am besten passt. Der Rückgabetyp steht nicht im Aufruf, deshalb kann er nicht entscheiden. Darum gehört er nicht zur Signatur. Zwei Methoden, die sich nur darin unterscheiden, sind ein Fehler."
+    },
+    {
+      "id": "m03-l05-q8",
+      "lesson": "m03-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug ist eine überladene Methode praktisch?",
+      "modelAnswer": "Zum Beispiel bei einer Methode `Line`, die einen Berichtswert ausgibt: Für ganze Zahlen wie die Zahl der Fehler schreibt sie den Wert direkt, für Kommazahlen wie die Fehlerrate formatiert sie ihn mit einer Nachkommastelle. Der Aufrufer benutzt immer denselben Namen, und der Typ des Wertes wählt die passende Variante."
+    },
+    {
+      "id": "m03-l06-q1",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Die lokale Variable `fallback` hat den Wert `3`. Ein Parameter wird als `int max = fallback` deklariert. Was sagt der Compiler?",
+      "options": [
+        {
+          "text": "Das ist ein Fehler. Der Standardwert muss ein konstanter Ausdruck sein.",
+          "correct": true
+        },
+        {
+          "text": "Das ist erlaubt. Beim Aufruf wird der aktuelle Wert von `fallback` benutzt.",
+          "feedback": "Ein Standardwert wird nicht beim Aufruf aus einer Variablen gelesen. Er muss beim Übersetzen feststehen.",
+          "misconception": "m03-l06-default-from-variable"
+        },
+        {
+          "text": "Das ist erlaubt, weil `fallback` vor der Methode deklariert ist.",
+          "feedback": "Die Reihenfolge ändert nichts. Eine Variable ist kein konstanter Ausdruck.",
+          "misconception": "m03-l06-default-from-variable"
+        },
+        {
+          "text": "Das ist erlaubt, aber nur mit `static` vor der Methode.",
+          "feedback": "`static` hat mit Standardwerten nichts zu tun."
+        }
+      ],
+      "explanation": "Ein Standardwert ist ein konstanter Ausdruck, zum Beispiel ein Literal oder eine `const`-Konstante. Eine Variable ist es nicht."
+    },
+    {
+      "id": "m03-l06-q2",
+      "lesson": "m03-l06",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt den Standardwert ab.",
+      "example": "m03/l06/default-from-variable.snippet.cs",
+      "bugLines": [
+        4
+      ],
+      "lineFeedback": {
+        "4": {
+          "feedback": "`fallback` ist eine Variable, kein konstanter Ausdruck. Ein Literal wie `3` oder eine `const`-Konstante wäre erlaubt.",
+          "misconception": "m03-l06-default-from-variable"
+        }
+      },
+      "explanation": "Der Standardwert eines optionalen Parameters muss ein konstanter Ausdruck sein."
+    },
+    {
+      "id": "m03-l06-q3",
+      "lesson": "m03-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l06/quiz-optional.cs",
+      "explanation": "Im ersten Aufruf gilt der Standardwert `level = 1`. Im zweiten setzt `level: 2` den optionalen Parameter. Im dritten ordnen die Namen `level` und `text` zu, obwohl die Reihenfolge anders ist."
+    },
+    {
+      "id": "m03-l06-q4",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Gegeben ist `string Greet(string name, string greeting = \"hello\")`. Welcher Aufruf lässt sich nicht übersetzen?",
+      "options": [
+        {
+          "text": "`Greet(greeting: \"hi\", \"bob\")`",
+          "correct": true
+        },
+        {
+          "text": "`Greet(\"bob\")`",
+          "feedback": "Das Argument für den optionalen Parameter darf fehlen."
+        },
+        {
+          "text": "`Greet(greeting: \"hi\", name: \"bob\")`",
+          "feedback": "Mit Namen ist die Reihenfolge frei."
+        },
+        {
+          "text": "`Greet(\"bob\", greeting: \"hi\")`",
+          "feedback": "Ein benanntes Argument darf hinter einem Argument ohne Namen stehen."
+        }
+      ],
+      "explanation": "`greeting: \"hi\"` steht an erster Stelle, aber `greeting` ist der zweite Parameter. Danach darf kein Argument ohne Namen folgen. Mit `name: \"bob\"` wäre der Aufruf gültig."
+    },
+    {
+      "id": "m03-l06-q5",
+      "lesson": "m03-l06",
+      "type": "single",
+      "question": "Welche Kopfzeile lässt sich nicht übersetzen?",
+      "options": [
+        {
+          "text": "`string Make(int first = 1, int second)`",
+          "correct": true
+        },
+        {
+          "text": "`string Make(int first, int second = 2)`",
+          "feedback": "Der optionale Parameter steht hinter dem Pflichtparameter. Das ist erlaubt."
+        },
+        {
+          "text": "`string Make(int first = 1, int second = 2)`",
+          "feedback": "Beide Parameter sind optional. Das ist erlaubt."
+        },
+        {
+          "text": "`string Make(int first, int second)`",
+          "feedback": "Ohne Standardwerte sind beide Parameter Pflicht. Das ist erlaubt."
+        }
+      ],
+      "explanation": "Ein Pflichtparameter darf nicht hinter einem optionalen Parameter stehen."
+    },
+    {
+      "id": "m03-l06-q6",
+      "lesson": "m03-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über optionale und benannte Argumente stimmen?",
+      "options": [
+        {
+          "text": "Mit einem benannten Argument kannst du einen optionalen Parameter in der Mitte überspringen und einen späteren setzen.",
+          "correct": true
+        },
+        {
+          "text": "Die Argumente werden in der Reihenfolge ausgewertet, in der sie im Aufruf stehen.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert eines Parameters muss ein konstanter Ausdruck sein.",
+          "correct": true
+        },
+        {
+          "text": "Als Standardwert darf ein Methodenaufruf wie `Math.Max(1, 3)` stehen.",
+          "feedback": "Ein Methodenaufruf ist kein konstanter Ausdruck.",
+          "misconception": "m03-l06-default-from-variable"
+        }
+      ],
+      "explanation": "Namen ordnen Argumente den Parametern zu. Die Reihenfolge der Auswertung bleibt die geschriebene."
+    },
+    {
+      "id": "m03-l06-q7",
+      "lesson": "m03-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wofür optionale Parameter und benannte Argumente gut sind und warum der Standardwert eine Konstante sein muss.",
+      "modelAnswer": "Ein optionaler Parameter hat einen Standardwert. Wer den Wert nicht angibt, bekommt ihn. So bleiben Aufrufe kurz, wenn ein Wert fast immer gleich ist. Mit einem benannten Argument gibt man den Parameternamen an. Das macht Aufrufe lesbar, erlaubt eine andere Reihenfolge und das Überspringen optionaler Parameter. Der Standardwert muss schon beim Übersetzen feststehen, deshalb ist nur ein konstanter Ausdruck erlaubt und keine Variable."
+    },
+    {
+      "id": "m03-l06-q8",
+      "lesson": "m03-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug passt ein optionaler Parameter, und wo helfen benannte Argumente?",
+      "modelAnswer": "Ein optionaler Parameter passt zu einer IP-Adresse, die in manchen Logzeilen fehlt: Der Standardwert `\"unknown\"` füllt die Lücke. Benannte Argumente helfen bei Methoden mit mehreren Texten wie Zeitstempel, Ereignistyp und Benutzer. Im Aufruf steht dann, welcher Text was ist, und man vertauscht sie nicht aus Versehen."
     }
   ]
 }
