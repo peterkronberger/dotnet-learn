@@ -2362,6 +2362,92 @@
         "title": "Deconstruction (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#127-deconstruction"
       }
+    },
+    {
+      "id": "recursion",
+      "term": "Recursion",
+      "german": "Rekursion",
+      "category": "language",
+      "definition": "Eine Methode ruft sich selbst auf. Jeder Aufruf löst ein kleineres Teilproblem, bis ein Basisfall die Aufrufe beendet.",
+      "aliases": [
+        "Rekursion",
+        "rekursiv",
+        "rekursive Methode"
+      ],
+      "related": [
+        "base-case",
+        "call-stack",
+        "method-call"
+      ],
+      "lesson": "m03-l10",
+      "source": {
+        "title": "Invocation expressions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12810-invocation-expressions"
+      }
+    },
+    {
+      "id": "base-case",
+      "term": "Base Case",
+      "german": "Basisfall",
+      "category": "language",
+      "definition": "Der Fall einer rekursiven Methode, den sie ohne weiteren Selbstaufruf beantwortet, zum Beispiel `if (count == 0) return \"\";`. Ohne Basisfall endet die Rekursion nicht.",
+      "aliases": [
+        "Basisfall",
+        "Abbruchbedingung"
+      ],
+      "related": [
+        "recursion",
+        "stack-overflow"
+      ],
+      "lesson": "m03-l10",
+      "source": {
+        "title": "StackOverflowException (.NET API)",
+        "url": "https://learn.microsoft.com/dotnet/api/system.stackoverflowexception"
+      }
+    },
+    {
+      "id": "call-stack",
+      "term": "Call Stack",
+      "german": "Aufrufstapel",
+      "category": "platform",
+      "definition": "Der Speicherbereich, in dem das Programm für jeden laufenden Methodenaufruf einen eigenen Frame (Rahmen) ablegt. Ein neuer Aufruf legt einen Frame obenauf, bei der Rückkehr verschwindet er wieder.",
+      "aliases": [
+        "Aufrufstapel",
+        "Stack",
+        "Callstack",
+        "Frame"
+      ],
+      "related": [
+        "recursion",
+        "stack-overflow",
+        "method-call"
+      ],
+      "lesson": "m03-l10",
+      "source": {
+        "title": "StackOverflowException (.NET API)",
+        "url": "https://learn.microsoft.com/dotnet/api/system.stackoverflowexception"
+      }
+    },
+    {
+      "id": "stack-overflow",
+      "term": "Stack Overflow",
+      "german": "Stapelüberlauf",
+      "category": "platform",
+      "definition": "Der Aufrufstapel überschreitet seine Größe, meist durch eine zu tiefe oder endlose Rekursion. Ein Stapelüberlauf lässt sich nicht abfangen, und der Prozess wird in der Regel beendet.",
+      "aliases": [
+        "Stapelüberlauf",
+        "StackOverflowException"
+      ],
+      "related": [
+        "call-stack",
+        "recursion",
+        "base-case"
+      ],
+      "lesson": "m03-l10",
+      "source": {
+        "title": "StackOverflowException (.NET API)",
+        "url": "https://learn.microsoft.com/dotnet/api/system.stackoverflowexception"
+      }
     }
   ]
 }

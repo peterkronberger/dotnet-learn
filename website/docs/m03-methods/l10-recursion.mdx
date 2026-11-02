@@ -1,0 +1,199 @@
+---
+title: Rekursion und der Aufrufstapel
+sidebar_position: 10
+description: "Eine Methode kann sich selbst aufrufen. Jeder Aufruf bekommt einen eigenen Frame auf dem Aufrufstapel, und ohne Basisfall läuft der Stapel über."
+lesson_id: m03-l10
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import countdown from '!!raw-loader!@site/examples/m03/l10/countdown.cs';
+import countdownOutput from '!!raw-loader!@site/examples/m03/l10/countdown.out.txt';
+import enterLeave from '!!raw-loader!@site/examples/m03/l10/enter-leave.cs';
+import enterLeaveOutput from '!!raw-loader!@site/examples/m03/l10/enter-leave.out.txt';
+import noBaseCase from '!!raw-loader!@site/examples/m03/l10/no-base-case.snippet.cs';
+import sumRecursiveLoop from '!!raw-loader!@site/examples/m03/l10/sum-recursive-loop.cs';
+import sumRecursiveLoopOutput from '!!raw-loader!@site/examples/m03/l10/sum-recursive-loop.out.txt';
+import factorialGaps from '!!raw-loader!@site/examples/m03/l10/factorial-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l10/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l10/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l10/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l10/seclog-methods-solution.cs';
+
+# Rekursion und der Aufrufstapel
+
+:::note[Lernziele]
+- Du kannst eine rekursive Methode mit Basisfall schreiben.
+- Du kannst den Ablauf einer rekursiven Methode mit dem Aufrufstapel nachverfolgen.
+- Du kannst erklären, warum ohne Basisfall ein Stapelüberlauf entsteht.
+- Du kannst entscheiden, wann eine Schleife einfacher ist als Rekursion.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l07-q2" />
+
+<Quiz id="m03-l08-q2" />
+
+<Quiz id="m02-l06-q1" />
+
+## Eine Methode ruft sich selbst auf
+
+Bisher hat eine Methode andere Methoden aufgerufen. Eine Methode darf sich aber auch selbst aufrufen, denn ein Aufruf steht in ihrem Rumpf wie jede andere Anweisung (<Term id="method-call">Methodenaufruf</Term>). Das heißt <Term id="recursion">Recursion (Rekursion)</Term>. Der Aufruf bekommt dabei ein kleineres Problem, zum Beispiel eine kleinere Zahl.
+
+Damit das nicht endlos weitergeht, braucht die Methode einen <Term id="base-case">Base Case (Basisfall)</Term>. Das ist der Fall, den sie ohne weiteren Selbstaufruf beantwortet. Du erkennst ihn an einer `if`-Prüfung am Anfang.
+
+:::info[Vorhersage]
+`Countdown(3)` zählt herunter. Was gibt das Programm aus, und in welcher Reihenfolge?
+:::
+
+<CSharpRunner id="m03-l10-countdown" code={countdown} predict expected={countdownOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3`, `2`, `1` und `Go`.
+
+1. **Basisfall prüfen:** Bei `number == 0` gibt die Methode `Go` aus und ruft sich nicht mehr auf.
+2. **Arbeit tun:** Sonst gibt sie `number` aus.
+3. **Kleineres Problem lösen:** Dann ruft sie sich mit `number - 1` selbst auf. Mit jedem Aufruf rückt der Wert dem Basisfall näher.
+
+**Was passiert, wenn du `Countdown(0)` aufrufst?** Dann trifft schon der erste Aufruf den Basisfall. Die Ausgabe ist nur `Go`.
+
+</details>
+
+## Der Aufrufstapel
+
+Wohin gehören die Parameter und Variablen eines Aufrufs? Jeder Aufruf bekommt einen eigenen Frame (Rahmen) auf dem <Term id="call-stack">Call Stack (Aufrufstapel)</Term>. Der Frame enthält die Parameter und lokalen Variablen dieses Aufrufs. Ein neuer Aufruf legt seinen Frame obenauf. Wenn der Aufruf endet, verschwindet sein Frame, und die Methode darunter läuft an der Stelle weiter, an der sie aufgerufen hat. Bei Rekursion liegen darum mehrere Frames derselben Methode übereinander, jeder mit seinem eigenen `number`.
+
+:::info[Vorhersage]
+`Show(3)` gibt vor und nach dem Selbstaufruf eine Zeile aus. In welcher Reihenfolge erscheinen die sechs Zeilen?
+:::
+
+<CSharpRunner id="m03-l10-enter-leave" code={enterLeave} predict expected={enterLeaveOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `enter 3`, `enter 2`, `enter 1`, `leave 1`, `leave 2`, `leave 3`.
+
+1. **Frames auflegen:** `Show(3)` gibt `enter 3` aus und ruft `Show(2)` auf. Dessen Frame liegt nun oben. So geht es bis `Show(1)`.
+2. **Basisfall erreichen:** Bei `number == 1` bleibt die Bedingung `number > 1` falsch. `Show(1)` ruft sich nicht mehr auf und gibt `leave 1` aus.
+3. **Frames abräumen:** Der oberste Frame verschwindet. `Show(2)` läuft hinter dem Selbstaufruf weiter und gibt `leave 2` aus, danach `Show(3)` mit `leave 3`.
+
+**Was passiert, wenn du `Show(1)` aufrufst?** Dann gibt es nur einen Frame. Die Ausgabe ist `enter 1` und `leave 1`.
+
+</details>
+
+Der zuletzt gestartete Aufruf endet also als erster. Darum heißt die Struktur Stapel.
+
+## Ohne Basisfall läuft der Stapel über
+
+Ein Aufrufstapel hat eine begrenzte Größe. Fehlt der Basisfall, startet jeder Aufruf den nächsten, und kein Aufruf endet. Die Frames häufen sich, bis der Stapel voll ist. Das nennt man <Term id="stack-overflow">Stack Overflow (Stapelüberlauf)</Term>.
+
+Dieser Code wird hier nicht ausgeführt. Der Stapelüberlauf lässt sich nicht abfangen, und das Programm wird in der Regel beendet. Darum steht er nur als Code da, ohne Ausgabe:
+
+<CodeBlock language="csharp" title="no-base-case.snippet.cs">{noBaseCase}</CodeBlock>
+
+Die Methode prüft nie, ob `number` `0` erreicht hat. Nach `3` kämen `2`, `1`, `0`, `-1` und so weiter, bis der Stapel voll ist. Die Klasse [StackOverflowException](https://learn.microsoft.com/dotnet/api/system.stackoverflowexception) beschreibt diesen Fall: Er entsteht meist bei sehr tiefer oder endloser Rekursion.
+
+:::warning[Achtung]
+<Misconception id="m03-l10-no-base-case" />
+
+**„Eine rekursive Methode braucht keinen Basisfall, sie hört von selbst auf.“** Das stimmt nicht. Die Methode weiß nichts von einem Ende, außer du prüfst es. Ein kleiner werdender Parameter allein beendet die Aufrufe nicht, denn `-1`, `-2` und weitere Werte sind auch Zahlen. Ohne Basisfall entsteht ein Stapelüberlauf.
+:::
+
+## Schleife oder Rekursion?
+
+Viele Aufgaben lösen beide Wege. Die Summe von `1` bis `n` zeigt das: `SumRecursive` ruft sich mit `n - 1` auf, `SumLoop` addiert in einer `for`-Schleife.
+
+:::info[Vorhersage]
+Welche Werte geben die beiden Aufrufe mit `4` aus?
+:::
+
+<CSharpRunner id="m03-l10-sum" code={sumRecursiveLoop} predict expected={sumRecursiveLoopOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Beide Zeilen zeigen `10`, denn `4 + 3 + 2 + 1` ist `10`.
+
+1. **Rekursiv:** `SumRecursive(4)` ist `4 + SumRecursive(3)` und so weiter bis zum Basisfall `n == 0`, der `0` liefert.
+2. **Mit Schleife:** `SumLoop(4)` addiert `1`, `2`, `3` und `4` zu `total`.
+
+**Was ist einfacher?** Hier die Schleife: Sie braucht keinen Basisfall und keine zusätzlichen Frames. Rekursion lohnt sich, wenn ein Problem aus kleineren Problemen derselben Art besteht.
+
+</details>
+
+## Lückenbeispiel
+
+`Factorial(n)` soll `n * (n - 1) * … * 1` berechnen, und `Factorial(0)` ist `1`. Ergänze den Basisfall und den rekursiven Aufruf. Für `Factorial(5)` erwartest du `120`.
+
+<CSharpRunner id="m03-l10-gaps" code={factorialGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Basisfall:** `if (n == 0) { return 1; }`
+2. **Selbstaufruf mit kleinerem Wert:** `return n * Factorial(n - 1);`
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zeichnet das Balkendiagramm der Fehlversuche pro Benutzer mit einer inneren `for`-Schleife.
+
+**Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die rekursive Methode `string Bar(int count)`: Bei `count == 0` gibt sie `""` zurück, sonst `"#" + Bar(count - 1)`. Das Balkendiagramm nutzt sie statt der inneren Schleife, die Ausgabe bleibt gleich. Eine neue Zeile steht direkt nach dem Diagramm: Sie gibt den Balken aller Fehlversuche des Beispiellogs aus, `all |#######`. Die Ausgabe hat jetzt 54 Zeilen.
+
+<CSharpRunner id="m03-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Basisfall festlegen:** Bei `count == 0` gibt `Bar` den leeren Text zurück.
+2. **Selbstaufruf mit kleinerem Wert:** Sonst setzt `Bar` ein `#` vor das Ergebnis von `Bar(count - 1)`.
+3. **Schleife ersetzen:** Das Diagramm schreibt `$"{name} |{Bar(count)}"` in einer Zeile.
+4. **Neue Zeile:** `Bar(failures)` baut sieben Zeichen für alle Fehlversuche.
+
+</details>
+
+**Neuer Stand:** SecLog baut die Balken mit einer rekursiven Methode und zeigt zusätzlich den Balken aller Fehlversuche.
+
+<details>
+<summary>Vertiefung: Warum Rekursion nicht immer die beste Wahl ist (optional)</summary>
+
+Jeder Aufruf kostet einen Frame, und der Stapel ist begrenzt. Eine Rekursion mit sehr vielen Aufrufen ist deshalb riskant, auch wenn sie einen Basisfall hat. Für `Bar` mit Zahlen unter 10 ist das kein Problem. Für lange Folgen ist eine Schleife sicherer. Die Spezifikation beschreibt den Aufruf einer Methode in [§12.8.10 Invocation expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12810-invocation-expressions).
+</details>
+
+## Zusammenfassung
+
+Eine rekursive Methode ruft sich selbst mit einem kleineren Problem auf. Der Basisfall beantwortet den einfachsten Fall ohne Selbstaufruf. Jeder Aufruf bekommt einen Frame auf dem Aufrufstapel, und der zuletzt gestartete Aufruf endet als erster. Ohne Basisfall wächst der Stapel, bis er überläuft. Wenn eine Schleife die Aufgabe ebenso einfach löst, nimm die Schleife.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l10-q1" />
+
+<Quiz id="m03-l10-q2" />
+
+<Quiz id="m03-l10-q3" />
+
+<Quiz id="m03-l10-q4" />
+
+<Quiz id="m03-l10-q5" />
+
+<Quiz id="m03-l10-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l10-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l10-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [StackOverflowException](https://learn.microsoft.com/dotnet/api/system.stackoverflowexception)
+- C#-Spezifikation: [§12.8.10 Invocation expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12810-invocation-expressions)
