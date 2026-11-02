@@ -1,0 +1,200 @@
+---
+title: "Tupel: mehrere Werte zurückgeben"
+sidebar_position: 9
+description: "Ein Tupel fasst mehrere Werte zusammen, auf Wunsch mit Namen. Eine Methode kann ein Tupel zurückgeben, und der Aufrufer zerlegt es in Variablen."
+lesson_id: m03-l09
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import tupleBasics from '!!raw-loader!@site/examples/m03/l09/tuple-basics.cs';
+import tupleBasicsOutput from '!!raw-loader!@site/examples/m03/l09/tuple-basics.out.txt';
+import tupleReturn from '!!raw-loader!@site/examples/m03/l09/tuple-return.cs';
+import tupleReturnOutput from '!!raw-loader!@site/examples/m03/l09/tuple-return.out.txt';
+import tupleCopy from '!!raw-loader!@site/examples/m03/l09/tuple-copy.cs';
+import tupleCopyOutput from '!!raw-loader!@site/examples/m03/l09/tuple-copy.out.txt';
+import countsGaps from '!!raw-loader!@site/examples/m03/l09/counts-gaps.cs';
+import namesNotRuntime from '!!raw-loader!@site/examples/m03/l09/names-not-runtime.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l09/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l09/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l09/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l09/seclog-methods-solution.cs';
+
+# Tupel: mehrere Werte zurückgeben
+
+:::note[Lernziele]
+- Du kannst einen Tupeltyp mit Elementnamen schreiben.
+- Du kannst eine Methode schreiben, die ein Tupel zurückgibt.
+- Du kannst ein Tupel in einzelne Variablen zerlegen (Dekonstruktion).
+- Du kannst vorhersagen, dass eine Zuweisung ein Tupel kopiert.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l06-q1" />
+
+<Quiz id="m03-l07-q6" />
+
+<Quiz id="m03-l08-q4" />
+
+## Werte zusammenfassen
+
+Ein `return` liefert einen Wert, ein `out`-Parameter einen weiteren. Oft gehören aber mehrere Werte zusammen, zum Beispiel Benutzer und IP-Adresse einer Logzeile. Dafür gibt es das <Term id="tuple">Tuple (Tupel)</Term>: eine feste Folge von zwei oder mehr Werten in runden Klammern. Jeder Wert hat einen eigenen Typ und darf einen Namen haben.
+
+Den Typ schreibst du wie eine Parameterliste: `(string User, int Failures)`. Die Werte nennt man <Term id="tuple-element">Tupelelemente (Tuple Elements)</Term>. Einen Wert schreibst du als `("bob", 5)`. Auf ein Element greifst du mit seinem Namen zu, zum Beispiel `entry.User`. Außerdem hat jedes Element einen Positionsnamen: `Item1` für das erste, `Item2` für das zweite und so weiter. Mit `var` und Namen im Wert, wie bei `(Name: "alice", Count: 1)`, leitet der Compiler den Typ ab.
+
+:::info[Vorhersage]
+Was geben die vier Ausgabezeilen aus?
+:::
+
+<CSharpRunner id="m03-l09-basics" code={tupleBasics} predict expected={tupleBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `bob`, `5`, `5` und `alice 1`.
+
+1. **Typ mit Namen schreiben:** `(string User, int Failures)` hat zwei Elemente mit den Namen `User` und `Failures`.
+2. **Über den Namen zugreifen:** `entry.User` ist `"bob"`, `entry.Failures` ist `5`.
+3. **Über die Position zugreifen:** `entry.Item2` ist dasselbe Element wie `entry.Failures`. Die Zählung beginnt bei 1.
+4. **Typ ableiten:** `var pair` bekommt den Typ `(string Name, int Count)` aus dem Wert.
+
+**Was passiert, wenn du `entry.Item3` schreibst?** Das Tupel hat nur zwei Elemente. Der Compiler meldet einen Fehler.
+
+</details>
+
+## Ein Tupel zurückgeben und zerlegen
+
+Eine Methode gibt ein Tupel zurück, wenn der Rückgabetyp ein Tupeltyp ist. Im Rumpf schreibst du `return (a, b);`. Der Aufrufer kann das Ergebnis in einer Variablen speichern und über die Namen auf die Elemente zugreifen. Er kann es auch in einzelne Variablen zerlegen. Das heißt <Term id="deconstruction">Deconstruction (Dekonstruktion)</Term>: `var (low, high) = MinMax(4, 8, 6);` legt zwei Variablen an und füllt sie mit den Elementen. Mit `(first, second) = …` füllst du Variablen, die es schon gibt.
+
+:::info[Vorhersage]
+`MinMax` gibt die kleinste und die größte von drei Zahlen zurück. Was geben die drei Ausgabezeilen aus?
+:::
+
+<CSharpRunner id="m03-l09-return" code={tupleReturn} predict expected={tupleReturnOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2 9`, `4 8` und `1 5`.
+
+1. **Tupel zurückgeben:** `return (smallest, largest);` gibt beide Werte auf einmal zurück. Die Namen `Smallest` und `Largest` stehen im Rückgabetyp.
+2. **Über Namen lesen:** `result.Smallest` ist `2` und `result.Largest` ist `9`.
+3. **Mit var zerlegen:** `var (low, high)` legt `low` und `high` an. Der Compiler leitet beide Typen ab.
+4. **In vorhandene Variablen zerlegen:** `(first, second) = MinMax(5, 5, 1)` setzt `first` auf `1` und `second` auf `5`. Beide Variablen waren vorher deklariert.
+
+**Was passiert, wenn du nur ein Element brauchst?** Du kannst es über den Namen lesen, `MinMax(4, 8, 6).Largest`. Zerlegen musst du das Tupel nicht.
+
+</details>
+
+Ein Tupel ist oft klarer als zwei `out`-Parameter, wenn eine Methode immer mehrere zusammengehörige Werte liefert. Der `out`-Parameter passt weiter zu `Try…`-Methoden, bei denen das `bool` den Erfolg meldet.
+
+## Eine Zuweisung kopiert das Tupel
+
+Nach `var b = a;` stellt man sich leicht vor, dass `a` und `b` dasselbe Tupel sind. Das stimmt nicht.
+
+<Forward concepts={['Werttyp und Referenztyp']} module="4" />
+
+:::info[Vorhersage]
+Das Programm kopiert `original` in `copy` und ändert dann `copy`. Welche Werte haben `original.Failures` und `copy.Failures`?
+:::
+
+<CSharpRunner id="m03-l09-copy" code={tupleCopy} predict expected={tupleCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5 6`.
+
+1. **Kopieren:** `var copy = original;` legt ein neues Tupel mit denselben Werten an.
+2. **Kopie ändern:** `copy.Failures = 6;` ändert nur das Tupel in `copy`.
+3. **Original prüfen:** `original.Failures` ist weiter `5`.
+
+**Was passiert, wenn du `original` ändern würdest?** Dann bliebe `copy` unverändert. Beide Variablen sind nach der Zuweisung unabhängig.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l09-tuple-is-reference-type" />
+
+**„Ein Tupel ist ein gemeinsames Objekt: Nach `var b = a;` ändert eine Änderung an `b` auch `a`.“** Das stimmt nicht. Die Zuweisung kopiert alle Elemente. Danach sind `a` und `b` getrennt, und eine Änderung an einem Element von `b` lässt `a` unverändert, wie in der Ausgabe `5 6`. Das passt zu dem, was du von einer `int`-Variablen kennst: `int b = a;` kopiert den Wert.
+:::
+
+## Lückenbeispiel
+
+`CountEvents` gibt noch `(0, 0)` zurück. Ändere es so, dass es `(7, 14)` zurückgibt: sieben fehlgeschlagene von 14 Ereignissen. Zerlege das Ergebnis dann mit `var (failed, total) = CountEvents();` und gib `7 of 14` aus.
+
+<CSharpRunner id="m03-l09-gaps" code={countsGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Werte zurückgeben:** `return (7, 14);`
+2. **Zerlegen:** `var (failed, total) = CountEvents();`
+3. **Ausgeben:** `Console.WriteLine($"{failed} of {total}");`
+
+</details>
+
+<details>
+<summary>Vertiefung: Namen gehören nicht zum Laufzeittyp (optional)</summary>
+
+Die Elementnamen sind eine Hilfe für den Code, aber nicht Teil der Laufzeitdarstellung des Tupels. Darum lässt sich ein Tupel mit den Namen `User` und `Failures` einer Variablen zuweisen, deren Typ `Name` und `Count` heißt. Es kommt auf Anzahl und Typen der Elemente an. Der Positionsname `Item1` funktioniert immer.
+
+<CSharpRunner id="m03-l09-names" code={namesNotRuntime} />
+
+Der Standard beschreibt das in [§8.3.11 Tuple types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8311-tuple-types): Die Elementnamen eines Tupeltyps sind optional und müssen verschieden sein, und zwischen Tupeln mit gleich vielen und passenden Elementtypen gibt es eine Identitätsumwandlung. Tupelwerte schreibst du nach [§12.8.6 Tuple literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1286-tuple-literals). Das Zerlegen steht in [§12.24.3 Deconstructing assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12243-deconstructing-assignment).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest mit `TryReadUser` den Benutzer aus einer Logzeile. Die IP-Adresse der Zeile liest es noch nicht.
+
+**Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `(string User, string Ip) ReadUserAndIp(string line)`. Sie liest Benutzer und IP-Adresse aus einer Logzeile und gibt beide als Tupel zurück. Eine neue Zeile steht direkt nach der Zeile `Line ok: False`: Sie zerlegt das Ergebnis für die Beispielzeile 2 mit `var (lineUser, lineIp) = …` und gibt `User and IP: bob 203.0.113.7` aus. Die Ausgabe hat jetzt 53 Zeilen.
+
+<CSharpRunner id="m03-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Tupeltyp festlegen:** Der Rückgabetyp `(string User, string Ip)` nennt beide Werte.
+2. **Felder unterscheiden:** Die Variable `field` merkt sich, ob gerade der Benutzer, die IP-Adresse oder noch nichts gelesen wird. Ein Leerzeichen setzt sie zurück. Das Wort `word` zeigt mit `user=` oder `ip=` an, wann ein Feld beginnt.
+3. **Zeichen sammeln:** In einem Feld hängt die Schleife jedes Zeichen an `userName` oder `ipText`.
+4. **Tupel zurückgeben und zerlegen:** `return (userName, ipText);` liefert beide Werte. Im Hauptteil zerlegt `var (lineUser, lineIp)` sie in zwei Variablen.
+
+</details>
+
+**Neuer Stand:** SecLog zerlegt die Methoden-Ergebnisse: prüfen, Benutzer lesen und Benutzer samt IP-Adresse gemeinsam zurückgeben.
+
+## Zusammenfassung
+
+Ein Tupel fasst zwei oder mehr Werte zusammen, jeder mit eigenem Typ und auf Wunsch mit Namen: `(string User, int Failures)`. Auf die Elemente greifst du über den Namen oder über `Item1`, `Item2` zu. Eine Methode gibt mit `return (a, b);` ein Tupel zurück, und der Aufrufer zerlegt es mit `var (x, y) = …`. Eine Zuweisung kopiert das Tupel, die Variablen bleiben danach unabhängig. Die Namen gehören nicht zum Laufzeittyp.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l09-q1" />
+
+<Quiz id="m03-l09-q2" />
+
+<Quiz id="m03-l09-q3" />
+
+<Quiz id="m03-l09-q4" />
+
+<Quiz id="m03-l09-q5" />
+
+<Quiz id="m03-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l09-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Tupeltypen](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/value-tuples)
+- C#-Spezifikation: [§8.3.11 Tuple types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8311-tuple-types)

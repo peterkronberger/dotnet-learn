@@ -839,6 +839,424 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Log-Werkzeug passt ein optionaler Parameter, und wo helfen benannte Argumente?",
       "modelAnswer": "Ein optionaler Parameter passt zu einer IP-Adresse, die in manchen Logzeilen fehlt: Der Standardwert `\"unknown\"` füllt die Lücke. Benannte Argumente helfen bei Methoden mit mehreren Texten wie Zeitstempel, Ereignistyp und Benutzer. Im Aufruf steht dann, welcher Text was ist, und man vertauscht sie nicht aus Versehen."
+    },
+    {
+      "id": "m03-l07-q1",
+      "lesson": "m03-l07",
+      "type": "single",
+      "question": "Die Methode ist `int Sum(params int[] numbers)`. Welche Aussage über die Aufrufe `Sum()`, `Sum(4)` und `Sum(4, 5, 6)` stimmt?",
+      "options": [
+        {
+          "text": "Alle drei Aufrufe sind erlaubt.",
+          "correct": true
+        },
+        {
+          "text": "Nur `Sum(4)` und `Sum(4, 5, 6)` sind erlaubt. Mindestens ein Argument ist nötig.",
+          "feedback": "Ein `params`-Parameter darf auch leer bleiben. `Sum()` übergibt null Argumente."
+        },
+        {
+          "text": "Nur `Sum(4, 5, 6)` ist erlaubt. Ein `params`-Parameter braucht mehrere Argumente.",
+          "feedback": "Auch ein einzelnes Argument oder keines ist erlaubt."
+        },
+        {
+          "text": "Keiner der Aufrufe ist erlaubt. Man darf genau ein Argument übergeben.",
+          "feedback": "Bei einem `params`-Parameter darfst du beliebig viele einzelne Werte angeben."
+        }
+      ],
+      "explanation": "Ein `params`-Parameter nimmt null, ein oder mehrere Argumente des Elementtyps einzeln an. Die Methode geht sie mit `foreach` einzeln durch."
+    },
+    {
+      "id": "m03-l07-q2",
+      "lesson": "m03-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l07/quiz-params.cs",
+      "explanation": "Der erste Aufruf übergibt drei Texte, `foreach` zählt drei Durchläufe. Im zweiten Aufruf fehlt jedes Argument, es gibt nichts zu durchlaufen, und die Schleife läuft nie."
+    },
+    {
+      "id": "m03-l07-q3",
+      "lesson": "m03-l07",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt die Kopfzeile ab.",
+      "example": "m03/l07/params-not-last.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "Der `params`-Parameter steht vor `offset`. Er muss der letzte Parameter der Liste sein.",
+          "misconception": "m03-l07-params-not-last"
+        }
+      },
+      "explanation": "Nur der letzte Parameter darf ein `params`-Parameter sein."
+    },
+    {
+      "id": "m03-l07-q4",
+      "lesson": "m03-l07",
+      "type": "single",
+      "question": "Warum muss ein `params`-Parameter der letzte Parameter sein?",
+      "options": [
+        {
+          "text": "Er nimmt alle übrigen Argumente des Aufrufs auf. Stünde danach noch ein Parameter, wäre unklar, welche Argumente zu welchem gehören.",
+          "correct": true
+        },
+        {
+          "text": "Weil die wichtigsten Parameter in C# immer am Ende der Liste stehen müssen.",
+          "feedback": "Eine solche Regel gibt es nicht. Normale Parameter stehen in beliebiger Reihenfolge, nur `params` steht am Ende.",
+          "misconception": "m03-l07-params-not-last"
+        },
+        {
+          "text": "Weil der Compiler `params` sonst als Namen eines Parameters liest.",
+          "feedback": "`params` ist ein Schlüsselwort und kann kein Parametername sein. Der Grund ist ein anderer."
+        },
+        {
+          "text": "Es ist keine feste Regel. Der Compiler übersetzt auch `params` an anderer Stelle, nur mit einer Warnung.",
+          "feedback": "Es ist ein Fehler, keine Warnung. Der Code wird nicht übersetzt.",
+          "misconception": "m03-l07-params-not-last"
+        }
+      ],
+      "explanation": "Die einzelnen Argumente am Ende des Aufrufs bilden zusammen den `params`-Parameter. Darum ist er der letzte und es gibt nur einen."
+    },
+    {
+      "id": "m03-l07-q5",
+      "lesson": "m03-l07",
+      "type": "single",
+      "question": "`Math.Max(3, 5)` liefert `5`. Was passiert bei `Math.Max(3, 5, 8)`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler. `Math.Max` hat zwei feste Parameter und keinen `params`-Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis ist `8`, weil `Math.Max` beliebig viele Argumente annimmt.",
+          "feedback": "`Math.Max` vergleicht genau zwei Werte. Beliebig viele Argumente gibt es nur bei einem `params`-Parameter."
+        },
+        {
+          "text": "Das Ergebnis ist `5`, das dritte Argument wird ignoriert.",
+          "feedback": "Der Compiler ignoriert keine überzähligen Argumente. Er meldet einen Fehler."
+        }
+      ],
+      "explanation": "Ein Aufruf mit mehr Argumenten als Parametern passt nur zu einer Methode mit `params`. `Console.WriteLine` mit Formatstring hat einen solchen Parameter."
+    },
+    {
+      "id": "m03-l07-q6",
+      "lesson": "m03-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über `params` stimmen?",
+      "options": [
+        {
+          "text": "Eine Methode hat höchstens einen `params`-Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Beim Aufruf darfst du die Argumente einzeln, durch Kommas getrennt, angeben.",
+          "correct": true
+        },
+        {
+          "text": "Das Wort `params` gehört nicht zur Signatur der Methode.",
+          "correct": true
+        },
+        {
+          "text": "Der `params`-Parameter darf an beliebiger Stelle der Parameterliste stehen.",
+          "feedback": "Er steht immer am Ende der Liste.",
+          "misconception": "m03-l07-params-not-last"
+        }
+      ],
+      "explanation": "Die Signatur besteht aus Name und Parametertypen. Der Modifizierer `params` ändert sie nicht."
+    },
+    {
+      "id": "m03-l07-q7",
+      "lesson": "m03-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein `params`-Parameter ist, wie du die Methode aufrufst und warum er der letzte Parameter sein muss.",
+      "modelAnswer": "Ein `params`-Parameter ist ein Parameter, der beim Aufruf null, ein oder mehrere Argumente desselben Typs einzeln annimmt. Die Methode kann sie zum Beispiel mit `foreach` einzeln durchgehen. Er muss der letzte Parameter sein, weil er alle übrigen Argumente des Aufrufs aufnimmt. Käme danach noch ein Parameter, wäre nicht zu erkennen, wo die Werte des `params`-Parameters enden."
+    },
+    {
+      "id": "m03-l07-q8",
+      "lesson": "m03-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug passt ein `params`-Parameter, und wo wäre er unpassend?",
+      "modelAnswer": "Er passt, wenn die Anzahl gleichartiger Werte wechselt, zum Beispiel eine Methode, die aus beliebig vielen Ereignistypen die fehlgeschlagenen Anmeldungen zählt. Unpassend ist er bei Werten mit verschiedener Bedeutung wie Zeitstempel, Benutzer und IP-Adresse: Dafür sind eigene, benannte Parameter klarer."
+    },
+    {
+      "id": "m03-l08-q1",
+      "lesson": "m03-l08",
+      "type": "single",
+      "question": "Warum hat `int.TryParse(text, out int number)` einen `out`-Parameter?",
+      "options": [
+        {
+          "text": "Die Methode gibt per `return` ein `bool` zurück (ob es geklappt hat) und liefert die Zahl zusätzlich über den `out`-Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Damit `number` vor dem Aufruf schon einen Wert haben muss.",
+          "feedback": "Bei `out` muss die Variable vorher keinen Wert haben. Das verlangt `ref`."
+        },
+        {
+          "text": "Weil eine Methode in C# nur einen Wert per `return` und nie ein `bool` zurückgeben darf.",
+          "feedback": "`TryParse` gibt ein `bool` zurück. Ein `return` liefert einen Wert, `out` einen weiteren."
+        },
+        {
+          "text": "Damit `number` bei ungültigem Text unverändert bleibt.",
+          "feedback": "Die Methode weist `number` immer einen Wert zu, bei ungültigem Text den Wert `0`.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        }
+      ],
+      "explanation": "Ein `return` liefert einen Wert. Ein `out`-Parameter ist ein zweiter Weg, einen weiteren Wert an den Aufrufer zu geben."
+    },
+    {
+      "id": "m03-l08-q2",
+      "lesson": "m03-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l08/quiz-ref.cs",
+      "explanation": "`left` und `right` sind andere Namen für `first` und `second`. `Swap` tauscht deshalb die Variablen des Aufrufers."
+    },
+    {
+      "id": "m03-l08-q3",
+      "lesson": "m03-l08",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt die Methode ab.",
+      "example": "m03/l08/out-not-assigned.snippet.cs",
+      "bugLines": [
+        9
+      ],
+      "lineFeedback": {
+        "9": {
+          "feedback": "Hier kehrt die Methode zurück, ohne `half` zugewiesen zu haben. Auch dieser Weg braucht `half = 0;`.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        }
+      },
+      "explanation": "Ein `out`-Parameter muss auf jedem Weg zugewiesen sein, bevor die Methode zurückkehrt."
+    },
+    {
+      "id": "m03-l08-q4",
+      "lesson": "m03-l08",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `out int result` und weist ihn auf einem Weg nicht zu. Was gilt?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler.",
+          "correct": true
+        },
+        {
+          "text": "Die Variable des Aufrufers behält ihren alten Wert.",
+          "feedback": "Der Code wird gar nicht übersetzt. Es gibt keinen Lauf, in dem ein alter Wert bleiben könnte.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        },
+        {
+          "text": "Die Variable des Aufrufers bekommt automatisch den Wert `0`.",
+          "feedback": "Es gibt keine automatische Zuweisung. Die Methode muss selbst zuweisen.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        },
+        {
+          "text": "Das Programm läuft, bricht aber zur Laufzeit ab.",
+          "feedback": "Die Prüfung geschieht beim Übersetzen, nicht erst beim Lauf."
+        }
+      ],
+      "explanation": "Ein `out`-Parameter gilt am Anfang der Methode als nicht zugewiesen. Auf jedem Weg zum Ende muss die Methode ihm einen Wert geben."
+    },
+    {
+      "id": "m03-l08-q5",
+      "lesson": "m03-l08",
+      "type": "single",
+      "question": "Gegeben ist `void Reset(ref int number) { number = 0; }`. Es gilt `int x = 5;` und danach der Aufruf `Reset(ref x);`. Welchen Wert hat `x`?",
+      "options": [
+        {
+          "text": "`0`",
+          "correct": true
+        },
+        {
+          "text": "`5`",
+          "feedback": "So wäre es bei einem Wertparameter, der eine Kopie bekommt. `ref` macht `number` zu einem zweiten Namen für `x`."
+        },
+        {
+          "text": "Der Aufruf lässt sich nicht übersetzen, weil `x` schon einen Wert hat.",
+          "feedback": "Bei `ref` muss die Variable sogar vorher einen Wert haben."
+        }
+      ],
+      "explanation": "Ein `ref`-Parameter ist ein anderer Name für die Variable des Aufrufers. Die Zuweisung in der Methode ändert `x`."
+    },
+    {
+      "id": "m03-l08-q6",
+      "lesson": "m03-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über `ref`, `out` und `in` stimmen?",
+      "options": [
+        {
+          "text": "Der Aufruf schreibt denselben Modifizierer vor das Argument, zum Beispiel `Reset(ref x)`.",
+          "correct": true
+        },
+        {
+          "text": "Bei `out int n` im Aufruf wird die Variable `n` dort deklariert.",
+          "correct": true
+        },
+        {
+          "text": "Einem `in`-Parameter darf die Methode keinen neuen Wert zuweisen.",
+          "correct": true
+        },
+        {
+          "text": "Bei `ref` darf die Variable des Aufrufers vor dem Aufruf unzugewiesen sein.",
+          "feedback": "Das gilt für `out`. Eine `ref`-Variable muss vor dem Aufruf einen Wert haben."
+        }
+      ],
+      "explanation": "Alle drei sind andere Namen für die Variable des Aufrufers. Sie unterscheiden sich darin, wer sie vorher füllen muss und wer sie ändern darf."
+    },
+    {
+      "id": "m03-l08-q7",
+      "lesson": "m03-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, worin sich ein `ref`-Parameter von einem Wertparameter unterscheidet und was ein `out`-Parameter zusätzlich verlangt.",
+      "modelAnswer": "Ein Wertparameter bekommt eine Kopie des Arguments. Eine Zuweisung ändert die Variable des Aufrufers nicht. Ein `ref`-Parameter ist ein zweiter Name für die Variable des Aufrufers, eine Zuweisung in der Methode ändert diese Variable. Beide stehen auch im Aufruf mit Modifizierer. Bei `out` muss die Variable vorher keinen Wert haben, dafür muss die Methode dem Parameter auf jedem Weg einen Wert zuweisen, bevor sie zurückkehrt."
+    },
+    {
+      "id": "m03-l08-q8",
+      "lesson": "m03-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug passt ein `out`-Parameter, und woran erkennst du, dass die Methode scheitern kann?",
+      "modelAnswer": "Ein `out`-Parameter passt zu einer Methode wie `TryReadUser`, die den Benutzernamen aus einer Logzeile liest. Der Rückgabewert `bool` sagt, ob die Zeile einen `user=`-Teil hat, und der `out`-Parameter liefert den Namen. Am Namen `Try…` und am `bool` erkennt man, dass die Methode scheitern kann."
+    },
+    {
+      "id": "m03-l09-q1",
+      "lesson": "m03-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l09/quiz-tuple.cs",
+      "explanation": "`Order(9, 2)` gibt das Tupel `(2, 9)` zurück, weil `9 < 2` falsch ist. Die Dekonstruktion legt `2` in `low` und `9` in `high`."
+    },
+    {
+      "id": "m03-l09-q2",
+      "lesson": "m03-l09",
+      "type": "single",
+      "question": "Es gilt `var a = (Count: 1, Name: \"x\"); var b = a; b.Count = 2;`. Welchen Wert hat danach `a.Count`?",
+      "options": [
+        {
+          "text": "`1`, denn `b` ist eine eigene Kopie.",
+          "correct": true
+        },
+        {
+          "text": "`2`, denn `a` und `b` sind dasselbe Tupel.",
+          "feedback": "Die Zuweisung `var b = a;` kopiert die Werte. Eine Änderung an `b` ändert `a` nicht.",
+          "misconception": "m03-l09-tuple-is-reference-type"
+        },
+        {
+          "text": "Der Code lässt sich nicht übersetzen, weil ein Tupelelement nicht änderbar ist.",
+          "feedback": "Die Elemente einer Tupelvariablen kann man zuweisen."
+        },
+        {
+          "text": "Das hängt davon ab, ob `b` vor `a` ausgewertet wird.",
+          "feedback": "Die Reihenfolge spielt keine Rolle. Die Variablen sind nach dem Kopieren unabhängig.",
+          "misconception": "m03-l09-tuple-is-reference-type"
+        }
+      ],
+      "explanation": "Eine Zuweisung kopiert das Tupel mit allen Elementen. Danach sind beide Variablen unabhängig."
+    },
+    {
+      "id": "m03-l09-q3",
+      "lesson": "m03-l09",
+      "type": "multi",
+      "question": "Gegeben ist `(string User, int Failures) entry = (\"bob\", 5);`. Welche Ausdrücke haben den Wert `5`?",
+      "options": [
+        {
+          "text": "`entry.Failures`",
+          "correct": true
+        },
+        {
+          "text": "`entry.Item2`",
+          "correct": true
+        },
+        {
+          "text": "`entry.Item1`",
+          "feedback": "`Item1` ist das erste Element, hier `\"bob\"`."
+        },
+        {
+          "text": "`entry.Item0`",
+          "feedback": "Die Positionsnamen beginnen bei `Item1`."
+        }
+      ],
+      "explanation": "Ein Element erreichst du über seinen Namen oder über `Item` und seine Position, die bei 1 beginnt."
+    },
+    {
+      "id": "m03-l09-q4",
+      "lesson": "m03-l09",
+      "type": "single",
+      "question": "Die Methode `(int, string) Pair()` gibt ein Tupel zurück. Welche Typen haben `a` und `b` nach `var (a, b) = Pair();`?",
+      "options": [
+        {
+          "text": "`a` ist ein `int`, `b` ein `string`.",
+          "correct": true
+        },
+        {
+          "text": "Beide sind Tupel.",
+          "feedback": "Die Dekonstruktion zerlegt das Tupel. Jede Variable bekommt ein Element."
+        },
+        {
+          "text": "Beide haben den Typ `var`.",
+          "feedback": "`var` ist kein Typ, sondern lässt den Compiler die Typen ableiten. Das sind hier `int` und `string`."
+        }
+      ],
+      "explanation": "Bei `var (a, b)` leitet der Compiler für jede Variable den Typ des passenden Elements ab."
+    },
+    {
+      "id": "m03-l09-q5",
+      "lesson": "m03-l09",
+      "type": "single",
+      "question": "Es gilt `(string User, int Failures) x = (\"bob\", 5);`. Ist `(string Name, int Count) y = x;` erlaubt?",
+      "options": [
+        {
+          "text": "Ja. Die Typen der Elemente passen, die Namen sind nicht Teil des Laufzeittyps.",
+          "correct": true
+        },
+        {
+          "text": "Nein. Die Elementnamen müssen gleich sein.",
+          "feedback": "Die Namen dürfen verschieden sein. Entscheidend sind Anzahl und Typen der Elemente."
+        },
+        {
+          "text": "Nein. Ein Tupel lässt sich nie einer anderen Variablen zuweisen.",
+          "feedback": "Zuweisen ist erlaubt und kopiert das Tupel."
+        }
+      ],
+      "explanation": "Zwei Tupeltypen mit gleich vielen Elementen und passenden Elementtypen lassen sich ineinander umwandeln. Die Namen gehören nur zur Schreibweise im Code."
+    },
+    {
+      "id": "m03-l09-q6",
+      "lesson": "m03-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Tupel stimmen?",
+      "options": [
+        {
+          "text": "Eine Methode kann ein Tupel zurückgeben und so mehrere Werte auf einmal liefern.",
+          "correct": true
+        },
+        {
+          "text": "Die Elemente eines Tupels dürfen verschiedene Typen haben.",
+          "correct": true
+        },
+        {
+          "text": "Ein Tupel hat mindestens zwei Elemente.",
+          "correct": true
+        },
+        {
+          "text": "Nach `var b = a;` ändert eine Zuweisung an ein Element von `b` auch `a`.",
+          "feedback": "`b` ist eine Kopie. `a` bleibt unverändert.",
+          "misconception": "m03-l09-tuple-is-reference-type"
+        }
+      ],
+      "explanation": "Ein Tupel fasst mindestens zwei Werte zusammen. Die Zuweisung kopiert sie."
+    },
+    {
+      "id": "m03-l09-q7",
+      "lesson": "m03-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine Methode mehrere Werte als Tupel zurückgibt und wie der Aufrufer sie in Variablen zerlegt.",
+      "modelAnswer": "Der Rückgabetyp ist ein Tupeltyp mit Elementen in Klammern, zum Beispiel `(string User, string Ip)`. Die Methode gibt mit `return (userName, ipText);` zwei Werte auf einmal zurück. Der Aufrufer kann das Ergebnis mit `var (lineUser, lineIp) = ReadUserAndIp(line);` in einzelne Variablen zerlegen. Das nennt man Dekonstruktion. Eine Zuweisung kopiert das Tupel."
+    },
+    {
+      "id": "m03-l09-q8",
+      "lesson": "m03-l09",
+      "type": "explain",
+      "question": "Transferfrage: Wann nimmst du ein Tupel als Rückgabe und wann einen `out`-Parameter?",
+      "modelAnswer": "Wenn eine Methode immer mehrere zusammengehörige Werte liefert, zum Beispiel Benutzer und IP-Adresse einer Logzeile, ist ein Tupel mit Elementnamen meist klarer. Ein `out`-Parameter passt zum Muster `Try…`, bei dem der Rückgabewert `bool` sagt, ob die Methode Erfolg hatte, und der `out`-Parameter das Ergebnis liefert."
     }
   ]
 }

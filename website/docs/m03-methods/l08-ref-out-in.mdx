@@ -1,0 +1,183 @@
+---
+title: ref, out und in
+sidebar_position: 8
+description: "Mit ref, out und in ist ein Parameter ein zweiter Name für die Variable des Aufrufers. Ein out-Parameter muss zugewiesen sein, bevor die Methode zurückkehrt."
+lesson_id: m03-l08
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import refVsValue from '!!raw-loader!@site/examples/m03/l08/ref-vs-value.cs';
+import refVsValueOutput from '!!raw-loader!@site/examples/m03/l08/ref-vs-value.out.txt';
+import outParameter from '!!raw-loader!@site/examples/m03/l08/out-parameter.cs';
+import outParameterOutput from '!!raw-loader!@site/examples/m03/l08/out-parameter.out.txt';
+import outError from '!!raw-loader!@site/examples/m03/l08/out-not-assigned.snippet.cs';
+import inParameter from '!!raw-loader!@site/examples/m03/l08/in-parameter.cs';
+import doubleGaps from '!!raw-loader!@site/examples/m03/l08/double-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l08/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l08/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l08/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l08/seclog-methods-solution.cs';
+
+# ref, out und in
+
+:::note[Lernziele]
+- Du kannst erklären, worin sich ein `ref`-Parameter von einem Wertparameter unterscheidet.
+- Du kannst eine Methode mit `out`-Parameter schreiben und mit `out var` oder `out int` aufrufen.
+- Du kannst erklären, warum `int.TryParse` einen `out`-Parameter hat.
+- Du kannst sagen, was ein `in`-Parameter verbietet.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l08-q4" />
+
+<Quiz id="m03-l03-q3" />
+
+<Quiz id="m03-l07-q4" />
+
+## ref: ein zweiter Name für die Variable
+
+Ein <Term id="value-parameter">Wertparameter</Term> bekommt eine Kopie des Arguments. Eine Zuweisung an ihn ändert die Variable des Aufrufers nicht. Mit dem Modifizierer `ref` vor dem Typ ist der Parameter anders: Er ist ein <Term id="reference-parameter">Reference Parameter (Referenzparameter)</Term>, also ein zweiter Name für die Variable des Aufrufers. Es gibt keine Kopie. Was die Methode dem Parameter zuweist, steht danach in der Variablen des Aufrufers.
+
+Zwei Regeln gehören dazu. Der Aufruf schreibt `ref` auch vor das Argument. Und die Variable muss vor dem Aufruf einen Wert haben, denn die Methode darf ihn lesen.
+
+:::info[Vorhersage]
+Beide Methoden erhöhen ihren Parameter um 1. Welchen Wert hat `attempts` nach dem ersten und nach dem zweiten Aufruf?
+:::
+
+<CSharpRunner id="m03-l08-ref" code={refVsValue} predict expected={refVsValueOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1` und `2`.
+
+1. **Kopie erhöhen:** `AddOneToCopy` erhöht seine Kopie. `attempts` bleibt `1`.
+2. **Zweiten Namen benutzen:** In `AddOneToOriginal(ref attempts)` ist `number` ein anderer Name für `attempts`. `number++` erhöht `attempts` selbst.
+3. **Modifizierer im Aufruf:** Ohne `ref` vor dem Argument lässt sich der zweite Aufruf nicht übersetzen.
+
+**Was passiert, wenn `attempts` vor dem Aufruf keinen Wert hat?** Dann lehnt der Compiler den Aufruf mit `ref` ab, weil die Methode den Wert lesen dürfte.
+
+</details>
+
+## out: ein zusätzlicher Rückgabewert
+
+Ein <Term id="output-parameter">Output Parameter (Ausgabeparameter)</Term> trägt den Modifizierer `out`. Auch er ist ein zweiter Name für die Variable des Aufrufers, aber mit umgekehrter Absicht: Die Variable muss vorher keinen Wert haben, dafür muss die Methode ihr einen geben. Das ist ein zweiter Weg, einen Wert zurückzuliefern. Ein `return` liefert genau einen Wert. Mit `out` liefert die Methode weitere.
+
+Diesen Weg kennst du aus Modul 1: `int.TryParse(text, out int number)` gibt ein `bool` zurück, das sagt, ob die Umwandlung geklappt hat. Die Zahl selbst kommt über den `out`-Parameter. Bei ungültigem Text bekommt `number` den Wert `0`. Das `bool` kann kein zweiter Rückgabewert sein, weil ein `return` nur einen Wert liefert. Darum gibt es `out`. Das Rezept aus Modul 1 ist jetzt erklärt.
+
+Im Aufruf schreibst du `out` vor das Argument. Du kannst die Variable direkt dort deklarieren (`out int half` oder `out var half`) oder eine vorhandene Variable benutzen (`out half`). Die Deklaration im Aufruf ist ein Deklarationsausdruck (Declaration Expression).
+
+:::info[Vorhersage]
+`TryHalf` halbiert gerade Zahlen. Was geben die vier Ausgabezeilen aus?
+:::
+
+<CSharpRunner id="m03-l08-out" code={outParameter} predict expected={outParameterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True 4`, `False 0`, `True` und `5`.
+
+1. **Deklarieren im Aufruf:** `out int half` legt `half` an. Die Methode setzt `half` auf `4` und gibt `true` zurück.
+2. **Variable wiederverwenden:** Der zweite Aufruf nutzt mit `out half` die vorhandene Variable. `7` ist ungerade, die Methode setzt `half = 0` und gibt `false` zurück.
+3. **Mit out var:** Beim dritten Aufruf legt `out var other` die Variable an, der Compiler leitet den Typ `int` ab. Die letzte Zeile zeigt ihren Wert, `5`.
+
+**Was passiert, wenn du `half = 0;` im ungeraden Fall weglässt?** Dann lässt sich die Methode nicht übersetzen. Das zeigt der nächste Abschnitt.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l08-out-may-stay-unassigned" />
+
+**„Eine Methode darf einen `out`-Parameter unzugewiesen lassen, dann behält die Variable des Aufrufers ihren alten Wert.“** Das stimmt nicht. Am Anfang der Methode gilt ein `out`-Parameter als nicht zugewiesen, und auf jedem Weg bis zur Rückkehr muss die Methode ihm einen Wert geben. Sonst lässt sich der Code nicht übersetzen. Im Fragment fehlt die Zuweisung im ungeraden Fall, deshalb meldet der Compiler einen Fehler an der Zeile `return false;`. In Modul 1 gab es die Vermutung, `TryParse` lasse die Variable bei ungültigem Text unverändert. Auch das stimmt nicht: `TryParse` setzt sie auf `0`.
+:::
+
+<CodeBlock language="csharp" title="out-not-assigned.snippet.cs">{outError}</CodeBlock>
+
+Die Regel ist die <Term id="definite-assignment">sichere Zuweisung (Definite Assignment)</Term> aus Modul 1, angewendet auf `out`: Vor dem Ende der Methode muss auf jedem Weg eine Zuweisung stehen.
+
+## in: nur lesen
+
+Ein <Term id="input-parameter">Input Parameter (Eingabeparameter)</Term> trägt den Modifizierer `in`. Er ist ebenfalls ein zweiter Name für die Variable des Aufrufers, aber die Methode darf ihm keinen neuen Wert zuweisen. Er kann nur lesen. Im Aufruf ist `in` vor dem Argument erlaubt, aber nicht nötig.
+
+<CSharpRunner id="m03-l08-in" code={inParameter} />
+
+Für ein einzelnes `int` bringt `in` nichts. Es ist für große Werte gedacht, die man nicht kopieren will. Für dieses Modul genügt: `in` heißt „nur lesen“.
+
+## Lückenbeispiel
+
+`TryDouble` soll eine Zahl verdoppeln, aber nur, wenn das Ergebnis höchstens `100` ist. Ergänze die Methode: Bei `30` soll sie `result = 60` setzen und `true` zurückgeben. Bei `80` ist das Ergebnis zu groß, dann bleibt `result` bei `0` und die Methode gibt `false` zurück. Erwartet sind `True 60` und `False 0`.
+
+<CSharpRunner id="m03-l08-gaps" code={doubleGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ergebnis berechnen:** `int doubledNumber = number * 2;`
+2. **Prüfen:** `if (doubledNumber > 100) { result = 0; return false; }` weist auch im Fehlerfall zu.
+3. **Zuweisen und melden:** `result = doubledNumber; return true;`
+
+</details>
+
+<details>
+<summary>Vertiefung: die Regeln im Standard (optional)</summary>
+
+Die Parameterarten stehen in [§15.6.2.3 By-reference parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15623-by-reference-parameters). Danach muss das Argument denselben Modifizierer tragen wie der Parameter. Bei `in` ist er im Aufruf wahlfrei. Die Zuweisungsregeln für `out` stehen in [§9.2.7 Output parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#927-output-parameters): Eine Variable braucht vor dem Aufruf keinen Wert, nach der normalen Rückkehr gilt sie als zugewiesen, und in der Methode ist der Parameter anfangs nicht zugewiesen. Die Schreibweise `out int half` im Aufruf beschreibt [§12.20 Declaration expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1220-declaration-expressions).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Ereignistypen mit einer `params`-Methode. Den Benutzernamen einer Logzeile liest es noch nicht aus dem Text.
+
+**Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `bool TryReadUser(string line, out string userName)`. Sie liest den Namen hinter `user=` aus einer Logzeile. Dazu gehst du die Zeichen mit `foreach` durch und merkst dir das aktuelle Wort, bis du `user=` erkennst. Hat die Zeile keinen `user=`-Teil, gibt sie `false` zurück und `userName` ist der leere Text. Zwei neue Zeilen kommen direkt nach der Zeile `Failed in sample: 7`: Für die Beispielzeile 2 (`2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`) gibt das Programm `User from line: bob` aus, für den Text `"broken line"` die Zeile `Line ok: False`. Die Ausgabe hat jetzt 52 Zeilen.
+
+<CSharpRunner id="m03-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Out-Parameter vorbelegen:** `userName = "";` steht gleich am Anfang. Damit ist der Parameter auf jedem Weg zugewiesen, auch wenn nichts gefunden wird.
+2. **Wort aufbauen und erkennen:** Solange `user=` nicht gefunden ist, wächst `word` Zeichen für Zeichen. Ein Leerzeichen setzt es zurück. Sobald `word == "user="` gilt, wird `found` wahr.
+3. **Namen lesen:** Danach hängt die Schleife die Zeichen an `userName`, bis das nächste Leerzeichen kommt (`break`).
+4. **Ergebnis melden:** `return found;` sagt dem Aufrufer, ob ein `user=`-Teil da war.
+
+</details>
+
+**Neuer Stand:** SecLog prüft eine Logzeile und liest den Benutzer daraus. Eine kaputte Zeile meldet die Methode mit `false`.
+
+## Zusammenfassung
+
+Ein `ref`-, `out`- oder `in`-Parameter ist ein zweiter Name für die Variable des Aufrufers, keine Kopie. Der Aufruf schreibt denselben Modifizierer vor das Argument, bei `in` ist er wahlfrei. Bei `ref` muss die Variable vorher einen Wert haben. Bei `out` muss sie das nicht, dafür muss die Methode dem Parameter auf jedem Weg einen Wert zuweisen. So liefert `int.TryParse` neben dem `bool` die Zahl. Ein `in`-Parameter darf nur gelesen werden.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l08-q1" />
+
+<Quiz id="m03-l08-q2" />
+
+<Quiz id="m03-l08-q3" />
+
+<Quiz id="m03-l08-q4" />
+
+<Quiz id="m03-l08-q5" />
+
+<Quiz id="m03-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l08-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Methodenparameter und Modifizierer](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/method-parameters)
+- Microsoft Learn: [Int32.TryParse](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)
+- C#-Spezifikation: [§15.6.2.3 By-reference parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15623-by-reference-parameters)
