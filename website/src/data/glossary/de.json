@@ -2218,6 +2218,150 @@
         "title": "Argument lists (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1262-argument-lists"
       }
+    },
+    {
+      "id": "parameter-array",
+      "term": "Parameter Array",
+      "german": "Parameterarray",
+      "category": "language",
+      "definition": "Ein Parameter mit dem Modifizierer `params`, zum Beispiel `params int[] numbers`. Beim Aufruf darfst du null, ein oder mehrere Argumente dieses Elementtyps einzeln angeben. Er steht immer als letzter Parameter.",
+      "aliases": [
+        "params",
+        "Parameter Arrays"
+      ],
+      "related": [
+        "parameter",
+        "argument",
+        "collection"
+      ],
+      "lesson": "m03-l07",
+      "source": {
+        "title": "Parameter collections (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15624-parameter-collections"
+      }
+    },
+    {
+      "id": "reference-parameter",
+      "term": "Reference Parameter",
+      "german": "Referenzparameter",
+      "category": "language",
+      "definition": "Ein Parameter mit dem Modifizierer `ref`. Er ist kein Wert, sondern ein zweiter Name für die Variable des Aufrufers. Die Variable muss vor dem Aufruf einen Wert haben, und der Aufruf schreibt `ref` vor das Argument.",
+      "aliases": [
+        "ref-Parameter",
+        "Referenzparameter"
+      ],
+      "related": [
+        "value-parameter",
+        "output-parameter",
+        "input-parameter"
+      ],
+      "lesson": "m03-l08",
+      "source": {
+        "title": "Reference parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156233-reference-parameters"
+      }
+    },
+    {
+      "id": "output-parameter",
+      "term": "Output Parameter",
+      "german": "Ausgabeparameter",
+      "category": "language",
+      "definition": "Ein Parameter mit dem Modifizierer `out`. Er ist ein zweiter Name für die Variable des Aufrufers, die vorher keinen Wert haben muss. Die Methode muss ihm einen Wert zuweisen, bevor sie zurückkehrt.",
+      "aliases": [
+        "out-Parameter",
+        "Ausgabeparameter"
+      ],
+      "related": [
+        "reference-parameter",
+        "definite-assignment",
+        "parsing"
+      ],
+      "lesson": "m03-l08",
+      "source": {
+        "title": "Output parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156234-output-parameters"
+      }
+    },
+    {
+      "id": "input-parameter",
+      "term": "Input Parameter",
+      "german": "Eingabeparameter",
+      "category": "language",
+      "definition": "Ein Parameter mit dem Modifizierer `in`. Er ist ein zweiter Name für die Variable des Aufrufers, aber die Methode darf ihm nichts zuweisen. Er liest nur.",
+      "aliases": [
+        "in-Parameter",
+        "Eingabeparameter"
+      ],
+      "related": [
+        "reference-parameter",
+        "output-parameter"
+      ],
+      "lesson": "m03-l08",
+      "source": {
+        "title": "Input parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156232-input-parameters"
+      }
+    },
+    {
+      "id": "tuple",
+      "term": "Tuple",
+      "german": "Tupel",
+      "category": "language",
+      "definition": "Eine feste Folge von zwei oder mehr Werten, geschrieben in runden Klammern, zum Beispiel `(\"bob\", 5)`. Jeder Wert hat einen eigenen Typ und kann einen Namen haben. Eine Methode kann ein Tupel zurückgeben.",
+      "aliases": [
+        "Tupel",
+        "Tuples",
+        "Tupeltyp"
+      ],
+      "related": [
+        "tuple-element",
+        "deconstruction",
+        "return-value"
+      ],
+      "lesson": "m03-l09",
+      "source": {
+        "title": "Tuple types (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8311-tuple-types"
+      }
+    },
+    {
+      "id": "tuple-element",
+      "term": "Tuple Element",
+      "german": "Tupelelement",
+      "category": "language",
+      "definition": "Einer der Werte eines Tupels. Du erreichst ihn über seinen Namen, zum Beispiel `entry.User`, oder über `Item1`, `Item2` und so weiter nach der Position.",
+      "aliases": [
+        "Elementname",
+        "Tupelelemente"
+      ],
+      "related": [
+        "tuple"
+      ],
+      "lesson": "m03-l09",
+      "source": {
+        "title": "Tuple types (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8311-tuple-types"
+      }
+    },
+    {
+      "id": "deconstruction",
+      "term": "Deconstruction",
+      "german": "Dekonstruktion",
+      "category": "language",
+      "definition": "Das Zerlegen eines Tupels in einzelne Variablen in einer Anweisung, zum Beispiel `var (user, ip) = ReadUserAndIp(line);`.",
+      "aliases": [
+        "Dekonstruktion",
+        "deconstruct"
+      ],
+      "related": [
+        "tuple",
+        "tuple-element"
+      ],
+      "lesson": "m03-l09",
+      "source": {
+        "title": "Deconstruction (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#127-deconstruction"
+      }
     }
   ]
 }

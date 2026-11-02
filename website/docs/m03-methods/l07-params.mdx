@@ -1,0 +1,164 @@
+---
+title: "Beliebig viele Argumente: params"
+sidebar_position: 7
+description: "Ein params-Parameter nimmt beim Aufruf null, ein oder mehrere Argumente eines Typs einzeln an. Er steht immer am Ende der Parameterliste."
+lesson_id: m03-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import sumParams from '!!raw-loader!@site/examples/m03/l07/sum-params.cs';
+import sumParamsOutput from '!!raw-loader!@site/examples/m03/l07/sum-params.out.txt';
+import libraryParams from '!!raw-loader!@site/examples/m03/l07/library-params.cs';
+import notLast from '!!raw-loader!@site/examples/m03/l07/params-not-last.snippet.cs';
+import largestGaps from '!!raw-loader!@site/examples/m03/l07/largest-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l07/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l07/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l07/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l07/seclog-methods-solution.cs';
+
+# Beliebig viele Argumente: params
+
+:::note[Lernziele]
+- Du kannst eine Methode mit `params`-Parameter schreiben.
+- Du kannst eine solche Methode mit null, einem oder mehreren Argumenten aufrufen.
+- Du kannst erklären, warum ein `params`-Parameter der letzte sein muss.
+- Du kannst `params` in der Bibliothek erkennen: `Console.WriteLine` mit Formatstring hat einen, `Math.Max` nicht.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l04-q1" />
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m03-l06-q4" />
+
+## Ein Parameter für viele Argumente
+
+Bisher hatte jede Methode eine feste Zahl von Parametern. Manchmal ist die Zahl der Werte aber offen, zum Beispiel wenn eine Methode alle übergebenen Zahlen addieren soll. Dafür gibt es das <Term id="parameter-array">Parameter Array (Parameterarray)</Term>. Du schreibst vor den Typ des letzten Parameters das Schlüsselwort `params`. Beim Aufruf gibst du dann null, ein oder mehrere Argumente einzeln an.
+
+<Forward concepts={['Arrays (`int[]`)']} module="5" />
+
+Der Typ `int[]` steht für eine Reihe von `int`-Werten. Was ein Array genau ist, folgt in Modul 5. Für dieses Beispiel genügt: Innerhalb der Methode gehst du alle übergebenen Werte mit `foreach` durch, wie du es von einem `string` kennst.
+
+:::info[Vorhersage]
+Was geben die drei Aufrufe von `Sum` aus?
+:::
+
+<CSharpRunner id="m03-l07-sum" code={sumParams} predict expected={sumParamsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0`, `5` und `6`.
+
+1. **Argumente sammeln:** Der Compiler fasst alle Argumente, die zu `params` gehören, zu einer Reihe von Werten zusammen.
+2. **Durchlaufen:** `foreach` nimmt einen Wert nach dem anderen und `total` addiert ihn.
+3. **Leerer Aufruf:** Bei `Sum()` gibt es keinen Wert. Die Schleife läuft nie, und `total` bleibt `0`.
+
+**Was passiert, wenn du `Sum(1, 2, 3, 4)` aufrufst?** Das ist erlaubt. Die Zahl der Argumente ist nicht begrenzt, die Summe ist `10`.
+
+</details>
+
+Ein `params`-Parameter darf auch hinter normalen Parametern stehen, etwa `string Join(string separator, params string[] parts)`. Dann gehören die ersten Argumente zu den festen Parametern und alle weiteren zu `params`. Es gibt höchstens einen `params`-Parameter pro Methode. Statt der einzelnen Werte darfst du auch eine fertige Reihe des Typs `int[]` übergeben, das ist die normale Form des Aufrufs. Die Form mit einzelnen Argumenten heißt erweiterte Form (Expanded Form).
+
+Das Wort `params` gehört nicht zur Signatur der Methode. Du kannst also nicht zwei Überladungen anlegen, die sich nur durch `params` unterscheiden. Die Signatur kennst du aus der Lektion über Überladung.
+
+## params in der Bibliothek
+
+Du kennst `params` schon, ohne es gesehen zu haben. `Console.WriteLine` mit Formatstring hat eine Überladung mit `params`: Der Formatstring steht zuerst, danach folgen beliebig viele Werte für die Platzhalter `{0}`, `{1}` und so weiter. Die Nummer gibt an, der wievielte Wert gemeint ist. `Math.Max` dagegen hat zwei feste Parameter. `Math.Max(3, 5, 8)` lässt sich nicht übersetzen.
+
+<CSharpRunner id="m03-l07-library" code={libraryParams} />
+
+## Warum nur am Ende?
+
+Alle Argumente, die nicht zu den festen Parametern passen, landen im `params`-Parameter. Stünde nach ihm noch ein weiterer Parameter, wäre nicht zu erkennen, wo die Werte des `params`-Parameters enden. Darum muss er der letzte sein.
+
+:::warning[Achtung]
+<Misconception id="m03-l07-params-not-last" />
+
+**„Ein `params`-Parameter darf an beliebiger Stelle der Parameterliste stehen.“** Das stimmt nicht. Der Compiler lehnt jede Kopfzeile ab, in der nach dem `params`-Parameter noch ein Parameter folgt. Im Fragment steht `offset` hinter `numbers`, deshalb lässt es sich nicht übersetzen. Nur der letzte Parameter darf `params` tragen.
+:::
+
+<CodeBlock language="csharp" title="params-not-last.snippet.cs">{notLast}</CodeBlock>
+
+## Lückenbeispiel
+
+Die Methode `Largest` hat schon einen `params`-Parameter, gibt aber immer `0` zurück. Ergänze eine `foreach`-Schleife, die jeden Wert mit `best` vergleicht und `best` ersetzt, wenn der Wert größer ist. Die erwartete Ausgabe ist `9`, `7` und `0`.
+
+<CSharpRunner id="m03-l07-gaps" code={largestGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Durchlaufen:** `foreach (int number in numbers)` nimmt jeden Wert einzeln.
+2. **Vergleichen:** `if (number > best)` prüft, ob der Wert größer ist als der bisher größte.
+3. **Ersetzen:** `best = number;` merkt sich den neuen größten Wert. Ohne Argumente bleibt `best` bei `0`.
+
+</details>
+
+<details>
+<summary>Vertiefung: params-Parameter mit anderen Sammlungstypen (optional)</summary>
+
+<Since csharp="13" dotnet="9" />
+
+Seit C# 13 darf `params` nicht nur bei Arrays stehen, sondern bei vielen weiteren <Term id="collection">Sammlungstypen (Collections)</Term>. Die Aufrufe sehen gleich aus.
+
+<Forward concepts={['Sammlungen']} module="5" />
+
+Das brauchst du in diesem Modul nicht. Die Regeln stehen in [§15.6.2.4 Parameter collections](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15624-parameter-collections): Es gibt höchstens einen solchen Parameter, und er ist der letzte der Liste. Dass `params` nicht zur Signatur gehört, steht in [§7.5 Signatures and overloading](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#75-signatures-and-overloading).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog formatiert Logzeilen mit einer Methode und gibt Berichtszeilen mit `Report.Line` aus. Die Ereignistypen der 14 Beispielzeilen werden noch nirgends gezählt.
+
+**Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `int CountFailed(params string[] eventTypes)`. Sie zählt mit `foreach` die Einträge `login-failed`. Direkt nach den beiden `FormatEvent`-Zeilen ruft eine neue Zeile sie mit den 14 Ereignistypen des Beispiellogs auf (erweiterte Form, ein Argument je Zeile des Logs) und gibt `Failed in sample: ` mit dem Ergebnis aus. Die Ausgabe hat jetzt 50 Zeilen.
+
+<CSharpRunner id="m03-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Methode mit params schreiben:** `CountFailed` hat einen einzigen Parameter, `params string[] eventTypes`.
+2. **Durchlaufen und zählen:** `foreach` geht alle Ereignistypen durch. Jeder `login-failed` erhöht `failed` um 1.
+3. **Erweitert aufrufen:** Der Aufruf gibt die 14 Ereignistypen einzeln an. Sieben davon sind `login-failed`.
+
+</details>
+
+**Neuer Stand:** SecLog zählt die fehlgeschlagenen Anmeldungen aus einer beliebig langen Liste von Ereignistypen.
+
+## Zusammenfassung
+
+Ein `params`-Parameter nimmt beim Aufruf null, ein oder mehrere Argumente desselben Typs einzeln an. Die Methode geht sie als Reihe von Werten durch, zum Beispiel mit `foreach`. Der `params`-Parameter ist der letzte der Liste, und es gibt höchstens einen. Das Wort `params` gehört nicht zur Signatur. In der Bibliothek hat `Console.WriteLine` mit Formatstring so einen Parameter, `Math.Max` nicht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l07-q1" />
+
+<Quiz id="m03-l07-q2" />
+
+<Quiz id="m03-l07-q3" />
+
+<Quiz id="m03-l07-q4" />
+
+<Quiz id="m03-l07-q5" />
+
+<Quiz id="m03-l07-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [params-Schlüsselwort](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/method-parameters#params-modifier)
+- C#-Spezifikation: [§15.6.2.4 Parameter collections](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15624-parameter-collections)
