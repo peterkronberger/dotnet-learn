@@ -1818,6 +1818,228 @@
         "title": "Iteration statements",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements"
       }
+    },
+    {
+      "id": "parameter",
+      "term": "Parameter",
+      "category": "language",
+      "definition": "Eine Variable in der Kopfzeile einer Methode. Sie bekommt bei jedem Aufruf den Wert des passenden Arguments. In `int Add(int first, int second)` sind `first` und `second` Parameter.",
+      "aliases": [
+        "Parameter",
+        "Parameter einer Methode"
+      ],
+      "related": [
+        "argument",
+        "method"
+      ],
+      "lesson": "m03-l01",
+      "source": {
+        "title": "Method parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1562-method-parameters"
+      }
+    },
+    {
+      "id": "argument",
+      "term": "Argument",
+      "category": "language",
+      "definition": "Der Wert, den du beim Aufruf einer Methode in die Klammern schreibst. In `Add(3, 4)` sind `3` und `4` die Argumente. Jedes Argument gehört zu einem Parameter.",
+      "aliases": [
+        "Argumente"
+      ],
+      "related": [
+        "parameter",
+        "method-call"
+      ],
+      "lesson": "m03-l01",
+      "source": {
+        "title": "Argument lists (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1262-argument-lists"
+      }
+    },
+    {
+      "id": "return-type",
+      "term": "Return Type",
+      "german": "Rückgabetyp",
+      "category": "language",
+      "definition": "Der Typ des Werts, den eine Methode an den Aufrufer zurückgibt. Er steht vor dem Methodennamen, zum Beispiel `int` in `int Add(int a, int b)`.",
+      "aliases": [
+        "Rückgabetypen"
+      ],
+      "related": [
+        "void",
+        "return-value"
+      ],
+      "lesson": "m03-l01",
+      "source": {
+        "title": "Methods (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1561-general"
+      }
+    },
+    {
+      "id": "void",
+      "term": "void",
+      "category": "language",
+      "definition": "Der Rückgabetyp einer Methode, die keinen Wert zurückgibt. Eine `void`-Methode führt nur ihre Anweisungen aus.",
+      "related": [
+        "return-type"
+      ],
+      "lesson": "m03-l01",
+      "source": {
+        "title": "Methods (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1561-general"
+      }
+    },
+    {
+      "id": "method-call",
+      "term": "Method Call",
+      "german": "Methodenaufruf",
+      "category": "language",
+      "definition": "Der Name einer Methode mit Argumenten in Klammern, zum Beispiel `Add(3, 4)`. Der Aufruf führt den Rumpf der Methode aus. Danach macht das Programm hinter dem Aufruf weiter.",
+      "aliases": [
+        "Methodenaufrufe",
+        "Invocation"
+      ],
+      "related": [
+        "argument",
+        "method"
+      ],
+      "lesson": "m03-l01",
+      "source": {
+        "title": "Method invocations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12102-method-invocations"
+      }
+    },
+    {
+      "id": "return-value",
+      "term": "Return Value",
+      "german": "Rückgabewert",
+      "category": "language",
+      "definition": "Der Wert, den eine Methode mit `return` an den Aufrufer übergibt. Der Aufruf selbst hat dann diesen Wert, sodass du ihn speichern, ausgeben oder weiterrechnen kannst.",
+      "aliases": [
+        "Rückgabewerte"
+      ],
+      "related": [
+        "return-statement",
+        "return-type"
+      ],
+      "lesson": "m03-l02",
+      "source": {
+        "title": "The return statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13105-the-return-statement"
+      }
+    },
+    {
+      "id": "return-statement",
+      "term": "Return Statement",
+      "german": "return-Anweisung",
+      "category": "language",
+      "definition": "Die Anweisung `return`, die eine Methode sofort beendet und zum Aufrufer zurückkehrt. Bei einer Methode mit Rückgabetyp steht ein Ausdruck dahinter, dessen Wert die Methode zurückgibt.",
+      "related": [
+        "return-value",
+        "jump-statement"
+      ],
+      "lesson": "m03-l02",
+      "source": {
+        "title": "The return statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13105-the-return-statement"
+      }
+    },
+    {
+      "id": "expression-body",
+      "term": "Expression Body",
+      "german": "Ausdruckskörper",
+      "category": "language",
+      "definition": "Die Kurzform einer Methode, die nur einen Ausdruck ergibt: `=>`, der Ausdruck und `;` ersetzen den Block mit `return`. Zum Beispiel `int Square(int n) => n * n;`.",
+      "aliases": [
+        "Ausdruckskörper",
+        "expression-bodied"
+      ],
+      "related": [
+        "return-statement",
+        "expression"
+      ],
+      "lesson": "m03-l02",
+      "source": {
+        "title": "Expression-bodied members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members"
+      }
+    },
+    {
+      "id": "scope",
+      "term": "Scope",
+      "german": "Gültigkeitsbereich",
+      "category": "language",
+      "definition": "Der Teil des Programmtexts, in dem du einen Namen verwenden kannst. Ein Parameter gilt in seiner Methode. Eine Variable gilt ab ihrer Deklaration bis zum Ende des Blocks, in dem sie steht.",
+      "aliases": [
+        "Sichtbarkeitsbereich",
+        "Gültigkeit"
+      ],
+      "related": [
+        "declaration-space",
+        "local-variable"
+      ],
+      "lesson": "m03-l03",
+      "source": {
+        "title": "Scopes (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#76-scopes"
+      }
+    },
+    {
+      "id": "local-variable",
+      "term": "Local Variable",
+      "german": "lokale Variable",
+      "category": "language",
+      "definition": "Eine Variable, die in einem Block oder einer Methode deklariert wird. Sie ist nur dort gültig und verschwindet mit dem Ende des Blocks. Auch ein Parameter ist in seiner Methode eine lokale Variable.",
+      "aliases": [
+        "lokale Variablen"
+      ],
+      "related": [
+        "scope",
+        "variable"
+      ],
+      "lesson": "m03-l03",
+      "source": {
+        "title": "Declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#72-declarations"
+      }
+    },
+    {
+      "id": "value-parameter",
+      "term": "Value Parameter",
+      "german": "Wertparameter",
+      "category": "language",
+      "definition": "Ein Parameter ohne Modifizierer. Er ist eine neue lokale Variable und bekommt eine Kopie des Arguments. Eine Zuweisung an ihn ändert die Variable des Aufrufers nicht.",
+      "aliases": [
+        "Wertparameter"
+      ],
+      "related": [
+        "parameter",
+        "local-variable"
+      ],
+      "lesson": "m03-l03",
+      "source": {
+        "title": "Value parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15622-value-parameters"
+      }
+    },
+    {
+      "id": "declaration-space",
+      "term": "Declaration Space",
+      "german": "Deklarationsraum",
+      "category": "language",
+      "definition": "Der Bereich, in dem ein Name nur einmal vorkommen darf, zum Beispiel der Rumpf einer Methode. Zwei getrennte Methoden haben getrennte Deklarationsräume, deshalb darf derselbe Name in beiden stehen.",
+      "aliases": [
+        "Deklarationsräume"
+      ],
+      "related": [
+        "scope",
+        "declaration"
+      ],
+      "lesson": "m03-l03",
+      "source": {
+        "title": "Declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#72-declarations"
+      }
     }
   ]
 }

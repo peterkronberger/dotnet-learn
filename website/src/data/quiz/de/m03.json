@@ -1,1 +1,428 @@
-{ "module": "m03", "questions": [] }
+{
+  "module": "m03",
+  "questions": [
+    {
+      "id": "m03-l01-q1",
+      "lesson": "m03-l01",
+      "type": "single",
+      "question": "Ein Programm gibt zuerst `A` aus, dann `B`. Am Ende der Datei steht die Deklaration `void Hello() { Console.WriteLine(\"Hi\"); }`, aber nirgends ein Aufruf `Hello()`. Was erscheint in der Konsole?",
+      "options": [
+        {
+          "text": "`A` und `B`",
+          "correct": true
+        },
+        {
+          "text": "`A`, `B` und `Hi`",
+          "feedback": "Die Deklaration führt den Rumpf nicht aus. Er läuft nur bei einem Aufruf.",
+          "misconception": "m03-l01-declaration-runs-code"
+        },
+        {
+          "text": "`Hi`, `A` und `B`",
+          "feedback": "Auch am Anfang läuft `Hello` nicht von selbst. Ohne Aufruf bleibt der Rumpf unbenutzt.",
+          "misconception": "m03-l01-declaration-runs-code"
+        },
+        {
+          "text": "Nur `A`",
+          "feedback": "Die beiden Anweisungen `A` und `B` laufen nacheinander. Die Methode ändert daran nichts."
+        }
+      ],
+      "explanation": "Eine Methode ist nur beschrieben, solange niemand sie aufruft. Der Rumpf läuft bei jedem Aufruf, und ohne Aufruf nie."
+    },
+    {
+      "id": "m03-l01-q2",
+      "lesson": "m03-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l01/quiz-calls.cs",
+      "explanation": "Zuerst läuft der innere Aufruf `Twice(3)` und liefert `6`. Dieser Wert ist das Argument des äußeren Aufrufs, der `12` liefert. `WriteLine` gibt `12` aus."
+    },
+    {
+      "id": "m03-l01-q3",
+      "lesson": "m03-l01",
+      "type": "single",
+      "question": "Gegeben ist `int Add(int first, int second) { return first + second; }` und der Aufruf `Add(3, 4)`. Was ist ein Argument?",
+      "options": [
+        {
+          "text": "`3`",
+          "correct": true
+        },
+        {
+          "text": "`first`",
+          "feedback": "`first` ist ein Parameter. Er steht in der Deklaration."
+        },
+        {
+          "text": "`int`",
+          "feedback": "`int` ist der Typ des Parameters bzw. der Rückgabetyp."
+        },
+        {
+          "text": "`Add`",
+          "feedback": "`Add` ist der Name der Methode."
+        }
+      ],
+      "explanation": "Parameter stehen in der Deklaration und sind Platzhalter. Argumente stehen im Aufruf und sind die Werte. `3` gehört zu `first`, `4` zu `second`."
+    },
+    {
+      "id": "m03-l01-q4",
+      "lesson": "m03-l01",
+      "type": "single",
+      "question": "Es gilt `int i = 1;`, und die Methode `void Show(int a, int b)` gibt `a` und `b` nacheinander aus. Was gibt der Aufruf `Show(i++, i++)` aus?",
+      "options": [
+        {
+          "text": "`1 2`",
+          "correct": true
+        },
+        {
+          "text": "`2 1`",
+          "feedback": "Die Argumente werden von links nach rechts ausgewertet. Das linke `i++` liefert zuerst `1`."
+        },
+        {
+          "text": "`1 1`",
+          "feedback": "Nach dem ersten `i++` ist `i` schon `2`. Das zweite `i++` liefert deshalb `2`."
+        },
+        {
+          "text": "`2 2`",
+          "feedback": "`i++` liefert den alten Wert und zählt danach hoch (Lektion über Operatoren in Modul 1)."
+        }
+      ],
+      "explanation": "Die Argumente werden in der Reihenfolge ausgewertet, in der sie im Aufruf stehen. Das erste `i++` liefert `1`, danach ist `i` gleich `2`, das zweite liefert `2`."
+    },
+    {
+      "id": "m03-l01-q5",
+      "lesson": "m03-l01",
+      "type": "single",
+      "question": "Welchen Rückgabetyp hat eine Methode, die nur eine Zeile ausgibt und keinen Wert zurückgibt?",
+      "options": [
+        {
+          "text": "`void`",
+          "correct": true
+        },
+        {
+          "text": "`string`",
+          "feedback": "`string` wäre ein Text als Ergebnis. Die Methode gibt aber keinen Wert zurück."
+        },
+        {
+          "text": "`int`",
+          "feedback": "`int` wäre eine Zahl als Ergebnis. Die Methode gibt aber keinen Wert zurück."
+        },
+        {
+          "text": "Eine Methode ohne Ergebnis braucht keinen Typ vor dem Namen.",
+          "feedback": "Jede Methode hat einen Rückgabetyp. Für „kein Wert“ steht dort `void`."
+        }
+      ],
+      "explanation": "`void` ist der Rückgabetyp für Methoden, die keinen Wert zurückgeben. Sie führen nur ihre Anweisungen aus."
+    },
+    {
+      "id": "m03-l01-q6",
+      "lesson": "m03-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über Methoden und Aufrufe stimmen?",
+      "options": [
+        {
+          "text": "Ein Methodenaufruf kann mehrfach stehen, der Rumpf läuft dann bei jedem Aufruf.",
+          "correct": true
+        },
+        {
+          "text": "Nach dem Ende des Rumpfs macht das Programm hinter dem Aufruf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Die Parameter einer Methode bekommen ihre Werte von den Argumenten des Aufrufs.",
+          "correct": true
+        },
+        {
+          "text": "Der Rumpf einer Methode läuft schon dort, wo die Methode im Text deklariert ist.",
+          "feedback": "Der Rumpf läuft nur bei einem Aufruf, nicht an der Stelle der Deklaration.",
+          "misconception": "m03-l01-declaration-runs-code"
+        }
+      ],
+      "explanation": "Eine Deklaration beschreibt die Methode, ein Aufruf führt sie aus. Danach kehrt das Programm zum Aufrufer zurück."
+    },
+    {
+      "id": "m03-l01-q7",
+      "lesson": "m03-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was bei einem Methodenaufruf passiert. Nenne die Wörter Parameter, Argument und Rückgabetyp.",
+      "modelAnswer": "Der Aufruf nennt den Namen der Methode und gibt in Klammern Argumente mit. Die Argumente werden von links nach rechts ausgewertet und als Werte an die Parameter der Methode übergeben. Dann läuft der Rumpf. Hat die Methode einen Rückgabetyp wie `int`, liefert der Aufruf einen Wert dieses Typs, bei `void` keinen. Danach macht das Programm hinter dem Aufruf weiter."
+    },
+    {
+      "id": "m03-l01-q8",
+      "lesson": "m03-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug eine Methode benutzen, die du mit verschiedenen Argumenten mehrfach aufrufst?",
+      "modelAnswer": "Zum Beispiel für das Bewerten der Schwere: Eine Methode bekommt die Zahl der Fehlversuche als Parameter und liefert „low“, „medium“ oder „high“. Man ruft sie für jeden Benutzer auf, ohne den Code zu kopieren. Auch das Ausgeben einer formatierten Logzeile eignet sich."
+    },
+    {
+      "id": "m03-l02-q1",
+      "lesson": "m03-l02",
+      "type": "single",
+      "question": "Die Methode `int Square(int n) { return n * n; }` ist deklariert. Das Programm enthält nur die Anweisung `Square(4);`. Was erscheint in der Konsole?",
+      "options": [
+        {
+          "text": "Nichts",
+          "correct": true
+        },
+        {
+          "text": "`16`",
+          "feedback": "`return` gibt den Wert an den Aufrufer, es schreibt nichts in die Konsole. Ausgeben kann nur `Console.WriteLine`.",
+          "misconception": "m03-l02-return-prints"
+        },
+        {
+          "text": "`Square`",
+          "feedback": "Der Name einer Methode wird nicht ausgegeben. Der Aufruf liefert höchstens einen Wert."
+        },
+        {
+          "text": "`4`",
+          "feedback": "Das Argument wird nicht ausgegeben. Es ist der Eingabewert der Methode."
+        }
+      ],
+      "explanation": "Der Aufruf berechnet `16` und gibt den Wert an den Aufrufer zurück. Dort wird er nicht gespeichert und nicht ausgegeben, also bleibt er unbenutzt."
+    },
+    {
+      "id": "m03-l02-q2",
+      "lesson": "m03-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l02/quiz-return.cs",
+      "explanation": "`Plus(2, 3)` liefert `5` und wird in `a` gespeichert. Der zweite Aufruf liefert `30`, der Wert wird nicht benutzt. Ausgegeben wird nur `a`."
+    },
+    {
+      "id": "m03-l02-q3",
+      "lesson": "m03-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l02/quiz-early-return.cs",
+      "explanation": "Für `number` gleich `5` ist die Bedingung wahr. Das erste `return` beendet die Methode sofort, das zweite `return` wird nicht mehr erreicht."
+    },
+    {
+      "id": "m03-l02-q4",
+      "lesson": "m03-l02",
+      "type": "single",
+      "question": "Welche Zeile ist die richtige Kurzform von `int Triple(int n) { return n * 3; }`?",
+      "options": [
+        {
+          "text": "`int Triple(int n) => n * 3;`",
+          "correct": true
+        },
+        {
+          "text": "`int Triple(int n) => return n * 3;`",
+          "feedback": "Hinter `=>` steht nur der Ausdruck, ohne `return`."
+        },
+        {
+          "text": "`int Triple(int n) = n * 3;`",
+          "feedback": "Der Pfeil heißt `=>`, nicht `=`."
+        },
+        {
+          "text": "`int Triple(int n) => { n * 3 };`",
+          "feedback": "Der Ausdruckskörper hat keine geschweiften Klammern. Er endet mit `;`."
+        }
+      ],
+      "explanation": "Ein Ausdruckskörper besteht aus `=>`, dem Ausdruck und `;`. Er ist gleichwertig zu einem Block, der nur `return` und diesen Ausdruck enthält."
+    },
+    {
+      "id": "m03-l02-q5",
+      "lesson": "m03-l02",
+      "type": "single",
+      "question": "Eine Methode mit Rückgabetyp `string` hat ein `if` mit `return \"none\";` und danach kein weiteres `return`. Was meldet der Compiler?",
+      "options": [
+        {
+          "text": "Einen Fehler: Auf dem Weg, auf dem das `if` nicht zutrifft, wird nichts zurückgegeben.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, die Methode liefert dann einen leeren Text.",
+          "feedback": "Eine Methode mit Rückgabetyp muss auf jedem Weg einen Wert zurückgeben. Einen Ersatzwert gibt es nicht."
+        },
+        {
+          "text": "Nichts, `return` ist bei `string` nicht nötig.",
+          "feedback": "Bei einem Rückgabetyp ungleich `void` muss jeder Weg mit einem `return` samt Ausdruck enden."
+        },
+        {
+          "text": "Eine Warnung, aber das Programm läuft.",
+          "feedback": "Es ist ein Fehler, das Programm wird nicht übersetzt."
+        }
+      ],
+      "explanation": "Der Compiler verlangt für jeden Weg durch die Methode ein `return` mit Wert. Fehlt es auf einem Weg, kann die Methode dort nicht enden."
+    },
+    {
+      "id": "m03-l02-q6",
+      "lesson": "m03-l02",
+      "type": "multi",
+      "question": "Welche Aussagen über `return` stimmen?",
+      "options": [
+        {
+          "text": "`return` beendet die Methode sofort.",
+          "correct": true
+        },
+        {
+          "text": "Den Rückgabewert kannst du in einer Variable speichern.",
+          "correct": true
+        },
+        {
+          "text": "Den Rückgabewert kannst du direkt in einer Rechnung benutzen, zum Beispiel `Square(3) + 1`.",
+          "correct": true
+        },
+        {
+          "text": "`return` gibt den Wert in der Konsole aus.",
+          "feedback": "Ausgeben kann nur `Console.Write` oder `Console.WriteLine`. `return` gibt den Wert an den Aufrufer.",
+          "misconception": "m03-l02-return-prints"
+        }
+      ],
+      "explanation": "Der Aufruf einer Methode mit Rückgabewert ist ein Ausdruck mit diesem Wert. Was damit passiert, entscheidet der Aufrufer."
+    },
+    {
+      "id": "m03-l02-q7",
+      "lesson": "m03-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `return` und der Ausgabe mit `Console.WriteLine`.",
+      "modelAnswer": "`return` gibt einen Wert an die Stelle zurück, die die Methode aufgerufen hat. Dort kann man ihn speichern, ausgeben oder weiterrechnen, und die Methode ist beendet. `Console.WriteLine` schreibt Text in die Konsole, macht aber keinen Wert für den Aufrufer verfügbar. Eine Methode kann beides tun, aber die beiden Dinge sind unabhängig."
+    },
+    {
+      "id": "m03-l02-q8",
+      "lesson": "m03-l02",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug eine Methode mit Rückgabewert statt einer Methode mit Ausgabe wählen?",
+      "modelAnswer": "Wenn das Ergebnis weiterverwendet wird: Eine Methode, die für eine Anzahl das Wort „attempt“ oder „attempts“ liefert, kann in einer Logzeile, in einer Meldung oder in einem Test benutzt werden. Eine Methode, die direkt ausgibt, wäre an eine Konsole gebunden."
+    },
+    {
+      "id": "m03-l03-q1",
+      "lesson": "m03-l03",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler kennt den Namen dort nicht.",
+      "example": "m03/l03/scope-block-error.snippet.cs",
+      "bugLines": [
+        5
+      ],
+      "lineFeedback": {
+        "5": {
+          "feedback": "`doubled` gilt nur im Block der Schleife. Nach der schließenden Klammer ist der Name nicht mehr gültig."
+        }
+      },
+      "explanation": "Eine Variable gilt vom Ort ihrer Deklaration bis zum Ende des Blocks. Außerhalb des Blocks ist sie unbekannt."
+    },
+    {
+      "id": "m03-l03-q2",
+      "lesson": "m03-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l03/quiz-scope.cs",
+      "explanation": "`amount` ist ein Wertparameter und enthält eine Kopie von `level`. Die Zuweisung ändert nur die Kopie, `level` bleibt `2`."
+    },
+    {
+      "id": "m03-l03-q3",
+      "lesson": "m03-l03",
+      "type": "single",
+      "question": "Es gilt `int attempts = 5;`, dann folgt der Aufruf `Reset(attempts);`. Die Methode ist `void Reset(int value) { value = 0; }`. Welchen Wert hat `attempts` danach?",
+      "options": [
+        {
+          "text": "`5`",
+          "correct": true
+        },
+        {
+          "text": "`0`",
+          "feedback": "`value` ist eine Kopie von `attempts`. Die Zuweisung `value = 0` ändert die Kopie, nicht `attempts`.",
+          "misconception": "m03-l03-method-changes-caller-variable"
+        },
+        {
+          "text": "Das Programm lässt sich nicht übersetzen.",
+          "feedback": "Einem Wertparameter darf man Werte zuweisen. Es wirkt nur nicht auf den Aufrufer."
+        },
+        {
+          "text": "Das hängt davon ab, ob `Reset` vor oder nach dem Aufruf steht.",
+          "feedback": "Die Lage der Deklaration ändert nicht, was der Aufruf mit Kopien macht."
+        }
+      ],
+      "explanation": "Ein Wertparameter ist eine neue lokale Variable mit einer Kopie des Arguments. Der Aufrufer behält seinen Wert."
+    },
+    {
+      "id": "m03-l03-q4",
+      "lesson": "m03-l03",
+      "type": "single",
+      "question": "Zwei verschiedene Methoden deklarieren je eine eigene lokale Variable `result`. Ist das erlaubt?",
+      "options": [
+        {
+          "text": "Ja, jede Methode hat ihren eigenen Deklarationsraum.",
+          "correct": true
+        },
+        {
+          "text": "Nein, ein Name darf im ganzen Programm nur einmal vorkommen.",
+          "feedback": "Ein Name darf nur in demselben Deklarationsraum nicht doppelt stehen. Zwei getrennte Methoden haben getrennte Deklarationsräume."
+        },
+        {
+          "text": "Nur, wenn die Typen verschieden sind.",
+          "feedback": "Die Typen spielen keine Rolle. Entscheidend ist, dass die Räume getrennt sind."
+        },
+        {
+          "text": "Nur, wenn beide Methoden `void` sind.",
+          "feedback": "Der Rückgabetyp ändert nichts an den Deklarationsräumen."
+        }
+      ],
+      "explanation": "Eine Variable ist nur in ihrem Block bzw. in ihrer Methode gültig. Zwei Methoden, die sich nicht umschließen, dürfen denselben Namen benutzen."
+    },
+    {
+      "id": "m03-l03-q5",
+      "lesson": "m03-l03",
+      "type": "single",
+      "question": "Wie bekommt der Aufrufer von `int AddedOne(int number) { return number + 1; }` den erhöhten Wert in seine Variable `failures`?",
+      "options": [
+        {
+          "text": "`failures = AddedOne(failures);`",
+          "correct": true
+        },
+        {
+          "text": "`AddedOne(failures);`",
+          "feedback": "Der Rückgabewert wird dann verworfen. `failures` behält seinen Wert.",
+          "misconception": "m03-l03-method-changes-caller-variable"
+        },
+        {
+          "text": "`AddedOne = failures;`",
+          "feedback": "Der Name einer Methode steht nicht links von `=`."
+        },
+        {
+          "text": "`failures AddedOne;`",
+          "feedback": "Das ist keine gültige Anweisung. Ein Aufruf schreibt den Namen mit Klammern."
+        }
+      ],
+      "explanation": "Die Methode gibt den neuen Wert zurück, der Aufrufer weist ihn seiner Variable zu."
+    },
+    {
+      "id": "m03-l03-q6",
+      "lesson": "m03-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Gültigkeitsbereiche und Parameter stimmen?",
+      "options": [
+        {
+          "text": "Ein Parameter gilt nur im Rumpf seiner Methode.",
+          "correct": true
+        },
+        {
+          "text": "Ein Wertparameter bekommt eine Kopie des Arguments.",
+          "correct": true
+        },
+        {
+          "text": "Eine Methode in einem Programm mit Top-Level-Anweisungen kann Variablen von außerhalb lesen. Mit Parametern ist trotzdem klarer, was sie braucht.",
+          "correct": true
+        },
+        {
+          "text": "Eine Zuweisung an einen Wertparameter ändert die Variable des Aufrufers.",
+          "feedback": "Der Parameter ist eine Kopie. Die Variable des Aufrufers bleibt unverändert.",
+          "misconception": "m03-l03-method-changes-caller-variable"
+        }
+      ],
+      "explanation": "Parameter und lokale Variablen gelten nur in ihrer Methode bzw. ihrem Block. Werte kommen über Parameter hinein und über `return` hinaus."
+    },
+    {
+      "id": "m03-l03-q7",
+      "lesson": "m03-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum eine Zuweisung an einen Wertparameter die Variable des Aufrufers nicht ändert.",
+      "modelAnswer": "Beim Aufruf legt die Methode für den Parameter eine neue lokale Variable an und kopiert den Wert des Arguments hinein. Eine Zuweisung im Rumpf ändert nur diese Kopie. Die Variable des Aufrufers ist ein eigener Speicherplatz und bleibt, wie sie war. Soll der Aufrufer etwas Neues bekommen, gibt die Methode den Wert mit `return` zurück."
+    },
+    {
+      "id": "m03-l03-q8",
+      "lesson": "m03-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug ist es nützlich, dass zwei Methoden denselben Variablennamen benutzen dürfen?",
+      "modelAnswer": "Wenn mehrere kleine Methoden Zwischenergebnisse berechnen, zum Beispiel `result` oder `count`. Man muss keine Namen wie `result1` und `result2` erfinden, weil jede Methode ihren eigenen Bereich hat. Das macht es möglich, Methoden unabhängig zu schreiben und zu ändern."
+    }
+  ]
+}

@@ -1,0 +1,207 @@
+---
+title: Methoden definieren und aufrufen
+sidebar_position: 1
+description: "Eine Methode ist ein benannter Block Code mit Parametern und Rückgabetyp. Ein Aufruf führt sie aus, danach geht das Programm an der Aufrufstelle weiter."
+lesson_id: m03-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import defineAndCall from '!!raw-loader!@site/examples/m03/l01/define-and-call.cs';
+import defineAndCallOutput from '!!raw-loader!@site/examples/m03/l01/define-and-call.out.txt';
+import callFlow from '!!raw-loader!@site/examples/m03/l01/call-flow.cs';
+import callFlowOutput from '!!raw-loader!@site/examples/m03/l01/call-flow.out.txt';
+import argumentOrder from '!!raw-loader!@site/examples/m03/l01/argument-order.cs';
+import argumentOrderOutput from '!!raw-loader!@site/examples/m03/l01/argument-order.out.txt';
+import twiceGaps from '!!raw-loader!@site/examples/m03/l01/twice-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l01/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l01/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l01/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l01/seclog-methods-solution.cs';
+
+# Methoden definieren und aufrufen
+
+:::note[Lernziele]
+- Du kannst eine Methode mit Parametern und Rückgabetyp deklarieren.
+- Du kannst eine Methode aufrufen und erklären, wohin das Programm danach springt.
+- Du kannst Parameter und Argument unterscheiden.
+- Du kannst vorhersagen, in welcher Reihenfolge Argumente ausgewertet werden.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog teilt seine Analyse in Methoden mit Parametern und Rückgabewerten auf.
+- SecLog prüft eine Logzeile und liest den Benutzer daraus.
+- SecLog gibt Benutzer und IP-Adresse zusammen als Tupel zurück.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l03-q1" />
+
+<Quiz id="m02-l07-q2" />
+
+<Quiz id="m02-l06-q2" />
+
+## Ein Name für einen Block Code
+
+Bisher stand jeder Schritt direkt im Programm. `Console.WriteLine(…)` kennst du aber schon als Aufruf: Dahinter steckt eine <Term id="method">Methode (Method)</Term>, ein benanntes Stück Code. Ab jetzt schreibst du eigene.
+
+Eine Methode hat vier Teile. Als Beispiel dient die Methode `Add` aus dem Programm unten, in der Form `int Add(int first, int second) { … }`:
+
+1. **Rückgabetyp:** `int` vor dem Namen. Das ist der Typ des Werts, den die Methode an den Aufrufer zurückgibt. Eine Methode ohne Ergebnis hat den Rückgabetyp <Term id="void">`void`</Term>. Der <Term id="return-type">Rückgabetyp (Return Type)</Term> gehört immer zur Deklaration.
+2. **Name:** `Add`. Methodennamen beginnen mit einem Großbuchstaben.
+3. **Parameterliste:** In den Klammern stehen die <Term id="parameter">Parameter</Term>. Jeder hat einen Typ und einen Namen und wirkt im Rumpf wie eine Variable.
+4. **Rumpf:** Der Block in `{ }`. Hier steht, was die Methode tut.
+
+Der Rumpf läuft nicht von selbst. Er läuft, wenn die Methode aufgerufen wird. Ein <Term id="method-call">Methodenaufruf (Method Call)</Term> besteht aus dem Namen und den <Term id="argument">Argumenten</Term> in Klammern: `Add(3, 4)`. Die Argumente sind die Werte, die an die Parameter gehen. `3` kommt in `first`, `4` in `second`, in dieser Reihenfolge.
+
+Eine Methode mit Rückgabetyp gibt ihren Wert mit `return` zurück. Der Aufruf `Add(3, 4)` hat dann den Wert `7`, so wie ein Ausdruck einen Wert hat. Was `return` genau tut, zeigt die nächste Lektion.
+
+In den Beispielen dieses Moduls stehen die Methoden am Ende der Datei, hinter den Anweisungen, die sie aufrufen. Die Aufrufe darüber funktionieren trotzdem.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<Forward concepts={['`return`']} lesson="m03-l02" />
+
+<CSharpRunner id="m03-l01-define" code={defineAndCall} predict expected={defineAndCallOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `7` und `done`.
+
+1. **Deklaration lesen:** `Add` hat zwei `int`-Parameter und den Rückgabetyp `int`. `PrintLine` hat einen `string`-Parameter und den Rückgabetyp `void`.
+2. **Aufruf mit Rückgabewert:** `Add(3, 4)` liefert `7`. Der Wert wird in `total` gespeichert und ausgegeben.
+3. **Aufruf ohne Rückgabewert:** `PrintLine("done")` gibt den Text aus. Es gibt kein Ergebnis, das man speichern könnte.
+
+**Was passiert, wenn du `Add("3", 4)` schreibst?** Der Parameter `first` hat den Typ `int`, ein Text passt nicht. Der Compiler meldet einen Fehler.
+
+</details>
+
+## Wohin springt das Programm?
+
+Ein Aufruf unterbricht die Anweisungen des Aufrufers. Das Programm springt in den Rumpf der Methode, führt ihn aus und kehrt dann hinter den Aufruf zurück. Du kannst eine Methode so oft aufrufen, wie du willst. Der Rumpf läuft bei jedem Aufruf neu, mit den neuen Argumenten.
+
+:::info[Vorhersage]
+Wie oft erscheint `Hello`, und in welcher Reihenfolge stehen die Zeilen?
+:::
+
+<CSharpRunner id="m03-l01-flow" code={callFlow} predict expected={callFlowOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe hat sechs Zeilen: `Start`, dann `Hello alice`, `Between`, `Hello bob`, `Hello carol` und `End`.
+
+1. **Weiterlaufen bis zum Aufruf:** `Start` kommt zuerst. Die Deklaration von `SayHello` steht am Ende der Datei und gibt selbst nichts aus.
+2. **In den Rumpf springen:** `SayHello("alice")` führt den Rumpf mit `name` gleich `"alice"` aus.
+3. **Zurückkehren:** Danach läuft die Zeile `Between` ab, denn das Programm macht hinter dem Aufruf weiter.
+4. **Wiederholen:** Zwei weitere Aufrufe führen den Rumpf zweimal aus, mit anderen Argumenten.
+
+**Was passiert, wenn du die Aufrufe löschst?** Die Deklaration allein gibt nichts aus. Es erscheinen nur `Start`, `Between` und `End`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m03-l01-declaration-runs-code" />
+
+**„Der Rumpf einer Methode läuft dort, wo er im Programm steht.“** Eine Deklaration beschreibt die Methode nur. Ausgeführt wird der Rumpf erst durch einen Aufruf, und zwar bei jedem Aufruf einmal. Eine Methode, die niemand aufruft, läuft nie.
+:::
+
+## Reihenfolge der Argumente
+
+Stehen mehrere Argumente im Aufruf, werden sie von links nach rechts ausgewertet. Das ist wichtig, wenn ein Argument einen Seiteneffekt hat, zum Beispiel `n++` (Modul 1: der Wert vor dem Hochzählen wird geliefert).
+
+:::info[Vorhersage]
+Welche Werte bekommen `first` und `second`? Welchen Wert hat `n` danach?
+:::
+
+<CSharpRunner id="m03-l01-order" code={argumentOrder} predict expected={argumentOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `first=0, second=1` und danach `2`.
+
+1. **Erstes Argument:** `n++` liefert `0` und setzt `n` auf `1`.
+2. **Zweites Argument:** `n++` liefert jetzt `1` und setzt `n` auf `2`.
+3. **Aufruf:** Die Methode bekommt `0` und `1` in dieser Reihenfolge. Danach hat `n` den Wert `2`.
+
+</details>
+
+## Lückenbeispiel
+
+Die Methode `Twice` liefert das Doppelte ihres Parameters. Ändere sie so, dass sie das **Dreifache** liefert, und gib ihr den passenden Namen `Triple`. Passe auch die beiden Aufrufe an. Erwartet sind `15` und `24`.
+
+<CSharpRunner id="m03-l01-gaps" code={twiceGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Name und Rumpf:** `int Triple(int number)` und `return number * 3;`
+2. **Aufrufe:** `Triple(5)` und `Triple(8)`
+
+Deklaration und Aufrufe müssen denselben Namen benutzen, sonst findet der Compiler die Methode nicht.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+Eine Methodendeklaration besteht aus Rückgabetyp, Name, Parameterliste und Rumpf ([§15.6.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1561-general)). Die Ausdrücke der Argumentliste werden zur Laufzeit in der Reihenfolge ihres Auftretens von links nach rechts ausgewertet ([§12.6.2.3 Run-time evaluation of argument lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12623-run-time-evaluation-of-argument-lists)). Methoden sind kein Feature neuerer C#-Versionen und brauchen kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bewertet die Zahl der Fehlversuche mit einem switch-Ausdruck, der direkt im Programm steht.
+
+**Neue Anforderung:** Die Bewertung der Schwere soll in eine Methode `string RateSeverity(int failures)` am Ende der Datei umziehen. Die Zeile `Severity: …` ruft sie auf. Eine neue Zeile ruft sie ein zweites Mal mit `bobFailures` auf und gibt `Severity of bob: high` aus. Die Ausgabe hat jetzt 42 Zeilen.
+
+<CSharpRunner id="m03-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Methode deklarieren:** Der switch-Ausdruck zieht in den Rumpf von `RateSeverity` um. Er steht hinter `return`. Der Parameter `failures` ersetzt die Variable, die vorher im Ausdruck stand.
+2. **Erster Aufruf:** `RateSeverity(failedFromInput)` liefert denselben Text wie vorher, die Zeile `Severity: high` bleibt gleich.
+3. **Zweiter Aufruf:** `RateSeverity(bobFailures)` benutzt dieselbe Methode mit einem anderen Argument. Ohne Methode müsstest du den switch-Ausdruck kopieren.
+
+</details>
+
+**Neuer Stand:** SecLog bewertet die Schwere über eine Methode, die es für verschiedene Zahlen aufrufen kann.
+
+## Zusammenfassung
+
+Eine Methode hat Rückgabetyp, Namen, Parameterliste und Rumpf. Der Rumpf läuft nur bei einem Aufruf, und zwar bei jedem. Die Argumente im Aufruf werden von links nach rechts ausgewertet und gehen der Reihe nach an die Parameter. Danach macht das Programm hinter dem Aufruf weiter. `void` steht als Rückgabetyp, wenn kein Wert zurückkommt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l01-q1" />
+
+<Quiz id="m03-l01-q2" />
+
+<Quiz id="m03-l01-q3" />
+
+<Quiz id="m03-l01-q4" />
+
+<Quiz id="m03-l01-q5" />
+
+<Quiz id="m03-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Methoden in C#](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/methods)
+- C#-Spezifikation: [§15.6 Methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156-methods)
