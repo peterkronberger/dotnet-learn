@@ -145,6 +145,29 @@ Misconceptions: assignment copies the object; value types always live on the sta
 - More misconceptions: "reference types are passed by reference"; a nullable annotation prevents `null` at runtime.
 
 ### W1 Wiederholung (review) M1–M4 ▶ (mixed practice)
+Mixes M1–M4. Folder `w01-review-basics/`, quiz file `de/w01.json`, position 4.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
+- Lesson L1 "Code lesen und vorhersagen": mixed reading and tracing set.
+- Lesson L2 "Code ergänzen und schreiben": mixed writing set and final set.
+- **M1** (from `module-digest.md` `## M1`):
+  - Concepts:
+    - integer division vs. `double` division (`m01-l03`)
+    - `=` (assignment) vs. `==` (comparison, taught in `m02-l01`) (`m01-l02`)
+    - implicit vs. explicit conversion; a cast truncates (`m01-l07`)
+    - `Parse` vs. `TryParse` and its `bool` result (`m01-l08`)
+    - `+` on strings vs. numbers, interpolation (`m01-l06`)
+    - `x++` vs. `++x` inside an expression (`m01-l04`)
+  - Misconception ids: m01-l02-assignment-is-comparison, m01-l03-integer-division-rounds, m01-l06-string-plus-number-adds, m01-l07-cast-rounds, m01-l08-tryparse-keeps-old-value
+- **M2** (from `module-digest.md` `## M2`):
+  - Concepts:
+    - `&&` / `||` with short-circuit vs. `&` / `|` on `bool` (`m02-l02`)
+    - `else` belongs to the nearest `if` (`m02-l01`)
+    - `switch` statement (no fall-through, `break`) vs. `switch` expression (`m02-l04`, `m02-l05`)
+    - `while` vs. `do … while` vs. `for`, and off-by-one (`m02-l06`, `m02-l07`)
+    - `break` vs. `continue`; in nested loops `break` leaves only the inner loop (`m02-l08`, `m02-l09`)
+  - Misconception ids: m02-l02-and-same-as-ampersand, m02-l05-case-falls-through, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
+- **M3**: Filled by the module review of M3.
+- **M4**: Filled by the module review of M4.
+- ▶: all parts are runnable. Mix concepts across modules, for example loop counters with integer division, or `TryParse` with an `if` check.
 
 ### M5 Arrays, Strings, Collections ▶
 Arrays · `List<T>` · `Dictionary<TKey,TValue>` · `HashSet<T>` · `StringBuilder` · iterating and changing.
@@ -219,6 +242,15 @@ Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · e
 - More misconceptions: a record is always immutable; an enum variable can only hold its named values; overriding `Equals` without `GetHashCode` is harmless; a sealed class makes its objects immutable (sealing is about inheritance, not about state).
 
 ### W2 Wiederholung M5–M8 ▶
+Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, position 8.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
+- Lesson L1: mixed reading and tracing set (title chosen by the architect of W2).
+- Lesson L2: mixed writing set and final set (title chosen by the architect of W2).
+- **M5**: Filled by the module review of M5.
+- **M6**: Filled by the module review of M6.
+- **M7**: Filled by the module review of M7.
+- **M8**: Filled by the module review of M8.
+- ▶: all covered modules are runnable.
+Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
 ### M9 Generics ▶
 Generic methods and classes · constraints · understanding generic collections.
@@ -262,6 +294,14 @@ Misconception: the query already runs when it is defined.
 - More misconceptions: `First` returns `null` when nothing matches; a query result is a copy that does not change when the source changes.
 
 ### W3 Wiederholung M9–M11 ▶
+Mixes M9–M11. Folder `w03-review-generics-linq/`, quiz file `de/w03.json`, position 11.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
+- Lesson L1: mixed reading and tracing set (title chosen by the architect of W3).
+- Lesson L2: mixed writing set and final set (title chosen by the architect of W3).
+- **M9**: Filled by the module review of M9.
+- **M10**: Filled by the module review of M10.
+- **M11**: Filled by the module review of M11.
+- ▶: all covered modules are runnable.
+Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
 ### M12 Pattern Matching (vertieft, in depth) ▶
 Type, property, relational and list patterns · `switch` expressions · `record` with `with`.
@@ -336,6 +376,14 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
 - More misconceptions: a test that never fails is a good test; 100 % coverage means no bugs; a Debug build is fine for production; self-contained apps get runtime security patches automatically; Native AOT works with every library.
 
 ### W4 Wiederholung M12–M14 ▶
+Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.json`, position 14.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
+- Lesson L1: mixed reading and tracing set (title chosen by the architect of W4).
+- Lesson L2: mixed writing set and final set (title chosen by the architect of W4).
+- **M12**: Filled by the module review of M12.
+- **M13**: Filled by the module review of M13.
+- **M14**: Filled by the module review of M14.
+- ▶/◻: M12 and M13 part A are runnable. M13 part B and M14 are ◻ (reading tasks without a runner).
+Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
 ### M15 Dependency Injection und Hosting ▶
 Dependencies through interfaces · `ServiceCollection` · lifetimes · logging · configuration/options. Runnable for DI and logging. Configuration/options and hosting cannot run (missing in the playground, see S6).
