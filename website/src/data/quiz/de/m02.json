@@ -993,6 +993,145 @@
       "type": "explain",
       "question": "Transferfrage: Wo würde ein Log-Werkzeug `for` und wo `foreach` nutzen?",
       "modelAnswer": "`for` passt, wenn die Zahl der Wiederholungen bekannt ist, zum Beispiel eine Zeile pro Fehlversuch von 1 bis zur Anzahl. `foreach` passt, wenn jedes Element einer Folge einmal drankommt, zum Beispiel jedes Zeichen einer IP-Adresse, um die Punkte zu zählen."
+    },
+    {
+      "id": "m02-l08-q1",
+      "lesson": "m02-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l08/quiz-jumps.cs",
+      "explanation": "Bei `i` gleich `1` wird addiert (`sum` ist 1). Bei `2` überspringt `continue` den Rest des Durchlaufs. Bei `3` und `4` wird addiert (`sum` ist 8). Bei `5` beendet `break` die Schleife. `6` wird nie erreicht. Die Ausgabe ist `8`."
+    },
+    {
+      "id": "m02-l08-q2",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "Was bewirkt `continue` in einer Schleife?",
+      "options": [
+        {
+          "text": "Es überspringt den Rest des aktuellen Durchlaufs, die Schleife macht mit dem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Es beendet die Schleife, und das Programm macht hinter der Schleife weiter.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "Das macht `break`. `continue` beendet nur den aktuellen Durchlauf."
+        },
+        {
+          "text": "Es beendet das ganze Programm.",
+          "feedback": "`continue` wirkt nur auf die Schleife, in der es steht."
+        }
+      ],
+      "explanation": "`continue` springt zur nächsten Iteration. Bei `for` läuft vorher noch die Änderung des Zählers, und die Bedingung wird geprüft."
+    },
+    {
+      "id": "m02-l08-q3",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "`foreach (char c in \"12x45\")` zählt mit `n++` jedes Zeichen. Im Block steht davor `if (c == 'x') { continue; }`. Welchen Wert hat `n` danach?",
+      "options": [
+        {
+          "text": "`4`, weil nur das Zeichen `x` übersprungen wird und die Schleife weiterläuft.",
+          "correct": true
+        },
+        {
+          "text": "`2`, weil die Schleife bei `x` endet.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "Bei `break` wäre es `2`. `continue` beendet die Schleife nicht."
+        },
+        {
+          "text": "`5`, weil `continue` nichts bewirkt.",
+          "feedback": "Bei `x` wird `n++` übersprungen, deshalb zählt `n` nur vier Zeichen."
+        }
+      ],
+      "explanation": "`continue` überspringt `n++` nur für das Zeichen `x`. Die Zeichen `4` und `5` kommen danach noch dran."
+    },
+    {
+      "id": "m02-l08-q4",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "Eine Schleife soll aufhören, sobald sie das gesuchte Zeichen gefunden hat. Was nimmst du?",
+      "options": [
+        {
+          "text": "`break;`",
+          "correct": true
+        },
+        {
+          "text": "`continue;`",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "`continue` springt nur zum nächsten Durchlauf. Die Schleife sucht weiter."
+        },
+        {
+          "text": "Nichts, eine Schleife endet von selbst, sobald ein Zeichen passt.",
+          "feedback": "Die Schleife endet nur, wenn ihre Bedingung falsch wird, bei `foreach` erst nach dem letzten Element."
+        }
+      ],
+      "explanation": "`break` verlässt die nächste umgebende Schleife sofort. Danach läuft die Anweisung hinter der Schleife."
+    },
+    {
+      "id": "m02-l08-q5",
+      "lesson": "m02-l08",
+      "type": "single",
+      "question": "In einer `for`-Schleife steht eine `switch`-Anweisung. In einem Abschnitt steht `break;`. Was beendet dieses `break`?",
+      "options": [
+        {
+          "text": "Nur die `switch`-Anweisung. Die `for`-Schleife läuft mit dem nächsten Durchlauf weiter.",
+          "correct": true
+        },
+        {
+          "text": "Die `for`-Schleife.",
+          "feedback": "`break` wirkt auf die nächste umgebende Schleife oder `switch`-Anweisung. Hier ist das die `switch`-Anweisung."
+        },
+        {
+          "text": "Beide, erst die `switch`-Anweisung und dann die Schleife.",
+          "feedback": "Ein `break` beendet immer nur eine Anweisung, die innerste."
+        }
+      ],
+      "explanation": "`break` gehört zur innersten umgebenden Anweisung, die es beenden kann. Im switch-Abschnitt ist das der switch."
+    },
+    {
+      "id": "m02-l08-q6",
+      "lesson": "m02-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über `break` und `continue` stimmen?",
+      "options": [
+        {
+          "text": "`break` beendet die Schleife sofort.",
+          "correct": true
+        },
+        {
+          "text": "`continue` überspringt den Rest des aktuellen Durchlaufs.",
+          "correct": true
+        },
+        {
+          "text": "Nach `continue` kann die Schleife noch weitere Durchläufe haben.",
+          "correct": true
+        },
+        {
+          "text": "`continue` beendet die Schleife wie `break`.",
+          "misconception": "m02-l08-continue-ends-loop",
+          "feedback": "`continue` führt zum nächsten Durchlauf, `break` verlässt die Schleife."
+        },
+        {
+          "text": "`break` startet die Schleife von vorn.",
+          "feedback": "Die Schleife wird verlassen, nicht neu gestartet."
+        }
+      ],
+      "explanation": "`break` verlässt die Schleife, `continue` springt zum nächsten Durchlauf."
+    },
+    {
+      "id": "m02-l08-q7",
+      "lesson": "m02-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `break` und `continue` in einer Schleife.",
+      "modelAnswer": "`break` beendet die Schleife sofort. Das Programm macht mit der Anweisung hinter der Schleife weiter, auch wenn die Bedingung noch wahr wäre.\n\n`continue` beendet nur den aktuellen Durchlauf. Der Rest des Blocks wird übersprungen, und die Schleife macht mit dem nächsten Durchlauf weiter. Bei `for` läuft vorher die Änderung des Zählers, und die Bedingung wird geprüft."
+    },
+    {
+      "id": "m02-l08-q8",
+      "lesson": "m02-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo würde ein Log-Werkzeug `break` und wo `continue` nutzen?",
+      "modelAnswer": "`break` passt, wenn die Suche fertig ist, zum Beispiel beim Lesen eines Zeitstempels bis zum Buchstaben `T`, weil danach nichts mehr gebraucht wird. `continue` passt, wenn einzelne Elemente übersprungen werden sollen, zum Beispiel Punkte in einer IP-Adresse oder Zeilen, die kein Ereignis enthalten."
     }
   ]
 }

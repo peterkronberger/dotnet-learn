@@ -1,0 +1,202 @@
+---
+title: "Schleifen steuern: break und continue"
+sidebar_position: 8
+description: "break verlässt eine Schleife sofort, continue überspringt den Rest eines Durchlaufs. Beide wirken nur auf die nächste umgebende Schleife."
+lesson_id: m02-l08
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import breakBasic from '!!raw-loader!@site/examples/m02/l08/break-basic.cs';
+import breakBasicOutput from '!!raw-loader!@site/examples/m02/l08/break-basic.out.txt';
+import continueBasic from '!!raw-loader!@site/examples/m02/l08/continue-basic.cs';
+import continueBasicOutput from '!!raw-loader!@site/examples/m02/l08/continue-basic.out.txt';
+import breakVsContinue from '!!raw-loader!@site/examples/m02/l08/break-vs-continue.cs';
+import breakVsContinueOutput from '!!raw-loader!@site/examples/m02/l08/break-vs-continue.out.txt';
+import breakInSwitch from '!!raw-loader!@site/examples/m02/l08/break-in-switch.cs';
+import breakInSwitchOutput from '!!raw-loader!@site/examples/m02/l08/break-in-switch.out.txt';
+import skipGaps from '!!raw-loader!@site/examples/m02/l08/skip-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m02/l08/seclog-analysis-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m02/l08/seclog-analysis-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m02/l08/seclog-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m02/l08/seclog-analysis-solution.cs';
+
+# Schleifen steuern: break und continue
+
+:::note[Lernziele]
+- Du beendest eine Schleife mit `break` und sagst voraus, welche Durchläufe noch laufen.
+- Du überspringst mit `continue` den Rest eines Durchlaufs.
+- Du erklärst den Unterschied zwischen `break` und `continue`.
+- Du sagst, welche Anweisung ein `break` in einer `switch`-Anweisung innerhalb einer Schleife beendet.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l07-q3" />
+
+<Quiz id="m02-l05-q2" />
+
+<Quiz id="m01-l06-q6" />
+
+## break: die Schleife sofort verlassen
+
+Eine Schleife läuft normalerweise, bis ihre Bedingung falsch wird oder alle Elemente dran waren. Manchmal weißt du früher, dass weiteres Arbeiten sinnlos ist, zum Beispiel wenn du das gesuchte Zeichen gefunden hast. Eine <Term id="jump-statement">Sprunganweisung (Jump Statement)</Term> verlegt den Ablauf an eine andere Stelle. `break;` springt aus der nächsten umgebenden Schleife hinaus, zur Anweisung hinter ihr. Du kennst `break` schon vom Ende der Abschnitte einer `switch`-Anweisung.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Läuft die Schleife bis zum letzten Zeichen?
+:::
+
+<CSharpRunner id="m02-l08-break" code={breakBasic} predict expected={breakBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `a`, `b` und `stopped`.
+
+1. **Zeichen prüfen:** Bei `'a'` und `'b'` ist `letter == '#'` falsch. Der Block gibt das Zeichen aus.
+2. **Verlassen:** Bei `'#'` ist die Bedingung wahr. `break;` beendet die Schleife sofort. Die Ausgabe des Zeichens darunter wird nicht mehr erreicht.
+3. **Weitermachen:** Das Programm läuft hinter der Schleife weiter und gibt `stopped` aus. Die Zeichen `c` und `d` kommen nie dran.
+
+</details>
+
+## continue: einen Durchlauf überspringen
+
+`continue;` beendet nur den **aktuellen** Durchlauf. Der Rest des Blocks wird übersprungen, und die Schleife macht mit dem nächsten Durchlauf weiter. Bei `for` läuft vorher noch die Änderung des Zählers, danach wird die Bedingung geprüft.
+
+:::info[Vorhersage]
+Die Schleife zählt von `1` bis `5` und überspringt gerade Zahlen. Eine Zahl ist gerade, wenn der Rest der Division durch `2` gleich `0` ist. Was wird ausgegeben?
+:::
+
+<CSharpRunner id="m02-l08-continue" code={continueBasic} predict expected={continueBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `3`, `5` und `done`.
+
+1. **Prüfen:** `number % 2 == 0` ist bei `2` und `4` wahr.
+2. **Überspringen:** `continue;` lässt die Ausgabe darunter aus. Die Schleife läuft aber weiter, `number++` zählt hoch.
+3. **Ende:** Erst nach `5` ist die Bedingung `number <= 5` falsch. Dann folgt `done`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m02-l08-continue-ends-loop" />
+
+**„`continue` beendet die Schleife, wie `break`.“** Nur `break` verlässt die Schleife. `continue` springt zum nächsten Durchlauf, die Schleife läuft weiter.
+:::
+
+## break und continue im Vergleich
+
+Dieselbe Bedingung bewirkt mit `break` und mit `continue` etwas ganz anderes.
+
+:::info[Vorhersage]
+Zwei `foreach`-Schleifen zählen die Zeichen des Textes `12x45`. Beide stoppen bei `x`, die erste mit `break`, die zweite mit `continue`. Welche zwei Zahlen stehen in der Ausgabe?
+:::
+
+<CSharpRunner id="m02-l08-compare" code={breakVsContinue} predict expected={breakVsContinueOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2 4`.
+
+1. **Mit break:** Gezählt werden `1` und `2`. Bei `x` endet die Schleife, `4` und `5` kommen nicht mehr dran.
+2. **Mit continue:** Gezählt werden `1`, `2`, `4` und `5`. Nur das Zeichen `x` wird übersprungen.
+
+</details>
+
+## break in einer switch-Anweisung in einer Schleife
+
+`break` wirkt immer auf die **nächste** umgebende Anweisung, die es beenden kann. Das kann eine Schleife oder eine `switch`-Anweisung sein. Steht ein `switch` in einer Schleife, beendet das `break` am Ende eines Abschnitts nur den `switch`.
+
+:::info[Vorhersage]
+Die Schleife läuft mit `number` von `1` bis `3`. Nur bei `2` gibt der `switch` `two` aus, sonst `other`. Welche Zeilen erscheinen?
+:::
+
+<CSharpRunner id="m02-l08-switch" code={breakInSwitch} predict expected={breakInSwitchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `other`, `two`, `other` und `end`.
+
+1. **Nur der switch endet:** Das `break` in den Abschnitten verlässt die `switch`-Anweisung.
+2. **Die Schleife läuft weiter:** Alle drei Werte kommen dran. Hätte `break` die Schleife beendet, stünde nur `other` in der Ausgabe.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm soll die Zahlen `1` bis `5` addieren, aber die `3` auslassen. Die Ausgabe muss `12` sein. Ergänze im Block eine Bedingung für `i` gleich `3` und überspringe in ihr den Rest des Durchlaufs.
+
+<CSharpRunner id="m02-l08-gaps" code={skipGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Bedingung:** `if (i == 3)`
+2. **Überspringen:** `continue;` im Block der Bedingung, vor `sum += i;`
+
+Die Ausgabe ist `12`, denn `1 + 2 + 4 + 5 = 12`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprachregeln festlegen (optional)</summary>
+
+`break` beendet die nächste umgebende `switch`-, `while`-, `do`-, `for`- oder `foreach`-Anweisung ([§13.10.2 The break statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13102-the-break-statement)). `continue` startet den nächsten Durchlauf der nächsten umgebenden Schleife ([§13.10.3 The continue statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13103-the-continue-statement)). Beide sind viel älter als C# 12 und brauchen kein Versions-Badge.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog listet Fehlversuche einzeln auf und zählt die Punkte einer IP-Adresse.
+
+**Neue Anforderung:** SecLog soll den Zeitstempel und die IP-Adresse genauer untersuchen. Baue mit `foreach` über `timestamp` das Datum auf: Alle Zeichen bis zum Buchstaben `T` kommen in einen Text, bei `T` endet die Schleife mit `break`. Gib `Date: 2026-03-02` aus. Zähle danach mit `foreach` über `ip` nur die Ziffern: Bei einem Punkt springt `continue` zum nächsten Zeichen. Gib `Digits in IP: 8` aus. Die Ausgabe hat jetzt 37 Zeilen.
+
+<CSharpRunner id="m02-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Datum aufbauen:** `datePart` startet als leerer Text. `datePart += symbol;` hängt das aktuelle Zeichen an, so wie `datePart = datePart + symbol;`. Ein `char` wird dabei als sein Zeichen angehängt.
+2. **Mit break stoppen:** Bei `'T'` verlässt `break` die Schleife. Der Rest des Zeitstempels wird nicht mehr gelesen.
+3. **Mit continue überspringen:** Bei einem Punkt springt `continue` zum nächsten Zeichen. `digits++` wird nur für die anderen Zeichen erreicht.
+4. **Ausgeben:** `Date: 2026-03-02` und `Digits in IP: 8` stehen am Ende.
+
+</details>
+
+**Neuer Stand:** SecLog liest das Datum aus dem Zeitstempel und zählt die Ziffern einer IP-Adresse.
+
+## Zusammenfassung
+
+`break` verlässt die nächste umgebende Schleife sofort. `continue` überspringt den Rest des aktuellen Durchlaufs, und die Schleife macht mit dem nächsten Durchlauf weiter. Beide wirken nur auf die innerste Schleife, in der sie stehen. Ein `break` in einem Abschnitt einer `switch`-Anweisung beendet nur den `switch`, auch wenn dieser in einer Schleife steht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m02-l08-q1" />
+
+<Quiz id="m02-l08-q2" />
+
+<Quiz id="m02-l08-q3" />
+
+<Quiz id="m02-l08-q4" />
+
+<Quiz id="m02-l08-q5" />
+
+<Quiz id="m02-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m02-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m02-l08-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Sprunganweisungen (break, continue, return, goto)](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements)
