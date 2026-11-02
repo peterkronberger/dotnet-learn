@@ -14,7 +14,7 @@ This document is binding for all work in the repo – for humans and for Claude 
 | `website/src/data/quiz/` | Quiz questions per language and module (`de/mXX.json`), format in its `README.md` |
 | `website/plugins/` | Local Docusaurus plugins (`lesson-index.js`) |
 | `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded by iframe |
-| `tools/` | `check-examples.sh` (S2), `check-quiz.mjs` (quiz data, links and wording) |
+| `tools/` | `check-examples.sh` (S2), `check-seclog.mjs` (fold markers, SecLog chain), `check-quiz.mjs` (quiz data, links and wording) |
 | `concept/` | Learning concept and module digest (read on demand, see below) |
 | `.claude/rules/` | Path-scoped rules for lessons, examples and the playground |
 | `.github/workflows/` | `pages.yml` (build + deploy), `examples.yml` (example check), `claude-*.yml` (issue automation) |
@@ -42,6 +42,9 @@ dotnet run --project playground               # run locally
 # Check example code (compile + compare output with <name>.out.txt), see S2
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
+
+# Check fold markers and the SecLog continuity chain (also run by check-examples.sh)
+node tools/check-seclog.mjs
 
 # Check quiz data, links and wording (runs in CI before the build)
 node tools/check-quiz.mjs
