@@ -423,6 +423,137 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Log-Werkzeug ist es nützlich, dass zwei Methoden denselben Variablennamen benutzen dürfen?",
       "modelAnswer": "Wenn mehrere kleine Methoden Zwischenergebnisse berechnen, zum Beispiel `result` oder `count`. Man muss keine Namen wie `result1` und `result2` erfinden, weil jede Methode ihren eigenen Bereich hat. Das macht es möglich, Methoden unabhängig zu schreiben und zu ändern."
+    },
+    {
+      "id": "m03-l04-q1",
+      "lesson": "m03-l04",
+      "type": "single",
+      "question": "Die lokale Funktion `Word` steht im Rumpf von `Label`, und zwar unter der Zeile, die `Word(count)` aufruft. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm läuft. Eine lokale Funktion gilt im ganzen Block, in dem sie steht.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `Word` erst nach dem Aufruf deklariert wird.",
+          "feedback": "Bei lokalen Funktionen ist die Reihenfolge egal. Sie gelten im ganzen Block.",
+          "misconception": "m03-l04-declare-before-call"
+        },
+        {
+          "text": "Das Programm läuft nur, wenn `Word` als `static` markiert ist.",
+          "feedback": "`static` hat mit der Reihenfolge nichts zu tun. Es verbietet nur den Zugriff auf Variablen der umgebenden Methode."
+        },
+        {
+          "text": "Der Aufruf liefert den Standardwert des Rückgabetyps.",
+          "feedback": "Es gibt keinen Standardwert. Die Funktion läuft normal und liefert ihr Ergebnis."
+        }
+      ],
+      "explanation": "Eine lokale Funktion wird im Blockbereich deklariert und gilt im ganzen Block. Du darfst sie schon oberhalb ihrer Deklaration aufrufen."
+    },
+    {
+      "id": "m03-l04-q2",
+      "lesson": "m03-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler kennt den Namen dort nicht.",
+      "example": "m03/l04/local-function-scope-error.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "`Word` ist eine lokale Funktion von `Label`. Außerhalb von `Label` ist der Name unbekannt."
+        }
+      },
+      "explanation": "Eine lokale Funktion ist nur im Block der umgebenden Methode sichtbar."
+    },
+    {
+      "id": "m03-l04-q3",
+      "lesson": "m03-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l04/quiz-local.cs",
+      "explanation": "`Twice(4)` ruft die lokale Funktion `Double` zweimal mit `4` auf. Jeder Aufruf liefert `8`, die Summe ist `16`."
+    },
+    {
+      "id": "m03-l04-q4",
+      "lesson": "m03-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler lehnt den Zugriff dort ab.",
+      "example": "m03/l04/static-capture-error.snippet.cs",
+      "bugLines": [
+        10
+      ],
+      "lineFeedback": {
+        "10": {
+          "feedback": "Eine statische lokale Funktion darf `net` und `tax` der umgebenden Methode nicht benutzen. Sie müssten als Parameter hineinkommen."
+        }
+      },
+      "explanation": "`static` verbietet das Erfassen von lokalen Variablen und Parametern der umgebenden Methode."
+    },
+    {
+      "id": "m03-l04-q5",
+      "lesson": "m03-l04",
+      "type": "single",
+      "question": "Ein Programm hat Top-Level-Anweisungen und am Ende der Datei eine Methode `void Hello()`. Was ist `Hello` technisch?",
+      "options": [
+        {
+          "text": "Eine lokale Funktion der Methode, die der Compiler aus den Top-Level-Anweisungen erzeugt.",
+          "correct": true
+        },
+        {
+          "text": "Eine Variable vom Typ `string`.",
+          "feedback": "Eine Methode ist keine Variable. Sie enthält Anweisungen und wird aufgerufen."
+        },
+        {
+          "text": "Eine Methode, die nirgends sichtbar ist.",
+          "feedback": "Sie ist im ganzen Programm der Datei sichtbar, auch oberhalb ihrer Deklaration."
+        },
+        {
+          "text": "Eine statische lokale Funktion.",
+          "feedback": "Ohne den Modifizierer `static` ist sie nicht statisch. Sie darf deshalb Variablen des Programms erfassen."
+        }
+      ],
+      "explanation": "Die Top-Level-Anweisungen stehen in einer vom Compiler erzeugten Methode. Methoden, die du dazwischen oder am Ende schreibst, sind lokale Funktionen davon."
+    },
+    {
+      "id": "m03-l04-q6",
+      "lesson": "m03-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über lokale Funktionen stimmen?",
+      "options": [
+        {
+          "text": "Eine lokale Funktion ist nur in der umgebenden Methode sichtbar.",
+          "correct": true
+        },
+        {
+          "text": "Ohne `static` darf eine lokale Funktion Variablen der umgebenden Methode benutzen.",
+          "correct": true
+        },
+        {
+          "text": "Mit `static` muss eine lokale Funktion alles, was sie braucht, als Parameter bekommen.",
+          "correct": true
+        },
+        {
+          "text": "Eine lokale Funktion muss oberhalb ihres ersten Aufrufs stehen.",
+          "feedback": "Sie gilt im ganzen Block und darf auch oberhalb ihrer Deklaration aufgerufen werden.",
+          "misconception": "m03-l04-declare-before-call"
+        }
+      ],
+      "explanation": "Sichtbar ist eine lokale Funktion im Block der Methode. `static` verbietet das Erfassen von Variablen. Die Reihenfolge von Aufruf und Deklaration spielt keine Rolle."
+    },
+    {
+      "id": "m03-l04-q7",
+      "lesson": "m03-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `static` vor einer lokalen Funktion bewirkt und warum das nützlich ist.",
+      "modelAnswer": "Eine lokale Funktion ohne `static` kann Variablen und Parameter der umgebenden Methode direkt benutzen. Mit `static` verbietet der Compiler das. Die Funktion bekommt alles über ihre Parameter. Das ist nützlich, weil ihre Kopfzeile dann zeigt, was sie braucht, und sie keine Variable der umgebenden Methode versehentlich liest oder ändert."
+    },
+    {
+      "id": "m03-l04-q8",
+      "lesson": "m03-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Log-Werkzeug würdest du eine lokale Funktion statt einer normalen Methode schreiben?",
+      "modelAnswer": "Wenn eine kleine Hilfsrechnung nur von einer einzigen Methode gebraucht wird, zum Beispiel das Zählen eines Zeichens in `DescribeIp`. Dann bleibt sie versteckt, und keine andere Stelle im Programm kann sie versehentlich aufrufen oder von ihr abhängen."
     }
   ]
 }

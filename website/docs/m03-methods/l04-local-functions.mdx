@@ -1,0 +1,185 @@
+---
+title: Lokale Funktionen
+sidebar_position: 4
+description: "Eine Methode kann in einer anderen Methode stehen. Sie gilt dann nur dort. Mit static darf sie keine Variablen von außen benutzen."
+lesson_id: m03-l04
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import localFunction from '!!raw-loader!@site/examples/m03/l04/local-function.cs';
+import localFunctionOutput from '!!raw-loader!@site/examples/m03/l04/local-function.out.txt';
+import scopeError from '!!raw-loader!@site/examples/m03/l04/local-function-scope-error.snippet.cs';
+import capture from '!!raw-loader!@site/examples/m03/l04/capture.cs';
+import captureOutput from '!!raw-loader!@site/examples/m03/l04/capture.out.txt';
+import staticError from '!!raw-loader!@site/examples/m03/l04/static-capture-error.snippet.cs';
+import staticGaps from '!!raw-loader!@site/examples/m03/l04/static-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m03/l04/seclog-methods-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m03/l04/seclog-methods-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m03/l04/seclog-methods-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m03/l04/seclog-methods-solution.cs';
+
+# Lokale Funktionen
+
+:::note[Lernziele]
+- Du kannst eine lokale Funktion in einer Methode deklarieren und aufrufen.
+- Du kannst erklären, wo eine lokale Funktion sichtbar ist.
+- Du kannst erklären, was `static` vor einer lokalen Funktion verbietet.
+- Du kannst erklären, dass die Methoden in einem Programm mit Top-Level-Anweisungen lokale Funktionen sind.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l01-q1" />
+
+<Quiz id="m03-l02-q1" />
+
+<Quiz id="m03-l03-q3" />
+
+## Eine Methode in einer Methode
+
+Bisher standen Methoden neben den Anweisungen des Programms. Eine Methode darf aber auch im Rumpf einer anderen Methode stehen. Sie heißt dann <Term id="local-function">lokale Funktion (Local Function)</Term>. Sie wird wie jede Methode aufgerufen, ist aber nur im Block der umgebenden Methode sichtbar. Außerhalb kennt der Compiler ihren Namen nicht.
+
+Eine lokale Funktion gilt im ganzen Block, in dem sie steht. Du kannst sie schon oberhalb ihrer Deklaration aufrufen.
+
+:::info[Vorhersage]
+`Label` ruft `Word` auf, bevor `Word` im Text deklariert ist. Läuft das Programm, und was gibt es aus?
+:::
+
+<CSharpRunner id="m03-l04-local" code={localFunction} predict expected={localFunctionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1 attempt` und `3 attempts`.
+
+1. **Deklarieren:** `Word` steht im Rumpf von `Label`. Nur `Label` kennt den Namen.
+2. **Aufrufen:** `string word = Word(count);` steht über der Deklaration von `Word`. Das ist erlaubt, weil die lokale Funktion im ganzen Block gilt.
+3. **Ergebnis nutzen:** `Label` setzt das Wort in den Text ein und gibt ihn zurück.
+
+**Was passiert, wenn du `Word(1)` außerhalb von `Label` aufrufst?** Dann meldet der Compiler einen Fehler, weil der Name dort nicht gilt. Das zeigt das Fragment unten.
+
+</details>
+
+<CodeBlock language="csharp" title="local-function-scope-error.snippet.cs">{scopeError}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m03-l04-declare-before-call" />
+
+**„Eine lokale Funktion muss über der Zeile stehen, die sie aufruft.“** Das stimmt nicht. Eine lokale Funktion gilt im ganzen Block. Du darfst sie vor oder nach ihrer Deklaration aufrufen. Nur außerhalb des Blocks ist sie unbekannt.
+:::
+
+## Was `static` verbietet
+
+Eine lokale Funktion kann die Variablen und Parameter der umgebenden Methode benutzen. Man sagt, sie <Term id="capture">erfasst (captures)</Term> diese Variablen. Das ist bequem, versteckt aber, was die Funktion braucht.
+
+:::info[Vorhersage]
+`AddTax` benutzt `net` und `tax` aus `Price`, ohne Parameter zu haben. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m03-l04-capture" code={capture} predict expected={captureOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `12` und `22`.
+
+1. **Erfassen:** `AddTax` liest `net` und `tax` von `Price`.
+2. **Rechnen:** Beim ersten Aufruf ist `net` gleich `10`, also `10 + 2`. Beim zweiten Aufruf ist es `20 + 2`.
+
+**Was passiert, wenn `AddTax` die Variable `tax` ändert?** Dann ändert sie `tax` in `Price`, denn sie benutzt die Variable selbst, keine Kopie.
+
+</details>
+
+Mit dem Modifizierer `static` wird eine lokale Funktion zur <Term id="static-local-function">statischen lokalen Funktion (Static Local Function)</Term>. Sie darf keine lokalen Variablen und Parameter der umgebenden Methode erfassen. Alles, was sie braucht, muss als Parameter hineinkommen. Der Compiler meldet sonst einen Fehler.
+
+<CodeBlock language="csharp" title="static-capture-error.snippet.cs">{staticError}</CodeBlock>
+
+Im Fragment benutzt die `static`-Funktion `AddTax` die Variablen `net` und `tax` von `Price`. Das ist verboten. So prüft der Compiler, dass die Funktion nur ihre Parameter benutzt.
+
+## Lückenbeispiel
+
+Mache `AddTax` zu einer statischen lokalen Funktion. Die Ausgabe muss gleich bleiben (`12` und `22`).
+
+1. Schreibe `static` vor `int AddTax()`.
+2. Gib `AddTax` zwei Parameter, `amount` und `extra`.
+3. Rechne in `AddTax` nur mit den Parametern.
+4. Übergib im Aufruf `net` und `tax`.
+
+<CSharpRunner id="m03-l04-gaps" code={staticGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Modifizierer:** `static int AddTax(int amount, int extra)`
+2. **Nur Parameter benutzen:** `return amount + extra;`
+3. **Werte übergeben:** `return AddTax(net, tax);`
+
+Die Funktion braucht jetzt nichts mehr von außen. Ihre Kopfzeile zeigt, was sie benötigt.
+
+</details>
+
+## Methoden in Top-Level-Programmen
+
+Der Compiler macht aus den Top-Level-Anweisungen eine Methode, die als Einstiegspunkt dient. Die Methoden, die du in der Datei dazu schreibst, stehen damit in dieser Methode. Es sind lokale Funktionen. Das erklärt zwei Dinge aus dem letzten Abschnitt: Sie dürfen Variablen des Programms erfassen (siehe die Vertiefung in der vorigen Lektion). Und sie gelten in der ganzen Datei, auch oberhalb ihrer Deklaration. Deshalb stehen sie am Ende und werden oben aufgerufen.
+
+<Forward concepts={['die erzeugte Methode `Main`', 'Klassen']} module="6" />
+
+<details>
+<summary>Vertiefung: Wo genau gilt eine lokale Funktion? (optional)</summary>
+
+Eine lokale Funktion wird im Blockbereich deklariert. Sie darf vor ihrer Deklaration aufgerufen werden. Eine nicht statische lokale Funktion darf Variablen der umgebenden Methode erfassen, eine statische nicht. Das steht in [§13.6.4 Local function declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations). Die Regeln für den erzeugten Einstiegspunkt beschreibt die Seite zu [Top-Level-Anweisungen](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt die Punkte einer IP-Adresse mit einer `foreach`-Schleife im Hauptteil und prüft Ereignisse mit eigenen Methoden.
+
+**Neue Anforderung:** Am Ende der Datei steht eine neue Methode `string DescribeIp(string ip)`. Sie enthält eine statische lokale Funktion `int CountChar(string text, char wanted)`, die ein Zeichen zählt, und gibt `"<ip> has <n> dots"` zurück. Eine neue Zeile gibt `DescribeIp(ip)` direkt nach `Dots in IP:` aus. Die Schleife zum Zählen der Punkte bleibt. Die Ausgabe hat jetzt 45 Zeilen.
+
+<CSharpRunner id="m03-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+
+1. **Lokale Funktion deklarieren:** `CountChar` steht im Rumpf von `DescribeIp` und ist `static`.
+2. **Nur Parameter benutzen:** `CountChar` bekommt Text und gesuchtes Zeichen als Parameter und zählt mit `foreach`.
+3. **Aufrufen und zurückgeben:** `DescribeIp` ruft `CountChar` vor der Deklaration auf und baut daraus den Text `203.0.113.7 has 3 dots`.
+
+</details>
+
+**Neuer Stand:** SecLog beschreibt eine IP-Adresse mit einer Methode, die ihre Hilfsarbeit in einer statischen lokalen Funktion versteckt.
+
+## Zusammenfassung
+
+Eine lokale Funktion steht im Rumpf einer Methode und ist nur dort sichtbar. Sie gilt im ganzen Block und darf vor ihrer Deklaration aufgerufen werden. Ohne `static` erfasst sie Variablen der umgebenden Methode. Mit `static` ist das verboten, alles muss über Parameter kommen. Die Methoden eines Programms mit Top-Level-Anweisungen sind lokale Funktionen der erzeugten Einstiegsmethode.
+
+## Prüfe dein Wissen
+
+<Quiz id="m03-l04-q1" />
+
+<Quiz id="m03-l04-q2" />
+
+<Quiz id="m03-l04-q3" />
+
+<Quiz id="m03-l04-q4" />
+
+<Quiz id="m03-l04-q5" />
+
+<Quiz id="m03-l04-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m03-l04-q7" />
+
+### Transferfrage
+
+<Quiz id="m03-l04-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Lokale Funktionen](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/local-functions)
+- C#-Spezifikation: [§13.6.4 Local function declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations)

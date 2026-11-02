@@ -2040,6 +2040,66 @@
         "title": "Declarations (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#72-declarations"
       }
+    },
+    {
+      "id": "local-function",
+      "term": "Local Function",
+      "german": "lokale Funktion",
+      "category": "language",
+      "definition": "Eine Methode, die im Rumpf einer anderen Methode steht. Sie ist nur in diesem Block sichtbar und darf schon oberhalb ihrer Deklaration aufgerufen werden.",
+      "aliases": [
+        "lokale Funktionen",
+        "Local Functions"
+      ],
+      "related": [
+        "method",
+        "static-local-function",
+        "capture"
+      ],
+      "lesson": "m03-l04",
+      "source": {
+        "title": "Local function declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations"
+      }
+    },
+    {
+      "id": "static-local-function",
+      "term": "Static Local Function",
+      "german": "statische lokale Funktion",
+      "category": "language",
+      "definition": "Eine lokale Funktion mit dem Modifizierer `static`. Sie darf keine lokalen Variablen und Parameter der umgebenden Methode benutzen. Alles, was sie braucht, kommt über ihre Parameter.",
+      "aliases": [
+        "statische lokale Funktionen"
+      ],
+      "related": [
+        "local-function",
+        "capture"
+      ],
+      "lesson": "m03-l04",
+      "source": {
+        "title": "Local function declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations"
+      }
+    },
+    {
+      "id": "capture",
+      "term": "Capture",
+      "german": "Erfassen",
+      "category": "language",
+      "definition": "Eine lokale Funktion erfasst eine Variable, wenn sie eine lokale Variable oder einen Parameter der umgebenden Methode benutzt. Sie arbeitet dann mit der Variable selbst, nicht mit einer Kopie.",
+      "aliases": [
+        "erfassen",
+        "Variable erfassen"
+      ],
+      "related": [
+        "local-function",
+        "static-local-function"
+      ],
+      "lesson": "m03-l04",
+      "source": {
+        "title": "Local function declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations"
+      }
     }
   ]
 }
