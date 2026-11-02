@@ -1257,6 +1257,149 @@
       "type": "explain",
       "question": "Transferfrage: Wann nimmst du ein Tupel als Rückgabe und wann einen `out`-Parameter?",
       "modelAnswer": "Wenn eine Methode immer mehrere zusammengehörige Werte liefert, zum Beispiel Benutzer und IP-Adresse einer Logzeile, ist ein Tupel mit Elementnamen meist klarer. Ein `out`-Parameter passt zum Muster `Try…`, bei dem der Rückgabewert `bool` sagt, ob die Methode Erfolg hatte, und der `out`-Parameter das Ergebnis liefert."
+    },
+    {
+      "id": "m03-l10-q1",
+      "lesson": "m03-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l10/quiz-recursion.cs",
+      "explanation": "`Twice(3)` ist `2 + Twice(2)`, das ist `2 + 2 + Twice(1)`, das ist `2 + 2 + 2 + Twice(0)`. Der Basisfall `n == 0` liefert `0`. Die Summe ist `6`."
+    },
+    {
+      "id": "m03-l10-q2",
+      "lesson": "m03-l10",
+      "type": "single",
+      "question": "Die Methode `Countdown(int number)` gibt `number` aus und ruft dann `Countdown(number - 1)` auf. Sie hat keinen Basisfall. Was passiert bei `Countdown(3)`?",
+      "options": [
+        {
+          "text": "Die Aufrufe hören nicht auf, der Aufrufstapel läuft über, und das Programm wird beendet.",
+          "correct": true
+        },
+        {
+          "text": "Die Methode hört bei `0` von selbst auf, weil dann nichts mehr zu zählen ist.",
+          "feedback": "Nichts in der Methode prüft die `0`. Der Aufruf `Countdown(0)` ruft `Countdown(-1)` auf, danach `Countdown(-2)` und so weiter.",
+          "misconception": "m03-l10-no-base-case"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil eine Methode sich nicht selbst aufrufen darf.",
+          "feedback": "Eine Methode darf sich selbst aufrufen. Das Programm lässt sich übersetzen. Das Problem entsteht erst beim Ablauf."
+        },
+        {
+          "text": "Die Methode gibt `3`, `2`, `1` aus und endet dann, weil `number` nicht mehr positiv ist.",
+          "feedback": "Ohne Prüfung läuft die Zählung weiter nach unten: `0`, `-1`, `-2` und so weiter.",
+          "misconception": "m03-l10-no-base-case"
+        }
+      ],
+      "explanation": "Jeder Aufruf legt einen neuen Frame auf den Aufrufstapel. Ohne Basisfall kehrt kein Aufruf zurück, der Stapel wird zu groß, und das Programm endet mit einem Stapelüberlauf."
+    },
+    {
+      "id": "m03-l10-q3",
+      "lesson": "m03-l10",
+      "type": "single",
+      "question": "`Show(3)` gibt `enter 3` aus, ruft `Show(2)` auf und gibt danach `leave 3` aus. `Show(2)` verhält sich ebenso mit `Show(1)`. Warum erscheint `leave 1` vor `leave 2`?",
+      "options": [
+        {
+          "text": "Der Frame von `Show(1)` liegt oben auf dem Aufrufstapel. Der Aufruf muss enden, bevor `Show(2)` weiterläuft.",
+          "correct": true
+        },
+        {
+          "text": "Die Zahlen werden beim Ausgeben aufsteigend sortiert.",
+          "feedback": "Nichts sortiert die Ausgabe. Die Reihenfolge folgt dem Aufrufstapel."
+        },
+        {
+          "text": "`Show(1)` wurde als erster Aufruf gestartet.",
+          "feedback": "Der erste Aufruf war `Show(3)`. Er endet als letzter."
+        }
+      ],
+      "explanation": "Der zuletzt gestartete Aufruf endet als erster. Der Aufrufstapel gibt die Frames in umgekehrter Reihenfolge wieder frei."
+    },
+    {
+      "id": "m03-l10-q4",
+      "lesson": "m03-l10",
+      "type": "multi",
+      "question": "Welche Aussagen über Rekursion stimmen?",
+      "options": [
+        {
+          "text": "Eine rekursive Methode ruft sich selbst auf.",
+          "correct": true
+        },
+        {
+          "text": "Jeder Aufruf hat seine eigenen Parameter und lokalen Variablen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Basisfall beendet die Kette der Aufrufe.",
+          "correct": true
+        },
+        {
+          "text": "Eine rekursive Methode braucht keinen Basisfall, wenn der Parameter kleiner wird.",
+          "feedback": "Ein kleiner werdender Parameter allein beendet nichts. Erst eine Prüfung im Basisfall tut das.",
+          "misconception": "m03-l10-no-base-case"
+        }
+      ],
+      "explanation": "Jeder Aufruf bekommt einen eigenen Frame mit eigenen Parametern und Variablen. Ein Basisfall sorgt dafür, dass die Aufrufe enden."
+    },
+    {
+      "id": "m03-l10-q5",
+      "lesson": "m03-l10",
+      "type": "single",
+      "question": "Du sollst die Zahlen von `1` bis `n` addieren. Was ist hier meist die einfachere Wahl?",
+      "options": [
+        {
+          "text": "Eine `for`-Schleife mit einer Summenvariablen. Sie braucht keine zusätzlichen Frames.",
+          "correct": true
+        },
+        {
+          "text": "Rekursion, weil eine Schleife die Summe nicht berechnen kann.",
+          "feedback": "Eine Schleife berechnet die Summe ebenso gut: Sie addiert jede Zahl zu einer Variablen."
+        },
+        {
+          "text": "Rekursion, weil sie immer weniger Speicher braucht.",
+          "feedback": "Jeder rekursive Aufruf braucht einen eigenen Frame. Die Schleife braucht keinen zusätzlichen Speicher pro Schritt."
+        }
+      ],
+      "explanation": "Wenn eine Schleife die Aufgabe ebenso einfach löst, ist sie meist die bessere Wahl: Sie braucht keine zusätzlichen Frames und keinen Basisfall."
+    },
+    {
+      "id": "m03-l10-q6",
+      "lesson": "m03-l10",
+      "type": "multi",
+      "question": "Welche Aussagen über einen Stapelüberlauf stimmen?",
+      "options": [
+        {
+          "text": "Er entsteht meist durch eine zu tiefe oder endlose Rekursion.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm wird in der Regel beendet.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler erkennt jede endlose Rekursion und meldet einen Fehler.",
+          "feedback": "Der Compiler prüft nicht, ob ein Basisfall erreicht wird. Der Fehler zeigt sich erst beim Ablauf."
+        },
+        {
+          "text": "Die Rekursion endet nach einigen tausend Aufrufen und gibt ein Ergebnis zurück.",
+          "feedback": "Der Stapelüberlauf beendet das Programm. Es gibt kein Ergebnis.",
+          "misconception": "m03-l10-no-base-case"
+        }
+      ],
+      "explanation": "Der Aufrufstapel hat eine begrenzte Größe. Endlose Rekursion füllt ihn, und das Programm endet mit einem Stapelüberlauf."
+    },
+    {
+      "id": "m03-l10-q7",
+      "lesson": "m03-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie die Methode `Bar(3)` den Text `###` baut und warum sie dabei endet.",
+      "modelAnswer": "`Bar(3)` ruft `Bar(2)` auf, das ruft `Bar(1)` auf, das ruft `Bar(0)` auf. Jeder Aufruf bekommt einen eigenen Frame auf dem Aufrufstapel. `Bar(0)` ist der Basisfall und gibt den leeren Text zurück. Danach kehren die Aufrufe in umgekehrter Reihenfolge zurück: `Bar(1)` gibt `#` zurück, `Bar(2)` gibt `##` zurück und `Bar(3)` gibt `###` zurück. Ohne den Basisfall würde `count` immer kleiner, die Aufrufe endeten nie, und der Aufrufstapel liefe über."
+    },
+    {
+      "id": "m03-l10-q8",
+      "lesson": "m03-l10",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du Rekursion einsetzen, und wann nimmst du lieber eine Schleife?",
+      "modelAnswer": "Rekursion passt, wenn ein Problem aus kleineren Problemen derselben Art besteht, zum Beispiel bei verschachtelten Strukturen wie Ordnern, die wieder Ordner enthalten. Wenn die Aufgabe nur eine feste Folge von Schritten wiederholt, zum Beispiel Zahlen addieren oder Zeichen zählen, ist eine Schleife meist einfacher und braucht keinen Basisfall."
     }
   ]
 }
