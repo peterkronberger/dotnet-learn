@@ -1,0 +1,2 @@
+Many failed logins (level 2, manual)
+Disk full (level 3, monitor)

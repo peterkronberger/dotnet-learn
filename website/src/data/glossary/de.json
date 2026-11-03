@@ -3405,12 +3405,13 @@
       "term": "Target-typed",
       "german": "zieltypisiert",
       "category": "language",
-      "definition": "Ein Ausdruck ohne eigenen Typ, dessen Typ der Zieltyp bestimmt: der Typ, zu dem er umgewandelt wird, zum Beispiel links einer Zuweisung. Ein Collection-Ausdruck ist so.",
+      "definition": "Ein Ausdruck ohne eigenen Typ, dessen Typ der Zieltyp bestimmt: der Typ, zu dem er umgewandelt wird, zum Beispiel links einer Zuweisung. Ein Collection-Ausdruck ist so, und `new()` ohne Typnamen auch.",
       "aliases": [
         "Target Type"
       ],
       "related": [
-        "collection-expression"
+        "collection-expression",
+        "object-initializer"
       ],
       "lesson": "m05-l08",
       "source": {
@@ -3910,6 +3911,110 @@
       "source": {
         "title": "Documentation comments (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction"
+      }
+    },
+    {
+      "id": "property",
+      "term": "Property",
+      "german": "Eigenschaft eines Typs",
+      "category": "language",
+      "definition": "Ein Member einer Klasse, das sich wie ein Feld lesen und schreiben lässt, aber Accessoren mit Code hat. Der Code läuft bei jedem Lesen und Schreiben. `Length` und `Count` sind Eigenschaften.",
+      "aliases": [
+        "Eigenschaften",
+        "Properties"
+      ],
+      "related": [
+        "accessor",
+        "backing-field",
+        "computed-property",
+        "field"
+      ],
+      "lesson": "m06-l04",
+      "source": {
+        "title": "Properties (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#157-properties"
+      }
+    },
+    {
+      "id": "accessor",
+      "term": "Accessor",
+      "german": "Zugriffsmethode einer Eigenschaft",
+      "category": "language",
+      "definition": "Der Codeblock einer Eigenschaft, der beim Lesen (`get`) oder beim Schreiben (`set`) läuft. Im `set`-Accessor steht der neue Wert in `value`.",
+      "aliases": [
+        "Accessoren",
+        "get-Accessor",
+        "set-Accessor"
+      ],
+      "related": [
+        "property",
+        "backing-field"
+      ],
+      "lesson": "m06-l04",
+      "source": {
+        "title": "Accessors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1573-accessors"
+      }
+    },
+    {
+      "id": "backing-field",
+      "term": "Backing Field",
+      "german": "Hintergrundfeld",
+      "category": "language",
+      "definition": "Das private Feld, in dem eine Eigenschaft ihren Wert ablegt. Der `get`-Accessor liest es, der `set`-Accessor schreibt es.",
+      "aliases": [
+        "Backing-Feld"
+      ],
+      "related": [
+        "property",
+        "accessor",
+        "field"
+      ],
+      "lesson": "m06-l04",
+      "source": {
+        "title": "Properties (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#157-properties"
+      }
+    },
+    {
+      "id": "computed-property",
+      "term": "Computed Property",
+      "german": "berechnete Eigenschaft",
+      "category": "language",
+      "definition": "Eine Eigenschaft ohne eigenes Feld: Ihr `get`-Accessor berechnet den Wert bei jedem Lesen, zum Beispiel `Area => width * height`. Sie hat meist nur `get` und ist dann schreibgeschützt.",
+      "aliases": [
+        "berechnete Eigenschaften"
+      ],
+      "related": [
+        "property",
+        "accessor"
+      ],
+      "lesson": "m06-l04",
+      "source": {
+        "title": "Properties (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#157-properties"
+      }
+    },
+    {
+      "id": "object-initializer",
+      "term": "Object Initializer",
+      "german": "Objektinitialisierer",
+      "category": "language",
+      "definition": "Ein Block `{ … }` hinter `new`, der nach dem Konstruktor zugängliche Felder und Eigenschaften des neuen Objekts setzt, zum Beispiel `new Alert { Level = 2 }`.",
+      "aliases": [
+        "Objektinitialisierer",
+        "Objektinitialisierern"
+      ],
+      "related": [
+        "constructor",
+        "property",
+        "collection-initializer",
+        "target-typed"
+      ],
+      "lesson": "m06-l05",
+      "source": {
+        "title": "Object initializers (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1281722-object-initializers"
       }
     }
   ]

@@ -1,0 +1,217 @@
+---
+title: Eigenschaften
+sidebar_position: 4
+description: Eine Eigenschaft sieht von außen wie ein Feld aus, führt aber Code beim Lesen und Schreiben aus. So prüft eine Klasse Werte, berechnet Werte und schützt das Schreiben.
+lesson_id: m06-l04
+duration_min: 24
+---
+
+import failureCounter from '!!raw-loader!@site/examples/m06/l04/failure-counter.cs';
+import failureCounterOutput from '!!raw-loader!@site/examples/m06/l04/failure-counter.out.txt';
+import propertyGap from '!!raw-loader!@site/examples/m06/l04/property-gap.cs';
+import computedProperty from '!!raw-loader!@site/examples/m06/l04/computed-property.cs';
+import computedPropertyOutput from '!!raw-loader!@site/examples/m06/l04/computed-property.out.txt';
+import readonlyProperty from '!!raw-loader!@site/examples/m06/l04/readonly-property.snippet.cs';
+import privateSet from '!!raw-loader!@site/examples/m06/l04/private-set.cs';
+import privateSetAccess from '!!raw-loader!@site/examples/m06/l04/private-set-access.snippet.cs';
+import refProperty from '!!raw-loader!@site/examples/m06/l04/ref-property.snippet.cs';
+import propertyIsNotField from '!!raw-loader!@site/examples/m06/l04/property-is-not-field.cs';
+import propertyIsNotFieldOutput from '!!raw-loader!@site/examples/m06/l04/property-is-not-field.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m06/l04/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l04/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l04/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l04/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Eigenschaften
+
+:::note[Lernziele]
+- Du kannst eine Eigenschaft mit `get`- und `set`-Accessor und einem privaten Feld schreiben.
+- Du kannst im `set`-Accessor den neuen Wert über `value` prüfen.
+- Du kannst berechnete Eigenschaften (nur `get`) und Accessoren mit eigener Zugriffsebene (`private set`) einsetzen.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l03-q1" />
+
+<Quiz id="m05-l01-q3" />
+
+<Quiz id="m03-l02-q4" />
+
+## Von der Methode zur Eigenschaft
+
+In Lektion 3 hat `FailureCounter` sein Feld `count` versteckt. Zum Ändern gab es die Methode `Add`, zum Lesen die Methode `Current()`. Das funktioniert, aber der Aufruf sieht anders aus als beim Feld: `counter.Current()` statt `counter.Count`.
+
+Eine <Term id="property">Eigenschaft</Term> (Property) löst das. Von außen liest und schreibt man sie wie ein Feld, zum Beispiel `counter.Count = 3;`. In der Klasse besteht sie aber aus zwei <Term id="accessor">Accessoren</Term> (Accessors): Der `get`-Accessor läuft beim Lesen, der `set`-Accessor beim Schreiben. Beide enthalten Code, genau wie eine Methode.
+
+Du kennst Eigenschaften schon: `Length` eines Arrays oder eines Strings und `Count` einer Liste sind Eigenschaften. Du hast sie bisher nur benutzt, jetzt schreibst du eigene.
+
+Ihren Wert legt eine Eigenschaft meist in einem privaten Feld ab. Dieses Feld heißt <Term id="backing-field">Hintergrundfeld</Term> (Backing Field). Im `set`-Accessor steht der zugewiesene Wert in dem Namen `value`. Das ist ein Parameter, den der Compiler für jeden `set`-Accessor bereitstellt. Du deklarierst ihn nicht selbst.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der `set`-Accessor bekommt zuerst 3 und dann −2.
+:::
+
+<CSharpRunner id="m06-l04-counter" code={failureCounter} predict expected={failureCounterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3`.
+
+1. **Schreiben:** `counter.Count = 3;` ruft den `set`-Accessor auf. Dort ist `value` gleich 3. Die Bedingung `value >= 0` stimmt, also landet 3 im Feld `count`.
+2. **Prüfen:** Bei `-2` ist die Bedingung falsch. Der Accessor ändert nichts, `count` bleibt 3.
+3. **Lesen:** `counter.Count` ruft den `get`-Accessor auf. Er gibt `count` zurück.
+
+Echter Code meldet einen ungültigen Wert mit einer Ausnahme.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Hier behält der Accessor stattdessen den alten Wert.
+
+</details>
+
+Die Eigenschaft hat denselben Schutz wie die Methode `Add` aus Lektion 3, aber den Aufruf eines Felds. Die Eigenschaft ist `public`, das Feld dahinter `private`.
+
+<details>
+<summary>Vertiefung: Eigenschaften in der Sprachspezifikation (optional)</summary>
+
+Eine Eigenschaft hat einen `get`- und/oder einen `set`-Accessor ([§15.7 Properties](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#157-properties)). Der implizite Parameter eines `set`-Accessors heißt immer `value` ([§15.7.3.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15731-general)).
+
+Eine Eigenschaft ist keine Variable. Deshalb kann man sie nicht als `ref`- oder `out`-Argument übergeben (Parameter mit `ref` und `out` kennst du aus Modul 3, Lektion 8), außer sie gibt selbst eine Variablenreferenz zurück:
+
+<CodeBlock language="csharp" title="ref-property.snippet.cs">{refProperty}</CodeBlock>
+
+Die Zeile 2 übersetzt nicht, weil `counter.Count` eine Eigenschaft ist. Bei einem Feld ginge sie ([§15.7.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1571-general)).
+
+</details>
+
+## Lückenbeispiel
+
+Die Eigenschaft `Level` soll nur die Stufen 1 bis 3 annehmen. Das Programm gibt aber `9` aus, es soll `2` ausgeben. Ändere den `set`-Accessor.
+
+<CSharpRunner id="m06-l04-gaps" code={propertyGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Der `set`-Accessor übernimmt jeden Wert.
+2. **Prüfung einbauen:** Statt `level = value;` steht `if (value >= 1 && value <= 3) { level = value; }`. Die Ausgabe ist `2`.
+
+</details>
+
+## Berechnete Eigenschaften
+
+Nicht jede Eigenschaft braucht ein Feld. Eine <Term id="computed-property">berechnete Eigenschaft</Term> (Computed Property) hat nur einen `get`-Accessor, der den Wert bei jedem Lesen ausrechnet. Sie ist dann schreibgeschützt (read-only). Wenn der Accessor nur einen Ausdruck zurückgibt, schreibst du ihn mit `=>`, wie bei einer Methode in Modul 3.
+
+<CSharpRunner id="m06-l04-computed" code={computedProperty} />
+
+Die Ausgabe ist `12` und `60`. `Area` ist 4 · 3 und 10 · 6. Die Fläche steht nirgends gespeichert: Sie kann nie von Breite und Höhe abweichen, weil sie bei jedem Lesen neu entsteht.
+
+Eine Zuweisung an eine solche Eigenschaft übersetzt nicht:
+
+<CodeBlock language="csharp" title="readonly-property.snippet.cs">{readonlyProperty}</CodeBlock>
+
+Der Compiler lehnt Zeile 2 ab: `Area` hat keinen `set`-Accessor.
+
+## Accessoren mit eigener Zugriffsebene
+
+Manchmal soll jeder eine Eigenschaft lesen dürfen, aber nur die Klasse selbst sie ändern. Dafür bekommt der `set`-Accessor einen eigenen Zugriffsmodifizierer: `private set`.
+
+<CSharpRunner id="m06-l04-private-set" code={privateSet} />
+
+Die Ausgabe ist `2`. `Register()` steht in der Klasse und darf `Total` schreiben. Von außen geht das nicht:
+
+<CodeBlock language="csharp" title="private-set-access.snippet.cs">{privateSetAccess}</CodeBlock>
+
+Zeile 2 übersetzt nicht, weil der `set`-Accessor `private` ist.
+
+Die Regel: Der Modifizierer eines Accessors muss strenger sein als die Zugriffsebene der Eigenschaft. Bei einer `public` Eigenschaft sind das zum Beispiel `private` oder `internal`. Er steht nur an einem der beiden Accessoren, und nur wenn die Eigenschaft `get` und `set` hat.
+
+<details>
+<summary>Vertiefung: Regeln für Accessor-Modifizierer (optional)</summary>
+
+Ein Accessor-Modifizierer muss eine strikt strengere Zugriffsebene als die Eigenschaft deklarieren. Er ist nur erlaubt, wenn die Eigenschaft `get` und `set` (oder `init`) hat, und dann nur an einem von beiden ([§15.7.3.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15731-general)). Mit einer Eigenschaft ohne Modifizierer gilt für beide Accessoren die Ebene der Eigenschaft ([§15.7.5 Accessibility](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1575-accessibility)).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klasse `Incident`. Sie sammelt die Fehlversuche eines Benutzers, und `FailureCount()` und `Summary()` lesen den Zustand.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Klasse `Incident` mit ihren Feldern, ihrem Konstruktor, `FailureCount()` und `Summary()`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Aus der Methode `FailureCount()` wird die schreibgeschützte Eigenschaft `FailureCount` (`=> failures.Count`). Passe die Aufrufer an. `Incident` bekommt außerdem das private Feld `status` (Startwert `"open"`) und die Eigenschaft `Status`. Der `get`-Accessor gibt `status` zurück. Der `set`-Accessor nimmt nur `open`, `investigating` und `closed` an (Vergleich mit `StringComparison.Ordinal`) und behält sonst den alten Wert. Beschreibe die neuen Member mit `///`-Kommentaren. Schreibe nach den ausgeblendeten Blöcken den Block `// Change the status of the incident`: Er setzt `Status` auf `investigating`, dann auf `unknown`, und gibt den Status nach jedem Schritt aus.
+
+<CSharpRunner id="m06-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Berechnen:** `FailureCount` hat nur `get`. Der Ausdruck `failures.Count` entsteht bei jedem Lesen neu. `Summary()` ruft `FailureCount` ohne Klammern auf.
+2. **Speichern:** Das private Feld `status` ist das Hintergrundfeld von `Status`. Es startet mit `"open"`.
+3. **Prüfen:** Der `set`-Accessor übernimmt `value` nur, wenn es eines der drei Wörter ist. Bei `unknown` bleibt der Status `investigating`.
+4. **Verwenden:** Der Block setzt zwei Werte und gibt `investigating` zweimal aus. Beim zweiten Mal hat der Accessor den Wert abgelehnt.
+
+</details>
+
+**Neuer Stand:** SecLog liest die Zahl der Fehlversuche als Eigenschaft und hat einen Status, den nur gültige Werte ändern.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l04-property-is-field" />
+
+**„Eine Eigenschaft ist dasselbe wie ein öffentliches Feld.“** Das stimmt nicht. Eine Eigenschaft hat Accessoren mit Code. Dieser Code läuft bei jedem Lesen und Schreiben. Sie kann einen Wert prüfen oder ablehnen, und sie muss gar nichts speichern.
+:::
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Die Accessoren schreiben jedes Mal eine Zeile.
+:::
+
+<CSharpRunner id="m06-l04-not-field" code={propertyIsNotField} predict expected={propertyIsNotFieldOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `set runs with 5`, zweimal `get runs` und `10`.
+
+1. **Schreiben:** `sensor.Reading = 5;` ruft den `set`-Accessor auf. Er gibt die erste Zeile aus.
+2. **Lesen:** Jedes Lesen von `sensor.Reading` ruft den `get`-Accessor auf. Zwei Lesevorgänge ergeben zwei Zeilen.
+3. **Rechnen:** `first` und `second` sind beide 5, die Summe ist 10.
+
+Bei einem Feld liefe kein Code.
+
+</details>
+
+## Zusammenfassung
+
+Eine Eigenschaft ist ein Member mit `get`- und/oder `set`-Accessor. Von außen verhält sie sich wie ein Feld, aber bei jedem Zugriff läuft ihr Code. Der Wert liegt meist in einem privaten Hintergrundfeld. Im `set`-Accessor enthält `value` den zugewiesenen Wert, den der Accessor prüfen kann. Eine Eigenschaft nur mit `get` ist schreibgeschützt, und mit `=>` berechnet sie ihren Wert bei jedem Lesen. Ein Modifizierer wie `private set` beschränkt das Schreiben auf die Klasse.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l04-q1" />
+
+<Quiz id="m06-l04-q2" />
+
+<Quiz id="m06-l04-q3" />
+
+<Quiz id="m06-l04-q4" />
+
+<Quiz id="m06-l04-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l04-q6" />
+
+### Transferfrage
+
+<Quiz id="m06-l04-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Properties (C# specification)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#157-properties)
+- Microsoft Learn: [Using properties](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/using-properties)
