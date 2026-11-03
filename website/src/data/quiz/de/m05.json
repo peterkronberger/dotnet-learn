@@ -663,6 +663,336 @@
         }
       ],
       "explanation": "Soll ein Wert über einen Text gefunden werden, passt ein Dictionary. Ein Array oder eine Liste findet Werte über eine Position."
+    },
+    {
+      "id": "m05-l07-q1",
+      "lesson": "m05-l07",
+      "type": "single",
+      "question": "Die Menge `names` enthält schon `\"bob\"`. Was bewirkt `bool again = names.Add(\"bob\");`?",
+      "options": [
+        {
+          "text": "`again` ist `false`, und die Menge bleibt unverändert.",
+          "correct": true,
+          "feedback": "Add meldet mit `false`, dass der Wert schon da war."
+        },
+        {
+          "text": "Das Programm bricht zur Laufzeit ab, weil der Wert schon da ist.",
+          "misconception": "m05-l07-add-duplicate-throws",
+          "feedback": "Das ist bei `Dictionary.Add` mit einem vorhandenen Schlüssel so, nicht bei `HashSet<T>.Add`."
+        },
+        {
+          "text": "`again` ist `true`, und `\"bob\"` steht jetzt zweimal in der Menge.",
+          "feedback": "Eine Menge enthält jeden Wert höchstens einmal."
+        }
+      ],
+      "explanation": "`Add` liefert `true`, wenn der Wert neu war, und `false`, wenn er schon in der Menge stand. In beiden Fällen läuft das Programm weiter."
+    },
+    {
+      "id": "m05-l07-q2",
+      "lesson": "m05-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l07/quiz-set.cs",
+      "explanation": "`Add(3)` und `Add(5)` fügen zwei Werte hinzu. Der zweite `Add(3)` liefert `False`, also steht `first` auf `False`. `Remove(5)` entfernt die 5, `Add(7)` fügt die 7 hinzu: Die Menge hat `3` und `7`, `Count` ist 2. `Contains(5)` ist `False`."
+    },
+    {
+      "id": "m05-l07-q3",
+      "lesson": "m05-l07",
+      "type": "single",
+      "question": "Warum hat ein `HashSet<T>` keinen Zugriff mit `[i]`?",
+      "options": [
+        {
+          "text": "Die Elemente stehen in keiner bestimmten Reihenfolge, eine Position hätte keine feste Bedeutung.",
+          "correct": true,
+          "feedback": "Ohne festgelegte Reihenfolge gibt es keine „Position 0“."
+        },
+        {
+          "text": "Weil ein `HashSet<T>` nur Zahlen enthalten darf.",
+          "feedback": "Ein `HashSet<string>` hält Texte. Der Elementtyp ist frei."
+        },
+        {
+          "text": "Weil `Add` sonst `false` liefern würde.",
+          "feedback": "Der Rückgabewert von `Add` hat mit dem Zugriff nichts zu tun."
+        }
+      ],
+      "explanation": "Eine Menge garantiert keine Reihenfolge. Darum gibt es keinen Index. Mit `foreach` gehst du durch alle Elemente, mit `Contains` fragst du nach einem Wert."
+    },
+    {
+      "id": "m05-l07-q4",
+      "lesson": "m05-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über `HashSet<string>` stimmen?",
+      "options": [
+        {
+          "text": "`Count` liefert die Zahl der verschiedenen Werte.",
+          "correct": true,
+          "feedback": "Doppelte Werte zählen nur einmal."
+        },
+        {
+          "text": "`Contains` fragt, ob ein Wert in der Menge ist.",
+          "correct": true,
+          "feedback": "Das ist die Mitgliedschaftsfrage."
+        },
+        {
+          "text": "`UnionWith` verändert die Menge, auf der es aufgerufen wird.",
+          "correct": true,
+          "feedback": "Die Operation schreibt das Ergebnis in die Menge selbst."
+        },
+        {
+          "text": "Beim Durchlaufen mit `foreach` kommen die Werte garantiert in der Reihenfolge, in der du sie hinzugefügt hast.",
+          "feedback": "Eine Reihenfolge ist nicht garantiert. Verlass dich nicht darauf."
+        }
+      ],
+      "explanation": "Eine Menge zählt verschiedene Werte, beantwortet Mitgliedschaftsfragen und ändert sich durch Mengenoperationen. Die Reihenfolge ist nicht festgelegt."
+    },
+    {
+      "id": "m05-l07-q5",
+      "lesson": "m05-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein `HashSet<T>` keinen Index und keine garantierte Reihenfolge hat und was `Add` zurückgibt.",
+      "modelAnswer": "Eine Menge enthält jeden Wert höchstens einmal und legt keine Reihenfolge der Elemente fest. Ohne Reihenfolge hat eine Position keine feste Bedeutung, darum gibt es kein `[i]`. Du durchläufst die Menge mit `foreach` oder fragst mit `Contains` nach einem Wert.\n\n`Add` liefert `true`, wenn der Wert neu war, und `false`, wenn er schon in der Menge stand. Es gibt keinen Fehler, die Menge bleibt dann unverändert."
+    },
+    {
+      "id": "m05-l07-q6",
+      "lesson": "m05-l07",
+      "type": "single",
+      "question": "Transferfrage: SecLog will wissen, wie viele verschiedene Benutzer im Log vorkommen. Was passt?",
+      "options": [
+        {
+          "text": "Ein `HashSet<string>`, in das jeder Benutzer mit `Add` kommt; `Count` ist das Ergebnis.",
+          "correct": true,
+          "feedback": "Doppelte Namen zählen in der Menge nur einmal."
+        },
+        {
+          "text": "Eine `List<string>`, in die jeder Benutzer mit `Add` kommt; `Count` ist das Ergebnis.",
+          "feedback": "Die Liste speichert jeden Namen so oft, wie er vorkommt. `Count` zählt dann die Zeilen."
+        },
+        {
+          "text": "Ein `string[]` mit 14 Einträgen; `Length` ist das Ergebnis.",
+          "feedback": "`Length` ist die Zahl der Einträge, nicht die der verschiedenen Namen."
+        }
+      ],
+      "explanation": "Wer nur wissen will, welche Werte vorkommen, nimmt eine Menge. Sie entfernt Doppelte von selbst."
+    },
+    {
+      "id": "m05-l08-q1",
+      "lesson": "m05-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l08/quiz-spread.cs",
+      "explanation": "`[.. second, 0, .. first, .. second]` fügt der Reihe nach ein: `3`, dann `0`, dann `1`, `2`, dann `3`. Die Liste hat 5 Elemente, das erste ist 3 und das letzte ist 3. Das Array `first` bleibt unverändert und hat 2 Elemente."
+    },
+    {
+      "id": "m05-l08-q2",
+      "lesson": "m05-l08",
+      "type": "single",
+      "question": "Was legt `List<int> numbers = [1, 2, 3];` an?",
+      "options": [
+        {
+          "text": "Eine `List<int>`, weil der Zieltyp `List<int>` ist.",
+          "correct": true,
+          "feedback": "Der Zieltyp bestimmt, was der Ausdruck anlegt."
+        },
+        {
+          "text": "Ein Array, weil eckige Klammern immer ein Array anlegen.",
+          "misconception": "m05-l08-collection-expression-is-array",
+          "feedback": "Derselbe Ausdruck legt bei `int[]` ein Array an und bei `List<int>` eine Liste."
+        },
+        {
+          "text": "Nichts, die Zeile kompiliert nicht.",
+          "feedback": "Mit dem Zieltyp `List<int>` ist der Ausdruck gültig."
+        }
+      ],
+      "explanation": "Ein Collection-Ausdruck hat keinen eigenen Typ. Der Zieltyp entscheidet, ob ein Array, eine Liste oder eine andere erlaubte Sammlung entsteht."
+    },
+    {
+      "id": "m05-l08-q3",
+      "lesson": "m05-l08",
+      "type": "single",
+      "question": "Warum kompiliert `var numbers = [1, 2];` nicht?",
+      "options": [
+        {
+          "text": "Der Ausdruck hat keinen eigenen Typ, und bei `var` gibt es keinen Zieltyp.",
+          "correct": true,
+          "feedback": "Der Compiler meldet, dass es keinen Zieltyp für den Collection-Ausdruck gibt."
+        },
+        {
+          "text": "Ein Collection-Ausdruck braucht mindestens drei Elemente.",
+          "feedback": "Die Zahl der Elemente spielt keine Rolle, `[]` ist sogar erlaubt."
+        },
+        {
+          "text": "Collection-Ausdrücke gibt es nur für Listen.",
+          "feedback": "Sie passen auch zu Arrays und einigen Schnittstellen."
+        }
+      ],
+      "explanation": "Mit `var` steht links kein Typ. Schreibe den Zieltyp hin, zum Beispiel `int[] numbers = [1, 2];`."
+    },
+    {
+      "id": "m05-l08-q4",
+      "lesson": "m05-l08",
+      "type": "multi",
+      "question": "Welche Aussagen stimmen?",
+      "options": [
+        {
+          "text": "`[.. a, 5]` fügt alle Elemente von `a` ein und danach die 5.",
+          "correct": true,
+          "feedback": "Das Spread-Element `..` breitet die Elemente aus."
+        },
+        {
+          "text": "Im Initialisierer eines Dictionary ruft `{ \"bob\", 5 }` die Methode `Add` auf.",
+          "correct": true,
+          "feedback": "Ein doppelter Schlüssel bricht deshalb ab."
+        },
+        {
+          "text": "`[\"bob\"] = 5` im Initialisierer eines Dictionary ersetzt einen vorhandenen Wert.",
+          "correct": true,
+          "feedback": "Der Index-Initialisierer schreibt wie `d[\"bob\"] = 5;`."
+        },
+        {
+          "text": "`[\"bob\"] = 5` im Initialisierer eines Dictionary bricht ab, wenn `bob` schon vorkommt.",
+          "feedback": "Das gilt für `Add`, nicht für den Index-Initialisierer."
+        }
+      ],
+      "explanation": "Der Initialisierer mit geschweiften Klammern ruft `Add` auf, der Index-Initialisierer schreibt über den Indexer. Das Spread-Element fügt Elemente einer anderen Sammlung ein."
+    },
+    {
+      "id": "m05-l08-q5",
+      "lesson": "m05-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum derselbe Ausdruck `[1, 2, 3]` ein Array oder eine Liste anlegen kann und warum `var x = [1, 2];` nicht kompiliert.",
+      "modelAnswer": "Ein Collection-Ausdruck hat keinen eigenen Typ. Der Zieltyp, der links der Zuweisung steht, bestimmt, welche Sammlung entsteht: bei `int[]` ein Array, bei `List<int>` eine Liste.\n\nBei `var` steht links kein Typ. Dann gibt es keinen Zieltyp, und der Compiler weiß nicht, was er anlegen soll."
+    },
+    {
+      "id": "m05-l08-q6",
+      "lesson": "m05-l08",
+      "type": "single",
+      "question": "Transferfrage: SecLog hat `string[] early` und `List<string> late` mit Benutzernamen und will eine neue Liste mit allen Namen. Was passt?",
+      "options": [
+        {
+          "text": "`List<string> all = [.. early, .. late];`",
+          "correct": true,
+          "feedback": "Das Spread-Element fügt die Elemente beider Sammlungen ein."
+        },
+        {
+          "text": "`List<string> all = [early, late];`",
+          "feedback": "Hier wären `early` und `late` selbst die Elemente, nicht ihre Namen. Der Elementtyp passt nicht zu `string`."
+        },
+        {
+          "text": "`var all = [.. early, .. late];`",
+          "feedback": "Bei `var` fehlt der Zieltyp."
+        }
+      ],
+      "explanation": "Soll der Inhalt einer Sammlung eingefügt werden, braucht es das Spread-Element `..`. Der Zieltyp steht links."
+    },
+    {
+      "id": "m05-l09-q1",
+      "lesson": "m05-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l09/quiz-queue.cs",
+      "explanation": "Beide Sammlungen bekommen 1, 2, 3. `Dequeue` entfernt vorne die 1, `Peek` der Queue liefert dann 2. `Pop` entfernt oben die 3, `Peek` des Stacks liefert dann 2. In beiden Sammlungen bleiben 2 Elemente, die Summe ist 4."
+    },
+    {
+      "id": "m05-l09-q2",
+      "lesson": "m05-l09",
+      "type": "single",
+      "question": "Nacheinander wurden `Push(1)`, `Push(2)` und `Push(3)` aufgerufen. Was liefert `Pop()`?",
+      "options": [
+        {
+          "text": "3, das zuletzt abgelegte Element.",
+          "correct": true,
+          "feedback": "Ein Stack arbeitet nach last in, first out."
+        },
+        {
+          "text": "1, das zuerst abgelegte Element.",
+          "feedback": "So arbeitet eine Queue mit `Dequeue`, nicht ein Stack."
+        },
+        {
+          "text": "2, das mittlere Element.",
+          "feedback": "Es gibt keinen Grund für die Mitte."
+        }
+      ],
+      "explanation": "Ein `Stack<T>` gibt das zuletzt abgelegte Element zuerst zurück. Eine `Queue<T>` gibt das zuerst eingereihte zuerst zurück."
+    },
+    {
+      "id": "m05-l09-q3",
+      "lesson": "m05-l09",
+      "type": "single",
+      "question": "Eine Liste und eine Menge enthalten je eine Million Werte. Wie verhält sich `Contains`?",
+      "options": [
+        {
+          "text": "Die Liste prüft Element für Element (linear), die Menge findet den Wert im Mittel in konstanter Zeit.",
+          "correct": true,
+          "feedback": "Die Liste wird mit mehr Elementen langsamer, die Menge im Mittel nicht."
+        },
+        {
+          "text": "Beide brauchen gleich lang, `Contains` kostet immer dasselbe.",
+          "misconception": "m05-l09-contains-same-cost",
+          "feedback": "Eine Liste sucht linear, eine Menge über den Hashcode."
+        },
+        {
+          "text": "Die Liste ist schneller, weil sie jeden Index kennt.",
+          "feedback": "Der Index hilft bei der Frage „ist der Wert drin?“ nicht, die Liste muss die Elemente nacheinander prüfen."
+        }
+      ],
+      "explanation": "Eine lineare Suche wird mit der Zahl der Elemente langsamer. Eine Menge findet über den Hashcode und braucht im Mittel gleich lang, egal wie groß sie ist."
+    },
+    {
+      "id": "m05-l09-q4",
+      "lesson": "m05-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über `void Show(IReadOnlyList<string> names)` stimmen?",
+      "options": [
+        {
+          "text": "Die Methode kann mit einem `string[]` aufgerufen werden.",
+          "correct": true,
+          "feedback": "Ein Array erfüllt `IReadOnlyList<T>`."
+        },
+        {
+          "text": "Die Methode kann mit einer `List<string>` aufgerufen werden.",
+          "correct": true,
+          "feedback": "Auch eine Liste erfüllt `IReadOnlyList<T>`."
+        },
+        {
+          "text": "Die Methode kann über `names` kein Element mit `Add` hinzufügen.",
+          "correct": true,
+          "feedback": "Die Schnittstelle kennt kein `Add`."
+        },
+        {
+          "text": "Die Methode kann nur mit einer `List<string>` aufgerufen werden.",
+          "feedback": "Jeder Wert mit den Fähigkeiten der Schnittstelle passt, auch ein Array."
+        }
+      ],
+      "explanation": "Als Parametertyp verlangt eine Schnittstelle nur, was die Methode braucht. Darum passen Array und Liste."
+    },
+    {
+      "id": "m05-l09-q5",
+      "lesson": "m05-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wann du für „ist dieser Wert schon vorgekommen?“ eine Menge statt einer Liste nimmst und was „linear“ und „konstant“ dabei bedeuten.",
+      "modelAnswer": "Für die Frage „ist der Wert drin?“ nimmst du eine Menge. `Contains` findet den Wert dort über den Hashcode und braucht im Mittel gleich lang, egal wie viele Elemente die Menge hat. Das heißt konstant.\n\nBei einer Liste prüft `Contains` Element für Element. Mit doppelt so vielen Elementen dauert die Suche im ungünstigen Fall doppelt so lang. Das heißt linear."
+    },
+    {
+      "id": "m05-l09-q6",
+      "lesson": "m05-l09",
+      "type": "single",
+      "question": "Transferfrage: SecLog bekommt Meldungen und soll sie in der Reihenfolge bearbeiten, in der sie eingetroffen sind. Was passt?",
+      "options": [
+        {
+          "text": "Eine `Queue<string>` mit `Enqueue` und `Dequeue`.",
+          "correct": true,
+          "feedback": "Die Queue gibt zuerst Eingetroffenes zuerst zurück."
+        },
+        {
+          "text": "Ein `Stack<string>` mit `Push` und `Pop`.",
+          "feedback": "Ein Stack bearbeitet zuerst das zuletzt Eingetroffene."
+        },
+        {
+          "text": "Ein `HashSet<string>` mit `Add`.",
+          "feedback": "Eine Menge hat keine Reihenfolge und entfernt gleiche Meldungen."
+        }
+      ],
+      "explanation": "Wenn die Reihenfolge des Eintreffens gilt, ist die Queue die passende Sammlung."
     }
   ]
 }

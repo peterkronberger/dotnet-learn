@@ -1,0 +1,194 @@
+---
+title: "Mengen: HashSet<T>"
+sidebar_position: 7
+description: Ein HashSet hält jeden Wert höchstens einmal. Add meldet mit true oder false, ob der Wert neu war, Contains fragt nach der Mitgliedschaft.
+lesson_id: m05-l07
+duration_min: 20
+---
+
+import hashSetBasics from '!!raw-loader!@site/examples/m05/l07/hash-set-basics.cs';
+import hashSetBasicsOutput from '!!raw-loader!@site/examples/m05/l07/hash-set-basics.out.txt';
+import removeDuplicates from '!!raw-loader!@site/examples/m05/l07/remove-duplicates.cs';
+import setOperations from '!!raw-loader!@site/examples/m05/l07/set-operations.cs';
+import setOperationsOutput from '!!raw-loader!@site/examples/m05/l07/set-operations.out.txt';
+import countRepeats from '!!raw-loader!@site/examples/m05/l07/count-repeats.cs';
+import noIndex from '!!raw-loader!@site/examples/m05/l07/no-index.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l07/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l07/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l07/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l07/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Mengen: HashSet&lt;T&gt;
+
+:::note[Lernziele]
+- Du kannst mit einem `HashSet<string>` doppelte Werte entfernen und die Anzahl verschiedener Werte bestimmen.
+- Du kannst den Rückgabewert von `Add` nutzen, um zu erkennen, ob ein Wert neu war.
+- Du kannst erklären, warum ein `HashSet<T>` keinen Index und keine garantierte Reihenfolge hat.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l06-q2" />
+
+<Quiz id="m05-l06-q3" />
+
+<Quiz id="m04-l08-q1" />
+
+## Jeder Wert höchstens einmal
+
+Oft interessiert dich nicht, wie oft ein Wert vorkommt, sondern nur, ob er vorkommt: Welche IP-Adressen tauchen im Log auf? Eine Liste würde jede Adresse so oft speichern, wie sie im Log steht. Dafür gibt es die <Term id="hash-set">Menge (`HashSet<T>`)</Term>. Sie enthält keine doppelten Elemente, und ihre Elemente stehen in keiner bestimmten Reihenfolge.
+
+Wie bei der Liste sagt die Angabe in den spitzen Klammern, was die Menge hält: Ein `HashSet<string>` hält Texte. Eine Menge ist ein Referenztyp. Die wichtigsten Mitglieder:
+
+| Aufruf | Wirkung |
+| --- | --- |
+| `Add(x)` | fügt `x` hinzu; liefert `true`, wenn `x` neu war, und `false`, wenn `x` schon da war |
+| `Contains(x)` | fragt, ob `x` in der Menge ist |
+| `Remove(x)` | entfernt `x`; liefert `true`, wenn `x` da war |
+| `Count` | Anzahl der Elemente (eine Eigenschaft) |
+
+Ob zwei Elemente gleich sind, entscheidet derselbe Vergleich wie bei den Schlüsseln eines Dictionary: Bei `string` und `int` zählt der Inhalt. Eigene Typen als Elemente brauchen mehr Sorgfalt, das kommt später.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l07-basics" code={hashSetBasics} predict expected={hashSetBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `True`, `False`, `2`, `True`, `True`, `False`.
+
+1. **Hinzufügen:** `Add("bob")` und `Add("alice")` liefern `True`, die Werte waren neu. Der zweite Aufruf `Add("bob")` liefert `False`: `bob` ist schon da, die Menge ändert sich nicht und es gibt keinen Fehler.
+2. **Zählen und fragen:** `Count` ist 2, nicht 3. `Contains("alice")` ist `True`.
+3. **Entfernen:** `Remove("alice")` liefert `True`, danach ist `Contains("alice")` `False`.
+
+**Was passiert, wenn du `Add("bob")` hundertmal aufrufst?** Die Menge enthält `bob` weiter genau einmal.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m05-l07-add-duplicate-throws" />
+
+**„Einen Wert hinzuzufügen, der schon in der Menge ist, ist ein Fehler.“** Das stimmt nicht. `HashSet<T>.Add` liefert `false` und die Menge bleibt, wie sie war. Anders ist es bei `Dictionary.Add` mit einem vorhandenen Schlüssel: Dort bricht das Programm ab (Lektion über Dictionary).
+:::
+
+## Doppelte Werte entfernen
+
+Du kannst eine Menge aus einem Array oder einer Liste anlegen. Der Konstruktor nimmt die Elemente und behält jeden Wert nur einmal. So findest du die verschiedenen Werte.
+
+<CSharpRunner id="m05-l07-distinct" code={removeDuplicates} />
+
+Die Ausgabe ist `4`, `2`, `True`, `False`: Das Array hat vier Einträge, die Menge nur zwei verschiedene (`logout` und `login-failed`). `Contains` fragt nach der Mitgliedschaft, ohne dass du die Menge durchsuchen musst.
+
+## Kein Index, keine Reihenfolge
+
+Eine Menge hat keinen Index. Die Elemente stehen in keiner bestimmten Reihenfolge, deshalb gäbe es keine sinnvolle „Position 0“. Der Compiler lehnt `users[0]` ab. Die Fehlermeldung kommt aus einem echten Übersetzungslauf:
+
+<CodeBlock language="csharp" title="no-index.cs">{noIndex}</CodeBlock>
+
+Der Compiler meldet in Zeile 2 den Fehler `CS0021`: „Cannot apply indexing with [] to an expression of type 'HashSet&lt;string&gt;'“.
+
+Durchlaufen kannst du eine Menge mit `foreach`. Die Reihenfolge, in der die Elemente kommen, ist nicht garantiert. Verlass dich nicht darauf, auch wenn sie in einem Lauf wie die Reihenfolge des Einfügens aussieht. Drucke in Programmen, deren Ausgabe stimmen muss, lieber mit `Count` und `Contains`.
+
+## Mengenoperationen
+
+Mit einer <Term id="set-operation">Mengenoperation</Term> verändert eine Menge sich anhand einer zweiten:
+
+- `UnionWith(other)`: danach enthält die Menge alle Elemente, die in ihr oder in `other` oder in beiden sind (Vereinigung).
+- `IntersectWith(other)`: danach bleiben nur Elemente, die in beiden sind (Schnitt).
+- `ExceptWith(other)`: entfernt alle Elemente, die in `other` stehen (Differenz).
+
+Die Operationen ändern die Menge, auf der du sie aufrufst. Willst du das Original behalten, kopiere es vorher mit dem Konstruktor.
+
+:::info[Vorhersage]
+`morning` hat `alice` und `bob`, `evening` hat `bob` und `carol`. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l07-set-operations" code={setOperations} predict expected={setOperationsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `True`, `3`, `1`, `True`.
+
+1. **Schnitt:** Nur `bob` steht in beiden Mengen, `Count` ist 1.
+2. **Vereinigung:** `alice`, `bob` und `carol`, also 3 Elemente. `bob` zählt nur einmal.
+3. **Differenz:** Nach `ExceptWith(evening)` bleibt nur `alice`.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm soll zählen, wie oft eine Adresse **wiederholt** vorkommt (dreimal `a` nach dem ersten `a`, also 3). Es gibt aber `2` aus. Ändere eine Zeile.
+
+<CSharpRunner id="m05-l07-gaps" code={countRepeats} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `seen.Add(address)` liefert `true`, wenn die Adresse neu ist. Die Bedingung zählt also die neuen Adressen (`a` und `b`).
+2. **Umkehren:** `if (!seen.Add(address))` ist wahr, wenn die Adresse schon da war. Dann steht am Ende `3`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält das Beispiel-Log im Array `sampleLog` und zählt die Fehlversuche pro Benutzer mit einem Dictionary.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Count the failed logins per user with a dictionary*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Count the failed logins per user with a dictionary* den Block `// List the distinct IP addresses of the sample log`. Lege `HashSet<string> distinctIps` an. Gehe mit `foreach` durch das Array `sampleLog` und füge die IP-Adresse jeder Zeile hinzu. Die Adresse liefert die vorhandene Methode `ReadUserAndIp(line).Ip` (sie gibt ein Tupel zurück). Zähle, wie oft `Add` den Wert `false` geliefert hat. Gib `Distinct IP addresses: 4`, `Repeated IP addresses: 10` und `Contains 203.0.113.7: True` aus und danach jede Adresse der Menge mit `foreach`.
+
+Die Reihenfolge der Adressen in der Menge ist nicht garantiert. Der Test akzeptiert deshalb jede Reihenfolge.
+
+<CSharpRunner id="m05-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Menge anlegen:** `distinctIps` nimmt jede Adresse nur einmal auf.
+2. **Hinzufügen und zählen:** Pro Zeile: Adresse lesen und `Add` aufrufen. `!distinctIps.Add(…)` ist wahr, wenn die Adresse schon da war. Dann zählt `repeatedIps` hoch.
+3. **Ausgeben:** 14 Zeilen, 4 verschiedene Adressen, also 10 Wiederholungen. `Contains` fragt nach `203.0.113.7`. Die Schleife zum Schluss druckt die vier Adressen.
+
+</details>
+
+**Neuer Stand:** SecLog kennt die vier verschiedenen IP-Adressen des Beispiel-Logs und weiß, dass 10 Zeilen eine schon bekannte Adresse wiederholen.
+
+<details>
+<summary>Vertiefung: Warum `Contains` schnell ist (optional)</summary>
+
+Eine Menge findet ein Element über dessen Hashcode, ohne alle Elemente anzusehen. Darum ist `Contains` eine O(1)-Operation, die Dauer hängt im Mittel nicht von der Zahl der Elemente ab ([HashSet&lt;T&gt;.Contains](https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1.contains#remarks)). Mehr dazu in der Lektion „Welche Sammlung wann?“.
+
+</details>
+
+## Zusammenfassung
+
+Ein `HashSet<T>` enthält jeden Wert höchstens einmal und hat keinen Index und keine garantierte Reihenfolge. `Add` liefert `true` für einen neuen Wert und `false` für einen vorhandenen, ohne Fehler. `Contains` fragt nach der Mitgliedschaft, `Count` zählt die verschiedenen Werte. `UnionWith`, `IntersectWith` und `ExceptWith` verändern die Menge anhand einer zweiten.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l07-q1" />
+
+<Quiz id="m05-l07-q2" />
+
+<Quiz id="m05-l07-q3" />
+
+<Quiz id="m05-l07-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l07-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l07-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [HashSet&lt;T&gt; Class](https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1)
+- Microsoft Learn: [Collections](https://learn.microsoft.com/dotnet/standard/collections/)

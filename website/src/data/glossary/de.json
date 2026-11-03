@@ -2522,7 +2522,8 @@
       "definition": "Im Stack-Heap-Modell der Bereich, in dem jeder laufende Methodenaufruf einen Frame mit seinen Parametern und lokalen Variablen hat. Das Modell beschreibt die Laufzeitumgebung, nicht die Sprache.",
       "related": [
         "heap",
-        "call-stack"
+        "call-stack",
+        "stack-collection"
       ],
       "lesson": "m04-l02",
       "source": {
@@ -3298,6 +3299,181 @@
       "source": {
         "title": "KeyValuePair<TKey,TValue> Struct",
         "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2"
+      }
+    },
+    {
+      "id": "hash-set",
+      "term": "HashSet<T>",
+      "category": "language",
+      "definition": "Eine Menge, die jeden Wert höchstens einmal enthält. Sie hat keinen Index und keine garantierte Reihenfolge. `Add` liefert `false`, wenn der Wert schon da ist, `Contains` fragt nach der Mitgliedschaft.",
+      "aliases": [
+        "HashSet"
+      ],
+      "related": [
+        "collection",
+        "set-operation",
+        "list",
+        "dictionary"
+      ],
+      "lesson": "m05-l07",
+      "source": {
+        "title": "HashSet<T> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1"
+      }
+    },
+    {
+      "id": "set-operation",
+      "term": "Set Operation",
+      "german": "Mengenoperation",
+      "category": "language",
+      "definition": "Eine Operation, die eine Menge anhand einer zweiten verändert: `UnionWith` (Vereinigung), `IntersectWith` (Schnitt) und `ExceptWith` (Differenz).",
+      "aliases": [
+        "Mengenoperationen"
+      ],
+      "related": [
+        "hash-set"
+      ],
+      "lesson": "m05-l07",
+      "source": {
+        "title": "HashSet<T> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1"
+      }
+    },
+    {
+      "id": "collection-expression",
+      "term": "Collection Expression",
+      "german": "Sammlungsausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck `[a, b]` mit Elementen zwischen `[` und `]`. Welche Sammlung entsteht, bestimmt der Zieltyp, zum Beispiel ein Array oder eine Liste. Ohne Zieltyp kompiliert er nicht.",
+      "aliases": [
+        "Collection-Ausdruck",
+        "Collection-Ausdrücke"
+      ],
+      "related": [
+        "spread-element",
+        "target-typed",
+        "collection",
+        "collection-initializer"
+      ],
+      "lesson": "m05-l08",
+      "source": {
+        "title": "Collection expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/collection-expressions"
+      }
+    },
+    {
+      "id": "spread-element",
+      "term": "Spread Element",
+      "category": "language",
+      "definition": "Das Element `..x` in einem Collection-Ausdruck. Es fügt alle Elemente der Sammlung `x` an dieser Stelle ein. Es ist nicht der Bereich `a..b` eines Index.",
+      "aliases": [
+        "Spread-Element"
+      ],
+      "related": [
+        "collection-expression",
+        "range"
+      ],
+      "lesson": "m05-l08",
+      "source": {
+        "title": "Collection expressions: Spread element",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/collection-expressions#spread-element"
+      }
+    },
+    {
+      "id": "collection-initializer",
+      "term": "Collection Initializer",
+      "german": "Sammlungs-Initialisierer",
+      "category": "language",
+      "definition": "Eine Liste von Elementen in geschweiften Klammern hinter `new`, zum Beispiel `new List<string> { \"a\", \"b\" }`. Der Compiler ruft `Add` für jedes Element auf. Der Index-Initialisierer `[\"k\"] = v` schreibt über den Indexer.",
+      "aliases": [
+        "Initialisierer"
+      ],
+      "related": [
+        "collection-expression",
+        "collection",
+        "dictionary"
+      ],
+      "lesson": "m05-l08",
+      "source": {
+        "title": "Object and collection initializers",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/object-and-collection-initializers"
+      }
+    },
+    {
+      "id": "target-typed",
+      "term": "Target-typed",
+      "german": "zieltypisiert",
+      "category": "language",
+      "definition": "Ein Ausdruck ohne eigenen Typ, dessen Typ der Zieltyp bestimmt: der Typ, zu dem er umgewandelt wird, zum Beispiel links einer Zuweisung. Ein Collection-Ausdruck ist so.",
+      "aliases": [
+        "Target Type"
+      ],
+      "related": [
+        "collection-expression"
+      ],
+      "lesson": "m05-l08",
+      "source": {
+        "title": "Collection expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/collection-expressions"
+      }
+    },
+    {
+      "id": "queue",
+      "term": "Queue<T>",
+      "german": "Warteschlange",
+      "category": "language",
+      "definition": "Eine Sammlung, die ihre Elemente in der Reihenfolge des Einfügens zurückgibt: first in, first out. `Enqueue` hängt hinten an, `Dequeue` nimmt vorne heraus, `Peek` sieht vorne nach.",
+      "aliases": [
+        "Queue",
+        "Warteschlangen"
+      ],
+      "related": [
+        "stack-collection",
+        "collection"
+      ],
+      "lesson": "m05-l09",
+      "source": {
+        "title": "Queue<T> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.queue-1"
+      }
+    },
+    {
+      "id": "stack-collection",
+      "term": "Stack<T>",
+      "category": "language",
+      "definition": "Eine Sammlung, die das zuletzt abgelegte Element zuerst zurückgibt: last in, first out. `Push` legt oben ab, `Pop` nimmt oben herunter, `Peek` sieht oben nach. Nicht zu verwechseln mit dem Stack-Speicher.",
+      "aliases": [
+        "Stack-Collection"
+      ],
+      "related": [
+        "stack",
+        "queue",
+        "collection"
+      ],
+      "lesson": "m05-l09",
+      "source": {
+        "title": "Stack<T> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.stack-1"
+      }
+    },
+    {
+      "id": "collection-interface",
+      "term": "Collection Interface",
+      "german": "Sammlungs-Schnittstelle",
+      "category": "language",
+      "definition": "Eine Schnittstelle wie `IEnumerable<T>`, `IReadOnlyList<T>` oder `IList<T>`, die beschreibt, was man mit einer Sammlung tun kann. Als Parametertyp nimmt sie jede Sammlung mit diesen Fähigkeiten an.",
+      "aliases": [
+        "Sammlungs-Schnittstellen"
+      ],
+      "related": [
+        "collection",
+        "list",
+        "array"
+      ],
+      "lesson": "m05-l09",
+      "source": {
+        "title": "Collections",
+        "url": "https://learn.microsoft.com/dotnet/standard/collections/"
       }
     }
   ]

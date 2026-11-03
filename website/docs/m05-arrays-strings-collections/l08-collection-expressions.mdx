@@ -1,0 +1,198 @@
+---
+title: Collection-Ausdrücke und Initialisierer
+sidebar_position: 8
+description: Mit [a, b, ..other] legst du je nach Zieltyp ein Array oder eine Liste an. Initialisierer füllen eine Sammlung beim Anlegen.
+lesson_id: m05-l08
+duration_min: 20
+---
+
+import collectionExpressions from '!!raw-loader!@site/examples/m05/l08/collection-expressions.cs';
+import collectionExpressionsOutput from '!!raw-loader!@site/examples/m05/l08/collection-expressions.out.txt';
+import noTargetType from '!!raw-loader!@site/examples/m05/l08/no-target-type.snippet.cs';
+import spread from '!!raw-loader!@site/examples/m05/l08/spread.cs';
+import spreadOutput from '!!raw-loader!@site/examples/m05/l08/spread.out.txt';
+import initializers from '!!raw-loader!@site/examples/m05/l08/initializers.cs';
+import spreadGap from '!!raw-loader!@site/examples/m05/l08/spread-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l08/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l08/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l08/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l08/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Collection-Ausdrücke und Initialisierer
+
+:::note[Lernziele]
+- Du kannst mit einem Collection-Ausdruck ein Array und eine Liste anlegen.
+- Du kannst mit dem Spread-Element `..` mehrere Sammlungen zu einer neuen zusammenfügen und das Ergebnis vorhersagen.
+- Du kannst erklären, warum `var x = [1, 2];` nicht kompiliert.
+- Du kannst eine Liste und ein Dictionary mit einem Initialisierer füllen.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l01-q3" />
+
+<Quiz id="m05-l04-q2" />
+
+<Quiz id="m05-l06-q2" />
+
+## Ein Ausdruck für viele Sammlungen
+
+Bisher hast du ein Array mit `{ … }` und eine Liste mit `new List<string>()` und `Add` angelegt. Ein <Term id="collection-expression">Collection-Ausdruck</Term> (Sammlungsausdruck) schreibt beides gleich: Die Elemente stehen zwischen `[` und `]`, getrennt durch Kommas. `[]` ist die leere Sammlung.
+
+<Since csharp="12" dotnet="8">
+
+Vorher schrieb man ein Array als `new[] { 1, 2, 3 }` oder `{ 1, 2, 3 }` und eine Liste als `new List<int> { 1, 2, 3 }`. Diese Formen gibt es weiter.
+
+</Since>
+
+Der Ausdruck selbst hat keinen eigenen Typ. Welche Sammlung entsteht, bestimmt der <Term id="target-typed">Zieltyp</Term> (Target Type): der Typ, der links der Zuweisung steht. Derselbe Ausdruck `[10, 20, 30]` legt bei `int[]` ein Array an und bei `List<int>` eine Liste.
+
+Als Zieltyp erlaubt sind unter anderem:
+
+- Arrays wie `int[]` oder `string[]`,
+- `List<T>` und andere Typen, die einen Initialisierer unterstützen (siehe unten),
+- die Schnittstellen `IEnumerable<T>`, `IReadOnlyCollection<T>`, `IReadOnlyList<T>`, `ICollection<T>` und `IList<T>`. Was eine Schnittstelle ist, siehst du in der nächsten Lektion.
+
+`Span<T>` und `ReadOnlySpan<T>` sind ebenfalls erlaubte Zieltypen. Sie kommen in diesem Kurs nicht weiter vor.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l08-expressions" code={collectionExpressions} predict expected={collectionExpressionsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3`, `3`, `0`, `4`.
+
+1. **Array:** `int[] numbers = [10, 20, 30];` legt ein Array mit 3 Elementen an. `Length` ist 3.
+2. **Liste:** Derselbe Ausdruck bei `List<int>` legt eine Liste an. `Count` ist 3.
+3. **Leer:** `[]` legt eine leere Liste an, `Count` ist 0. Weil es eine Liste ist, wächst sie mit `Add(40)` auf 4 Elemente. Ein Array könnte nicht wachsen.
+
+</details>
+
+## Ohne Zieltyp geht es nicht
+
+Bei `var` steht links kein Typ, und der Ausdruck hat selbst keinen. Dann weiß der Compiler nicht, was er anlegen soll:
+
+<CodeBlock language="csharp" title="no-target-type.cs">{noTargetType}</CodeBlock>
+
+Der Compiler meldet `CS9176`: „There is no target type for the collection expression.“ Schreibe den Typ hin, zum Beispiel `int[] numbers = [1, 2];`.
+
+:::warning[Achtung]
+<Misconception id="m05-l08-collection-expression-is-array" />
+
+**„`[1, 2, 3]` ist immer ein Array.“** Das stimmt nicht. Der Zieltyp entscheidet: Derselbe Ausdruck kann ein `int[]` oder eine `List<int>` anlegen. Ohne Zieltyp, etwa bei `var`, lässt sich der Code nicht übersetzen.
+:::
+
+## Das Spread-Element
+
+Mit dem <Term id="spread-element">Spread-Element</Term> `..` fügst du alle Elemente einer anderen Sammlung an dieser Stelle ein. So setzt du eine neue Sammlung aus mehreren zusammen, und einzelne Werte dürfen dazwischenstehen. Hinter `..` steht eine Sammlung, durch die `foreach` gehen kann.
+
+`..` hat zwei Bedeutungen. In einem Index wie `a[1..3]` ist es der Bereich aus der Lektion über Indizes vom Ende. In einem Collection-Ausdruck wie `[.. a, 5]` ist es das Spread-Element. Der Ort entscheidet: eckige Klammern hinter einem Wert sind ein Zugriff, eckige Klammern allein sind ein Collection-Ausdruck.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte auf die Reihenfolge der Namen.
+:::
+
+<CSharpRunner id="m05-l08-spread" code={spread} predict expected={spreadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `4`, `alice`, `bob`, `dave`, `carol`, `4`, `5`.
+
+1. **Zusammenfügen:** `[.. early, "dave", .. late]` nimmt zuerst `alice` und `bob`, dann `dave`, dann `carol`. Die Reihenfolge im Ausdruck ist die Reihenfolge in der Liste. `Count` ist 4.
+2. **Kopieren:** `[.. all]` legt eine neue Liste mit denselben Elementen an. `copy.Add("eve")` ändert nur die Kopie: `all` hat weiter 4, `copy` hat 5.
+
+</details>
+
+## Initialisierer
+
+Ein <Term id="collection-initializer">Collection-Initialisierer</Term> füllt eine Sammlung gleich beim Anlegen: `new List<string> { "alice", "bob" }`. Der Compiler ruft dafür `Add` für jedes Element auf.
+
+Für ein Dictionary gibt es zwei Formen:
+
+- `{ "bob", 5 }` ruft `Add("bob", 5)` auf. Kommt ein Schlüssel zweimal vor, bricht das Programm ab, wie bei `Add`.
+- `["bob"] = 5` ist ein Index-Initialisierer. Er schreibt wie `d["bob"] = 5;` und ersetzt einen vorhandenen Wert.
+
+<CSharpRunner id="m05-l08-initializers" code={initializers} />
+
+Die Ausgabe ist `2`, `5`, `2`: zwei Benutzer in der Liste, `bob` hat 5 Fehlversuche, beide Dictionaries haben zwei Einträge.
+
+Initialisierer gibt es auch für die Eigenschaften eines Objekts. Eigene Klassen kommen erst später.
+
+<Forward concepts={['Objektinitialisierer für eigene Klassen']} module="6" />
+
+## Lückenbeispiel
+
+Die Liste `extended` soll `bob`, `carol` und `dave` enthalten (3 Elemente). Das Programm gibt aber `1` aus. Ändere eine Zeile.
+
+<CSharpRunner id="m05-l08-gaps" code={spreadGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `["dave"]` kennt `watchList` nicht, die Liste hat nur den einen Namen.
+2. **Spread ergänzen:** `List<string> extended = [.. watchList, "dave"];` fügt zuerst `bob` und `carol` ein, dann `dave`. `Count` ist 3.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog kennt die vier verschiedenen IP-Adressen und zählt die Fehlversuche pro Benutzer im Dictionary `failuresPerUser`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *List the distinct IP addresses of the sample log*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *List the distinct IP addresses of the sample log* den Block `// Build a watch list with collection expressions`. Lege `string[] watchList = ["bob"];` an und `List<string> extendedWatchList = [.. watchList, "dave"];`. Gehe mit `foreach` durch `extendedWatchList` und gib für jeden Benutzer die Fehlversuche aus `failuresPerUser` aus, gelesen mit `TryGetValue`: `Watch bob: 5` und `Watch dave: 1`.
+
+<CSharpRunner id="m05-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Array und Liste anlegen:** Der Zieltyp `string[]` macht aus `["bob"]` ein Array, der Zieltyp `List<string>` aus dem zweiten Ausdruck eine Liste.
+2. **Zusammenfügen:** `.. watchList` fügt `bob` ein, danach kommt `dave`.
+3. **Ausgeben:** Pro Benutzer liest `TryGetValue` die Anzahl: bob 5, dave 1.
+
+</details>
+
+**Neuer Stand:** SecLog baut eine Beobachtungsliste aus einer bestehenden und gibt die Fehlversuche ihrer Benutzer aus.
+
+<details>
+<summary>Vertiefung: Was der Compiler daraus macht (optional)</summary>
+
+Ein Collection-Ausdruck legt immer eine Sammlung an, die alle Elemente enthält, auch wenn der Zieltyp eine Schnittstelle wie `IEnumerable<T>` ist. Die Regeln für die Umwandlung stehen in [§12.8.25 Collection expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12825-collection-expressions). Ein Dictionary-Ausdruck mit `[key: value]` ist kein Thema dieses Kurses.
+
+</details>
+
+## Zusammenfassung
+
+Ein Collection-Ausdruck `[a, b]` legt eine Sammlung an, deren Typ der Zieltyp bestimmt: ein Array, eine Liste oder eine der erlaubten Schnittstellen. Ohne Zieltyp, etwa bei `var`, kompiliert er nicht. Das Spread-Element `..x` fügt alle Elemente von `x` ein. Initialisierer füllen eine Sammlung beim Anlegen: `{ … }` ruft `Add` auf, `["k"] = v` schreibt über den Index.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l08-q1" />
+
+<Quiz id="m05-l08-q2" />
+
+<Quiz id="m05-l08-q3" />
+
+<Quiz id="m05-l08-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l08-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l08-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Collection expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/collection-expressions)
+- Microsoft Learn: [Object and collection initializers](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/object-and-collection-initializers)
