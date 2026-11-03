@@ -1,0 +1,202 @@
+---
+title: Code ergänzen und schreiben
+sidebar_position: 2
+description: "Gemischte Schreibaufgaben zu den Modulen 1–4: erst das Konzept erkennen, dann Code ergänzen oder schreiben."
+lesson_id: w01-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import skipMultiplesTask from '!!raw-loader!@site/examples/w01/l02/skip-multiples-task.cs';
+import skipMultiplesTests from '!!raw-loader!@site/examples/w01/l02/skip-multiples-task.tests.snippet.cs';
+import skipMultiplesSolution from '!!raw-loader!@site/examples/w01/l02/skip-multiples-solution.cs';
+import averageTask from '!!raw-loader!@site/examples/w01/l02/average-task.cs';
+import averageTests from '!!raw-loader!@site/examples/w01/l02/average-task.tests.snippet.cs';
+import averageSolution from '!!raw-loader!@site/examples/w01/l02/average-solution.cs';
+import sumUpToTask from '!!raw-loader!@site/examples/w01/l02/sum-up-to-task.cs';
+import sumUpToTests from '!!raw-loader!@site/examples/w01/l02/sum-up-to-task.tests.snippet.cs';
+import sumUpToSolution from '!!raw-loader!@site/examples/w01/l02/sum-up-to-solution.cs';
+import defaultNameTask from '!!raw-loader!@site/examples/w01/l02/default-name-task.cs';
+import defaultNameTests from '!!raw-loader!@site/examples/w01/l02/default-name-task.tests.snippet.cs';
+import defaultNameSolution from '!!raw-loader!@site/examples/w01/l02/default-name-solution.cs';
+
+# Code ergänzen und schreiben
+
+:::note[Lernziele]
+- Du erkennst bei einer Schreibaufgabe, welches Konzept aus den Modulen 1–4 gebraucht wird.
+- Du ergänzt und schreibst kurzen Code zu den Modulen 1–4 so, dass er das verlangte Ergebnis liefert.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann ergänzt oder schreibst du den Code. Bei den Programmieraufgaben überlegst du vorher, was der Startcode ausgibt, und führst ihn dann aus.
+
+### Aufgabe 1
+
+<Quiz id="w01-l02-q1" />
+
+<Quiz id="w01-l02-q2" />
+
+<Quiz id="w01-l02-q3" />
+
+### Aufgabe 2
+
+<Quiz id="w01-l02-q4" />
+
+<Quiz id="w01-l02-q5" />
+
+### Aufgabe 3
+
+<Quiz id="w01-l02-q6" />
+
+<Quiz id="w01-l02-q7" />
+
+### Aufgabe 4
+
+<Quiz id="w01-l02-q8" />
+
+<Quiz id="w01-l02-q9" />
+
+### Aufgabe 5
+
+<Quiz id="w01-l02-q10" />
+
+:::info[Vorhersage]
+Der Startcode addiert die Zahlen von 1 bis 6. Welche Summe gibt er aus, bevor du etwas änderst? Und welche Summe soll er ausgeben, wenn alle Vielfachen von 3 fehlen?
+:::
+
+Aufgabe: Überspringe die Vielfachen von 3 mit `continue`.
+
+<CSharpRunner id="w01-l02-skip-multiples" code={skipMultiplesTask} tests={skipMultiplesTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `Sum: 21` aus. Mit der Lösung gibt das Programm `Sum: 12` aus.
+
+<CodeBlock language="csharp" title="skip-multiples-solution.cs">{skipMultiplesSolution}</CodeBlock>
+
+1. **Bedingung:** `i % 3 == 0` ist wahr für 3 und 6.
+2. **Überspringen:** `continue` beendet nur diesen Durchlauf, der Zähler läuft weiter.
+3. **Summe:** Nur 1, 2, 4 und 5 werden addiert.
+
+</details>
+
+<Quiz id="w01-l02-q11" />
+
+### Aufgabe 6
+
+<Quiz id="w01-l02-q12" />
+
+<Quiz id="w01-l02-q13" />
+
+<Quiz id="w01-l02-q14" />
+
+### Aufgabe 7
+
+<Quiz id="w01-l02-q15" />
+
+<Quiz id="w01-l02-q16" />
+
+<Quiz id="w01-l02-q17" />
+
+### Aufgabe 8
+
+<Quiz id="w01-l02-q18" />
+
+<Quiz id="w01-l02-q19" />
+
+## Abschlussrunde
+
+Drei kurze gemischte Aufgaben, jeweils mit einem anderen Modul.
+
+### Aufgabe 9
+
+<Quiz id="w01-l02-q20" />
+
+:::info[Vorhersage]
+`total` ist `7`, `count` ist `2`. Was gibt der Startcode aus? Welche Ausgabe soll er haben?
+:::
+
+Aufgabe: Das Ergebnis soll die Nachkommastelle behalten.
+
+<CSharpRunner id="w01-l02-average" code={averageTask} tests={averageTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `Average: 3` aus. Mit der Lösung gibt das Programm `Average: 3.5` aus.
+
+<CodeBlock language="csharp" title="average-solution.cs">{averageSolution}</CodeBlock>
+
+1. **Ursache:** `total / count` hat zwei `int`-Operanden. Die Division schneidet den Rest ab, das Ergebnis `3` wird erst danach zu `double`.
+2. **Umwandlung:** `(double)total` macht einen Operanden zu `double`. Dann rechnet C# die ganze Division als Gleitkommadivision.
+
+</details>
+
+### Aufgabe 10
+
+<Quiz id="w01-l02-q21" />
+
+:::info[Vorhersage]
+Der Startcode gibt immer `0` zurück. Was gibt er aus? Welche Summe soll `SumUpTo(4)` liefern?
+:::
+
+Aufgabe: Schreibe `SumUpTo` rekursiv. Sie addiert `n + (n - 1) + … + 1`.
+
+<CSharpRunner id="w01-l02-sum-up-to" code={sumUpToTask} tests={sumUpToTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `Sum: 0` aus. Mit der Lösung gibt das Programm `Sum: 10` aus.
+
+<CodeBlock language="csharp" title="sum-up-to-solution.cs">{sumUpToSolution}</CodeBlock>
+
+1. **Basisfall:** Bei `n == 0` gibt die Methode `0` zurück und ruft sich nicht mehr auf.
+2. **Rekursiver Fall:** Sonst addiert sie `n` zu `SumUpTo(n - 1)`. Das Problem wird bei jedem Aufruf kleiner.
+
+</details>
+
+### Aufgabe 11
+
+<Quiz id="w01-l02-q22" />
+
+:::info[Vorhersage]
+Die Eingabe ist leer. Was liefert `Console.ReadLine()` dann? Was gibt der Startcode aus?
+:::
+
+Aufgabe: Das Programm soll `Name: unknown` ausgeben, wenn keine Zeile da ist.
+
+<CSharpRunner id="w01-l02-default-name" code={defaultNameTask} stdin="" tests={defaultNameTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `Name: ` aus. Mit der Lösung gibt das Programm `Name: unknown` aus.
+
+<CodeBlock language="csharp" title="default-name-solution.cs">{defaultNameSolution}</CodeBlock>
+
+1. **Eingabe:** Ohne weitere Zeile liefert `Console.ReadLine()` `null`.
+2. **Ersatzwert:** `line ?? "unknown"` nimmt `line`, wenn es nicht `null` ist, sonst den Text rechts.
+
+</details>
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w01-l02-q23" />
+
+### Übertragen
+
+<Quiz id="w01-l02-q24" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- Microsoft Learn: [Auswahlanweisungen](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)
+- Microsoft Learn: [Iterationsanweisungen](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements)
+- Microsoft Learn: [`int.TryParse`](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)
