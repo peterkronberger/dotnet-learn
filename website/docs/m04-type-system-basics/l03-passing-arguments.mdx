@@ -1,0 +1,199 @@
+---
+title: Argumente übergeben
+sidebar_position: 3
+description: "Ein Wertparameter eines Referenztyps bekommt eine Kopie des Verweises. Die Methode kann das Objekt ändern, aber nicht die Variable des Aufrufers. Ein ref-Parameter ist ein Alias für diese Variable."
+lesson_id: m04-l03
+duration_min: 22
+---
+
+import intParameters from '!!raw-loader!@site/examples/m04/l03/int-parameters.cs';
+import intParametersOutput from '!!raw-loader!@site/examples/m04/l03/int-parameters.out.txt';
+import changeObject from '!!raw-loader!@site/examples/m04/l03/change-object.cs';
+import changeObjectOutput from '!!raw-loader!@site/examples/m04/l03/change-object.out.txt';
+import replaceObject from '!!raw-loader!@site/examples/m04/l03/replace-object.cs';
+import replaceObjectOutput from '!!raw-loader!@site/examples/m04/l03/replace-object.out.txt';
+import addNameGaps from '!!raw-loader!@site/examples/m04/l03/add-name-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l03/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l03/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l03/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l03/seclog-types-solution.cs';
+
+# Argumente übergeben
+
+:::note[Lernziele]
+- Du kannst vorhersagen, ob eine Methode das Objekt hinter einem Parameter ändern kann.
+- Du kannst vorhersagen, ob eine Zuweisung an einen Parameter die Variable des Aufrufers ändert – bei Wertparametern und bei `ref`-Parametern.
+- Du kannst „Referenztyp“ und „Übergabe per Referenz“ auseinanderhalten.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l03-q3" />
+
+<Quiz id="m03-l08-q2" />
+
+<Quiz id="m04-l01-q3" />
+
+## Zwei Fragen, nicht eine
+
+Bei jedem Aufruf stellen sich zwei getrennte Fragen:
+
+1. Ist der Typ ein Werttyp oder ein Referenztyp? Das entscheidet, was die Variable enthält: einen Wert oder einen Verweis.
+2. Ist der Parameter ein <Term id="value-parameter">Wertparameter</Term> oder ein <Term id="reference-parameter">`ref`-Parameter</Term>? Das entscheidet, ob der Parameter eine Kopie des Inhalts der Variablen ist oder ein zweiter Name für die Variable selbst.
+
+Ein Wertparameter bekommt immer eine Kopie dessen, was in der Variablen steht. Bei einem `int` ist das die Zahl. Bei einem Referenztyp ist das der Verweis, also nicht das Objekt.
+
+:::info[Vorhersage]
+Beide Methoden erhöhen ihren Parameter um `1`. Was steht nach den beiden Aufrufen in `number`?
+:::
+
+<CSharpRunner id="m04-l03-int" code={intParameters} predict expected={intParametersOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `after value parameter: 1` und `after ref parameter: 2`.
+
+1. **Wertparameter:** `value` ist eine Kopie der `1`. `value = value + 1` ändert nur die Kopie, `number` bleibt `1`.
+2. **`ref`-Parameter:** `value` ist ein zweiter Name für `number`. Die Zuweisung ändert `number` auf `2`.
+
+**Was passiert, wenn du das `ref` beim Aufruf weglässt?** Dann meldet der Compiler einen Fehler: Der Aufruf muss `ref` ebenfalls schreiben.
+
+</details>
+
+## Das Objekt ändern
+
+Jetzt der Referenztyp. Der Wertparameter `builder` enthält eine Kopie des Verweises. Er zeigt also auf dasselbe Objekt wie `text`.
+
+:::info[Vorhersage]
+Die Methode hängt Text an. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m04-l03-change" code={changeObject} predict expected={changeObjectOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `old+more`.
+
+1. **Verweis kopieren:** Beim Aufruf bekommt `builder` eine Kopie des Verweises aus `text`.
+2. **Objekt ändern:** `builder.Append("+more")` ändert das Objekt, auf das beide Verweise zeigen.
+3. **Aufrufer prüfen:** `text` zeigt auf dasselbe, geänderte Objekt.
+
+**Was passiert, wenn die Methode kein `Append` aufruft?** Dann bleibt das Objekt unverändert, und die Ausgabe ist `old`.
+
+</details>
+
+## Ein neues Objekt zuweisen
+
+Die Methode kann den Parameter auch auf ein neues Objekt zeigen lassen. Beim Wertparameter ändert das nur die Kopie des Verweises. Beim `ref`-Parameter ändert es die Variable des Aufrufers.
+
+:::info[Vorhersage]
+Beide Methoden weisen ihrem Parameter ein neues Objekt zu. Was zeigt `text` jeweils danach?
+:::
+
+<CSharpRunner id="m04-l03-replace" code={replaceObject} predict expected={replaceObjectOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `after value parameter: old` und `after ref parameter: new`.
+
+1. **Wertparameter:** `builder` ist eine Kopie des Verweises. Die Zuweisung lässt nur die Kopie auf das neue Objekt zeigen. `text` zeigt weiter auf das alte Objekt.
+2. **`ref`-Parameter:** `builder` ist ein zweiter Name für `text`. Die Zuweisung lässt `text` selbst auf das neue Objekt zeigen.
+
+**Was passiert mit dem alten Objekt nach dem zweiten Aufruf?** Keine Variable zeigt mehr darauf. Der Garbage Collector darf seinen Speicher irgendwann freigeben.
+
+</details>
+
+Alle vier Fälle in einer Tabelle:
+
+| | Wertparameter | `ref`-Parameter |
+| --- | --- | --- |
+| `int` zuweisen | Aufrufer unverändert | Aufrufer geändert |
+| `StringBuilder`: Objekt ändern (`Append`) | Aufrufer sieht die Änderung | Aufrufer sieht die Änderung |
+| `StringBuilder`: neues Objekt zuweisen | Aufrufer unverändert | Aufrufer zeigt auf das neue Objekt |
+
+:::warning[Achtung]
+<Misconception id="m04-l03-reference-types-passed-by-reference" />
+
+**„Referenztypen werden per Referenz übergeben.“** Das stimmt nicht. Ohne `ref` wird jedes Argument als Wert übergeben. Bei einem Referenztyp ist dieser Wert der Verweis. Darum kann die Methode das Objekt ändern, aber nicht die Variable des Aufrufers. Erst die <Term id="pass-by-reference">Übergabe per Referenz</Term> mit `ref` macht den Parameter zu einem zweiten Namen für die Variable des Aufrufers.
+:::
+
+## Lückenbeispiel
+
+`Add` soll jeden Namen mit `;` an `names` hängen. Das Ergebnis soll `alice;bob;` sein. Aktuell gibt das Programm eine leere Zeile aus. Ersetze die Zuweisung im Rumpf von `Add` so, dass sie das Objekt ändert.
+
+<CSharpRunner id="m04-l03-gaps" code={addNameGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Objekt statt Variable ändern:** `target.Append(name);` statt `target = new StringBuilder(name);`.
+2. **Trennzeichen anhängen:** `target.Append(";");` direkt danach.
+
+Die Zuweisung `target = …` hat nur die Kopie des Verweises geändert. Darum blieb `names` leer.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog sammelt einen Befund in einem `StringBuilder`-Objekt, auf das die Variablen `findings` und `sameFindings` zeigen.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block mit den Befunden und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe direkt vor der Klasse `Report` die lokale Funktion `void AddFinding(StringBuilder findings, string text)`. Sie hängt `text` und danach `"; "` an. Ersetze im Block *Collect the findings in one StringBuilder* den Aufruf von `Append` durch `AddFinding(sameFindings, "bob: 5 failed attempts")`. Füge `AddFinding(findings, "alice: 1 failed attempt")` hinzu. Die Ausgabezeile ist jetzt `Findings: bob: 5 failed attempts; alice: 1 failed attempt; `.
+
+<CSharpRunner id="m04-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Methode schreiben:** `AddFinding` hängt zuerst `text` und dann `"; "` an den Parameter `findings` an.
+2. **Aufrufen:** Beide Aufrufe übergeben einen Verweis auf das eine Objekt, einmal über `sameFindings` und einmal über `findings`.
+3. **Ergebnis lesen:** Der Parameter ist ein Wertparameter, aber er enthält eine Kopie des Verweises. `Append` ändert das Objekt des Aufrufers. Darum zeigt `findings` beide Befunde.
+
+</details>
+
+**Neuer Stand:** SecLog sammelt Befunde, indem es das Objekt an eine Methode übergibt, die es ergänzt.
+
+<details>
+<summary>Vertiefung: Wertparameter und Referenzparameter in der Spezifikation (optional)</summary>
+
+Ein Wertparameter ist eine lokale Variable, die ihren Anfangswert vom Argument bekommt. Zuweisungen an ihn betreffen nur diesen Speicherplatz und haben keine Wirkung auf das Argument des Aufrufs ([§15.6.2.2 Value parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15622-value-parameters)).
+
+Ein Referenzparameter bezeichnet im Rumpf dieselbe Variable wie das Argument ([§15.6.2.3.3 Reference parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156233-reference-parameters)).
+</details>
+
+## Zusammenfassung
+
+Ohne `ref` wird jedes Argument als Wert übergeben. Bei einem Werttyp ist das der Wert, bei einem Referenztyp der Verweis. Eine Methode kann deshalb das Objekt hinter einem Parameter ändern, aber mit einer Zuweisung an den Parameter nicht die Variable des Aufrufers. Ein `ref`-Parameter ist ein zweiter Name für die Variable des Aufrufers, darum ändert eine Zuweisung sie. „Referenztyp“ beschreibt den Typ, „Übergabe per Referenz“ beschreibt den Parameter.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l03-q1" />
+
+<Quiz id="m04-l03-q2" />
+
+<Quiz id="m04-l03-q3" />
+
+<Quiz id="m04-l03-q4" />
+
+<Quiz id="m04-l03-q5" />
+
+<Quiz id="m04-l03-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l03-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§15.6.2.2 Value parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15622-value-parameters)
+- C#-Spezifikation: [§15.6.2.3.3 Reference parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156233-reference-parameters)

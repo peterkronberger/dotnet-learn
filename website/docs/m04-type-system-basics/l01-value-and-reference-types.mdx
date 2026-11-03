@@ -1,0 +1,206 @@
+---
+title: Werttypen und Referenztypen
+sidebar_position: 1
+description: "Eine Variable eines Werttyps enthält den Wert selbst, eine Variable eines Referenztyps nur einen Verweis auf ein Objekt. Darum kopiert eine Zuweisung bei Referenztypen den Verweis."
+lesson_id: m04-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import valueCopy from '!!raw-loader!@site/examples/m04/l01/value-copy.cs';
+import valueCopyOutput from '!!raw-loader!@site/examples/m04/l01/value-copy.out.txt';
+import referenceCopy from '!!raw-loader!@site/examples/m04/l01/reference-copy.cs';
+import referenceCopyOutput from '!!raw-loader!@site/examples/m04/l01/reference-copy.out.txt';
+import simpleTypeAlias from '!!raw-loader!@site/examples/m04/l01/simple-type-alias.cs';
+import simpleTypeAliasOutput from '!!raw-loader!@site/examples/m04/l01/simple-type-alias.out.txt';
+import separateGaps from '!!raw-loader!@site/examples/m04/l01/separate-objects-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l01/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l01/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l01/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l01/seclog-types-solution.cs';
+
+# Werttypen und Referenztypen
+
+:::note[Lernziele]
+- Du kannst Werttypen und Referenztypen an Beispielen unterscheiden.
+- Du kannst vorhersagen, was eine Zuweisung bei einem Werttyp und bei einem Referenztyp kopiert.
+- Du kannst erklären, dass `int` ein Alias für die Struktur `System.Int32` ist und dass alle Typen von `object` abstammen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog sammelt seine Befunde in einem Objekt und gibt es an Methoden weiter.
+- SecLog markiert Werte, die fehlen können (kein Benutzer, keine Zahl), mit `?`.
+- SecLog behandelt fehlende Werte sicher mit `?.`, `??` und `??=`.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l03-q2" />
+
+<Quiz id="m03-l09-q1" />
+
+<Quiz id="m03-l09-q2" />
+
+## Was eine Variable enthält
+
+In Modul 3 hast du gesehen: Ein Wertparameter bekommt eine Kopie des Arguments, und ein Tupel ist beim Kopieren unabhängig vom Original. Das gilt nicht für alle Typen. Es gibt zwei Arten von Typen, und sie unterscheiden sich darin, was eine Variable enthält.
+
+Eine Variable eines <Term id="value-type">Value Type (Werttyp)</Term> enthält den Wert selbst. `int`, `double`, `bool`, `char` und Tupel sind Werttypen. Eine Zuweisung kopiert den Wert, danach sind beide Variablen unabhängig.
+
+:::info[Vorhersage]
+Was geben die beiden Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l01-value-copy" code={valueCopy} predict expected={valueCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `original: 5` und `copy: 7`.
+
+1. **Wert kopieren:** `int copy = original;` legt eine Kopie der `5` in `copy`.
+2. **Kopie ändern:** `copy = 7;` ändert nur `copy`.
+3. **Original prüfen:** `original` enthält weiter die `5`.
+
+**Was passiert, wenn du `original = 9;` vor der Ausgabe ergänzt?** Dann ist `original` `9` und `copy` weiter `7`. Die Variablen sind unabhängig.
+
+</details>
+
+## Variablen mit Verweis
+
+Eine Variable eines <Term id="reference-type">Reference Type (Referenztyp)</Term> enthält nur einen Verweis (Referenz) auf ein <Term id="object">Object (Objekt)</Term>. Das Objekt selbst liegt an anderer Stelle. `new` erzeugt ein Objekt und liefert den Verweis darauf. Der Typ `string` ist ein Referenztyp, du kennst ihn aus Modul 1. Für dieses Modul brauchen wir einen Referenztyp, dessen Objekt sich ändern lässt: den <Term id="string-builder">StringBuilder</Term>. Er nimmt einen Text auf, an den du mit `Append` weiteren Text hängst. `ToString()` liefert den Text als `string`.
+
+<Forward concepts={['Namespaces', '`using`-Direktive', 'Klassen', 'Konstruktoren']} module="6" />
+
+Die erste Zeile `using System.Text;` macht den Typ `StringBuilder` unter seinem kurzen Namen bekannt. Die Textinterpolation `{first}` ruft `ToString()` auf und setzt den Text ein.
+
+:::info[Vorhersage]
+`second = first` weist eine Variable an die andere zu. Was zeigen die beiden Zeilen nach dem `Append`?
+:::
+
+<CSharpRunner id="m04-l01-reference-copy" code={referenceCopy} predict expected={referenceCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist zweimal `alice!`.
+
+1. **Objekt erzeugen:** `new StringBuilder("alice")` erzeugt ein Objekt. `first` enthält den Verweis darauf.
+2. **Verweis kopieren:** `var second = first;` kopiert den Verweis. Es gibt weiterhin nur ein Objekt, und beide Variablen zeigen darauf.
+3. **Objekt ändern:** `second.Append("!")` hängt `!` an dieses eine Objekt. Über `first` ist die Änderung auch zu sehen.
+
+**Was passiert, wenn du statt `var second = first;` ein zweites `new StringBuilder("alice")` schreibst?** Dann gibt es zwei Objekte. Die Änderung über `second` betrifft nur sein Objekt, und `first` bleibt `alice`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m04-l01-assignment-copies-object" />
+
+**„Eine Zuweisung kopiert das Objekt.“** Das stimmt nicht. Bei einem Referenztyp kopiert die Zuweisung nur den Verweis. Danach zeigen beide Variablen auf dasselbe Objekt, und eine Änderung über die eine Variable sieht man über die andere. Nur bei Werttypen wie `int` oder einem Tupel (Modul 3) kopiert die Zuweisung den Wert selbst.
+:::
+
+## `int` ist ein Alias
+
+Das Schlüsselwort `int` ist ein anderer Name für die Struktur `System.Int32`. Man nennt solche Schlüsselwörter <Term id="simple-type">Simple Types (einfache Typen)</Term>. `double`, `bool` und `char` gehören dazu. Sie sind Werttypen. Eine Struktur ist eine Art von Werttyp. Eigene Typen schreibst du erst in späteren Modulen.
+
+:::info[Vorhersage]
+`Int32` und `int` sind derselbe Typ. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m04-l01-alias" code={simpleTypeAlias} predict expected={simpleTypeAliasOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5 6` und `2147483647`.
+
+1. **Beide Namen nutzen:** `Int32 a = 5;` und `int b = a;` brauchen keine Umwandlung, denn es ist ein Typ.
+2. **Kopie ändern:** `b++` ändert nur `b`, denn `Int32` ist ein Werttyp.
+3. **Größten Wert lesen:** `int.MaxValue` ist eine Zahl vom Typ `int`. Sie passt in eine `Int32`-Variable.
+
+**Was passiert, wenn du `Int32` durch `System.Int32` ersetzt?** Dasselbe: Es ist der volle Name des Typs.
+
+</details>
+
+Alle Typen stammen direkt oder indirekt von `object` ab. `object` ist die Wurzel. Darum kannst du bei jedem Wert `ToString()` aufrufen, auch bei einem `int`. Wie ein Werttyp als `object` behandelt wird, lernst du in der letzten Lektion dieses Moduls.
+
+## Lückenbeispiel
+
+Hier zeigen `morning` und `evening` auf dasselbe Objekt. Ändere genau eine Zeile so, dass `morning` den Text `morning:` behält und `evening` den Text `morning: 3 failures` zeigt.
+
+<CSharpRunner id="m04-l01-gaps" code={separateGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Eigenes Objekt anlegen:** `var evening = new StringBuilder("morning:");` statt `var evening = morning;`.
+2. **Nur dieses ändern:** `evening.Append(" 3 failures");` ändert jetzt nur das zweite Objekt. `morning` zeigt weiter `morning:`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog ist in Methoden aufgeteilt: Es prüft eine Zeile, liest den Benutzer, gibt Benutzer und IP-Adresse zusammen zurück und zeichnet die Balken der Fehlversuche.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den letzten Block mit dem Balken aller Fehlversuche. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Ergänze als erste Zeile `using System.Text;`, noch vor der ersten Zeile mit ⋯. Füge nach dem Block *Print the bar of all failures of the sample log* einen neuen Block `// Collect the findings in one StringBuilder` ein: Lege `var findings = new StringBuilder();` an und `var sameFindings = findings;`. Hänge `"bob: 5 failed attempts"` über `sameFindings` an und gib `Findings: ` mit dem Text von `findings` aus. Die Ausgabe hat jetzt 55 Zeilen.
+
+<CSharpRunner id="m04-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Typ bekannt machen:** `using System.Text;` steht in der ersten Zeile.
+2. **Objekt erzeugen:** `new StringBuilder()` erzeugt ein Objekt, `findings` enthält den Verweis.
+3. **Verweis kopieren:** `sameFindings = findings` kopiert den Verweis, nicht das Objekt.
+4. **Über die Kopie ändern:** `sameFindings.Append(…)` ändert das eine Objekt.
+5. **Über das Original lesen:** `findings` zeigt auf dasselbe Objekt und gibt darum `bob: 5 failed attempts` aus.
+
+</details>
+
+**Neuer Stand:** SecLog sammelt einen Befund in einem `StringBuilder`-Objekt, auf das zwei Variablen zeigen.
+
+<details>
+<summary>Vertiefung: Was die Spezifikation festlegt (optional)</summary>
+
+Eine Variable eines Werttyps enthält ihre Daten direkt, eine Variable eines Referenztyps speichert einen Verweis auf ihr Objekt. Zwei Variablen können auf dasselbe Objekt zeigen, bei Werttypen hat jede Variable ihre eigene Kopie ([§8.1 Types: General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#81-general)).
+
+Die einfachen Typen sind Aliase für vordefinierte Strukturen im Namespace `System` ([§8.3.5 Simple types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#835-simple-types)).
+
+Jeder Typ stammt direkt oder indirekt von der Klasse `object` ab ([§8.2.3 The object type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#823-the-object-type)).
+</details>
+
+## Zusammenfassung
+
+Eine Variable eines Werttyps enthält den Wert, und eine Zuweisung kopiert ihn. Eine Variable eines Referenztyps enthält einen Verweis auf ein Objekt, und eine Zuweisung kopiert den Verweis. Danach zeigen beide Variablen auf dasselbe Objekt. `int` ist ein anderer Name für den Werttyp `System.Int32`, und alle Typen stammen von `object` ab. Der `StringBuilder` ist der veränderbare Referenztyp dieses Moduls.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l01-q1" />
+
+<Quiz id="m04-l01-q2" />
+
+<Quiz id="m04-l01-q3" />
+
+<Quiz id="m04-l01-q4" />
+
+<Quiz id="m04-l01-q5" />
+
+<Quiz id="m04-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Value types (C#-Referenz)](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/value-types)
+- Microsoft Learn: [StringBuilder-Klasse](https://learn.microsoft.com/dotnet/api/system.text.stringbuilder)
+- C#-Spezifikation: [§8.1 Types: General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#81-general)
