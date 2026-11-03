@@ -1,0 +1,9 @@
+two parameters: logins, 3
+[logins] 3
+two parameters: logouts, 0
+one parameter done
+[logouts] 0
+two parameters: unnamed, 0
+one parameter done
+no parameters done
+[unnamed] 0

@@ -1,4 +1,282 @@
 {
   "module": "m06",
-  "questions": []
+  "questions": [
+    {
+      "id": "m06-l01-q1",
+      "lesson": "m06-l01",
+      "type": "single",
+      "question": "Eine Datei enthält nur die Deklaration `class Counter { public int Value; }`. Wie viele Objekte der Klasse `Counter` gibt es, sobald das Programm läuft?",
+      "options": [
+        {
+          "text": "Eins, denn die Deklaration erzeugt ein Objekt.",
+          "misconception": "m06-l01-class-declaration-creates-object",
+          "feedback": "Die Deklaration beschreibt nur den Typ. Objekte entstehen erst mit `new`."
+        },
+        {
+          "text": "Keins, denn die Deklaration beschreibt nur den Typ. Objekte entstehen mit `new`.",
+          "correct": true
+        },
+        {
+          "text": "Eins pro Feld der Klasse.",
+          "feedback": "Felder gehören zu einem Objekt. Sie erzeugen keine Objekte."
+        }
+      ],
+      "explanation": "Eine Klassendeklaration beschreibt einen Typ mit Feldern und Methoden. Jedes `new Counter()` erzeugt ein Objekt mit eigenem Feld `Value`."
+    },
+    {
+      "id": "m06-l01-q2",
+      "lesson": "m06-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l01/quiz-own-fields.cs",
+      "explanation": "`x` und `y` sind zwei Objekte mit je eigenem Feld `Value`. `y.Value = x.Value` kopiert nur die Zahl 5. Die spätere Zuweisung `x.Value = 7` ändert `y` nicht."
+    },
+    {
+      "id": "m06-l01-q3",
+      "lesson": "m06-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l01/quiz-alias.cs",
+      "explanation": "`Counter q = p;` kopiert den Verweis. `p` und `q` sind dasselbe Objekt, also ändert `q.Value = 4` und danach `p.Value++` ein und dasselbe Feld: 5."
+    },
+    {
+      "id": "m06-l01-q4",
+      "lesson": "m06-l01",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0165.",
+      "example": "m06/l01/unassigned.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Diese Zeile ist gültig. Sie deklariert nur eine Variable, erzeugt aber kein Objekt.",
+          "misconception": "m06-l01-class-declaration-creates-object"
+        }
+      },
+      "explanation": "Zeile 1 deklariert nur die Variable `counter`. Sie hat noch kein Objekt. In Zeile 2 wird sie benutzt, bevor `new Counter()` ihr einen Verweis gegeben hat."
+    },
+    {
+      "id": "m06-l01-q5",
+      "lesson": "m06-l01",
+      "type": "single",
+      "question": "Es gilt `Counter x = new Counter(); Counter y = x;`. Wie viele Objekte gibt es danach, und worauf zeigen `x` und `y`?",
+      "options": [
+        {
+          "text": "Zwei Objekte: `y` bekommt eine Kopie des Objekts von `x`.",
+          "feedback": "Eine Zuweisung kopiert bei einem Referenztyp nur den Verweis."
+        },
+        {
+          "text": "Ein Objekt, auf das beide Variablen zeigen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Objekt, auf das nur `y` zeigt. `x` verweist auf nichts mehr.",
+          "feedback": "`x` behält seinen Verweis. Eine Zuweisung an `y` ändert `x` nicht."
+        }
+      ],
+      "explanation": "`new Counter()` wird nur einmal ausgeführt. `y = x` kopiert den Verweis, nicht das Objekt."
+    },
+    {
+      "id": "m06-l01-q6",
+      "lesson": "m06-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen einer Klasse und einem Objekt. Warum hat jedes Objekt eigene Felder?",
+      "modelAnswer": "Eine Klasse ist die Beschreibung eines Typs: Sie legt fest, welche Felder und Methoden es gibt. Ein Objekt entsteht erst mit `new` und ist eine Instanz dieser Klasse. Jedes `new` legt einen eigenen Satz der Felder an. Darum kann ein Objekt `Value` 2 haben und ein anderes 1."
+    },
+    {
+      "id": "m06-l01-q7",
+      "lesson": "m06-l01",
+      "type": "explain",
+      "question": "Wo in SecLog würdest du eine Klasse verwenden, und welche Felder bekäme sie? Begründe kurz, warum eine Klasse hier besser passt als mehrere einzelne Variablen.",
+      "modelAnswer": "Ein Ereignis des Logs passt zu einer Klasse `LogEvent` mit den Feldern Zeitstempel, Ereignistyp und Benutzer. Zusammengehörige Werte stehen dann in einem Objekt. Man kann es an Methoden übergeben und in einer Liste sammeln, statt viele einzelne Variablen zu pflegen."
+    },
+    {
+      "id": "m06-l02-q1",
+      "lesson": "m06-l02",
+      "type": "single",
+      "question": "Die Klasse `Counter` hat nur den Konstruktor `Counter(string name)`. Was passiert bei `new Counter()`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil es keinen Konstruktor ohne Parameter gibt.",
+          "correct": true
+        },
+        {
+          "text": "Es entsteht ein Objekt, dessen Felder die Standardwerte haben.",
+          "feedback": "Der Standardkonstruktor gibt es nur, solange die Klasse keinen eigenen Konstruktor hat."
+        },
+        {
+          "text": "Es entsteht ein Objekt, und `name` ist `null`.",
+          "feedback": "Ein Parameter ohne Argument gibt es nicht. Der Aufruf passt zu keinem Konstruktor."
+        }
+      ],
+      "explanation": "Mit dem ersten eigenen Konstruktor entfällt der Standardkonstruktor. `new Counter()` passt dann zu keinem Konstruktor."
+    },
+    {
+      "id": "m06-l02-q2",
+      "lesson": "m06-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l02/quiz-chain.cs",
+      "explanation": "`new Box()` ruft `this(1)` auf. Zuerst läuft der Rumpf des Konstruktors mit Parameter (`A`, `Size` wird 1), danach der Rumpf des Konstruktors ohne Parameter (`B`). Zuletzt gibt das Programm `Size` aus: 1."
+    },
+    {
+      "id": "m06-l02-q3",
+      "lesson": "m06-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l02/quiz-readonly.cs",
+      "explanation": "`readonly` schützt nur das Feld `Items`. Die Liste dahinter darf wachsen und schrumpfen. Nach zwei `Add` und einem `RemoveAt(0)` bleibt ein Element: `b`."
+    },
+    {
+      "id": "m06-l02-q4",
+      "lesson": "m06-l02",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0191.",
+      "example": "m06/l02/readonly-assign.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "`Add` ändert die Liste, nicht das Feld `Users`. Das ist erlaubt.",
+          "misconception": "m06-l02-readonly-object-immutable"
+        }
+      },
+      "explanation": "Zeile 3 weist dem `readonly`-Feld `Users` eine neue Liste zu, außerhalb eines Konstruktors. Zeile 2 ändert nur die Liste, auf die das Feld verweist."
+    },
+    {
+      "id": "m06-l02-q5",
+      "lesson": "m06-l02",
+      "type": "single",
+      "question": "Was unterscheidet ein `readonly`-Feld von einer Konstanten?",
+      "options": [
+        {
+          "text": "Ein `readonly`-Feld kann je Objekt einen anderen Wert haben, der im Konstruktor feststeht. Der Wert einer Konstanten steht schon beim Übersetzen fest.",
+          "correct": true
+        },
+        {
+          "text": "Ein `readonly`-Feld macht das Objekt unveränderlich, auf das es verweist. Eine Konstante nicht.",
+          "misconception": "m06-l02-readonly-object-immutable",
+          "feedback": "`readonly` schützt nur das Feld. Das Objekt dahinter bleibt veränderbar."
+        },
+        {
+          "text": "Es gibt keinen Unterschied, beide lassen sich nach dem Konstruktor nicht ändern und haben denselben Wert für alle Objekte.",
+          "feedback": "Der Wert eines `readonly`-Feldes wird erst zur Laufzeit gesetzt und kann je Objekt verschieden sein."
+        }
+      ],
+      "explanation": "Eine Konstante braucht einen Wert, den der Compiler berechnen kann. Ein `readonly`-Feld bekommt seinen Wert zur Laufzeit, bei der Deklaration oder im Konstruktor."
+    },
+    {
+      "id": "m06-l02-q6",
+      "lesson": "m06-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wozu ein Konstruktor da ist und warum `new Counter()` nach dem Schreiben eines eigenen Konstruktors mit Parametern nicht mehr geht.",
+      "modelAnswer": "Ein Konstruktor läuft bei jedem `new` und bringt das neue Objekt in einen gültigen Startzustand, zum Beispiel indem er die Felder aus seinen Parametern setzt. Ohne eigenen Konstruktor erzeugt die Sprache einen Standardkonstruktor ohne Parameter. Sobald die Klasse einen eigenen Konstruktor hat, entfällt er. Dann passt `new Counter()` zu keinem Konstruktor."
+    },
+    {
+      "id": "m06-l02-q7",
+      "lesson": "m06-l02",
+      "type": "explain",
+      "question": "Welche Felder von `LogEvent` solltest du `readonly` machen, und warum? Nenne ein Beispiel für eine Klasse, in der ein Feld nicht `readonly` sein sollte.",
+      "modelAnswer": "Zeitstempel, Ereignistyp und Benutzer beschreiben ein Ereignis, das schon passiert ist. Sie ändern sich nicht mehr, also sind sie `readonly` und werden im Konstruktor gesetzt. Ein Zähler wie `Value` in `Counter` muss dagegen wachsen und darf nicht `readonly` sein."
+    },
+    {
+      "id": "m06-l03-q1",
+      "lesson": "m06-l03",
+      "type": "single",
+      "question": "Eine Klasse hat das Feld `private int count;` und die Methode `public bool Add(int number)`. Wozu dient diese Aufteilung?",
+      "options": [
+        {
+          "text": "Nur `Add` ändert `count` und kann ungültige Zahlen ablehnen. So bleibt der Zustand des Objekts gültig.",
+          "correct": true
+        },
+        {
+          "text": "`private` macht den Zugriff auf `count` schneller als `public`.",
+          "feedback": "Der Modifizierer ändert nur, wer zugreifen darf, nicht die Geschwindigkeit."
+        },
+        {
+          "text": "`public` sorgt dafür, dass `Add` nur einmal aufgerufen werden kann.",
+          "feedback": "`public` erlaubt den Zugriff von außen. Wie oft die Methode läuft, regelt es nicht."
+        }
+      ],
+      "explanation": "Kapselung: Die Daten sind privat, und die öffentlichen Methoden prüfen jeden Wert, bevor sie ihn übernehmen."
+    },
+    {
+      "id": "m06-l03-q2",
+      "lesson": "m06-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l03/quiz-private-method.cs",
+      "explanation": "`Record` ruft die private Methode `IsValid` auf, die nur positive Zahlen zulässt. Die Zahl −1 wird nicht addiert, also ist die Summe 4 + 2 = 6."
+    },
+    {
+      "id": "m06-l03-q3",
+      "lesson": "m06-l03",
+      "type": "single",
+      "question": "In der Klasse `Counter` mit `private int value;` steht die Methode `public bool SameValueAs(Counter other) { return value == other.value; }`. Warum übersetzt `other.value`?",
+      "options": [
+        {
+          "text": "`private` beschränkt den Zugriff auf den Programmtext der Klasse. Die Methode steht in `Counter` und darf `value` jedes `Counter`-Objekts lesen.",
+          "correct": true
+        },
+        {
+          "text": "Es übersetzt nicht: `private` erlaubt nur den Zugriff auf das eigene Objekt über `this`.",
+          "misconception": "m06-l03-private-per-object",
+          "feedback": "`private` gilt für den Text der Klasse, nicht für ein einzelnes Objekt."
+        },
+        {
+          "text": "Es übersetzt, weil `other` ein Parameter ist und für Parameter kein Zugriffsschutz gilt.",
+          "feedback": "Der Schutz hängt am Member und am Ort des Zugriffs, nicht an der Art der Variable."
+        }
+      ],
+      "explanation": "Der Zugriffsbereich eines privaten Members ist der Programmtext seiner Klasse. Der Zugriff steht in dieser Klasse, also ist er erlaubt, für jedes Objekt der Klasse."
+    },
+    {
+      "id": "m06-l03-q4",
+      "lesson": "m06-l03",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0122.",
+      "example": "m06/l03/private-access.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`count` ist `private`. Zeile 2 steht außerhalb der Klasse `FailureCounter` und darf es nicht benutzen. Nur Code in der Klasse, zum Beispiel `Current()`, erreicht das Feld."
+    },
+    {
+      "id": "m06-l03-q5",
+      "lesson": "m06-l03",
+      "type": "match",
+      "question": "Ordne jedem Tag des Dokumentationskommentars seine Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "`<summary>`",
+          "right": "beschreibt das Member in einem Satz"
+        },
+        {
+          "left": "`<param name=\"…\">`",
+          "right": "beschreibt einen Parameter"
+        },
+        {
+          "left": "`<returns>`",
+          "right": "beschreibt den Rückgabewert"
+        }
+      ],
+      "explanation": "Ein Dokumentationskommentar beginnt mit `///` und steht direkt vor dem Member. `<summary>` beschreibt das Member, `<param>` jeden Parameter und `<returns>` den Rückgabewert."
+    },
+    {
+      "id": "m06-l03-q6",
+      "lesson": "m06-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Kapselung ist und warum eine Klasse ihre Daten hinter Methoden schützt.",
+      "modelAnswer": "Bei Kapselung hält eine Klasse ihre Daten in `private` Feldern. Anderer Code kommt nur über `public` Methoden heran. Diese Methoden können jeden Wert prüfen, bevor sie ihn übernehmen, und ungültige Werte ablehnen. So kann kein fremder Code das Objekt in einen ungültigen Zustand bringen."
+    },
+    {
+      "id": "m06-l03-q7",
+      "lesson": "m06-l03",
+      "type": "explain",
+      "question": "In `Incident` sind `user` und `failures` privat, `Add`, `FailureCount` und `Summary` sind öffentlich. Wo würdest du in einem eigenen Programm dasselbe Muster einsetzen, und welche Member wären dort privat?",
+      "modelAnswer": "Das Muster passt überall, wo ein Objekt Regeln für seine Daten hat. Ein Konto hat zum Beispiel ein privates Feld für den Kontostand, und öffentliche Methoden wie `Deposit` lehnen negative Beträge ab. Privat sind die Daten und Hilfsmethoden, öffentlich ist nur das, was andere Code benutzen soll."
+    }
+  ]
 }

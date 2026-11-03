@@ -3614,6 +3614,303 @@
         "title": "DateTimeOffset Struct",
         "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset"
       }
+    },
+    {
+      "id": "class",
+      "term": "Class",
+      "category": "language",
+      "definition": "Eine Klasse beschreibt einen eigenen Typ mit Feldern und Methoden. Sie ist ein Referenztyp. Erst `new` erzeugt ein Objekt dieser Klasse.",
+      "aliases": [
+        "class declaration"
+      ],
+      "related": [
+        "object",
+        "field",
+        "member",
+        "reference-type"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Classes (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#152-class-declarations"
+      }
+    },
+    {
+      "id": "instance",
+      "term": "Instance",
+      "german": "Instanz",
+      "category": "language",
+      "definition": "Ein Objekt einer Klasse, das mit `new` erzeugt wurde. Jede Instanz hat einen eigenen Satz der Instanzfelder.",
+      "aliases": [
+        "Instanzen",
+        "Exemplar"
+      ],
+      "related": [
+        "object",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Static and instance members (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members"
+      }
+    },
+    {
+      "id": "field",
+      "term": "Field",
+      "category": "language",
+      "definition": "Ein Feld ist eine Variable, die direkt in einer Klasse steht. Jedes Objekt hat seine eigene Kopie der Instanzfelder. Ohne Startwert hat ein Feld den Standardwert seines Typs.",
+      "aliases": [
+        "Instanzfeld"
+      ],
+      "related": [
+        "class",
+        "member",
+        "default-value"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#155-fields"
+      }
+    },
+    {
+      "id": "member",
+      "term": "Member",
+      "category": "language",
+      "definition": "Ein Member (Mitglied) ist alles, was im Rumpf einer Klasse steht, zum Beispiel Felder und Methoden. Du greifst mit dem Punkt darauf zu: `counter.Value`.",
+      "aliases": [
+        "Klassenmitglied"
+      ],
+      "related": [
+        "class",
+        "field",
+        "instance-method"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Class members (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#153-class-members"
+      }
+    },
+    {
+      "id": "instance-method",
+      "term": "Instance Method",
+      "german": "Instanzmethode",
+      "category": "language",
+      "definition": "Eine Methode einer Klasse, die du auf einem Objekt aufrufst, zum Beispiel `counter.Increment()`. Sie arbeitet mit den Feldern dieses Objekts.",
+      "aliases": [
+        "Instanzmethoden"
+      ],
+      "related": [
+        "method",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Methods (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156-methods"
+      }
+    },
+    {
+      "id": "object-creation",
+      "term": "Object Creation Expression",
+      "german": "Objekterzeugung",
+      "category": "language",
+      "definition": "Der Ausdruck `new Counter()` erzeugt ein neues Objekt der Klasse und liefert einen Verweis darauf. Die Felder bekommen ihre Start- oder Standardwerte.",
+      "aliases": [
+        "Objekterzeugungsausdruck"
+      ],
+      "related": [
+        "object",
+        "class",
+        "instance"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Object creation expressions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128172-object-creation-expressions"
+      }
+    },
+    {
+      "id": "constructor",
+      "term": "Constructor",
+      "german": "Konstruktor",
+      "category": "language",
+      "definition": "Eine Methode ohne Rückgabetyp mit dem Namen der Klasse. Sie läuft bei jedem `new` und bringt das neue Objekt in einen gültigen Startzustand.",
+      "aliases": [
+        "Konstruktoren",
+        "Instanzkonstruktor"
+      ],
+      "related": [
+        "default-constructor",
+        "constructor-chaining",
+        "class"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Instance constructors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1511-instance-constructors"
+      }
+    },
+    {
+      "id": "default-constructor",
+      "term": "Default Constructor",
+      "german": "Standardkonstruktor",
+      "category": "language",
+      "definition": "Der Konstruktor ohne Parameter, den eine Klasse automatisch bekommt, solange sie keinen eigenen Konstruktor deklariert. Mit einem eigenen Konstruktor entfällt er.",
+      "aliases": [
+        "Standardkonstruktoren"
+      ],
+      "related": [
+        "constructor"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Default constructors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15115-default-constructors"
+      }
+    },
+    {
+      "id": "constructor-chaining",
+      "term": "Constructor Chaining",
+      "german": "Konstruktorverkettung",
+      "category": "language",
+      "definition": "Ein Konstruktor ruft mit `: this(…)` einen anderen Konstruktor derselben Klasse auf. Der aufgerufene Konstruktor läuft zuerst, danach der Rumpf des aufrufenden.",
+      "aliases": [
+        "Verkettung von Konstruktoren",
+        "constructor initializer"
+      ],
+      "related": [
+        "constructor",
+        "overloading"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Constructor initializers (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15112-constructor-initializers"
+      }
+    },
+    {
+      "id": "this-access",
+      "term": "this",
+      "category": "language",
+      "definition": "Das Schlüsselwort `this` steht in einem Konstruktor oder einer Instanzmethode für das Objekt, das gerade läuft. `this.Name` ist das Feld `Name` dieses Objekts.",
+      "aliases": [
+        "this-Zugriff",
+        "this access"
+      ],
+      "related": [
+        "constructor",
+        "field"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "This access (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12814-this-access"
+      }
+    },
+    {
+      "id": "readonly-field",
+      "term": "Readonly Field",
+      "german": "schreibgeschütztes Feld",
+      "category": "language",
+      "definition": "Ein Feld mit `readonly`. Du darfst es nur bei der Deklaration oder in einem Konstruktor derselben Klasse setzen. Ein Objekt, auf das es verweist, bleibt veränderbar.",
+      "aliases": [
+        "readonly",
+        "readonly-Feld"
+      ],
+      "related": [
+        "field",
+        "constant",
+        "constructor"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Readonly fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15531-general"
+      }
+    },
+    {
+      "id": "encapsulation",
+      "term": "Encapsulation",
+      "german": "Kapselung",
+      "category": "language",
+      "definition": "Eine Klasse hält ihre Daten in `private` Feldern. Anderer Code erreicht sie nur über `public` Member, die Werte prüfen können. So bleibt der Zustand eines Objekts gültig.",
+      "aliases": [
+        "Datenkapselung"
+      ],
+      "related": [
+        "access-modifier",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Access modifiers (C# programming guide)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers"
+      }
+    },
+    {
+      "id": "access-modifier",
+      "term": "Access Modifier",
+      "german": "Zugriffsmodifizierer",
+      "category": "language",
+      "definition": "Ein Schlüsselwort wie `public` oder `private` vor einem Member oder Typ. Es legt fest, welcher Code darauf zugreifen darf. Ohne Modifizierer ist ein Klassenmember `private`.",
+      "aliases": [
+        "Zugriffsmodifikator",
+        "Zugriffsmodifizierer",
+        "accessibility"
+      ],
+      "related": [
+        "accessibility-domain",
+        "encapsulation"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Declared accessibility (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#742-declared-accessibility"
+      }
+    },
+    {
+      "id": "accessibility-domain",
+      "term": "Accessibility Domain",
+      "german": "Zugriffsbereich",
+      "category": "language",
+      "definition": "Die Teile des Programmtextes, in denen ein Member erreichbar ist. Bei einem `private` Member ist es der Text seiner Klasse.",
+      "aliases": [
+        "Zugriffsbereiche"
+      ],
+      "related": [
+        "access-modifier"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Accessibility domains (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#743-accessibility-domains"
+      }
+    },
+    {
+      "id": "documentation-comment",
+      "term": "Documentation Comment",
+      "german": "Dokumentationskommentar",
+      "category": "language",
+      "definition": "Ein Kommentar mit `///` direkt vor einem Typ oder Member. Sein Text ist XML mit Tags wie `<summary>`, `<param>` und `<returns>`. Editoren zeigen ihn an.",
+      "aliases": [
+        "XML-Kommentar",
+        "Dokumentationskommentare"
+      ],
+      "related": [
+        "comment",
+        "member"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Documentation comments (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction"
+      }
     }
   ]
 }

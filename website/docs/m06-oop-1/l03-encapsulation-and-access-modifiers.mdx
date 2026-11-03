@@ -1,0 +1,213 @@
+---
+title: Kapselung und Zugriffsmodifizierer
+sidebar_position: 3
+description: Mit private und public legst du fest, was andere Klassen von einer Klasse sehen. So schützt eine Klasse ihre Daten hinter Methoden.
+lesson_id: m06-l03
+duration_min: 24
+---
+
+import hiddenCount from '!!raw-loader!@site/examples/m06/l03/hidden-count.cs';
+import hiddenCountOutput from '!!raw-loader!@site/examples/m06/l03/hidden-count.out.txt';
+import privateAccess from '!!raw-loader!@site/examples/m06/l03/private-access.snippet.cs';
+import encapsulationGap from '!!raw-loader!@site/examples/m06/l03/encapsulation-gap.cs';
+import documentedClass from '!!raw-loader!@site/examples/m06/l03/documented-class.cs';
+import privatePerClass from '!!raw-loader!@site/examples/m06/l03/private-per-class.cs';
+import privatePerClassOutput from '!!raw-loader!@site/examples/m06/l03/private-per-class.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m06/l03/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l03/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l03/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l03/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Kapselung und Zugriffsmodifizierer
+
+:::note[Lernziele]
+- Du kannst mit `private` und `public` festlegen, welche Member von außen erreichbar sind.
+- Du kannst erklären, warum eine Klasse ihre Daten hinter Methoden schützt (Kapselung).
+- Du kannst öffentliche Member mit einem Dokumentationskommentar `///` beschreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l01-q5" />
+
+<Quiz id="m06-l02-q1" />
+
+<Quiz id="m03-l03-q1" />
+
+## Warum eine Klasse ihre Daten schützt
+
+Bisher waren alle Felder `public`: Jeder Code durfte sie lesen und ändern. Dann kann jeder Code ein Objekt in einen Zustand bringen, den die Klasse nie wollte, zum Beispiel einen negativen Zähler. Bei `Counter` aus Lektion 1 schreibt `counter.Value = -5;` genau das.
+
+<Term id="encapsulation">Kapselung</Term> (Encapsulation) löst das: Die Klasse hält ihre Daten in `private` Feldern. Anderer Code erreicht sie nur über `public` Methoden. Diese Methoden prüfen jeden Wert, bevor sie ihn übernehmen. So bleibt der Zustand des Objekts immer gültig.
+
+Ein <Term id="access-modifier">Zugriffsmodifizierer</Term> (Access Modifier) steht vor einem Member und legt fest, wer darauf zugreifen darf:
+
+- `public`: Jeder Code, der die Klasse sieht, darf zugreifen. Die `public` Member bilden die Schnittstelle der Klasse: das, was anderer Code von ihr benutzen darf.
+- `private`: Nur Code innerhalb der Klasse darf zugreifen.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? `Add` bekommt zuerst 3 und dann −2. Wie viele Fehlversuche zählt das Objekt am Ende?
+:::
+
+<CSharpRunner id="m06-l03-hidden" code={hiddenCount} predict expected={hiddenCountOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True False` und `3`.
+
+1. **Daten verstecken:** Das Feld `count` ist `private`. Nur die Methoden der Klasse lesen und ändern es.
+2. **Werte prüfen:** `Add` lehnt negative Zahlen ab und gibt dann `false` zurück. Der Zähler bleibt unverändert. Bei einer gültigen Zahl wächst `count`, und `Add` gibt `true` zurück.
+3. **Zustand lesen:** Von außen geht das nur über `Current()`. Ändern geht nur über `Add`.
+
+Eine Methode, die einen ungültigen Wert bekommt, meldet das in echtem Code mit einer Ausnahme.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Hier gibt `Add` stattdessen `false` zurück.
+
+</details>
+
+Greift anderer Code auf ein `private` Feld zu, übersetzt das Programm nicht:
+
+<CodeBlock language="csharp" title="private-access.snippet.cs">{privateAccess}</CodeBlock>
+
+Der Compiler meldet in Zeile 2 den Fehler CS0122: `count` ist wegen seiner Schutzstufe nicht zugänglich.
+
+## Was gilt ohne Modifizierer?
+
+Schreibst du keinen Zugriffsmodifizierer, gilt ein Standard. Member einer Klasse sind dann `private`. Typen, die direkt in einer Datei stehen (wie deine Klassen), sind `internal`. `internal` bedeutet: Zugriff im selben Projekt.
+
+<Forward concepts={['Projekte und Assemblys']} module="14" />
+
+Der Standard für Member ist die sichere Wahl, trotzdem schreibt man `private` und `public` meist ausdrücklich hin. Dann sieht man an jedem Member, wie er gemeint ist.
+
+<Forward concepts={['`protected`', 'Vererbung']} module="8" />
+
+Es gibt noch weitere Zugriffsmodifizierer, zum Beispiel `protected`, `protected internal` und `private protected`. Sie gehören zur Vererbung und kommen in Modul 8.
+
+Die Teile des Programmtextes, in denen ein Member erreichbar ist, heißen <Term id="accessibility-domain">Zugriffsbereich</Term> (Accessibility Domain). Bei einem `private` Member ist es der Text seiner Klasse. Bei einem `public` Member ist es der Zugriffsbereich der Klasse, in der er steht.
+
+<details>
+<summary>Vertiefung: Regeln in der Sprachspezifikation (optional)</summary>
+
+Ohne Modifizierer sind Klassenmember `private`, und Typen direkt in einer Kompilierungseinheit sind `internal` ([§7.4.2 Declared accessibility](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#742-declared-accessibility)). Der Zugriffsbereich eines `private` Members ist der Programmtext seines Typs ([§7.4.3 Accessibility domains](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#743-accessibility-domains)).
+
+</details>
+
+## Lückenbeispiel
+
+Der Zähler soll −2 ablehnen und bei 3 bleiben. Das Programm gibt aber `True`, `True` und `1` aus. Ändere die Methode `Add`.
+
+<CSharpRunner id="m06-l03-gaps" code={encapsulationGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `Add` übernimmt jede Zahl und gibt immer `true` zurück.
+2. **Prüfung einbauen:** Vor `count += number;` steht `if (number < 0) { return false; }`. Die Ausgabe ist `True`, `False`, `3`.
+
+</details>
+
+## Dokumentationskommentare
+
+Die Methoden und Konstruktoren, die `public` sind, benutzt anderer Code. Dort hilft ein Kommentar, der erklärt, was ein Member tut. Ein <Term id="documentation-comment">Dokumentationskommentar</Term> (Documentation Comment) beginnt mit `///` und steht direkt vor dem Member. Sein Text ist XML mit Tags:
+
+- `<summary>` beschreibt das Member in einem Satz.
+- `<param name="…">` beschreibt einen Parameter.
+- `<returns>` beschreibt den Rückgabewert.
+
+Editoren zeigen diese Texte an, wenn du einen Aufruf schreibst. Der Compiler kann sie außerdem in eine XML-Datei schreiben, das lernst du hier nur dem Namen nach kennen. Für den Compiler sind sie sonst normale Kommentare.
+
+<CSharpRunner id="m06-l03-docs" code={documentedClass} />
+
+Die Ausgabe ist `False` und `True`: 3 liegt unter der Grenze 4, 5 darüber. Beschreibe so jede Klasse und jedes `public` Member.
+
+<details>
+<summary>Vertiefung: Dokumentationskommentare in der Spezifikation (optional)</summary>
+
+Dokumentationskommentare beginnen mit `///` und stehen direkt vor dem Typ oder Member, den sie beschreiben. Der Compiler muss ihre Syntax nicht prüfen ([§D.2 Introduction](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction)). Die empfohlenen Tags stehen in [§D.3 Recommended tags](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments#d3-recommended-tags).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klasse `LogEvent` mit einem Konstruktor und `readonly` Feldern. Alle 14 Zeilen des Beispiel-Logs liegen als `LogEvent` in der Liste `logEvents`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Turn every line of the sample log into a LogEvent* mit der Liste `logEvents` und die Klasse `LogEvent`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe am Ende der Datei, nach `LogEvent`, die Klasse `Incident`. Sie hat die privaten Felder `user` (`readonly string`) und `failures` (`readonly List<LogEvent>`, Startwert `[]`) und den Konstruktor `Incident(string user)`. Die öffentliche Methode `bool Add(LogEvent logEvent)` nimmt nur Ereignisse vom Typ `login-failed` mit demselben Benutzer an (Vergleich mit `StringComparison.Ordinal`) und gibt sonst `false` zurück. Die öffentlichen Methoden `int FailureCount()` und `string Summary()` liefern die Anzahl und eine Zeile wie `Incident bob: 5 failed logins`. Die Klasse und jedes öffentliche Member bekommen einen `///`-Kommentar mit `<summary>`, bei Parametern und Rückgabewerten auch mit `<param>` und `<returns>`. Schreibe nach dem Block *Turn every line of the sample log into a LogEvent* den Block `// Collect the failed logins of bob in an incident`: Er geht durch `logEvents` und ruft für jedes Ereignis `Add` auf. Er zählt die abgelehnten Ereignisse und gibt die Zusammenfassung und diese Zahl aus (`Rejected events: 9`).
+
+<CSharpRunner id="m06-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Daten kapseln:** `user` und `failures` sind `private`. Anderer Code kann die Liste der Fehlversuche nicht verändern, ohne dass `Add` sie prüft. Der Konstruktor setzt `this.user`: `this.` ist nötig, weil Feld und Parameter denselben Namen haben.
+2. **Prüfen:** `Add` nimmt nur `login-failed` mit demselben Benutzer an. Bei jedem anderen Ereignis gibt es `false` zurück und ändert nichts.
+3. **Öffentliche Schnittstelle:** `FailureCount` und `Summary` lesen den Zustand, ohne die Liste herauszugeben.
+4. **Dokumentieren:** Jedes öffentliche Member hat einen `///`-Kommentar.
+5. **Verwenden:** Der Block zählt die Ereignisse, die `Add` ablehnt: 14 Ereignisse minus 5 Fehlversuche von `bob` sind 9.
+
+</details>
+
+**Neuer Stand:** SecLog fasst die Fehlversuche eines Benutzers in einem `Incident` zusammen. Dessen Daten sind gekapselt, und nur `Add` kann sie ändern.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l03-private-per-object" />
+
+**„`private` heißt: nur dieses eine Objekt darf auf das Feld zugreifen.“** Das stimmt nicht. `private` beschränkt den Zugriff auf den Programmtext der Klasse. Eine Methode der Klasse darf deshalb auch die privaten Felder eines anderen Objekts derselben Klasse lesen.
+:::
+
+:::info[Vorhersage]
+Was gibt das Programm aus? `SameValueAs` liest das private Feld `value` von `other`.
+:::
+
+<CSharpRunner id="m06-l03-same-class" code={privatePerClass} predict expected={privatePerClassOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True` und `False`.
+
+1. **Zugriff prüfen:** `other.value` steht im Text der Klasse `Counter`. Dort ist `value` zugänglich, auch wenn `other` ein anderes Objekt ist.
+2. **Vergleichen:** `a` und `b` haben beide 5, `a` und `c` nicht.
+
+Von außerhalb der Klasse ginge `a.value` nicht.
+
+</details>
+
+## Zusammenfassung
+
+Kapselung heißt: Eine Klasse hält ihre Daten in `private` Feldern und erlaubt den Zugriff nur über `public` Methoden, die Werte prüfen. Ohne Modifizierer sind Member `private` und Typen `internal`. Der Zugriffsbereich eines `private` Members ist der Text seiner Klasse, auch andere Objekte derselben Klasse sind dort erreichbar. Ein Dokumentationskommentar mit `///`, `<summary>`, `<param>` und `<returns>` beschreibt die öffentlichen Member.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l03-q1" />
+
+<Quiz id="m06-l03-q2" />
+
+<Quiz id="m06-l03-q3" />
+
+<Quiz id="m06-l03-q4" />
+
+<Quiz id="m06-l03-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l03-q6" />
+
+### Transferfrage
+
+<Quiz id="m06-l03-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Accessibility domains (C# specification)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#743-accessibility-domains)
+- Microsoft Learn: [Access modifiers](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers)
+- Microsoft Learn: [Documentation comments (C# specification)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments)
