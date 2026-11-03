@@ -4016,6 +4016,90 @@
         "title": "Object initializers (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1281722-object-initializers"
       }
+    },
+    {
+      "id": "auto-property",
+      "term": "Auto-Property",
+      "german": "Automatisch implementierte Eigenschaft",
+      "category": "language",
+      "definition": "Eine Eigenschaft, deren Accessoren keinen Körper haben, zum Beispiel `public int Level { get; set; }`. Der Compiler erzeugt das versteckte Hintergrundfeld und implementiert die Accessoren dafür.",
+      "aliases": [
+        "Auto-Properties",
+        "automatisch implementierte Eigenschaft"
+      ],
+      "related": [
+        "property",
+        "backing-field",
+        "accessor"
+      ],
+      "lesson": "m06-l06",
+      "source": {
+        "title": "Automatically implemented properties (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1574-automatically-implemented-properties"
+      }
+    },
+    {
+      "id": "init-accessor",
+      "term": "init Accessor",
+      "german": "init-Accessor",
+      "category": "language",
+      "definition": "Ein Accessor, der wie `set` einen Wert zuweist, aber nur beim Erzeugen des Objekts erlaubt ist, zum Beispiel im Objektinitialisierer oder im Konstruktor. Eine spätere Zuweisung ist ein Compilerfehler.",
+      "aliases": [
+        "init-Accessoren",
+        "init-Eigenschaft"
+      ],
+      "related": [
+        "accessor",
+        "object-initializer",
+        "required-member"
+      ],
+      "lesson": "m06-l06",
+      "source": {
+        "title": "Init accessors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15733-init-accessors"
+      }
+    },
+    {
+      "id": "required-member",
+      "term": "Required Member",
+      "german": "Pflicht-Member",
+      "category": "language",
+      "definition": "Ein Feld oder eine Eigenschaft mit dem Modifizierer `required`. Wer das Objekt erzeugt, muss im Objektinitialisierer einen Anfangswert angeben, sonst meldet der Compiler einen Fehler.",
+      "aliases": [
+        "required-Member",
+        "required Member",
+        "Pflicht-Member"
+      ],
+      "related": [
+        "init-accessor",
+        "object-initializer",
+        "property"
+      ],
+      "lesson": "m06-l06",
+      "source": {
+        "title": "Properties, general (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1571-general"
+      }
+    },
+    {
+      "id": "field-keyword",
+      "term": "field keyword",
+      "german": "Schlüsselwort field",
+      "category": "language",
+      "definition": "Das Schlüsselwort `field` steht im Körper eines Accessors für das vom Compiler erzeugte Hintergrundfeld der Eigenschaft. Es gibt es seit C# 14.",
+      "aliases": [
+        "field-Schlüsselwort"
+      ],
+      "related": [
+        "auto-property",
+        "backing-field",
+        "accessor"
+      ],
+      "lesson": "m06-l06",
+      "source": {
+        "title": "The field contextual keyword (C# feature specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/field-keyword"
+      }
     }
   ]
 }

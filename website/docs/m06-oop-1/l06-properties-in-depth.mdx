@@ -1,0 +1,211 @@
+---
+title: Eigenschaften im Detail
+sidebar_position: 6
+description: Automatische Eigenschaften sparen das Hintergrundfeld, init und required steuern, wann ein Wert gesetzt wird, und field baut eine Prüfung ein, ohne ein eigenes Feld zu deklarieren.
+lesson_id: m06-l06
+duration_min: 24
+---
+
+import autoProperty from '!!raw-loader!@site/examples/m06/l06/auto-property.cs';
+import autoPropertyOutput from '!!raw-loader!@site/examples/m06/l06/auto-property.out.txt';
+import initRequired from '!!raw-loader!@site/examples/m06/l06/init-required.cs';
+import initRequiredOutput from '!!raw-loader!@site/examples/m06/l06/init-required.out.txt';
+import requiredMissing from '!!raw-loader!@site/examples/m06/l06/required-missing.snippet.cs';
+import fieldKeyword from '!!raw-loader!@site/examples/m06/l06/field-keyword.cs';
+import fieldKeywordOutput from '!!raw-loader!@site/examples/m06/l06/field-keyword.out.txt';
+import fieldGap from '!!raw-loader!@site/examples/m06/l06/field-gap.cs';
+import initAssignLater from '!!raw-loader!@site/examples/m06/l06/init-assign-later.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l06/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l06/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l06/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l06/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Eigenschaften im Detail
+
+:::note[Lernziele]
+- Du kannst automatisch implementierte Eigenschaften schreiben und erklären, was der Compiler dafür erzeugt.
+- Du kannst mit `init` und `required` festlegen, wann eine Eigenschaft gesetzt werden darf oder muss.
+- Du kannst mit dem Schlüsselwort `field` eine Prüfung in eine automatische Eigenschaft einbauen.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l04-q1" />
+
+<Quiz id="m06-l05-q1" />
+
+<Quiz id="m06-l02-q5" />
+
+## Automatische Eigenschaften
+
+In Lektion 4 hast du für jede Eigenschaft ein privates Feld und zwei Accessoren geschrieben. Oft prüft der Code aber nichts: Der `get`-Accessor gibt das Feld zurück, der `set`-Accessor schreibt es. Dafür gibt es eine Kurzform. Eine <Term id="auto-property">automatisch implementierte Eigenschaft</Term> (Auto-Property) hat Accessoren ohne Körper: Statt `{ … }` steht nur ein Semikolon, zum Beispiel `{ get; set; }`.
+
+Den Rest übernimmt der Compiler. Er legt ein verstecktes <Term id="backing-field">Hintergrundfeld</Term> an und implementiert die Accessoren so, dass sie dieses Feld lesen und schreiben. Das Feld ist versteckt: Du erreichst es nur über die Eigenschaft ([§15.7.4 Automatically implemented properties](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1574-automatically-implemented-properties)).
+
+Drei Formen kommen oft vor:
+
+- `{ get; set; }` kann von außen gelesen und geschrieben werden.
+- `{ get; }` hat keinen `set`-Accessor. Der Wert wird im Konstruktor gesetzt und ändert sich danach nicht mehr, so wie bei einem `readonly`-Feld aus Lektion 2.
+- `= Wert` hinter der Eigenschaft ist ein Startwert. Er gilt, bevor ein Konstruktor etwas anderes setzt.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? `Title` hat nur `get`, `Level` hat `get` und `set`, `Source` hat nur `get` und einen Startwert.
+:::
+
+<CSharpRunner id="m06-l06-auto" code={autoProperty} predict expected={autoPropertyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Many failed logins: level 3` und `Source: manual`.
+
+1. **Konstruktor:** `Title = title;` setzt die Eigenschaft ohne `set` im Konstruktor. Das ist nur dort erlaubt.
+2. **Zuweisung:** `alert.Level = 3;` läuft über den automatischen `set`-Accessor.
+3. **Startwert:** `Source` bekommt `"manual"` und wird nirgends geändert.
+
+Was passiert, wenn du `alert.Title = "…";` außerhalb der Klasse schreibst? Der Compiler lehnt es ab, weil `Title` keinen `set`-Accessor hat.
+
+</details>
+
+## init und required
+
+Mit `{ get; }` ist ein Wert nach dem Konstruktor fest. Ein Konstruktor mit vielen Parametern ist aber unhandlich. Mit einem Objektinitialisierer aus Lektion 5 geht es kürzer, doch dafür braucht die Eigenschaft einen Accessor, der von außen zuweisen darf. `set` erlaubt das auch später. Der <Term id="init-accessor">`init`-Accessor</Term> ist die Lösung: Er weist wie `set` einen Wert zu, aber nur, solange das Objekt erzeugt wird. Das ist zum Beispiel im Objektinitialisierer und im Konstruktor der Fall ([§15.7.3.3 Init accessors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15733-init-accessors)).
+
+Mit `init` kann der Aufrufer einen Wert aber auch weglassen. Das Modifizierer-Wort `required` verhindert das. Ein <Term id="required-member">Pflicht-Member</Term> (Required Member) muss im Objektinitialisierer gesetzt werden, an der Stelle, an der das Objekt mit `new` erzeugt wird. Fehlt er, meldet der Compiler einen Fehler ([§15.7.1 Properties, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1571-general)). Ein Pflicht-Member muss mindestens so zugänglich sein wie seine Klasse.
+
+<CSharpRunner id="m06-l06-init" code={initRequired} />
+
+Die Ausgabe ist `Many failed logins: level 3` und `Disk full: level 1`.
+
+- `Title` ist `required` und `init`. Beide Objekte setzen es im Initialisierer.
+- `Level` ist `init`, aber nicht `required`. Das zweite Objekt lässt es weg, deshalb gilt der Startwert 1.
+
+Ohne `Title` im Initialisierer übersetzt das Programm nicht:
+
+<CodeBlock language="csharp" title="required-missing.snippet.cs">{requiredMissing}</CodeBlock>
+
+Die Zeile setzt nur `Level`. Der Compiler lehnt sie ab, weil das Pflicht-Member `Title` fehlt.
+
+<details>
+<summary>Vertiefung: Weitere Wege, ein init-Member zu setzen (optional)</summary>
+
+Die Erzeugungsphase eines Objekts umfasst den Objektinitialisierer, die Member-Initialisierer eines `with`-Ausdrucks, Instanzkonstruktoren auf `this` oder `base` und die `init`-Accessoren von Eigenschaften auf `this` oder `base` ([§15.7.3.3 Init accessors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15733-init-accessors)).
+
+<Forward concepts={['`with`-Ausdruck']} module="12" />
+
+Ein Konstruktor mit dem Attribut `SetsRequiredMembers` nimmt dem Aufrufer die Pflicht ab, Pflicht-Member zu setzen. Der Compiler vertraut dann darauf, dass der Konstruktor sie setzt ([§15.7.1 Properties, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1571-general)).
+
+<Forward concepts={['Attribute']} module="14" />
+
+</details>
+
+## Das Schlüsselwort field
+
+<Since csharp="14" dotnet="10" />
+
+Eine Prüfung im `set`-Accessor brauchte bisher ein eigenes privates Feld. Ab C# 14 geht es ohne. Das <Term id="field-keyword">Schlüsselwort `field`</Term> steht im Körper eines Accessors für das Hintergrundfeld, das der Compiler für die Eigenschaft erzeugt. Ein Accessor darf einen Körper haben, der andere darf ein Semikolon behalten ([field keyword](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/field-keyword)). Auch hinter dem Accessor-Block darf ein Startwert stehen. Er wird direkt in das Feld geschrieben, ohne den `set`-Accessor aufzurufen.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der `set`-Accessor nimmt nur Werte von 1 bis 3 an.
+:::
+
+<CSharpRunner id="m06-l06-field" code={fieldKeyword} predict expected={fieldKeywordOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `3`, `3` und `3`.
+
+1. **Startwert:** Der erste Zugriff liest `field`, und das ist der Startwert 1.
+2. **Gültiger Wert:** 3 liegt zwischen 1 und 3, also schreibt der `set`-Accessor `field = 3`.
+3. **Ungültige Werte:** 9 und 0 liegen außerhalb. Die `if`-Bedingung ist falsch, `field` bleibt 3.
+
+Was passiert, wenn du `get => field;` durch `get;` ersetzt? Das Programm läuft gleich. Der `get`-Accessor darf ein Semikolon behalten, weil `field` im `set` das Feld schon erzeugt.
+
+</details>
+
+`init` darf wie `set` einen Körper haben und `field` nutzen: `init => field = value > 3 ? 3 : value;`.
+
+Der Name `field` ist nur im Körper eines Accessors ein Schlüsselwort. Hast du dort eine Variable namens `field`, meldet der Compiler einen Fehler. Mit einem vorangestellten `@` (`@field`) ist es wieder ein gewöhnlicher Name ([field keyword, Breaking changes](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/field-keyword)).
+
+## Lückenbeispiel
+
+Der Titel soll ohne Leerzeichen am Rand gespeichert werden und `[Disk full]` ausgeben. Das Programm gibt `[  Disk full  ]` aus. Baue in `Title` einen `set`-Accessor mit `field` ein. Tipp: `value.Trim()` entfernt die Ränder.
+
+<CSharpRunner id="m06-l06-gaps" code={fieldGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Die Auto-Property speichert den Text unverändert.
+2. **Ergänzen:** `public string Title { get; set => field = value.Trim(); } = "";`. `get;` bleibt, nur `set` bekommt einen Körper.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klassen `LogEvent` und `Incident`. `Incident` hat das Feld `status` und die Eigenschaft `Status`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die beiden Blöcke, die einen `Incident` erzeugen, und die Klassen `LogEvent` und `Incident`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Die `public readonly` Felder von `LogEvent` werden zu Eigenschaften mit `{ get; }` (gleiche Namen, im Konstruktor gesetzt). `Incident.Status` nutzt `field` statt des Feldes `status` (gleiches Verhalten, Startwert `"open"` hinter der Eigenschaft). `Incident` bekommt `public required string Source { get; init; }` mit `///`-Kommentar. Beide `new`-Zeilen (bob und dave) setzen `Source = "sample log"` in einem Objektinitialisierer. `Summary()` hängt die Quelle in Klammern an, zum Beispiel `Incident bob: 5 failed logins (sample log)`. Schreibe danach, nach den ausgeblendeten Blöcken, den Block `// Print the source of each incident`: Er gibt `Source of bob: …` und `Source of dave: …` aus.
+
+<CSharpRunner id="m06-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Eigenschaften:** `{ get; }` ersetzt `public readonly`. Der Konstruktor setzt die Werte weiter mit `this.`.
+2. **Prüfen:** `get => field;` liest das Hintergrundfeld, `field = value;` schreibt es nach der Prüfung. `= "open"` ist der Startwert.
+3. **Pflicht:** `Source` ist `required` und `init`. Beide Zeilen mit `new` setzen es im Initialisierer.
+4. **Ausgeben:** `Summary()` und der neue Block lesen `Source`.
+
+</details>
+
+**Neuer Stand:** SecLog speichert, woher ein Vorfall stammt. Die Quelle muss beim Erzeugen angegeben werden und bleibt danach fest.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l06-init-settable-later" />
+
+**„Eine `init`-Eigenschaft kann man später wie mit `set` ändern.“** Das stimmt nicht. `init` erlaubt die Zuweisung nur, solange das Objekt erzeugt wird, zum Beispiel im Objektinitialisierer. Eine spätere Zuweisung lehnt der Compiler ab.
+:::
+
+<CodeBlock language="csharp" title="init-assign-later.snippet.cs">{initAssignLater}</CodeBlock>
+
+Die zweite Zeile ist der Fehler: Das Objekt ist schon erzeugt. Willst du den Wert später ändern, nimmst du `set` statt `init`.
+
+## Zusammenfassung
+
+Eine automatisch implementierte Eigenschaft hat Accessoren ohne Körper. Der Compiler erzeugt das versteckte Hintergrundfeld. Mit `{ get; }` setzt nur der Konstruktor den Wert, und `= Wert` gibt einen Startwert. Der `init`-Accessor erlaubt die Zuweisung nur beim Erzeugen des Objekts. `required` zwingt den erzeugenden Code, das Member im Objektinitialisierer zu setzen. Seit C# 14 steht `field` im Accessor für das Hintergrundfeld, sodass eine Prüfung ohne eigenes Feld auskommt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l06-q1" />
+
+<Quiz id="m06-l06-q2" />
+
+<Quiz id="m06-l06-q3" />
+
+<Quiz id="m06-l06-q4" />
+
+<Quiz id="m06-l06-q5" />
+
+<Quiz id="m06-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m06-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Properties](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/properties)
+- Microsoft Learn: [The field keyword](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/field-keyword)
