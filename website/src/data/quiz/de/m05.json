@@ -993,6 +993,273 @@
         }
       ],
       "explanation": "Wenn die Reihenfolge des Eintreffens gilt, ist die Queue die passende Sammlung."
+    },
+    {
+      "id": "m05-l10-q1",
+      "lesson": "m05-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l10/quiz-split.cs",
+      "explanation": "`Split(' ')` zerlegt `login-failed user=bob` an dem einen Leerzeichen in 2 Teile. `parts[1]` ist `user=bob`. `Replace` liefert davon eine neue Zeichenkette `bob`, `parts[1]` bleibt unverändert."
+    },
+    {
+      "id": "m05-l10-q2",
+      "lesson": "m05-l10",
+      "type": "single",
+      "question": "Es gilt `string text = \"alice\";`. Danach steht die Zeile `text.Replace(\"a\", \"A\");` allein. Was steht danach in `text`?",
+      "options": [
+        {
+          "text": "`alice`",
+          "correct": true,
+          "feedback": "`Replace` liefert eine neue Zeichenkette. Ohne Zuweisung geht sie verloren, `text` bleibt gleich."
+        },
+        {
+          "text": "`Alice`",
+          "feedback": "`Alice` wäre das Ergebnis von `Replace`. Es wird aber nicht zugewiesen, `text` ändert sich nicht.",
+          "misconception": "m05-l10-replace-changes-string"
+        },
+        {
+          "text": "Ein leerer Text",
+          "feedback": "`Replace` löscht den Inhalt von `text` nicht."
+        }
+      ],
+      "explanation": "Ein `string` ist unveränderlich. `Replace` liefert eine neue Zeichenkette, die du einer Variable zuweisen musst."
+    },
+    {
+      "id": "m05-l10-q3",
+      "lesson": "m05-l10",
+      "type": "single",
+      "question": "Was liefert `\"login-failed user=bob\".IndexOf(\"carol\", StringComparison.Ordinal)`?",
+      "options": [
+        {
+          "text": "`-1`",
+          "correct": true,
+          "feedback": "Wenn der Text nicht vorkommt, liefert `IndexOf` `-1`."
+        },
+        {
+          "text": "`0`",
+          "feedback": "`0` wäre die Stelle ganz vorn. Hier kommt der Text gar nicht vor."
+        },
+        {
+          "text": "`null`",
+          "feedback": "`IndexOf` liefert eine Zahl vom Typ `int`, nie `null`."
+        }
+      ],
+      "explanation": "`IndexOf` liefert den Index des ersten Treffers oder `-1`, wenn der gesuchte Text nicht vorkommt."
+    },
+    {
+      "id": "m05-l10-q4",
+      "lesson": "m05-l10",
+      "type": "single",
+      "question": "`string[] names = [\"bob\", \"dave\"];` – was liefert `string.Join(\", \", names)`?",
+      "options": [
+        {
+          "text": "`bob, dave`",
+          "correct": true,
+          "feedback": "Das Trennzeichen steht nur zwischen den Teilen."
+        },
+        {
+          "text": "`bob, dave, `",
+          "feedback": "`Join` setzt kein Trennzeichen hinter das letzte Teil."
+        },
+        {
+          "text": "`bobdave`",
+          "feedback": "Das Trennzeichen `\", \"` wird zwischen die Teile gesetzt."
+        }
+      ],
+      "explanation": "`string.Join` setzt die Teile mit dem Trennzeichen dazwischen zusammen."
+    },
+    {
+      "id": "m05-l10-q5",
+      "lesson": "m05-l10",
+      "type": "multi",
+      "question": "Welche Aussagen über den Vergleich von Texten stimmen?",
+      "options": [
+        {
+          "text": "`StringComparison.OrdinalIgnoreCase` vergleicht Zeichen für Zeichen und ignoriert Groß- und Kleinschreibung.",
+          "correct": true,
+          "feedback": "Der ordinale Vergleich nutzt keine Sprachregeln."
+        },
+        {
+          "text": "Für Bezeichner wie Ereignistypen im Log passt ein ordinaler Vergleich.",
+          "correct": true,
+          "feedback": "Solche Werte sind keine Sprache, sondern feste Zeichenfolgen."
+        },
+        {
+          "text": "Ein kulturabhängiger Vergleich passt zu Text, den Benutzer sehen.",
+          "correct": true,
+          "feedback": "Dafür gelten die Regeln der Kultur."
+        },
+        {
+          "text": "Ein ordinaler Vergleich liefert je nach eingestellter Kultur andere Ergebnisse.",
+          "feedback": "Genau das ist der Vorteil: der ordinale Vergleich hängt nicht von der Kultur ab."
+        }
+      ],
+      "explanation": "Sag den Vergleich ausdrücklich mit `StringComparison` an. Ordinal für feste Werte, kulturabhängig für Text für Benutzer."
+    },
+    {
+      "id": "m05-l10-q6",
+      "lesson": "m05-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `text.Replace(\"a\", \"b\");` allein `text` nicht ändert und wie du das Ergebnis behältst.",
+      "modelAnswer": "Ein `string` ist unveränderlich: Sein Text ändert sich nach dem Erzeugen nie. `Replace` baut deshalb eine neue Zeichenkette und liefert sie als Rückgabewert. Steht der Aufruf allein, geht dieses Ergebnis verloren.\n\nDu behältst es, indem du es zuweist: `string changed = text.Replace(\"a\", \"b\");` oder `text = text.Replace(\"a\", \"b\");`."
+    },
+    {
+      "id": "m05-l10-q7",
+      "lesson": "m05-l10",
+      "type": "single",
+      "question": "Transferfrage: SecLog liest den Ereignistyp aus einer Log-Zeile und prüft, ob er `login-failed` ist. Der Log kann `LOGIN-FAILED` schreiben. Was passt?",
+      "options": [
+        {
+          "text": "`string.Equals(type, \"login-failed\", StringComparison.OrdinalIgnoreCase)`",
+          "correct": true,
+          "feedback": "Der Ereignistyp ist ein fester Wert, kein Text für Benutzer. Ordinal ohne Beachtung der Schreibweise passt."
+        },
+        {
+          "text": "`type.Replace(\"LOGIN-FAILED\", \"login-failed\");` als einzelne Zeile",
+          "feedback": "Das Ergebnis von `Replace` geht verloren, und es ist auch kein Vergleich.",
+          "misconception": "m05-l10-replace-changes-string"
+        },
+        {
+          "text": "`type.Split(' ')` und das Ergebnis mit `login-failed` vergleichen",
+          "feedback": "`Split` liefert ein Array von Teilen, keinen Text, und prüft keine Schreibweise."
+        }
+      ],
+      "explanation": "Feste Werte wie Ereignistypen vergleichst du ordinal und mit ausdrücklichem `StringComparison`."
+    },
+    {
+      "id": "m05-l11-q1",
+      "lesson": "m05-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l11/quiz-span.cs",
+      "explanation": "Der Abstand von 09:10:09 bis 09:10:41 sind 32 Sekunden. Ein `TimeSpan` wird als `00:00:32` ausgegeben, `TotalSeconds` ist `32`. 32 Sekunden sind weniger als eine Minute, der Vergleich ist `True`."
+    },
+    {
+      "id": "m05-l11-q2",
+      "lesson": "m05-l11",
+      "type": "single",
+      "question": "Ein Entwickler schreibt Zeitstempel für Log-Einträge mit `DateTime.Now`. Was stimmt?",
+      "options": [
+        {
+          "text": "Der Wert ist die Ortszeit des Rechners und hängt von Zeitzone und Sommerzeit ab. Für Logs nimmst du UTC, zum Beispiel `DateTimeOffset.UtcNow`.",
+          "correct": true,
+          "feedback": "Zwei Rechner in verschiedenen Zeitzonen schreiben für denselben Moment verschiedene Werte."
+        },
+        {
+          "text": "Das ist für Logs richtig, weil `Now` auf allen Rechnern denselben Zeitpunkt liefert.",
+          "feedback": "`Now` liefert die Ortszeit. Sie ist auf Rechnern in verschiedenen Zeitzonen verschieden.",
+          "misconception": "m05-l11-now-for-log-timestamps"
+        },
+        {
+          "text": "Das ist für Logs richtig, solange das Programm nur in einer Zeitzone läuft.",
+          "feedback": "Auch dann springt die Ortszeit bei der Umstellung auf Sommerzeit.",
+          "misconception": "m05-l11-now-for-log-timestamps"
+        }
+      ],
+      "explanation": "Ein Log braucht Zeitpunkte, die überall dasselbe bedeuten. Das erfüllt UTC."
+    },
+    {
+      "id": "m05-l11-q3",
+      "lesson": "m05-l11",
+      "type": "single",
+      "question": "Du speicherst einen Feiertag, zum Beispiel den 1. Mai 2026, ohne Uhrzeit. Welcher Typ passt?",
+      "options": [
+        {
+          "text": "`DateOnly`",
+          "correct": true,
+          "feedback": "Er hält ein Datum ohne Uhrzeit."
+        },
+        {
+          "text": "`TimeOnly`",
+          "feedback": "Er hält eine Uhrzeit ohne Datum."
+        },
+        {
+          "text": "`TimeSpan`",
+          "feedback": "Er hält eine Zeitspanne, kein Datum."
+        }
+      ],
+      "explanation": "`DateOnly` ist für ein Datum ohne Uhrzeit gedacht, `TimeOnly` für eine Uhrzeit ohne Datum."
+    },
+    {
+      "id": "m05-l11-q4",
+      "lesson": "m05-l11",
+      "type": "single",
+      "question": "`DateTimeOffset a` und `DateTimeOffset b` sind zwei Zeitpunkte. Welchen Typ hat `b - a`?",
+      "options": [
+        {
+          "text": "`TimeSpan`",
+          "correct": true,
+          "feedback": "Die Differenz zweier Zeitpunkte ist eine Zeitspanne."
+        },
+        {
+          "text": "`DateTimeOffset`",
+          "feedback": "Eine Differenz ist kein Zeitpunkt, sondern ein Abstand."
+        },
+        {
+          "text": "`int`",
+          "feedback": "Der Abstand hat eine Einheit und ist kein bloßer `int`. Einzelne Zahlen liest du mit `TotalMinutes` ab."
+        }
+      ],
+      "explanation": "Zwei Zeitpunkte voneinander abzuziehen ergibt einen `TimeSpan`."
+    },
+    {
+      "id": "m05-l11-q5",
+      "lesson": "m05-l11",
+      "type": "multi",
+      "question": "Welche Aussagen über `DateTimeOffset` stimmen?",
+      "options": [
+        {
+          "text": "Er speichert Datum, Uhrzeit und den Versatz zur UTC.",
+          "correct": true,
+          "feedback": "Daraus ergibt sich genau ein Zeitpunkt."
+        },
+        {
+          "text": "Ein Text mit `Z` am Ende wird mit Versatz `00:00:00` gelesen.",
+          "correct": true,
+          "feedback": "`Z` steht für UTC."
+        },
+        {
+          "text": "Zwei Werte lassen sich mit `-` voneinander abziehen.",
+          "correct": true,
+          "feedback": "Das Ergebnis ist ein `TimeSpan`."
+        },
+        {
+          "text": "Er ändert seinen Wert, wenn der Rechner in eine andere Zeitzone umzieht.",
+          "feedback": "Der Wert ist ein fester Zeitpunkt und hängt nicht von der Zeitzone des Rechners ab."
+        }
+      ],
+      "explanation": "`DateTimeOffset` legt einen Zeitpunkt fest, unabhängig von der Zeitzone des Rechners."
+    },
+    {
+      "id": "m05-l11-q6",
+      "lesson": "m05-l11",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum Logs ihre Zeitstempel in UTC speichern und warum `DateTime.Now` dafür ungeeignet ist.",
+      "modelAnswer": "UTC hängt nicht von Zeitzone und Sommerzeit ab. Ein Zeitstempel in UTC bezeichnet auf jedem Rechner denselben Zeitpunkt, und man kann Einträge von verschiedenen Rechnern vergleichen und den Abstand berechnen.\n\n`DateTime.Now` liefert die Ortszeit des Rechners. Sie hängt von der Zeitzone ab und springt bei der Sommerzeit. Zwei Rechner würden für denselben Moment verschiedene Werte schreiben."
+    },
+    {
+      "id": "m05-l11-q7",
+      "lesson": "m05-l11",
+      "type": "single",
+      "question": "Transferfrage: SecLog bekommt Zeilen von zwei Servern. Der eine schreibt `2026-03-02T08:00:00Z`, der andere `2026-03-02T09:00:30+01:00`. Wie vergleichst du die Zeitpunkte richtig?",
+      "options": [
+        {
+          "text": "Beide mit `DateTimeOffset.Parse` einlesen und den Abstand als `TimeSpan` berechnen.",
+          "correct": true,
+          "feedback": "`DateTimeOffset` kennt den Versatz. Beide Zeitpunkte liegen 30 Sekunden auseinander."
+        },
+        {
+          "text": "Nur die Uhrzeit-Teile als Text vergleichen.",
+          "feedback": "Der Text `09:00:30` wäre dann später als `08:00:00`, obwohl der Abstand nur 30 Sekunden beträgt."
+        },
+        {
+          "text": "Beide mit `DateTime.Now` ersetzen.",
+          "feedback": "`Now` ist die aktuelle Zeit und hat mit den Zeitstempeln der Zeilen nichts zu tun.",
+          "misconception": "m05-l11-now-for-log-timestamps"
+        }
+      ],
+      "explanation": "Ein `DateTimeOffset` berücksichtigt den Versatz, der Abstand ist ein `TimeSpan`."
     }
   ]
 }

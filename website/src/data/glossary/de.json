@@ -3475,6 +3475,144 @@
         "title": "Collections",
         "url": "https://learn.microsoft.com/dotnet/standard/collections/"
       }
+    },
+    {
+      "id": "ordinal-comparison",
+      "term": "Ordinal Comparison",
+      "german": "ordinaler Vergleich",
+      "category": "platform",
+      "definition": "Ein Vergleich von Texten Zeichen für Zeichen anhand der Zeichenwerte, ohne Regeln einer Sprache. Er ist unabhängig von der Kultur. `StringComparison.Ordinal` unterscheidet Groß- und Kleinschreibung, `OrdinalIgnoreCase` nicht.",
+      "aliases": [
+        "ordinal",
+        "Ordinal",
+        "OrdinalIgnoreCase",
+        "StringComparison.Ordinal"
+      ],
+      "related": [
+        "culture-sensitive-comparison",
+        "culture"
+      ],
+      "lesson": "m05-l10",
+      "source": {
+        "title": "Best practices for comparing strings in .NET",
+        "url": "https://learn.microsoft.com/dotnet/standard/base-types/best-practices-strings"
+      }
+    },
+    {
+      "id": "culture-sensitive-comparison",
+      "term": "Culture-sensitive Comparison",
+      "german": "kulturabhängiger Vergleich",
+      "category": "platform",
+      "definition": "Ein Vergleich von Texten nach den Regeln einer Kultur, etwa für Sortierung und Groß-/Kleinschreibung. Das Ergebnis kann je nach Kultur verschieden sein. Er passt zu Text, den Benutzer sehen.",
+      "aliases": [
+        "kulturabhängig",
+        "CurrentCulture",
+        "StringComparison.CurrentCulture"
+      ],
+      "related": [
+        "ordinal-comparison",
+        "culture"
+      ],
+      "lesson": "m05-l10",
+      "source": {
+        "title": "Best practices for comparing strings in .NET",
+        "url": "https://learn.microsoft.com/dotnet/standard/base-types/best-practices-strings"
+      }
+    },
+    {
+      "id": "separator",
+      "term": "Separator",
+      "category": "platform",
+      "definition": "Ein Zeichen oder Text, der die Teile eines Textes trennt. `Split(' ')` zerlegt einen Text an jedem Leerzeichen, `string.Join(\", \", teile)` setzt Teile mit einem Trennzeichen zusammen.",
+      "aliases": [
+        "Separatoren",
+        "Separator"
+      ],
+      "related": [
+        "string"
+      ],
+      "lesson": "m05-l10",
+      "source": {
+        "title": "String.Split Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.string.split"
+      }
+    },
+    {
+      "id": "utc",
+      "term": "UTC",
+      "german": "koordinierte Weltzeit",
+      "category": "platform",
+      "definition": "Die Weltzeit, die nicht von Zeitzone oder Sommerzeit abhängt. Ein Zeitstempel in UTC bezeichnet auf jedem Rechner denselben Zeitpunkt. Im Log-Format des Kurses endet er mit `Z`.",
+      "aliases": [
+        "Coordinated Universal Time",
+        "Weltzeit"
+      ],
+      "related": [
+        "timestamp",
+        "date-time-offset"
+      ],
+      "lesson": "m05-l11",
+      "source": {
+        "title": "Compare types related to date and time",
+        "url": "https://learn.microsoft.com/dotnet/standard/datetime/choosing-between-datetime"
+      }
+    },
+    {
+      "id": "timestamp",
+      "term": "Timestamp",
+      "category": "platform",
+      "definition": "Die Angabe eines Zeitpunkts, die ein Log-Eintrag mitführt, zum Beispiel `2026-03-02T08:01:40Z`. Ein Programm liest sie als `DateTimeOffset` ein. Auf Deutsch: Zeitstempel.",
+      "aliases": [
+        "Timestamps"
+      ],
+      "related": [
+        "utc",
+        "date-time-offset"
+      ],
+      "lesson": "m05-l11",
+      "source": {
+        "title": "DateTimeOffset.Parse Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset.parse"
+      }
+    },
+    {
+      "id": "time-span",
+      "term": "TimeSpan",
+      "german": "Zeitspanne",
+      "category": "platform",
+      "definition": "Ein Typ für eine Zeitspanne, etwa 5 Minuten und 8 Sekunden. Die Differenz zweier Zeitpunkte ist ein `TimeSpan`. Er lässt sich mit `<=` vergleichen.",
+      "aliases": [
+        "Zeitspanne",
+        "TimeSpan"
+      ],
+      "related": [
+        "date-time-offset"
+      ],
+      "lesson": "m05-l11",
+      "source": {
+        "title": "TimeSpan Struct",
+        "url": "https://learn.microsoft.com/dotnet/api/system.timespan"
+      }
+    },
+    {
+      "id": "date-time-offset",
+      "term": "DateTimeOffset",
+      "german": "Zeitpunkt mit Versatz",
+      "category": "platform",
+      "definition": "Ein Typ für einen Zeitpunkt aus Datum, Uhrzeit und dem Versatz zur UTC. Er bezeichnet damit genau einen Zeitpunkt. Für Zeitstempel in Logs ist er die übliche Wahl.",
+      "aliases": [
+        "DateTimeOffset"
+      ],
+      "related": [
+        "utc",
+        "time-span",
+        "timestamp"
+      ],
+      "lesson": "m05-l11",
+      "source": {
+        "title": "DateTimeOffset Struct",
+        "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset"
+      }
     }
   ]
 }

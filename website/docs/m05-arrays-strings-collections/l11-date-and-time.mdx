@@ -1,0 +1,194 @@
+---
+title: Datum und Uhrzeit
+sidebar_position: 11
+description: Ein Log-Zeitstempel ist ein Zeitpunkt in UTC. Du liest ihn als DateTimeOffset, berechnest Abstände als TimeSpan und wählst den passenden Datums-Typ.
+lesson_id: m05-l11
+duration_min: 25
+---
+
+import parseTimestamp from '!!raw-loader!@site/examples/m05/l11/parse-timestamp.cs';
+import parseTimestampOutput from '!!raw-loader!@site/examples/m05/l11/parse-timestamp.out.txt';
+import timeSpan from '!!raw-loader!@site/examples/m05/l11/time-span.cs';
+import timeSpanOutput from '!!raw-loader!@site/examples/m05/l11/time-span.out.txt';
+import dateOnlyTimeOnly from '!!raw-loader!@site/examples/m05/l11/date-only-time-only.cs';
+import nowVsUtc from '!!raw-loader!@site/examples/m05/l11/now-vs-utc.snippet.cs';
+import windowGap from '!!raw-loader!@site/examples/m05/l11/window-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l11/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l11/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l11/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l11/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Datum und Uhrzeit
+
+:::note[Lernziele]
+- Du kannst einen Zeitstempel im Format des Beispiel-Logs in ein `DateTimeOffset` umwandeln und formatiert ausgeben.
+- Du kannst den Abstand zweier Zeitpunkte als `TimeSpan` berechnen und mit einer Grenze wie 10 Minuten vergleichen.
+- Du kannst begründen, warum Logs Zeitstempel in UTC speichern und warum `DateTime.Now` dafür ungeeignet ist.
+- Du kannst für eine Aufgabe zwischen `DateTime`, `DateTimeOffset`, `DateOnly`, `TimeOnly` und `TimeSpan` wählen.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l08-q6" />
+
+<Quiz id="m05-l03-q6" />
+
+<Quiz id="m05-l10-q3" />
+
+## Ein Zeitstempel ist ein Zeitpunkt
+
+Jede Zeile des Beispiel-Logs beginnt mit einem <Term id="timestamp">Zeitstempel</Term> (Timestamp) wie `2026-03-02T08:01:40Z`. Das `Z` am Ende steht für <Term id="utc">UTC</Term>, die Weltzeit. Sie hängt weder von der Zeitzone noch von der Sommerzeit ab: Auf jedem Rechner bezeichnet derselbe Zeitstempel denselben Moment.
+
+Als Text kann ein Programm damit nicht rechnen. Es liest ihn als <Term id="date-time-offset">`DateTimeOffset`</Term> ein. Der Typ speichert Datum, Uhrzeit und den Versatz (Offset) zur UTC und bezeichnet damit genau einen Zeitpunkt. `DateTimeOffset.Parse(text, CultureInfo.InvariantCulture)` liest den Text. Die <Term id="culture">Kultur</Term> `InvariantCulture` legt fest, dass keine Regeln einer Sprache gelten. Sie ist Teil von `System.Globalization`.
+
+<Forward concepts={['Namespaces', '`using`-Direktive']} module="6" />
+
+Die Ausgabe legst du mit einem Formattext fest, wie in `{rate:F1}`: `yyyy-MM-dd` ist das Datum, `HH:mm:ss` die Uhrzeit mit 24 Stunden.
+
+:::info[Vorhersage]
+Was gibt das Programm in den drei Zeilen aus? Der Text hat ein `Z` am Ende.
+:::
+
+<CSharpRunner id="m05-l11-parse" code={parseTimestamp} predict expected={parseTimestampOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2026-03-02 08:01:40`, `00:00:00`, `8`.
+
+1. **Lesen:** `Parse` macht aus dem Text einen Zeitpunkt. Das `Z` setzt den Versatz auf 0.
+2. **Formatieren:** `yyyy-MM-dd HH:mm:ss` gibt Jahr, Monat, Tag und die Uhrzeit aus.
+3. **Versatz und UTC:** `Offset` ist `00:00:00`. `UtcDateTime.Hour` ist die Stunde in UTC: 8.
+
+**Was passiert, wenn …** der Rechner in einer anderen Zeitzone läuft? Nichts: Der Zeitstempel enthält seinen Versatz, die Ausgabe bleibt gleich.
+
+</details>
+
+## Abstände mit TimeSpan
+
+Zieht man einen Zeitpunkt von einem anderen ab, entsteht ein <Term id="time-span">`TimeSpan`</Term> (Zeitspanne). `TimeSpan.FromMinutes(10)` erzeugt eine Zeitspanne von 10 Minuten. `TotalMinutes` gibt die Spanne als Zahl in Minuten an. Zeitspannen lassen sich mit `<`, `<=`, `>` und `>=` vergleichen.
+
+:::info[Vorhersage]
+Die Zeitpunkte sind der erste und der fünfte Fehlversuch von `bob` aus dem Log. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l11-span" code={timeSpan} predict expected={timeSpanOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `00:05:08`, `True`, `True`.
+
+1. **Abziehen:** `last - first` ist der Abstand von 08:01:40 bis 08:06:48, also 5 Minuten und 8 Sekunden. Ein `TimeSpan` wird als `Stunden:Minuten:Sekunden` ausgegeben.
+2. **Als Zahl:** `TotalMinutes` ist etwa 5,13, also größer als 5.
+3. **Vergleichen:** 5 Minuten 8 Sekunden sind weniger als 10 Minuten: `gap <= limit` ist `True`.
+
+</details>
+
+„5 Fehlversuche in 10 Minuten“ ist eine vereinfachte Regel zum Lernen. Echte Erkennung braucht mehr Kontext, zum Beispiel die Quelle und die Art der Anmeldung.
+
+## Welcher Typ wofür?
+
+| Typ | Passt für |
+| --- | --- |
+| `DateTimeOffset` | einen eindeutigen Zeitpunkt, zum Beispiel einen Log-Zeitstempel |
+| `DateTime` | Datum und Uhrzeit mit einem `Kind` (`Utc`, `Local` oder `Unspecified`); ohne UTC oft mehrdeutig |
+| `DateOnly` | ein Datum ohne Uhrzeit, zum Beispiel einen Feiertag |
+| `TimeOnly` | eine Uhrzeit ohne Datum, zum Beispiel eine Öffnungszeit |
+| `TimeSpan` | eine Zeitspanne, zum Beispiel den Abstand zweier Zeitpunkte |
+
+Als Standard für Zeitpunkte gilt `DateTimeOffset`. Ein `DateTime` ist nur in UTC eindeutig. Ein `DateTime` in Ortszeit hat außerhalb seiner Zeitzone mehrere mögliche Deutungen, mit `Kind` `Unspecified` ist er sogar auf demselben Rechner mehrdeutig.
+
+<CSharpRunner id="m05-l11-dateonly" code={dateOnlyTimeOnly} />
+
+Die Ausgabe ist `2026-03-02`, `2026-04-01`, `08:01:40`. `AddDays(30)` rechnet nur mit dem Datum.
+
+Umrechnungen zwischen Zeitzonen (mit `TimeZoneInfo`) und die Sommerzeit sind eine häufige Fehlerquelle. SecLog speichert deshalb UTC und rechnet nicht um.
+
+## Warum nicht DateTime.Now?
+
+`DateTime.Now` liefert die Ortszeit des Rechners. Sie hängt von der Zeitzone ab und springt bei der Umstellung auf Sommerzeit. Zwei Rechner schreiben für denselben Moment verschiedene Werte. Ein Log braucht UTC, zum Beispiel `DateTimeOffset.UtcNow`. Die aktuelle Zeit ändert sich bei jedem Lauf, darum steht dieser Code nur als Beispiel hier und läuft nicht im Runner.
+
+<CodeBlock language="csharp" title="now-vs-utc.cs">{nowVsUtc}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m05-l11-now-for-log-timestamps" />
+
+**„`DateTime.Now` ist für Zeitstempel in Logs in Ordnung, auch über Zeitzonen hinweg.“** Das stimmt nicht. `Now` ist die Ortszeit des Rechners, sie hängt von Zeitzone und Sommerzeit ab. Logs nutzen UTC, zum Beispiel `DateTimeOffset.UtcNow`.
+:::
+
+<details>
+<summary>Vertiefung: Warum ist DateTime mehrdeutig? (optional)</summary>
+
+Ein `DateTime` trägt in `Kind` nur begrenzte Information über die Zeitzone. Nur wenn es UTC darstellt, bezeichnet es auf jedem System denselben Zeitpunkt. Beim Speichern und Weitergeben von `DateTime` gilt: UTC verwenden und `Kind` auf `DateTimeKind.Utc` setzen. Details stehen in [Compare types related to date and time](https://learn.microsoft.com/dotnet/standard/datetime/choosing-between-datetime).
+
+</details>
+
+## Lückenbeispiel
+
+Die Zeilen 2 und 9 des Logs liegen 13 Minuten und 23 Sekunden auseinander. Das Programm soll prüfen, ob der Abstand höchstens 10 Minuten beträgt, gibt aber `True` aus. Ändere eine Zeile.
+
+<CSharpRunner id="m05-l11-gaps" code={windowGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `first - last` zieht den früheren vom späteren Zeitpunkt ab. Der Abstand ist negativ und damit kleiner als 10 Minuten.
+2. **Reihenfolge ändern:** `last - first` ist 13 Minuten 23 Sekunden. Der Vergleich mit 10 Minuten ist `False`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt die Ereignisse je Typ und hat die Liste `bobLines` mit den fünf fehlgeschlagenen Zeilen von `bob`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die ersten Zeilen mit `using System.Text;`, den Block *Count the events per type with Split* und die Methode `EventTypeOf`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe `using System.Globalization;` direkt nach `using System.Text;`. Schreibe nach der Methode `EventTypeOf` die lokale Methode `DateTimeOffset TimestampOf(string line) => DateTimeOffset.Parse(line.Split(' ')[0], CultureInfo.InvariantCulture);`. Schreibe nach dem Block `// Count the events per type with Split` den Block `// Find 5 failed logins within 10 minutes`: Er füllt eine `List<DateTimeOffset>` mit den Zeitstempeln von `bobLines`. Mit `TimeSpan window = TimeSpan.FromMinutes(10);` und einer `for`-Schleife prüft er, ob fünf aufeinanderfolgende Fehlversuche (Index `i` bis `i + 4`) innerhalb von `window` liegen. Wenn ja, gibt er `bob: 5 failed logins within 10 minutes (08:01:40 to 08:06:48)` aus (Format `HH:mm:ss`) und danach die Zeitspanne `00:05:08`.
+
+<CSharpRunner id="m05-l11-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Zeitstempel lesen:** `TimestampOf` zerlegt die Zeile am Leerzeichen und liest den ersten Teil als `DateTimeOffset`.
+2. **Liste füllen:** Jede Zeile von `bobLines` ergibt einen Zeitpunkt in der Liste.
+3. **Fenster prüfen:** Die Schleife läuft, solange `first + 4` noch ein gültiger Index ist. Der Abstand vom ersten zum fünften Zeitpunkt ist ein `TimeSpan`. Ist er höchstens `window`, liegen alle fünf im Fenster.
+4. **Ausgeben:** Die Uhrzeiten kommen mit `HH:mm:ss`, der Abstand ist `00:05:08`. Mit `break` endet die Schleife beim ersten Treffer.
+
+</details>
+
+**Neuer Stand:** SecLog liest Zeitstempel und findet „5 Fehlversuche in 10 Minuten“ für `bob`. Damit ist der Meilenstein dieses Moduls erreicht.
+
+## Zusammenfassung
+
+Ein Log-Zeitstempel ist ein Zeitpunkt in UTC. `DateTimeOffset.Parse` mit `CultureInfo.InvariantCulture` liest ihn, ein Formattext wie `HH:mm:ss` gibt ihn aus. Der Abstand zweier Zeitpunkte ist ein `TimeSpan`, den du mit einer Grenze vergleichst. `DateOnly` und `TimeOnly` halten nur ein Datum oder nur eine Uhrzeit. `DateTime.Now` ist die Ortszeit und für Logs ungeeignet.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l11-q1" />
+
+<Quiz id="m05-l11-q2" />
+
+<Quiz id="m05-l11-q3" />
+
+<Quiz id="m05-l11-q4" />
+
+<Quiz id="m05-l11-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l11-q6" />
+
+### Transferfrage
+
+<Quiz id="m05-l11-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Compare types related to date and time](https://learn.microsoft.com/dotnet/standard/datetime/choosing-between-datetime)
+- Microsoft Learn: [TimeSpan](https://learn.microsoft.com/dotnet/api/system.timespan)
+- Microsoft Learn: [DateTimeOffset.Parse](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.parse)
