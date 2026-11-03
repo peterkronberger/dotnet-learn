@@ -90,6 +90,96 @@
       "type": "explain",
       "question": "Wo in SecLog würdest du eine Klasse verwenden, und welche Felder bekäme sie? Begründe kurz, warum eine Klasse hier besser passt als mehrere einzelne Variablen.",
       "modelAnswer": "Ein Ereignis des Logs passt zu einer Klasse `LogEvent` mit den Feldern Zeitstempel, Ereignistyp und Benutzer. Zusammengehörige Werte stehen dann in einem Objekt. Man kann es an Methoden übergeben und in einer Liste sammeln, statt viele einzelne Variablen zu pflegen."
+    },
+    {
+      "id": "m06-l02-q1",
+      "lesson": "m06-l02",
+      "type": "single",
+      "question": "Die Klasse `Counter` hat nur den Konstruktor `Counter(string name)`. Was passiert bei `new Counter()`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil es keinen Konstruktor ohne Parameter gibt.",
+          "correct": true
+        },
+        {
+          "text": "Es entsteht ein Objekt, dessen Felder die Standardwerte haben.",
+          "feedback": "Der Standardkonstruktor gibt es nur, solange die Klasse keinen eigenen Konstruktor hat."
+        },
+        {
+          "text": "Es entsteht ein Objekt, und `name` ist `null`.",
+          "feedback": "Ein Parameter ohne Argument gibt es nicht. Der Aufruf passt zu keinem Konstruktor."
+        }
+      ],
+      "explanation": "Mit dem ersten eigenen Konstruktor entfällt der Standardkonstruktor. `new Counter()` passt dann zu keinem Konstruktor."
+    },
+    {
+      "id": "m06-l02-q2",
+      "lesson": "m06-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l02/quiz-chain.cs",
+      "explanation": "`new Box()` ruft `this(1)` auf. Zuerst läuft der Rumpf des Konstruktors mit Parameter (`A`, `Size` wird 1), danach der Rumpf des Konstruktors ohne Parameter (`B`). Zuletzt gibt das Programm `Size` aus: 1."
+    },
+    {
+      "id": "m06-l02-q3",
+      "lesson": "m06-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l02/quiz-readonly.cs",
+      "explanation": "`readonly` schützt nur das Feld `Items`. Die Liste dahinter darf wachsen und schrumpfen. Nach zwei `Add` und einem `RemoveAt(0)` bleibt ein Element: `b`."
+    },
+    {
+      "id": "m06-l02-q4",
+      "lesson": "m06-l02",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0191.",
+      "example": "m06/l02/readonly-assign.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "`Add` ändert die Liste, nicht das Feld `Users`. Das ist erlaubt.",
+          "misconception": "m06-l02-readonly-object-immutable"
+        }
+      },
+      "explanation": "Zeile 3 weist dem `readonly`-Feld `Users` eine neue Liste zu, außerhalb eines Konstruktors. Zeile 2 ändert nur die Liste, auf die das Feld verweist."
+    },
+    {
+      "id": "m06-l02-q5",
+      "lesson": "m06-l02",
+      "type": "single",
+      "question": "Was unterscheidet ein `readonly`-Feld von einer Konstanten?",
+      "options": [
+        {
+          "text": "Ein `readonly`-Feld kann je Objekt einen anderen Wert haben, der im Konstruktor feststeht. Der Wert einer Konstanten steht schon beim Übersetzen fest.",
+          "correct": true
+        },
+        {
+          "text": "Ein `readonly`-Feld macht das Objekt unveränderlich, auf das es verweist. Eine Konstante nicht.",
+          "misconception": "m06-l02-readonly-object-immutable",
+          "feedback": "`readonly` schützt nur das Feld. Das Objekt dahinter bleibt veränderbar."
+        },
+        {
+          "text": "Es gibt keinen Unterschied, beide lassen sich nach dem Konstruktor nicht ändern und haben denselben Wert für alle Objekte.",
+          "feedback": "Der Wert eines `readonly`-Feldes wird erst zur Laufzeit gesetzt und kann je Objekt verschieden sein."
+        }
+      ],
+      "explanation": "Eine Konstante braucht einen Wert, den der Compiler berechnen kann. Ein `readonly`-Feld bekommt seinen Wert zur Laufzeit, bei der Deklaration oder im Konstruktor."
+    },
+    {
+      "id": "m06-l02-q6",
+      "lesson": "m06-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wozu ein Konstruktor da ist und warum `new Counter()` nach dem Schreiben eines eigenen Konstruktors mit Parametern nicht mehr geht.",
+      "modelAnswer": "Ein Konstruktor läuft bei jedem `new` und bringt das neue Objekt in einen gültigen Startzustand, zum Beispiel indem er die Felder aus seinen Parametern setzt. Ohne eigenen Konstruktor erzeugt die Sprache einen Standardkonstruktor ohne Parameter. Sobald die Klasse einen eigenen Konstruktor hat, entfällt er. Dann passt `new Counter()` zu keinem Konstruktor."
+    },
+    {
+      "id": "m06-l02-q7",
+      "lesson": "m06-l02",
+      "type": "explain",
+      "question": "Welche Felder von `LogEvent` solltest du `readonly` machen, und warum? Nenne ein Beispiel für eine Klasse, in der ein Feld nicht `readonly` sein sollte.",
+      "modelAnswer": "Zeitstempel, Ereignistyp und Benutzer beschreiben ein Ereignis, das schon passiert ist. Sie ändern sich nicht mehr, also sind sie `readonly` und werden im Konstruktor gesetzt. Ein Zähler wie `Value` in `Counter` muss dagegen wachsen und darf nicht `readonly` sein."
     }
   ]
 }

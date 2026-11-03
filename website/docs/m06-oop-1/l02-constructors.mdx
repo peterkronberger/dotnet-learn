@@ -1,0 +1,206 @@
+---
+title: Konstruktoren
+sidebar_position: 2
+description: Ein Konstruktor bringt ein neues Objekt in einen gültigen Startzustand. Du überlädst und verkettest Konstruktoren und unterscheidet readonly-Felder von Konstanten.
+lesson_id: m06-l02
+duration_min: 24
+---
+
+import initOrder from '!!raw-loader!@site/examples/m06/l02/init-order.cs';
+import initOrderOutput from '!!raw-loader!@site/examples/m06/l02/init-order.out.txt';
+import noDefaultConstructor from '!!raw-loader!@site/examples/m06/l02/no-default-constructor.snippet.cs';
+import chained from '!!raw-loader!@site/examples/m06/l02/chained-constructors.cs';
+import chainedOutput from '!!raw-loader!@site/examples/m06/l02/chained-constructors.out.txt';
+import readonlyVsConst from '!!raw-loader!@site/examples/m06/l02/readonly-vs-const.cs';
+import readonlyList from '!!raw-loader!@site/examples/m06/l02/readonly-list.cs';
+import readonlyAssign from '!!raw-loader!@site/examples/m06/l02/readonly-assign.snippet.cs';
+import constructorGap from '!!raw-loader!@site/examples/m06/l02/constructor-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l02/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l02/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l02/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l02/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Konstruktoren
+
+:::note[Lernziele]
+- Du kannst einen Konstruktor schreiben, der ein neues Objekt in einen gültigen Startzustand bringt.
+- Du kannst Konstruktoren überladen und mit `this(…)` verketten.
+- Du kannst `readonly`-Felder und Konstanten unterscheiden.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l01-q2" />
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m01-l05-q1" />
+
+## Ein Konstruktor setzt den Startzustand
+
+Nach `new Counter()` aus der letzten Lektion hat ein Objekt nur Standardwerte: `Name` ist leer und `Value` ist 0. Für manche Klassen ist das kein gültiger Zustand. Ein <Term id="constructor">Konstruktor</Term> (Constructor) legt fest, wie ein Objekt beginnt. Er sieht aus wie eine Methode, hat aber den Namen der Klasse und keinen Rückgabetyp. Er läuft bei jedem `new`. Die Argumente von `new Counter("logins", 3)` landen in seinen Parametern.
+
+In einem Konstruktor steht <Term id="this-access">`this`</Term> für das Objekt, das gerade entsteht. `this.Name = name;` setzt das Feld `Name` dieses Objekts auf den Wert des Parameters. Ohne `this.` bedeutet `Name = name;` hier dasselbe, weil Feld und Parameter verschiedene Namen haben.
+
+Der Ablauf bei `new` hat eine feste Reihenfolge: Erst bekommen alle Felder ihren Standardwert, dann laufen die Startwerte der Felder (wie `Value = 10`), danach der Rumpf des Konstruktors.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Das Feld `Value` hat den Startwert 10. Der Konstruktor gibt `Value` am Anfang aus und setzt es dann auf `start`.
+:::
+
+<CSharpRunner id="m06-l02-order" code={initOrder} predict expected={initOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Start of constructor: Value is 10`, `End of constructor`, `[logins] 3`.
+
+1. **Startwerte zuerst:** Der Startwert `Value = 10` läuft vor dem Rumpf des Konstruktors. Darum zeigt die erste Zeile 10.
+2. **Rumpf:** Der Konstruktor setzt `Name` auf `logins` und `Value` auf 3.
+3. **Aufruf mit Argumenten:** Beim Aufruf `new Counter("logins", 3)` ist `name` der Text `logins` und `start` die Zahl 3.
+
+**Was passiert, wenn …** du `new Counter()` ohne Argumente schreibst? Das zeigt der nächste Abschnitt.
+
+</details>
+
+<details>
+<summary>Vertiefung: Reihenfolge und Konstruktor-Regeln (optional)</summary>
+
+Beim Erzeugen einer Instanz bekommen zuerst alle Instanzfelder ihren Standardwert. Danach laufen die Startwerte der Felder in der Reihenfolge, in der sie im Text stehen ([§15.5.6.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15561-general)). Der Name eines Konstruktors muss der Name seiner Klasse sein ([§15.11.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15111-general)).
+
+</details>
+
+## Der Standardkonstruktor
+
+Eine Klasse ohne Konstruktor bekommt automatisch einen <Term id="default-constructor">Standardkonstruktor</Term> (Default Constructor) ohne Parameter. Deshalb funktioniert `new Counter()` in der letzten Lektion. Sobald du einen eigenen Konstruktor schreibst, entfällt der Standardkonstruktor.
+
+<CodeBlock language="csharp" title="no-default-constructor.snippet.cs">{noDefaultConstructor}</CodeBlock>
+
+Dieser Code lässt sich nicht übersetzen. Der Compiler meldet den Fehler CS7036: Es fehlt ein Argument für den Parameter `name`. Das ist gewollt: Wer einen Konstruktor mit Parametern schreibt, will, dass jedes Objekt mit diesen Werten beginnt.
+
+## Konstruktoren überladen und verketten
+
+Eine Klasse darf mehrere Konstruktoren haben, wenn sich ihre Parameterlisten unterscheiden. Das ist das <Term id="overloading">Überladen</Term> aus Modul 3, jetzt für Konstruktoren. Beim Aufruf wählt der Compiler den Konstruktor, dessen Parameter zu den Argumenten passen.
+
+Oft wiederholen sich die Anweisungen. Mit <Term id="constructor-chaining">`: this(…)`</Term> hinter der Parameterliste ruft ein Konstruktor einen anderen Konstruktor derselben Klasse auf. Der aufgerufene Konstruktor läuft zuerst, danach der Rumpf des aufrufenden.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Verfolge den Aufruf `new Counter()` von Konstruktor zu Konstruktor.
+:::
+
+<CSharpRunner id="m06-l02-chain" code={chained} predict expected={chainedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `two parameters: logins, 3`, `[logins] 3`, `two parameters: logouts, 0`, `one parameter done`, `[logouts] 0`, `two parameters: unnamed, 0`, `one parameter done`, `no parameters done`, `[unnamed] 0`.
+
+1. **Passenden Konstruktor wählen:** Zwei Argumente passen zum Konstruktor mit zwei Parametern, ein Argument zu dem mit einem, kein Argument zu dem ohne Parameter.
+2. **Kette verfolgen:** `new Counter()` ruft `this("unnamed")` auf. Das ruft `this(name, 0)` auf. Dieser Konstruktor setzt die Felder.
+3. **Rümpfe in Reihenfolge:** Zuerst läuft der Rumpf ganz hinten in der Kette (`two parameters`), danach `one parameter done`, zuletzt `no parameters done`.
+4. **Ein Ort für die Arbeit:** Nur der Konstruktor mit zwei Parametern setzt die Felder. Die anderen geben ihm Standardwerte.
+
+</details>
+
+## readonly-Felder und Konstanten
+
+Manche Felder sollen nach dem Erzeugen nicht mehr wechseln, zum Beispiel der Benutzer eines Alarms. Mit `readonly` markierst du ein <Term id="readonly-field">schreibgeschütztes Feld</Term>. Du darfst es nur bei der Deklaration oder in einem Konstruktor derselben Klasse setzen. Jedes Objekt kann einen eigenen Wert haben, der zur Laufzeit feststeht.
+
+Eine Konstante mit `const` kennst du aus Modul 1. Ihr Wert muss beim Übersetzen feststehen. Als Member einer Klasse gilt sie für alle Objekte gleich.
+
+<CSharpRunner id="m06-l02-readonly" code={readonlyVsConst} />
+
+Die Ausgabe ist `bob: 5 of 5, alarm: True` und `dave: 1 of 5, alarm: False`. `Limit` ist für beide Alarme gleich. `User` ist je Objekt verschieden und lässt sich nach dem Konstruktor nicht mehr ändern.
+
+## Lückenbeispiel
+
+Der Zähler soll bei 3 beginnen, das Programm gibt aber `[logins] 0` aus. Ändere eine Zeile.
+
+<CSharpRunner id="m06-l02-gaps" code={constructorGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Der Konstruktor bekommt `start`, setzt `Value` aber fest auf 0.
+2. **Parameter verwenden:** Mit `Value = start;` beginnt der Zähler bei 3. Die Ausgabe ist `[logins] 3`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klasse `LogEvent` mit drei öffentlichen Feldern und der Methode `Describe`. Ein Objekt wird mit `new LogEvent()` erzeugt, und die Felder werden danach einzeln gesetzt.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Model one event of the sample log as an object*, die Methoden `EventTypeOf` und `TimestampOf` und die Klasse `LogEvent`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** `LogEvent` bekommt den Konstruktor `LogEvent(DateTimeOffset timestamp, string eventType, string? user)`, der die drei Felder mit `this.` setzt. Die Felder werden `public readonly`. Weil die Klasse jetzt einen Konstruktor hat, gibt es kein `new LogEvent()` mehr: Ändere den Block *Model one event of the sample log as an object* so, dass er den Konstruktor aufruft. Schreibe danach den Block `// Turn every line of the sample log into a LogEvent`: Er legt `List<LogEvent> logEvents = [];` an und fügt für jede Zeile von `sampleLog` ein `LogEvent` hinzu (mit `TimestampOf`, `EventTypeOf` und `FindUser`). Dann gibt er die Anzahl der Ereignisse aus (`Events: 14`) und `Describe()` des letzten Ereignisses.
+
+<CSharpRunner id="m06-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Konstruktor schreiben:** Er setzt jedes Feld aus dem passenden Parameter. Die Felder sind `readonly` und dürfen deshalb hier gesetzt werden.
+2. **Ersten Block anpassen:** `new LogEvent(…)` bekommt die drei Werte als Argumente. Die Zuweisungen einzelner Felder entfallen.
+3. **Liste füllen:** Die Schleife erzeugt für jede Zeile ein Objekt und fügt es der Liste hinzu.
+4. **Ausgeben:** `Count` ist 14, und das letzte Ereignis ist die Zeile `2026-03-02 09:30 logout alice`.
+
+Ein zweiter Konstruktor für Zeilen ohne Benutzer ist nicht nötig: Jede Zeile des Beispiel-Logs hat einen Benutzer.
+
+</details>
+
+**Neuer Stand:** SecLog erzeugt jedes `LogEvent` fertig im Konstruktor. Alle 14 Zeilen des Beispiel-Logs liegen als Objekte in einer Liste.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l02-readonly-object-immutable" />
+
+**„`readonly` macht das Objekt unveränderlich, auf das das Feld verweist.“** Das stimmt nicht. `readonly` schützt nur das Feld: Es kann nach dem Konstruktor keinen neuen Wert bekommen. Das Objekt dahinter bleibt veränderbar. Zu einer `readonly List<string>` kannst du weiter Elemente hinzufügen.
+:::
+
+<CSharpRunner id="m06-l02-readonly-list" code={readonlyList} />
+
+Die Ausgabe ist `2`: `Add` ändert die Liste, nicht das Feld `Users`. Eine neue Liste zuzuweisen geht dagegen nicht:
+
+<CodeBlock language="csharp" title="readonly-assign.snippet.cs">{readonlyAssign}</CodeBlock>
+
+Der Compiler meldet in Zeile 3 den Fehler CS0191: Ein `readonly`-Feld darf außerhalb eines Konstruktors nicht zugewiesen werden.
+
+<details>
+<summary>Vertiefung: readonly und const in der Sprache (optional)</summary>
+
+Zuweisungen an ein `readonly`-Feld sind nur bei der Deklaration oder in einem Konstruktor derselben Klasse erlaubt, sonst ist es ein Übersetzungsfehler ([§15.5.3.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15531-general)). Den Wert einer Konstanten holt der Compiler beim Übersetzen, den Wert eines `readonly`-Feldes erst die Laufzeit ([§15.5.3.3 Versioning](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15533-versioning)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Konstruktor hat den Namen der Klasse und keinen Rückgabetyp. Er läuft bei jedem `new` und bringt das Objekt in einen gültigen Startzustand. Ohne eigenen Konstruktor gibt es einen Standardkonstruktor ohne Parameter, mit eigenem nicht mehr. Konstruktoren lassen sich überladen und mit `: this(…)` verketten. `readonly`-Felder setzt nur ein Konstruktor oder ihr Startwert, aber das Objekt dahinter bleibt veränderbar. Eine Konstante steht schon beim Übersetzen fest.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l02-q1" />
+
+<Quiz id="m06-l02-q2" />
+
+<Quiz id="m06-l02-q3" />
+
+<Quiz id="m06-l02-q4" />
+
+<Quiz id="m06-l02-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l02-q6" />
+
+### Transferfrage
+
+<Quiz id="m06-l02-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Instance constructors (C# specification)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1511-instance-constructors)
+- Microsoft Learn: [Constructors (C# programming guide)](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/constructors)

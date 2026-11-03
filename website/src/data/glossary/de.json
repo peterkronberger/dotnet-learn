@@ -3733,6 +3733,105 @@
         "title": "Object creation expressions (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128172-object-creation-expressions"
       }
+    },
+    {
+      "id": "constructor",
+      "term": "Constructor",
+      "german": "Konstruktor",
+      "category": "language",
+      "definition": "Eine Methode ohne Rückgabetyp mit dem Namen der Klasse. Sie läuft bei jedem `new` und bringt das neue Objekt in einen gültigen Startzustand.",
+      "aliases": [
+        "Konstruktoren",
+        "Instanzkonstruktor"
+      ],
+      "related": [
+        "default-constructor",
+        "constructor-chaining",
+        "class"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Instance constructors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1511-instance-constructors"
+      }
+    },
+    {
+      "id": "default-constructor",
+      "term": "Default Constructor",
+      "german": "Standardkonstruktor",
+      "category": "language",
+      "definition": "Der Konstruktor ohne Parameter, den eine Klasse automatisch bekommt, solange sie keinen eigenen Konstruktor deklariert. Mit einem eigenen Konstruktor entfällt er.",
+      "aliases": [
+        "Standardkonstruktoren"
+      ],
+      "related": [
+        "constructor"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Default constructors (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15115-default-constructors"
+      }
+    },
+    {
+      "id": "constructor-chaining",
+      "term": "Constructor Chaining",
+      "german": "Konstruktorverkettung",
+      "category": "language",
+      "definition": "Ein Konstruktor ruft mit `: this(…)` einen anderen Konstruktor derselben Klasse auf. Der aufgerufene Konstruktor läuft zuerst, danach der Rumpf des aufrufenden.",
+      "aliases": [
+        "Verkettung von Konstruktoren",
+        "constructor initializer"
+      ],
+      "related": [
+        "constructor",
+        "overloading"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Constructor initializers (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15112-constructor-initializers"
+      }
+    },
+    {
+      "id": "this-access",
+      "term": "this",
+      "category": "language",
+      "definition": "Das Schlüsselwort `this` steht in einem Konstruktor oder einer Instanzmethode für das Objekt, das gerade läuft. `this.Name` ist das Feld `Name` dieses Objekts.",
+      "aliases": [
+        "this-Zugriff",
+        "this access"
+      ],
+      "related": [
+        "constructor",
+        "field"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "This access (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12814-this-access"
+      }
+    },
+    {
+      "id": "readonly-field",
+      "term": "Readonly Field",
+      "german": "schreibgeschütztes Feld",
+      "category": "language",
+      "definition": "Ein Feld mit `readonly`. Du darfst es nur bei der Deklaration oder in einem Konstruktor derselben Klasse setzen. Ein Objekt, auf das es verweist, bleibt veränderbar.",
+      "aliases": [
+        "readonly",
+        "readonly-Feld"
+      ],
+      "related": [
+        "field",
+        "constant",
+        "constructor"
+      ],
+      "lesson": "m06-l02",
+      "source": {
+        "title": "Readonly fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15531-general"
+      }
     }
   ]
 }

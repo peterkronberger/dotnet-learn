@@ -1,0 +1,3 @@
+Start of constructor: Value is 10
+End of constructor
+[logins] 3
