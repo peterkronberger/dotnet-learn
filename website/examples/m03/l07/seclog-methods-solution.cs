@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -144,11 +145,13 @@ Console.WriteLine($"Digits in IP: {digits}");
 // Print the counts and the rate with the overloaded Report.Line
 Console.WriteLine(Report.Line("Failures", failures));
 Console.WriteLine(Report.Line("Failure rate (%)", failureRate));
+// @fold-end
 // Format log lines with a method that has an optional parameter
 Console.WriteLine(FormatEvent(timestamp, eventType, "bob", ip));
 Console.WriteLine(FormatEvent(user: "carol", eventType: "logout", timestamp: "2026-03-02T08:42:11Z"));
 // Count the failed logins among the 14 event types of the sample log
 Console.WriteLine($"Failed in sample: {CountFailed("login-success", "login-failed", "login-failed", "login-success", "login-failed", "login-failed", "login-failed", "login-success", "login-failed", "login-success", "logout", "login-failed", "login-success", "logout")}");
+// @fold-start
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -214,6 +217,7 @@ string DescribeIp(string ip)
         return found;
     }
 }
+// @fold-end
 
 // Build a log line: the IP address is optional and defaults to "unknown"
 string FormatEvent(string timestamp, string eventType, string user, string ip = "unknown")

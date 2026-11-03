@@ -143,6 +143,8 @@ Beide Zeilen zeigen `10`, denn `4 + 3 + 2 + 1` ist `10`.
 
 **Stand bisher:** SecLog zeichnet das Balkendiagramm der Fehlversuche pro Benutzer mit einer inneren `for`-Schleife.
 
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: das Balkendiagramm und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
 **Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die rekursive Methode `string Bar(int count)`: Bei `count == 0` gibt sie `""` zurück, sonst `"#" + Bar(count - 1)`. Das Balkendiagramm nutzt sie statt der inneren Schleife, die Ausgabe bleibt gleich. Eine neue Zeile steht direkt nach dem Diagramm: Sie gibt den Balken aller Fehlversuche des Beispiellogs aus, `all |#######`. Die Ausgabe hat jetzt 54 Zeilen.
 
 <CSharpRunner id="m03-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
@@ -150,7 +152,7 @@ Beide Zeilen zeigen `10`, denn `4 + 3 + 2 + 1` ist `10`.
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Basisfall festlegen:** Bei `count == 0` gibt `Bar` den leeren Text zurück.
 2. **Selbstaufruf mit kleinerem Wert:** Sonst setzt `Bar` ein `#` vor das Ergebnis von `Bar(count - 1)`.

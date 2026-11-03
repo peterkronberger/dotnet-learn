@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -161,6 +162,7 @@ Console.WriteLine($"Line ok: {brokenOk}");
 // Read user and IP address together from sample line 2 and split the tuple
 var (lineUser, lineIp) = ReadUserAndIp(sampleLine);
 Console.WriteLine($"User and IP: {lineUser} {lineIp}");
+// @fold-end
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -186,6 +188,7 @@ for (int userNumber = 1; userNumber <= 4; userNumber++)
     Console.WriteLine();
 }
 
+// @fold-start
 // Rate the severity of a number of failures (the thresholds are made up)
 string RateSeverity(int failures)
 {
@@ -316,6 +319,7 @@ bool TryReadUser(string line, out string userName)
     }
     return (userName, ipText);
 }
+// @fold-end
 
 // Format a report line: the overloads choose the number format
 static class Report

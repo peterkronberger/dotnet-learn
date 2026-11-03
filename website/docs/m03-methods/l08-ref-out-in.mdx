@@ -132,6 +132,8 @@ Die Parameterarten stehen in [§15.6.2.3 By-reference parameters](https://learn.
 
 **Stand bisher:** SecLog zählt Ereignistypen mit einer `params`-Methode. Den Benutzernamen einer Logzeile liest es noch nicht aus dem Text.
 
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Zeilen mit `CountFailed`, die Methode `CountFailed` und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
 **Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `bool TryReadUser(string line, out string userName)`. Sie liest den Namen hinter `user=` aus einer Logzeile. Dazu gehst du die Zeichen mit `foreach` durch und merkst dir das aktuelle Wort, bis du `user=` erkennst. Hat die Zeile keinen `user=`-Teil, gibt sie `false` zurück und `userName` ist der leere Text. Zwei neue Zeilen kommen direkt nach der Zeile `Failed in sample: 7`: Für die Beispielzeile 2 (`2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`) gibt das Programm `User from line: bob` aus, für den Text `"broken line"` die Zeile `Line ok: False`. Die Ausgabe hat jetzt 52 Zeilen.
 
 <CSharpRunner id="m03-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
@@ -139,7 +141,7 @@ Die Parameterarten stehen in [§15.6.2.3 By-reference parameters](https://learn.
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Out-Parameter vorbelegen:** `userName = "";` steht gleich am Anfang. Damit ist der Parameter auf jedem Weg zugewiesen, auch wenn nichts gefunden wird.
 2. **Wort aufbauen und erkennen:** Solange `user=` nicht gefunden ist, wächst `word` Zeichen für Zeichen. Ein Leerzeichen setzt es zurück. Sobald `word == "user="` gilt, wird `found` wahr.

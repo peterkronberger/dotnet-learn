@@ -134,14 +134,16 @@ Die Regeln zu Gültigkeit und Verdeckung von Namen stehen in [§7.6.1 Scopes Gen
 
 **Stand bisher:** SecLog bewertet die Schwere mit `RateSeverity` und wählt das Wort mit `AttemptWord`. Ob ein Ereignis verdächtig ist, steht noch als Ausdruck im Programm.
 
-**Neue Anforderung:** Die Prüfung soll in die Methode `bool IsSuspicious(string eventType, int failures)` umziehen. Die Zeile `Suspicious: …` ruft sie mit `eventType` und `failedFromInput` auf. Eine neue Zeile prüft einen zweiten Fall: `IsSuspicious("login-success", failedFromInput)` und gibt `Suspicious for login-success: False` aus. Die Ausgabe hat jetzt 44 Zeilen.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Prüfung auf verdächtige Ereignisse und die Methode `AttemptWord`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** Die Prüfung soll in die Methode `bool IsSuspicious(string eventType, int failures)` umziehen. Die Zeile `Suspicious: …` ruft sie mit `eventType` und `failedFromInput` auf. Eine neue Zeile prüft einen zweiten Fall: `IsSuspicious("login-success", failedFromInput)` und gibt `Suspicious for login-success: False` aus. Die Methode steht am Ende der Datei, nach der Methode `AttemptWord`. Die Ausgabe hat jetzt 44 Zeilen.
 
 <CSharpRunner id="m03-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Parameter statt Variablen:** Die Methode bekommt Ereignistyp und Fehlerzahl als Parameter. Sie liest keine Variablen des Programms.
 2. **Ausdruck zurückgeben:** Der boolesche Ausdruck steht hinter `return`.

@@ -124,6 +124,8 @@ Die Regeln stehen in [§12.6.2.3 Run-time evaluation of argument lists](https://
 
 **Stand bisher:** SecLog baut die Logzeile eines Ereignisses noch als Interpolation im Hauptteil und gibt Berichtszeilen mit `Report.Line` aus.
 
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: das Einlesen von Benutzer und IP-Adresse, die Zeile mit dem Zeitstempel, die `Report.Line`-Zeilen und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
 **Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `string FormatEvent(string timestamp, string eventType, string user, string ip = "unknown")`. Direkt nach den `Report.Line`-Zeilen geben zwei neue Zeilen aus: `FormatEvent(timestamp, eventType, "bob", ip)` (dieselbe Logzeile wie bisher) und ein Aufruf mit benannten Argumenten ohne IP: `FormatEvent(user: "carol", eventType: "logout", timestamp: "2026-03-02T08:42:11Z")`. Die Ausgabe hat jetzt 49 Zeilen.
 
 Der Benutzer steht hier als Text `"bob"` im Aufruf. Die Variable `user` aus der Eingabe kannst du noch nicht übergeben. Warum, klärt Modul 4.
@@ -135,7 +137,7 @@ Der Benutzer steht hier als Text `"bob"` im Aufruf. Die Variable `user` aus der 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Methode mit Standardwert schreiben:** `ip` steht als letzter Parameter mit dem Standardwert `"unknown"`.
 2. **Vollständig aufrufen:** Der erste Aufruf übergibt alle vier Argumente und ergibt die Logzeile von Ereignis 2.

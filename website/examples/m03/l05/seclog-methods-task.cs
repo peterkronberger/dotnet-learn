@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -20,12 +21,14 @@ Console.Write("IP: ");
 Console.WriteLine(ip);
 Console.Write("Event type: ");
 Console.WriteLine(eventType);
+// @fold-end
 // Compute the failure rate of the sample log in percent
 const int events = 14;
 const int failures = 7;
 var failureRate = (failures * 100.0) / events;
 Console.Write("Failure rate (%): ");
 Console.WriteLine(failureRate);
+// @fold-start
 // Count the failed logins of bob (sample log lines 2, 3, 5, 6 and 7)
 var bobFailures = 0;
 bobFailures++;
@@ -130,6 +133,7 @@ foreach (char symbol in timestamp)
     datePart += symbol;
 }
 Console.WriteLine($"Date: {datePart}");
+// @fold-end
 // Count the digits of the IP address: skip the dots
 int digits = 0;
 foreach (char symbol in ip)
@@ -141,6 +145,7 @@ foreach (char symbol in ip)
     digits++;
 }
 Console.WriteLine($"Digits in IP: {digits}");
+// @fold-start
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -186,6 +191,7 @@ bool IsSuspicious(string eventType, int failures)
 {
     return eventType == "login-failed" && failures >= 3;
 }
+// @fold-end
 
 // Describe an IP address: the dots are counted by a static local function
 string DescribeIp(string ip)

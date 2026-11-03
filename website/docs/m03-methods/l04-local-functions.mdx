@@ -136,14 +136,16 @@ Eine lokale Funktion wird im Blockbereich deklariert. Sie darf vor ihrer Deklara
 
 **Stand bisher:** SecLog zählt die Punkte einer IP-Adresse mit einer `foreach`-Schleife im Hauptteil und prüft Ereignisse mit eigenen Methoden.
 
-**Neue Anforderung:** Am Ende der Datei steht eine neue Methode `string DescribeIp(string ip)`. Sie enthält eine statische lokale Funktion `int CountChar(string text, char wanted)`, die ein Zeichen zählt, und gibt `"<ip> has <n> dots"` zurück. Eine neue Zeile gibt `DescribeIp(ip)` direkt nach `Dots in IP:` aus. Die Schleife zum Zählen der Punkte bleibt. Die Ausgabe hat jetzt 45 Zeilen.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: das Einlesen von Benutzer und IP-Adresse, das Zählen der Punkte und die Methode `IsSuspicious`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** Am Ende der Datei, nach der Methode `IsSuspicious`, steht eine neue Methode `string DescribeIp(string ip)`. Sie enthält eine statische lokale Funktion `int CountChar(string text, char wanted)`, die ein Zeichen zählt, und gibt `"<ip> has <n> dots"` zurück. Eine neue Zeile gibt `DescribeIp(ip)` direkt nach `Dots in IP:` aus. Die Schleife zum Zählen der Punkte bleibt. Die Ausgabe hat jetzt 45 Zeilen.
 
 <CSharpRunner id="m03-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Lokale Funktion deklarieren:** `CountChar` steht im Rumpf von `DescribeIp` und ist `static`.
 2. **Nur Parameter benutzen:** `CountChar` bekommt Text und gesuchtes Zeichen als Parameter und zählt mit `foreach`.
