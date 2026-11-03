@@ -951,13 +951,15 @@
       "term": "Collection",
       "german": "Sammlung",
       "category": "language",
-      "definition": "Ein Objekt, das mehrere Elemente enthält, zum Beispiel eine Liste. Mit `foreach` gehst du alle Elemente durch.",
+      "definition": "Ein Objekt, das mehrere Elemente aufnimmt, zum Beispiel ein Array, eine Liste oder ein Dictionary. Mit `foreach` gehst du die Elemente nacheinander durch.",
       "aliases": [
-        "Collections",
-        "Sammlungen"
+        "Collections"
       ],
       "related": [
-        "loop"
+        "loop",
+        "array",
+        "list",
+        "dictionary"
       ],
       "source": {
         "title": "Collections",
@@ -3157,6 +3159,145 @@
       "source": {
         "title": "The Range type (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges#183-the-range-type"
+      }
+    },
+    {
+      "id": "list",
+      "term": "List<T>",
+      "category": "language",
+      "definition": "Eine `List<T>` ist eine Sammlung, die wächst und schrumpft. Du hängst Elemente an, fügst sie ein oder entfernst sie, und `Count` zeigt die aktuelle Anzahl. Eine Liste ist ein Referenztyp.",
+      "aliases": [
+        "Listen"
+      ],
+      "related": [
+        "collection",
+        "array",
+        "type-argument",
+        "reference-type"
+      ],
+      "lesson": "m05-l04",
+      "source": {
+        "title": "List<T> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1"
+      }
+    },
+    {
+      "id": "type-argument",
+      "term": "Type Argument",
+      "german": "Typargument",
+      "category": "language",
+      "definition": "Die Angabe in spitzen Klammern, zum Beispiel `string` in `List<string>`. Sie sagt, welchen Typ die Elemente der Sammlung haben.",
+      "aliases": [
+        "Typargumente"
+      ],
+      "related": [
+        "list",
+        "dictionary"
+      ],
+      "lesson": "m05-l04",
+      "source": {
+        "title": "Generics overview",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
+      }
+    },
+    {
+      "id": "enumerator",
+      "term": "Enumerator",
+      "german": "Aufzähler",
+      "category": "language",
+      "definition": "Ein Objekt, das die Elemente einer Sammlung nacheinander liefert. `MoveNext` geht zum nächsten Element weiter, `Current` liefert es. `foreach` benutzt einen Enumerator.",
+      "aliases": [
+        "Enumeratoren",
+        "GetEnumerator"
+      ],
+      "related": [
+        "collection",
+        "iteration-variable"
+      ],
+      "lesson": "m05-l05",
+      "source": {
+        "title": "The foreach statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1395-the-foreach-statement"
+      }
+    },
+    {
+      "id": "iteration-variable",
+      "term": "Iteration Variable",
+      "german": "Iterationsvariable",
+      "category": "language",
+      "definition": "Die Variable im Kopf von `foreach`. Sie hält in jedem Durchlauf das aktuelle Element und kann im Block nur gelesen, nicht zugewiesen werden.",
+      "aliases": [
+        "Iterationsvariablen"
+      ],
+      "related": [
+        "loop-variable",
+        "enumerator"
+      ],
+      "lesson": "m05-l05",
+      "source": {
+        "title": "The foreach statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1395-the-foreach-statement"
+      }
+    },
+    {
+      "id": "dictionary",
+      "term": "Dictionary",
+      "german": "Wörterbuch",
+      "category": "language",
+      "definition": "Ein `Dictionary<TKey, TValue>` ordnet jedem eindeutigen Schlüssel einen Wert zu. Über den Schlüssel liest und speichert man Werte. Die Reihenfolge der Einträge ist nicht festgelegt.",
+      "aliases": [
+        "Dictionaries",
+        "Wörterbücher"
+      ],
+      "related": [
+        "key",
+        "key-value-pair",
+        "collection"
+      ],
+      "lesson": "m05-l06",
+      "source": {
+        "title": "Dictionary<TKey,TValue> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2"
+      }
+    },
+    {
+      "id": "key",
+      "term": "Key",
+      "german": "Schlüssel",
+      "category": "language",
+      "definition": "Der eindeutige Wert, mit dem ein `Dictionary` einen Eintrag findet. Jeder Schlüssel kommt höchstens einmal vor.",
+      "aliases": [
+        "Schlüssel",
+        "Keys"
+      ],
+      "related": [
+        "dictionary",
+        "key-value-pair"
+      ],
+      "lesson": "m05-l06",
+      "source": {
+        "title": "Dictionary<TKey,TValue> Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2"
+      }
+    },
+    {
+      "id": "key-value-pair",
+      "term": "Key-Value Pair",
+      "german": "Schlüssel-Wert-Paar",
+      "category": "language",
+      "definition": "Ein Eintrag eines `Dictionary`: ein Schlüssel und der zugehörige Wert. In `foreach` liefert jeder Durchlauf ein `KeyValuePair<TKey, TValue>` mit `Key` und `Value`.",
+      "aliases": [
+        "Schlüssel-Wert-Paare",
+        "KeyValuePair"
+      ],
+      "related": [
+        "dictionary",
+        "key"
+      ],
+      "lesson": "m05-l06",
+      "source": {
+        "title": "KeyValuePair<TKey,TValue> Struct",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.keyvaluepair-2"
       }
     }
   ]

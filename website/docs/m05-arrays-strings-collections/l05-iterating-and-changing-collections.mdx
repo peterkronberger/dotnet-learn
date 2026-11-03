@@ -1,0 +1,170 @@
+---
+title: Sammlungen durchlaufen und ändern
+sidebar_position: 5
+description: foreach holt die Elemente über einen Enumerator, seine Variable ist schreibgeschützt, und eine Liste darf während des foreach nicht geändert werden.
+lesson_id: m05-l05
+duration_min: 20
+---
+
+import enumeratorByHand from '!!raw-loader!@site/examples/m05/l05/enumerator-by-hand.cs';
+import removeBackwards from '!!raw-loader!@site/examples/m05/l05/remove-backwards.cs';
+import removeBackwardsOutput from '!!raw-loader!@site/examples/m05/l05/remove-backwards.out.txt';
+import forwardRemoveSkips from '!!raw-loader!@site/examples/m05/l05/forward-remove-skips.cs';
+import changeInForeach from '!!raw-loader!@site/examples/m05/l05/change-in-foreach.snippet.cs';
+import assignIterationVariable from '!!raw-loader!@site/examples/m05/l05/assign-iteration-variable.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l05/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l05/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l05/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l05/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Sammlungen durchlaufen und ändern
+
+:::note[Lernziele]
+- Du kannst erklären, wie `foreach` mit `GetEnumerator`, `MoveNext` und `Current` die Elemente holt.
+- Du kannst begründen, warum die Iterationsvariable von `foreach` nur gelesen werden kann.
+- Du kannst Elemente sicher aus einer Liste entfernen (rückwärts mit `for` oder über eine zweite Liste).
+:::
+
+## Rückblick
+
+<Quiz id="m02-l07-q5" />
+
+<Quiz id="m05-l04-q2" />
+
+<Quiz id="m02-l07-q2" />
+
+## Wie foreach die Elemente holt
+
+`foreach` kennst du von Texten und Arrays. Es funktioniert bei jeder <Term id="collection">Sammlung</Term>, die einen <Term id="enumerator">Enumerator</Term> liefert. Das ist ein Objekt, das die Elemente nacheinander herausgibt. Der Ablauf hat drei Teile:
+
+1. `GetEnumerator()` liefert den Enumerator der Sammlung.
+2. `MoveNext()` geht zum nächsten Element weiter. Es liefert `true`, wenn es ein Element gibt, und `false`, wenn die Sammlung zu Ende ist.
+3. `Current` liefert das Element, bei dem der Enumerator gerade steht.
+
+`foreach` ruft vor jedem Durchlauf `MoveNext` auf. Gibt es `true` zurück, steht `Current` in der <Term id="iteration-variable">Iterationsvariable</Term>, und der Block läuft. Bei `false` endet die Schleife. Das Programm unten macht dasselbe von Hand und danach mit `foreach`.
+
+<CSharpRunner id="m05-l05-enumerator" code={enumeratorByHand} />
+
+Die Ausgabe ist zweimal `alice`, `bob`: einmal von Hand, einmal mit `foreach`.
+
+## Die Iterationsvariable ist schreibgeschützt
+
+Die Variable im Kopf von `foreach` (`user` im Beispiel) hält das Element, das der Enumerator liefert. Im Block kannst du sie nur lesen. Eine Zuweisung übersetzt der Compiler nicht. Das hast du bei `foreach` über einen Text schon gesehen, und es gilt bei jeder Sammlung. Das Programm unten ist also falsch, der Compiler meldet `CS1656`: „Cannot assign to 'user' because it is a 'foreach iteration variable'“.
+
+<CodeBlock language="csharp" title="assign-iteration-variable.cs">{assignIterationVariable}</CodeBlock>
+
+Hätte die Zuweisung eine Wirkung, würde sie nur die Variable ändern, nicht die Sammlung. Willst du ein Element ersetzen, brauchst du den Index: `users[i] = "carol";` in einer `for`-Schleife.
+
+## Eine Liste während foreach ändern
+
+Der Enumerator merkt sich, wie die Liste beim Start aussah. Fügst du während des `foreach` ein Element hinzu oder entfernst eins, ist der Enumerator ungültig. Der nächste Aufruf von `MoveNext` bricht das Programm ab.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Das Programm unten bricht in Zeile 6 mit der `System.InvalidOperationException` ab, sobald `foreach` das nächste Element holen will. Die Meldung lautet: „Collection was modified; enumeration operation may not execute.“
+
+<CodeBlock language="csharp" title="change-in-foreach.cs">{changeInForeach}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m05-l05-change-list-in-foreach" />
+
+**„In einem `foreach` über eine Liste darf ich Elemente aus derselben Liste entfernen.“** Das stimmt nicht. Eine Änderung macht den Enumerator ungültig, und das Programm bricht ab. Entferne stattdessen rückwärts mit `for` und `RemoveAt`, oder sammle die Elemente zuerst in einer zweiten Liste und entferne sie nach der Schleife.
+:::
+
+## Sicher entfernen: rückwärts
+
+Beim Entfernen rücken die Elemente hinter dem entfernten eine Stelle nach vorn. Läuft die Schleife von hinten nach vorn, betrifft das nur Elemente, die sie schon besucht hat. Die noch nicht besuchten behalten ihren Index.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l05-backwards" code={removeBackwards} predict expected={removeBackwardsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2`, `alice`, `carol`.
+
+1. **Start:** Die Schleife beginnt bei `Count - 1`, also Index 3 (`carol`). Das ist nicht `bob`.
+2. **Entfernen:** Bei Index 2 steht `bob`, `RemoveAt(2)` entfernt es. Die Indizes 0 und 1 bleiben, wie sie sind.
+3. **Weiter:** Index 1 ist `alice`, Index 0 ist `bob` und wird entfernt. Übrig sind `alice` und `carol`.
+
+**Was passiert, wenn du vorwärts gehst?** Das zeigt die nächste Aufgabe.
+
+</details>
+
+## Lückenbeispiel
+
+Die Schleife soll alle `bob` entfernen. Sie läuft vorwärts und lässt einen übrig. Mache sie rückwärts.
+
+<CSharpRunner id="m05-l05-gaps" code={forwardRemoveSkips} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Das erste `bob` steht an Index 0 und wird entfernt. Das zweite `bob` rückt auf Index 0, aber `i` ist schon 1. Die Schleife überspringt es. Das ist ein Off-by-one-Fehler wie in der Lektion über `for`.
+2. **Ändern:** `for (int i = users.Count - 1; i >= 0; i--)` geht rückwärts. Dann bleibt nur `alice` übrig, `Count` ist 1.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog sammelt die 7 fehlgeschlagenen Zeilen des Beispiel-Logs in der Liste `failedLines`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Collect the failed lines of the sample log in a list*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Collect the failed lines of the sample log in a list* den Block `// Keep only the failed lines of bob`. Lege mit `List<string> bobLines = new List<string>(failedLines);` eine Kopie an: Dieser Konstruktor erzeugt eine neue Liste mit denselben Elementen. Gehe dann mit `for` **rückwärts** durch `bobLines` und rufe `bobLines.RemoveAt(i)` auf, wenn `FindUser(bobLines[i]) != "bob"` gilt. Gib `Failed lines of bob: 5` aus und `Failed lines in total: 7` mit `failedLines.Count`.
+
+<CSharpRunner id="m05-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Kopieren:** `new List<string>(failedLines)` ist ein neues Listenobjekt. Eine Zuweisung `bobLines = failedLines` würde nur den Verweis kopieren, beide Variablen zeigten auf dieselbe Liste.
+2. **Rückwärts durchlaufen:** Die Schleife beginnt bei `Count - 1` und endet bei Index 0.
+3. **Entfernen:** Zeilen, deren Benutzer nicht `bob` ist, fliegen mit `RemoveAt(i)` raus. Es bleiben 5 Zeilen.
+4. **Original prüfen:** `failedLines.Count` ist weiter 7, denn die Kopie ist ein eigenes Objekt.
+
+</details>
+
+**Neuer Stand:** SecLog filtert die Fehlversuche eines Benutzers aus der Liste, ohne die Originalliste zu verändern.
+
+<details>
+<summary>Vertiefung: Das foreach-Muster (optional)</summary>
+
+`foreach` braucht einen Typ mit einer Methode `GetEnumerator`, deren Ergebnis `MoveNext` und `Current` hat. Der Compiler erzeugt aus der Schleife einen Aufruf von `GetEnumerator`, eine Schleife über `MoveNext` und ein Lesen von `Current`. Die Iterationsvariable ist schreibgeschützt ([§13.9.5 The foreach statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1395-the-foreach-statement)).
+
+Für `List<T>` gilt zusätzlich eine Regel der Bibliothek: Ändert sich die Sammlung nach dem Erzeugen des Enumerators, ist er ungültig, und der nächste `MoveNext` löst eine `InvalidOperationException` aus ([List&lt;T&gt;.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.getenumerator#remarks)).
+
+</details>
+
+## Zusammenfassung
+
+`foreach` holt die Elemente über einen Enumerator: `GetEnumerator`, vor jedem Durchlauf `MoveNext`, dann `Current`. Die Iterationsvariable kann nur gelesen werden. Ändert sich eine Liste während des `foreach`, ist der Enumerator ungültig und das Programm bricht ab. Sicher entfernst du rückwärts mit `for` und `RemoveAt` oder über eine zweite Liste.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l05-q1" />
+
+<Quiz id="m05-l05-q2" />
+
+<Quiz id="m05-l05-q3" />
+
+<Quiz id="m05-l05-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l05-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l05-q6" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§13.9.5 The foreach statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1395-the-foreach-statement)
+- Microsoft Learn: [List&lt;T&gt;.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.getenumerator)

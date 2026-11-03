@@ -7,9 +7,20 @@
       "type": "single",
       "question": "Es gilt `string[] users = { \"alice\", \"bob\", \"carol\" };`. Welches Element liefert `users[1]`?",
       "options": [
-        { "text": "`\"alice\"`", "misconception": "m05-l01-index-starts-at-one", "feedback": "Der Index beginnt bei 0. `users[0]` ist `\"alice\"`, `users[1]` ist das zweite Element." },
-        { "text": "`\"bob\"`", "correct": true, "feedback": "Der Index zählt ab 0. Index 1 ist darum das zweite Element." },
-        { "text": "`\"carol\"`", "feedback": "`\"carol\"` hat den Index 2, denn der Index beginnt bei 0." }
+        {
+          "text": "`\"alice\"`",
+          "misconception": "m05-l01-index-starts-at-one",
+          "feedback": "Der Index beginnt bei 0. `users[0]` ist `\"alice\"`, `users[1]` ist das zweite Element."
+        },
+        {
+          "text": "`\"bob\"`",
+          "correct": true,
+          "feedback": "Der Index zählt ab 0. Index 1 ist darum das zweite Element."
+        },
+        {
+          "text": "`\"carol\"`",
+          "feedback": "`\"carol\"` hat den Index 2, denn der Index beginnt bei 0."
+        }
       ],
       "explanation": "Das erste Element hat den Index 0, das zweite den Index 1, das dritte den Index 2. Der letzte Index eines Arrays ist `Length - 1`."
     },
@@ -27,9 +38,20 @@
       "type": "single",
       "question": "Ein Array hat die Länge 4. Welcher Index ist der größte gültige?",
       "options": [
-        { "text": "4", "misconception": "m05-l01-index-starts-at-one", "feedback": "Bei der Länge 4 gibt es die Indizes 0, 1, 2 und 3. Der Index 4 liegt außerhalb und lässt das Programm zur Laufzeit abbrechen." },
-        { "text": "3", "correct": true, "feedback": "Der letzte Index ist `Length - 1`, hier also 3." },
-        { "text": "5", "feedback": "5 liegt noch weiter außerhalb. Gültig sind 0 bis 3." }
+        {
+          "text": "4",
+          "misconception": "m05-l01-index-starts-at-one",
+          "feedback": "Bei der Länge 4 gibt es die Indizes 0, 1, 2 und 3. Der Index 4 liegt außerhalb und lässt das Programm zur Laufzeit abbrechen."
+        },
+        {
+          "text": "3",
+          "correct": true,
+          "feedback": "Der letzte Index ist `Length - 1`, hier also 3."
+        },
+        {
+          "text": "5",
+          "feedback": "5 liegt noch weiter außerhalb. Gültig sind 0 bis 3."
+        }
       ],
       "explanation": "Die Indizes laufen von 0 bis `Length - 1`. Ein Array der Länge 4 hat darum die Indizes 0, 1, 2 und 3."
     },
@@ -39,10 +61,25 @@
       "type": "multi",
       "question": "Welche Aussagen über `int[] counts = new int[3];` stimmen?",
       "options": [
-        { "text": "Das Array hat 3 Elemente.", "correct": true, "feedback": "`new int[3]` legt 3 Elemente an." },
-        { "text": "Jedes Element hat zuerst den Wert `0`.", "correct": true, "feedback": "Neu angelegte Elemente bekommen den Standardwert ihres Typs, bei `int` also `0`." },
-        { "text": "Das Array wächst von selbst, wenn du `counts[3]` schreibst.", "feedback": "Die Länge steht beim Erzeugen fest. Ein Zugriff auf `counts[3]` liegt außerhalb und bricht das Programm zur Laufzeit ab." },
-        { "text": "Das erste Element ist `counts[1]`.", "misconception": "m05-l01-index-starts-at-one", "feedback": "Das erste Element hat den Index 0." }
+        {
+          "text": "Das Array hat 3 Elemente.",
+          "correct": true,
+          "feedback": "`new int[3]` legt 3 Elemente an."
+        },
+        {
+          "text": "Jedes Element hat zuerst den Wert `0`.",
+          "correct": true,
+          "feedback": "Neu angelegte Elemente bekommen den Standardwert ihres Typs, bei `int` also `0`."
+        },
+        {
+          "text": "Das Array wächst von selbst, wenn du `counts[3]` schreibst.",
+          "feedback": "Die Länge steht beim Erzeugen fest. Ein Zugriff auf `counts[3]` liegt außerhalb und bricht das Programm zur Laufzeit ab."
+        },
+        {
+          "text": "Das erste Element ist `counts[1]`.",
+          "misconception": "m05-l01-index-starts-at-one",
+          "feedback": "Das erste Element hat den Index 0."
+        }
       ],
       "explanation": "Die Länge eines Arrays steht beim Erzeugen fest. Die Elemente starten mit dem Standardwert des Elementtyps. Gezählt wird ab 0."
     },
@@ -59,9 +96,19 @@
       "type": "single",
       "question": "Transferfrage: SecLog hält die 14 Zeilen des Beispiel-Logs. Wann ist dafür ein Array passend?",
       "options": [
-        { "text": "Wenn die Anzahl der Zeilen beim Anlegen feststeht und du sie über den Index erreichen willst.", "correct": true, "feedback": "Genau dafür sind Arrays gedacht: feste Länge, Zugriff über den Index." },
-        { "text": "Wenn laufend neue Zeilen dazukommen sollen, ohne dass du die Länge vorher kennst.", "feedback": "Die Länge eines Arrays ändert sich nicht. Für wachsende Daten gibt es andere Sammlungen, die später im Modul folgen." },
-        { "text": "Wenn du ein einzelnes Wort speichern willst.", "feedback": "Für ein einzelnes Wort genügt eine Variable vom Typ `string`." }
+        {
+          "text": "Wenn die Anzahl der Zeilen beim Anlegen feststeht und du sie über den Index erreichen willst.",
+          "correct": true,
+          "feedback": "Genau dafür sind Arrays gedacht: feste Länge, Zugriff über den Index."
+        },
+        {
+          "text": "Wenn laufend neue Zeilen dazukommen sollen, ohne dass du die Länge vorher kennst.",
+          "feedback": "Die Länge eines Arrays ändert sich nicht. Für wachsende Daten gibt es andere Sammlungen, die später im Modul folgen."
+        },
+        {
+          "text": "Wenn du ein einzelnes Wort speichern willst.",
+          "feedback": "Für ein einzelnes Wort genügt eine Variable vom Typ `string`."
+        }
       ],
       "explanation": "Ein Array passt, wenn die Anzahl der Werte feststeht, zum Beispiel bei den 14 Zeilen des Beispiel-Logs."
     },
@@ -79,9 +126,19 @@
       "type": "single",
       "question": "Es gilt `int[,] table = new int[2, 3];`. Wie viele Elemente hat `table`, und was liefert `table.GetLength(1)`?",
       "options": [
-        { "text": "6 Elemente, `GetLength(1)` liefert 3.", "correct": true, "feedback": "2 Zeilen mal 3 Spalten sind 6 Elemente. Die Dimension 1 ist die Spalte mit der Länge 3." },
-        { "text": "5 Elemente, `GetLength(1)` liefert 2.", "feedback": "Die Elemente werden multipliziert, nicht addiert. Und Dimension 1 hat die Länge 3." },
-        { "text": "6 Elemente, `GetLength(1)` liefert 2.", "feedback": "`GetLength(0)` ist 2 (Zeilen), `GetLength(1)` ist 3 (Spalten)." }
+        {
+          "text": "6 Elemente, `GetLength(1)` liefert 3.",
+          "correct": true,
+          "feedback": "2 Zeilen mal 3 Spalten sind 6 Elemente. Die Dimension 1 ist die Spalte mit der Länge 3."
+        },
+        {
+          "text": "5 Elemente, `GetLength(1)` liefert 2.",
+          "feedback": "Die Elemente werden multipliziert, nicht addiert. Und Dimension 1 hat die Länge 3."
+        },
+        {
+          "text": "6 Elemente, `GetLength(1)` liefert 2.",
+          "feedback": "`GetLength(0)` ist 2 (Zeilen), `GetLength(1)` ist 3 (Spalten)."
+        }
       ],
       "explanation": "Die Zahl der Elemente ist das Produkt der Längen aller Dimensionen: 2 · 3 = 6. `GetLength(0)` ist 2, `GetLength(1)` ist 3."
     },
@@ -91,10 +148,26 @@
       "type": "single",
       "question": "Welche Aussage über `int[,]` und `int[][]` stimmt?",
       "options": [
-        { "text": "`int[,]` ist ein rechteckiger Block mit Rang 2. `int[][]` ist ein Array von Arrays, dessen Zeilen verschieden lang sein können.", "correct": true, "feedback": "So ist es." },
-        { "text": "Beide sind dasselbe, nur anders geschrieben.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "`int[,]` ist ein einziges Array mit Rang 2. `int[][]` hat Rang 1 und enthält andere Arrays." },
-        { "text": "Bei `int[,]` kann jede Zeile eine andere Länge haben.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "Bei `int[,]` haben alle Zeilen dieselbe Länge. Verschieden lange Zeilen gibt es bei `int[][]`." },
-        { "text": "`int[][]` legt alle Zeilen automatisch an.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "Bei `new int[3][]` sind die Zeilen zuerst `null`. Jede Zeile musst du selbst mit `new int[…]` anlegen." }
+        {
+          "text": "`int[,]` ist ein rechteckiger Block mit Rang 2. `int[][]` ist ein Array von Arrays, dessen Zeilen verschieden lang sein können.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Beide sind dasselbe, nur anders geschrieben.",
+          "misconception": "m05-l02-jagged-same-as-multidimensional",
+          "feedback": "`int[,]` ist ein einziges Array mit Rang 2. `int[][]` hat Rang 1 und enthält andere Arrays."
+        },
+        {
+          "text": "Bei `int[,]` kann jede Zeile eine andere Länge haben.",
+          "misconception": "m05-l02-jagged-same-as-multidimensional",
+          "feedback": "Bei `int[,]` haben alle Zeilen dieselbe Länge. Verschieden lange Zeilen gibt es bei `int[][]`."
+        },
+        {
+          "text": "`int[][]` legt alle Zeilen automatisch an.",
+          "misconception": "m05-l02-jagged-same-as-multidimensional",
+          "feedback": "Bei `new int[3][]` sind die Zeilen zuerst `null`. Jede Zeile musst du selbst mit `new int[…]` anlegen."
+        }
       ],
       "explanation": "`int[,]` ist ein Array mit Rang 2 und gleich langen Zeilen. `int[][]` ist ein Array mit Rang 1, dessen Elemente selbst Arrays sind. Jede Zeile hat ihre eigene Länge und muss einzeln angelegt werden."
     },
@@ -104,9 +177,19 @@
       "type": "single",
       "question": "Wie greifst du auf Zeile 1 und Spalte 2 von `int[,] table` zu?",
       "options": [
-        { "text": "`table[1, 2]`", "correct": true, "feedback": "Bei einem mehrdimensionalen Array stehen alle Indizes in einer Klammer, durch Komma getrennt." },
-        { "text": "`table[1][2]`", "feedback": "Diese Schreibweise gilt für `int[][]`. Bei `int[,]` schreibst du `table[1, 2]`." },
-        { "text": "`table[2, 1]`", "feedback": "Die Reihenfolge ist Zeile, dann Spalte: `table[1, 2]`." }
+        {
+          "text": "`table[1, 2]`",
+          "correct": true,
+          "feedback": "Bei einem mehrdimensionalen Array stehen alle Indizes in einer Klammer, durch Komma getrennt."
+        },
+        {
+          "text": "`table[1][2]`",
+          "feedback": "Diese Schreibweise gilt für `int[][]`. Bei `int[,]` schreibst du `table[1, 2]`."
+        },
+        {
+          "text": "`table[2, 1]`",
+          "feedback": "Die Reihenfolge ist Zeile, dann Spalte: `table[1, 2]`."
+        }
       ],
       "explanation": "`int[,]` hat eine Klammer mit mehreren Indizes: `table[zeile, spalte]`. `table[1][2]` gehört zu `int[][]`."
     },
@@ -123,9 +206,19 @@
       "type": "single",
       "question": "Transferfrage: SecLog zählt Fehlversuche pro Benutzer und Stunde. Jeder Benutzer hat dieselben Stunden. Welche Form passt?",
       "options": [
-        { "text": "Ein `int[,]` mit einer Zeile pro Benutzer und einer Spalte pro Stunde.", "correct": true, "feedback": "Alle Zeilen sind gleich lang, also passt ein rechteckiger Block." },
-        { "text": "Ein einzelnes `int`.", "feedback": "Ein `int` hält nur eine Zahl, nicht eine Tabelle." },
-        { "text": "Ein `string`, in dem alle Zahlen stehen.", "feedback": "Ein Text hält keine Zahlen, mit denen du pro Zelle rechnen kannst." }
+        {
+          "text": "Ein `int[,]` mit einer Zeile pro Benutzer und einer Spalte pro Stunde.",
+          "correct": true,
+          "feedback": "Alle Zeilen sind gleich lang, also passt ein rechteckiger Block."
+        },
+        {
+          "text": "Ein einzelnes `int`.",
+          "feedback": "Ein `int` hält nur eine Zahl, nicht eine Tabelle."
+        },
+        {
+          "text": "Ein `string`, in dem alle Zahlen stehen.",
+          "feedback": "Ein Text hält keine Zahlen, mit denen du pro Zelle rechnen kannst."
+        }
       ],
       "explanation": "Eine Tabelle mit gleich langen Zeilen ist ein rechteckiger Block. Haben die Zeilen verschiedene Längen, passt `int[][]`."
     },
@@ -143,9 +236,20 @@
       "type": "single",
       "question": "Es gilt `int[] a = { 10, 20, 30, 40, 50 };`. Welche Elemente enthält `a[1..3]`?",
       "options": [
-        { "text": "20 und 30", "correct": true, "feedback": "Der Anfang 1 gehört dazu, das Ende 3 nicht." },
-        { "text": "20, 30 und 40", "misconception": "m05-l03-range-end-inclusive", "feedback": "Das Ende eines Bereichs gehört nicht dazu. Der Bereich `1..3` hat 2 Elemente." },
-        { "text": "10, 20 und 30", "feedback": "Der Bereich beginnt beim Index 1, nicht bei 0." }
+        {
+          "text": "20 und 30",
+          "correct": true,
+          "feedback": "Der Anfang 1 gehört dazu, das Ende 3 nicht."
+        },
+        {
+          "text": "20, 30 und 40",
+          "misconception": "m05-l03-range-end-inclusive",
+          "feedback": "Das Ende eines Bereichs gehört nicht dazu. Der Bereich `1..3` hat 2 Elemente."
+        },
+        {
+          "text": "10, 20 und 30",
+          "feedback": "Der Bereich beginnt beim Index 1, nicht bei 0."
+        }
       ],
       "explanation": "Der Anfang eines Bereichs gehört dazu, das Ende nicht. `a[1..3]` enthält die Elemente mit den Indizes 1 und 2, also `20` und `30`."
     },
@@ -155,9 +259,20 @@
       "type": "single",
       "question": "Das Array `a` hat 8 Elemente. Wie viele Elemente hat `a[2..5]`?",
       "options": [
-        { "text": "3", "correct": true, "feedback": "Die Länge ist Ende minus Anfang: 5 − 2 = 3." },
-        { "text": "4", "misconception": "m05-l03-range-end-inclusive", "feedback": "Wer 4 rechnet, zählt das Ende mit. Es gehört aber nicht zum Bereich." },
-        { "text": "5", "feedback": "5 ist das Ende des Bereichs, nicht seine Länge." }
+        {
+          "text": "3",
+          "correct": true,
+          "feedback": "Die Länge ist Ende minus Anfang: 5 − 2 = 3."
+        },
+        {
+          "text": "4",
+          "misconception": "m05-l03-range-end-inclusive",
+          "feedback": "Wer 4 rechnet, zählt das Ende mit. Es gehört aber nicht zum Bereich."
+        },
+        {
+          "text": "5",
+          "feedback": "5 ist das Ende des Bereichs, nicht seine Länge."
+        }
       ],
       "explanation": "Die Länge eines Bereichs `a..b` ist `b - a`, wenn beide Werte von vorne zählen. Hier ist sie 3."
     },
@@ -167,10 +282,25 @@
       "type": "multi",
       "question": "Welche Aussagen über Indizes vom Ende und Bereiche stimmen?",
       "options": [
-        { "text": "`a[^1]` ist das letzte Element.", "correct": true, "feedback": "`^1` zählt vom Ende und beginnt bei 1." },
-        { "text": "`a[^0]` ist das letzte Element.", "feedback": "`^0` zeigt hinter das letzte Element. Ein Zugriff damit bricht das Programm zur Laufzeit ab." },
-        { "text": "Ein Bereich eines Arrays ist eine neue Kopie. Änderst du sie, bleibt das Original gleich.", "correct": true, "feedback": "Bei einem Array entsteht ein neues Array." },
-        { "text": "`a[2..]` enthält alle Elemente ab dem Index 2.", "correct": true, "feedback": "Fehlt das Ende, reicht der Bereich bis zum Schluss." }
+        {
+          "text": "`a[^1]` ist das letzte Element.",
+          "correct": true,
+          "feedback": "`^1` zählt vom Ende und beginnt bei 1."
+        },
+        {
+          "text": "`a[^0]` ist das letzte Element.",
+          "feedback": "`^0` zeigt hinter das letzte Element. Ein Zugriff damit bricht das Programm zur Laufzeit ab."
+        },
+        {
+          "text": "Ein Bereich eines Arrays ist eine neue Kopie. Änderst du sie, bleibt das Original gleich.",
+          "correct": true,
+          "feedback": "Bei einem Array entsteht ein neues Array."
+        },
+        {
+          "text": "`a[2..]` enthält alle Elemente ab dem Index 2.",
+          "correct": true,
+          "feedback": "Fehlt das Ende, reicht der Bereich bis zum Schluss."
+        }
       ],
       "explanation": "`^1` ist das letzte Element, `^0` ist kein Element. Ein Bereich eines Arrays oder `string` ist eine neue Kopie. Fehlt eine Grenze, reicht der Bereich bis zum Anfang oder Ende."
     },
@@ -187,11 +317,352 @@
       "type": "single",
       "question": "Transferfrage: SecLog will aus einer Log-Zeile nur das Datum haben (die ersten 10 Zeichen). Was passt?",
       "options": [
-        { "text": "`line[..10]`", "correct": true, "feedback": "Der Bereich `..10` nimmt die Zeichen mit den Indizes 0 bis 9." },
-        { "text": "`line[10..]`", "feedback": "Das wäre alles ab dem Zeichen 10, also der Rest der Zeile." },
-        { "text": "`line[^10]`", "feedback": "Das ist ein einzelnes Zeichen, das zehntletzte." }
+        {
+          "text": "`line[..10]`",
+          "correct": true,
+          "feedback": "Der Bereich `..10` nimmt die Zeichen mit den Indizes 0 bis 9."
+        },
+        {
+          "text": "`line[10..]`",
+          "feedback": "Das wäre alles ab dem Zeichen 10, also der Rest der Zeile."
+        },
+        {
+          "text": "`line[^10]`",
+          "feedback": "Das ist ein einzelnes Zeichen, das zehntletzte."
+        }
       ],
       "explanation": "Der Bereich `..10` beginnt am Anfang und endet vor dem Index 10. Er liefert die ersten 10 Zeichen."
+    },
+    {
+      "id": "m05-l04-q1",
+      "lesson": "m05-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l04/quiz-list.cs",
+      "explanation": "Die Liste beginnt mit `5, 1`. `Insert(0, 3)` setzt die 3 an den Anfang und schiebt die anderen nach hinten: `3, 5, 1`. `RemoveAt(1)` entfernt das Element mit dem Index 1, also die 5: `3, 1`. `Count` ist 2, `counts[0]` ist 3 und `counts[1]` ist 1."
+    },
+    {
+      "id": "m05-l04-q2",
+      "lesson": "m05-l04",
+      "type": "single",
+      "question": "Die Liste `users` enthält `alice`, `bob`, `dave`. Was bewirkt `users.Insert(1, \"carol\");`?",
+      "options": [
+        {
+          "text": "`carol` steht an Index 1, `bob` und `dave` rücken eine Stelle nach hinten. `Count` ist 4.",
+          "correct": true,
+          "feedback": "`Insert` schiebt das Element an der Stelle und alle danach um eins nach hinten."
+        },
+        {
+          "text": "`carol` ersetzt `bob`. `Count` bleibt 3.",
+          "misconception": "m05-l04-insert-overwrites",
+          "feedback": "Ersetzen würde `users[1] = \"carol\";`. `Insert` fügt ein und macht die Liste um ein Element länger."
+        },
+        {
+          "text": "`carol` steht am Ende der Liste.",
+          "feedback": "Am Ende hängt `Add` an. `Insert` setzt das Element an die angegebene Stelle."
+        }
+      ],
+      "explanation": "`Insert(i, x)` fügt `x` an der Stelle `i` ein. Das Element an der Stelle `i` und alle danach rücken eine Stelle nach hinten, `Count` wächst um 1."
+    },
+    {
+      "id": "m05-l04-q3",
+      "lesson": "m05-l04",
+      "type": "single",
+      "question": "Die Liste `users` enthält `alice` und `bob`. Was liefert `users.IndexOf(\"carol\")`?",
+      "options": [
+        {
+          "text": "`-1`",
+          "correct": true,
+          "feedback": "Ist das Element nicht in der Liste, liefert `IndexOf` den Wert -1."
+        },
+        {
+          "text": "`0`",
+          "feedback": "0 ist ein gültiger Index, nämlich der von `alice`."
+        },
+        {
+          "text": "`2`",
+          "feedback": "2 wäre der Index hinter dem letzten Element. `IndexOf` liefert nur Indizes, die es in der Liste gibt, oder -1."
+        }
+      ],
+      "explanation": "`IndexOf` liefert den Index des ersten passenden Elements. Gibt es keins, ist das Ergebnis -1."
+    },
+    {
+      "id": "m05-l04-q4",
+      "lesson": "m05-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über `List<string>` und `string[]` stimmen?",
+      "options": [
+        {
+          "text": "Die Länge eines Arrays steht beim Erzeugen fest, eine Liste wächst und schrumpft.",
+          "correct": true,
+          "feedback": "Das ist der wichtigste Unterschied."
+        },
+        {
+          "text": "Die Anzahl der Elemente einer Liste liefert `Count`.",
+          "correct": true,
+          "feedback": "Bei einem Array heißt das Gegenstück `Length`."
+        },
+        {
+          "text": "Eine Liste ist ein Wertetyp. Nach `var b = a;` sind `a` und `b` unabhängig.",
+          "feedback": "Eine Liste ist ein Referenztyp. Nach `var b = a;` zeigen beide Variablen auf dieselbe Liste."
+        },
+        {
+          "text": "Nach `Remove` sind die Indizes der folgenden Elemente um 1 kleiner.",
+          "correct": true,
+          "feedback": "Die Elemente rücken nach vorn, damit keine Lücke bleibt."
+        }
+      ],
+      "explanation": "Eine Liste ist ein Referenztyp mit veränderlicher Länge. Sie hält die Elemente ohne Lücke, darum ändern sich beim Einfügen und Entfernen die Indizes der folgenden Elemente."
+    },
+    {
+      "id": "m05-l04-q5",
+      "lesson": "m05-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `Insert(i, x)` mit der Liste macht und wie es sich von `list[i] = x;` unterscheidet.",
+      "modelAnswer": "`Insert(i, x)` fügt `x` an der Stelle `i` ein. Das Element, das dort stand, und alle danach rücken eine Stelle nach hinten. Die Liste wird um ein Element länger, `Count` wächst um 1.\n\n`list[i] = x;` ersetzt dagegen das Element an der Stelle `i`. Es geht kein Platz dazu und `Count` bleibt gleich."
+    },
+    {
+      "id": "m05-l04-q6",
+      "lesson": "m05-l04",
+      "type": "single",
+      "question": "Transferfrage: SecLog sammelt die fehlgeschlagenen Zeilen eines Logs. Wie viele es werden, steht vorher nicht fest. Was passt?",
+      "options": [
+        {
+          "text": "Eine `List<string>`, an die jede passende Zeile mit `Add` angehängt wird.",
+          "correct": true,
+          "feedback": "Eine Liste wächst mit jedem `Add`."
+        },
+        {
+          "text": "Ein `string[]`, dessen Länge sich beim Hinzufügen von selbst vergrößert.",
+          "feedback": "Die Länge eines Arrays steht fest und ändert sich nicht."
+        },
+        {
+          "text": "Ein einzelner `string`, der nur die letzte Zeile hält.",
+          "feedback": "Dann gehen alle früheren Zeilen verloren."
+        }
+      ],
+      "explanation": "Ist die Anzahl vorher nicht bekannt, passt eine Liste. Ein Array passt, wenn die Anzahl beim Erzeugen feststeht."
+    },
+    {
+      "id": "m05-l05-q1",
+      "lesson": "m05-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l05/quiz-iterate.cs",
+      "explanation": "Die Schleife läuft rückwärts von Index 3 bis 0 und entfernt jede 2. Aus `1, 2, 2, 3` wird `1, 3`. `Count` ist 2 und `numbers[1]` ist 3."
+    },
+    {
+      "id": "m05-l05-q2",
+      "lesson": "m05-l05",
+      "type": "single",
+      "question": "Ein `foreach` geht durch eine Liste und ruft in einem Durchlauf `list.Remove(...)` für ein Element in der Mitte auf. Was passiert?",
+      "options": [
+        {
+          "text": "Beim nächsten Schritt der Schleife bricht das Programm zur Laufzeit ab.",
+          "correct": true,
+          "feedback": "Die Liste hat sich geändert, darum ist der Enumerator ungültig."
+        },
+        {
+          "text": "Das Element ist weg und die Schleife läuft normal weiter.",
+          "misconception": "m05-l05-change-list-in-foreach",
+          "feedback": "Das wäre bequem, ist aber falsch: Eine Änderung der Liste macht den Enumerator ungültig."
+        },
+        {
+          "text": "Der Compiler lehnt den Code ab.",
+          "feedback": "Der Compiler erkennt das nicht. Der Fehler zeigt sich erst beim Ausführen."
+        }
+      ],
+      "explanation": "`foreach` holt die Elemente über einen Enumerator. Ändert sich die Liste, ist er ungültig, und der nächste `MoveNext` bricht das Programm ab."
+    },
+    {
+      "id": "m05-l05-q3",
+      "lesson": "m05-l05",
+      "type": "single",
+      "question": "Was geschieht bei `foreach (string user in users) { user = \"carol\"; }`?",
+      "options": [
+        {
+          "text": "Der Compiler lehnt die Zuweisung ab, weil die Iterationsvariable nur gelesen werden kann.",
+          "correct": true,
+          "feedback": "Die Variable von `foreach` ist schreibgeschützt."
+        },
+        {
+          "text": "Alle Elemente von `users` sind danach `carol`.",
+          "feedback": "Selbst wenn die Zuweisung erlaubt wäre, würde sie nur die Variable ändern, nicht die Sammlung."
+        },
+        {
+          "text": "Die Zuweisung klappt, ändert aber nur eine Kopie.",
+          "feedback": "Der Code kommt nicht bis zur Ausführung. Der Compiler meldet einen Fehler."
+        }
+      ],
+      "explanation": "Die Iterationsvariable ist im Block schreibgeschützt. Eine Zuweisung ist ein Fehler beim Übersetzen."
+    },
+    {
+      "id": "m05-l05-q4",
+      "lesson": "m05-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über `foreach` und den Enumerator stimmen?",
+      "options": [
+        {
+          "text": "`MoveNext` geht zum nächsten Element und liefert `false`, wenn keins mehr da ist.",
+          "correct": true,
+          "feedback": "So weiß `foreach`, wann die Schleife endet."
+        },
+        {
+          "text": "`Current` liefert das Element, bei dem der Enumerator gerade steht.",
+          "correct": true,
+          "feedback": "Der Wert von `Current` landet in der Iterationsvariable."
+        },
+        {
+          "text": "`foreach` zählt einen Index mit und liest `list[index]`.",
+          "feedback": "`foreach` braucht keinen Index. Es fragt den Enumerator nach dem nächsten Element."
+        },
+        {
+          "text": "Rückwärts mit `for` und `RemoveAt` zu löschen, ist sicher, weil die Indizes der noch nicht besuchten Elemente gleich bleiben.",
+          "correct": true,
+          "feedback": "Entfernt wird nur an Stellen, die schon besucht sind."
+        }
+      ],
+      "explanation": "`foreach` ruft `GetEnumerator` auf, dann vor jedem Durchlauf `MoveNext` und liest `Current`. Beim Löschen mit `for` rückwärts verschieben sich nur Elemente, die schon besucht sind."
+    },
+    {
+      "id": "m05-l05-q5",
+      "lesson": "m05-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum du Elemente aus einer Liste nicht in einem `foreach` über dieselbe Liste entfernen darfst und was du stattdessen tust.",
+      "modelAnswer": "`foreach` holt die Elemente über einen Enumerator. Ändert sich die Liste während der Schleife, ist der Enumerator ungültig, und der nächste Schritt bricht das Programm ab.\n\nStattdessen gehst du mit `for` rückwärts durch die Liste und rufst `RemoveAt(i)` auf. Oder du sammelst die Elemente zuerst in einer zweiten Liste und entfernst sie nach der Schleife."
+    },
+    {
+      "id": "m05-l05-q6",
+      "lesson": "m05-l05",
+      "type": "single",
+      "question": "Transferfrage: SecLog hat die Liste `failedLines` und will nur die Zeilen von bob behalten, ohne die Liste während einer `foreach`-Schleife zu ändern. Was geht?",
+      "options": [
+        {
+          "text": "Eine Kopie der Liste anlegen und in der Kopie mit `for` rückwärts per `RemoveAt` alles andere entfernen.",
+          "correct": true,
+          "feedback": "Rückwärts bleiben die Indizes der noch nicht besuchten Elemente gleich."
+        },
+        {
+          "text": "In einem `foreach` über `failedLines` jede fremde Zeile mit `Remove` entfernen.",
+          "misconception": "m05-l05-change-list-in-foreach",
+          "feedback": "Das ändert die Liste während des `foreach` und bricht das Programm ab."
+        },
+        {
+          "text": "Mit `for` vorwärts und `RemoveAt(i)` entfernen, ohne `i` anzupassen.",
+          "feedback": "Nach dem Entfernen rückt das nächste Element auf Index `i`. Die Schleife überspringt es."
+        }
+      ],
+      "explanation": "Sicher ist nur, die Liste außerhalb des `foreach` zu ändern: rückwärts mit `for` oder über eine zweite Liste."
+    },
+    {
+      "id": "m05-l06-q1",
+      "lesson": "m05-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l06/quiz-dictionary.cs",
+      "explanation": "`stock[\"a\"] = 10;` ersetzt den Wert von `a`. `Remove(\"b\")` entfernt den Eintrag `b`, also ist `Count` 1. `stock[\"a\"]` ist 10. `TryGetValue` findet `b` nicht, die Variable `bValue` bekommt den Standardwert 0."
+    },
+    {
+      "id": "m05-l06-q2",
+      "lesson": "m05-l06",
+      "type": "single",
+      "question": "Das Dictionary `failures` hat nur den Schlüssel `bob`. Was geschieht bei `int n = failures[\"carol\"];`?",
+      "options": [
+        {
+          "text": "Das Programm bricht zur Laufzeit ab, weil der Schlüssel fehlt.",
+          "correct": true,
+          "feedback": "Das Lesen eines fehlenden Schlüssels mit `[]` ist ein Fehler."
+        },
+        {
+          "text": "`n` ist 0.",
+          "misconception": "m05-l06-missing-key-gives-default",
+          "feedback": "Den Standardwert gibt `TryGetValue` in der `out`-Variable zurück, aber nicht `[]`."
+        },
+        {
+          "text": "Der Compiler lehnt die Zeile ab.",
+          "feedback": "Der Compiler kennt die Schlüssel nicht. Der Fehler zeigt sich erst beim Ausführen."
+        }
+      ],
+      "explanation": "Mit `[]` liest du nur Schlüssel, die es gibt. Bei einem fehlenden Schlüssel bricht das Programm ab. Sicher ist `TryGetValue` oder vorher `ContainsKey`."
+    },
+    {
+      "id": "m05-l06-q3",
+      "lesson": "m05-l06",
+      "type": "single",
+      "question": "Das Dictionary `failures` hat schon den Schlüssel `bob`. Welche Zeile setzt den Wert auf 7, ohne dass das Programm abbricht?",
+      "options": [
+        {
+          "text": "`failures[\"bob\"] = 7;`",
+          "correct": true,
+          "feedback": "Der Indexer beim Schreiben ersetzt den Wert oder legt den Eintrag neu an."
+        },
+        {
+          "text": "`failures.Add(\"bob\", 7);`",
+          "feedback": "`Add` bricht ab, wenn der Schlüssel schon da ist."
+        },
+        {
+          "text": "`failures.ContainsKey(\"bob\");`",
+          "feedback": "`ContainsKey` fragt nur, ob der Schlüssel da ist. Sie setzt keinen Wert."
+        }
+      ],
+      "explanation": "`Add` verlangt einen neuen Schlüssel. Die Zuweisung über den Indexer ersetzt den Wert eines vorhandenen Schlüssels oder legt einen neuen Eintrag an."
+    },
+    {
+      "id": "m05-l06-q4",
+      "lesson": "m05-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über `Dictionary<string, int>` stimmen?",
+      "options": [
+        {
+          "text": "Jeder Schlüssel kommt höchstens einmal vor.",
+          "correct": true,
+          "feedback": "Ein Schlüssel ist eindeutig."
+        },
+        {
+          "text": "`TryGetValue` liefert `false`, wenn der Schlüssel fehlt.",
+          "correct": true,
+          "feedback": "Die `out`-Variable bekommt dann den Standardwert."
+        },
+        {
+          "text": "Zwei verschiedene Schlüssel dürfen denselben Wert haben.",
+          "correct": true,
+          "feedback": "Nur die Schlüssel müssen eindeutig sein."
+        },
+        {
+          "text": "Beim Durchlaufen mit `foreach` kommen die Einträge in der Reihenfolge, in der du sie eingefügt hast.",
+          "feedback": "Eine Reihenfolge ist nicht festgelegt. Verlass dich nicht darauf."
+        }
+      ],
+      "explanation": "Die Schlüssel sind eindeutig, die Werte nicht. Eine Reihenfolge der Einträge ist nicht festgelegt."
+    },
+    {
+      "id": "m05-l06-q5",
+      "lesson": "m05-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie du mit einem Dictionary zählst, wie oft ein Wert vorkommt, und warum du dafür `TryGetValue` nimmst.",
+      "modelAnswer": "Der Wert ist der Schlüssel, die Anzahl ist der Wert des Eintrags. Für jedes Vorkommen liest du die bisherige Anzahl mit `TryGetValue` und speicherst `count + 1` zurück.\n\nBeim ersten Vorkommen gibt es den Schlüssel noch nicht. `TryGetValue` bricht dann nicht ab, sondern liefert in der `out`-Variable 0. Mit `[]` zu lesen würde bei einem fehlenden Schlüssel das Programm abbrechen."
+    },
+    {
+      "id": "m05-l06-q6",
+      "lesson": "m05-l06",
+      "type": "single",
+      "question": "Transferfrage: SecLog will die Fehlversuche pro IP-Adresse zählen. Was passt?",
+      "options": [
+        {
+          "text": "Ein `Dictionary<string, int>` mit der IP-Adresse als Schlüssel und der Anzahl als Wert.",
+          "correct": true,
+          "feedback": "Der Schlüssel findet den Zähler zu einer IP-Adresse."
+        },
+        {
+          "text": "Ein `int[]`, in dem die IP-Adresse der Index ist.",
+          "feedback": "Ein Index ist eine Zahl, die IP-Adresse hier ein Text."
+        },
+        {
+          "text": "Eine `List<int>` mit einem Eintrag pro Log-Zeile.",
+          "feedback": "Die Liste sagt nicht, welcher Zähler zu welcher IP-Adresse gehört."
+        }
+      ],
+      "explanation": "Soll ein Wert über einen Text gefunden werden, passt ein Dictionary. Ein Array oder eine Liste findet Werte über eine Position."
     }
   ]
 }

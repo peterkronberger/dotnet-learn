@@ -1,0 +1,13 @@
+List<string> users = new List<string>();
+users.Add("alice");
+users.Add("bob");
+users.Add("dave");
+Console.WriteLine(users.Count);
+users.Insert(2, "carol");
+Console.WriteLine(users[2]);
+Console.WriteLine(users[3]);
+Console.WriteLine(users.Count);
+users.Remove("bob");
+users.RemoveAt(0);
+Console.WriteLine(users[0]);
+Console.WriteLine(users.Count);

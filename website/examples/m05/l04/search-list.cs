@@ -1,0 +1,11 @@
+List<string> users = new List<string>();
+users.Add("alice");
+users.Add("bob");
+Console.WriteLine(users.Contains("bob"));
+Console.WriteLine(users.Contains("carol"));
+Console.WriteLine(users.IndexOf("bob"));
+Console.WriteLine(users.IndexOf("carol"));
+Console.WriteLine(users.Remove("carol"));
+Console.WriteLine(users.Count);
+users.Clear();
+Console.WriteLine(users.Count);

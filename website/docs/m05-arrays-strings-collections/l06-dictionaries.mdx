@@ -1,0 +1,202 @@
+---
+title: "Wörterbücher: Dictionary<TKey,TValue>"
+sidebar_position: 6
+description: Ein Dictionary ordnet eindeutigen Schlüsseln Werte zu. Ein fehlender Schlüssel ist mit [] ein Fehler, TryGetValue liest sicher.
+lesson_id: m05-l06
+duration_min: 20
+---
+
+import dictionaryBasics from '!!raw-loader!@site/examples/m05/l06/dictionary-basics.cs';
+import dictionaryBasicsOutput from '!!raw-loader!@site/examples/m05/l06/dictionary-basics.out.txt';
+import tryGetValue from '!!raw-loader!@site/examples/m05/l06/try-get-value.cs';
+import tryGetValueOutput from '!!raw-loader!@site/examples/m05/l06/try-get-value.out.txt';
+import countWords from '!!raw-loader!@site/examples/m05/l06/count-words.cs';
+import countGaps from '!!raw-loader!@site/examples/m05/l06/count-gaps.cs';
+import missingKey from '!!raw-loader!@site/examples/m05/l06/missing-key.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l06/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l06/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l06/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l06/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Wörterbücher: Dictionary&lt;TKey,TValue&gt;
+
+:::note[Lernziele]
+- Du kannst ein `Dictionary<string, int>` anlegen, Werte über einen Schlüssel speichern und lesen.
+- Du kannst mit `TryGetValue` einen Wert lesen, ohne dass ein fehlender Schlüssel zum Fehler führt.
+- Du kannst mit einem Dictionary zählen, wie oft ein Wert vorkommt.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l08-q4" />
+
+<Quiz id="m03-l08-q1" />
+
+<Quiz id="m05-l04-q2" />
+
+## Werte über einen Schlüssel finden
+
+In einer Liste und einem Array findest du ein Element über seine Position. Oft willst du aber einen Wert über einen Namen finden: die Anzahl der Fehlversuche von `bob`. Dafür gibt es das <Term id="dictionary">Dictionary</Term> (Wörterbuch). Es speichert <Term id="key-value-pair">Schlüssel-Wert-Paare</Term>: Jeder <Term id="key">Schlüssel</Term> kommt höchstens einmal vor und gehört zu einem Wert.
+
+Der Typ hat zwei Typargumente: `Dictionary<string, int>` hat Schlüssel vom Typ `string` und Werte vom Typ `int`. Wie bei der Liste sagt die Angabe in den spitzen Klammern, was die Sammlung hält. Auch das Dictionary ist ein Referenztyp.
+
+Die wichtigsten Mitglieder:
+
+| Aufruf | Wirkung |
+| --- | --- |
+| `Add(k, v)` | legt einen neuen Eintrag an; ist `k` schon da, bricht das Programm ab |
+| `d[k] = v` | ersetzt den Wert von `k` oder legt den Eintrag neu an |
+| `d[k]` | liest den Wert von `k`; fehlt `k`, bricht das Programm ab |
+| `TryGetValue(k, out v)` | liefert `true` und den Wert, oder `false` und den Standardwert |
+| `ContainsKey(k)` | fragt, ob `k` vorkommt |
+| `Remove(k)` | entfernt den Eintrag von `k` |
+| `Count` | Anzahl der Einträge |
+
+Den `out`-Parameter kennst du von `int.TryParse`. `TryGetValue` folgt demselben Muster: Der Rückgabewert sagt, ob es geklappt hat, die `out`-Variable bekommt den Wert.
+
+Als Schlüssel passen `string` und `int`, die du von `==` und `Equals` kennst: Zwei Schlüssel sind gleich, wenn der Vergleich sie gleich nennt. Eigene Typen als Schlüssel brauchen mehr Sorgfalt.
+
+<Forward concepts={['Gleichheit und Hashcode eigener Typen']} module="8" />
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l06-basics" code={dictionaryBasics} predict expected={dictionaryBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2`, `2`, `5`, `False`.
+
+1. **Anlegen:** `Add("bob", 5)` legt den Eintrag `bob` an. `failures["alice"] = 1;` legt `alice` neu an.
+2. **Ersetzen:** `failures["alice"] = 2;` ersetzt den Wert. Es gibt weiter zwei Einträge, `Count` ist 2.
+3. **Lesen:** `failures["alice"]` ist 2, `failures["bob"]` ist 5. `ContainsKey("carol")` ist `False`.
+
+**Was passiert bei `failures.Add("bob", 7);`?** Der Schlüssel `bob` ist schon da, und das Programm bricht zur Laufzeit ab.
+
+</details>
+
+## Ein fehlender Schlüssel
+
+Mit `[]` liest du nur Schlüssel, die es gibt. Fehlt der Schlüssel, bricht das Programm ab, mit der `System.Collections.Generic.KeyNotFoundException`.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Das Programm unten bricht in Zeile 4 ab. Die Meldung lautet: „The given key 'carol' was not present in the dictionary.“
+
+<CodeBlock language="csharp" title="missing-key.cs">{missingKey}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m05-l06-missing-key-gives-default" />
+
+**„Liest man einen fehlenden Schlüssel mit `[]`, bekommt man `0` (oder `null`).“** Das stimmt nicht. Das Programm bricht zur Laufzeit ab. Nimm `TryGetValue` oder frage vorher mit `ContainsKey`. Das ist dasselbe Muster wie bei `int.TryParse`: erst fragen, ob es klappt.
+:::
+
+## TryGetValue
+
+`TryGetValue(k, out v)` bricht bei einem fehlenden Schlüssel nicht ab. Es liefert `false`, und die `out`-Variable bekommt den Standardwert des Typs, bei `int` also `0`.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l06-trygetvalue" code={tryGetValue} predict expected={tryGetValueOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True 5`, `False 0`, `0`.
+
+1. **Schlüssel vorhanden:** Für `bob` ist das Ergebnis `True`, `bobCount` ist 5.
+2. **Schlüssel fehlt:** Für `carol` ist das Ergebnis `False`, `carolCount` ist der Standardwert 0. Das Programm läuft weiter.
+3. **Entfernen:** Nach `Remove("bob")` ist das Dictionary leer, `Count` ist 0.
+
+</details>
+
+## Zählen mit einem Dictionary
+
+Mit `TryGetValue` zählst du, wie oft etwas vorkommt. Der Wert ist der Schlüssel, die Anzahl ist der Wert des Eintrags. Für jedes Vorkommen:
+
+1. **Alten Zähler lesen:** `TryGetValue(kind, out int count)` liefert die bisherige Anzahl, beim ersten Mal 0.
+2. **Zurückschreiben:** `counts[kind] = count + 1;` speichert die neue Anzahl.
+
+<CSharpRunner id="m05-l06-count" code={countWords} />
+
+Die Ausgabe ist `3`, `1`, `2`: dreimal `logout`, einmal `login-failed`, zwei Einträge.
+
+Gehst du mit `foreach` durch ein Dictionary, liefert jeder Durchlauf ein `KeyValuePair<TKey,TValue>` mit `Key` und `Value`. Die Reihenfolge der Einträge ist nicht garantiert. Drucke deshalb in Programmen, deren Ausgabe stimmen muss, nach bekannten Schlüsseln, wie es der Projektschritt unten macht.
+
+## Lückenbeispiel
+
+Das Programm soll zählen, wie oft `bob` vorkommt (zweimal). Es gibt aber `1` aus. Ändere eine Zeile.
+
+<CSharpRunner id="m05-l06-gaps" code={countGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `counts[user] = 1;` ignoriert den gelesenen Wert `count`. Jeder Eintrag steht danach auf 1.
+2. **Ersetzen:** `counts[user] = count + 1;` zählt weiter. Dann ist `counts["bob"]` gleich 2.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Liste `failedLines` mit den 7 fehlgeschlagenen Zeilen und kann daraus die Zeilen eines Benutzers auswählen.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Anfang des Tabellenblocks mit dem Array `users` und den Block *Collect the failed lines of the sample log in a list*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem ausgeblendeten Block *Keep only the failed lines of bob* (direkt unter der ⋯-Zeile) den Block `// Count the failed logins per user with a dictionary`. Lege `Dictionary<string, int> failuresPerUser` an. Gehe mit `foreach` durch `failedLines`. Hole den Benutzer mit `string failedUser = FindUser(failedLine) ?? "unknown";`, lies den alten Zähler mit `TryGetValue` und speichere `count + 1`. Gib danach für jeden Benutzer des Arrays `users` in dieser Reihenfolge eine Zeile aus, zum Beispiel `bob: 5`. Lies dabei wieder mit `TryGetValue`, damit `carol`, die keinen Eintrag hat, `0` bekommt.
+
+Die Tabelle aus der Lektion über mehrdimensionale Arrays hast du von Hand gefüllt. Jetzt zählt SecLog aus dem Log selbst. Die Namen kommen aus dem Array `users`, damit die Reihenfolge der Ausgabe feststeht.
+
+<CSharpRunner id="m05-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Dictionary anlegen:** Schlüssel ist der Benutzername, Wert ist die Anzahl.
+2. **Zählen:** Pro Zeile: Benutzer holen (`?? "unknown"` für Zeilen ohne Benutzer), alten Zähler lesen, `count + 1` speichern.
+3. **Ausgeben:** Die Schleife geht durch `users`, nicht durch das Dictionary. So steht die Reihenfolge fest. `carol` hat keinen Eintrag, `TryGetValue` liefert 0.
+
+</details>
+
+**Neuer Stand:** SecLog zählt die Fehlversuche pro Benutzer aus dem Log selbst: alice 1, bob 5, carol 0, dave 1.
+
+<details>
+<summary>Vertiefung: Warum die Reihenfolge nicht feststeht (optional)</summary>
+
+Die Dokumentation legt für ein `Dictionary<TKey,TValue>` keine Reihenfolge der Einträge fest, und das Durchlaufen darf sich darauf nicht verlassen ([Dictionary&lt;TKey,TValue&gt; Class](https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2#remarks)). Ein Dictionary findet Einträge über den Hashcode des Schlüssels. Darum müssen gleiche Schlüssel denselben Hashcode haben.
+
+</details>
+
+## Zusammenfassung
+
+Ein `Dictionary<TKey,TValue>` ordnet eindeutigen Schlüsseln Werte zu. `d[k] = v` legt an oder ersetzt, `Add` verlangt einen neuen Schlüssel. Ein fehlender Schlüssel ist mit `[]` ein Fehler. `TryGetValue` und `ContainsKey` fragen vorher. Zum Zählen liest du den alten Wert mit `TryGetValue` und schreibst `count + 1` zurück. Die Reihenfolge der Einträge ist nicht festgelegt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l06-q1" />
+
+<Quiz id="m05-l06-q2" />
+
+<Quiz id="m05-l06-q3" />
+
+<Quiz id="m05-l06-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l06-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l06-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dictionary&lt;TKey,TValue&gt; Class](https://learn.microsoft.com/dotnet/api/system.collections.generic.dictionary-2)
+- Microsoft Learn: [Collections](https://learn.microsoft.com/dotnet/standard/collections/)

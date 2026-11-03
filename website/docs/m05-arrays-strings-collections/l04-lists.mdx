@@ -1,0 +1,196 @@
+---
+title: "Listen: List<T>"
+sidebar_position: 4
+description: Eine List<T> wächst und schrumpft. Add, Insert, Remove und RemoveAt verändern ein Listenobjekt, Count und die Indizes passen sich an.
+lesson_id: m05-l04
+duration_min: 20
+---
+
+import listBasics from '!!raw-loader!@site/examples/m05/l04/list-basics.cs';
+import listBasicsOutput from '!!raw-loader!@site/examples/m05/l04/list-basics.out.txt';
+import insertOrSet from '!!raw-loader!@site/examples/m05/l04/insert-or-set.cs';
+import insertOrSetOutput from '!!raw-loader!@site/examples/m05/l04/insert-or-set.out.txt';
+import searchList from '!!raw-loader!@site/examples/m05/l04/search-list.cs';
+import listIsReference from '!!raw-loader!@site/examples/m05/l04/list-is-reference.cs';
+import removeBob from '!!raw-loader!@site/examples/m05/l04/remove-bob.cs';
+import capacity from '!!raw-loader!@site/examples/m05/l04/capacity.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l04/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l04/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l04/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l04/seclog-collections-solution.cs';
+
+# Listen: List&lt;T&gt;
+
+:::note[Lernziele]
+- Du kannst eine `List<string>` anlegen und mit `Add`, `Insert`, `Remove` und `RemoveAt` verändern.
+- Du kannst vorhersagen, wie sich `Count` und die Indizes nach einem Einfügen oder Entfernen ändern.
+- Du kannst erklären, wann eine Liste besser passt als ein Array.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l01-q3" />
+
+<Quiz id="m05-l03-q2" />
+
+<Quiz id="m04-l01-q3" />
+
+## Ein Array wächst nicht
+
+Ein Array hat eine feste Länge. Sammelt SecLog die fehlgeschlagenen Zeilen eines Logs, weißt du vorher nicht, wie viele es werden. Dafür gibt es die <Term id="list">Liste</Term>: Eine `List<string>` wächst mit jedem neuen Element und schrumpft, wenn du Elemente entfernst. Sie gehört zu den <Term id="collection">Sammlungen</Term> (Collections).
+
+Die Angabe in den spitzen Klammern heißt <Term id="type-argument">Typargument</Term> und sagt, welchen Typ die Elemente haben: `List<string>` hält `string`, `List<int>` hält `int`.
+
+<Forward concepts={['Generics (eigene generische Typen)']} module="9" />
+
+Eine Liste legst du mit `new List<string>()` an. Sie ist zuerst leer. Die Anzahl der Elemente liefert `Count`, bei einem Array hieß das `Length`. Auch `Count` ist eine Eigenschaft, wie `Length`. Ein Element erreichst du wie beim Array über den Index in eckigen Klammern, und der Index beginnt bei `0`.
+
+| Aufruf | Wirkung |
+| --- | --- |
+| `Add(x)` | hängt `x` am Ende an |
+| `Insert(i, x)` | fügt `x` an der Stelle `i` ein, die Elemente ab `i` rücken nach hinten |
+| `Remove(x)` | entfernt das erste Element, das gleich `x` ist, und liefert `true` oder `false` |
+| `RemoveAt(i)` | entfernt das Element an der Stelle `i`, die folgenden rücken nach vorn |
+
+Nach jedem Einfügen oder Entfernen bleibt die Liste ohne Lücke. Darum ändern sich `Count` und die Indizes der Elemente dahinter.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Schreibe dir nach jeder Änderung auf, wie die Liste aussieht.
+:::
+
+<CSharpRunner id="m05-l04-basics" code={listBasics} predict expected={listBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3`, `carol`, `dave`, `4`, `carol`, `2`.
+
+1. **Anhängen:** Nach drei `Add` ist die Liste `alice, bob, dave`, `Count` ist 3.
+2. **Einfügen:** `Insert(2, "carol")` setzt `carol` an Index 2. `dave` rückt auf Index 3, `Count` ist 4.
+3. **Entfernen:** `Remove("bob")` löscht `bob`, danach `RemoveAt(0)` das Element an Index 0, also `alice`. Übrig sind `carol, dave`.
+4. **Lesen:** `users[0]` ist jetzt `carol`, `Count` ist 2.
+
+**Was passiert bei `users[5]`?** Der Index liegt außerhalb der Liste, und das Programm bricht zur Laufzeit ab, wie bei einem Array.
+
+</details>
+
+## Einfügen ist nicht Ersetzen
+
+Mit `list[i] = x;` ersetzt du das Element an der Stelle `i`. `Insert(i, x)` macht etwas anderes: Es schafft an der Stelle Platz.
+
+:::info[Vorhersage]
+Beide Listen beginnen mit `alice, bob, dave`. Was geben die zwei Zeilen aus?
+:::
+
+<CSharpRunner id="m05-l04-insert-or-set" code={insertOrSet} predict expected={insertOrSetOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Insert: 4 carol bob` und `Set: 3 carol dave`.
+
+1. **`Insert(1, "carol")`:** `bob` rückt von Index 1 auf Index 2. Die Liste hat 4 Elemente.
+2. **`replaced[1] = "carol"`:** `bob` ist weg. Die Liste hat weiter 3 Elemente, `dave` bleibt an Index 2.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m05-l04-insert-overwrites" />
+
+**„`Insert(i, x)` überschreibt das Element an der Stelle `i`.“** Das stimmt nicht. `Insert` schiebt das Element an der Stelle `i` und alle danach um einen Platz nach hinten, und `Count` wächst um 1. Ersetzen würde `list[i] = x;`.
+:::
+
+## Suchen, Entfernen und Leeren
+
+`Contains(x)` fragt, ob `x` in der Liste steht. `IndexOf(x)` liefert den Index des ersten passenden Elements oder `-1`, wenn es keins gibt. `Remove(x)` liefert `true`, wenn es ein Element entfernt hat, und `false`, wenn es keins gefunden hat. Dann bleibt die Liste gleich. `Clear()` entfernt alle Elemente.
+
+<CSharpRunner id="m05-l04-search" code={searchList} />
+
+Die Ausgabe ist `True`, `False`, `1`, `-1`, `False`, `2`, `0`.
+
+## Eine Liste ist ein Referenztyp
+
+Eine `List<string>` ist wie ein Array ein Referenztyp. Die Variable hält einen Verweis auf das Listenobjekt. Mit `second = first` zeigen beide Variablen auf dieselbe Liste.
+
+<CSharpRunner id="m05-l04-reference" code={listIsReference} />
+
+`first.Count` ist 1, obwohl `Add` über `second` aufgerufen wurde. Es gibt nur eine Liste.
+
+### Array oder Liste?
+
+Ein Array passt, wenn die Anzahl beim Erzeugen feststeht, zum Beispiel die 14 Zeilen des Beispiel-Logs. Eine Liste passt, wenn Elemente dazukommen oder wegfallen, zum Beispiel bei den Zeilen, die ein Filter findet.
+
+## Lückenbeispiel
+
+Das Programm soll `bob` entfernen, sodass `alice` und `carol` übrig bleiben. Es entfernt aber das falsche Element. Ändere eine Zeile.
+
+<CSharpRunner id="m05-l04-gaps" code={removeBob} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `RemoveAt(2)` entfernt das Element an Index 2, also `carol`. Danach ist `users[1]` noch `bob`.
+2. **Ersetzen:** `users.RemoveAt(1);` oder `users.Remove("bob");` entfernt `bob`. Dann ist `users[1]` gleich `carol`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält das Beispiel-Log in `sampleLog`, gibt die Fehlversuche pro Benutzer und Stunde aus und schneidet Teile des Logs mit Bereichen aus.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Hold the whole sample log in an array*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe direkt unter die ⋯-Zeile, die die Blöcke der Tabelle und der Bereiche verbirgt, den Block `// Collect the failed lines of the sample log in a list`. Lege `List<string> failedLines = new List<string>();` an. Gehe mit `foreach` durch `sampleLog` und hänge jede Zeile an, für die `line.Contains("login-failed")` gilt. `Contains` ist eine Methode von `string`, wie `ToUpper`: Sie liefert `true`, wenn der Text das Argument enthält. Wie du in Texten suchst, lernst du später genauer. Gib dann `Failed lines: 7` aus (mit `Count`) und die erste fehlgeschlagene Zeile (`failedLines[0]`).
+
+<CSharpRunner id="m05-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Liste anlegen:** `new List<string>()` ist zuerst leer.
+2. **Zeilen filtern:** Das `foreach` geht durch alle 14 Zeilen. `Contains("login-failed")` wählt die 7 fehlgeschlagenen aus, `Add` hängt sie an.
+3. **Ausgeben:** `Count` ist 7, `failedLines[0]` ist die Zeile 2 des Logs.
+
+</details>
+
+**Neuer Stand:** SecLog hat die 7 fehlgeschlagenen Zeilen in einer eigenen Liste.
+
+<details>
+<summary>Vertiefung: Count und Capacity (optional)</summary>
+
+Eine `List<T>` hält ihre Elemente intern in einem Array, dessen Größe bei Bedarf wächst ([List&lt;T&gt; Class](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1#remarks)). `Capacity` ist die Anzahl der Elemente, die die Liste aufnehmen kann, bevor sie sich vergrößern muss. `Count` ist die Anzahl der Elemente, die wirklich drin sind.
+
+`Capacity` ist immer mindestens so groß wie `Count` ([List&lt;T&gt;.Capacity](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.capacity#remarks)). Welchen Wert `Capacity` genau hat, solltest du nicht erwarten, darum prüft das Programm unten nur den Vergleich.
+
+<CSharpRunner id="m05-l04-capacity" code={capacity} />
+
+</details>
+
+## Zusammenfassung
+
+Eine `List<T>` wächst und schrumpft. `Add` hängt an, `Insert` fügt ein und schiebt die folgenden Elemente nach hinten, `Remove` und `RemoveAt` entfernen und schieben sie nach vorn. `Count` und die Indizes passen sich an. Eine Liste ist ein Referenztyp. Ein Array passt, wenn die Anzahl feststeht, eine Liste, wenn sie sich ändert.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l04-q1" />
+
+<Quiz id="m05-l04-q2" />
+
+<Quiz id="m05-l04-q3" />
+
+<Quiz id="m05-l04-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l04-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l04-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [List&lt;T&gt; Class](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)
+- Microsoft Learn: [Collections](https://learn.microsoft.com/dotnet/standard/collections/)
