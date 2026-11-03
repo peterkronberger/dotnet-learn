@@ -720,6 +720,270 @@
         }
       ],
       "explanation": "Für den Zugriff auf ein Mitglied, das bei `null` fehlen darf, ist `?.` der passende Operator."
+    },
+    {
+      "id": "m04-l07-q1",
+      "lesson": "m04-l07",
+      "type": "single",
+      "question": "Es gilt `string text = \"alice\";`. Danach steht die Zeile `text.ToUpper();` allein. Welchen Wert hat `text`?",
+      "options": [
+        { "text": "`\"alice\"`, denn die Methode liefert ein neues `string`-Objekt und ändert `text` nicht.", "correct": true, "feedback": "Das Ergebnis wird nicht gespeichert und geht verloren." },
+        { "text": "`\"ALICE\"`, denn `ToUpper()` ändert den Text.", "feedback": "Ein `string`-Objekt lässt sich nicht ändern. Die Methode gibt einen neuen Text zurück.", "misconception": "m04-l07-string-method-changes-string" },
+        { "text": "`null`, denn das Ergebnis wurde nicht zugewiesen.", "feedback": "Die Variable behält ihr Objekt. Sie wird nicht `null`." }
+      ],
+      "explanation": "Methoden von `string` ändern das Objekt nie. Sie liefern ein neues `string`-Objekt. Ohne Zuweisung geht das Ergebnis verloren."
+    },
+    {
+      "id": "m04-l07-q2",
+      "lesson": "m04-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l07/quiz-immutable.cs",
+      "explanation": "`user` bleibt `Carol`, denn `Replace` in der dritten Zeile wirft sein Ergebnis weg. `shown` enthält das Ergebnis von `ToLower()`: `carol`. Der letzte Aufruf liefert `Karol` und gibt es direkt aus."
+    },
+    {
+      "id": "m04-l07-q3",
+      "lesson": "m04-l07",
+      "type": "single",
+      "question": "Welche Zeile sorgt dafür, dass `text` danach ohne Leerzeichen am Rand gespeichert ist?",
+      "options": [
+        { "text": "`text = text.Trim();`", "correct": true, "feedback": "Das Ergebnis von `Trim()` wird der Variable zugewiesen." },
+        { "text": "`text.Trim();`", "feedback": "Das Ergebnis geht verloren, `text` bleibt, wie es war.", "misconception": "m04-l07-string-method-changes-string" },
+        { "text": "`text.Length = 0;`", "feedback": "`Length` eines `string` lässt sich nicht setzen." }
+      ],
+      "explanation": "Erst die Zuweisung lässt die Variable auf das neue Objekt zeigen."
+    },
+    {
+      "id": "m04-l07-q4",
+      "lesson": "m04-l07",
+      "type": "single",
+      "question": "Es gilt `string a = \"x\"; string b = a; b = b + \"y\";`. Was steht danach in `a`?",
+      "options": [
+        { "text": "`\"x\"`, denn `b + \"y\"` erzeugt ein neues `string`-Objekt, auf das nur `b` zeigt.", "correct": true, "feedback": "Das Objekt von `a` bleibt unverändert." },
+        { "text": "`\"xy\"`, denn `a` und `b` zeigen auf dasselbe Objekt.", "feedback": "Sie zeigten auf dasselbe Objekt, aber `b` zeigt nach der Zuweisung auf ein neues. Das alte Objekt wurde nicht verändert." },
+        { "text": "`null`, denn das alte Objekt wird gelöscht.", "feedback": "Ein Objekt, auf das noch `a` zeigt, bleibt erhalten." }
+      ],
+      "explanation": "Bei einem `StringBuilder` änderst du das gemeinsame Objekt. Bei einem `string` entsteht ein neues Objekt, und nur die zugewiesene Variable zeigt darauf."
+    },
+    {
+      "id": "m04-l07-q5",
+      "lesson": "m04-l07",
+      "type": "multi",
+      "question": "Es gilt `string raw = \"  Bob \";`. Welche Aussagen über `string clean = raw.Trim().ToLower();` stimmen?",
+      "options": [
+        { "text": "`raw` enthält danach weiter `\"  Bob \"`.", "correct": true },
+        { "text": "`clean` enthält `\"bob\"`.", "correct": true },
+        { "text": "`Trim()` liefert ein neues `string`-Objekt, auf dem `ToLower()` aufgerufen wird.", "correct": true },
+        { "text": "`raw` enthält danach `\"bob\"`.", "feedback": "Keine der beiden Methoden ändert `raw`.", "misconception": "m04-l07-string-method-changes-string" }
+      ],
+      "explanation": "Aufrufe lassen sich verketten, weil jeder Aufruf ein neues `string` liefert. Das Original bleibt unverändert."
+    },
+    {
+      "id": "m04-l07-q6",
+      "lesson": "m04-l07",
+      "type": "single",
+      "question": "Ein Programm hängt in einer Schleife tausende Male Text an einen Text. Wann ist ein `StringBuilder` die passende Wahl?",
+      "options": [
+        { "text": "Bei vielen solchen Änderungen. Der `StringBuilder` ändert sein Objekt, statt jedes Mal ein neues zu erzeugen.", "correct": true, "feedback": "Das ist der dokumentierte Einsatz für viele Änderungen." },
+        { "text": "Immer, denn `string` ist zu langsam.", "feedback": "Für wenige Änderungen genügt `string`." },
+        { "text": "Nie, denn `StringBuilder` ist ein Referenztyp.", "feedback": "Gerade weil er ein veränderbares Objekt ist, eignet er sich für viele Änderungen." }
+      ],
+      "explanation": "Jedes `+` auf einem `string` erzeugt ein neues Objekt. Ein `StringBuilder` hängt an dasselbe Objekt an."
+    },
+    {
+      "id": "m04-l07-q7",
+      "lesson": "m04-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `name.ToUpper();` allein `name` nicht ändert und wie du das Ergebnis behältst.",
+      "modelAnswer": "Ein `string`-Objekt ist unveränderlich. Eine Methode wie `ToUpper()` ändert es nicht, sondern liefert ein neues `string`-Objekt zurück. Wenn du das Ergebnis nicht speicherst, geht es verloren, und `name` zeigt weiter auf das alte Objekt.\n\nMit `name = name.ToUpper();` oder `string shout = name.ToUpper();` hältst du das neue Objekt in einer Variable fest."
+    },
+    {
+      "id": "m04-l07-q8",
+      "lesson": "m04-l07",
+      "type": "single",
+      "question": "SecLog soll `\"  Bob \"` und `\"bob\"` als denselben Benutzer behandeln. Was schreibst du?",
+      "options": [
+        { "text": "`string user = rawUser.Trim().ToLower();` und danach mit `user` weiterarbeiten", "correct": true, "feedback": "Das Ergebnis steht in einer neuen Variable." },
+        { "text": "`rawUser.Trim().ToLower();` und danach mit `rawUser` weiterarbeiten", "feedback": "`rawUser` ist unverändert, das Ergebnis ging verloren.", "misconception": "m04-l07-string-method-changes-string" },
+        { "text": "`rawUser.Length = 3;`", "feedback": "`Length` eines `string` lässt sich nicht setzen." }
+      ],
+      "explanation": "Das bereinigte Ergebnis muss in einer Variable landen. Das Original bleibt erhalten."
+    },
+    {
+      "id": "m04-l08-q1",
+      "lesson": "m04-l08",
+      "type": "single",
+      "question": "Es gilt `var a = new StringBuilder(\"bob\"); var b = new StringBuilder(\"bob\");`. Was ergibt `a == b`?",
+      "options": [
+        { "text": "`False`, denn `==` vergleicht hier die Verweise, und es sind zwei Objekte.", "correct": true, "feedback": "Für `StringBuilder` vergleicht `==` Verweise." },
+        { "text": "`True`, denn beide enthalten denselben Text.", "feedback": "`==` vergleicht bei den meisten Referenztypen, ob beide Variablen auf dasselbe Objekt zeigen." },
+        { "text": "Der Ausdruck ist ungültig.", "feedback": "Der Ausdruck ist gültig, er vergleicht die Verweise." }
+      ],
+      "explanation": "Für Referenztypen ohne eigenen Vergleich prüft `==`, ob es dasselbe Objekt ist."
+    },
+    {
+      "id": "m04-l08-q2",
+      "lesson": "m04-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l08/quiz-equality.cs",
+      "explanation": "Die beiden `StringBuilder` sind verschiedene Objekte: `False`. Die Texte `textOne` und `textTwo` haben dieselben Zeichen: `True`, aber es sind zwei Objekte: `False`. Nach `two = one;` zeigen beide Variablen auf dasselbe Objekt: `True`."
+    },
+    {
+      "id": "m04-l08-q3",
+      "lesson": "m04-l08",
+      "type": "single",
+      "question": "Es gilt `string a = \"bob\";` und `string b = new StringBuilder(\"bob\").ToString();`. Was ergibt `a == b`?",
+      "options": [
+        { "text": "`True`, denn bei `string` vergleicht `==` die Zeichen.", "correct": true, "feedback": "Der Inhalt zählt, nicht das Objekt." },
+        { "text": "`False`, denn es sind zwei verschiedene Objekte.", "feedback": "Bei `string` vergleicht `==` die Zeichen und nicht die Verweise.", "misconception": "m04-l08-string-equality-compares-references" },
+        { "text": "`False`, denn `==` darf bei `string` nur mit Literalen stehen.", "feedback": "Es darf bei zwei Variablen stehen.", "misconception": "m04-l08-string-equality-compares-references" }
+      ],
+      "explanation": "Für `string` sind `==` und `Equals` auf den Inhalt festgelegt. Zwei verschiedene Objekte mit gleichem Text sind gleich."
+    },
+    {
+      "id": "m04-l08-q4",
+      "lesson": "m04-l08",
+      "type": "single",
+      "question": "Du willst wissen, ob zwei `string`-Variablen auf dasselbe Objekt zeigen. Was schreibst du?",
+      "options": [
+        { "text": "`object.ReferenceEquals(a, b)`", "correct": true, "feedback": "Das prüft immer die Verweise." },
+        { "text": "`a == b`", "feedback": "Bei `string` vergleicht das die Zeichen.", "misconception": "m04-l08-string-equality-compares-references" },
+        { "text": "`a.Equals(b)`", "feedback": "Bei `string` vergleicht das ebenfalls die Zeichen.", "misconception": "m04-l08-string-equality-compares-references" }
+      ],
+      "explanation": "`object.ReferenceEquals` vergleicht Verweise, egal wie ein Typ `==` oder `Equals` festlegt."
+    },
+    {
+      "id": "m04-l08-q5",
+      "lesson": "m04-l08",
+      "type": "multi",
+      "question": "Welche Aussagen stimmen?",
+      "options": [
+        { "text": "Bei `int` vergleicht `==` die Werte.", "correct": true },
+        { "text": "Bei `string` vergleicht `==` die Zeichen.", "correct": true },
+        { "text": "Bei `StringBuilder` vergleicht `==` die Verweise.", "correct": true },
+        { "text": "Bei `string` vergleicht `==` die Verweise, weil `string` ein Referenztyp ist.", "feedback": "Für `string` gilt eine eigene Regel: Er vergleicht die Zeichen.", "misconception": "m04-l08-string-equality-compares-references" }
+      ],
+      "explanation": "Welche Art von Gleichheit `==` prüft, hängt vom Typ ab. Die vordefinierten Werttypen und `string` vergleichen Werte, die meisten anderen Referenztypen Verweise."
+    },
+    {
+      "id": "m04-l08-q6",
+      "lesson": "m04-l08",
+      "type": "single",
+      "question": "SecLog bildet `cleanUser` mit `rawUser.Trim().ToLower()` und prüft `cleanUser == \"bob\"`. Was ergibt das bei `rawUser = \"  Bob \"`?",
+      "options": [
+        { "text": "`True`, denn der Text von `cleanUser` ist `bob`.", "correct": true, "feedback": "Das neue Objekt hat dieselben Zeichen wie das Literal." },
+        { "text": "`False`, denn `cleanUser` ist ein anderes Objekt als das Literal `\"bob\"`.", "feedback": "Bei `string` zählen die Zeichen, nicht das Objekt.", "misconception": "m04-l08-string-equality-compares-references" },
+        { "text": "`False`, denn `Trim()` ändert die Groß- und Kleinschreibung nicht.", "feedback": "`Trim()` entfernt Leerzeichen, `ToLower()` sorgt für Kleinbuchstaben." }
+      ],
+      "explanation": "Zeichen: `bob`. Der Vergleich ist wahr, auch wenn die Objekte verschieden sind."
+    },
+    {
+      "id": "m04-l08-q7",
+      "lesson": "m04-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum zwei verschiedene `string`-Objekte mit gleichem Text mit `==` gleich sind, zwei verschiedene `StringBuilder`-Objekte mit gleichem Text aber nicht.",
+      "modelAnswer": "`==` prüft bei jedem Typ etwas anderes. Bei `string` ist festgelegt, dass die Zeichen verglichen werden. Zwei Objekte mit denselben Zeichen sind darum gleich.\n\nBei `StringBuilder` gibt es keine solche Festlegung. Dort prüft `==`, ob beide Variablen auf dasselbe Objekt zeigen. Zwei Objekte mit gleichem Text sind verschiedene Objekte, also nicht gleich.\n\nMit `object.ReferenceEquals` prüfst du bei jedem Typ, ob es dasselbe Objekt ist."
+    },
+    {
+      "id": "m04-l08-q8",
+      "lesson": "m04-l08",
+      "type": "single",
+      "question": "In SecLog schreiben zwei Stellen in dasselbe Objekt für die Befunde. Du willst im Test sicherstellen, dass beide Variablen wirklich auf dasselbe Objekt zeigen. Was nutzt du?",
+      "options": [
+        { "text": "`object.ReferenceEquals(first, second)`", "correct": true, "feedback": "Es sagt, ob beide Variablen auf dasselbe Objekt zeigen." },
+        { "text": "`first.ToString() == second.ToString()`", "feedback": "Das vergleicht nur den Text. Zwei verschiedene Objekte mit gleichem Text wären auch gleich." },
+        { "text": "`first.Length == second.Length`", "feedback": "Gleiche Länge heißt nicht, dass es dasselbe Objekt ist." }
+      ],
+      "explanation": "Wenn es um die Identität des Objekts geht, ist `object.ReferenceEquals` der passende Test."
+    },
+    {
+      "id": "m04-l09-q1",
+      "lesson": "m04-l09",
+      "type": "single",
+      "question": "Welche Zeile boxt?",
+      "options": [
+        { "text": "`object a = 5;`", "correct": true, "feedback": "`int` ist ein Werttyp, der Wert wird in ein neues Objekt kopiert." },
+        { "text": "`object b = \"text\";`", "feedback": "`string` ist schon ein Referenztyp, es wird nur ein Verweis zugewiesen." },
+        { "text": "`object c = new StringBuilder();`", "feedback": "`StringBuilder` ist ein Referenztyp, es wird nur ein Verweis zugewiesen." }
+      ],
+      "explanation": "Boxing gibt es nur, wenn ein Werttyp nach `object` umgewandelt wird."
+    },
+    {
+      "id": "m04-l09-q2",
+      "lesson": "m04-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l09/quiz-boxing.cs",
+      "explanation": "`box` enthält eine Kopie von `1`. `level++` ändert nur `level` auf `2`. Das Unboxing liefert `1`, also ist `level` danach `2 + 1 = 3`. `box` zeigt weiter `1`."
+    },
+    {
+      "id": "m04-l09-q3",
+      "lesson": "m04-l09",
+      "type": "single",
+      "question": "Es gilt `int n = 5; object box = n; n = 10;`. Was gibt `Console.WriteLine(box);` aus?",
+      "options": [
+        { "text": "`5`, denn das Objekt enthält eine Kopie.", "correct": true, "feedback": "Spätere Änderungen von `n` erreichen das Objekt nicht." },
+        { "text": "`10`, denn `box` ist mit `n` verbunden.", "feedback": "Die Variable und das Objekt sind nach dem Boxing unabhängig.", "misconception": "m04-l09-box-shares-value" },
+        { "text": "`null`, denn `n` wurde geändert.", "feedback": "Das Objekt bleibt unverändert." }
+      ],
+      "explanation": "Boxing kopiert den Wert. Danach sind Variable und Box getrennt."
+    },
+    {
+      "id": "m04-l09-q4",
+      "lesson": "m04-l09",
+      "type": "single",
+      "question": "Es gilt `object o = 42;`. Was passiert bei `long x = (long)o;`?",
+      "options": [
+        { "text": "Das Programm bricht zur Laufzeit mit einem Fehler ab, denn die Box enthält ein `int` und kein `long`.", "correct": true, "feedback": "Unboxing braucht den genauen Typ." },
+        { "text": "`x` wird `42`, denn `int` passt in `long`.", "feedback": "Beim Unboxing zählt der genaue Typ. `(long)(int)o` funktioniert." },
+        { "text": "`x` wird `0`, denn die Umwandlung schlägt leise fehl.", "feedback": "Es gibt keinen stillen Fehlschlag." }
+      ],
+      "explanation": "Zuerst `(int)o`, dann ist `int` zu `long` umwandelbar."
+    },
+    {
+      "id": "m04-l09-q5",
+      "lesson": "m04-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Boxing stimmen?",
+      "options": [
+        { "text": "Beim Boxing entsteht ein neues Objekt.", "correct": true },
+        { "text": "Beim Boxing wird der Wert kopiert.", "correct": true },
+        { "text": "Unboxing braucht eine explizite Umwandlung wie `(int)o`.", "correct": true },
+        { "text": "Eine Box bleibt mit der ursprünglichen Variable verbunden.", "feedback": "Nach dem Boxing sind beide unabhängig.", "misconception": "m04-l09-box-shares-value" }
+      ],
+      "explanation": "Boxing allokiert ein Objekt und kopiert den Wert hinein. Unboxing prüft den Typ und kopiert zurück."
+    },
+    {
+      "id": "m04-l09-q6",
+      "lesson": "m04-l09",
+      "type": "single",
+      "question": "Es gilt `int n = 7; object a = n; object b = n;`. Was ergibt `object.ReferenceEquals(a, b)`?",
+      "options": [
+        { "text": "`False`, denn jedes Boxing erzeugt ein eigenes Objekt.", "correct": true, "feedback": "Zwei Boxen sind zwei Objekte, auch mit gleichem Wert." },
+        { "text": "`True`, denn beide enthalten `7`.", "feedback": "Es sind zwei Objekte." },
+        { "text": "`True`, denn beide stammen aus `n`.", "feedback": "Die Herkunft verbindet sie nicht, jedes Boxing kopiert neu.", "misconception": "m04-l09-box-shares-value" }
+      ],
+      "explanation": "Jedes Boxing erzeugt ein neues Objekt."
+    },
+    {
+      "id": "m04-l09-q7",
+      "lesson": "m04-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was beim Boxing und beim Unboxing passiert und warum Unboxing den genauen Typ braucht.",
+      "modelAnswer": "Beim Boxing wird ein Werttyp nach `object` umgewandelt. Es entsteht ein neues Objekt, das eine Kopie des Werts enthält. Die Variable und das Objekt sind danach unabhängig.\n\nBeim Unboxing wird der Wert aus dem Objekt zurückkopiert. Dabei wird geprüft, ob das Objekt genau den verlangten Werttyp enthält. Enthält die Box ein `int`, passt `(int)o`, aber `(long)o` nicht. Dann bricht das Programm mit einem Fehler ab."
+    },
+    {
+      "id": "m04-l09-q8",
+      "lesson": "m04-l09",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `object value`. Du rufst sie mit einer `int`-Variable auf. Was passiert beim Aufruf?",
+      "options": [
+        { "text": "Der Wert wird geboxt: Es entsteht ein neues Objekt mit einer Kopie.", "correct": true, "feedback": "Die Umwandlung nach `object` ist eine Boxing-Umwandlung." },
+        { "text": "Die Methode ändert die Variable des Aufrufers.", "feedback": "Sie bekommt nur eine Kopie.", "misconception": "m04-l09-box-shares-value" },
+        { "text": "Nichts, `int` ist schon ein `object`-Verweis.", "feedback": "Ein `int` liegt direkt in der Variable und ist kein Verweis." }
+      ],
+      "explanation": "Auch beim Übergeben an einen `object`-Parameter wird geboxt."
     }
   ]
 }

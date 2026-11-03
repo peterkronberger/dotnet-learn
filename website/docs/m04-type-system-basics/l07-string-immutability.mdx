@@ -1,0 +1,196 @@
+---
+title: Strings sind unveränderlich
+sidebar_position: 7
+description: "Ein string-Objekt ändert sich nie. Methoden wie ToUpper, Trim und Replace liefern ein neues string-Objekt, und erst eine Zuweisung ändert, worauf eine Variable zeigt."
+lesson_id: m04-l07
+duration_min: 20
+---
+
+import stringMethods from '!!raw-loader!@site/examples/m04/l07/string-methods.cs';
+import stringMethodsOutput from '!!raw-loader!@site/examples/m04/l07/string-methods.out.txt';
+import stringResult from '!!raw-loader!@site/examples/m04/l07/string-result.cs';
+import stringResultOutput from '!!raw-loader!@site/examples/m04/l07/string-result.out.txt';
+import stringCopy from '!!raw-loader!@site/examples/m04/l07/string-copy.cs';
+import stringCopyOutput from '!!raw-loader!@site/examples/m04/l07/string-copy.out.txt';
+import builderOrPlus from '!!raw-loader!@site/examples/m04/l07/builder-or-plus.cs';
+import cleanUserGaps from '!!raw-loader!@site/examples/m04/l07/clean-user-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l07/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l07/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l07/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l07/seclog-types-solution.cs';
+
+# Strings sind unveränderlich
+
+:::note[Lernziele]
+- Du kannst vorhersagen, dass `ToUpper()`, `Trim()` oder `Replace()` den ursprünglichen Text nicht ändern.
+- Du kannst das Ergebnis einer String-Methode einer Variablen zuweisen und Aufrufe verketten.
+- Du kannst erklären, wann ein `StringBuilder` statt wiederholtem `+` sinnvoll ist.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l01-q3" />
+
+<Quiz id="m04-l06-q1" />
+
+<Quiz id="m01-l06-q3" />
+
+## Ein Text ändert sich nie
+
+Ein `string` ist ein Referenztyp. Eine Variable vom Typ `string` enthält also einen Verweis auf ein Objekt, das den Text enthält. Anders als beim `StringBuilder` aus Lektion 1 lässt sich dieses Objekt nach dem Erzeugen nicht mehr ändern. Man sagt: Ein `string` ist <Term id="immutable">immutable (unveränderlich)</Term>. Der Typ <Term id="string">string</Term> trägt diese Eigenschaft in jedem Programm.
+
+Methoden wie `ToUpper()` (Großbuchstaben), `Trim()` (Leerzeichen am Anfang und Ende entfernen) und `Replace("A", "a")` (jedes `A` durch `a` ersetzen) ändern das Objekt deshalb nicht. Sie liefern ein neues `string`-Objekt mit dem Ergebnis.
+
+:::info[Vorhersage]
+Was steht in den eckigen Klammern? Die Klammern machen die Leerzeichen sichtbar.
+:::
+
+<CSharpRunner id="m04-l07-methods" code={stringMethods} predict expected={stringMethodsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `[  Alice ]`, also der ursprüngliche Text mit beiden Leerzeichen am Anfang und einem am Ende.
+
+1. **Methode aufrufen:** `text.ToUpper()` erzeugt ein neues Objekt `  ALICE `. Das Objekt von `text` bleibt, wie es war.
+2. **Ergebnis prüfen:** Das neue Objekt wird keiner Variable zugewiesen. Es ist danach nicht mehr erreichbar.
+3. **Wiederholung:** `Trim()` und `Replace` verhalten sich genauso. Keine der drei Zeilen ändert `text`.
+
+**Was passiert, wenn du `text = text.Trim();` schreibst?** Dann zeigt `text` auf das neue Objekt `Alice`.
+
+</details>
+
+## Das Ergebnis behalten und verketten
+
+Willst du das Ergebnis behalten, weist du es zu. Es gibt zwei Wege: eine neue Variable, oder dieselbe Variable erneut. Weil jeder Aufruf ein `string` liefert, kannst du den nächsten Aufruf direkt anhängen. Das heißt Verkettung: `raw.Trim().ToUpper()` wendet erst `Trim()` an und dann `ToUpper()` auf das Ergebnis.
+
+:::info[Vorhersage]
+Was geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l07-result" code={stringResult} predict expected={stringResultOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `[  Alice ]`, `[Alice]`, `[AL1CE]`, `[Alice]`.
+
+1. **Neue Variable:** `raw.Trim()` liefert `Alice`. Das Ergebnis steht in `clean`, `raw` bleibt unverändert.
+2. **Verkettung:** `raw.Trim()` ergibt `Alice`, darauf `ToUpper()` ergibt `ALICE`, darauf `Replace("I", "1")` ergibt `AL1CE`. Auch `raw` bleibt dabei unverändert.
+3. **Dieselbe Variable:** `raw = raw.Trim();` lässt `raw` auf das neue Objekt zeigen. Erst jetzt ist `raw` `Alice`. Das alte Objekt wurde nie verändert.
+
+</details>
+
+## Zuweisen ändert den Verweis
+
+Aus Lektion 1 kennst du: Nach `var b = a;` zeigen beide Variablen auf dasselbe Objekt. Bei einem `StringBuilder` ändert `Append` dieses Objekt, und beide Variablen zeigen die Änderung. Bei einem `string` gibt es keine solche Änderung. Der Ausdruck `second + "!"` erzeugt ein neues Objekt, und die Zuweisung lässt nur `second` darauf zeigen.
+
+:::info[Vorhersage]
+`first` und `second` zeigen zuerst auf dasselbe Objekt. Was geben die beiden Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l07-copy" code={stringCopy} predict expected={stringCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `alice` und `alice!`.
+
+1. **Verweis kopieren:** `second = first` lässt beide auf das Objekt `alice` zeigen.
+2. **Neues Objekt:** `second + "!"` erzeugt ein neues Objekt `alice!`. Das Objekt `alice` bleibt unverändert.
+3. **Verweis ändern:** `second` zeigt jetzt auf das neue Objekt, `first` zeigt weiter auf das alte.
+
+Der Unterschied zum `StringBuilder`: Dort ändert `second.Append("!")` das gemeinsame Objekt, und `first` zeigt `alice!` mit.
+
+</details>
+
+## Viele Änderungen: StringBuilder
+
+Jede „Änderung“ eines `string` erzeugt ein neues Objekt. Für ein paar Änderungen ist das in Ordnung. Baust du einen Text aber mit vielen Anhängen auf, etwa in einer Schleife, ist ein `StringBuilder` die dafür vorgesehene Wahl: Er ändert sein eigenes Objekt, statt jedes Mal ein neues zu erzeugen. Am Ende holst du den Text mit `ToString()`.
+
+<CSharpRunner id="m04-l07-builder" code={builderOrPlus} />
+
+Beide Wege liefern denselben Text. Der erste erzeugt in jedem Durchlauf neue `string`-Objekte, der zweite hängt an ein einziges `StringBuilder`-Objekt an. `Length` des Builders zählt die Zeichen: `1;2;3;` hat sechs.
+
+:::warning[Achtung]
+<Misconception id="m04-l07-string-method-changes-string" />
+
+**„`text.ToUpper();` ändert `text`.“** Das stimmt nicht. Die Methode liefert ein neues `string`-Objekt, und `text` zeigt weiter auf das alte. Steht die Zeile allein, geht das Ergebnis verloren. Willst du es behalten, schreibst du `text = text.ToUpper();`.
+:::
+
+## Lückenbeispiel
+
+`raw` bleibt in dem Beispiel unverändert, und `clean` wird in zwei Schritten gebaut. Schreibe die beiden Zeilen für `clean` als eine einzige Zeile mit Verkettung. Die Ausgabe `[ Dave ]` und `[dave]` bleibt gleich.
+
+<CSharpRunner id="m04-l07-gaps" code={cleanUserGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zeilen zusammenführen:** `string clean = raw.Trim().ToLower();` ersetzt die Zeilen `string clean = raw.Trim();` und `clean = clean.ToLower();`.
+2. **Prüfen:** `raw` ist weiter `[ Dave ]`, denn auch hier ändert keine Methode das Original.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog behandelt fehlende Werte mit `?.`, `??` und `??=`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Handle missing values with null-safe operators*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Handle missing values with null-safe operators* den Block `// Clean up a user name: string methods return a new string`. Er hat `string rawUser = "  Bob ";` und `string cleanUser = rawUser.Trim().ToLower();`. Gib `Raw user: [  Bob ]` und `Clean user: [bob]` aus. Die eckigen Klammern machen die Leerzeichen sichtbar.
+
+<CSharpRunner id="m04-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Rohwert speichern:** `rawUser` enthält den Text mit Leerzeichen, so wie er in einer Eingabe stehen könnte.
+2. **Bereinigen und verketten:** `Trim()` entfernt die Leerzeichen, `ToLower()` macht Kleinbuchstaben daraus. Das Ergebnis `bob` steht in `cleanUser`.
+3. **Beide ausgeben:** `rawUser` ist unverändert `  Bob `, denn keine der beiden Methoden ändert das Original. Nur `cleanUser` zeigt auf das neue Objekt.
+
+</details>
+
+**Neuer Stand:** SecLog bereinigt einen Benutzernamen, ohne den Rohwert zu verlieren.
+
+<details>
+<summary>Vertiefung: Der Typ string in der Spezifikation (optional)</summary>
+
+Der Typ `string` ist eine versiegelte Klasse, die direkt von `object` abstammt, und das Schlüsselwort `string` ist ein anderer Name für `System.String` ([§8.2.5 The string type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#825-the-string-type)).
+
+Dass die Methoden von `String` und die Operatoren, die einen Text zu ändern scheinen, ein neues Objekt liefern, steht in der Bibliotheksdokumentation: [Immutability of strings](https://learn.microsoft.com/dotnet/csharp/programming-guide/strings/#immutability-of-strings). Dort steht auch: Legst du einen Verweis auf einen `string` an und „änderst“ dann das Original, zeigt der Verweis weiter auf das ursprüngliche Objekt. Das ist genau das Verhalten aus dem Beispiel mit `first` und `second`.
+</details>
+
+## Zusammenfassung
+
+Ein `string`-Objekt ändert sich nach dem Erzeugen nie. Methoden wie `ToUpper()`, `Trim()` und `Replace()` liefern ein neues `string`-Objekt. Willst du das Ergebnis behalten, weist du es zu, und weil jeder Aufruf ein `string` liefert, lassen sich Aufrufe verketten. Eine Zuweisung ändert nur, worauf eine Variable zeigt. Für viele Änderungen nacheinander eignet sich ein `StringBuilder`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l07-q1" />
+
+<Quiz id="m04-l07-q2" />
+
+<Quiz id="m04-l07-q3" />
+
+<Quiz id="m04-l07-q4" />
+
+<Quiz id="m04-l07-q5" />
+
+<Quiz id="m04-l07-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Strings (C#-Programmierhandbuch)](https://learn.microsoft.com/dotnet/csharp/programming-guide/strings/)
+- C#-Spezifikation: [§8.2.5 The string type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#825-the-string-type)
+- Microsoft Learn: [StringBuilder-Klasse](https://learn.microsoft.com/dotnet/api/system.text.stringbuilder)
