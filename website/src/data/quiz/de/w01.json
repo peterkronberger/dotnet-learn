@@ -1,4 +1,592 @@
 {
   "module": "w01",
-  "questions": []
+  "questions": [
+    {
+      "id": "w01-l01-q1",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Verkettung von Text und Zahlen",
+          "correct": true
+        },
+        {
+          "text": "Ganzzahldivision"
+        },
+        {
+          "text": "Explizite Umwandlung (Cast)"
+        },
+        {
+          "text": "Parse und TryParse"
+        }
+      ],
+      "explanation": "Das Konzept ist die Verkettung mit `+`, sobald ein Operand ein Text ist. Du kennst es aus Lektion „Zeichenketten und Interpolation“ (Modul 1)."
+    },
+    {
+      "id": "w01-l01-q2",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Was gibt `Console.WriteLine(\"Sum: \" + 2 + 3);` aus?",
+      "options": [
+        {
+          "text": "`Sum: 23`",
+          "correct": true
+        },
+        {
+          "text": "`Sum: 5`",
+          "misconception": "m01-l06-string-plus-number-adds",
+          "feedback": "Sobald ein Operand ein Text ist, verkettet `+`. `\"Sum: \" + 2` ergibt zuerst den Text `Sum: 2`. Danach wird `3` angehängt. Gerechnet wird nur, solange beide Operanden Zahlen sind."
+        },
+        {
+          "text": "Ein Compilerfehler, weil Text und Zahl nicht zusammenpassen",
+          "feedback": "Die Zahl wird zu Text, und `+` verkettet. Das Programm läuft."
+        }
+      ],
+      "explanation": "Von links nach rechts: `\"Sum: \" + 2` ist der Text `Sum: 2`, und `+ 3` hängt `3` an. Ergebnis: `Sum: 23`."
+    },
+    {
+      "id": "w01-l01-q3",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Zählschleife und Off-by-one",
+          "correct": true
+        },
+        {
+          "text": "`break` und `continue`"
+        },
+        {
+          "text": "`switch`-Anweisung"
+        },
+        {
+          "text": "Verschachtelte Schleifen"
+        }
+      ],
+      "explanation": "Das Konzept ist die Zählschleife mit `for`, bei der Grenze und Startwert die Zahl der Durchläufe bestimmen. Du kennst es aus Lektion „Zählschleifen mit for und Durchlaufen mit foreach“ (Modul 2)."
+    },
+    {
+      "id": "w01-l01-q4",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Wie oft läuft der Block von `for (int i = 0; i <= 3; i++)`?",
+      "options": [
+        {
+          "text": "4-mal, mit `i` gleich `0`, `1`, `2` und `3`",
+          "correct": true
+        },
+        {
+          "text": "3-mal",
+          "misconception": "m02-l07-off-by-one",
+          "feedback": "`<=` und `<` ändern die Zahl der Durchläufe um eins. Hier läuft die Schleife auch mit `i` gleich `3`. Zähle im Zweifel die Werte der Schleifenvariablen von Hand auf."
+        },
+        {
+          "text": "5-mal",
+          "feedback": "Die Werte von `i` sind `0`, `1`, `2` und `3`. Bei `4` ist die Bedingung falsch."
+        }
+      ],
+      "explanation": "Die Werte der Schleifenvariablen sind `0`, `1`, `2`, `3`. Bei `4` ist `i <= 3` falsch und die Schleife endet. Das sind vier Durchläufe."
+    },
+    {
+      "id": "w01-l01-q5",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`return` und Ausgabe",
+          "correct": true
+        },
+        {
+          "text": "Überladen von Methoden"
+        },
+        {
+          "text": "Tupel als Rückgabewert"
+        },
+        {
+          "text": "Rekursion"
+        }
+      ],
+      "explanation": "Das Konzept ist der Unterschied zwischen `return` und `Console.WriteLine`. Du kennst es aus Lektion „return oder Ausgabe?“ (Modul 3)."
+    },
+    {
+      "id": "w01-l01-q6",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Eine Methode `int Square(int x)` gibt `x * x` mit `return` zurück. Was gibt das Programm aus: `Square(4); Console.WriteLine(\"Done\");`?",
+      "options": [
+        {
+          "text": "Nur `Done`",
+          "correct": true
+        },
+        {
+          "text": "`16` und danach `Done`",
+          "misconception": "m03-l02-return-prints",
+          "feedback": "`return` gibt den Wert nur an den Aufrufer weiter. Ausgegeben wird er erst, wenn der Aufrufer ihn an `Console.WriteLine` übergibt. Hier tut der Aufrufer nichts mit dem Wert."
+        },
+        {
+          "text": "Nur `16`",
+          "feedback": "Die Zeile mit `Console.WriteLine(\"Done\")` läuft trotzdem."
+        }
+      ],
+      "explanation": "Der Aufruf `Square(4)` berechnet `16` und gibt den Wert an den Aufrufer. Dort wird er nicht benutzt und nicht ausgegeben. Nur `Done` erscheint."
+    },
+    {
+      "id": "w01-l01-q7",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Wertparameter und Gültigkeitsbereich",
+          "correct": true
+        },
+        {
+          "text": "`out`-Parameter"
+        },
+        {
+          "text": "Optionale Argumente"
+        },
+        {
+          "text": "Lokale Funktionen"
+        }
+      ],
+      "explanation": "Das Konzept ist der Wertparameter: Er ist eine Kopie des Arguments. Du kennst es aus Lektion „Gültigkeitsbereich und Wertparameter“ (Modul 3)."
+    },
+    {
+      "id": "w01-l01-q8",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Die Methode `void AddOne(int n)` enthält nur `n = n + 1;`. Was gibt `int a = 5; AddOne(a); Console.WriteLine(a);` aus?",
+      "options": [
+        {
+          "text": "`5`",
+          "correct": true
+        },
+        {
+          "text": "`6`",
+          "misconception": "m03-l03-method-changes-caller-variable",
+          "feedback": "Der Parameter ist eine Kopie. Die Zuweisung wirkt nur in der Methode. Für einen neuen Wert beim Aufrufer brauchst du `return` und eine Zuweisung im Aufrufer."
+        },
+        {
+          "text": "Ein Compilerfehler, weil `n` nicht zugewiesen werden darf",
+          "feedback": "Ein Parameter darf wie eine lokale Variable zugewiesen werden. Die Zuweisung wirkt nur in der Methode."
+        }
+      ],
+      "explanation": "`n` ist eine Kopie von `a`. Die Methode erhöht die Kopie, `a` bleibt `5`."
+    },
+    {
+      "id": "w01-l01-q9",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Kopie eines Verweises bei Referenztypen",
+          "correct": true
+        },
+        {
+          "text": "Unveränderlichkeit von Strings"
+        },
+        {
+          "text": "Boxing"
+        },
+        {
+          "text": "Nullable-Werttypen"
+        }
+      ],
+      "explanation": "Das Konzept ist: Bei einem Referenztyp kopiert die Zuweisung nur den Verweis. Du kennst es aus Lektion „Werttypen und Referenztypen“ (Modul 4)."
+    },
+    {
+      "id": "w01-l01-q10",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Was gibt `var a = new StringBuilder(\"x\"); var b = a; b.Append(\"y\"); Console.WriteLine(a);` aus?",
+      "options": [
+        {
+          "text": "`xy`",
+          "correct": true
+        },
+        {
+          "text": "`x`",
+          "misconception": "m04-l01-assignment-copies-object",
+          "feedback": "Bei einem Referenztyp kopiert die Zuweisung nur den Verweis. `a` und `b` zeigen auf dasselbe Objekt, und die Änderung über `b` sieht man auch über `a`."
+        },
+        {
+          "text": "`y`",
+          "feedback": "`Append` hängt `y` an den vorhandenen Text an und ersetzt ihn nicht."
+        }
+      ],
+      "explanation": "`var b = a;` kopiert den Verweis. Beide Variablen zeigen auf dasselbe `StringBuilder`-Objekt, daher enthält es nach `Append` den Text `xy`."
+    },
+    {
+      "id": "w01-l01-q11",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Explizite Umwandlung (Cast)",
+          "correct": true
+        },
+        {
+          "text": "Verkettung von Text und Zahlen"
+        },
+        {
+          "text": "`checked`-Kontext"
+        },
+        {
+          "text": "Konstanten"
+        }
+      ],
+      "explanation": "Das Konzept ist die explizite Umwandlung: Ein Cast nach `int` schneidet die Nachkommastellen ab. Du kennst es aus Lektion „Explizite Umwandlungen und Überlauf“ (Modul 1)."
+    },
+    {
+      "id": "w01-l01-q12",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welchen Wert hat `(int)3.99`?",
+      "options": [
+        {
+          "text": "`3`",
+          "correct": true
+        },
+        {
+          "text": "`4`",
+          "misconception": "m01-l07-cast-rounds",
+          "feedback": "Der Cast schneidet die Nachkommastellen ab, in Richtung null. Gerundet wird nur mit `Math.Round`."
+        },
+        {
+          "text": "`3.99`",
+          "feedback": "Der Cast liefert einen `int`. Er hat keine Nachkommastellen."
+        }
+      ],
+      "explanation": "Der Cast schneidet ab: `(int)3.99` ist `3`."
+    },
+    {
+      "id": "w01-l01-q13",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Ganzzahldivision",
+          "correct": true
+        },
+        {
+          "text": "Explizite Umwandlung (Cast)"
+        },
+        {
+          "text": "Operator-Vorrang"
+        },
+        {
+          "text": "Parse und TryParse"
+        }
+      ],
+      "explanation": "Das Konzept ist die Ganzzahldivision: Zwei `int` ergeben wieder einen `int`. Du kennst es aus Lektion „Ganzzahlen, Gleitkommazahlen und decimal“ (Modul 1)."
+    },
+    {
+      "id": "w01-l01-q14",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welchen Wert hat `9 / 2`?",
+      "options": [
+        {
+          "text": "`4`",
+          "correct": true
+        },
+        {
+          "text": "`5`",
+          "misconception": "m01-l03-integer-division-rounds",
+          "feedback": "Die Ganzzahldivision rundet nicht. Sie schneidet den Nachkommateil ab, in Richtung 0."
+        },
+        {
+          "text": "`4.5`",
+          "feedback": "Beide Operanden sind `int`, darum ist auch das Ergebnis ein `int`. Für `4.5` müsste ein Operand ein `double` sein."
+        }
+      ],
+      "explanation": "Beide Operanden sind `int`. Der Nachkommateil wird abgeschnitten: `9 / 2` ist `4`."
+    },
+    {
+      "id": "w01-l01-q15",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`break` in verschachtelten Schleifen",
+          "correct": true
+        },
+        {
+          "text": "`continue`"
+        },
+        {
+          "text": "`while` und `do … while`"
+        },
+        {
+          "text": "`foreach`"
+        }
+      ],
+      "explanation": "Das Konzept ist `break` in verschachtelten Schleifen: Es verlässt nur die innere Schleife. Du kennst es aus Lektion „Verschachtelte Schleifen“ (Modul 2)."
+    },
+    {
+      "id": "w01-l01-q16",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Was geben die Schleifen aus? `for (int i = 1; i <= 2; i++) { for (int j = 1; j <= 3; j++) { if (j == 2) { break; } Console.WriteLine($\"{i}{j}\"); } }`",
+      "options": [
+        {
+          "text": "`11` und `21`",
+          "correct": true
+        },
+        {
+          "text": "Nur `11`",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Ein `break` in der inneren Schleife verlässt nur die innere Schleife. Die äußere läuft weiter."
+        },
+        {
+          "text": "`11`, `12`, `13`, `21`, `22` und `23`",
+          "feedback": "Bei `j` gleich `2` greift das `break` und beendet die innere Schleife."
+        }
+      ],
+      "explanation": "Für `i = 1` gibt die innere Schleife `11` aus und endet bei `j = 2`. Die äußere Schleife läuft weiter und ergibt für `i = 2` die Ausgabe `21`."
+    },
+    {
+      "id": "w01-l01-q17",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Wert- oder `ref`-Parameter bei Referenztypen",
+          "correct": true
+        },
+        {
+          "text": "`string?` und `int?`"
+        },
+        {
+          "text": "`==` und `Equals`"
+        },
+        {
+          "text": "Boxing"
+        }
+      ],
+      "explanation": "Das Konzept ist die Übergabe eines Referenztyps als Wertparameter: Der Verweis wird kopiert. Du kennst es aus Lektion „Argumente übergeben“ (Modul 4)."
+    },
+    {
+      "id": "w01-l01-q18",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "`void Reset(StringBuilder text)` enthält nur `text = new StringBuilder(\"new\");`. Was gibt `var log = new StringBuilder(\"old\"); Reset(log); Console.WriteLine(log);` aus?",
+      "options": [
+        {
+          "text": "`old`",
+          "correct": true
+        },
+        {
+          "text": "`new`",
+          "misconception": "m04-l03-reference-types-passed-by-reference",
+          "feedback": "Ohne `ref` wird jedes Argument als Wert übergeben. Bei einem Referenztyp ist dieser Wert der Verweis. Die Methode kann das Objekt ändern, aber nicht die Variable des Aufrufers."
+        },
+        {
+          "text": "`oldnew`",
+          "feedback": "Es wird nichts angehängt. Die Methode weist ihrem Parameter nur ein neues Objekt zu."
+        }
+      ],
+      "explanation": "`text` ist eine Kopie des Verweises. Die Zuweisung lässt nur `text` auf ein neues Objekt zeigen. `log` zeigt weiter auf das alte Objekt mit `old`."
+    },
+    {
+      "id": "w01-l01-q19",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Rekursion und Basisfall",
+          "correct": true
+        },
+        {
+          "text": "Überladen von Methoden"
+        },
+        {
+          "text": "`ref`-Parameter"
+        },
+        {
+          "text": "Tupel"
+        }
+      ],
+      "explanation": "Das Konzept ist die Rekursion mit Basisfall. Du kennst es aus Lektion „Rekursion und der Aufrufstapel“ (Modul 3)."
+    },
+    {
+      "id": "w01-l01-q20",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Die Methode `int Count(int n)` enthält nur `return Count(n - 1) + 1;`. Was passiert bei `Count(3)`?",
+      "options": [
+        {
+          "text": "Die Aufrufe hören nicht auf, es entsteht ein Stapelüberlauf",
+          "correct": true
+        },
+        {
+          "text": "Die Methode gibt `3` zurück",
+          "misconception": "m03-l10-no-base-case",
+          "feedback": "Die Methode weiß nichts von einem Ende, außer du prüfst es. Ein kleiner werdender Parameter allein beendet die Aufrufe nicht, denn `-1`, `-2` und weitere Werte sind auch Zahlen."
+        },
+        {
+          "text": "Die Methode gibt `0` zurück",
+          "misconception": "m03-l10-no-base-case",
+          "feedback": "Ohne Basisfall gibt es kein Ende der Aufrufe, darum auch keinen Rückgabewert. Es entsteht ein Stapelüberlauf."
+        }
+      ],
+      "explanation": "Es fehlt ein Basisfall. `Count(3)` ruft `Count(2)`, `Count(1)`, `Count(0)`, `Count(-1)` und immer weiter auf, bis ein Stapelüberlauf entsteht."
+    },
+    {
+      "id": "w01-l01-q21",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`&` und `&&` auf `bool`",
+          "correct": true
+        },
+        {
+          "text": "`else` und das nächste `if`"
+        },
+        {
+          "text": "`switch`-Ausdruck"
+        },
+        {
+          "text": "Bedingter Operator `?:`"
+        }
+      ],
+      "explanation": "Das Konzept ist der Unterschied zwischen `&` und `&&`: `&` wertet die rechte Seite immer aus. Du kennst es aus Lektion „Bedingungen verknüpfen: logische Operatoren“ (Modul 2)."
+    },
+    {
+      "id": "w01-l01-q22",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "`Check()` erhöht `calls` um eins und gibt `true` zurück. `calls` ist am Anfang `0`. Welchen Wert hat `calls` nach `bool ok = false & Check();`?",
+      "options": [
+        {
+          "text": "`1`",
+          "correct": true
+        },
+        {
+          "text": "`0`",
+          "misconception": "m02-l02-and-same-as-ampersand",
+          "feedback": "Bei `bool` liefern `&` und `&&` dasselbe Ergebnis, aber `&` wertet die rechte Seite immer aus. Nur `&&` überspringt sie, wenn die linke Seite `false` ist."
+        },
+        {
+          "text": "`2`",
+          "feedback": "Die rechte Seite wird genau einmal ausgewertet."
+        }
+      ],
+      "explanation": "Der Operator `&` wertet beide Seiten aus. `Check()` läuft einmal, `calls` ist danach `1`. Bei `&&` wäre es `0`."
+    },
+    {
+      "id": "w01-l01-q23",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`TryParse` mit `??` auf `ReadLine`",
+          "correct": true
+        },
+        {
+          "text": "`foreach` über einen Text"
+        },
+        {
+          "text": "Wertparameter"
+        },
+        {
+          "text": "Boxing"
+        }
+      ],
+      "explanation": "Das Konzept ist `Console.ReadLine()` als `string?` mit `??` und `TryParse` mit seinem `bool`-Ergebnis. Du kennst es aus den Lektionen „Text in Zahlen umwandeln: Parse und TryParse“ (Modul 1), „Konsoleneingabe“ (Modul 1) und „Null-sichere Operatoren“ (Modul 4)."
+    },
+    {
+      "id": "w01-l01-q24",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`??` und Short-Circuit",
+          "correct": true
+        },
+        {
+          "text": "`?:` mit zwei Zweigen"
+        },
+        {
+          "text": "`&&` und `||`"
+        },
+        {
+          "text": "Rekursion"
+        }
+      ],
+      "explanation": "Das Konzept ist der Operator `??`: Die rechte Seite wird nur ausgewertet, wenn die linke `null` ist. Du kennst es aus Lektion „Null-sichere Operatoren“ (Modul 4)."
+    },
+    {
+      "id": "w01-l01-q25",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "`Fallback()` gibt `Fallback called` aus und liefert `\"none\"`. Was gibt `string? name = \"ann\"; Console.WriteLine(name ?? Fallback());` aus?",
+      "options": [
+        {
+          "text": "Nur `ann`",
+          "correct": true
+        },
+        {
+          "text": "`Fallback called` und danach `ann`",
+          "misconception": "m04-l06-coalesce-always-evaluates",
+          "feedback": "Der rechte Teil wird nur ausgewertet, wenn der linke `null` ist. Eine Methode auf der rechten Seite läuft sonst nicht."
+        },
+        {
+          "text": "`none`",
+          "feedback": "`name` ist nicht `null`, darum ist das Ergebnis der Wert von `name`."
+        }
+      ],
+      "explanation": "`name` ist nicht `null`. Der Ausdruck ist `ann`, und `Fallback()` läuft nicht."
+    },
+    {
+      "id": "w01-l01-q26",
+      "lesson": "w01-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`do … while` mit Ganzzahldivision",
+          "correct": true
+        },
+        {
+          "text": "`for` mit Off-by-one"
+        },
+        {
+          "text": "`foreach`"
+        },
+        {
+          "text": "`switch`-Anweisung"
+        }
+      ],
+      "explanation": "Das Konzept ist die `do … while`-Schleife, die den Block mindestens einmal ausführt, zusammen mit der Ganzzahldivision. Du kennst sie aus den Lektionen „Schleifen mit while und do“ (Modul 2) und „Ganzzahlen, Gleitkommazahlen und decimal“ (Modul 1)."
+    },
+    {
+      "id": "w01-l01-q27",
+      "lesson": "w01-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du, welches Konzept eine Aufgabe braucht? Nenne ein Beispiel aus dieser Lektion.",
+      "modelAnswer": "Ich lese zuerst die Bausteine des Codes: Operatoren, Schlüsselwörter, Typen und Aufrufe. Dann frage ich, was davon ein Verhalten festlegt, zum Beispiel ob `+` rechnet oder verkettet, ob ein Parameter eine Kopie ist oder ob eine Seite von `??` ausgewertet wird. Erst danach sage ich das Ergebnis voraus.\n\nBeispiel: Bei `\"Sum: \" + 2 + 3` ist ein Operand ein Text. Darum verkettet `+`, und das Ergebnis ist `Sum: 23`."
+    },
+    {
+      "id": "w01-l01-q28",
+      "lesson": "w01-l01",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm `TryParse` und `??` zusammen einsetzen? Beschreibe die Situation und was der Code bei fehlender oder falscher Eingabe tut.",
+      "modelAnswer": "Zum Beispiel beim Einlesen einer Anzahl von der Konsole. `Console.ReadLine()` kann `null` liefern, `??` setzt dann einen Ersatztext. `TryParse` prüft, ob der Text eine Zahl ist, und liefert `false` statt eines Fehlers. Bei fehlender oder falscher Eingabe nimmt das Programm den `else`-Zweig, zum Beispiel eine Meldung oder einen Standardwert."
+    }
+  ]
 }
