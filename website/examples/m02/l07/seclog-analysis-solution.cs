@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,10 +11,12 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
 string eventType = "login-failed";
+// @fold-start
 Console.Write("User: ");
 Console.WriteLine(user);
 Console.Write("IP: ");
@@ -26,6 +29,7 @@ const int failures = 7;
 var failureRate = (failures * 100.0) / events;
 Console.Write("Failure rate (%): ");
 Console.WriteLine(failureRate);
+// @fold-end
 // Count the failed logins of bob (sample log lines 2, 3, 5, 6 and 7)
 var bobFailures = 0;
 bobFailures++;
@@ -35,6 +39,7 @@ bobFailures++;
 bobFailures++;
 Console.Write("Failed logins of bob: ");
 Console.WriteLine(bobFailures);
+// @fold-start
 // Compute the share of bob in all failures in percent, rounded to 2 places
 var bobShare = Math.Round(bobFailures * 100.0 / failures, 2);
 Console.Write("Share of bob (%): ");
@@ -97,6 +102,7 @@ switch (eventType)
         Console.WriteLine("Action: unknown event type");
         break;
 }
+// @fold-end
 // Count the failure streak: read event types while they are login-failed
 var nextEvent = Console.ReadLine();
 int streak = 0;

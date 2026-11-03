@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -20,12 +21,14 @@ Console.Write("IP: ");
 Console.WriteLine(ip);
 Console.Write("Event type: ");
 Console.WriteLine(eventType);
+// @fold-end
 // Compute the failure rate of the sample log in percent
 const int events = 14;
 const int failures = 7;
 var failureRate = (failures * 100.0) / events;
 Console.Write("Failure rate (%): ");
 Console.WriteLine(failureRate);
+// @fold-start
 // Count the failed logins of bob (sample log lines 2, 3, 5, 6 and 7)
 var bobFailures = 0;
 bobFailures++;
@@ -44,6 +47,7 @@ string timestamp = "2026-03-02T08:01:40Z";
 Console.WriteLine($"{timestamp} {eventType} user={user} ip={ip}");
 // Print the failure rate with one decimal place
 Console.WriteLine($"Failure rate: {failureRate:F1} %");
+// @fold-end
 // Print the share of successful logins (5 of 14) as a whole percent number
 const int successes = 5;
 var successRate = successes * 100.0 / events;

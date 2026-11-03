@@ -6,7 +6,6 @@ lesson_id: m02-l01
 duration_min: 22
 ---
 
-import CodeBlock from '@theme/CodeBlock';
 import compareNumbers from '!!raw-loader!@site/examples/m02/l01/compare-numbers.cs';
 import compareNumbersOutput from '!!raw-loader!@site/examples/m02/l01/compare-numbers.out.txt';
 import compareText from '!!raw-loader!@site/examples/m02/l01/compare-text.cs';
@@ -192,14 +191,16 @@ Die Bedingung einer `if`-Anweisung muss ein boolescher Ausdruck sein ([§12.27 B
 
 **Stand bisher:** SecLog gibt seinen Steckbrief aus, zeigt ein Ereignis, rechnet Fehlerquoten und liest den Benutzer und die Zahl der fehlgeschlagenen Anmeldungen aus der Eingabe (im Feld stehen `bob` und `5`).
 
-**Neue Anforderung:** SecLog soll bewerten, ob die Zahl `failedFromInput` hoch ist. Gib am Ende die Zeile `Alert: many failed logins` aus, wenn `failedFromInput` mindestens `5` ist, sonst die Zeile `No alert`. Die anderen Zeilen bleiben, die Ausgabe hat jetzt 24 Zeilen. Der Grenzwert 5 ist für den Unterricht erfunden.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Eingabe der Zahl `failedFromInput` und der letzte Block. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** SecLog soll bewerten, ob die Zahl `failedFromInput` hoch ist. Gib am Ende die Zeile `Alert: many failed logins` aus, wenn `failedFromInput` mindestens `5` ist, sonst die Zeile `No alert`. Der neue Code kommt am Ende, nach dem Block *Check a second text with TryParse and print the result*. Die anderen Zeilen bleiben, die Ausgabe hat jetzt 24 Zeilen. Der Grenzwert 5 ist für den Unterricht erfunden.
 
 <CSharpRunner id="m02-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-analysis-solution.cs" />
 
 1. **Bedingung formulieren:** `failedFromInput >= 5` vergleicht die eingelesene Zahl mit dem Grenzwert. Bei `5` ist sie wahr, weil `>=` auch Gleichheit zulässt.
 2. **Alarm ausgeben:** Der `if`-Block schreibt `Alert: many failed logins`.

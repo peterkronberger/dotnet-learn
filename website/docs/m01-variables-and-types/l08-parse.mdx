@@ -150,14 +150,16 @@ Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleib
 
 **Stand bisher:** SecLog gibt seinen Steckbrief aus, das erste Ereignis, Benutzer, IP-Adresse und Ereignistyp, die Fehlerquote, Bobs fehlgeschlagene Anmeldungen und seinen Anteil, das Ereignis als Logzeile, die Fehlerquote mit einer Nachkommastelle und den Anteil erfolgreicher Anmeldungen als ganze Prozentzahl.
 
-**Neue Anforderung:** Die Zahl der fehlgeschlagenen Anmeldungen kommt als Text, als stünde sie in einem Bericht: `string failedText = "7";`. Wandle sie mit `int.Parse` um und berechne damit die Fehlerquote (`Failure rate from text (%): 50`). Prüfe außerdem den Text `"seven"` mit `int.TryParse` und gib aus, ob es geklappt hat und welche Zahl herauskam (`Second text worked: False`, `Second text number: 0`). Die bisherigen 20 Zeilen bleiben, die neuen kommen am Ende dazu.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Fehlerquote und die Ausgabe der erfolgreichen Anmeldungen. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** Die Zahl der fehlgeschlagenen Anmeldungen kommt als Text, als stünde sie in einem Bericht: `string failedText = "7";`. Wandle sie mit `int.Parse` um und berechne damit die Fehlerquote (`Failure rate from text (%): 50`). Prüfe außerdem den Text `"seven"` mit `int.TryParse` und gib aus, ob es geklappt hat und welche Zahl herauskam (`Second text worked: False`, `Second text number: 0`). Die bisherigen 20 Zeilen bleiben, die neuen kommen am Ende dazu, nach dem Block *Print the share of successful logins (5 of 14) as a whole percent number*.
 
 <CSharpRunner id="m01-l08-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-event-solution.cs" />
 
 1. **Text umwandeln:** `int.Parse(failedText)` macht aus `"7"` die Zahl `7`.
 2. **Quote berechnen:** `failedFromText * 100.0 / events` rechnet mit `double` und ergibt `50`.

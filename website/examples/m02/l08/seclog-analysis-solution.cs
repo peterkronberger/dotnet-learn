@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,10 +11,12 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
 string eventType = "login-failed";
+// @fold-start
 Console.Write("User: ");
 Console.WriteLine(user);
 Console.Write("IP: ");
@@ -39,9 +42,11 @@ Console.WriteLine(bobFailures);
 var bobShare = Math.Round(bobFailures * 100.0 / failures, 2);
 Console.Write("Share of bob (%): ");
 Console.WriteLine(bobShare);
+// @fold-end
 // Print the event of sample line 2 as one log line, built from the variables
 string timestamp = "2026-03-02T08:01:40Z";
 Console.WriteLine($"{timestamp} {eventType} user={user} ip={ip}");
+// @fold-start
 // Print the failure rate with one decimal place
 Console.WriteLine($"Failure rate: {failureRate:F1} %");
 // Print the share of successful logins (5 of 14) as a whole percent number
@@ -111,6 +116,7 @@ for (int attempt = 1; attempt <= bobFailures; attempt++)
 {
     Console.WriteLine($"Attempt {attempt}");
 }
+// @fold-end
 // Count the dots in the IP address with a foreach loop
 int dots = 0;
 foreach (char symbol in ip)

@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,10 +11,12 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
 string eventType = "login-failed";
+// @fold-start
 Console.Write("User: ");
 Console.WriteLine(user);
 Console.Write("IP: ");
@@ -74,6 +77,7 @@ Console.WriteLine($"Suspicious: {suspicious}");
 // Print the number of failures with the singular or plural word
 string attemptWord = failedFromInput == 1 ? "attempt" : "attempts";
 Console.WriteLine($"{failedFromInput} failed {attemptWord}");
+// @fold-end
 // Rate the severity of the failures (the thresholds are made up for teaching)
 string severity = failedFromInput switch
 {

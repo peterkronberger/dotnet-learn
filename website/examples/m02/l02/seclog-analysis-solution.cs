@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,10 +11,12 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
 string eventType = "login-failed";
+// @fold-start
 Console.Write("User: ");
 Console.WriteLine(user);
 Console.Write("IP: ");
@@ -49,16 +52,19 @@ const int successes = 5;
 var successRate = successes * 100.0 / events;
 Console.WriteLine($"Success share, cut off (%): {(int)successRate}");
 Console.WriteLine($"Success share, rounded (%): {(int)Math.Round(successRate)}");
+// @fold-end
 // Read the number of failed logins from the second input line, compute the rate
 var failedText = Console.ReadLine();
 int.TryParse(failedText, out int failedFromInput);
 double rateFromInput = failedFromInput * 100.0 / events;
 Console.WriteLine($"Failure rate from input (%): {rateFromInput:F1}");
+// @fold-start
 // Check a second text with TryParse and print the result
 string badText = "seven";
 bool parsed = int.TryParse(badText, out int badNumber);
 Console.WriteLine($"Second text worked: {parsed}");
 Console.WriteLine($"Second text number: {badNumber}");
+// @fold-end
 // Print an alert if the number of failed logins from the input is high
 if (failedFromInput >= 5)
 {
