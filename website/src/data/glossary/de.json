@@ -2957,6 +2957,207 @@
         "title": "Unboxing conversions (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1037-unboxing-conversions"
       }
+    },
+    {
+      "id": "array",
+      "term": "Array",
+      "german": "Feld",
+      "category": "language",
+      "definition": "Ein Array hält eine feste Anzahl von Elementen desselben Typs. Die Länge steht beim Erzeugen fest und ändert sich danach nicht. Ein Array ist ein Referenztyp.",
+      "aliases": [
+        "Arrays",
+        "Reihung"
+      ],
+      "related": [
+        "element",
+        "index",
+        "array-initializer",
+        "collection",
+        "reference-type"
+      ],
+      "source": {
+        "title": "Arrays (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#171-general"
+      }
+    },
+    {
+      "id": "element",
+      "term": "Element",
+      "category": "language",
+      "definition": "Ein Element ist eine der Variablen eines Arrays. Alle Elemente eines Arrays haben denselben Typ, den Elementtyp.",
+      "aliases": [
+        "Elemente",
+        "Elementtyp"
+      ],
+      "related": [
+        "array",
+        "index"
+      ],
+      "source": {
+        "title": "Arrays (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#171-general"
+      }
+    },
+    {
+      "id": "index",
+      "term": "Index",
+      "category": "language",
+      "definition": "Der Index nennt die Position eines Elements im Array. Er beginnt bei `0`. Das letzte Element hat den Index `Length - 1`.",
+      "aliases": [
+        "Indizes",
+        "Position"
+      ],
+      "related": [
+        "array",
+        "element",
+        "bounds-check",
+        "index-from-end"
+      ],
+      "source": {
+        "title": "Array element access (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#174-array-element-access"
+      }
+    },
+    {
+      "id": "array-initializer",
+      "term": "Array Initializer",
+      "german": "Array-Initialisierer",
+      "category": "language",
+      "definition": "Ein Array-Initialisierer listet die Werte eines neuen Arrays in geschweiften Klammern auf, zum Beispiel `{ 1, 5, 0 }`. Die Anzahl der Werte bestimmt die Länge.",
+      "aliases": [
+        "Initialisierer"
+      ],
+      "related": [
+        "array",
+        "element"
+      ],
+      "lesson": "m05-l01",
+      "source": {
+        "title": "Array initializers (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#177-array-initializers"
+      }
+    },
+    {
+      "id": "bounds-check",
+      "term": "Bounds Check",
+      "german": "Bereichsprüfung",
+      "category": "language",
+      "definition": "Bei jedem Zugriff prüft die Laufzeit, ob der Index zwischen `0` und `Length - 1` liegt. Liegt er außerhalb, bricht das Programm mit einer `IndexOutOfRangeException` ab.",
+      "aliases": [
+        "Indexprüfung",
+        "IndexOutOfRangeException"
+      ],
+      "related": [
+        "index",
+        "array"
+      ],
+      "lesson": "m05-l01",
+      "source": {
+        "title": "IndexOutOfRangeException Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.indexoutofrangeexception"
+      }
+    },
+    {
+      "id": "rank",
+      "term": "Rank",
+      "german": "Rang, Anzahl der Dimensionen",
+      "category": "language",
+      "definition": "Der Rang eines Arrays ist die Anzahl seiner Dimensionen. `int[]` hat den Rang 1, `int[,]` den Rang 2. Die Eigenschaft `Rank` liefert ihn.",
+      "aliases": [
+        "Dimensionen"
+      ],
+      "related": [
+        "array",
+        "multi-dimensional-array"
+      ],
+      "lesson": "m05-l02",
+      "source": {
+        "title": "Arrays (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#171-general"
+      }
+    },
+    {
+      "id": "multi-dimensional-array",
+      "term": "Multi-dimensional Array",
+      "german": "mehrdimensionales Array",
+      "category": "language",
+      "definition": "Ein mehrdimensionales Array hat einen Rang größer als 1, zum Beispiel `int[,]`. Es ist ein einziger rechteckiger Block: Jede Zeile hat dieselbe Länge. Den Zugriff schreibst du `table[zeile, spalte]`.",
+      "aliases": [
+        "rechteckiges Array",
+        "zweidimensionales Array"
+      ],
+      "related": [
+        "array",
+        "rank",
+        "jagged-array"
+      ],
+      "lesson": "m05-l02",
+      "source": {
+        "title": "Arrays (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#171-general"
+      }
+    },
+    {
+      "id": "jagged-array",
+      "term": "Jagged Array",
+      "german": "verzweigtes Array",
+      "category": "language",
+      "definition": "Ein verzweigtes Array wie `int[][]` ist ein Array von Arrays. Jede Zeile ist ein eigenes Array und kann eine andere Länge haben. Jede Zeile muss einzeln erzeugt werden.",
+      "aliases": [
+        "Array von Arrays",
+        "gezacktes Array"
+      ],
+      "related": [
+        "array",
+        "multi-dimensional-array",
+        "rank"
+      ],
+      "lesson": "m05-l02",
+      "source": {
+        "title": "Arrays (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#171-general"
+      }
+    },
+    {
+      "id": "index-from-end",
+      "term": "Index from End",
+      "german": "Index vom Ende",
+      "category": "language",
+      "definition": "Der Operator `^` zählt ab dem Ende: `^1` ist das letzte Element, `^2` das vorletzte. `^0` zeigt hinter das letzte Element und ist kein gültiger Elementzugriff.",
+      "aliases": [
+        "Hat-Operator",
+        "^"
+      ],
+      "related": [
+        "index",
+        "range"
+      ],
+      "lesson": "m05-l03",
+      "source": {
+        "title": "The Index type (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges#182-the-index-type"
+      }
+    },
+    {
+      "id": "range",
+      "term": "Range",
+      "german": "Bereich",
+      "category": "language",
+      "definition": "Ein Bereich `a..b` wählt Elemente von `a` bis vor `b` aus: Der Anfang gehört dazu, das Ende nicht. Bei einem Array oder `string` ist das Ergebnis eine neue Kopie.",
+      "aliases": [
+        "Bereiche",
+        "Range-Operator",
+        ".."
+      ],
+      "related": [
+        "index-from-end",
+        "index",
+        "array"
+      ],
+      "source": {
+        "title": "The Range type (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges#183-the-range-type"
+      }
     }
   ]
 }

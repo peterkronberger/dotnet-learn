@@ -1,4 +1,197 @@
 {
   "module": "m05",
-  "questions": []
+  "questions": [
+    {
+      "id": "m05-l01-q1",
+      "lesson": "m05-l01",
+      "type": "single",
+      "question": "Es gilt `string[] users = { \"alice\", \"bob\", \"carol\" };`. Welches Element liefert `users[1]`?",
+      "options": [
+        { "text": "`\"alice\"`", "misconception": "m05-l01-index-starts-at-one", "feedback": "Der Index beginnt bei 0. `users[0]` ist `\"alice\"`, `users[1]` ist das zweite Element." },
+        { "text": "`\"bob\"`", "correct": true, "feedback": "Der Index zählt ab 0. Index 1 ist darum das zweite Element." },
+        { "text": "`\"carol\"`", "feedback": "`\"carol\"` hat den Index 2, denn der Index beginnt bei 0." }
+      ],
+      "explanation": "Das erste Element hat den Index 0, das zweite den Index 1, das dritte den Index 2. Der letzte Index eines Arrays ist `Length - 1`."
+    },
+    {
+      "id": "m05-l01-q2",
+      "lesson": "m05-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l01/quiz-index.cs",
+      "explanation": "`counts.Length - 1` ist 4, also ist `counts[4]` gleich `5`. Dann ist `counts[1] + counts[3]` gleich `1 + 1`, also `2`. `counts[0] = counts[4]` überschreibt das erste Element mit `5`."
+    },
+    {
+      "id": "m05-l01-q3",
+      "lesson": "m05-l01",
+      "type": "single",
+      "question": "Ein Array hat die Länge 4. Welcher Index ist der größte gültige?",
+      "options": [
+        { "text": "4", "misconception": "m05-l01-index-starts-at-one", "feedback": "Bei der Länge 4 gibt es die Indizes 0, 1, 2 und 3. Der Index 4 liegt außerhalb und lässt das Programm zur Laufzeit abbrechen." },
+        { "text": "3", "correct": true, "feedback": "Der letzte Index ist `Length - 1`, hier also 3." },
+        { "text": "5", "feedback": "5 liegt noch weiter außerhalb. Gültig sind 0 bis 3." }
+      ],
+      "explanation": "Die Indizes laufen von 0 bis `Length - 1`. Ein Array der Länge 4 hat darum die Indizes 0, 1, 2 und 3."
+    },
+    {
+      "id": "m05-l01-q4",
+      "lesson": "m05-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über `int[] counts = new int[3];` stimmen?",
+      "options": [
+        { "text": "Das Array hat 3 Elemente.", "correct": true, "feedback": "`new int[3]` legt 3 Elemente an." },
+        { "text": "Jedes Element hat zuerst den Wert `0`.", "correct": true, "feedback": "Neu angelegte Elemente bekommen den Standardwert ihres Typs, bei `int` also `0`." },
+        { "text": "Das Array wächst von selbst, wenn du `counts[3]` schreibst.", "feedback": "Die Länge steht beim Erzeugen fest. Ein Zugriff auf `counts[3]` liegt außerhalb und bricht das Programm zur Laufzeit ab." },
+        { "text": "Das erste Element ist `counts[1]`.", "misconception": "m05-l01-index-starts-at-one", "feedback": "Das erste Element hat den Index 0." }
+      ],
+      "explanation": "Die Länge eines Arrays steht beim Erzeugen fest. Die Elemente starten mit dem Standardwert des Elementtyps. Gezählt wird ab 0."
+    },
+    {
+      "id": "m05-l01-q5",
+      "lesson": "m05-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum der letzte Index eines Arrays `Length - 1` ist und was passiert, wenn du mit `Length` zugreifst.",
+      "modelAnswer": "Der Index beginnt bei 0. Ein Array mit 4 Elementen hat darum die Indizes 0, 1, 2 und 3. Der letzte ist `Length - 1`.\n\nGreifst du mit `Length` zu, liegt der Index außerhalb des Arrays. Das Programm prüft den Index bei jedem Zugriff und bricht zur Laufzeit ab."
+    },
+    {
+      "id": "m05-l01-q6",
+      "lesson": "m05-l01",
+      "type": "single",
+      "question": "Transferfrage: SecLog hält die 14 Zeilen des Beispiel-Logs. Wann ist dafür ein Array passend?",
+      "options": [
+        { "text": "Wenn die Anzahl der Zeilen beim Anlegen feststeht und du sie über den Index erreichen willst.", "correct": true, "feedback": "Genau dafür sind Arrays gedacht: feste Länge, Zugriff über den Index." },
+        { "text": "Wenn laufend neue Zeilen dazukommen sollen, ohne dass du die Länge vorher kennst.", "feedback": "Die Länge eines Arrays ändert sich nicht. Für wachsende Daten gibt es andere Sammlungen, die später im Modul folgen." },
+        { "text": "Wenn du ein einzelnes Wort speichern willst.", "feedback": "Für ein einzelnes Wort genügt eine Variable vom Typ `string`." }
+      ],
+      "explanation": "Ein Array passt, wenn die Anzahl der Werte feststeht, zum Beispiel bei den 14 Zeilen des Beispiel-Logs."
+    },
+    {
+      "id": "m05-l02-q1",
+      "lesson": "m05-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l02/quiz-jagged.cs",
+      "explanation": "Das äußere Array hat 3 Zeilen. `rows[2]` hat 3 Elemente. `rows[1][0]` ist `3` und `rows[2][2]` ist `6`, die Summe ist `9`."
+    },
+    {
+      "id": "m05-l02-q2",
+      "lesson": "m05-l02",
+      "type": "single",
+      "question": "Es gilt `int[,] table = new int[2, 3];`. Wie viele Elemente hat `table`, und was liefert `table.GetLength(1)`?",
+      "options": [
+        { "text": "6 Elemente, `GetLength(1)` liefert 3.", "correct": true, "feedback": "2 Zeilen mal 3 Spalten sind 6 Elemente. Die Dimension 1 ist die Spalte mit der Länge 3." },
+        { "text": "5 Elemente, `GetLength(1)` liefert 2.", "feedback": "Die Elemente werden multipliziert, nicht addiert. Und Dimension 1 hat die Länge 3." },
+        { "text": "6 Elemente, `GetLength(1)` liefert 2.", "feedback": "`GetLength(0)` ist 2 (Zeilen), `GetLength(1)` ist 3 (Spalten)." }
+      ],
+      "explanation": "Die Zahl der Elemente ist das Produkt der Längen aller Dimensionen: 2 · 3 = 6. `GetLength(0)` ist 2, `GetLength(1)` ist 3."
+    },
+    {
+      "id": "m05-l02-q3",
+      "lesson": "m05-l02",
+      "type": "single",
+      "question": "Welche Aussage über `int[,]` und `int[][]` stimmt?",
+      "options": [
+        { "text": "`int[,]` ist ein rechteckiger Block mit Rang 2. `int[][]` ist ein Array von Arrays, dessen Zeilen verschieden lang sein können.", "correct": true, "feedback": "So ist es." },
+        { "text": "Beide sind dasselbe, nur anders geschrieben.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "`int[,]` ist ein einziges Array mit Rang 2. `int[][]` hat Rang 1 und enthält andere Arrays." },
+        { "text": "Bei `int[,]` kann jede Zeile eine andere Länge haben.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "Bei `int[,]` haben alle Zeilen dieselbe Länge. Verschieden lange Zeilen gibt es bei `int[][]`." },
+        { "text": "`int[][]` legt alle Zeilen automatisch an.", "misconception": "m05-l02-jagged-same-as-multidimensional", "feedback": "Bei `new int[3][]` sind die Zeilen zuerst `null`. Jede Zeile musst du selbst mit `new int[…]` anlegen." }
+      ],
+      "explanation": "`int[,]` ist ein Array mit Rang 2 und gleich langen Zeilen. `int[][]` ist ein Array mit Rang 1, dessen Elemente selbst Arrays sind. Jede Zeile hat ihre eigene Länge und muss einzeln angelegt werden."
+    },
+    {
+      "id": "m05-l02-q4",
+      "lesson": "m05-l02",
+      "type": "single",
+      "question": "Wie greifst du auf Zeile 1 und Spalte 2 von `int[,] table` zu?",
+      "options": [
+        { "text": "`table[1, 2]`", "correct": true, "feedback": "Bei einem mehrdimensionalen Array stehen alle Indizes in einer Klammer, durch Komma getrennt." },
+        { "text": "`table[1][2]`", "feedback": "Diese Schreibweise gilt für `int[][]`. Bei `int[,]` schreibst du `table[1, 2]`." },
+        { "text": "`table[2, 1]`", "feedback": "Die Reihenfolge ist Zeile, dann Spalte: `table[1, 2]`." }
+      ],
+      "explanation": "`int[,]` hat eine Klammer mit mehreren Indizes: `table[zeile, spalte]`. `table[1][2]` gehört zu `int[][]`."
+    },
+    {
+      "id": "m05-l02-q5",
+      "lesson": "m05-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `int[,]` und `int[][]` und wann die Zeilen verschieden lang sein können.",
+      "modelAnswer": "`int[,]` ist ein einziger rechteckiger Block mit Rang 2. Alle Zeilen haben dieselbe Länge.\n\n`int[][]` ist ein Array mit Rang 1, dessen Elemente selbst Arrays sind. Jede Zeile ist ein eigenes Array und kann eine andere Länge haben. Jede Zeile muss einzeln mit `new` angelegt werden."
+    },
+    {
+      "id": "m05-l02-q6",
+      "lesson": "m05-l02",
+      "type": "single",
+      "question": "Transferfrage: SecLog zählt Fehlversuche pro Benutzer und Stunde. Jeder Benutzer hat dieselben Stunden. Welche Form passt?",
+      "options": [
+        { "text": "Ein `int[,]` mit einer Zeile pro Benutzer und einer Spalte pro Stunde.", "correct": true, "feedback": "Alle Zeilen sind gleich lang, also passt ein rechteckiger Block." },
+        { "text": "Ein einzelnes `int`.", "feedback": "Ein `int` hält nur eine Zahl, nicht eine Tabelle." },
+        { "text": "Ein `string`, in dem alle Zahlen stehen.", "feedback": "Ein Text hält keine Zahlen, mit denen du pro Zelle rechnen kannst." }
+      ],
+      "explanation": "Eine Tabelle mit gleich langen Zeilen ist ein rechteckiger Block. Haben die Zeilen verschiedene Längen, passt `int[][]`."
+    },
+    {
+      "id": "m05-l03-q1",
+      "lesson": "m05-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m05/l03/quiz-range.cs",
+      "explanation": "`users[^3]` ist das drittletzte Element, also `bob`. `users[1..^1]` enthält `bob` und `carol`, die Länge ist `2`. `text[..5]` nimmt die ersten 5 Zeichen: `login`."
+    },
+    {
+      "id": "m05-l03-q2",
+      "lesson": "m05-l03",
+      "type": "single",
+      "question": "Es gilt `int[] a = { 10, 20, 30, 40, 50 };`. Welche Elemente enthält `a[1..3]`?",
+      "options": [
+        { "text": "20 und 30", "correct": true, "feedback": "Der Anfang 1 gehört dazu, das Ende 3 nicht." },
+        { "text": "20, 30 und 40", "misconception": "m05-l03-range-end-inclusive", "feedback": "Das Ende eines Bereichs gehört nicht dazu. Der Bereich `1..3` hat 2 Elemente." },
+        { "text": "10, 20 und 30", "feedback": "Der Bereich beginnt beim Index 1, nicht bei 0." }
+      ],
+      "explanation": "Der Anfang eines Bereichs gehört dazu, das Ende nicht. `a[1..3]` enthält die Elemente mit den Indizes 1 und 2, also `20` und `30`."
+    },
+    {
+      "id": "m05-l03-q3",
+      "lesson": "m05-l03",
+      "type": "single",
+      "question": "Das Array `a` hat 8 Elemente. Wie viele Elemente hat `a[2..5]`?",
+      "options": [
+        { "text": "3", "correct": true, "feedback": "Die Länge ist Ende minus Anfang: 5 − 2 = 3." },
+        { "text": "4", "misconception": "m05-l03-range-end-inclusive", "feedback": "Wer 4 rechnet, zählt das Ende mit. Es gehört aber nicht zum Bereich." },
+        { "text": "5", "feedback": "5 ist das Ende des Bereichs, nicht seine Länge." }
+      ],
+      "explanation": "Die Länge eines Bereichs `a..b` ist `b - a`, wenn beide Werte von vorne zählen. Hier ist sie 3."
+    },
+    {
+      "id": "m05-l03-q4",
+      "lesson": "m05-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Indizes vom Ende und Bereiche stimmen?",
+      "options": [
+        { "text": "`a[^1]` ist das letzte Element.", "correct": true, "feedback": "`^1` zählt vom Ende und beginnt bei 1." },
+        { "text": "`a[^0]` ist das letzte Element.", "feedback": "`^0` zeigt hinter das letzte Element. Ein Zugriff damit bricht das Programm zur Laufzeit ab." },
+        { "text": "Ein Bereich eines Arrays ist eine neue Kopie. Änderst du sie, bleibt das Original gleich.", "correct": true, "feedback": "Bei einem Array entsteht ein neues Array." },
+        { "text": "`a[2..]` enthält alle Elemente ab dem Index 2.", "correct": true, "feedback": "Fehlt das Ende, reicht der Bereich bis zum Schluss." }
+      ],
+      "explanation": "`^1` ist das letzte Element, `^0` ist kein Element. Ein Bereich eines Arrays oder `string` ist eine neue Kopie. Fehlt eine Grenze, reicht der Bereich bis zum Anfang oder Ende."
+    },
+    {
+      "id": "m05-l03-q5",
+      "lesson": "m05-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, welche Elemente `a[1..3]` auswählt und warum eine Änderung des Ergebnisses das Original nicht ändert.",
+      "modelAnswer": "Der Anfang 1 gehört zum Bereich, das Ende 3 nicht. Es sind also die Elemente mit den Indizes 1 und 2.\n\nBei einem Array entsteht ein neues Array mit Kopien der Elemente. Änderst du das Ergebnis, bleibt das ursprüngliche Array unverändert."
+    },
+    {
+      "id": "m05-l03-q6",
+      "lesson": "m05-l03",
+      "type": "single",
+      "question": "Transferfrage: SecLog will aus einer Log-Zeile nur das Datum haben (die ersten 10 Zeichen). Was passt?",
+      "options": [
+        { "text": "`line[..10]`", "correct": true, "feedback": "Der Bereich `..10` nimmt die Zeichen mit den Indizes 0 bis 9." },
+        { "text": "`line[10..]`", "feedback": "Das wäre alles ab dem Zeichen 10, also der Rest der Zeile." },
+        { "text": "`line[^10]`", "feedback": "Das ist ein einzelnes Zeichen, das zehntletzte." }
+      ],
+      "explanation": "Der Bereich `..10` beginnt am Anfang und endet vor dem Index 10. Er liefert die ersten 10 Zeichen."
+    }
+  ]
 }

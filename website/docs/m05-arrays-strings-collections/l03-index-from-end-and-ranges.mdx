@@ -1,0 +1,181 @@
+---
+title: Index vom Ende und Bereiche
+sidebar_position: 3
+description: ^n zählt vom Ende, a..b wählt einen Teil aus. Das Ende eines Bereichs gehört nicht dazu, und das Ergebnis ist eine neue Kopie.
+lesson_id: m05-l03
+duration_min: 20
+---
+
+import fromEnd from '!!raw-loader!@site/examples/m05/l03/from-end.cs';
+import fromEndOutput from '!!raw-loader!@site/examples/m05/l03/from-end.out.txt';
+import rangeCopy from '!!raw-loader!@site/examples/m05/l03/range-copy.cs';
+import lastTwo from '!!raw-loader!@site/examples/m05/l03/last-two.cs';
+import indexZeroFromEnd from '!!raw-loader!@site/examples/m05/l03/index-zero-from-end.snippet.cs';
+import rangeOutOfBounds from '!!raw-loader!@site/examples/m05/l03/range-out-of-bounds.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l03/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l03/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l03/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l03/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Index vom Ende und Bereiche
+
+:::note[Lernziele]
+- Du kannst mit `^1` auf das letzte Element zugreifen und erklären, warum `^0` kein Element ist.
+- Du kannst mit `a..b` einen Teil eines Arrays oder Strings auswählen und vorhersagen, welche Elemente er enthält.
+- Du kannst erklären, dass ein Bereich eines Arrays eine neue Kopie ist.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l01-q1" />
+
+<Quiz id="m05-l02-q3" />
+
+<Quiz id="m04-l07-q4" />
+
+## Vom Ende zählen
+
+Das letzte Element eines Arrays schreibst du bisher `a[a.Length - 1]`. Kürzer geht es mit dem Operator `^`: Ein <Term id="index-from-end">Index vom Ende</Term> zählt von hinten. `a[^1]` ist das letzte Element, `a[^2]` das vorletzte. Allgemein ist `^n` dasselbe wie `Length - n`.
+
+Gezählt wird hier ab 1, denn `^0` wäre `Length`. Das ist die Position hinter dem letzten Element, also kein Element. `a[^0]` bricht darum das Programm zur Laufzeit ab.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Das Programm unten bricht in Zeile 2 mit der `System.IndexOutOfRangeException` ab. Die Meldung lautet: „Index was outside the bounds of the array.“
+
+<CodeBlock language="csharp" title="index-zero-from-end.cs">{indexZeroFromEnd}</CodeBlock>
+
+## Bereiche
+
+Ein <Term id="range">Bereich (Range)</Term> `a..b` wählt einen Teil aus. Der Anfang `a` gehört dazu, das Ende `b` nicht. `users[1..3]` enthält also die Elemente mit den Indizes 1 und 2: zwei Elemente, nicht drei. Die Länge ist `b - a`.
+
+Beide Grenzen dürfen auch vom Ende zählen: `users[1..^1]` lässt das erste und das letzte Element weg. Fehlt eine Grenze, gilt der Anfang oder das Ende: `..2` ist `0..2`, und `2..` reicht bis zum Ende.
+
+Ein Bereich funktioniert bei Arrays und bei `string`. Das Ergebnis hat denselben Typ wie das Original: ein Array ergibt ein Array, ein `string` einen `string`.
+
+:::info[Vorhersage]
+`users` hält vier Namen. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l03-from-end" code={fromEnd} predict expected={fromEndOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `dave`, `carol`, `2`, `bob`, `carol`, `2`, `2`.
+
+1. **Vom Ende:** `users[^1]` ist `dave`, `users[^2]` ist `carol`.
+2. **Bereich 1..3:** Der Anfang 1 gehört dazu, das Ende 3 nicht. Der Bereich hat `3 - 1 = 2` Elemente, `bob` und `carol`. Die `foreach`-Schleife gibt beide aus.
+3. **Offene Grenzen:** `users[..2]` ist `0..2` mit zwei Elementen. `users[2..]` reicht von Index 2 bis zum Ende, ebenfalls zwei Elemente.
+
+**Was passiert bei `users[2..9]`?** Das Ende liegt hinter dem Array, und das Programm bricht zur Laufzeit ab.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m05-l03-range-end-inclusive" />
+
+**„Das Ende eines Bereichs gehört dazu: `a[1..3]` hat drei Elemente.“** Das stimmt nicht. Der Anfang gehört dazu, das Ende nicht. `a[1..3]` hat zwei Elemente, die Indizes 1 und 2. Merke dir: Länge gleich Ende minus Anfang. Auch bei `^0` zeigt das Ende hinter das letzte Element, darum enthält `a[2..^0]` alles ab Index 2.
+:::
+
+## Ein Bereich ist eine Kopie
+
+Bei einem Array entsteht ein neues Array mit Kopien der Elemente. Änderst du das Ergebnis, bleibt das Original gleich. Bei einem `string` entsteht ein neuer `string`. Das passt zu den unveränderlichen Strings aus der Lektion über String-Immutability: Ein `string` ändert sich nie, ein Bereich liefert einen neuen.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte darauf, welche Variable `part[0] = 99;` ändert.
+:::
+
+<CSharpRunner id="m05-l03-copy" code={rangeCopy} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5`, `99`, `failed`, `login`.
+
+1. **Kopie:** `part` enthält `5` und `0` als Kopien. `part[0] = 99;` ändert nur `part`. `failures[1]` bleibt `5`.
+2. **String-Bereich:** `text[6..]` ist der Rest ab Index 6: `failed`. `text[..5]` sind die ersten fünf Zeichen: `login`.
+
+</details>
+
+## Lückenbeispiel
+
+Der Bereich soll die letzten zwei Benutzer auswählen, `carol` und `dave`. Er wählt aber nur einen aus. Ändere den Bereich.
+
+<CSharpRunner id="m05-l03-gaps" code={lastTwo} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `2..3` hat die Länge 1, denn das Ende 3 gehört nicht dazu. Es bleibt nur `carol`.
+2. **Ersetzen:** `users[2..]` oder `users[^2..]` wählt `carol` und `dave` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält das Beispiel-Log in `sampleLog` und gibt die Fehlversuche pro Benutzer und Stunde als Tabelle aus.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Hold the whole sample log in an array* und den Platz nach dem Tabellenblock. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Print a table of failed logins per user and hour* den Block `// Show parts of the sample log with ranges`. Gib `Last line again: …` mit `sampleLog[^1]` aus. Hole die Zeilen 2 bis 7 (den Angriff auf bob) mit `sampleLog[1..7]` in ein neues Array, gib `Lines 2 to 7: 6` aus (mit `Length`) und jede dieser Zeilen mit `foreach`. Gib dann `Last three lines: 3` aus, mit `sampleLog[^3..]`. Gib zuletzt `Date of line 1: 2026-03-02` aus, mit einem Bereich auf dem String: `sampleLog[0][..10]`.
+
+Den Datumsteil hast du in Modul 2 mit einer Schleife und `break` bestimmt. Ein Bereich macht daraus eine Zeile.
+
+<CSharpRunner id="m05-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Letzte Zeile:** `^1` ist das letzte Element.
+2. **Angriff ausschneiden:** `1..7` enthält die Indizes 1 bis 6, also die Zeilen 2 bis 7. Das sind 6 Elemente, `7 - 1`.
+3. **Ende des Logs:** `^3..` reicht von drittletzten Element bis zum Ende: drei Zeilen.
+4. **Datum:** `..10` nimmt die Zeichen 0 bis 9 der ersten Zeile.
+
+</details>
+
+**Neuer Stand:** SecLog schneidet Teile des Beispiel-Logs mit Bereichen aus und liest das Datum einer Zeile direkt.
+
+<details>
+<summary>Vertiefung: Index und Range als Typen (optional)</summary>
+
+Hinter `^1` steht der Typ `System.Index`, hinter `1..3` der Typ `System.Range` ([§18.2 The Index type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges#182-the-index-type), [§18.3 The Range type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges#183-the-range-type)). Ein Bereich reicht vom Anfang bis ausschließlich zum Ende. Fehlt der erste Operand, ist er `0`. Fehlt der zweite, ist er `^0`. Du kannst beide Typen auch in Variablen halten.
+
+Beim Zugriff auf ein einzelnes Array entsteht durch einen Bereich ein neues Array aus einer flachen Kopie der Elemente. Bei einem Array von Verweisen werden also die Verweise kopiert, nicht die Objekte dahinter ([§17.4 Array element access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#174-array-element-access)).
+
+Liegt ein Bereich nicht vollständig im Array, bricht das Programm ab. Beim Programm unten meldet die Laufzeit: „Specified argument was out of the range of valid values. (Parameter 'length')“. Die Ausnahme heißt `System.ArgumentOutOfRangeException`.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+<CodeBlock language="csharp" title="range-out-of-bounds.cs">{rangeOutOfBounds}</CodeBlock>
+</details>
+
+## Zusammenfassung
+
+`^n` zählt vom Ende: `^1` ist das letzte Element, `^0` kein Element. `a..b` wählt vom Anfang bis ausschließlich zum Ende aus, die Länge ist `b - a`. Fehlt eine Grenze, gilt der Anfang oder das Ende. Ein Bereich eines Arrays ist ein neues Array, ein Bereich eines `string` ein neuer `string`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l03-q1" />
+
+<Quiz id="m05-l03-q2" />
+
+<Quiz id="m05-l03-q3" />
+
+<Quiz id="m05-l03-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l03-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l03-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Indizes und Bereiche](https://learn.microsoft.com/dotnet/csharp/tutorials/ranges-indexes)
+- C#-Spezifikation: [§18 Indexes and ranges](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/ranges)
