@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,6 +11,7 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
@@ -20,6 +22,7 @@ Console.Write("IP: ");
 Console.WriteLine(ip);
 Console.Write("Event type: ");
 Console.WriteLine(eventType);
+// @fold-start
 // Compute the failure rate of the sample log in percent
 const int events = 14;
 const int failures = 7;
@@ -107,6 +110,7 @@ for (int attempt = 1; attempt <= bobFailures; attempt++)
 {
     Console.WriteLine($"Attempt {attempt}");
 }
+// @fold-end
 // Count the dots in the IP address with a foreach loop
 int dots = 0;
 foreach (char symbol in ip)
@@ -117,6 +121,7 @@ foreach (char symbol in ip)
     }
 }
 Console.WriteLine($"Dots in IP: {dots}");
+// @fold-start
 // Build the date part of the timestamp: stop at the letter T
 string datePart = "";
 foreach (char symbol in timestamp)
@@ -178,6 +183,7 @@ string RateSeverity(int failures)
 
 // Choose the singular or plural word for a number of attempts
 string AttemptWord(int count) => count == 1 ? "attempt" : "attempts";
+// @fold-end
 
 // Rate an event as suspicious: a failed login and at least 3 failures
 bool IsSuspicious(string eventType, int failures)

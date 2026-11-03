@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -147,8 +148,10 @@ Console.WriteLine(Report.Line("Failure rate (%)", failureRate));
 // Format log lines with a method that has an optional parameter
 Console.WriteLine(FormatEvent(timestamp, eventType, "bob", ip));
 Console.WriteLine(FormatEvent(user: "carol", eventType: "logout", timestamp: "2026-03-02T08:42:11Z"));
+// @fold-end
 // Count the failed logins among the 14 event types of the sample log
 Console.WriteLine($"Failed in sample: {CountFailed("login-success", "login-failed", "login-failed", "login-success", "login-failed", "login-failed", "login-failed", "login-success", "login-failed", "login-success", "logout", "login-failed", "login-success", "logout")}");
+// @fold-start
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -220,6 +223,7 @@ string FormatEvent(string timestamp, string eventType, string user, string ip = 
 {
     return $"{timestamp} {eventType} user={user} ip={ip}";
 }
+// @fold-end
 
 // Count the login-failed entries among any number of event types
 int CountFailed(params string[] eventTypes)

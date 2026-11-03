@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -26,6 +27,7 @@ const int failures = 7;
 var failureRate = (failures * 100.0) / events;
 Console.Write("Failure rate (%): ");
 Console.WriteLine(failureRate);
+// @fold-end
 // Count the failed logins of bob (sample log lines 2, 3, 5, 6 and 7)
 var bobFailures = 0;
 bobFailures++;
@@ -35,6 +37,7 @@ bobFailures++;
 bobFailures++;
 Console.Write("Failed logins of bob: ");
 Console.WriteLine(bobFailures);
+// @fold-start
 // Compute the share of bob in all failures in percent, rounded to 2 places
 var bobShare = Math.Round(bobFailures * 100.0 / failures, 2);
 Console.Write("Share of bob (%): ");
@@ -71,9 +74,11 @@ else
 // Rate the event as suspicious: a failed login and at least 3 failures
 bool suspicious = eventType == "login-failed" && failedFromInput >= 3;
 Console.WriteLine($"Suspicious: {suspicious}");
+// @fold-end
 // Print the number of failures with the singular or plural word
 Console.WriteLine($"{failedFromInput} failed {AttemptWord(failedFromInput)}");
 Console.WriteLine($"{bobFailures} failed {AttemptWord(bobFailures)}");
+// @fold-start
 // Rate the severity of the failures with a method
 string severity = RateSeverity(failedFromInput);
 Console.WriteLine($"Severity: {severity}");
@@ -162,6 +167,7 @@ for (int userNumber = 1; userNumber <= 4; userNumber++)
     }
     Console.WriteLine();
 }
+// @fold-end
 
 // Rate the severity of a number of failures (the thresholds are made up)
 string RateSeverity(int failures)

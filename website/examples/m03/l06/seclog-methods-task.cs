@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -10,6 +11,7 @@ Console.WriteLine();
 // Print the heading and the first event of the sample log
 Console.WriteLine("First event:");
 Console.WriteLine("2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10");
+// @fold-end
 // Read the user from the first input line, store the IP address and the event type
 var user = Console.ReadLine();
 string ip = "203.0.113.7";
@@ -20,6 +22,7 @@ Console.Write("IP: ");
 Console.WriteLine(ip);
 Console.Write("Event type: ");
 Console.WriteLine(eventType);
+// @fold-start
 // Compute the failure rate of the sample log in percent
 const int events = 14;
 const int failures = 7;
@@ -39,9 +42,11 @@ Console.WriteLine(bobFailures);
 var bobShare = Math.Round(bobFailures * 100.0 / failures, 2);
 Console.Write("Share of bob (%): ");
 Console.WriteLine(bobShare);
+// @fold-end
 // Print the event of sample line 2 as one log line, built from the variables
 string timestamp = "2026-03-02T08:01:40Z";
 Console.WriteLine($"{timestamp} {eventType} user={user} ip={ip}");
+// @fold-start
 // Print the failure rate with one decimal place
 Console.WriteLine($"Failure rate: {failureRate:F1} %");
 // Print the share of successful logins (5 of 14) as a whole percent number
@@ -141,9 +146,11 @@ foreach (char symbol in ip)
     digits++;
 }
 Console.WriteLine($"Digits in IP: {digits}");
+// @fold-end
 // Print the counts and the rate with the overloaded Report.Line
 Console.WriteLine(Report.Line("Failures", failures));
 Console.WriteLine(Report.Line("Failure rate (%)", failureRate));
+// @fold-start
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -209,6 +216,7 @@ string DescribeIp(string ip)
         return found;
     }
 }
+// @fold-end
 
 // Format a report line: the overloads choose the number format
 static class Report

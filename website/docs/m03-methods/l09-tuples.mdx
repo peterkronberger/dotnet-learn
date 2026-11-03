@@ -150,6 +150,8 @@ Der Standard beschreibt das in [§8.3.11 Tuple types](https://learn.microsoft.co
 
 **Stand bisher:** SecLog liest mit `TryReadUser` den Benutzer aus einer Logzeile. Die IP-Adresse der Zeile liest es noch nicht.
 
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Zeilen zu `TryReadUser` und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
 **Neue Anforderung:** Am Ende der Datei, vor der Klasse `Report`, steht die Methode `(string User, string Ip) ReadUserAndIp(string line)`. Sie liest Benutzer und IP-Adresse aus einer Logzeile und gibt beide als Tupel zurück. Eine neue Zeile steht direkt nach der Zeile `Line ok: False`: Sie zerlegt das Ergebnis für die Beispielzeile 2 mit `var (lineUser, lineIp) = …` und gibt `User and IP: bob 203.0.113.7` aus. Die Ausgabe hat jetzt 53 Zeilen.
 
 <CSharpRunner id="m03-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
@@ -157,7 +159,7 @@ Der Standard beschreibt das in [§8.3.11 Tuple types](https://learn.microsoft.co
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-methods-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-methods-solution.cs" />
 
 1. **Tupeltyp festlegen:** Der Rückgabetyp `(string User, string Ip)` nennt beide Werte.
 2. **Felder unterscheiden:** Die Variable `field` merkt sich, ob gerade der Benutzer, die IP-Adresse oder noch nichts gelesen wird. Ein Leerzeichen setzt sie zurück. Das Wort `word` zeigt mit `user=` oder `ip=` an, wann ein Feld beginnt.

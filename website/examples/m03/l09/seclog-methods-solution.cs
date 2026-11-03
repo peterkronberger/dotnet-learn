@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -149,6 +150,7 @@ Console.WriteLine(FormatEvent(timestamp, eventType, "bob", ip));
 Console.WriteLine(FormatEvent(user: "carol", eventType: "logout", timestamp: "2026-03-02T08:42:11Z"));
 // Count the failed logins among the 14 event types of the sample log
 Console.WriteLine($"Failed in sample: {CountFailed("login-success", "login-failed", "login-failed", "login-success", "login-failed", "login-failed", "login-failed", "login-success", "login-failed", "login-success", "logout", "login-failed", "login-success", "logout")}");
+// @fold-end
 // Read the user from sample line 2, and check a text that is not a log line
 string sampleLine = "2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7";
 bool lineOk = TryReadUser(sampleLine, out string readUser);
@@ -161,6 +163,7 @@ Console.WriteLine($"Line ok: {brokenOk}");
 // Read user and IP address together from sample line 2 and split the tuple
 var (lineUser, lineIp) = ReadUserAndIp(sampleLine);
 Console.WriteLine($"User and IP: {lineUser} {lineIp}");
+// @fold-start
 // Print a bar chart of the failed logins per user of the sample log
 for (int userNumber = 1; userNumber <= 4; userNumber++)
 {
@@ -278,6 +281,7 @@ bool TryReadUser(string line, out string userName)
     }
     return found;
 }
+// @fold-end
 
 // Read the user name and the IP address of a log line and return both
 (string User, string Ip) ReadUserAndIp(string line)

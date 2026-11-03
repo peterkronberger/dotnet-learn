@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -68,10 +69,12 @@ else
 {
     Console.WriteLine("No alert");
 }
+// @fold-end
 // Rate the event as suspicious with a method, for two event types
 bool suspicious = IsSuspicious(eventType, failedFromInput);
 Console.WriteLine($"Suspicious: {suspicious}");
 Console.WriteLine($"Suspicious for login-success: {IsSuspicious("login-success", failedFromInput)}");
+// @fold-start
 // Print the number of failures with the singular or plural word
 Console.WriteLine($"{failedFromInput} failed {AttemptWord(failedFromInput)}");
 Console.WriteLine($"{bobFailures} failed {AttemptWord(bobFailures)}");
@@ -175,6 +178,7 @@ string RateSeverity(int failures)
         _ => "high",
     };
 }
+// @fold-end
 
 // Choose the singular or plural word for a number of attempts
 string AttemptWord(int count) => count == 1 ? "attempt" : "attempts";
