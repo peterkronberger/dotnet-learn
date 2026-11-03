@@ -277,6 +277,200 @@
       "type": "explain",
       "question": "In `Incident` sind `user` und `failures` privat, `Add`, `FailureCount` und `Summary` sind öffentlich. Wo würdest du in einem eigenen Programm dasselbe Muster einsetzen, und welche Member wären dort privat?",
       "modelAnswer": "Das Muster passt überall, wo ein Objekt Regeln für seine Daten hat. Ein Konto hat zum Beispiel ein privates Feld für den Kontostand, und öffentliche Methoden wie `Deposit` lehnen negative Beträge ab. Privat sind die Daten und Hilfsmethoden, öffentlich ist nur das, was andere Code benutzen soll."
+    },
+    {
+      "id": "m06-l04-q1",
+      "lesson": "m06-l04",
+      "type": "single",
+      "question": "Eine Klasse hat die Eigenschaft `public int Level { get { return level; } set { … } }`. Was unterscheidet sie von einem öffentlichen Feld `public int Level;`?",
+      "options": [
+        {
+          "text": "Die Accessoren enthalten Code, der bei jedem Lesen und Schreiben läuft. Der `set`-Accessor kann einen Wert prüfen oder ablehnen.",
+          "correct": true
+        },
+        {
+          "text": "Es gibt keinen Unterschied. Eine Eigenschaft ist nur ein anderer Name für ein öffentliches Feld.",
+          "misconception": "m06-l04-property-is-field",
+          "feedback": "Ein Feld speichert nur einen Wert. Eine Eigenschaft führt bei jedem Zugriff Code aus und muss nicht einmal etwas speichern."
+        },
+        {
+          "text": "Eine Eigenschaft ist schneller, weil der Compiler ihren Wert zwischenspeichert.",
+          "feedback": "Der `get`-Accessor läuft bei jedem Lesen erneut. Der Compiler speichert den Wert nicht zwischen."
+        }
+      ],
+      "explanation": "Eine Eigenschaft sieht beim Zugriff wie ein Feld aus, ist aber ein Member mit Accessoren. Ihr Code läuft bei jedem Lesen und Schreiben."
+    },
+    {
+      "id": "m06-l04-q2",
+      "lesson": "m06-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l04/quiz-clamp.cs",
+      "explanation": "Der `set`-Accessor übernimmt 7. Die 12 lehnt er ab, weil sie größer als 10 ist, und `Level` bleibt 7. Dann übernimmt er 4. Gelesen wird 4."
+    },
+    {
+      "id": "m06-l04-q3",
+      "lesson": "m06-l04",
+      "type": "single",
+      "question": "Im `set`-Accessor einer Eigenschaft steht `value`. Wofür steht dieser Name?",
+      "options": [
+        {
+          "text": "Für den Wert, der der Eigenschaft zugewiesen wird, zum Beispiel die 5 bei `counter.Count = 5;`.",
+          "correct": true
+        },
+        {
+          "text": "Für den Wert, den die Eigenschaft vor der Zuweisung hatte.",
+          "feedback": "Den alten Wert liest man über das Feld. `value` ist der neue Wert."
+        },
+        {
+          "text": "Für ein Feld, das die Klasse selbst mit dem Namen `value` deklarieren muss.",
+          "feedback": "`value` ist ein impliziter Parameter des `set`-Accessors. Die Klasse deklariert ihn nicht."
+        }
+      ],
+      "explanation": "Der `set`-Accessor hat einen impliziten Parameter namens `value`. Er enthält den Wert der Zuweisung."
+    },
+    {
+      "id": "m06-l04-q4",
+      "lesson": "m06-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? `Area` hat nur einen `get`-Accessor.",
+      "example": "m06/l04/readonly-property.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`Area` hat keinen `set`-Accessor, ist also schreibgeschützt. Die Zuweisung in Zeile 2 übersetzt nicht. Der Wert entsteht nur durch die Berechnung in `get`."
+    },
+    {
+      "id": "m06-l04-q5",
+      "lesson": "m06-l04",
+      "type": "match",
+      "question": "Ordne jeder Schreibweise ihre Wirkung zu.",
+      "pairs": [
+        {
+          "left": "`public int Area => width * height;`",
+          "right": "berechnet den Wert bei jedem Lesen, ohne eigenes Feld"
+        },
+        {
+          "left": "`public int Total { get { … } private set { … } }`",
+          "right": "von außen nur lesbar, schreiben darf nur die Klasse selbst"
+        },
+        {
+          "left": "`public int Level { get { … } set { … } }`",
+          "right": "von außen lesbar und schreibbar, der `set`-Accessor kann prüfen"
+        }
+      ],
+      "explanation": "Nur `get` mit `=>` ergibt eine berechnete, schreibgeschützte Eigenschaft. `private set` beschränkt das Schreiben auf die Klasse. Mit beiden öffentlichen Accessoren kann jeder lesen und schreiben, und der `set`-Accessor prüft."
+    },
+    {
+      "id": "m06-l04-q6",
+      "lesson": "m06-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was eine Eigenschaft ist und worin sie sich von einem Feld unterscheidet.",
+      "modelAnswer": "Eine Eigenschaft ist ein Member mit `get`- und/oder `set`-Accessor. Von außen liest und schreibt man sie wie ein Feld. Bei jedem Zugriff läuft aber der Code des Accessors. Der `set`-Accessor kann den neuen Wert in `value` prüfen und ablehnen, der `get`-Accessor kann einen Wert berechnen. Meist liegt der Wert in einem privaten Feld, dem Hintergrundfeld."
+    },
+    {
+      "id": "m06-l04-q7",
+      "lesson": "m06-l04",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm eine berechnete Eigenschaft einsetzen, und wo eine Eigenschaft mit `private set`?",
+      "modelAnswer": "Berechnet: Eine Klasse `Rechnung` hat Einzelpreis und Menge als Felder, und die Eigenschaft `Gesamtpreis => preis * menge` rechnet den Wert bei jedem Lesen neu aus. Mit `private set`: Eine Eigenschaft `Besuche`, die jeder lesen darf, aber nur die Klasse selbst in einer Methode wie `Registrieren()` erhöht."
+    },
+    {
+      "id": "m06-l05-q1",
+      "lesson": "m06-l05",
+      "type": "single",
+      "question": "Wann läuft bei `new Alert(1) { Level = 3 }` der Konstruktor, und wann der Zugriff auf `Level`?",
+      "options": [
+        {
+          "text": "Zuerst läuft der Konstruktor, danach setzt der Objektinitialisierer `Level` in der geschriebenen Reihenfolge.",
+          "correct": true
+        },
+        {
+          "text": "Zuerst setzt der Objektinitialisierer `Level`, danach läuft der Konstruktor.",
+          "misconception": "m06-l05-initializer-before-constructor",
+          "feedback": "Der Initialisierer arbeitet an einem Objekt, das es erst nach dem Konstruktor gibt. Der Konstruktor läuft zuerst."
+        },
+        {
+          "text": "Beides läuft gleichzeitig, die Reihenfolge ist nicht festgelegt.",
+          "feedback": "Die Reihenfolge ist festgelegt: erst der Konstruktor, dann die Zuweisungen in der geschriebenen Reihenfolge."
+        }
+      ],
+      "explanation": "Die Objekterzeugung verarbeitet zuerst den Konstruktor und danach die Zuweisungen des Initialisierers, eine nach der anderen."
+    },
+    {
+      "id": "m06-l05-q2",
+      "lesson": "m06-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l05/quiz-order.cs",
+      "explanation": "Zuerst läuft der Konstruktor und gibt `constructor` aus. Dann setzt der Initialisierer `Step` auf 2, der `set`-Accessor gibt `setter` aus. `Total` ist 10 + 2 = 12."
+    },
+    {
+      "id": "m06-l05-q3",
+      "lesson": "m06-l05",
+      "type": "single",
+      "question": "Welche Zeile ist gültig? `Alert` hat einen Konstruktor `Alert(int level)` und die Eigenschaft `Title`.",
+      "options": [
+        {
+          "text": "`Alert alert = new(3) { Title = \"Disk full\" };`",
+          "correct": true
+        },
+        {
+          "text": "`var alert = new(3);`",
+          "feedback": "Bei `var` bestimmt erst die rechte Seite den Typ. `new(…)` braucht aber einen bekannten Zieltyp."
+        },
+        {
+          "text": "`Alert alert = new;`",
+          "feedback": "Auch bei `new()` ohne Typnamen schreibt man immer die runden Klammern."
+        }
+      ],
+      "explanation": "`new()` nimmt den Typ von der linken Seite. Argumente und ein Objektinitialisierer sind erlaubt. Die Klammern sind Pflicht, und der Typ muss bekannt sein."
+    },
+    {
+      "id": "m06-l05-q4",
+      "lesson": "m06-l05",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler?",
+      "example": "m06/l05/target-typed-var.snippet.cs",
+      "bugLines": [
+        1
+      ],
+      "explanation": "Bei `var` steht auf der linken Seite kein Typ. `new()` hat dann keinen Zieltyp. Schreibe `var alert = new Alert();` oder `Alert alert = new();`."
+    },
+    {
+      "id": "m06-l05-q5",
+      "lesson": "m06-l05",
+      "type": "single",
+      "question": "Was kann ein Objektinitialisierer setzen?",
+      "options": [
+        {
+          "text": "Alle Felder und Eigenschaften des neuen Objekts, auf die der Code an dieser Stelle zugreifen darf.",
+          "correct": true
+        },
+        {
+          "text": "Nur die Parameter des Konstruktors, den `new` aufruft.",
+          "feedback": "Der Initialisierer setzt Member, keine Parameter. Er kommt zusätzlich zu den Argumenten des Konstruktors."
+        },
+        {
+          "text": "Auch private Felder, weil das Objekt gerade erst entsteht.",
+          "feedback": "Ein privates Feld ist von außerhalb der Klasse nicht zugänglich, auch nicht in einem Initialisierer."
+        }
+      ],
+      "explanation": "Jede Zuweisung im Initialisierer muss ein zugängliches Feld oder eine zugängliche Eigenschaft benennen, wie bei einer normalen Zuweisung außerhalb der Klasse."
+    },
+    {
+      "id": "m06-l05-q6",
+      "lesson": "m06-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Objektinitialisierer ist und in welcher Reihenfolge Konstruktor und Initialisierer laufen.",
+      "modelAnswer": "Ein Objektinitialisierer ist ein Block in geschweiften Klammern hinter `new`. Er setzt zugängliche Felder und Eigenschaften des neuen Objekts. Zuerst läuft der Konstruktor. Danach führt das Programm die Zuweisungen des Initialisierers in der geschriebenen Reihenfolge aus, bei Eigenschaften über deren `set`-Accessor."
+    },
+    {
+      "id": "m06-l05-q7",
+      "lesson": "m06-l05",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm einen Objektinitialisierer einsetzen, und wo `new()` ohne Typnamen?",
+      "modelAnswer": "Ein Objektinitialisierer passt, wenn ein Objekt einige optionale Werte bekommt, zum Beispiel ein `Kunde` mit `Name` und `Stadt`, ohne dass für jede Kombination ein eigener Konstruktor nötig ist. `new()` passt, wenn der Typ links schon dasteht, etwa bei `List<Kunde> kunden = new();` oder `kunden.Add(new(\"Anna\"))`, damit man den Typnamen nicht doppelt schreibt."
     }
   ]
 }

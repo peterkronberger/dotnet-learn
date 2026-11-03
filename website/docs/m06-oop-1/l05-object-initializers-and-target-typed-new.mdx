@@ -1,0 +1,205 @@
+---
+title: Objektinitialisierer und zieltypisiertes new
+sidebar_position: 5
+description: Mit einem Objektinitialisierer setzt du Felder und Eigenschaften direkt beim Erzeugen eines Objekts. Mit new() sparst du den Typnamen, wenn der Typ bekannt ist.
+lesson_id: m06-l05
+duration_min: 23
+---
+
+import initializerBasics from '!!raw-loader!@site/examples/m06/l05/initializer-basics.cs';
+import initializerBasicsOutput from '!!raw-loader!@site/examples/m06/l05/initializer-basics.out.txt';
+import initializerGap from '!!raw-loader!@site/examples/m06/l05/initializer-gap.cs';
+import targetTypedNew from '!!raw-loader!@site/examples/m06/l05/target-typed-new.cs';
+import targetTypedNewOutput from '!!raw-loader!@site/examples/m06/l05/target-typed-new.out.txt';
+import targetTypedVar from '!!raw-loader!@site/examples/m06/l05/target-typed-var.snippet.cs';
+import initializerOrder from '!!raw-loader!@site/examples/m06/l05/initializer-order.cs';
+import initializerOrderOutput from '!!raw-loader!@site/examples/m06/l05/initializer-order.out.txt';
+import nestedInitializer from '!!raw-loader!@site/examples/m06/l05/nested-initializer.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l05/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l05/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l05/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l05/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Objektinitialisierer und zieltypisiertes new
+
+:::note[Lernziele]
+- Du kannst ein Objekt mit einem Objektinitialisierer erzeugen und dabei Eigenschaften setzen.
+- Du kannst vorhersagen, in welcher Reihenfolge Konstruktor und Initialisierer laufen.
+- Du kannst `new()` einsetzen, wenn der Typ aus dem Zusammenhang bekannt ist.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l04-q1" />
+
+<Quiz id="m05-l08-q2" />
+
+<Quiz id="m06-l02-q1" />
+
+## Objekte beim Erzeugen einrichten
+
+Mit einem Konstruktor setzt du den Startzustand eines Objekts. Oft hat ein Objekt aber mehrere Werte, die man nur manchmal setzen will. Dafür bräuchte man viele Konstruktoren. Ein <Term id="object-initializer">Objektinitialisierer</Term> (Object Initializer) ist kürzer: Hinter `new` steht ein Block in geschweiften Klammern. Darin steht eine Liste von Zuweisungen der Form `Name = Wert`, getrennt durch Kommas.
+
+In Modul 5 hast du das bei Bibliothekstypen gesehen. Es funktioniert genauso bei deinen eigenen Klassen. Der Name links muss ein Feld oder eine Eigenschaft sein, auf die der Code an dieser Stelle zugreifen darf. Ein Name darf nur einmal vorkommen. Ein `private` Feld ist von außen nicht erreichbar, also auch nicht im Initialisierer.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Die Klasse `Alert` hat ein öffentliches Feld `Source`, die Eigenschaften `Level` und `Title` und zwei Konstruktoren.
+:::
+
+<CSharpRunner id="m06-l05-basics" code={initializerBasics} predict expected={initializerBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Many failed logins (level 2, manual)` und `Disk full (level 3, monitor)`.
+
+1. **Ohne Argumente:** `new Alert { … }` ruft den Konstruktor ohne Parameter auf. Der Initialisierer setzt `Level` auf 2 und `Title`. `Source` bleibt beim Startwert `"manual"`.
+2. **Mit Argument:** `new Alert(3) { … }` ruft zuerst den Konstruktor mit 3 auf. Dann setzt der Initialisierer `Title` und das Feld `Source`.
+3. **Eigenschaften:** Für `Level` und `Title` läuft jedes Mal der `set`-Accessor aus Lektion 4.
+
+</details>
+
+Die Klammern des Konstruktors dürfen bei einem Aufruf ohne Argumente fehlen, wenn ein Initialisierer folgt. Mit Argumenten stehen sie vor dem Initialisierer.
+
+<details>
+<summary>Vertiefung: Objektinitialisierer in der Sprachspezifikation (optional)</summary>
+
+Der Name in einem Member-Initialisierer muss ein zugängliches Feld oder eine zugängliche Eigenschaft benennen, und er darf nur einmal vorkommen. Eine Zuweisung im Initialisierer wird wie eine normale Zuweisung verarbeitet ([§12.8.17.2.2 Object initializers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1281722-object-initializers)).
+
+Ein Initialisierer kann auch ein verschachtelter Objektinitialisierer sein. Dann weist er dem Member kein neues Objekt zu, sondern setzt Member des Objekts, das schon darin steckt:
+
+<CSharpRunner id="m06-l05-nested" code={nestedInitializer} />
+
+`Report` hat nur einen `get`-Accessor, also kann man `Main` nicht neu zuweisen. `Main = { Level = 3 }` setzt `Level` des vorhandenen `Alert`. Die Ausgabe ist `3`.
+
+</details>
+
+## Lückenbeispiel
+
+Der Alarm soll `Disk full (level 3, monitor)` ausgeben. Das Programm gibt aber `(level 3, monitor)` aus. Ergänze den Initialisierer.
+
+<CSharpRunner id="m06-l05-gaps" code={initializerGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Der Initialisierer setzt nur `Source`. `Title` bleibt der leere Startwert.
+2. **Ergänzen:** Der Initialisierer heißt `{ Title = "Disk full", Source = "monitor" }`.
+
+</details>
+
+## Zieltypisiertes new
+
+Bei `Alert alert = new Alert(3);` steht der Typ zweimal da. Wenn der Typ links schon bekannt ist, kannst du ihn rechts weglassen. `new()` ist <Term id="target-typed">zieltypisiert</Term> (target-typed): Der Zieltyp ist der Typ der Variable, der der Wert zugewiesen wird.
+
+<CSharpRunner id="m06-l05-target" code={targetTypedNew} />
+
+Die Ausgabe ist `1`, `3`, `2` und `2`.
+
+- `new()` ruft den Konstruktor ohne Parameter auf. Argumente stehen wie sonst in den Klammern: `new(3)`.
+- Ein Objektinitialisierer ist erlaubt: `new(2) { Title = "…" }`.
+- Bei `alerts.Add(new(1) { … })` ist der Zieltyp der Parametertyp von `Add`, hier `Alert`.
+- Die Klammern sind Pflicht, auch ohne Argumente.
+
+Der Typ muss bekannt sein. Bei `var` ist er es nicht:
+
+<CodeBlock language="csharp" title="target-typed-var.snippet.cs">{targetTypedVar}</CodeBlock>
+
+Der Compiler lehnt die Zeile ab, weil weder links noch rechts ein Typ steht. Schreibe entweder `var alert = new Alert();` oder `Alert alert = new();`.
+
+Der Quelltext mit `new()` ist kürzer, wenn der Typname lang ist oder wenn der Typ schon in der Deklaration steht.
+
+<details>
+<summary>Vertiefung: new() in der Dokumentation (optional)</summary>
+
+Konstruktoraufrufe sind zieltypisiert: Ist der Zieltyp bekannt, lässt man den Typnamen weg und schreibt immer die Klammern. Bei einem unbekannten Zieltyp, zum Beispiel mit `var`, muss der Typname stehen ([new operator, Target-typed new](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/new-operator#target-typed-new)).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klasse `Incident` mit der Eigenschaft `Status`. Alle 14 Zeilen des Beispiel-Logs liegen als `LogEvent` in der Liste `logEvents`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Turn every line of the sample log into a LogEvent* mit der Liste `logEvents`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Im Block *Turn every line of the sample log into a LogEvent* wird `logEvents.Add(new LogEvent(…))` zu `logEvents.Add(new(…))`. Schreibe danach, nach den ausgeblendeten Blöcken, den Block `// Open an incident for dave with an object initializer`. Er erzeugt `Incident daveIncident = new("dave") { Status = "investigating" };` und ruft für jedes Ereignis in `logEvents` die Methode `Add` auf. Nur der Fehlversuch von dave wird angenommen. Dann gibt er `Summary()` und `Status` aus.
+
+<CSharpRunner id="m06-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Zieltyp nutzen:** Der Parameter von `Add` ist ein `LogEvent`. Deshalb braucht `new(…)` den Typnamen nicht.
+2. **Initialisieren:** `new("dave")` ruft den Konstruktor auf. Danach setzt der Initialisierer `Status` über den `set`-Accessor aus Lektion 4.
+3. **Sammeln:** `Add` lehnt alle Ereignisse außer dem Fehlversuch von dave ab. Die Zusammenfassung zeigt einen Fehlversuch.
+4. **Ausgeben:** Der Status ist `investigating`.
+
+</details>
+
+**Neuer Stand:** SecLog legt einen Vorfall mit einem Objektinitialisierer an und nutzt `new()`, wo der Typ feststeht.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l05-initializer-before-constructor" />
+
+**„Der Objektinitialisierer läuft vor dem Konstruktor.“** Das stimmt nicht. Zuerst läuft der Konstruktor. Danach führt das Programm die Zuweisungen des Initialisierers in der geschriebenen Reihenfolge aus.
+:::
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der Konstruktor und beide `set`-Accessoren schreiben eine Zeile.
+:::
+
+<CSharpRunner id="m06-l05-order" code={initializerOrder} predict expected={initializerOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Create the alert`, `constructor runs with level 1`, `Title set to Many failed logins`, `Level set to 3` und `Done`.
+
+1. **Konstruktor:** `new Alert(1)` erzeugt das Objekt. Der Konstruktor läuft zuerst.
+2. **Initialisierer:** Danach setzt das Programm `Title` und dann `Level`, so wie sie im Initialisierer stehen.
+3. **Ende:** Erst danach ist der Ausdruck fertig, und `Done` folgt.
+
+Die Reihenfolge im Initialisierer ist also wichtig, wenn sich die Accessoren gegenseitig beeinflussen.
+
+</details>
+
+<details>
+<summary>Vertiefung: Reihenfolge in der Sprachspezifikation (optional)</summary>
+
+Ein Objekterzeugungsausdruck mit Initialisierer verarbeitet zuerst den Instanzkonstruktor und dann die Initialisierungen des Initialisierers ([§12.8.17.2.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1281721-general)). Das Beispiel der Spezifikation für `new Point { X = 0, Y = 1 }` entspricht einem Konstruktoraufruf, gefolgt von `X = 0` und `Y = 1`.
+
+</details>
+
+## Zusammenfassung
+
+Ein Objektinitialisierer setzt direkt hinter `new` zugängliche Felder und Eigenschaften. Der Konstruktor läuft zuerst, danach folgen die Zuweisungen in der geschriebenen Reihenfolge, bei Eigenschaften über den `set`-Accessor. `new()` ohne Typnamen nimmt den Typ aus dem Zusammenhang, braucht immer die Klammern und geht nicht mit `var`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l05-q1" />
+
+<Quiz id="m06-l05-q2" />
+
+<Quiz id="m06-l05-q3" />
+
+<Quiz id="m06-l05-q4" />
+
+<Quiz id="m06-l05-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l05-q6" />
+
+### Transferfrage
+
+<Quiz id="m06-l05-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Object and collection initializers](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/object-and-collection-initializers)
+- Microsoft Learn: [new operator](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/new-operator)
