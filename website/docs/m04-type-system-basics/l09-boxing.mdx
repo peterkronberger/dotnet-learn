@@ -1,0 +1,187 @@
+---
+title: Boxing und Unboxing
+sidebar_position: 9
+description: "Wird ein Werttyp nach object umgewandelt, kopiert Boxing den Wert in ein neues Objekt. Unboxing kopiert ihn zurück und braucht den genauen Typ."
+lesson_id: m04-l09
+duration_min: 20
+---
+
+import boxingCopy from '!!raw-loader!@site/examples/m04/l09/boxing-copy.cs';
+import boxingCopyOutput from '!!raw-loader!@site/examples/m04/l09/boxing-copy.out.txt';
+import boxingTwice from '!!raw-loader!@site/examples/m04/l09/boxing-twice.cs';
+import boxingTwiceOutput from '!!raw-loader!@site/examples/m04/l09/boxing-twice.out.txt';
+import unboxingExact from '!!raw-loader!@site/examples/m04/l09/unboxing-exact.cs';
+import unboxingWrongType from '!!raw-loader!@site/examples/m04/l09/unboxing-wrong-type.snippet.cs';
+import whereBoxes from '!!raw-loader!@site/examples/m04/l09/where-boxes.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Boxing und Unboxing
+
+:::note[Lernziele]
+- Du kannst erkennen, wo eine Zuweisung an `object` boxt.
+- Du kannst vorhersagen, dass eine Änderung der ursprünglichen Variable den geboxten Wert nicht ändert.
+- Du kannst erklären, warum Unboxing den genauen Typ braucht.
+:::
+
+Diese Lektion ist eine Vertiefung (deep dive: boxing). Sie ist trotzdem eine volle Lektion mit Aufgaben und Quiz.
+
+## Rückblick
+
+<Quiz id="m04-l01-q1" />
+
+<Quiz id="m04-l05-q4" />
+
+<Quiz id="m04-l08-q5" />
+
+## object und Werttypen
+
+Der Typ `object` ist die Wurzel aller Typen: Jeder Typ stammt direkt oder indirekt von `object` ab. Eine Variable vom Typ `object` kann also auch einen `int` aufnehmen. Ein Werttyp liegt aber direkt in seiner Variable, und `object` ist ein Referenztyp, der auf ein Objekt verweist. Zwischen beiden vermittelt <Term id="boxing">Boxing (Verpacken)</Term>: Bei der Zuweisung `object boxed = number;` entsteht ein neues Objekt, und der Wert wird in dieses Objekt kopiert. Die Umwandlung ist implizit.
+
+Die Gegenrichtung heißt <Term id="unboxing">Unboxing (Auspacken)</Term>. Sie ist explizit, du schreibst eine Umwandlung wie `(int)boxed`. Sie prüft, ob das Objekt wirklich einen `int` enthält, und kopiert den Wert heraus.
+
+:::info[Vorhersage]
+`number` wird nach dem Boxing geändert. Was geben die drei Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l09-copy" code={boxingCopy} predict expected={boxingCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `43`, `42`, `42`.
+
+1. **Boxen:** `object boxed = number;` erzeugt ein Objekt mit einer Kopie von `42`.
+2. **Original ändern:** `number = 43;` ändert nur die Variable. Das Objekt hinter `boxed` enthält weiter `42`.
+3. **Unboxen:** `(int)boxed` kopiert `42` zurück in `back`.
+
+**Was passiert, wenn du `boxed` änderst?** Du kannst den Inhalt der Box nicht ändern, ohne neu zu boxen. Eine neue Zuweisung an `boxed` erzeugt ein neues Objekt, und `number` bleibt davon unberührt.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m04-l09-box-shares-value" />
+
+**„Ein geboxter Wert bleibt mit der ursprünglichen Variable verbunden.“** Das stimmt nicht. Boxing kopiert den Wert. Spätere Änderungen der Variable ändern die Box nicht, und umgekehrt.
+:::
+
+## Wo wird geboxt?
+
+Geboxt wird nur, wenn ein Werttyp nach `object` umgewandelt wird. Ein Referenztyp wie `string` oder `StringBuilder` ist schon ein Verweis. Bei ihm wird nur der Verweis zugewiesen.
+
+:::info[Vorhersage]
+Welche der fünf Zuweisungen an `object` boxen? Notiere deinen Tipp und führe den Code dann aus. Die Ausgabe zeigt nur, dass alle Zeilen laufen. Das Boxen siehst du nicht.
+:::
+
+<CSharpRunner id="m04-l09-where" code={whereBoxes} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Es boxen die Zuweisungen von `count` und von `2.5`.
+
+1. **Werttyp:** `int` und `double` sind Werttypen. `object a = count;` und `object e = 2.5;` erzeugen je ein neues Objekt mit einer Kopie.
+2. **Referenztyp:** `object b = "text";` und `object c = new StringBuilder("x");` weisen nur einen Verweis zu.
+3. **Verweis kopieren:** `object d = c;` kopiert wieder nur den Verweis auf das Objekt von `c`. Es entsteht nichts Neues.
+
+Auch das Übergeben eines `int` an einen Parameter vom Typ `object` boxt, denn dabei wird ein `int` nach `object` umgewandelt.
+
+</details>
+
+## Jedes Boxing erzeugt ein Objekt
+
+Boxt du dieselbe Variable zweimal, entstehen zwei Objekte. Sie enthalten denselben Wert, sind aber nicht dasselbe Objekt.
+
+:::info[Vorhersage]
+`first` und `second` entstehen beide aus `number`. Was geben die drei Zeilen aus? `Equals` vergleicht hier den Wert in der Box.
+:::
+
+<CSharpRunner id="m04-l09-twice" code={boxingTwice} predict expected={boxingTwiceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `False`.
+
+1. **Gleicher Wert:** `first.Equals(second)` ist `True`, denn beide Boxen enthalten die `7`.
+2. **Zwei Objekte:** `object.ReferenceEquals(first, second)` ist `False`. Jedes Boxing hat ein eigenes Objekt erzeugt.
+3. **Verweise vergleichen:** `first == second` vergleicht hier zwei `object`-Verweise, also ebenfalls `False`.
+
+</details>
+
+## Unboxing braucht den genauen Typ
+
+Das Objekt weiß, welchen Typ es geboxt hat. Beim Unboxing wird das geprüft. Hat die Box ein `int`, passt `(int)boxed`. Eine Umwandlung in einen anderen Typ, selbst in einen größeren wie `long`, passt nicht.
+
+<Forward concepts={['Exceptions (hier `InvalidCastException`)']} module="7" />
+
+<CodeBlock language="csharp" title="unboxing-wrong-type.snippet.cs">{unboxingWrongType}</CodeBlock>
+
+Dieses Programm bricht in der zweiten Zeile zur Laufzeit mit einem Fehler ab.
+
+Der Weg, der funktioniert: erst mit dem genauen Typ auspacken, dann den Wert umwandeln.
+
+<CSharpRunner id="m04-l09-exact" code={unboxingExact} />
+
+`(int)boxed` packt den `int` aus. Danach wandelt die Zuweisung an `long wide` den `int` in einen `long` um. Beide Ausgaben sind `42`.
+
+## Lückenbeispiel
+
+Gegeben ist `object boxed = 3.5;` (ein `double`). Welche Zeile liest den Wert als `int`-Zahl `3`, ohne abzubrechen? Schreibe sie zuerst auf, bevor du die Lösung öffnest.
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Genauen Typ auspacken:** `double exact = (double)boxed;` packt den `double` aus.
+2. **Wert umwandeln:** `int whole = (int)(double)boxed;` schneidet danach die Nachkommastellen ab und ergibt `3`.
+
+`(int)boxed` würde abbrechen, denn die Box enthält einen `double`.
+
+</details>
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog keine Werte als `object` speichern muss.
+
+<details>
+<summary>Vertiefung: Boxing in der Spezifikation (optional)</summary>
+
+Der Typ `object` ist die letzte Basisklasse aller anderen Typen ([§8.2.3 The object type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#823-the-object-type)).
+
+Beim Boxing eines Werts eines nicht-nullbaren Werttyps wird eine Objektinstanz angelegt und der Wert in diese Instanz kopiert ([§10.2.9 Boxing conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1029-boxing-conversions)).
+
+Beim Unboxing wird zuerst geprüft, ob die Objektinstanz ein geboxter Wert des verlangten Typs ist. Danach wird der Wert herauskopiert ([§10.3.7 Unboxing conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1037-unboxing-conversions)).
+
+Boxing legt ein neues Objekt an und ist darum teurer als eine einfache Zuweisung. Das gilt auch für die Typprüfung beim Unboxing, in geringerem Maß ([Boxing and Unboxing](https://learn.microsoft.com/dotnet/csharp/programming-guide/types/boxing-and-unboxing#performance)).
+</details>
+
+## Zusammenfassung
+
+Boxing wandelt einen Werttyp nach `object` um. Dabei entsteht ein neues Objekt mit einer Kopie des Werts. Die ursprüngliche Variable und die Box sind danach unabhängig, und jedes Boxing erzeugt ein eigenes Objekt. Unboxing ist explizit, prüft den genauen Typ und kopiert den Wert zurück. Passt der Typ nicht, bricht das Programm zur Laufzeit ab.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l09-q1" />
+
+<Quiz id="m04-l09-q2" />
+
+<Quiz id="m04-l09-q3" />
+
+<Quiz id="m04-l09-q4" />
+
+<Quiz id="m04-l09-q5" />
+
+<Quiz id="m04-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l09-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Boxing und Unboxing (C#-Programmierhandbuch)](https://learn.microsoft.com/dotnet/csharp/programming-guide/types/boxing-and-unboxing)
+- C#-Spezifikation: [§10.2.9 Boxing conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1029-boxing-conversions)
+- C#-Spezifikation: [§10.3.7 Unboxing conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1037-unboxing-conversions)

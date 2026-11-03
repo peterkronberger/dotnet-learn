@@ -2834,6 +2834,129 @@
         "title": "Null conditional assignment (C# feature specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/null-conditional-assignment"
       }
+    },
+    {
+      "id": "string",
+      "term": "String",
+      "german": "Zeichenkette",
+      "category": "language",
+      "definition": "Der Typ für Text. `string` ist ein Referenztyp und ein anderer Name für `System.String`. Ein `string`-Objekt ist unveränderlich.",
+      "aliases": [
+        "Strings",
+        "Zeichenkette"
+      ],
+      "related": [
+        "reference-type",
+        "immutable",
+        "simple-type"
+      ],
+      "lesson": "m00-l01",
+      "source": {
+        "title": "The string type (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#825-the-string-type"
+      }
+    },
+    {
+      "id": "immutable",
+      "term": "Immutable",
+      "german": "unveränderlich",
+      "category": "language",
+      "definition": "Ein Objekt ist unveränderlich, wenn es sich nach dem Erzeugen nicht mehr ändern lässt. Methoden eines `string` ändern das Objekt nicht, sie liefern ein neues `string`-Objekt.",
+      "aliases": [
+        "unveränderlich",
+        "Immutability"
+      ],
+      "related": [
+        "string",
+        "string-builder"
+      ],
+      "lesson": "m04-l07",
+      "source": {
+        "title": "Strings (C# programming guide)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/strings/#immutability-of-strings"
+      }
+    },
+    {
+      "id": "reference-equality",
+      "term": "Reference Equality",
+      "german": "Verweisgleichheit",
+      "category": "language",
+      "definition": "Zwei Verweise sind gleich, wenn sie auf dasselbe Objekt zeigen. Für die meisten Referenztypen prüft `==` das. `object.ReferenceEquals` prüft es immer.",
+      "aliases": [
+        "Referenzgleichheit",
+        "Identität"
+      ],
+      "related": [
+        "value-equality",
+        "reference-type",
+        "object"
+      ],
+      "lesson": "m04-l08",
+      "source": {
+        "title": "Reference type equality operators (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12157-reference-type-equality-operators"
+      }
+    },
+    {
+      "id": "value-equality",
+      "term": "Value Equality",
+      "german": "Wertgleichheit",
+      "category": "language",
+      "definition": "Zwei Werte sind gleich, wenn ihr Inhalt gleich ist. Bei Zahlen und bei `string` vergleicht `==` den Inhalt, bei `string` also die Zeichen.",
+      "aliases": [
+        "Gleichheit der Werte"
+      ],
+      "related": [
+        "reference-equality",
+        "string"
+      ],
+      "lesson": "m04-l08",
+      "source": {
+        "title": "String equality operators (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12158-string-equality-operators"
+      }
+    },
+    {
+      "id": "boxing",
+      "term": "Boxing",
+      "german": "Boxing (Verpacken)",
+      "category": "language",
+      "definition": "Die Umwandlung eines Werttyps nach `object`. Dabei entsteht ein neues Objekt, das eine Kopie des Werts enthält.",
+      "aliases": [
+        "Boxing-Konvertierung",
+        "boxen"
+      ],
+      "related": [
+        "unboxing",
+        "value-type",
+        "object"
+      ],
+      "lesson": "m04-l09",
+      "source": {
+        "title": "Boxing conversions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1029-boxing-conversions"
+      }
+    },
+    {
+      "id": "unboxing",
+      "term": "Unboxing",
+      "german": "Unboxing (Auspacken)",
+      "category": "language",
+      "definition": "Die explizite Umwandlung von `object` zurück in einen Werttyp. Sie prüft, ob das Objekt genau diesen Typ geboxt enthält, und kopiert den Wert heraus.",
+      "aliases": [
+        "Unboxing-Konvertierung",
+        "unboxen"
+      ],
+      "related": [
+        "boxing",
+        "value-type",
+        "object"
+      ],
+      "lesson": "m04-l09",
+      "source": {
+        "title": "Unboxing conversions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1037-unboxing-conversions"
+      }
     }
   ]
 }

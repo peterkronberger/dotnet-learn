@@ -1,0 +1,180 @@
+---
+title: "Gleichheit: == und Equals"
+sidebar_position: 8
+description: "Bei den meisten Referenztypen vergleicht == die Verweise. Bei string und bei den einfachen Werttypen vergleichen == und Equals den Inhalt."
+lesson_id: m04-l08
+duration_min: 20
+---
+
+import referenceEquality from '!!raw-loader!@site/examples/m04/l08/reference-equality.cs';
+import referenceEqualityOutput from '!!raw-loader!@site/examples/m04/l08/reference-equality.out.txt';
+import stringEquality from '!!raw-loader!@site/examples/m04/l08/string-equality.cs';
+import stringEqualityOutput from '!!raw-loader!@site/examples/m04/l08/string-equality.out.txt';
+import valueEquality from '!!raw-loader!@site/examples/m04/l08/value-equality.cs';
+import sameTextGaps from '!!raw-loader!@site/examples/m04/l08/same-text-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l08/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l08/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l08/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l08/seclog-types-solution.cs';
+
+# Gleichheit: == und Equals
+
+:::note[Lernziele]
+- Du kannst vorhersagen, ob `==` bei zwei Variablen Werte oder Verweise vergleicht.
+- Du kannst erklären, warum zwei verschiedene `string`-Objekte mit gleichem Text gleich sind.
+- Du kannst mit `object.ReferenceEquals` prüfen, ob zwei Variablen auf dasselbe Objekt verweisen.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l01-q3" />
+
+<Quiz id="m04-l07-q4" />
+
+<Quiz id="m02-l01-q5" />
+
+## Zwei Arten von Gleichheit
+
+Es gibt zwei Fragen, die man „sind die gleich?“ nennen kann. Bei <Term id="value-equality">Value Equality (Wertgleichheit)</Term> fragst du, ob der Inhalt gleich ist. Bei <Term id="reference-equality">Reference Equality (Verweisgleichheit)</Term> fragst du, ob beide Variablen auf dasselbe Objekt zeigen.
+
+Welche Frage `==` stellt, hängt vom Typ ab:
+
+- Bei den vordefinierten Werttypen wie `int`, `double`, `bool` und `char` vergleicht `==` die Werte.
+- Bei `string` vergleicht `==` die Zeichen.
+- Bei den meisten anderen Referenztypen, zum Beispiel `StringBuilder`, vergleicht `==` die Verweise.
+
+Die Methode `Equals` stellt dieselbe Frage wie `==`, wenn man sie auf einem `int` oder einem `string` aufruft. Für den Verweisvergleich gibt es `object.ReferenceEquals(a, b)`. Sie fragt bei jedem Typ, ob `a` und `b` dasselbe Objekt sind.
+
+## Verweise vergleichen
+
+:::info[Vorhersage]
+`first` und `second` haben denselben Text, `third` zeigt auf dasselbe Objekt wie `first`. Was geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l08-reference" code={referenceEquality} predict expected={referenceEqualityOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `False`, `True`, `False`, `True`.
+
+1. **Zwei Objekte:** `first` und `second` sind zwei verschiedene Objekte, auch wenn beide `bob` enthalten. `first == second` ist darum `False`.
+2. **Ein Objekt:** `third = first` kopiert den Verweis. `first == third` ist `True`.
+3. **Gegenprobe:** `object.ReferenceEquals` bestätigt es: Das Paar `first`, `second` ergibt `False`, das Paar `first`, `third` ergibt `True`.
+
+</details>
+
+## Text vergleichen
+
+:::info[Vorhersage]
+`built` entsteht zur Laufzeit aus einem `StringBuilder`. Es ist damit ein anderes Objekt als das Literal `"bob"`. Was geben die fünf Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l08-string" code={stringEquality} predict expected={stringEqualityOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `True`, `False`, `False`, `True`.
+
+1. **Gleicher Text:** `literal == built` ist `True`, denn bei `string` vergleicht `==` die Zeichen. Dasselbe gilt für `literal.Equals(built)`.
+2. **Verschiedene Objekte:** `object.ReferenceEquals(literal, built)` ist `False`. Der Text ist gleich, die Objekte sind es nicht.
+3. **Groß und klein:** `literal == "BOB"` ist `False`, denn die Zeichen unterscheiden sich. `literal.ToUpper() == "BOB"` ist `True`.
+
+**Was passiert, wenn du `built` mit `ToUpper()` bildest?** Dann ist `literal == built` `False`, denn die Zeichen unterscheiden sich.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m04-l08-string-equality-compares-references" />
+
+**„`==` auf zwei Strings prüft, ob es dasselbe Objekt ist.“** Das stimmt nicht. Bei `string` vergleichen `==` und `Equals` die Zeichen. Zwei verschiedene Objekte mit gleichem Text sind gleich. Willst du wissen, ob es dasselbe Objekt ist, nutzt du `object.ReferenceEquals`.
+:::
+
+## Werttypen
+
+Bei den einfachen Werttypen ist die Frage immer die nach dem Wert. Es gibt kein „dasselbe Objekt“, denn jede Variable enthält ihren Wert selbst.
+
+<CSharpRunner id="m04-l08-value" code={valueEquality} />
+
+`failures == copy` und `failures.Equals(copy)` sind beide `True`. Auch `letter == 'b'` vergleicht den Wert der Variable mit dem Zeichen.
+
+## Lückenbeispiel
+
+Die Zeile mit `bool sameText` prüft den Verweis und gibt darum `False` aus. Ändere sie so, dass sie den Text vergleicht. Die Ausgabe soll `True` sein.
+
+<CSharpRunner id="m04-l08-gaps" code={sameTextGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Frage klären:** Gesucht ist der Textvergleich, also Wertgleichheit.
+2. **Ersetzen:** `bool sameText = typed == stored;` oder `bool sameText = typed.Equals(stored);` ergibt `True`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog bereinigt einen Benutzernamen in `cleanUser`. Der Block *Collect the findings in one StringBuilder* hat zwei Variablen, `findings` und `sameFindings`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Blöcke *Collect the findings in one StringBuilder* und *Clean up a user name: string methods return a new string*. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Clean up a user name: string methods return a new string* den Block `// Compare user names: == and Equals compare the text of strings`. Er gibt drei Zeilen aus: `Is bob: True` (`cleanUser == "bob"`), `Equals bob: True` (`cleanUser.Equals("bob")`) und `Same findings object: True` (`object.ReferenceEquals(findings, sameFindings)`).
+
+<CSharpRunner id="m04-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Text vergleichen:** `cleanUser` ist ein anderes Objekt als das Literal `"bob"`, aber der Text ist gleich. Darum sind `==` und `Equals` beide `True`.
+2. **Objekt vergleichen:** `findings` und `sameFindings` sind zwei Variablen für dasselbe `StringBuilder`-Objekt. `object.ReferenceEquals` ergibt `True`.
+
+</details>
+
+**Neuer Stand:** SecLog vergleicht Benutzernamen nach ihrem Text und prüft, ob zwei Variablen auf dasselbe Objekt zeigen.
+
+<details>
+<summary>Vertiefung: Die Vergleichsoperatoren in der Spezifikation (optional)</summary>
+
+Bei den ganzzahligen Typen vergleichen die Operatoren die numerischen Werte ([§12.15.2 Integer comparison operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12152-integer-comparison-operators)).
+
+Für eine Klasse, die keinen eigenen Operator vorsieht, liefert `==` genau dann `true`, wenn beide Operanden auf dieselbe Instanz verweisen oder beide `null` sind ([§12.15.7 Reference type equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12157-reference-type-equality-operators)).
+
+Für `string` gibt es eigene Operatoren. Zwei Werte sind gleich, wenn beide `null` sind oder beide auf Instanzen mit gleicher Länge und gleichen Zeichen verweisen ([§12.15.8 String equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12158-string-equality-operators)).
+
+Ein Typ kann das Verhalten von `==` und `Equals` selbst festlegen. Darum nennt man `object.ReferenceEquals` auch die Prüfung, die davon unabhängig immer die Verweise vergleicht ([Equality comparisons](https://learn.microsoft.com/dotnet/csharp/fundamentals/expressions/equality)).
+</details>
+
+## Zusammenfassung
+
+`==` stellt je nach Typ eine andere Frage. Bei `int`, `double`, `bool` und `char` vergleicht es Werte, bei `string` die Zeichen und bei den meisten anderen Referenztypen die Verweise. Zwei verschiedene `string`-Objekte mit gleichem Text sind darum gleich, zwei verschiedene `StringBuilder`-Objekte mit gleichem Text nicht. Ob zwei Variablen auf dasselbe Objekt zeigen, prüfst du bei jedem Typ mit `object.ReferenceEquals`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l08-q1" />
+
+<Quiz id="m04-l08-q2" />
+
+<Quiz id="m04-l08-q3" />
+
+<Quiz id="m04-l08-q4" />
+
+<Quiz id="m04-l08-q5" />
+
+<Quiz id="m04-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l08-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Gleichheitsvergleiche in C#](https://learn.microsoft.com/dotnet/csharp/fundamentals/expressions/equality)
+- C#-Spezifikation: [§12.15.7 Reference type equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12157-reference-type-equality-operators)
+- Microsoft Learn: [Object.ReferenceEquals](https://learn.microsoft.com/dotnet/api/system.object.referenceequals)
