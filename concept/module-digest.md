@@ -130,3 +130,9 @@ Each module section has these fields:
 - **Notes for later modules:**
   - `StringBuilder` is the only mutable reference type used so far. Examples compile without nullable warnings.
   - `Console.ReadLine()` is `string?`; pass it on only after a null check or with `??`.
+
+## W1 Wiederholung M1–M4
+
+- **Lessons:**
+  - `w01-l01` Code lesen und vorhersagen – mixed reading and tracing set for M1–M4 (quiz ids `w01-l01-q1` … `w01-l01-q28`).
+  - `w01-l02` Code ergänzen und schreiben – mixed writing set and final set for M1–M4 (quiz ids `w01-l02-q1` … `w01-l02-q24`).
