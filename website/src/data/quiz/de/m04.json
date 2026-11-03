@@ -25,6 +25,7 @@
     {
       "id": "m04-l01-q3",
       "lesson": "m04-l01",
+      "placement": true,
       "type": "single",
       "question": "Es gilt `var a = new StringBuilder(\"x\"); var b = a; b.Append(\"y\");`. Welchen Text zeigt `a` danach?",
       "options": [
@@ -94,6 +95,7 @@
     {
       "id": "m04-l02-q1",
       "lesson": "m04-l02",
+      "placement": true,
       "type": "single",
       "question": "Welche Aussage über den Ort von Werten ist richtig?",
       "options": [
@@ -203,6 +205,7 @@
     {
       "id": "m04-l03-q3",
       "lesson": "m04-l03",
+      "placement": true,
       "type": "single",
       "question": "Eine Methode mit Wertparameter `StringBuilder builder` führt `builder = new StringBuilder(\"new\");` aus. Was sieht der Aufrufer?",
       "options": [
@@ -301,6 +304,7 @@
     {
       "id": "m04-l04-q3",
       "lesson": "m04-l04",
+      "placement": true,
       "type": "single",
       "question": "Eine Variable ist als `string name` deklariert, also ohne `?`. Was stimmt?",
       "options": [
@@ -417,6 +421,7 @@
     {
       "id": "m04-l05-q1",
       "lesson": "m04-l05",
+      "placement": true,
       "type": "single",
       "question": "Welche Deklaration kann „keine Zahl“ ausdrücken?",
       "options": [
@@ -572,6 +577,7 @@
     {
       "id": "m04-l06-q1",
       "lesson": "m04-l06",
+      "placement": true,
       "type": "single",
       "question": "`string? text` ist gesetzt. Welchen Typ hat der Ausdruck `text?.Length`?",
       "options": [
@@ -832,6 +838,8 @@
     {
       "id": "m04-l08-q3",
       "lesson": "m04-l08",
+      "placement": true,
+      "placementLessons": ["m04-l07"],
       "type": "single",
       "question": "Es gilt `string a = \"bob\";` und `string b = new StringBuilder(\"bob\").ToString();`. Was ergibt `a == b`?",
       "options": [
@@ -920,6 +928,7 @@
     {
       "id": "m04-l09-q3",
       "lesson": "m04-l09",
+      "placement": true,
       "type": "single",
       "question": "Es gilt `int n = 5; object box = n; n = 10;`. Was gibt `Console.WriteLine(box);` aus?",
       "options": [

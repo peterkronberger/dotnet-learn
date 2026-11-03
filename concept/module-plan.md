@@ -173,7 +173,15 @@ Mixes M1–M4. Folder `w01-review-basics/`, quiz file `de/w01.json`, position 4.
     - tuple vs. `out` for several results (`m03-l08`, `m03-l09`)
     - recursion vs. loop, base case (`m03-l10`; loops in `m02-l06`, `m02-l07`)
   - Misconception ids: m03-l02-return-prints, m03-l03-method-changes-caller-variable, m03-l05-return-type-overloads, m03-l08-out-may-stay-unassigned, m03-l10-no-base-case
-- **M4**: Filled by the module review of M4.
+- **M4** (from `module-digest.md` `## M4`):
+  - Concepts:
+    - copy of a value vs. copy of a reference (`m04-l01`)
+    - value parameter of a reference type vs. `ref` parameter (`m04-l03`; `m03-l03`, `m03-l08`)
+    - `string?` vs. `int?` (`m04-l04`, `m04-l05`)
+    - `??` vs. `?:` (`m04-l06`; `m02-l03`)
+    - `==` vs. `Equals` vs. `ReferenceEquals` (`m04-l08`)
+    - string method result vs. changed string (`m04-l07`)
+  - Misconception ids: m04-l01-assignment-copies-object, m04-l03-reference-types-passed-by-reference, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references
 - ▶: all parts are runnable. Mix concepts across modules, for example loop counters with integer division, or `TryParse` with an `if` check.
 
 ### M5 Arrays, Strings, Collections ▶
