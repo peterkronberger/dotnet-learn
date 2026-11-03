@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-02. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-03. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -53,12 +53,10 @@ Each module section has these fields:
 - **Open forward references:**
   - Member (Mitglied) eines Typs → M6 (`m01-l06`)
   - Exceptions (Ausnahmen) → M7 (`m01-l07`, `m01-l08`)
-  - `null`, nullable reference types (`string?`) → M4 (`m01-l09`)
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
   - `if` is taught in `m02-l01` (M1 only pointed to it). In M1, `bool` only stores `true`/`false` and the result of `TryParse`.
   - `TryParse` and `out` are used as a recipe. The `bool` result is ignored in the `m01-l09` SecLog solution. `out` is explained in `m03-l08`.
-  - `var name = Console.ReadLine()` (`m01-l09`) hides that the type can be `string?`. Module 4 must correct this.
 
 ## M2 Kontrollfluss
 
@@ -76,13 +74,11 @@ Each module section has these fields:
 - **Glossary terms:** selection-statement, boolean-expression, comparison-operator (`m02-l01`), logical-operator, short-circuit-evaluation (`m02-l02`), conditional-operator (`m02-l03`), switch-expression, pattern, discard, relational-pattern, constant-pattern, exhaustive (`m02-l04`), switch-statement, case-guard, fall-through (`m02-l05`), loop, iteration (`m02-l06`), loop-variable, off-by-one-error (`m02-l07`), jump-statement (`m02-l08`), nested-loop (`m02-l09`). `collection` has no `lesson` field yet (belongs to M5).
 - **Misconception ids:** m02-l01-else-wrong-if, m02-l02-and-same-as-ampersand, m02-l03-both-branches-evaluated, m02-l04-missing-arm-gives-default, m02-l05-case-falls-through, m02-l06-condition-checked-once, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
 - **Open forward references:**
-  - `null` (der Wert „kein Wert“) → M4 (`m02-l06`; `Console.ReadLine()` can return `null`)
   - Sammlungen (Arrays, Listen) with `foreach` → M5 (`m02-l07`, plain text, no `<Forward>`)
 - **SecLog end state:** `website/examples/m02/l09/seclog-analysis-solution.cs` – the M1 end state plus (each lesson only adds code): alert for many failed logins, `suspicious` flag, singular/plural word, severity (`switch` expression), action per event type (`switch` statement), failure streak read with `while`, per-attempt lines (`for`) and dot count (`foreach`), date part (`break`) and digit count (`continue`), bar chart of failures per user (nested loops).
 - **Notes for later modules:**
   - SecLog still holds data in single variables; the bar chart of `m02-l09` takes names and counts from `switch` expressions as a stand-in for arrays (M5).
   - `foreach` is taught only over a `string`. `switch` on `string` uses constant labels; type, property and list patterns are not taught.
-  - `Console.ReadLine()` loops (`m02-l06`) compare with `==` and ignore `null`; module 4 must correct this.
 
 ## M3 Methoden
 
@@ -101,14 +97,36 @@ Each module section has these fields:
 - **Glossary terms:** parameter, argument, return-type, void, method-call, return-value, return-statement, expression-body, scope, local-variable, value-parameter, declaration-space, local-function, static-local-function, capture, signature, overloading, overload-resolution, optional-parameter, default-argument, named-argument, parameter-array, reference-parameter, output-parameter, input-parameter, tuple, tuple-element, deconstruction, recursion, base-case, call-stack, stack-overflow
 - **Misconception ids:** m03-l01-declaration-runs-code, m03-l02-return-prints, m03-l03-method-changes-caller-variable, m03-l04-declare-before-call, m03-l05-return-type-overloads, m03-l06-default-from-variable, m03-l07-params-not-last, m03-l08-out-may-stay-unassigned, m03-l09-tuple-is-reference-type, m03-l10-no-base-case
 - **Open forward references:**
-  - Werte mit Verweis als Argument → M4 (`m03-l03`)
-  - Werte, die fehlen können (`null`) → M4 (`m03-l06`)
-  - Werttyp und Referenztyp → M4 (`m03-l09`)
   - die erzeugte Methode `Main`, Klassen → M6 (`m03-l04`)
   - `static class`, `public static` → M6 (`m03-l05`)
   - Arrays (`int[]`), Sammlungen → M5 (`m03-l07`)
 - **SecLog end state:** `website/examples/m03/l10/seclog-methods-solution.cs` – the M2 end state split into methods: check a line, read the user (`TryReadUser` with `out`), return user and IP together as a tuple (`ReadUserAndIp`), overloaded report lines, optional IP argument, static local helper, recursion. Each task file equals the previous solution.
 - **Notes for later modules:**
   - Methods in examples are local functions in top-level code. Overloads live in a `static class` (Forward to M6).
-  - `user` from `Console.ReadLine()` is never passed to a `string` parameter until M4.
   - `TryParse` can now be used with its `bool` result (`m03-l08`).
+
+## M4 Typsystem-Fundamente
+
+- **Lessons:**
+  - `m04-l01` Werttypen und Referenztypen – a variable holds a value or a reference; assignment copies the value or the reference; `int` is an alias of `System.Int32`; `object` is the root.
+  - `m04-l02` Stack und Heap – ein Modell – stack and heap as a model, not a promise of the language; garbage collector.
+  - `m04-l03` Argumente übergeben – two questions: value or reference type, value or `ref` parameter; changing the object vs. replacing the reference.
+  - `m04-l04` null und Nullable-Verweistypen – `null` = no object; `string?`, nullable context, null-state warnings, `!`.
+  - `m04-l05` Nullable-Werttypen und Standardwerte – `int?`, `HasValue`, `Value`, lifted operators; default values (locals get none).
+  - `m04-l06` Null-sichere Operatoren – `?.`, `?[]`, `??`, `??=`, null-conditional assignment (C# 14).
+  - `m04-l07` Strings sind unveränderlich – string methods return a new string; `+` vs. `StringBuilder`.
+  - `m04-l08` Gleichheit: == und Equals – reference vs. value equality; `string` compares content; `ReferenceEquals`.
+  - `m04-l09` Boxing und Unboxing – `object` holds a copy of a value in a new object; unboxing needs the exact type.
+- **Constructs taught:** value and reference type, `new StringBuilder(…)` as recipe (`m04-l01`), `ref` with reference types (`m04-l03`), `null`, `string?`, `!` (`m04-l04`), `int?`, `HasValue`, `Value`, default values (`m04-l05`), `?.` `?[]` `??` `??=` (`m04-l06`), `Trim()`, `ToLower()`, `Append` (`m04-l07`), `Equals`, `object.ReferenceEquals` (`m04-l08`), boxing, unboxing cast `(int)obj` (`m04-l09`).
+- **Glossary terms:** value-type, reference-type, object, simple-type, string-builder, stack, heap, garbage-collector, automatic-memory-management, pass-by-reference, null, nullable-reference-type, nullable-context, null-state-analysis, null-forgiving-operator, nullable-value-type, lifted-operator, default-value, null-conditional-operator, null-coalescing-operator, null-coalescing-assignment, null-conditional-assignment, immutable, reference-equality, value-equality, boxing, unboxing
+- **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack, m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null, m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
+- **Open forward references:**
+  - Namespaces, `using`, Klassen, Konstruktoren → M6 (`m04-l01`)
+  - Elementzugriff `[]`, Felder, Arrays → M5 (`m04-l05`, `m04-l06`)
+  - Eigenschaften (Properties) → M6 (`m04-l06`)
+  - Exceptions → M7 (`m04-l04`, `m04-l05`, `m04-l09`)
+  - Projektdatei (nullable setting) → M14 (`m04-l04`)
+- **SecLog end state:** `website/examples/m04/l08/seclog-types-solution.cs` – the M3 end state plus: findings in one `StringBuilder` passed to a method (`l03`), `FindUser` returns `string?` (`l04`), `FailuresOrNull` returns `int?` (`l05`), `??`, `?.`, `??=` for missing values (`l06`), `Trim().ToLower()` for user names (`l07`), `==`/`Equals`/`ReferenceEquals` (`l08`). `l02` and `l09` have no step. Chain: `m03/l10` → `m04/l01` → `l03` → `l04` → `l05` → `l06` → `l07` → `l08`.
+- **Notes for later modules:**
+  - `StringBuilder` is the only mutable reference type used so far. Examples compile without nullable warnings.
+  - `Console.ReadLine()` is `string?`; pass it on only after a null check or with `??`.
