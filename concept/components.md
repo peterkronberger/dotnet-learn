@@ -73,6 +73,7 @@ Available:
 - **Export/import** as a JSON file (with lessons and activity).
 - Test page `/dev/progress-selftest`.
 
+- **Optional-review note** – available: `<OptionalReview modules={[1, 2, 3, 4]} />` (registered in `MDXComponents.js`). Place: the first review lesson, after "Lernziele". Shows the info box "Wiederholung ist optional" only if `allPlacementsPassed` is true for every listed module (placement test passed; lessons completed by hand do not count). Renders nothing while `progress` is `null` (server render) and when the condition is false. Read-only. Invalid `modules` (not a non-empty list of integers 0–19) fails the build.
 - **Placement test** – available: `<PlacementTest module="N" />` (registered in `MDXComponents.js`). Place: the first lesson of the module, after "Lernziele". Flow: the questions are deferred question components (no feedback while answering), the evaluation comes at the end (pass = at most 1 wrong answer), then retake and reset. Data: `"placement": true` on the questions and `placementLessons` in the quiz data, checked by `check-quiz.mjs`. Option A: the answers are not stored in the Leitner system; on a pass every lesson of the module gets `via: "placement"`. A lesson completed this way shows "· per Einstufungstest" in "Lernpfad" and in `<LessonComplete>` (`completedVia` in `lessonOverview`).
 
 ## More components

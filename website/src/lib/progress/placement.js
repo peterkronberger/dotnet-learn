@@ -46,3 +46,9 @@ export function resetPlacement(progress, moduleKey) {
 export function placementResult(progress, moduleKey) {
   return (progress.placement ?? {})[moduleKey] ?? null;
 }
+
+// Pure, never writes. True if every key has a passed placement result; false for an empty list.
+export function allPlacementsPassed(progress, moduleKeys) {
+  if (!progress || !Array.isArray(moduleKeys) || moduleKeys.length === 0) return false;
+  return moduleKeys.every((key) => placementResult(progress, key)?.passed === true);
+}
