@@ -1,0 +1,218 @@
+---
+title: Mit Strings arbeiten
+sidebar_position: 10
+description: Texte durchsuchen, zerlegen, zusammensetzen und vergleichen – mit Methoden, die neue Strings liefern, und mit ausdrücklichem StringComparison.
+lesson_id: m05-l10
+duration_min: 25
+---
+
+import findParts from '!!raw-loader!@site/examples/m05/l10/find-parts.cs';
+import findPartsOutput from '!!raw-loader!@site/examples/m05/l10/find-parts.out.txt';
+import splitJoin from '!!raw-loader!@site/examples/m05/l10/split-join.cs';
+import replaceResult from '!!raw-loader!@site/examples/m05/l10/replace-result.cs';
+import replaceResultOutput from '!!raw-loader!@site/examples/m05/l10/replace-result.out.txt';
+import buildText from '!!raw-loader!@site/examples/m05/l10/build-text.cs';
+import compareOrdinal from '!!raw-loader!@site/examples/m05/l10/compare-ordinal.cs';
+import compareOrdinalOutput from '!!raw-loader!@site/examples/m05/l10/compare-ordinal.out.txt';
+import joinGap from '!!raw-loader!@site/examples/m05/l10/join-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l10/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l10/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l10/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l10/seclog-collections-solution.cs';
+
+# Mit Strings arbeiten
+
+:::note[Lernziele]
+- Du kannst mit `Contains`, `IndexOf`, `StartsWith` und `Split` Teile eines Textes finden und zerlegen.
+- Du kannst mit `string.Join` und `StringBuilder` Text aus mehreren Teilen zusammensetzen.
+- Du kannst erklären, warum `Replace` den ursprünglichen String nicht ändert.
+- Du kannst begründen, wann ein ordinaler und wann ein kulturabhängiger Vergleich passt, und `StringComparison` angeben.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l07-q1" />
+
+<Quiz id="m04-l08-q6" />
+
+<Quiz id="m01-l06-q5" />
+
+## Teile eines Textes finden
+
+Eine Log-Zeile ist ein Text. SecLog muss in ihm suchen: Steht `login-failed` darin? Wo beginnt der Benutzername? Dafür hat `string` Methoden. Sie ändern den Text nicht, sie liefern ein Ergebnis.
+
+| Methode | Liefert |
+| --- | --- |
+| `Contains(x, vergleich)` | `true`, wenn `x` im Text vorkommt |
+| `StartsWith(x, vergleich)` / `EndsWith(x, vergleich)` | `true`, wenn der Text mit `x` beginnt bzw. endet |
+| `IndexOf(x, vergleich)` | den Index des ersten Treffers, oder `-1`, wenn `x` nicht vorkommt |
+
+Der zweite Parameter `vergleich` legt fest, wie Zeichen verglichen werden. Dazu kommt weiter unten ein eigener Abschnitt. Hier steht überall `StringComparison.Ordinal`: Es zählt jedes Zeichen genau so, wie es ist.
+
+:::info[Vorhersage]
+Was gibt das Programm in jeder Zeile aus? Der Index zählt ab 0, wie bei einem Array.
+:::
+
+<CSharpRunner id="m05-l10-find" code={findParts} predict expected={findPartsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `13`, `-1`.
+
+1. **Enthalten:** `failed` kommt in `login-failed user=bob` vor.
+2. **Anfang:** Der Text beginnt nicht mit `logout`, sondern mit `login-failed`.
+3. **Position:** `login-failed` hat 12 Zeichen, danach kommt das Leerzeichen. `user=` beginnt darum bei Index 13.
+4. **Nicht gefunden:** `carol` kommt nicht vor, `IndexOf` liefert `-1`. Ein Index von `-1` ist kein gültiger Index, prüfe ihn, bevor du ihn benutzt.
+
+**Was passiert, wenn …** du `StartsWith("login", StringComparison.Ordinal)` fragst? Dann ist das Ergebnis `True`.
+
+</details>
+
+## Zerlegen und zusammensetzen
+
+`Split` zerlegt einen Text an einem <Term id="separator">Trennzeichen</Term> (Separator) in ein Array von Teilen. Das Trennzeichen selbst gehört nicht zu den Teilen. `string.Join(trenner, teile)` macht das Gegenteil: Es setzt die Teile mit dem Trennzeichen dazwischen zu einem Text zusammen.
+
+<CSharpRunner id="m05-l10-split" code={splitJoin} />
+
+Die Ausgabe ist `4`, dann `login-failed`, dann die vier Teile mit ` | ` dazwischen. Die Zeile hat drei Leerzeichen, also vier Teile. `parts[1]` ist der Ereignistyp. Genau dafür nutzt SecLog `Split` weiter unten. Zeigt ein Text zwei Trennzeichen direkt hintereinander, entsteht zwischen ihnen ein leerer Teil. Mit `StringSplitOptions.RemoveEmptyEntries` als zweitem Argument lässt `Split` leere Teile weg.
+
+Reguläre Ausdrücke (Regular Expressions) können Texte nach Mustern durchsuchen. Sie sind hier nicht Thema, SecLog kommt mit den Methoden dieser Lektion aus.
+
+## Replace liefert einen neuen Text
+
+`Replace(alt, neu)` ersetzt jedes Vorkommen von `alt` durch `neu`. Ein `string` ist unveränderlich (<Term id="immutable">immutable</Term>), das kennst du aus der Lektion „Strings sind unveränderlich“. `Replace` ändert also den vorhandenen Text nicht, sondern liefert einen neuen.
+
+:::info[Vorhersage]
+Was gibt das Programm in den drei Zeilen aus?
+:::
+
+<CSharpRunner id="m05-l10-replace" code={replaceResult} predict expected={replaceResultOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `bob`, `BoB`, `bob`.
+
+1. **Ergebnis verworfen:** Die erste `Replace`-Zeile liefert einen neuen Text, aber niemand speichert ihn. `text` bleibt `bob`.
+2. **Ergebnis gespeichert:** `changed` bekommt den neuen Text. Beide `b` sind ersetzt, weil `Replace` jedes Vorkommen ersetzt: `BoB`.
+3. **Original unverändert:** `text` ist weiter `bob`.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m05-l10-replace-changes-string" />
+
+**„`text.Replace("a", "b");` ändert `text`.“** Das stimmt nicht. Der Text ist unveränderlich. `Replace` liefert einen neuen Text, den du einer Variable zuweisen musst, zum Beispiel `text = text.Replace("a", "b");`. Das gilt für alle Methoden von `string`, so wie bei `ToUpper()` und `Trim()`.
+:::
+
+## Text aus Teilen aufbauen
+
+Für wenige Teile genügen `+` und `string.Join`. Wächst ein Text in einer Schleife, ist ein `StringBuilder` besser: Er hängt an dasselbe Objekt an, statt jedes Mal einen neuen Text zu erzeugen (siehe „Strings sind unveränderlich“). Neu ist `AppendLine`: Es hängt den Text an und danach einen Zeilenumbruch.
+
+<CSharpRunner id="m05-l10-build" code={buildText} />
+
+Die Ausgabe sind drei Zeilen `user: …`, eine je Benutzer. `ToString()` macht aus dem `StringBuilder` am Ende den fertigen Text.
+
+## Texte vergleichen: ordinal oder kulturabhängig
+
+Zwei Texte kann man auf zwei Arten vergleichen:
+
+- Beim <Term id="ordinal-comparison">ordinalen Vergleich</Term> (Ordinal Comparison) zählen nur die Zeichen selbst, Zeichen für Zeichen. Er hängt nicht von der <Term id="culture">Kultur</Term> ab. `StringComparison.Ordinal` beachtet die Schreibweise, `StringComparison.OrdinalIgnoreCase` nicht.
+- Beim <Term id="culture-sensitive-comparison">kulturabhängigen Vergleich</Term> (Culture-sensitive Comparison) gelten die Regeln einer Sprache, zum Beispiel für die Sortierung. `StringComparison.CurrentCulture` benutzt die Kultur des Rechners. Das Ergebnis kann sich je nach Kultur unterscheiden.
+
+Die Faustregel: Sag den Vergleich immer ausdrücklich mit einem `StringComparison`-Wert. Für Bezeichner, Dateipfade und feste Werte wie die Ereignistypen im Log nimmst du einen ordinalen Vergleich. Für Text, den ein Benutzer liest und sortiert sehen will, nimmst du einen kulturabhängigen. Wo sich die beiden unterscheiden, zeigt dieser Kurs nicht im Runner: Die Ausgabe hinge vom Rechner und seiner Kultur ab.
+
+Manche Methoden vergleichen ohne Angabe nach festen Regeln: `==` und `Contains` sind ordinal, `IndexOf` mit einem Text als Argument ist dagegen kulturabhängig. Wer ausdrücklich `StringComparison` angibt, muss das nicht wissen.
+
+:::info[Vorhersage]
+Was geben die drei Zeilen aus?
+:::
+
+<CSharpRunner id="m05-l10-compare" code={compareOrdinal} predict expected={compareOrdinalOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `False`, `False`, `True`.
+
+1. **`==`:** Vergleicht die Zeichen genau, `l` und `L` sind verschieden.
+2. **`Ordinal`:** Dasselbe wie `==`, aber ausdrücklich angegeben.
+3. **`OrdinalIgnoreCase`:** Groß- und Kleinschreibung zählt nicht, die Texte sind gleich.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wann welcher Vergleich? (optional)</summary>
+
+Die Regeln für den Vergleich von Texten sind in [Best practices for comparing strings in .NET](https://learn.microsoft.com/dotnet/standard/base-types/best-practices-strings) beschrieben: Überladungen mit `StringComparison` wählen, ordinale Vergleiche als sicheren Standard für kulturunabhängige Werte nehmen und kulturabhängige Vergleiche für Text einsetzen, der sprachlich bedeutsam ist.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm soll `bob, dave` ausgeben. Der erste Name soll aus `user=bob` kommen. Es gibt aber `user,dave` aus. Ändere zwei Stellen.
+
+<CSharpRunner id="m05-l10-gaps" code={joinGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Teil wählen:** `Split('=')` liefert `user` und `bob`. Der Name steht bei Index 1: `parts[1]`.
+2. **Trennzeichen:** Mit `", "` (Komma und Leerzeichen) statt `","` steht ein Leerzeichen nach dem Komma.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Beobachtungsliste `extendedWatchList` und gibt für jeden Fehlversuch von `bob` einen Alarm aus.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Build a watch list with collection expressions* mit den Alarmen und die Methode `PrintAlerts` am Ende der lokalen Methoden. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe direkt nach der Methode `PrintAlerts` (vor der Klasse `Report`) die lokale Methode `string EventTypeOf(string line) => line.Split(' ')[1];`. Schreibe nach dem Block `// Print one alert per failed login of bob, in order` den Block `// Count the events per type with Split`: Er füllt ein `Dictionary<string, int>` mit der Zahl der Ereignisse je Typ aus allen Zeilen von `sampleLog` (Typ über `EventTypeOf`) und gibt die Zahlen für `string[] eventTypes = ["login-success", "login-failed", "logout"];` in dieser Reihenfolge aus (5, 7, 2). Danach gibt er `Watch list: bob, dave` aus (mit `string.Join(", ", extendedWatchList)`). Zuletzt gibt er aus, ob der Ereignistyp von Zeile 2 `"LOGIN-FAILED"` ist, mit `StringComparison.OrdinalIgnoreCase` (`True`).
+
+<CSharpRunner id="m05-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Zerlegen:** `line.Split(' ')[1]` nimmt aus den Teilen einer Zeile den zweiten, den Ereignistyp.
+2. **Zählen:** Wie bei den Fehlversuchen pro Benutzer: `TryGetValue` holt die bisherige Zahl, dann wird eins addiert.
+3. **Ausgeben:** Die Typen stehen in `eventTypes` in einer festen Reihenfolge. Die Schleife geht diese Reihenfolge durch, nicht die Schlüssel des Dictionary, deren Reihenfolge nicht garantiert ist.
+4. **Zusammensetzen und vergleichen:** `string.Join(", ", …)` setzt die Namen zusammen. `string.Equals(…, StringComparison.OrdinalIgnoreCase)` ignoriert die Schreibweise von `login-failed`.
+
+</details>
+
+**Neuer Stand:** SecLog zählt die Ereignisse je Typ, gibt die Beobachtungsliste als Text aus und vergleicht Ereignistypen ausdrücklich ordinal.
+
+## Zusammenfassung
+
+`Contains`, `StartsWith`, `EndsWith` und `IndexOf` suchen in einem Text, `Split` zerlegt ihn, `string.Join` und `StringBuilder` setzen Text zusammen. Alle diese Methoden liefern neue Werte, sie ändern den Text nicht: Das Ergebnis von `Replace` muss zugewiesen werden. Beim Vergleich gibst du `StringComparison` ausdrücklich an: ordinal für feste Werte wie Ereignistypen, kulturabhängig für Text, den Benutzer sehen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l10-q1" />
+
+<Quiz id="m05-l10-q2" />
+
+<Quiz id="m05-l10-q3" />
+
+<Quiz id="m05-l10-q4" />
+
+<Quiz id="m05-l10-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l10-q6" />
+
+### Transferfrage
+
+<Quiz id="m05-l10-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Best practices for comparing strings in .NET](https://learn.microsoft.com/dotnet/standard/base-types/best-practices-strings)
+- Microsoft Learn: [String.Split](https://learn.microsoft.com/dotnet/api/system.string.split)
+- Microsoft Learn: [StringBuilder](https://learn.microsoft.com/dotnet/api/system.text.stringbuilder)
