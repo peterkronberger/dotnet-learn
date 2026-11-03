@@ -145,6 +145,8 @@
     {
       "id": "m05-l02-q3",
       "lesson": "m05-l02",
+      "placement": true,
+      "placementLessons": ["m05-l01"],
       "type": "single",
       "question": "Welche Aussage über `int[,]` und `int[][]` stimmt?",
       "options": [
@@ -256,6 +258,7 @@
     {
       "id": "m05-l03-q3",
       "lesson": "m05-l03",
+      "placement": true,
       "type": "single",
       "question": "Das Array `a` hat 8 Elemente. Wie viele Elemente hat `a[2..5]`?",
       "options": [
@@ -454,6 +457,8 @@
     {
       "id": "m05-l05-q2",
       "lesson": "m05-l05",
+      "placement": true,
+      "placementLessons": ["m05-l04"],
       "type": "single",
       "question": "Ein `foreach` geht durch eine Liste und ruft in einem Durchlauf `list.Remove(...)` für ein Element in der Mitte auf. Was passiert?",
       "options": [
@@ -565,6 +570,7 @@
     {
       "id": "m05-l06-q2",
       "lesson": "m05-l06",
+      "placement": true,
       "type": "single",
       "question": "Das Dictionary `failures` hat nur den Schlüssel `bob`. Was geschieht bei `int n = failures[\"carol\"];`?",
       "options": [
@@ -667,6 +673,8 @@
     {
       "id": "m05-l07-q1",
       "lesson": "m05-l07",
+      "placement": true,
+      "placementLessons": ["m05-l09"],
       "type": "single",
       "question": "Die Menge `names` enthält schon `\"bob\"`. Was bewirkt `bool again = names.Add(\"bob\");`?",
       "options": [
@@ -785,6 +793,7 @@
     {
       "id": "m05-l08-q2",
       "lesson": "m05-l08",
+      "placement": true,
       "type": "single",
       "question": "Was legt `List<int> numbers = [1, 2, 3];` an?",
       "options": [
@@ -1005,6 +1014,7 @@
     {
       "id": "m05-l10-q2",
       "lesson": "m05-l10",
+      "placement": true,
       "type": "single",
       "question": "Es gilt `string text = \"alice\";`. Danach steht die Zeile `text.Replace(\"a\", \"A\");` allein. Was steht danach in `text`?",
       "options": [
@@ -1138,6 +1148,7 @@
     {
       "id": "m05-l11-q2",
       "lesson": "m05-l11",
+      "placement": true,
       "type": "single",
       "question": "Ein Entwickler schreibt Zeitstempel für Log-Einträge mit `DateTime.Now`. Was stimmt?",
       "options": [

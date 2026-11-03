@@ -260,7 +260,15 @@ Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · e
 Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, position 8.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
 - Lesson L1: mixed reading and tracing set (title chosen by the architect of W2).
 - Lesson L2: mixed writing set and final set (title chosen by the architect of W2).
-- **M5**: Filled by the module review of M5.
+- **M5** (from `module-digest.md` `## M5`):
+  - Concepts:
+    - array vs. `List<T>` (fixed vs. growing); `Length` vs. `Count` (`m05-l01`, `m05-l04`)
+    - range `..` (slice) vs. spread `..` (collection expression) (`m05-l03`, `m05-l08`)
+    - `Dictionary.Add` / indexer / `TryGetValue` on a missing or duplicate key (`m05-l06`)
+    - `Dictionary.Add` vs. `HashSet.Add` on a duplicate (`m05-l06`, `m05-l07`)
+    - `DateTime` vs. `DateTimeOffset` (`m05-l11`)
+    - ordinal vs. culture-sensitive comparison (`m05-l10`)
+  - Misconception ids: m05-l01-index-starts-at-one, m05-l03-range-end-inclusive, m05-l05-change-list-in-foreach, m05-l07-add-duplicate-throws, m05-l10-replace-changes-string
 - **M6**: Filled by the module review of M6.
 - **M7**: Filled by the module review of M7.
 - **M8**: Filled by the module review of M8.

@@ -71,10 +71,9 @@ Each module section has these fields:
   - `m02-l08` Schleifen steuern: break und continue – leave a loop or skip one iteration.
   - `m02-l09` Verschachtelte Schleifen – inner block runs outer x inner times; `break` leaves only the inner loop.
 - **Constructs taught:** `==` `!=` `<` `>` `<=` `>=` (`m02-l01`), `if`/`else`/`else if` and `{ }` blocks (`m02-l01`), `&&` `||` `!` and short-circuit (`m02-l02`), `&` `|` on `bool` (`m02-l02`), `?:` (`m02-l03`), `switch` expression with constant, `<`-relational and `_` patterns (`m02-l04`), `switch` statement with `case`, `default`, several labels, `when` (`m02-l05`), `while` (`m02-l06`), `do … while` (`m02-l06`), `for` (`m02-l07`), `foreach` over a `string` (`m02-l07`), `break` (`m02-l05`, `m02-l08`), `continue` (`m02-l08`), nested loops (`m02-l09`).
-- **Glossary terms:** selection-statement, boolean-expression, comparison-operator (`m02-l01`), logical-operator, short-circuit-evaluation (`m02-l02`), conditional-operator (`m02-l03`), switch-expression, pattern, discard, relational-pattern, constant-pattern, exhaustive (`m02-l04`), switch-statement, case-guard, fall-through (`m02-l05`), loop, iteration (`m02-l06`), loop-variable, off-by-one-error (`m02-l07`), jump-statement (`m02-l08`), nested-loop (`m02-l09`). `collection` has no `lesson` field yet (belongs to M5).
+- **Glossary terms:** selection-statement, boolean-expression, comparison-operator (`m02-l01`), logical-operator, short-circuit-evaluation (`m02-l02`), conditional-operator (`m02-l03`), switch-expression, pattern, discard, relational-pattern, constant-pattern, exhaustive (`m02-l04`), switch-statement, case-guard, fall-through (`m02-l05`), loop, iteration (`m02-l06`), loop-variable, off-by-one-error (`m02-l07`), jump-statement (`m02-l08`), nested-loop (`m02-l09`). `collection` has `lesson` `m05-l04`.
 - **Misconception ids:** m02-l01-else-wrong-if, m02-l02-and-same-as-ampersand, m02-l03-both-branches-evaluated, m02-l04-missing-arm-gives-default, m02-l05-case-falls-through, m02-l06-condition-checked-once, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
 - **Open forward references:**
-  - Sammlungen (Arrays, Listen) with `foreach` → M5 (`m02-l07`, plain text, no `<Forward>`)
 - **SecLog end state:** `website/examples/m02/l09/seclog-analysis-solution.cs` – the M1 end state plus (each lesson only adds code): alert for many failed logins, `suspicious` flag, singular/plural word, severity (`switch` expression), action per event type (`switch` statement), failure streak read with `while`, per-attempt lines (`for`) and dot count (`foreach`), date part (`break`) and digit count (`continue`), bar chart of failures per user (nested loops).
 - **Notes for later modules:**
   - SecLog still holds data in single variables; the bar chart of `m02-l09` takes names and counts from `switch` expressions as a stand-in for arrays (M5).
@@ -99,7 +98,6 @@ Each module section has these fields:
 - **Open forward references:**
   - die erzeugte Methode `Main`, Klassen → M6 (`m03-l04`)
   - `static class`, `public static` → M6 (`m03-l05`)
-  - Arrays (`int[]`), Sammlungen → M5 (`m03-l07`)
 - **SecLog end state:** `website/examples/m03/l10/seclog-methods-solution.cs` – the M2 end state split into methods: check a line, read the user (`TryReadUser` with `out`), return user and IP together as a tuple (`ReadUserAndIp`), overloaded report lines, optional IP argument, static local helper, recursion. Each task file equals the previous solution.
 - **Notes for later modules:**
   - Methods in examples are local functions in top-level code. Overloads live in a `static class` (Forward to M6).
@@ -122,7 +120,7 @@ Each module section has these fields:
 - **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack, m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null, m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
 - **Open forward references:**
   - Namespaces, `using`, Klassen, Konstruktoren → M6 (`m04-l01`)
-  - Elementzugriff `[]`, Felder, Arrays → M5 (`m04-l05`, `m04-l06`)
+  - Felder → M6 (`m04-l05`, `m04-l06`)
   - Eigenschaften (Properties) → M6 (`m04-l06`)
   - Exceptions → M7 (`m04-l04`, `m04-l05`, `m04-l09`)
   - Projektdatei (nullable setting) → M14 (`m04-l04`)
@@ -130,6 +128,34 @@ Each module section has these fields:
 - **Notes for later modules:**
   - `StringBuilder` is the only mutable reference type used so far. Examples compile without nullable warnings.
   - `Console.ReadLine()` is `string?`; pass it on only after a null check or with `??`.
+
+## M5 Arrays, Strings, Collections
+
+- **Lessons:**
+  - `m05-l01` Arrays – fixed length, index from 0, `Length`, `for`/`foreach`; index out of range.
+  - `m05-l02` Mehrdimensionale und verzweigte Arrays – `int[,]` (rectangular) vs. `int[][]` (jagged).
+  - `m05-l03` Index vom Ende und Bereiche – `^n`, `a..b` (end exclusive), `Index`/`Range`.
+  - `m05-l04` Listen: List<T> – growing list, `Add`, `Insert`, `Remove`, `IndexOf`, `Count`; a list is a reference type.
+  - `m05-l05` Sammlungen durchlaufen und ändern – enumerator, no change during `foreach`, remove backwards.
+  - `m05-l06` Wörterbücher: Dictionary<TKey,TValue> – key to value, `Add`, indexer, `TryGetValue`, `ContainsKey`; key equality (→ M8).
+  - `m05-l07` Mengen: HashSet<T> – no duplicates, `Add` returns `bool`, set operations.
+  - `m05-l08` Collection-Ausdrücke und Initialisierer – `[1, 2, 3]`, spread `..`, object/collection initializers (C# 12).
+  - `m05-l09` Welche Sammlung wann? – `Queue<T>`, `Stack<T>`, `IReadOnlyList<T>`, cost of `Contains`.
+  - `m05-l10` Mit Strings arbeiten – `Split`, `Join`, `IndexOf`, `Replace`, `StringComparison`, ordinal vs. culture.
+  - `m05-l11` Datum und Uhrzeit – `DateTimeOffset`, `TimeSpan`, `DateOnly`, `TimeOnly`, UTC; time zones as a warning.
+- **Constructs taught:** `T[]`, `new T[n]`, `{ … }` initializer, `Length`, `[i]` (`m05-l01`), `T[,]`, `T[][]`, `GetLength` (`m05-l02`), `^n`, `..`, `Index`, `Range` (`m05-l03`), `List<T>` and its members (`m05-l04`), enumerator, `GetEnumerator`, `MoveNext` (`m05-l05`), `Dictionary<TKey,TValue>`, `TryGetValue` (`m05-l06`), `HashSet<T>`, `UnionWith`, `IntersectWith`, `ExceptWith` (`m05-l07`), collection expressions, `..` spread, object and collection initializers (`m05-l08`), `Queue<T>`, `Stack<T>`, `IReadOnlyList<T>` (`m05-l09`), `Split`, `Join`, `Contains`, `StartsWith`, `StringComparison` (`m05-l10`), `DateTimeOffset`, `TimeSpan`, `DateOnly`, `TimeOnly`, `DateTimeOffset.Parse(text, CultureInfo.InvariantCulture)` (`m05-l11`). `Span<T>` and `ref struct` are named only.
+- **Glossary terms:** collection (`m05-l04`); see the `"lesson": "m05-l…"` fields: array-initializer, bounds-check, rank, multi-dimensional-array, jagged-array, index-from-end, list, type-argument, enumerator, iteration-variable, dictionary, key, key-value-pair, hash-set, set-operation, collection-expression, spread-element, collection-initializer, target-typed, queue, stack-collection, collection-interface, ordinal-comparison, culture-sensitive-comparison, separator, utc, timestamp, time-span, date-time-offset
+- **Misconception ids:** m05-l01-index-starts-at-one, m05-l02-jagged-same-as-multidimensional, m05-l03-range-end-inclusive, m05-l04-insert-overwrites, m05-l05-change-list-in-foreach, m05-l06-missing-key-gives-default, m05-l07-add-duplicate-throws, m05-l08-collection-expression-is-array, m05-l09-contains-same-cost, m05-l10-replace-changes-string, m05-l11-now-for-log-timestamps
+- **Open forward references:**
+  - Key equality of `Dictionary`/`HashSet` (`Equals`/`GetHashCode`) → M8 (`m05-l06`, `m05-l07`)
+  - Generics (`List<T>` as a generic type) → M9
+  - Exceptions (`KeyNotFoundException`, `InvalidOperationException`) → M7
+  - `Span<T>`, `ref struct` → named only, not taught
+- **SecLog end state:** `website/examples/m05/l11/seclog-collections-solution.cs` – the M4 end state plus: whole sample log in an array/list, failures per user in a `Dictionary`, distinct IPs in a `HashSet`, timestamps as `DateTimeOffset`, alert "5 failed attempts in 10 minutes". New local functions: `PrintAlerts`, `EventTypeOf`, `TimestampOf`. Chain: `m04/l08` → `m05/l01` → … → `m05/l11`. M5 milestone reached.
+- **Notes for later modules:**
+  - No current time in runnable examples. Parse timestamps with `DateTimeOffset` and `CultureInfo.InvariantCulture`.
+  - The order of `HashSet` and `Dictionary` elements is not promised. Do not print them unsorted in outputs.
+  - Compare texts with an explicit `StringComparison` (ordinal for logs).
 
 ## W1 Wiederholung M1–M4
 
