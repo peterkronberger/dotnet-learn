@@ -1,5 +1,7 @@
-HashSet<string> morning = new HashSet<string> { "alice", "bob" };
-HashSet<string> evening = new HashSet<string> { "bob", "carol" };
+string[] morningUsers = { "alice", "bob" };
+string[] eveningUsers = { "bob", "carol" };
+HashSet<string> morning = new HashSet<string>(morningUsers);
+HashSet<string> evening = new HashSet<string>(eveningUsers);
 
 HashSet<string> both = new HashSet<string>(morning);
 both.IntersectWith(evening);
