@@ -1,0 +1,211 @@
+---
+title: Arrays
+sidebar_position: 1
+description: Ein Array hält eine feste Anzahl von Elementen eines Typs. Du greifst über den Index zu, der bei 0 beginnt.
+lesson_id: m05-l01
+duration_min: 22
+---
+
+import firstArray from '!!raw-loader!@site/examples/m05/l01/first-array.cs';
+import firstArrayOutput from '!!raw-loader!@site/examples/m05/l01/first-array.out.txt';
+import creation from '!!raw-loader!@site/examples/m05/l01/creation.cs';
+import loopOverArray from '!!raw-loader!@site/examples/m05/l01/loop-over-array.cs';
+import usersIndex from '!!raw-loader!@site/examples/m05/l01/users-index.cs';
+import usersIndexOutput from '!!raw-loader!@site/examples/m05/l01/users-index.out.txt';
+import printAllUsers from '!!raw-loader!@site/examples/m05/l01/print-all-users.cs';
+import indexOutOfRange from '!!raw-loader!@site/examples/m05/l01/index-out-of-range.snippet.cs';
+import arrayCovariance from '!!raw-loader!@site/examples/m05/l01/array-covariance.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m05/l01/seclog-collections-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m05/l01/seclog-collections-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m05/l01/seclog-collections-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m05/l01/seclog-collections-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Arrays
+
+:::note[Lernziele]
+- Du kannst ein Array anlegen, mit Werten füllen und über den Index auf Elemente zugreifen.
+- Du kannst vorhersagen, welches Element ein Index liefert, und erklären, warum der letzte Index `Length - 1` ist.
+- Du kannst ein Array mit `for` und `foreach` durchlaufen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog hält das ganze Beispiel-Log in einem Array und in Listen.
+- SecLog zählt Fehlversuche pro Benutzer und listet die verschiedenen IP-Adressen auf.
+- SecLog liest Zeitstempel und findet „5 Fehlversuche in 10 Minuten“.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l07-q2" />
+
+<Quiz id="m03-l07-q1" />
+
+<Quiz id="m04-l06-q1" />
+
+## Viele Werte in einer Variable
+
+Bisher hielt jede Variable einen Wert. SecLog soll aber 14 Log-Zeilen halten, und du willst keine 14 Variablen schreiben. Dafür gibt es das <Term id="array">Array (Feld)</Term>: Es hält eine feste Anzahl von Werten desselben Typs. Jeder Wert heißt <Term id="element">Element</Term>, ihr gemeinsamer Typ ist der Elementtyp. Die Länge steht beim Erzeugen fest und ändert sich danach nicht.
+
+Den Typ schreibst du mit eckigen Klammern hinter dem Elementtyp: `int[]` ist ein Array von `int`, `string[]` ein Array von `string`. Einen solchen Parameter kennst du schon: `params string[]` aus der Lektion über Methoden mit beliebig vielen Argumenten war ein Array.
+
+Ein Array ist ein Referenztyp. Die Variable hält also einen Verweis auf das Array, nicht die Werte selbst.
+
+Ein Element erreichst du über seinen <Term id="index">Index</Term> in eckigen Klammern. Der Index beginnt bei `0`. Die Anzahl der Elemente liefert `Length`.
+
+<Forward concepts={['Eigenschaften (Properties)']} module="6" />
+
+:::info[Vorhersage]
+`failures` hält die Fehlversuche von alice, bob, carol und dave. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m05-l01-first" code={firstArray} predict expected={firstArrayOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `4`, `4`, `1`.
+
+1. **Lesen:** `failures[0]` ist das erste Element, also `1`.
+2. **Länge:** `failures.Length` ist `4`, denn der Initialisierer enthält vier Werte.
+3. **Schreiben:** `failures[2] = 4;` ersetzt das dritte Element. `failures[2]` ist danach `4`.
+4. **Letztes Element:** Der letzte Index ist `Length - 1`, hier `3`. `failures[failures.Length - 1]` ist `1`.
+
+**Was passiert, wenn du `failures[4]` liest?** Dann liegt der Index außerhalb des Arrays (siehe unten).
+
+</details>
+
+## Arrays anlegen
+
+Es gibt zwei Wege. Mit `new` und einer Länge legst du ein Array an: `new int[3]` erzeugt drei Elemente. Jedes Element bekommt den Standardwert seines Typs, wie in der Lektion über Standardwerte: `0` bei `int`, `false` bei `bool`, `null` bei einem Verweistyp.
+
+Mit einem <Term id="array-initializer">Array-Initialisierer</Term> listest du die Werte in geschweiften Klammern auf. Die Anzahl der Werte bestimmt die Länge. Mit `new[] { … }` leitet der Compiler den Elementtyp aus den Werten ab.
+
+<CSharpRunner id="m05-l01-creation" code={creation} />
+
+`counts[0]` ist `0`, `seen[1]` ist `False`, und `names[0] == null` ist `True`. Der Elementtyp `string?` erlaubt `null`. Die beiden Initialisierer ergeben die Längen `3` und `2`.
+
+## Zugriff außerhalb des Arrays
+
+Gültig sind die Indizes von `0` bis `Length - 1`. Bei jedem Zugriff prüft die Laufzeit den Index (<Term id="bounds-check">Bereichsprüfung</Term>). Liegt er außerhalb, bricht das Programm ab. Der Compiler meldet das nicht vorher, denn der Index kann ein Wert zur Laufzeit sein.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Das Programm unten bricht in Zeile 2 mit der `System.IndexOutOfRangeException` ab. Der Text der Meldung lautet: „Index was outside the bounds of the array.“
+
+<CodeBlock language="csharp" title="index-out-of-range.cs">{indexOutOfRange}</CodeBlock>
+
+:::warning[Achtung]
+<Misconception id="m05-l01-index-starts-at-one" />
+
+**„Das erste Element hat den Index 1.“** Das stimmt nicht. Der Index beginnt bei `0`. Das erste Element ist `a[0]`, das letzte ist `a[a.Length - 1]`. Der Fehler „um eins daneben“ (off-by-one) aus der Lektion über `for`-Schleifen entsteht hier ebenfalls: Eine Schleife mit `i <= a.Length` greift einmal zu weit zu.
+:::
+
+## Durchlaufen
+
+Mit `for` brauchst du den Index, mit `foreach` bekommst du direkt die Elemente. `foreach` kennst du von `string`. Bei einem Array läuft es genauso, und die Laufvariable ist schreibgeschützt.
+
+<CSharpRunner id="m05-l01-loop" code={loopOverArray} />
+
+Beide Schleifen ergeben `7`. Die `for`-Schleife läuft von `0` bis `i < failures.Length`, also bis zum letzten gültigen Index.
+
+## Vorhersage-Übung
+
+:::info[Vorhersage]
+`users` hält vier Namen. Was geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m05-l01-users" code={usersIndex} predict expected={usersIndexOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `carol`, `dave`, `carol`, `5`.
+
+1. **Index berechnen:** `index` ist `2`, also ist `users[index]` das dritte Element: `carol`.
+2. **Eins weiter:** `users[index + 1]` hat den Index `3`: `dave`.
+3. **Vom Ende zählen:** `users.Length - 2` ist `2`, also wieder `carol`.
+4. **Element, dann Eigenschaft:** `users[0]` ist `"alice"`, und `.Length` davon ist `5`.
+
+</details>
+
+## Lückenbeispiel
+
+Die Schleife soll alle vier Benutzer ausgeben, lässt aber einen aus. Finde die Ursache und ändere die Schleifenbedingung.
+
+<CSharpRunner id="m05-l01-gaps" code={printAllUsers} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** Die Bedingung `i < users.Length - 1` endet einen Index zu früh. `dave` mit dem Index `3` fehlt.
+2. **Ersetzen:** `i < users.Length` durchläuft die Indizes `0` bis `3`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog kann nach Modul 4 Benutzer und IP-Adressen aus einer Zeile lesen, fehlende Werte sicher behandeln und Benutzernamen als Text vergleichen. Das Beispiel-Log steht dafür noch im Code verstreut.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Compare user names* und die Methode `FindUser`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Compare user names: == and Equals compare the text of strings* den Block `// Hold the whole sample log in an array`. Lege `string[] sampleLog` mit den 14 Zeilen des Beispiel-Logs an (ein Array-Initialisierer, eine Zeile pro Eintrag). Gib dann vier Zeilen aus: `Lines in the sample log: 14` (mit `Length`), `First line: …` (`sampleLog[0]`), `Last line: …` (`sampleLog[sampleLog.Length - 1]`) und `User of line 2: bob` (mit `FindUser(sampleLog[1])`). Die 14 Zeilen findest du in der Musterlösung.
+
+<CSharpRunner id="m05-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-collections-solution.cs" />
+
+1. **Array anlegen:** Der Initialisierer legt 14 Elemente an. Die Zeile 1 des Logs hat den Index `0`.
+2. **Länge, erstes und letztes Element:** `Length` ist `14`, das letzte Element hat den Index `Length - 1`, also `13`.
+3. **Zeile 2 auswerten:** Zeile 2 hat den Index `1`. `FindUser` liefert `bob`.
+
+</details>
+
+**Neuer Stand:** SecLog hält das ganze Beispiel-Log in einem Array. Alle weiteren Schritte des Moduls lesen daraus.
+
+<details>
+<summary>Vertiefung: Array-Kovarianz (optional)</summary>
+
+Ein `string[]` lässt sich einer Variable vom Typ `object[]` zuweisen. Man nennt das Array-Kovarianz ([§17.6 Array covariance](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#176-array-covariance)). Weil dann hinter einem `object[]` in Wahrheit ein `string[]` stecken kann, prüft die Laufzeit bei jedem Schreiben eines Elements, ob der Wert zum echten Elementtyp passt. Passt er nicht, bricht das Programm ab.
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Das Programm unten wirft in Zeile 3 eine `System.ArrayTypeMismatchException`. Die Meldung lautet: „Attempted to access an element as a type incompatible with the array.“
+
+<CodeBlock language="csharp" title="array-covariance.cs">{arrayCovariance}</CodeBlock>
+
+Bei Arrays von Werttypen gibt es das nicht: Ein `int[]` lässt sich nicht als `object[]` verwenden.
+
+Dass Länge und Rang beim Erzeugen feststehen, legt [§17.3 Array creation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#173-array-creation) fest.
+</details>
+
+## Zusammenfassung
+
+Ein Array hält eine feste Anzahl von Elementen desselben Typs. Du legst es mit `new int[n]` oder mit einem Initialisierer an. Der Index beginnt bei `0`, der letzte gültige Index ist `Length - 1`. Ein Index außerhalb lässt das Programm zur Laufzeit abbrechen. Mit `for` und `foreach` durchläufst du alle Elemente.
+
+## Prüfe dein Wissen
+
+<Quiz id="m05-l01-q1" />
+
+<Quiz id="m05-l01-q2" />
+
+<Quiz id="m05-l01-q3" />
+
+<Quiz id="m05-l01-q4" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m05-l01-q5" />
+
+### Transferfrage
+
+<Quiz id="m05-l01-q6" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§17 Arrays](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays)
+- Microsoft Learn: [Arrays](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/arrays)
+- Microsoft Learn: [Array.Length](https://learn.microsoft.com/dotnet/api/system.array.length)

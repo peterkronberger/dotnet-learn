@@ -1,0 +1,2 @@
+int[] failures = { 1, 5, 0, 1 };
+Console.WriteLine(failures[2..9].Length);
