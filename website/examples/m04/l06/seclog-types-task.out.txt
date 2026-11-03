@@ -53,7 +53,7 @@ bob |#####
 carol |
 dave |#
 all |#######
-Findings: bob: 5 failed attempts; alice: 1 failed attempt;
+Findings: bob: 5 failed attempts; alice: 1 failed attempt; 
 User of sample line: bob
 User of broken line is missing: True
 Failures from input: 5
