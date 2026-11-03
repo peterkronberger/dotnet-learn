@@ -3832,6 +3832,85 @@
         "title": "Readonly fields (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15531-general"
       }
+    },
+    {
+      "id": "encapsulation",
+      "term": "Encapsulation",
+      "german": "Kapselung",
+      "category": "language",
+      "definition": "Eine Klasse hält ihre Daten in `private` Feldern. Anderer Code erreicht sie nur über `public` Member, die Werte prüfen können. So bleibt der Zustand eines Objekts gültig.",
+      "aliases": [
+        "Datenkapselung"
+      ],
+      "related": [
+        "access-modifier",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Access modifiers (C# programming guide)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/access-modifiers"
+      }
+    },
+    {
+      "id": "access-modifier",
+      "term": "Access Modifier",
+      "german": "Zugriffsmodifizierer",
+      "category": "language",
+      "definition": "Ein Schlüsselwort wie `public` oder `private` vor einem Member oder Typ. Es legt fest, welcher Code darauf zugreifen darf. Ohne Modifizierer ist ein Klassenmember `private`.",
+      "aliases": [
+        "Zugriffsmodifikator",
+        "Zugriffsmodifizierer",
+        "accessibility"
+      ],
+      "related": [
+        "accessibility-domain",
+        "encapsulation"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Declared accessibility (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#742-declared-accessibility"
+      }
+    },
+    {
+      "id": "accessibility-domain",
+      "term": "Accessibility Domain",
+      "german": "Zugriffsbereich",
+      "category": "language",
+      "definition": "Die Teile des Programmtextes, in denen ein Member erreichbar ist. Bei einem `private` Member ist es der Text seiner Klasse.",
+      "aliases": [
+        "Zugriffsbereiche"
+      ],
+      "related": [
+        "access-modifier"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Accessibility domains (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#743-accessibility-domains"
+      }
+    },
+    {
+      "id": "documentation-comment",
+      "term": "Documentation Comment",
+      "german": "Dokumentationskommentar",
+      "category": "language",
+      "definition": "Ein Kommentar mit `///` direkt vor einem Typ oder Member. Sein Text ist XML mit Tags wie `<summary>`, `<param>` und `<returns>`. Editoren zeigen ihn an.",
+      "aliases": [
+        "XML-Kommentar",
+        "Dokumentationskommentare"
+      ],
+      "related": [
+        "comment",
+        "member"
+      ],
+      "lesson": "m06-l03",
+      "source": {
+        "title": "Documentation comments (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/documentation-comments#d2-introduction"
+      }
     }
   ]
 }

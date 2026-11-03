@@ -180,6 +180,103 @@
       "type": "explain",
       "question": "Welche Felder von `LogEvent` solltest du `readonly` machen, und warum? Nenne ein Beispiel für eine Klasse, in der ein Feld nicht `readonly` sein sollte.",
       "modelAnswer": "Zeitstempel, Ereignistyp und Benutzer beschreiben ein Ereignis, das schon passiert ist. Sie ändern sich nicht mehr, also sind sie `readonly` und werden im Konstruktor gesetzt. Ein Zähler wie `Value` in `Counter` muss dagegen wachsen und darf nicht `readonly` sein."
+    },
+    {
+      "id": "m06-l03-q1",
+      "lesson": "m06-l03",
+      "type": "single",
+      "question": "Eine Klasse hat das Feld `private int count;` und die Methode `public bool Add(int number)`. Wozu dient diese Aufteilung?",
+      "options": [
+        {
+          "text": "Nur `Add` ändert `count` und kann ungültige Zahlen ablehnen. So bleibt der Zustand des Objekts gültig.",
+          "correct": true
+        },
+        {
+          "text": "`private` macht den Zugriff auf `count` schneller als `public`.",
+          "feedback": "Der Modifizierer ändert nur, wer zugreifen darf, nicht die Geschwindigkeit."
+        },
+        {
+          "text": "`public` sorgt dafür, dass `Add` nur einmal aufgerufen werden kann.",
+          "feedback": "`public` erlaubt den Zugriff von außen. Wie oft die Methode läuft, regelt es nicht."
+        }
+      ],
+      "explanation": "Kapselung: Die Daten sind privat, und die öffentlichen Methoden prüfen jeden Wert, bevor sie ihn übernehmen."
+    },
+    {
+      "id": "m06-l03-q2",
+      "lesson": "m06-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l03/quiz-private-method.cs",
+      "explanation": "`Record` ruft die private Methode `IsValid` auf, die nur positive Zahlen zulässt. Die Zahl −1 wird nicht addiert, also ist die Summe 4 + 2 = 6."
+    },
+    {
+      "id": "m06-l03-q3",
+      "lesson": "m06-l03",
+      "type": "single",
+      "question": "In der Klasse `Counter` mit `private int value;` steht die Methode `public bool SameValueAs(Counter other) { return value == other.value; }`. Warum übersetzt `other.value`?",
+      "options": [
+        {
+          "text": "`private` beschränkt den Zugriff auf den Programmtext der Klasse. Die Methode steht in `Counter` und darf `value` jedes `Counter`-Objekts lesen.",
+          "correct": true
+        },
+        {
+          "text": "Es übersetzt nicht: `private` erlaubt nur den Zugriff auf das eigene Objekt über `this`.",
+          "misconception": "m06-l03-private-per-object",
+          "feedback": "`private` gilt für den Text der Klasse, nicht für ein einzelnes Objekt."
+        },
+        {
+          "text": "Es übersetzt, weil `other` ein Parameter ist und für Parameter kein Zugriffsschutz gilt.",
+          "feedback": "Der Schutz hängt am Member und am Ort des Zugriffs, nicht an der Art der Variable."
+        }
+      ],
+      "explanation": "Der Zugriffsbereich eines privaten Members ist der Programmtext seiner Klasse. Der Zugriff steht in dieser Klasse, also ist er erlaubt, für jedes Objekt der Klasse."
+    },
+    {
+      "id": "m06-l03-q4",
+      "lesson": "m06-l03",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0122.",
+      "example": "m06/l03/private-access.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`count` ist `private`. Zeile 2 steht außerhalb der Klasse `FailureCounter` und darf es nicht benutzen. Nur Code in der Klasse, zum Beispiel `Current()`, erreicht das Feld."
+    },
+    {
+      "id": "m06-l03-q5",
+      "lesson": "m06-l03",
+      "type": "match",
+      "question": "Ordne jedem Tag des Dokumentationskommentars seine Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "`<summary>`",
+          "right": "beschreibt das Member in einem Satz"
+        },
+        {
+          "left": "`<param name=\"…\">`",
+          "right": "beschreibt einen Parameter"
+        },
+        {
+          "left": "`<returns>`",
+          "right": "beschreibt den Rückgabewert"
+        }
+      ],
+      "explanation": "Ein Dokumentationskommentar beginnt mit `///` und steht direkt vor dem Member. `<summary>` beschreibt das Member, `<param>` jeden Parameter und `<returns>` den Rückgabewert."
+    },
+    {
+      "id": "m06-l03-q6",
+      "lesson": "m06-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Kapselung ist und warum eine Klasse ihre Daten hinter Methoden schützt.",
+      "modelAnswer": "Bei Kapselung hält eine Klasse ihre Daten in `private` Feldern. Anderer Code kommt nur über `public` Methoden heran. Diese Methoden können jeden Wert prüfen, bevor sie ihn übernehmen, und ungültige Werte ablehnen. So kann kein fremder Code das Objekt in einen ungültigen Zustand bringen."
+    },
+    {
+      "id": "m06-l03-q7",
+      "lesson": "m06-l03",
+      "type": "explain",
+      "question": "In `Incident` sind `user` und `failures` privat, `Add`, `FailureCount` und `Summary` sind öffentlich. Wo würdest du in einem eigenen Programm dasselbe Muster einsetzen, und welche Member wären dort privat?",
+      "modelAnswer": "Das Muster passt überall, wo ein Objekt Regeln für seine Daten hat. Ein Konto hat zum Beispiel ein privates Feld für den Kontostand, und öffentliche Methoden wie `Deposit` lehnen negative Beträge ab. Privat sind die Daten und Hilfsmethoden, öffentlich ist nur das, was andere Code benutzen soll."
     }
   ]
 }
