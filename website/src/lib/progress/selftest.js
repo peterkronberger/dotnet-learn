@@ -12,7 +12,7 @@ import {
   recordAnswer,
   reopenLesson,
 } from './leitner';
-import { applyPlacementPass, evaluatePlacement, placementResult, resetPlacement } from './placement';
+import { allPlacementsPassed, applyPlacementPass, evaluatePlacement, placementResult, resetPlacement } from './placement';
 import { createMemoryStorage, emptyProgress, loadProgress, saveProgress } from './storage';
 import { activityBuckets, activitySum, isoWeek, lessonOverview, nextLesson, stageTotals } from './summary';
 
@@ -257,6 +257,17 @@ const TESTS = [
     expectEqual(r.lessons, { 'm01-l01': { completedAt: '2026-10-20' }, 'm00-l01': { completedAt: '2026-10-21', via: 'placement' } }, 'lessons');
     expectEqual(Object.keys(r.placement), ['m00'], 'placement');
     check(r.questions === p.questions && r.activity === p.activity, 'questions and activity unchanged');
+    check('m01' in p.placement, 'input unchanged');
+  }],
+  ['Placement: allPlacementsPassed needs every module, false for empty list', () => {
+    const pass = { correct: 8, total: 8, passed: true };
+    let p = emptyProgress();
+    for (const k of ['m01', 'm02', 'm03']) p = applyPlacementPass(p, k, [], pass, '2026-11-01');
+    check(allPlacementsPassed(p, ['m01', 'm02', 'm03']), 'all passed');
+    check(!allPlacementsPassed(p, ['m01', 'm04']), 'one missing');
+    check(!allPlacementsPassed(p, []), 'empty list');
+    check(!allPlacementsPassed(resetPlacement(p, 'm02'), ['m01', 'm02', 'm03']), 'after reset');
+    check(!allPlacementsPassed({ ...emptyProgress(), placement: undefined }, ['m01']), 'no placement field');
     check('m01' in p.placement, 'input unchanged');
   }],
   ['Placement: export → import keeps placement and via', () => {
