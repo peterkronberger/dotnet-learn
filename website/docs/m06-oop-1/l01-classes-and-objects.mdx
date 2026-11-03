@@ -1,0 +1,185 @@
+---
+title: Klassen und Objekte
+sidebar_position: 1
+description: Eine Klasse beschreibt einen Typ mit Feldern und Methoden. Mit new entsteht daraus ein Objekt, das eigene Felder hat.
+lesson_id: m06-l01
+duration_min: 22
+---
+
+import counterBasics from '!!raw-loader!@site/examples/m06/l01/counter-basics.cs';
+import counterBasicsOutput from '!!raw-loader!@site/examples/m06/l01/counter-basics.out.txt';
+import sharedReference from '!!raw-loader!@site/examples/m06/l01/shared-reference.cs';
+import sharedReferenceOutput from '!!raw-loader!@site/examples/m06/l01/shared-reference.out.txt';
+import twoCountersGap from '!!raw-loader!@site/examples/m06/l01/two-counters-gap.cs';
+import unassigned from '!!raw-loader!@site/examples/m06/l01/unassigned.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l01/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l01/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l01/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l01/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Klassen und Objekte
+
+:::note[Lernziele]
+- Du kannst eine Klasse mit Feldern und einer Methode deklarieren.
+- Du kannst mit `new` Objekte erzeugen und mit dem Punkt auf ihre Member zugreifen.
+- Du kannst erklären, warum zwei Variablen auf dasselbe Objekt verweisen können und jedes Objekt eigene Felder hat.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog beschreibt jedes Ereignis des Beispiel-Logs als Objekt einer eigenen Klasse.
+- SecLog fasst die Fehlversuche eines Benutzers in einem Vorfall (Incident) zusammen, der seine Daten schützt.
+- SecLog ordnet seine Klassen in einem Namespace und kennt seinen Startpunkt.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l01-q1" />
+
+<Quiz id="m04-l01-q3" />
+
+<Quiz id="m03-l01-q1" />
+
+## Eine Klasse beschreibt einen Typ
+
+Bisher hast du Typen benutzt, die es schon gab: `int`, `string`, `List<T>`. Mit einer <Term id="class">Klasse</Term> (Class) beschreibst du einen eigenen Typ. Die Klassendeklaration beginnt mit dem Schlüsselwort `class` und dem Namen. Im Rumpf zwischen den geschweiften Klammern stehen die <Term id="member">Member</Term> (Mitglieder) der Klasse. Zwei Arten davon brauchst du jetzt:
+
+- Ein <Term id="field">Feld</Term> (Field) ist eine Variable, die in der Klasse steht. Es speichert einen Teil des Zustands.
+- Eine <Term id="instance-method">Instanzmethode</Term> (Instance Method) ist eine Methode der Klasse. Sie arbeitet mit den Feldern des Objekts, auf dem du sie aufrufst.
+
+<Forward concepts={['`public`']} lesson="m06-l03" />
+
+Das Wort `public` vor den Membern erlaubt den Zugriff von außerhalb der Klasse. Was es genau bedeutet, lernst du in der dritten Lektion dieses Moduls. Die Klasse steht in den Beispielen am Ende der Datei, nach den Anweisungen.
+
+Ein Feld ohne Startwert hat den <Term id="default-value">Standardwert</Term> seines Typs: `0` für `int`. Wenn du einen Startwert willst, schreibst du ihn hinter das Feld, wie bei `Name = ""`. Auch hier gilt das Muster aus Modul 4: Eine Variable vom Typ einer Klasse ist ein Referenztyp.
+
+## Objekte erzeugen
+
+Die Klasse ist nur die Beschreibung. Mit dem <Term id="object-creation">Ausdruck `new Counter()`</Term> entsteht ein <Term id="object">Objekt</Term>, auch <Term id="instance">Instanz</Term> (Instance) genannt. Es bekommt seinen eigenen Satz aller Felder der Klasse. Mit einem Punkt greifst du auf seine Member zu: `logins.Value` liest das Feld, `logins.Increment()` ruft die Methode auf.
+
+:::info[Vorhersage]
+Was gibt das Programm in den drei Zeilen aus? Denke an die Startwerte der Felder von `unnamed`.
+:::
+
+<CSharpRunner id="m06-l01-basics" code={counterBasics} predict expected={counterBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `[logins] 2`, `[logouts] 1`, `[] 0`.
+
+1. **Klasse lesen:** `Counter` hat zwei Felder (`Name` und `Value`) und zwei Methoden (`Increment` und `Describe`).
+2. **Objekte erzeugen:** Jedes `new Counter()` legt ein neues Objekt an. `logins`, `logouts` und `unnamed` sind drei verschiedene Objekte.
+3. **Eigene Felder:** `logins.Increment()` erhöht nur `Value` des Objekts `logins`. `logouts` und `unnamed` bleiben davon unberührt.
+4. **Startwerte:** `unnamed` hat nie einen Namen bekommen. `Name` hat den Startwert `""`, `Value` den Standardwert `0`.
+
+**Was passiert, wenn …** du `Describe()` aufrufst, bevor du `Increment()` aufgerufen hast? Die Methode liest dann den Startwert `0`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Sprache über Klassen festlegt (optional)</summary>
+
+Jede Instanz einer Klasse enthält einen eigenen Satz aller Instanzfelder ([§15.3.8 Static and instance members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members)). Der Anfangswert eines Feldes ist der Standardwert seines Typs, ein Feld ist also nie nicht initialisiert ([§15.5.5 Field initialization](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1555-field-initialization)).
+
+</details>
+
+## Zwei Variablen, ein Objekt
+
+Eine Klasse ist ein Referenztyp. Die Variable `a` enthält deshalb nur einen Verweis auf das Objekt. `Counter b = a;` kopiert den Verweis, nicht das Objekt. Danach zeigen `a` und `b` auf dasselbe Objekt.
+
+:::info[Vorhersage]
+Welche Werte haben `a.Value`, `b.Value` und `c.Value` am Ende? Welche beiden Variablen verweisen auf dasselbe Objekt?
+:::
+
+<CSharpRunner id="m06-l01-shared" code={sharedReference} predict expected={sharedReferenceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `a: 1`, `b: 1`, `c: 2`, `True`, `False`.
+
+1. **Verweis kopieren:** `Counter b = a;` erzeugt kein neues Objekt. Es gibt nur zwei Objekte: das von `a` und `b` und das von `c`.
+2. **Über eine Variable ändern:** `b.Increment()` ändert das gemeinsame Objekt. Darum zeigt auch `a.Value` den Wert 1.
+3. **Verweise vergleichen:** `object.ReferenceEquals(a, b)` ist `True`, weil beide Variablen auf dasselbe Objekt zeigen. Für `a` und `c` ist es `False`.
+
+</details>
+
+## Lückenbeispiel
+
+`logins` soll am Ende 2 sein und `logouts` 1. Das Programm gibt aber zweimal 3 aus. Ändere eine Zeile.
+
+<CSharpRunner id="m06-l01-gaps" code={twoCountersGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fehler finden:** `Counter logouts = logins;` kopiert nur den Verweis. Alle drei Aufrufe ändern dasselbe Objekt, also 3 und 3.
+2. **Eigenes Objekt anlegen:** Mit `Counter logouts = new Counter();` hat `logouts` ein eigenes Feld `Value`. Die Ausgabe ist 2 und 1.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest die Zeilen des Beispiel-Logs aus dem Array `sampleLog`, zählt Fehlversuche je Benutzer und findet „5 Fehlversuche in 10 Minuten“. Ein Ereignis besteht dabei aus einzelnen Texten und Zahlen. Die Methoden `EventTypeOf` und `TimestampOf` aus Modul 5 lesen Teile einer Zeile. Mit dieser Lektion beginnt Modul 6: SecLog bekommt Klassen.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Find 5 failed logins within 10 minutes* als Ort für den neuen Block und die Methoden `EventTypeOf` und `TimestampOf`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe am Ende der Datei, nach dem ausgeblendeten Teil mit `static class Report`, die Klasse `LogEvent` mit den öffentlichen Feldern `Timestamp` (`DateTimeOffset`), `EventType` (`string`, Startwert `""`) und `User` (`string?`). Die Methode `string Describe()` gibt eine Zeile wie `2026-03-02 08:01 login-failed bob` zurück. Der Zeitstempel hat das Format `yyyy-MM-dd HH:mm` (mit `CultureInfo.InvariantCulture`), ein fehlender Benutzer erscheint als `unknown`. Schreibe nach dem Block *Find 5 failed logins within 10 minutes* den Block `// Model one event of the sample log as an object`: Er erzeugt ein `LogEvent` mit `new LogEvent()`, setzt die Felder aus `sampleLog[1]` mit `TimestampOf`, `EventTypeOf` und `FindUser` und gibt `Describe()` aus.
+
+<CSharpRunner id="m06-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Klasse deklarieren:** `LogEvent` hat die drei Felder und die Methode `Describe`. Sie formatiert den Zeitstempel mit festem Format und setzt `unknown` ein, wenn `User` den Wert `null` hat (Operator `??` aus Modul 4).
+2. **Objekt erzeugen:** `new LogEvent()` legt ein Objekt mit den Startwerten an.
+3. **Felder setzen:** Die drei Felder bekommen ihre Werte aus der zweiten Zeile des Logs.
+4. **Ausgeben:** `Describe()` liefert `2026-03-02 08:01 login-failed bob`.
+
+</details>
+
+**Neuer Stand:** SecLog hat eine eigene Klasse `LogEvent` und beschreibt eine Zeile des Logs als Objekt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l01-class-declaration-creates-object" />
+
+**„Eine Klassendeklaration erzeugt schon ein Objekt.“** Das stimmt nicht. Die Deklaration beschreibt nur den Typ. Eine Variable wie `Counter counter;` hat noch kein Objekt: Der Compiler lässt den Zugriff darauf nicht zu. Erst jedes `new Counter()` erzeugt ein neues Objekt mit eigenen Feldern.
+:::
+
+<CodeBlock language="csharp" title="unassigned.snippet.cs">{unassigned}</CodeBlock>
+
+Dieser Code lässt sich nicht übersetzen. Der Compiler meldet in Zeile 2 den Fehler CS0165: `counter` wird benutzt, bevor es einen Wert bekommen hat.
+
+## Zusammenfassung
+
+Eine Klasse beschreibt einen Typ mit Feldern und Methoden. Ein Feld speichert Zustand, eine Instanzmethode arbeitet mit den Feldern ihres Objekts. `new` erzeugt ein Objekt, und jedes Objekt hat eigene Felder. Eine Klasse ist ein Referenztyp: Eine Zuweisung kopiert den Verweis, sodass zwei Variablen dasselbe Objekt ändern können.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l01-q1" />
+
+<Quiz id="m06-l01-q2" />
+
+<Quiz id="m06-l01-q3" />
+
+<Quiz id="m06-l01-q4" />
+
+<Quiz id="m06-l01-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l01-q6" />
+
+### Transferfrage
+
+<Quiz id="m06-l01-q7" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Classes (C# specification)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes)
+- Microsoft Learn: [Classes (C# programming guide)](https://learn.microsoft.com/dotnet/csharp/fundamentals/types/classes)

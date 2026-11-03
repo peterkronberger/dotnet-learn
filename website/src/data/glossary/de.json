@@ -3614,6 +3614,125 @@
         "title": "DateTimeOffset Struct",
         "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset"
       }
+    },
+    {
+      "id": "class",
+      "term": "Class",
+      "category": "language",
+      "definition": "Eine Klasse beschreibt einen eigenen Typ mit Feldern und Methoden. Sie ist ein Referenztyp. Erst `new` erzeugt ein Objekt dieser Klasse.",
+      "aliases": [
+        "class declaration"
+      ],
+      "related": [
+        "object",
+        "field",
+        "member",
+        "reference-type"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Classes (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#152-class-declarations"
+      }
+    },
+    {
+      "id": "instance",
+      "term": "Instance",
+      "german": "Instanz",
+      "category": "language",
+      "definition": "Ein Objekt einer Klasse, das mit `new` erzeugt wurde. Jede Instanz hat einen eigenen Satz der Instanzfelder.",
+      "aliases": [
+        "Instanzen",
+        "Exemplar"
+      ],
+      "related": [
+        "object",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Static and instance members (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members"
+      }
+    },
+    {
+      "id": "field",
+      "term": "Field",
+      "category": "language",
+      "definition": "Ein Feld ist eine Variable, die direkt in einer Klasse steht. Jedes Objekt hat seine eigene Kopie der Instanzfelder. Ohne Startwert hat ein Feld den Standardwert seines Typs.",
+      "aliases": [
+        "Instanzfeld"
+      ],
+      "related": [
+        "class",
+        "member",
+        "default-value"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#155-fields"
+      }
+    },
+    {
+      "id": "member",
+      "term": "Member",
+      "category": "language",
+      "definition": "Ein Member (Mitglied) ist alles, was im Rumpf einer Klasse steht, zum Beispiel Felder und Methoden. Du greifst mit dem Punkt darauf zu: `counter.Value`.",
+      "aliases": [
+        "Klassenmitglied"
+      ],
+      "related": [
+        "class",
+        "field",
+        "instance-method"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Class members (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#153-class-members"
+      }
+    },
+    {
+      "id": "instance-method",
+      "term": "Instance Method",
+      "german": "Instanzmethode",
+      "category": "language",
+      "definition": "Eine Methode einer Klasse, die du auf einem Objekt aufrufst, zum Beispiel `counter.Increment()`. Sie arbeitet mit den Feldern dieses Objekts.",
+      "aliases": [
+        "Instanzmethoden"
+      ],
+      "related": [
+        "method",
+        "class",
+        "field"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Methods (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156-methods"
+      }
+    },
+    {
+      "id": "object-creation",
+      "term": "Object Creation Expression",
+      "german": "Objekterzeugung",
+      "category": "language",
+      "definition": "Der Ausdruck `new Counter()` erzeugt ein neues Objekt der Klasse und liefert einen Verweis darauf. Die Felder bekommen ihre Start- oder Standardwerte.",
+      "aliases": [
+        "Objekterzeugungsausdruck"
+      ],
+      "related": [
+        "object",
+        "class",
+        "instance"
+      ],
+      "lesson": "m06-l01",
+      "source": {
+        "title": "Object creation expressions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128172-object-creation-expressions"
+      }
     }
   ]
 }
