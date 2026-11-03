@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -20,6 +21,7 @@ Console.Write("IP: ");
 Console.WriteLine(ip);
 Console.Write("Event type: ");
 Console.WriteLine(eventType);
+// @fold-end
 // Compute the failure rate of the sample log in percent
 int events = 14;
 int failures = 7;

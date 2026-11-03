@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -49,11 +50,13 @@ const int successes = 5;
 var successRate = successes * 100.0 / events;
 Console.WriteLine($"Success share, cut off (%): {(int)successRate}");
 Console.WriteLine($"Success share, rounded (%): {(int)Math.Round(successRate)}");
+// @fold-end
 // Read the number of failed logins from the second input line, compute the rate
 var failedText = Console.ReadLine();
 int.TryParse(failedText, out int failedFromInput);
 double rateFromInput = failedFromInput * 100.0 / events;
 Console.WriteLine($"Failure rate from input (%): {rateFromInput:F1}");
+// @fold-start
 // Check a second text with TryParse and print the result
 string badText = "seven";
 bool parsed = int.TryParse(badText, out int badNumber);
@@ -68,6 +71,7 @@ else
 {
     Console.WriteLine("No alert");
 }
+// @fold-end
 // Rate the event as suspicious: a failed login and at least 3 failures
 bool suspicious = eventType == "login-failed" && failedFromInput >= 3;
 Console.WriteLine($"Suspicious: {suspicious}");

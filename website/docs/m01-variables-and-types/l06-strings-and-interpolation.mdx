@@ -152,14 +152,16 @@ Dasselbe Vorgehen mit Lücken: Die Schrittbezeichnungen in den Kommentaren bleib
 
 **Stand bisher:** SecLog gibt seinen Steckbrief aus, die erste Ereigniszeile, Benutzer, IP-Adresse und Ereignistyp von Zeile 2, die Fehlerquote von 50 Prozent sowie Bobs fehlgeschlagene Anmeldungen und seinen Anteil daran.
 
-**Neue Anforderung:** Gib das Ereignis von Zeile 2 des Beispiel-Logs noch einmal als eine Zeile im Log-Format aus: `2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`. Baue sie mit Interpolation aus den Variablen. Gib danach die Fehlerquote mit einer Nachkommastelle und einem Prozentzeichen aus, zum Beispiel `Failure rate: 50.0 %`. Die bisherigen 16 Zeilen bleiben, die neuen kommen am Ende dazu.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: Benutzer, IP-Adresse und Ereignistyp, die Fehlerquote und Bobs Anteil. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** Gib das Ereignis von Zeile 2 des Beispiel-Logs noch einmal als eine Zeile im Log-Format aus: `2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`. Baue sie mit Interpolation aus den Variablen. Gib danach die Fehlerquote mit einer Nachkommastelle und einem Prozentzeichen aus, zum Beispiel `Failure rate: 50.0 %`. Die bisherigen 16 Zeilen bleiben, die neuen kommen am Ende dazu, nach dem Block *Compute the share of bob in all failures in percent, rounded to 2 places*.
 
 <CSharpRunner id="m01-l06-project" code={projectTask} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-event-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-event-solution.cs" />
 
 1. **Zeitstempel ablegen:** `string timestamp = "2026-03-02T08:01:40Z";` hält den Zeitstempel von Zeile 2 in einer Variable.
 2. **Logzeile bauen:** `$"{timestamp} {eventType} user={user} ip={ip}"` setzt die vier Variablen in das Log-Format ein. Text wie `user=` bleibt stehen.

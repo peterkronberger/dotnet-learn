@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -49,6 +50,7 @@ const int successes = 5;
 var successRate = successes * 100.0 / events;
 Console.WriteLine($"Success share, cut off (%): {(int)successRate}");
 Console.WriteLine($"Success share, rounded (%): {(int)Math.Round(successRate)}");
+// @fold-end
 // Read the number of failed logins from the second input line, compute the rate
 var failedText = Console.ReadLine();
 int.TryParse(failedText, out int failedFromInput);

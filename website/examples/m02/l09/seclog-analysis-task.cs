@@ -1,3 +1,4 @@
+// @fold-start
 Console.WriteLine("SecLog project profile");
 Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
@@ -132,6 +133,7 @@ foreach (char symbol in timestamp)
     datePart += symbol;
 }
 Console.WriteLine($"Date: {datePart}");
+// @fold-end
 // Count the digits of the IP address: skip the dots
 int digits = 0;
 foreach (char symbol in ip)

@@ -130,14 +130,16 @@ Die Zweige werden in der Reihenfolge des Textes geprüft. Ein Muster, das von de
 
 **Stand bisher:** SecLog meldet einen Alarm, stuft ein Ereignis als verdächtig ein und gibt die Fehlversuche in einem Satz aus.
 
-**Neue Anforderung:** SecLog soll die Zahl der Fehlversuche als Schweregrad bewerten. Die Schwellen sind für den Unterricht ausgedacht: `0` ist `none`, weniger als `3` ist `low`, weniger als `5` ist `medium`, sonst `high`. Gib am Ende die Zeile `Severity: high` aus. Nimm dafür einen switch-Ausdruck auf `failedFromInput`. Die Ausgabe hat jetzt 27 Zeilen.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Eingabe der Zahl `failedFromInput` und der Satz mit dem Wort für die Fehlversuche. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** SecLog soll die Zahl der Fehlversuche als Schweregrad bewerten. Die Schwellen sind für den Unterricht ausgedacht: `0` ist `none`, weniger als `3` ist `low`, weniger als `5` ist `medium`, sonst `high`. Der neue Code kommt am Ende, nach dem Block *Print the number of failures with the singular or plural word*. Gib die Zeile `Severity: high` aus. Nimm dafür einen switch-Ausdruck auf `failedFromInput`. Die Ausgabe hat jetzt 27 Zeilen.
 
 <CSharpRunner id="m02-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-analysis-solution.cs" />
 
 1. **Eingabewert:** `failedFromInput` steht links vor `switch`.
 2. **Zweige, von oben nach unten:** Erst die Konstante `0`, dann die Grenzen `< 3` und `< 5`. Bei `5` passt keiner von ihnen.

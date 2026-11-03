@@ -6,7 +6,6 @@ lesson_id: m02-l06
 duration_min: 20
 ---
 
-import CodeBlock from '@theme/CodeBlock';
 import whileBasic from '!!raw-loader!@site/examples/m02/l06/while-basic.cs';
 import whileBasicOutput from '!!raw-loader!@site/examples/m02/l06/while-basic.out.txt';
 import conditionEachTime from '!!raw-loader!@site/examples/m02/l06/condition-each-time.cs';
@@ -165,14 +164,16 @@ Bei `while` wird die Bedingung vor jeder Ausführung des Blocks ausgewertet, bei
 
 **Stand bisher:** SecLog wählt je nach Ereignistyp eine Aktion.
 
-**Neue Anforderung:** SecLog soll mehrere Ereignisse durchgehen. Lies weitere Zeilen mit Ereignistypen, solange die Zeile `login-failed` ist, und zähle sie. Das ist die Zahl der aufeinanderfolgenden Fehlversuche (Failure Streak). Gib `Failure streak: 5` aus. Die Eingabe im Runner hat nach `bob` und `5` fünfmal `login-failed` und dann `login-success`. Die Schleife muss am Ende der Eingabe enden. Die Ausgabe hat jetzt 29 Zeilen.
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Eingabe der Zahl `failedFromInput` und die Wahl der Aktion. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit.
+
+**Neue Anforderung:** SecLog soll mehrere Ereignisse durchgehen. Der neue Code kommt am Ende, nach dem Block *Choose an action for the event type with a switch statement*. Lies weitere Zeilen mit Ereignistypen, solange die Zeile `login-failed` ist, und zähle sie. Das ist die Zahl der aufeinanderfolgenden Fehlversuche (Failure Streak). Gib `Failure streak: 5` aus. Die Eingabe im Runner hat nach `bob` und `5` fünfmal `login-failed` und dann `login-success`. Die Schleife muss am Ende der Eingabe enden. Die Ausgabe hat jetzt 29 Zeilen.
 
 <CSharpRunner id="m02-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
 
 <details>
 <summary>Musterlösung anzeigen</summary>
 
-<CodeBlock language="csharp" title="seclog-analysis-solution.cs">{projectSolution}</CodeBlock>
+<FoldedCode code={projectSolution} title="seclog-analysis-solution.cs" />
 
 1. **Vorbereiten:** Lies die erste Zeile und setze den Zähler `streak` auf `0`.
 2. **Bedingung:** `nextEvent == "login-failed"` ist wahr, solange Fehlversuche kommen. Am Ende der Eingabe ist sie falsch, die Schleife endet.
