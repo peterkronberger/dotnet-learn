@@ -1,0 +1,246 @@
+---
+title: Null-sichere Operatoren
+sidebar_position: 6
+description: "Mit ?., ?[], ?? und ??= behandelst du einen möglichen null-Wert in einem Ausdruck. Seit C# 14 darf ?. auch links einer Zuweisung stehen."
+lesson_id: m04-l06
+duration_min: 25
+---
+
+import nullConditional from '!!raw-loader!@site/examples/m04/l06/null-conditional.cs';
+import nullConditionalOutput from '!!raw-loader!@site/examples/m04/l06/null-conditional.out.txt';
+import nullConditionalIndex from '!!raw-loader!@site/examples/m04/l06/null-conditional-index.cs';
+import nullConditionalIndexOutput from '!!raw-loader!@site/examples/m04/l06/null-conditional-index.out.txt';
+import coalesce from '!!raw-loader!@site/examples/m04/l06/coalesce.cs';
+import coalesceOutput from '!!raw-loader!@site/examples/m04/l06/coalesce.out.txt';
+import coalesceAssign from '!!raw-loader!@site/examples/m04/l06/coalesce-assign.cs';
+import coalesceAssignOutput from '!!raw-loader!@site/examples/m04/l06/coalesce-assign.out.txt';
+import nullConditionalAssignment from '!!raw-loader!@site/examples/m04/l06/null-conditional-assignment.cs';
+import nullConditionalAssignmentOutput from '!!raw-loader!@site/examples/m04/l06/null-conditional-assignment.out.txt';
+import shownUserGaps from '!!raw-loader!@site/examples/m04/l06/shown-user-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l06/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l06/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l06/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l06/seclog-types-solution.cs';
+
+# Null-sichere Operatoren
+
+:::note[Lernziele]
+- Du kannst mit `?.` und `?[]` auf ein Mitglied oder Element zugreifen, ohne bei `null` abzustürzen, und den Typ des Ergebnisses vorhersagen.
+- Du kannst mit `??` einen Ersatzwert und mit `??=` eine Zuweisung nur bei `null` schreiben.
+- Du kannst eine null-bedingte Zuweisung (`a?.B = x`, C# 14) lesen und ihre Wirkung vorhersagen.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l04-q6" />
+
+<Quiz id="m04-l05-q4" />
+
+<Quiz id="m04-l05-q5" />
+
+## ?. – Zugriff nur bei einem Objekt
+
+Bisher hast du mit `if (x != null)` geprüft. Das ist ausführlich, wenn du nur ein Mitglied lesen willst. Der <Term id="null-conditional-operator">Null-Conditional Operator (null-bedingter Operator)</Term> `?.` ist die Kurzform: Ist der Ausdruck links `null`, ist das Ergebnis `null`, und das Mitglied wird nicht angesprochen. Sonst ist es der normale Zugriff.
+
+Der Typ des Ergebnisses passt sich an. `Length` ist ein `int`. Weil das Ergebnis `null` sein kann, ist `text?.Length` ein `int?`.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m04-l06-conditional" code={nullConditional} predict expected={nullConditionalOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5`, `False`, `ALICE`, `True`.
+
+1. **Objekt vorhanden:** `present?.Length` ist `5`, der Wert eines `int?`.
+2. **Kein Objekt:** `missing?.Length` ist `null`. `length.HasValue` ist darum `False`.
+3. **Methodenaufruf:** `?.` funktioniert auch mit Methoden. `present?.ToUpper()` ergibt `ALICE`. `missing?.ToUpper()` ergibt `null`, der Vergleich mit `null` ist `True`.
+
+**Was passiert bei `missing.Length` ohne `?`?** Der Compiler warnt, und das Programm stürzt ab.
+
+</details>
+
+## ?[] – Elementzugriff
+
+Ein `string` besteht aus Zeichen. Mit `text[0]` liest du das erste Zeichen als `char`, mit `text[1]` das zweite. Gezählt wird ab `0`.
+
+<Forward concepts={['Elementzugriff `[]`']} module="5" />
+
+Auch dafür gibt es die Kurzform: `text?[0]` liefert das Zeichen, oder `null`, wenn `text` `null` ist. Der Ergebnistyp ist `char?`.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m04-l06-index" code={nullConditionalIndex} predict expected={nullConditionalIndexOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `b`, `b`, `True`.
+
+1. **Normaler Zugriff:** `user[0]` ist das erste Zeichen von `bob`. Der Compiler warnt nicht, denn `user` ist dort nicht `null`.
+2. **Null-bedingter Zugriff:** `user?[0]` liefert dasselbe Zeichen.
+3. **Bei `null`:** `none?[0]` ist `null`, der Vergleich ergibt `True`.
+
+</details>
+
+## ?? – ein Ersatzwert
+
+Der <Term id="null-coalescing-operator">Null-Coalescing Operator (Null-Verschmelzungsoperator)</Term> `??` wählt einen Ersatzwert. `a ?? b` ergibt `a`, wenn `a` nicht `null` ist, sonst `b`. Der Ausdruck `b` wird nur ausgewertet, wenn er gebraucht wird.
+
+:::info[Vorhersage]
+`Fallback` gibt eine Zeile aus, wenn sie aufgerufen wird. Welche Zeilen erscheinen, und in welcher Reihenfolge?
+:::
+
+<CSharpRunner id="m04-l06-coalesce" code={coalesce} predict expected={coalesceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Fallback called`, `unknown`, `alice`.
+
+1. **Linker Teil `null`:** `missing ?? Fallback()` ruft `Fallback` auf. Dabei erscheint die erste Zeile. Das Ergebnis `unknown` steht in `first`.
+2. **Linker Teil vorhanden:** `present ?? Fallback()` ergibt `alice`. `Fallback` läuft nicht, also gibt es keine zweite Zeile `Fallback called`.
+3. **Ausgeben:** Danach schreiben die beiden `WriteLine`-Aufrufe `unknown` und `alice`.
+
+**Was passiert, wenn beide Variablen `null` sind?** Dann erscheint `Fallback called` zweimal.
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m04-l06-coalesce-always-evaluates" />
+
+**„Beide Seiten von `??` werden immer ausgewertet.“** Das stimmt nicht. Der rechte Teil wird nur ausgewertet, wenn der linke `null` ist. Eine Methode auf der rechten Seite läuft sonst nicht. Das ist wie bei `&&` und `||` (Short-Circuit).
+:::
+
+## ??= – zuweisen, falls null
+
+Der <Term id="null-coalescing-assignment">Null-Coalescing Assignment</Term> `??=` weist nur zu, wenn die Variable links gerade `null` ist. `ip ??= "unknown"` bedeutet `ip = ip ?? "unknown"`, wobei `ip` nur einmal ausgewertet wird.
+
+:::info[Vorhersage]
+Was geben die beiden Ausgaben aus?
+:::
+
+<CSharpRunner id="m04-l06-assign" code={coalesceAssign} predict expected={coalesceAssignOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist zweimal `unknown`.
+
+1. **Erste Zuweisung:** `ip` ist `null`, also bekommt es `unknown`.
+2. **Zweite Zuweisung:** `ip` ist nicht mehr `null`, also bleibt es unverändert. Die IP-Adresse `192.0.2.10` wird nie zugewiesen.
+
+</details>
+
+## Null-bedingte Zuweisung
+
+<Since csharp="14" dotnet="10" />
+
+Seit C# 14 darf `?.` auch auf der linken Seite einer Zuweisung stehen. `a?.B = x` weist nur zu, wenn `a` nicht `null` ist. Dann wird auch `x` nur in diesem Fall ausgewertet. Das ist die <Term id="null-conditional-assignment">null-bedingte Zuweisung</Term>.
+
+`Length` eines `StringBuilder` darf gesetzt werden: Der Text wird dann auf diese Länge gekürzt. Hier ist `NextLength()` die rechte Seite, sie gibt eine Zeile aus.
+
+<Forward concepts={['Eigenschaften (Properties)']} module="6" />
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen? Was steht danach in `findings`?
+:::
+
+<CSharpRunner id="m04-l06-assignment" code={nullConditionalAssignment} predict expected={nullConditionalAssignmentOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `NextLength called`, `bo`, `True`.
+
+1. **Objekt vorhanden:** `findings?.Length = NextLength()` ruft `NextLength` auf und setzt die Länge auf `2`. Aus `bob` wird `bo`.
+2. **Kein Objekt:** `none?.Length = NextLength()` tut nichts. `NextLength` wird nicht aufgerufen, es gibt keinen Absturz.
+3. **Ergebnis lesen:** `findings` enthält `bo`, `none` ist weiter `null`.
+
+Vor C# 14 hätte man dafür `if (findings != null) { findings.Length = NextLength(); }` geschrieben.
+
+</details>
+
+## Lückenbeispiel
+
+`Shown` gibt den Benutzer oder `unknown` zurück. Schreibe den Rumpf so um, dass er nur noch eine `return`-Zeile mit `??` hat. Die Ausgabe `bob` und `unknown` bleibt gleich.
+
+<CSharpRunner id="m04-l06-gaps" code={shownUserGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Rumpf ersetzen:** Der ganze `if`-Block und das `return user;` werden zu `return user ?? "unknown";`.
+2. **Typ prüfen:** `user` ist ein `string?`, der Ausdruck ergibt einen `string`. Der Rückgabetyp `string` passt.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog kann „kein Benutzer“ (`FindUser`) und „keine Zahl“ (`FailuresOrNull`) ausdrücken.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Blöcke *Find the user of a line …* und *Read a number of failures …* sowie die Funktion `FindUser`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem Block *Read a number of failures, or null if the text is not a number* den Block `// Handle missing values with null-safe operators`. Er hat drei Teile. `string shownUser = FindUser("broken line") ?? "unknown";` gibt `Shown user: unknown` aus. `int? userLength = FindUser(sampleLine)?.Length;` gibt `Length of user: 3` aus. `string? lastIp = null;` mit `lastIp ??= "unknown";` gibt `Last IP: unknown` aus.
+
+<CSharpRunner id="m04-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Ersatzwert:** `??` ersetzt den fehlenden Benutzer der kaputten Zeile durch `unknown`.
+2. **Sicherer Zugriff:** `?.Length` liest die Länge von `bob`. Bei einer Zeile ohne Benutzer wäre das Ergebnis `null`. Der Typ ist darum `int?`.
+3. **Einmal zuweisen:** `lastIp ??= "unknown"` setzt den Wert, weil `lastIp` gerade `null` ist.
+
+</details>
+
+**Neuer Stand:** SecLog behandelt fehlende Werte sicher mit `?.`, `??` und `??=`. Damit ist der Meilenstein dieses Moduls für den Umgang mit `null` erreicht.
+
+<details>
+<summary>Vertiefung: Die Operatoren in der Spezifikation (optional)</summary>
+
+Der null-bedingte Zugriff auf ein Mitglied liefert `null`, wenn der Operand `null` ist. Ist der Typ des Mitglieds ein Werttyp `T`, wird der Ergebnistyp `T?` ([§12.8.8 Null conditional member access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1288-null-conditional-member-access)). Dasselbe gilt für den Elementzugriff ([§12.8.13 Null conditional element access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12813-null-conditional-element-access)).
+
+Zum Operator `??` und zur Zuweisung `??=` gehören die Abschnitte [§12.18 The null coalescing operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1218-the-null-coalescing-operator) und [§12.24.5 Compound assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12245-compound-assignment).
+
+Bei der null-bedingten Zuweisung wird die rechte Seite nur ausgewertet, wenn der Empfänger nicht `null` ist ([Feature-Spezifikation Null conditional assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/null-conditional-assignment)). Die Operatoren `++` und `--` sind dort nicht erlaubt.
+</details>
+
+## Zusammenfassung
+
+`?.` und `?[]` greifen nur auf ein Objekt zu und ergeben sonst `null`. Das Ergebnis hat dann einen Nullable-Typ, zum Beispiel `int?`. `??` liefert einen Ersatzwert und wertet den rechten Teil nur aus, wenn der linke `null` ist. `??=` weist nur zu, wenn die Variable `null` ist. Seit C# 14 weist `a?.B = x` nur zu, wenn `a` nicht `null` ist, und wertet `x` auch nur dann aus.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l06-q1" />
+
+<Quiz id="m04-l06-q2" />
+
+<Quiz id="m04-l06-q3" />
+
+<Quiz id="m04-l06-q4" />
+
+<Quiz id="m04-l06-q5" />
+
+<Quiz id="m04-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l06-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§12.8.8 Null conditional member access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1288-null-conditional-member-access)
+- C#-Spezifikation: [§12.18 The null coalescing operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1218-the-null-coalescing-operator)
+- Microsoft Learn: [Member access operators and expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/member-access-operators)

@@ -1,0 +1,2 @@
+Number: 42
+Number: 0

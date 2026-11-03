@@ -2603,6 +2603,237 @@
         "title": "Reference parameters (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156233-reference-parameters"
       }
+    },
+    {
+      "id": "null",
+      "term": "Null-Verweis",
+      "category": "language",
+      "definition": "Der Wert `null`: eine Referenz, die auf kein Objekt zeigt. Eine Variable eines Referenztyps kann ihn enthalten. `null` ist nicht dasselbe wie der leere Text `\"\"`: Der leere Text ist ein Objekt mit der Länge 0.",
+      "related": [
+        "reference-type",
+        "nullable-reference-type",
+        "nullable-value-type"
+      ],
+      "lesson": "m04-l04",
+      "source": {
+        "title": "Reference types and nullability (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#89-reference-types-and-nullability"
+      }
+    },
+    {
+      "id": "nullable-reference-type",
+      "term": "Nullable Reference Type",
+      "german": "Verweistyp, der null sein darf",
+      "category": "language",
+      "definition": "Ein Referenztyp mit angehängtem `?`, zum Beispiel `string?`. Das `?` erklärt, dass die Variable `null` enthalten darf. Der Compiler warnt, wenn ein solcher Wert ohne Prüfung benutzt wird. Zur Laufzeit ändert das `?` nichts.",
+      "aliases": [
+        "Nullable Reference Types",
+        "string?"
+      ],
+      "related": [
+        "null",
+        "nullable-context",
+        "null-state-analysis"
+      ],
+      "lesson": "m04-l04",
+      "source": {
+        "title": "Nullable reference types (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#893-nullable-reference-types"
+      }
+    },
+    {
+      "id": "nullable-context",
+      "term": "Nullable Context",
+      "german": "Nullable-Kontext",
+      "category": "language",
+      "definition": "Die Einstellung, ob der Compiler `?` bei Referenztypen auswertet und Warnungen zu `null` ausgibt. In neuen Projekten ist sie eingeschaltet. Im Projekt steht dafür die Einstellung `<Nullable>enable</Nullable>`.",
+      "aliases": [
+        "Nullable-Kontext",
+        "nullable enable"
+      ],
+      "related": [
+        "nullable-reference-type",
+        "null-state-analysis"
+      ],
+      "lesson": "m04-l04",
+      "source": {
+        "title": "Nullable context (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#894-nullable-context"
+      }
+    },
+    {
+      "id": "null-state-analysis",
+      "term": "Null-State-Analyse",
+      "category": "language",
+      "definition": "Der Compiler verfolgt beim Übersetzen, ob ein Ausdruck gerade „nicht null“ oder „vielleicht null“ ist (Flussanalyse). Eine Prüfung wie `!= null` ändert den Zustand im geprüften Zweig. Die Analyse erzeugt nur Warnungen.",
+      "aliases": [
+        "Flussanalyse",
+        "null state",
+        "flow analysis"
+      ],
+      "related": [
+        "nullable-context",
+        "null-forgiving-operator"
+      ],
+      "lesson": "m04-l04",
+      "source": {
+        "title": "Nullabilities and null states (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#895-nullabilities-and-null-states"
+      }
+    },
+    {
+      "id": "null-forgiving-operator",
+      "term": "Null-Forgiving Operator",
+      "german": "null-nachsichtiger Operator",
+      "category": "language",
+      "definition": "Das `!` hinter einem Ausdruck, zum Beispiel `user!`. Es sagt dem Compiler „das ist nicht null“ und schaltet die Warnung ab. Zur Laufzeit macht es nichts: Ist der Wert `null`, stürzt das Programm trotzdem ab.",
+      "aliases": [
+        "null-forgiving",
+        "Null-vergebender Operator"
+      ],
+      "related": [
+        "null-state-analysis",
+        "nullable-reference-type"
+      ],
+      "lesson": "m04-l04",
+      "source": {
+        "title": "Null-forgiving expressions (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1289-null-forgiving-expressions"
+      }
+    },
+    {
+      "id": "nullable-value-type",
+      "term": "Nullable Value Type",
+      "german": "Werttyp, der null sein darf",
+      "category": "language",
+      "definition": "Ein Werttyp mit angehängtem `?`, zum Beispiel `int?`. Er kann alle Werte von `int` und zusätzlich „kein Wert“ (`null`) enthalten. `HasValue` sagt, ob ein Wert da ist, `Value` liefert ihn.",
+      "aliases": [
+        "Nullable Value Types",
+        "int?",
+        "Nullable<T>"
+      ],
+      "related": [
+        "value-type",
+        "null",
+        "lifted-operator"
+      ],
+      "lesson": "m04-l05",
+      "source": {
+        "title": "Nullable value types (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8312-nullable-value-types"
+      }
+    },
+    {
+      "id": "lifted-operator",
+      "term": "Lifted Operator",
+      "german": "gehobener Operator",
+      "category": "language",
+      "definition": "Die Form eines Operators für Nullable-Werttypen. Ist ein Operand `null`, ist das Ergebnis von Rechenoperatoren `null`. Vergleiche mit `<`, `>`, `<=` und `>=` ergeben dann `false`.",
+      "aliases": [
+        "gehobene Operatoren",
+        "Lifted Operators"
+      ],
+      "related": [
+        "nullable-value-type",
+        "operator"
+      ],
+      "lesson": "m04-l05",
+      "source": {
+        "title": "Lifted operators (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1248-lifted-operators"
+      }
+    },
+    {
+      "id": "default-value",
+      "term": "Default Value",
+      "german": "Standardwert eines Typs",
+      "category": "language",
+      "definition": "Der Wert, den ein Typ ohne Zuweisung hat: `0` bei Zahlen, `false` bei `bool`, `null` bei Referenztypen. Felder und Array-Elemente bekommen ihn automatisch, lokale Variablen nicht. `default` schreibt ihn im Code an.",
+      "related": [
+        "definite-assignment",
+        "local-variable"
+      ],
+      "lesson": "m04-l05",
+      "source": {
+        "title": "Default values (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#93-default-values"
+      }
+    },
+    {
+      "id": "null-conditional-operator",
+      "term": "Null-Conditional Operator",
+      "german": "null-bedingter Operator",
+      "category": "language",
+      "definition": "`?.` und `?[]` greifen nur dann auf ein Mitglied oder ein Element zu, wenn der Ausdruck davor nicht `null` ist. Sonst ist das Ergebnis `null`. Bei einem Wert der Art `int` wird der Ergebnistyp `int?`.",
+      "aliases": [
+        "?.",
+        "?[]",
+        "Elvis-Operator"
+      ],
+      "related": [
+        "null-coalescing-operator",
+        "nullable-value-type"
+      ],
+      "lesson": "m04-l06",
+      "source": {
+        "title": "Null conditional member access (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1288-null-conditional-member-access"
+      }
+    },
+    {
+      "id": "null-coalescing-operator",
+      "term": "Null-Coalescing Operator",
+      "german": "Null-Verschmelzungsoperator",
+      "category": "language",
+      "definition": "`a ?? b` ergibt `a`, wenn `a` nicht `null` ist, sonst `b`. Der rechte Teil wird nur ausgewertet, wenn der linke `null` ist.",
+      "aliases": [
+        "??"
+      ],
+      "related": [
+        "null-coalescing-assignment",
+        "null-conditional-operator"
+      ],
+      "lesson": "m04-l06",
+      "source": {
+        "title": "The null coalescing operator (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1218-the-null-coalescing-operator"
+      }
+    },
+    {
+      "id": "null-coalescing-assignment",
+      "term": "Null-Coalescing Assignment",
+      "german": "Zuweisung nur bei null",
+      "category": "language",
+      "definition": "`a ??= b` weist `b` nur dann an `a` zu, wenn `a` gerade `null` ist. Ist `a` nicht `null`, bleibt es unverändert und `b` wird nicht ausgewertet.",
+      "aliases": [
+        "??="
+      ],
+      "related": [
+        "null-coalescing-operator"
+      ],
+      "lesson": "m04-l06",
+      "source": {
+        "title": "Compound assignment (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12245-compound-assignment"
+      }
+    },
+    {
+      "id": "null-conditional-assignment",
+      "term": "Null-Conditional Assignment",
+      "german": "null-bedingte Zuweisung",
+      "category": "language",
+      "definition": "Seit C# 14 darf `?.` links einer Zuweisung stehen: `a?.B = x` weist nur zu, wenn `a` nicht `null` ist. Der rechte Teil wird dann auch nur in diesem Fall ausgewertet.",
+      "aliases": [
+        "a?.B = x"
+      ],
+      "related": [
+        "null-conditional-operator"
+      ],
+      "lesson": "m04-l06",
+      "source": {
+        "title": "Null conditional assignment (C# feature specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/null-conditional-assignment"
+      }
     }
   ]
 }

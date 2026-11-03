@@ -1,0 +1,226 @@
+---
+title: null und Nullable-Verweistypen
+sidebar_position: 4
+description: "null bedeutet „kein Objekt“. Mit ? markierst du eine Variable, die null sein darf. Der Compiler warnt beim Übersetzen, wenn du sie ohne Prüfung benutzt."
+lesson_id: m04-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import nullMeaning from '!!raw-loader!@site/examples/m04/l04/null-meaning.cs';
+import nullMeaningOutput from '!!raw-loader!@site/examples/m04/l04/null-meaning.out.txt';
+import warningDereference from '!!raw-loader!@site/examples/m04/l04/warning-dereference.snippet.cs';
+import warningAssignNull from '!!raw-loader!@site/examples/m04/l04/warning-assign-null.snippet.cs';
+import warningArgument from '!!raw-loader!@site/examples/m04/l04/warning-argument.snippet.cs';
+import nullCheck from '!!raw-loader!@site/examples/m04/l04/null-check.cs';
+import nullCheckOutput from '!!raw-loader!@site/examples/m04/l04/null-check.out.txt';
+import nullCheckGaps from '!!raw-loader!@site/examples/m04/l04/null-check-gaps.cs';
+import forgivingCrash from '!!raw-loader!@site/examples/m04/l04/null-forgiving-crash.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l04/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l04/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l04/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l04/seclog-types-solution.cs';
+
+# null und Nullable-Verweistypen
+
+:::note[Lernziele]
+- Du kannst erklären, was `null` bei einem Referenztyp bedeutet.
+- Du kannst eine Variable mit `?` als „darf `null` sein“ markieren und vorhersagen, wann der Compiler warnt.
+- Du kannst mit einer `!= null`-Prüfung die Warnung vermeiden und erklären, warum die Prüfung wirkt (Flussanalyse).
+- Du kannst erklären, warum `!` (null-forgiving) nur die Warnung abschaltet.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l01-q1" />
+
+<Quiz id="m04-l03-q3" />
+
+<Quiz id="m01-l09-q5" />
+
+## null: kein Objekt
+
+Eine Variable eines Referenztyps enthält einen Verweis auf ein Objekt. Sie kann aber auch einen Verweis enthalten, der auf nichts zeigt. Dieser Wert heißt <Term id="null">null</Term>. Er bedeutet: Hier ist kein Objekt.
+
+`null` ist nicht der leere Text. Der leere Text `""` ist ein Objekt, das zufällig keine Zeichen hat. `null` ist gar kein Objekt.
+
+Das `?` hinter `string` in der ersten Zeile erklären wir im nächsten Abschnitt. Hier zählt nur: Die Variable `user` darf `null` enthalten.
+
+:::info[Vorhersage]
+Welche Werte zeigen die drei Zeilen?
+:::
+
+<CSharpRunner id="m04-l04-null-meaning" code={nullMeaning} predict expected={nullMeaningOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `False`.
+
+1. **`user` mit `null` starten:** `user == null` ist `True`, die Variable zeigt auf kein Objekt.
+2. **Leeren Text prüfen:** `empty` zeigt auf ein Objekt, den leeren Text. Der Vergleich mit `null` ergibt `False`.
+3. **Objekt zuweisen:** Nach `user = "bob"` zeigt `user` auf ein Objekt, der Vergleich ergibt `False`.
+
+**Was passiert, wenn du `empty` auf `null` setzt?** Dann ist der Vergleich `True`. Der Compiler warnt dabei, weil `empty` ein `string` ohne `?` ist (dazu gleich mehr).
+
+</details>
+
+## Das ? und die Warnung des Compilers
+
+Mit dem <Term id="nullable-reference-type">Nullable Reference Type (Verweistyp, der null sein darf)</Term> sagst du dem Compiler, ob `null` an einer Stelle erlaubt ist:
+
+- `string` bedeutet: Hier soll immer ein Objekt stehen.
+- `string?` bedeutet: Hier darf auch `null` stehen.
+
+Der Compiler prüft das beim Übersetzen. Er verfolgt für jede Variable, ob sie gerade sicher ein Objekt enthält oder `null` enthalten könnte. Diese <Term id="null-state-analysis">Null-State-Analyse (Flussanalyse)</Term> findet drei typische Stellen und meldet jeweils eine Warnung.
+
+<CodeBlock language="csharp" title="warning-dereference.snippet.cs">{warningDereference}</CodeBlock>
+
+`Console.ReadLine()` hat den Typ `string?`, denn am Ende der Eingabe gibt es keine Zeile mehr und das Ergebnis ist `null`. Der Zugriff auf `Length` kann also ins Leere gehen.
+
+<CodeBlock language="csharp" title="warning-assign-null.snippet.cs">{warningAssignNull}</CodeBlock>
+
+`name` ist ein `string` ohne `?`. Dort soll kein `null` stehen.
+
+<CodeBlock language="csharp" title="warning-argument.snippet.cs">{warningArgument}</CodeBlock>
+
+Der Parameter `name` ist ein `string`. Das Argument `user` kann `null` sein. Aus diesem Grund hat SecLog `user` aus `Console.ReadLine()` bisher nie an eine Methode mit `string`-Parameter übergeben.
+
+Die drei Meldungen des Compilers:
+
+```text title="Meldungen des Compilers"
+warning CS8602: Dereference of a possibly null reference.
+warning CS8600: Converting null literal or possible null value to non-nullable type.
+warning CS8604: Possible null reference argument for parameter 'name' in 'void Greet(string name)'.
+```
+
+Das sind Warnungen, keine Fehler. Die Programme werden übersetzt und laufen. Die Warnungen erscheinen nur, wenn der <Term id="nullable-context">Nullable-Kontext</Term> eingeschaltet ist. In neuen Projekten ist er eingeschaltet, im Projekt steht dafür die Einstellung `<Nullable>enable</Nullable>`.
+
+<Forward concepts={['Projektdatei']} module="14" />
+
+`var user = Console.ReadLine();` hat in Modul 1 unauffällig einen `string?` erzeugt, weil `var` den Typ vom Aufruf übernimmt.
+
+## Prüfen macht die Warnung überflüssig
+
+Eine Prüfung mit `!= null` ändert, was der Compiler weiß. Im Zweig des `if` ist `user` sicher ein Objekt. Das ist der Kern der Flussanalyse: Der Compiler liest den Code von oben nach unten und merkt sich bei jeder Stelle, was er über die Variable weiß.
+
+:::info[Vorhersage]
+Die Methode wird einmal mit einem Text und einmal mit `null` aufgerufen. Was gibt das Programm aus? Warnt der Compiler?
+:::
+
+<CSharpRunner id="m04-l04-null-check" code={nullCheck} predict expected={nullCheckOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Length: 5` und `No user`. Der Compiler warnt nicht.
+
+1. **Parameter als nullable markieren:** `string? user` erlaubt den Aufruf mit `null`.
+2. **Prüfen:** `user != null` ist im ersten Zweig wahr. Dort weiß der Compiler: `user` ist ein Objekt.
+3. **Zugreifen:** `user.Length` ist im Zweig sicher. Im `else`-Zweig wird `user` nicht benutzt.
+
+**Was passiert, wenn du `user.Length` vor dem `if` schreibst?** Dann kennt der Compiler den Zustand nicht und warnt. Beim Aufruf mit `null` stürzt das Programm ab.
+
+</details>
+
+## Lückenbeispiel
+
+`PrintLength` soll für `null` den Text `No text` ausgeben. Aktuell gibt das Programm nur die erste Zeile aus. Ergänze einen `else`-Zweig.
+
+<CSharpRunner id="m04-l04-gaps" code={nullCheckGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zweig ergänzen:** Nach der schließenden Klammer des `if` steht `else` mit einem Block.
+2. **Ausgabe schreiben:** Der Block enthält `Console.WriteLine("No text");`.
+
+Die Ausgabe ist dann `Length: 5` und `No text`.
+
+</details>
+
+## Das ! schaltet nur die Warnung ab
+
+Manchmal weißt du etwas, das der Compiler nicht erkennt. Mit dem <Term id="null-forgiving-operator">Null-Forgiving Operator</Term> `!` hinter einem Ausdruck sagst du: „Das ist nicht `null`.“ Der Compiler glaubt dir und meldet nichts. Geprüft wird das Versprechen nicht.
+
+<CodeBlock language="csharp" title="null-forgiving-crash.snippet.cs">{forgivingCrash}</CodeBlock>
+
+Das Programm wird ohne Warnung übersetzt. Ist die Eingabe leer, gibt `Console.ReadLine()` `null` zurück, und das Programm stürzt in Zeile 2 ab:
+
+```text title="Ausgabe bei leerer Eingabe"
+Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.
+```
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Eine `NullReferenceException` ist der Laufzeitfehler für einen Zugriff über `null`. Wie man Fehler dieser Art behandelt, zeigt Modul 7. Hier zählt: Nutze `!` nur, wenn du es wirklich weißt. Besser ist eine Prüfung.
+
+:::warning[Achtung]
+<Misconception id="m04-l04-annotation-prevents-null" />
+
+**„Ein `string` ohne `?` kann nie `null` sein, und das `?` verhindert Abstürze.“** Das stimmt nicht. Die Annotationen sind nur Absichten für den Compiler und führen zu Warnungen beim Übersetzen. Zur Laufzeit gibt es keine Prüfung. Mit `!` oder an einer Stelle, die der Compiler nicht sieht, kann `null` in einer `string`-Variablen landen. Das Programm stürzt dann beim Zugriff ab.
+:::
+
+## Projektschritt
+
+**Stand bisher:** SecLog kann die Zeichenkette einer Zeile in Benutzer und IP zerlegen. `TryReadUser` meldet über `out`, ob die Zeile einen Benutzer hat.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block *Read the user from sample line 2 …* mit `sampleLine`, den Block *Collect the findings …* und die Klasse `Report`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe direkt vor der Klasse `Report` die lokale Funktion `string? FindUser(string line)`. Sie ruft `TryReadUser` auf und gibt den Benutzernamen zurück, bei einer Zeile ohne Benutzer `null`. Schreibe direkt nach dem Block *Collect the findings in one StringBuilder* den neuen Block `// Find the user of a line, or null if it has none`. Er gibt `User of sample line: bob` aus, mit einer `!= null`-Prüfung vor der Benutzung, damit keine Warnung entsteht. Danach gibt er `User of broken line is missing: True` aus (`FindUser("broken line") == null`).
+
+<CSharpRunner id="m04-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Funktion schreiben:** `FindUser` ruft `TryReadUser` auf. Bei `true` gibt sie `userName` zurück, sonst `null`. Der Rückgabetyp `string?` zeigt das an.
+2. **Prüfen:** `foundUser != null` schützt die Ausgabe. Der Compiler warnt nicht.
+3. **Vergleichen:** Für die kaputte Zeile genügt der Vergleich `== null`, es wird nichts benutzt.
+
+</details>
+
+**Neuer Stand:** SecLog kann „kein Benutzer“ ausdrücken und prüft das Ergebnis, bevor es benutzt wird.
+
+<details>
+<summary>Vertiefung: Annotationen, Kontext und Flussanalyse in der Spezifikation (optional)</summary>
+
+Ein Verweistyp `R?` und `R` verwenden denselben Typ. Der Unterschied besteht nur in der Absicht: Der Compiler darf Diagnosen ausgeben, und diese müssen Warnungen sein. Das Programmverhalten ändert sich nicht ([§8.9.1 Reference types and nullability](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#891-general)).
+
+Jede Quellcodezeile hat einen Nullable-Kontext. Der Compiler darf mit statischer Flussanalyse für jede Variable bestimmen, ob sie *not null*, *maybe null* oder *maybe default* ist ([§8.9.4 Nullable context](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#894-nullable-context)).
+
+Der Null-Forgiving Operator hat zur Laufzeit keine Wirkung ([§12.8.9 Null-forgiving expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1289-null-forgiving-expressions)).
+</details>
+
+## Zusammenfassung
+
+`null` bedeutet, dass eine Referenz auf kein Objekt zeigt. Mit `?` markierst du, dass `null` erlaubt ist, ohne `?` soll ein Objekt vorhanden sein. Der Compiler verfolgt beim Übersetzen, was er über jede Variable weiß, und warnt bei unsicheren Zugriffen. Eine Prüfung mit `!= null` macht den Zugriff im Zweig sicher. Das `!` schaltet nur die Warnung ab. Zur Laufzeit gibt es keinen Schutz.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m04-l04-q2" />
+
+<Quiz id="m04-l04-q3" />
+
+<Quiz id="m04-l04-q4" />
+
+<Quiz id="m04-l04-q5" />
+
+<Quiz id="m04-l04-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l04-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l04-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§8.9 Reference types and nullability](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#89-reference-types-and-nullability)
+- Microsoft Learn: [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references)
