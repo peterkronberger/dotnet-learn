@@ -1,0 +1,159 @@
+---
+title: Code lesen und vorhersagen
+sidebar_position: 1
+description: "Gemischte Leseaufgaben zu den Modulen 1–4: erst das Konzept erkennen, dann das Ergebnis vorhersagen."
+lesson_id: w01-l01
+duration_min: 25
+---
+
+import readCount from '!!raw-loader!@site/examples/w01/l01/read-count.cs';
+import readCountInput from '!!raw-loader!@site/examples/w01/l01/read-count.in.txt';
+import readCountOutput from '!!raw-loader!@site/examples/w01/l01/read-count.out.txt';
+import halvingRounds from '!!raw-loader!@site/examples/w01/l01/halving-rounds.cs';
+import halvingRoundsOutput from '!!raw-loader!@site/examples/w01/l01/halving-rounds.out.txt';
+
+# Code lesen und vorhersagen
+
+:::note[Lernziele]
+- Du erkennst bei kurzem Code, welches Konzept aus den Modulen 1–4 das Verhalten bestimmt.
+- Du sagst die Ausgabe von kurzem Code aus den Modulen 1–4 vorher, ohne ihn auszuführen.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+<OptionalReview modules={[1, 2, 3, 4]} />
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann sagst du das Ergebnis voraus. Die Aufgaben mischen die Module 1–4. Notiere deinen Tipp, bevor du antwortest.
+
+### Aufgabe 1
+
+<Quiz id="w01-l01-q1" />
+
+<Quiz id="w01-l01-q2" />
+
+### Aufgabe 2
+
+<Quiz id="w01-l01-q3" />
+
+<Quiz id="w01-l01-q4" />
+
+### Aufgabe 3
+
+<Quiz id="w01-l01-q5" />
+
+<Quiz id="w01-l01-q6" />
+
+Eine zweite Frage zum selben Konzeptbereich:
+
+<Quiz id="w01-l01-q7" />
+
+<Quiz id="w01-l01-q8" />
+
+### Aufgabe 4
+
+<Quiz id="w01-l01-q9" />
+
+<Quiz id="w01-l01-q10" />
+
+### Aufgabe 5
+
+<Quiz id="w01-l01-q11" />
+
+<Quiz id="w01-l01-q12" />
+
+Und eine zweite Frage:
+
+<Quiz id="w01-l01-q13" />
+
+<Quiz id="w01-l01-q14" />
+
+### Aufgabe 6
+
+<Quiz id="w01-l01-q15" />
+
+<Quiz id="w01-l01-q16" />
+
+### Aufgabe 7
+
+<Quiz id="w01-l01-q17" />
+
+<Quiz id="w01-l01-q18" />
+
+### Aufgabe 8
+
+<Quiz id="w01-l01-q19" />
+
+<Quiz id="w01-l01-q20" />
+
+### Aufgabe 9
+
+<Quiz id="w01-l01-q21" />
+
+<Quiz id="w01-l01-q22" />
+
+### Aufgabe 10
+
+<Quiz id="w01-l01-q23" />
+
+:::info[Vorhersage]
+Die Eingabe ist eine Zeile: `12`. Danach ist die Eingabe zu Ende. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="w01-l01-read-count" code={readCount} stdin={readCountInput} predict expected={readCountOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Count: 12` und `Not a number: none`.
+
+1. **Erste Zeile:** `Console.ReadLine()` liefert `12`. `??` lässt den Wert stehen, und `TryParse` liefert `true`.
+2. **Eingabe zu Ende:** Der zweite Aufruf liefert `null`. `??` setzt dann den Ersatztext `none` ein.
+3. **Prüfung:** `none` ist keine Zahl, `TryParse` liefert `false`, und der `else`-Zweig läuft.
+
+</details>
+
+### Aufgabe 11
+
+<Quiz id="w01-l01-q24" />
+
+<Quiz id="w01-l01-q25" />
+
+### Aufgabe 12
+
+<Quiz id="w01-l01-q26" />
+
+:::info[Vorhersage]
+Wie viele Zeilen gibt das Programm aus, und welche Zahl steht in jeder Zeile?
+:::
+
+<CSharpRunner id="w01-l01-halving" code={halvingRounds} predict expected={halvingRoundsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Round 1: 3`, `Round 2: 1`, `Round 3: 0` und `Rounds: 3`.
+
+1. **Ganzzahldivision:** `7 / 2` ist `3`, danach `3 / 2` gleich `1` und `1 / 2` gleich `0`. Der Rest wird abgeschnitten.
+2. **Bedingung am Ende:** `do … while` prüft nach dem Block. Bei `0` ist `total > 0` falsch und die Schleife endet.
+3. **Zähler:** `rounds` zählt drei Durchläufe.
+
+</details>
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w01-l01-q27" />
+
+### Übertragen
+
+<Quiz id="w01-l01-q28" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- Microsoft Learn: [Auswahlanweisungen](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/selection-statements)
+- Microsoft Learn: [Iterationsanweisungen](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements)
+- Microsoft Learn: [`int.TryParse`](https://learn.microsoft.com/dotnet/api/system.int32.tryparse)
