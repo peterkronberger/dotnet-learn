@@ -267,6 +267,459 @@
         { "text": "Gar nichts, `new` in der Methode reicht.", "feedback": "Das neue Objekt gehört dann nur dem Parameter." }
       ],
       "explanation": "Soll sich die Variable des Aufrufers ändern, braucht die Methode einen `ref`-Parameter. Soll nur das Objekt ändern, reicht ein Wertparameter."
+    },
+    {
+      "id": "m04-l04-q1",
+      "lesson": "m04-l04",
+      "type": "single",
+      "question": "Was bedeutet `null` bei einer Variablen eines Referenztyps?",
+      "options": [
+        {
+          "text": "Die Variable zeigt auf kein Objekt.",
+          "correct": true,
+          "feedback": "`null` ist der Verweis, der auf nichts zeigt."
+        },
+        {
+          "text": "Die Variable zeigt auf ein Objekt mit dem Inhalt `0`.",
+          "feedback": "`null` ist kein Objekt und hat keinen Inhalt."
+        },
+        {
+          "text": "Die Variable zeigt auf einen leeren Text.",
+          "feedback": "Der leere Text `\"\"` ist ein Objekt mit der Länge 0. `null` ist es nicht."
+        }
+      ],
+      "explanation": "Eine Variable eines Referenztyps enthält einen Verweis. `null` ist der Verweis ohne Objekt. Der leere Text `\"\"` ist dagegen ein Objekt."
+    },
+    {
+      "id": "m04-l04-q2",
+      "lesson": "m04-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l04/quiz-null-state.cs",
+      "explanation": "`second = first` kopiert den Verweis. Er ist `null`, also ist `second` auch `null`. Die spätere Zuweisung an `first` ändert `second` nicht. Darum ist die Ausgabe `True`, `True`, `False`."
+    },
+    {
+      "id": "m04-l04-q3",
+      "lesson": "m04-l04",
+      "type": "single",
+      "question": "Eine Variable ist als `string name` deklariert, also ohne `?`. Was stimmt?",
+      "options": [
+        {
+          "text": "Der Compiler warnt bei Stellen, an denen sie `null` bekommen könnte. Zur Laufzeit verhindert die Deklaration `null` nicht.",
+          "correct": true,
+          "feedback": "Die Annotation wirkt nur beim Übersetzen, als Warnung."
+        },
+        {
+          "text": "Die Variable kann zur Laufzeit nie `null` enthalten.",
+          "misconception": "m04-l04-annotation-prevents-null",
+          "feedback": "Das Programm kann trotzdem `null` in die Variable bringen, zum Beispiel mit `!`. Die Annotation erzeugt nur Warnungen."
+        },
+        {
+          "text": "Das Programm lässt sich nicht übersetzen, sobald `null` zugewiesen werden könnte.",
+          "misconception": "m04-l04-annotation-prevents-null",
+          "feedback": "Die Meldungen sind Warnungen, keine Fehler. Das Programm wird trotzdem übersetzt."
+        }
+      ],
+      "explanation": "Die Annotationen `T` und `T?` sind Absichten für den Compiler. Er gibt Warnungen aus, ändert aber nichts am Verhalten des Programms."
+    },
+    {
+      "id": "m04-l04-q4",
+      "lesson": "m04-l04",
+      "type": "find-bug",
+      "question": "Eine dieser Zeilen erzeugt beim Übersetzen eine Warnung zu `null`. Welche?",
+      "example": "m04/l04/quiz-warning-lines.snippet.cs",
+      "bugLines": [4],
+      "lineFeedback": {
+        "3": {
+          "feedback": "`copy` ist ein `string` mit dem Wert `\"alice\"`. Der Compiler weiß, dass er nicht `null` ist."
+        }
+      },
+      "explanation": "`user` kommt aus `Console.ReadLine()` und ist vom Typ `string?`. Der Compiler weiß nicht, ob `user` ein Objekt enthält, und warnt beim Zugriff auf `Length`."
+    },
+    {
+      "id": "m04-l04-q5",
+      "lesson": "m04-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über das `!` in `user!.Length` stimmen?",
+      "options": [
+        {
+          "text": "Es schaltet die Warnung des Compilers ab.",
+          "correct": true
+        },
+        {
+          "text": "Ist `user` zur Laufzeit `null`, stürzt das Programm beim Zugriff trotzdem ab.",
+          "correct": true
+        },
+        {
+          "text": "Es prüft zur Laufzeit, ob `user` `null` ist.",
+          "misconception": "m04-l04-annotation-prevents-null",
+          "feedback": "Das `!` macht zur Laufzeit nichts. Es ändert nur, was der Compiler annimmt."
+        },
+        {
+          "text": "Es ersetzt `null` durch den leeren Text.",
+          "feedback": "Das `!` ersetzt nichts. Der Wert bleibt `null`."
+        }
+      ],
+      "explanation": "Das `!` sagt dem Compiler „das ist nicht null“. Es ist ein Versprechen des Programmierers, das nicht geprüft wird."
+    },
+    {
+      "id": "m04-l04-q6",
+      "lesson": "m04-l04",
+      "type": "single",
+      "question": "`Console.ReadLine()` hat den Rückgabetyp `string?`. Warum?",
+      "options": [
+        {
+          "text": "Am Ende der Eingabe gibt es keine Zeile mehr, dann ist das Ergebnis `null`.",
+          "correct": true,
+          "feedback": "Ohne weitere Zeile liefert der Aufruf kein Objekt."
+        },
+        {
+          "text": "Eine leere Zeile ergibt immer `null`.",
+          "feedback": "Eine leere Zeile ergibt den leeren Text `\"\"`, ein Objekt."
+        },
+        {
+          "text": "Das `?` macht das Ergebnis zu einer Zahl.",
+          "feedback": "Das `?` markiert nur, dass `null` möglich ist. Das Ergebnis bleibt Text."
+        }
+      ],
+      "explanation": "Fehlt die Zeile, liefert `Console.ReadLine()` `null`. Darum zeigt der Typ `string?`. Ein `string?` an einen `string`-Parameter zu übergeben, ergibt eine Warnung."
+    },
+    {
+      "id": "m04-l04-q7",
+      "lesson": "m04-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum die Warnung bei `user.Length` verschwindet, wenn du den Zugriff in `if (user != null)` setzt.",
+      "modelAnswer": "Der Compiler verfolgt beim Übersetzen, ob eine Variable `null` sein kann (Flussanalyse). Nach der Prüfung `user != null` weiß er: Im Zweig des `if` ist `user` nicht `null`. Dort ist der Zugriff sicher und es gibt keine Warnung.\n\nAußerhalb des Zweigs gilt das nicht, dort warnt der Compiler weiter. Das `!` würde dagegen nur die Warnung abschalten, ohne etwas zu prüfen."
+    },
+    {
+      "id": "m04-l04-q8",
+      "lesson": "m04-l04",
+      "type": "single",
+      "question": "SecLog soll den Benutzernamen einer Logzeile liefern. Manche Zeilen haben keinen Benutzer. Welcher Rückgabetyp zeigt das ehrlich an?",
+      "options": [
+        {
+          "text": "`string?`, denn der Rückgabewert darf `null` sein, wenn kein Benutzer da ist.",
+          "correct": true,
+          "feedback": "Wer die Methode aufruft, sieht am Typ, dass er auf `null` prüfen muss."
+        },
+        {
+          "text": "`string`, und bei fehlendem Benutzer wird `null` zurückgegeben.",
+          "misconception": "m04-l04-annotation-prevents-null",
+          "feedback": "Der Typ verspricht dann einen Text. Der Compiler warnt bei `return null`, und der Aufrufer prüft nicht auf `null`."
+        },
+        {
+          "text": "`bool`, denn nur `true` und `false` sind sicher.",
+          "feedback": "Dann ginge der Benutzername verloren."
+        }
+      ],
+      "explanation": "Der Typ `string?` beschreibt eine Methode, die manchmal keinen Text liefert. Der Compiler erinnert alle Aufrufer an die Prüfung."
+    },
+    {
+      "id": "m04-l05-q1",
+      "lesson": "m04-l05",
+      "type": "single",
+      "question": "Welche Deklaration kann „keine Zahl“ ausdrücken?",
+      "options": [
+        {
+          "text": "`int? failures = null;`",
+          "correct": true,
+          "feedback": "`int?` ist ein Nullable-Werttyp. Er kann eine Zahl oder `null` enthalten."
+        },
+        {
+          "text": "`int failures = null;`",
+          "feedback": "Ein `int` kann nicht `null` sein. Der Compiler meldet einen Fehler."
+        },
+        {
+          "text": "`int failures = -;`",
+          "feedback": "Das ist kein gültiger C#-Code."
+        }
+      ],
+      "explanation": "Ein Werttyp enthält immer einen Wert. Mit `?` kommt „kein Wert“ als zusätzlicher Wert dazu."
+    },
+    {
+      "id": "m04-l05-q2",
+      "lesson": "m04-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l05/quiz-lifted.cs",
+      "explanation": "`a + 1` ist `5`. `a + b` ist `null`, weil `b` `null` ist, also `True`. `a > b` ergibt `False`, denn ein Vergleich mit `null` ist nie wahr. `b.GetValueOrDefault()` ist `0`, plus `2` ergibt `2`."
+    },
+    {
+      "id": "m04-l05-q3",
+      "lesson": "m04-l05",
+      "type": "single",
+      "question": "Eine lokale Variable wird als `int count;` deklariert und dann sofort gelesen: `Console.WriteLine(count);`. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm lässt sich nicht übersetzen, weil `count` vor dem Lesen keinen Wert hat.",
+          "correct": true,
+          "feedback": "Lokale Variablen müssen zugewiesen sein, bevor man sie liest."
+        },
+        {
+          "text": "Das Programm gibt `0` aus, denn `0` ist der Standardwert von `int`.",
+          "misconception": "m04-l05-local-gets-default",
+          "feedback": "Felder und Array-Elemente bekommen den Standardwert automatisch, lokale Variablen nicht."
+        },
+        {
+          "text": "Das Programm gibt eine leere Zeile aus.",
+          "misconception": "m04-l05-local-gets-default",
+          "feedback": "Eine lokale Variable hat ohne Zuweisung keinen Wert, den man ausgeben könnte."
+        }
+      ],
+      "explanation": "Der Compiler verlangt sichere Zuweisung (Definite Assignment). Der Standardwert gilt nur für Felder und Array-Elemente."
+    },
+    {
+      "id": "m04-l05-q4",
+      "lesson": "m04-l05",
+      "type": "single",
+      "question": "Was gilt für `int? x = null;`?",
+      "options": [
+        {
+          "text": "`x.HasValue` ist `false`.",
+          "correct": true,
+          "feedback": "`HasValue` ist `true`, wenn ein Wert da ist."
+        },
+        {
+          "text": "`x.HasValue` ist `true`, denn `x` hat den Wert `0`.",
+          "feedback": "`null` ist nicht `0`. `GetValueOrDefault()` liefert `0`, aber `x` selbst hat keinen Wert."
+        },
+        {
+          "text": "Die Deklaration ist ein Fehler, weil `int` nicht `null` sein kann.",
+          "feedback": "Mit dem `?` ist `null` erlaubt."
+        }
+      ],
+      "explanation": "Ein `int?` mit `null` hat keinen Wert. `HasValue` meldet das mit `false`."
+    },
+    {
+      "id": "m04-l05-q5",
+      "lesson": "m04-l05",
+      "type": "multi",
+      "question": "Es gilt `int? a = 5;` und `int? b = null;`. Bei welchen Ausdrücken ist das Ergebnis `null`?",
+      "options": [
+        {
+          "text": "`a + b`",
+          "correct": true
+        },
+        {
+          "text": "`b + 1`",
+          "correct": true
+        },
+        {
+          "text": "`a * 2`",
+          "feedback": "Beide Operanden haben einen Wert, das Ergebnis ist `10`."
+        },
+        {
+          "text": "`a > b`",
+          "feedback": "Ein Vergleich ergibt `bool`, nie `null`. Hier ist das Ergebnis `false`."
+        }
+      ],
+      "explanation": "Rechenoperatoren geben `null` zurück, wenn ein Operand `null` ist. Vergleichsoperatoren ergeben immer einen `bool`."
+    },
+    {
+      "id": "m04-l05-q6",
+      "lesson": "m04-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über Standardwerte stimmen?",
+      "options": [
+        {
+          "text": "Der Standardwert von `int` ist `0`.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert von `bool` ist `false`.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert von `int?` ist `null`.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert von `string` ist der leere Text.",
+          "feedback": "Der Standardwert eines Referenztyps ist `null`, auch bei `string`."
+        }
+      ],
+      "explanation": "Zahlen haben `0`, `bool` hat `false`, Nullable-Werttypen und Referenztypen haben `null`. Der Ausdruck `default` schreibt den Standardwert an."
+    },
+    {
+      "id": "m04-l05-q7",
+      "lesson": "m04-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `int` und `int?`, und warum eine lokale Variable trotz Standardwert vor dem Lesen zugewiesen werden muss.",
+      "modelAnswer": "Ein `int` enthält immer eine Zahl. Ein `int?` kann zusätzlich „kein Wert“ enthalten, das ist `null`. Mit `HasValue` fragst du, ob ein Wert da ist.\n\nJeder Typ hat einen Standardwert, aber nur Felder und Array-Elemente bekommen ihn automatisch. Eine lokale Variable bekommt ihn nicht. Der Compiler verlangt, dass sie vor dem Lesen sicher zugewiesen ist, sonst gibt es einen Fehler."
+    },
+    {
+      "id": "m04-l05-q8",
+      "lesson": "m04-l05",
+      "type": "single",
+      "question": "Eine SecLog-Methode soll die Anzahl der Fehlversuche aus einem Text lesen. Ist der Text keine Zahl, soll sie „unbekannt“ melden. Welcher Rückgabetyp passt?",
+      "options": [
+        {
+          "text": "`int?`, mit `null` für „unbekannt“.",
+          "correct": true,
+          "feedback": "So bleibt `0` Fehlversuche von „unbekannt“ unterscheidbar."
+        },
+        {
+          "text": "`int`, mit `0` für „unbekannt“.",
+          "feedback": "Dann kann man `0` Fehlversuche nicht von „unbekannt“ unterscheiden."
+        },
+        {
+          "text": "`bool`, denn die Zahl wird nicht gebraucht.",
+          "feedback": "Dann ginge die gelesene Zahl verloren."
+        }
+      ],
+      "explanation": "`null` ist ein eigener Wert für „kein Wert“. Ein Ersatz wie `0` kann mit einem echten Wert verwechselt werden."
+    },
+    {
+      "id": "m04-l06-q1",
+      "lesson": "m04-l06",
+      "type": "single",
+      "question": "`string? text` ist gesetzt. Welchen Typ hat der Ausdruck `text?.Length`?",
+      "options": [
+        {
+          "text": "`int?`, denn bei `null` fehlt das Ergebnis.",
+          "correct": true,
+          "feedback": "Der Typ wird zu einem Nullable-Werttyp, weil `null` herauskommen kann."
+        },
+        {
+          "text": "`int`, denn `Length` ist immer eine Zahl.",
+          "feedback": "Ist `text` `null`, gibt es keine Länge. Darum muss der Typ `null` erlauben."
+        },
+        {
+          "text": "`string?`, denn `text` ist ein `string?`.",
+          "feedback": "`Length` ist eine Zahl, kein Text."
+        }
+      ],
+      "explanation": "Der Operator `?.` ergibt `null`, wenn der linke Teil `null` ist. Bei einem Wert wie `int` wird der Ergebnistyp darum `int?`."
+    },
+    {
+      "id": "m04-l06-q2",
+      "lesson": "m04-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l06/quiz-null-safe.cs",
+      "explanation": "`user?.Length` ist `null`, also ist der Vergleich `True`. `user ?? \"none\"` ergibt `none`. `user ??= \"bob\"` weist `bob` zu, das zweite `??=` ändert nichts mehr. `ip?.Length` ist `10`."
+    },
+    {
+      "id": "m04-l06-q3",
+      "lesson": "m04-l06",
+      "type": "single",
+      "question": "Die Variable `name` enthält `\"alice\"`. Wird `Fallback()` in `string result = name ?? Fallback();` aufgerufen?",
+      "options": [
+        {
+          "text": "Nein, der rechte Teil wird nur ausgewertet, wenn `name` `null` ist.",
+          "correct": true,
+          "feedback": "Ist der linke Teil nicht `null`, ist er das Ergebnis."
+        },
+        {
+          "text": "Ja, beide Seiten von `??` werden immer ausgewertet.",
+          "misconception": "m04-l06-coalesce-always-evaluates",
+          "feedback": "Der rechte Teil wird nur bei Bedarf ausgewertet, ähnlich wie bei `&&`."
+        },
+        {
+          "text": "Ja, aber das Ergebnis wird verworfen.",
+          "misconception": "m04-l06-coalesce-always-evaluates",
+          "feedback": "Die Methode wird gar nicht aufgerufen, ihre Ausgaben erscheinen nicht."
+        }
+      ],
+      "explanation": "`a ?? b` wertet `b` nur aus, wenn `a` `null` ist. Eine Methode auf der rechten Seite läuft sonst nicht."
+    },
+    {
+      "id": "m04-l06-q4",
+      "lesson": "m04-l06",
+      "type": "single",
+      "question": "Was steht nach `string? x = \"a\"; x ??= \"b\";` in `x`?",
+      "options": [
+        {
+          "text": "`\"a\"`, denn `x` war nicht `null`.",
+          "correct": true,
+          "feedback": "`??=` weist nur bei `null` zu."
+        },
+        {
+          "text": "`\"b\"`, denn `??=` weist immer zu.",
+          "feedback": "Immer zuweisen wäre `=`. Bei `??=` entscheidet `null`."
+        },
+        {
+          "text": "`null`, denn beide Werte heben sich auf.",
+          "feedback": "Es gibt keine solche Regel."
+        }
+      ],
+      "explanation": "`x ??= \"b\"` bedeutet: Weise `\"b\"` zu, aber nur wenn `x` gerade `null` ist."
+    },
+    {
+      "id": "m04-l06-q5",
+      "lesson": "m04-l06",
+      "type": "multi",
+      "question": "Es gilt `StringBuilder? findings = null;`. Welche Aussagen über `findings?.Length = NextLength();` stimmen?",
+      "options": [
+        {
+          "text": "Die Zeile ändert nichts, weil `findings` `null` ist.",
+          "correct": true
+        },
+        {
+          "text": "`NextLength()` wird nicht aufgerufen.",
+          "correct": true
+        },
+        {
+          "text": "Die Schreibweise gibt es seit C# 14.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm stürzt ab, weil `findings` `null` ist.",
+          "feedback": "Bei `null` wird die Zuweisung übersprungen, es gibt keinen Absturz."
+        }
+      ],
+      "explanation": "Die null-bedingte Zuweisung führt nur aus, wenn der Empfänger nicht `null` ist. Dann wird auch die rechte Seite ausgewertet."
+    },
+    {
+      "id": "m04-l06-q6",
+      "lesson": "m04-l06",
+      "type": "single",
+      "question": "Welcher Ausdruck liefert den Benutzer oder den Text `unknown`, wenn `FindUser(line)` `null` zurückgibt?",
+      "options": [
+        {
+          "text": "`FindUser(line) ?? \"unknown\"`",
+          "correct": true,
+          "feedback": "`??` wählt den rechten Teil, wenn der linke `null` ist."
+        },
+        {
+          "text": "`FindUser(line)?.Length`",
+          "feedback": "Das liefert die Länge als `int?`, nicht den Text."
+        },
+        {
+          "text": "`FindUser(line)!`",
+          "feedback": "Das schaltet nur die Warnung ab und liefert weiter `null`."
+        }
+      ],
+      "explanation": "Für einen Ersatzwert ist `??` der passende Operator."
+    },
+    {
+      "id": "m04-l06-q7",
+      "lesson": "m04-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `?.` und `??`.",
+      "modelAnswer": "Mit `?.` greifst du auf ein Mitglied zu, zum Beispiel `text?.Length`. Ist `text` `null`, ist das Ergebnis `null`, es gibt keinen Absturz. Bei einer Zahl wie `Length` wird der Typ `int?`.\n\nMit `??` legst du einen Ersatzwert fest: `a ?? b` ergibt `a`, außer `a` ist `null`, dann `b`. Der rechte Teil wird nur dann ausgewertet.\n\nBeide lassen sich verbinden: `text?.Length ?? 0`."
+    },
+    {
+      "id": "m04-l06-q8",
+      "lesson": "m04-l06",
+      "type": "single",
+      "question": "SecLog hat `string? lastIp`. Die IP-Adresse fehlt manchmal. Du willst ihre Länge lesen, ohne dass das Programm bei `null` abstürzt. Was schreibst du?",
+      "options": [
+        {
+          "text": "`lastIp?.Length`",
+          "correct": true,
+          "feedback": "Bei `null` ist das Ergebnis `null`, es gibt keinen Zugriff."
+        },
+        {
+          "text": "`lastIp.Length`",
+          "feedback": "Der Compiler warnt, und bei `null` stürzt das Programm ab."
+        },
+        {
+          "text": "`lastIp ?? Length`",
+          "feedback": "`Length` ist hier kein Wert, der Ausdruck ist ungültig."
+        }
+      ],
+      "explanation": "Für den Zugriff auf ein Mitglied, das bei `null` fehlen darf, ist `?.` der passende Operator."
     }
   ]
 }

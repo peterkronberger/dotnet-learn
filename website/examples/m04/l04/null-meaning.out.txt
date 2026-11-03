@@ -1,0 +1,3 @@
+user is null: True
+empty is null: False
+user is null: False

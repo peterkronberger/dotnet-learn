@@ -1,0 +1,241 @@
+---
+title: Nullable-Werttypen und Standardwerte
+sidebar_position: 5
+description: "int? ergänzt einen Werttyp um „kein Wert“. Jeder Typ hat einen Standardwert, aber eine lokale Variable bekommt ihn nicht automatisch."
+lesson_id: m04-l05
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import nullableInt from '!!raw-loader!@site/examples/m04/l05/nullable-int.cs';
+import nullableIntOutput from '!!raw-loader!@site/examples/m04/l05/nullable-int.out.txt';
+import valueOnNull from '!!raw-loader!@site/examples/m04/l05/value-on-null.snippet.cs';
+import liftedOperators from '!!raw-loader!@site/examples/m04/l05/lifted-operators.cs';
+import liftedOperatorsOutput from '!!raw-loader!@site/examples/m04/l05/lifted-operators.out.txt';
+import defaultValues from '!!raw-loader!@site/examples/m04/l05/default-values.cs';
+import defaultValuesOutput from '!!raw-loader!@site/examples/m04/l05/default-values.out.txt';
+import unassignedLocal from '!!raw-loader!@site/examples/m04/l05/unassigned-local.snippet.cs';
+import readNumberGaps from '!!raw-loader!@site/examples/m04/l05/read-number-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m04/l05/seclog-types-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m04/l05/seclog-types-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m04/l05/seclog-types-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m04/l05/seclog-types-solution.cs';
+
+# Nullable-Werttypen und Standardwerte
+
+:::note[Lernziele]
+- Du kannst einen Nullable-Werttyp (`int?`) deklarieren und mit `HasValue`, `Value` und `GetValueOrDefault()` lesen.
+- Du kannst vorhersagen, was ein Operator mit einem `null`-Operanden ergibt (gehobene Operatoren).
+- Du kannst den Standardwert eines Typs nennen (`default`) und erklären, warum eine lokale Variable trotzdem zugewiesen werden muss.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m04-l04-q3" />
+
+<Quiz id="m01-l02-q6" />
+
+## int? – eine Zahl oder kein Wert
+
+Ein `int` enthält immer eine Zahl. Oft fehlt aber eine Zahl: Ein Text lässt sich nicht in eine Zahl umwandeln, oder die Eingabe fehlt. Ein <Term id="nullable-value-type">Nullable Value Type (Werttyp, der null sein darf)</Term> löst das. `int?` kann jede Zahl eines `int` enthalten und zusätzlich `null` für „kein Wert“.
+
+Ein `int?` hat zwei Mitglieder:
+
+- `HasValue` ist `true`, wenn eine Zahl da ist.
+- `Value` liefert die Zahl.
+
+Außerdem liefert die Methode `GetValueOrDefault()` die Zahl, oder `0`, wenn keine da ist.
+
+Einem `int?` kannst du direkt eine Zahl zuweisen, zum Beispiel `failures = 5`.
+
+:::info[Vorhersage]
+Was geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m04-l05-nullable-int" code={nullableInt} predict expected={nullableIntOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `False`, `True`, `5`, `0`.
+
+1. **Mit `null` starten:** `failures.HasValue` ist `False`.
+2. **Zahl zuweisen:** Nach `failures = 5` ist `HasValue` `True`, und `Value` liefert `5`.
+3. **Standardwert holen:** `none.GetValueOrDefault()` liefert `0`, weil `none` keine Zahl enthält.
+
+**Was passiert, wenn du `none.Value` schreibst?** Dann hat das Programm keine Zahl, die es liefern kann.
+
+</details>
+
+Genau das passiert, wenn du `Value` bei `null` benutzt:
+
+<CodeBlock language="csharp" title="value-on-null.snippet.cs">{valueOnNull}</CodeBlock>
+
+Der Compiler warnt vor dem Zugriff, und das Programm stürzt ab:
+
+```text title="Meldungen"
+warning CS8629: Nullable value type may be null.
+Unhandled exception. System.InvalidOperationException: Nullable object must have a value.
+```
+
+<Forward concepts={['Exceptions']} module="7" />
+
+Prüfe also mit `HasValue`, bevor du `Value` liest, oder nimm `GetValueOrDefault()`.
+
+## Rechnen mit null: gehobene Operatoren
+
+Rechenoperatoren und Vergleiche gibt es auch für `int?`. Sie heißen <Term id="lifted-operator">Lifted Operators (gehobene Operatoren)</Term>. Die Regeln:
+
+- Ist ein Operand von `+`, `-`, `*`, `/` oder `%` gleich `null`, ist das Ergebnis `null`.
+- Die Vergleiche `<`, `>`, `<=` und `>=` ergeben `false`, wenn ein Operand `null` ist.
+- `==` vergleicht auch `null`: Zwei `null` sind gleich, `null` und eine Zahl sind es nicht.
+
+:::info[Vorhersage]
+Welche Werte zeigen die sechs Zeilen?
+:::
+
+<CSharpRunner id="m04-l05-lifted" code={liftedOperators} predict expected={liftedOperatorsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `6`, `True`, `False`, `False`, `False`, `True`.
+
+1. **Rechnen mit Wert:** `five + 1` ist `6`.
+2. **Rechnen mit `null`:** `five + missing` ist `null`, der Vergleich mit `null` ergibt `True`. Das Ergebnis der Addition ist wieder ein `int?`.
+3. **Vergleichen mit `null`:** `five > missing` und `five < missing` sind beide `false`. `five == missing` ist `false`, `missing == null` ist `true`.
+
+**Was passiert, wenn du `five + missing` ausgibst?** Es erscheint eine leere Zeile, denn `null` hat keinen Text.
+
+</details>
+
+## Standardwerte
+
+Jeder Typ hat einen <Term id="default-value">Standardwert</Term>:
+
+| Typ | Standardwert |
+| --- | --- |
+| Zahlen (`int`, `double`) | `0` |
+| `bool` | `false` |
+| `char` | das Zeichen mit dem Code 0 |
+| `int?` und andere Nullable-Werttypen | `null` |
+| Referenztypen (`string`) | `null` |
+
+Der Ausdruck `default` ergibt den Standardwert des Typs, in den er zugewiesen wird.
+
+:::info[Vorhersage]
+Welche Standardwerte zeigt das Programm?
+:::
+
+<CSharpRunner id="m04-l05-default" code={defaultValues} predict expected={defaultValuesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0`, `False`, `0`, `True`.
+
+1. **Zahlen:** `int` und `double` bekommen `0`.
+2. **`bool`:** `false`.
+3. **Nullable-Werttyp:** `maybe` ist `null`, der Vergleich ergibt `True`.
+
+</details>
+
+Bestimmte Variablen bekommen diesen Wert automatisch: Felder einer Klasse und Elemente eines Arrays. Beides lernst du später kennen.
+
+<Forward concepts={['Felder', 'Arrays']} module="5" />
+
+**Lokale Variablen** bekommen ihn nicht. Der Compiler verlangt, dass sie zugewiesen sind, bevor du sie liest (Definite Assignment, siehe Modul 1).
+
+<CodeBlock language="csharp" title="unassigned-local.snippet.cs">{unassignedLocal}</CodeBlock>
+
+```text title="Meldung des Compilers"
+error CS0165: Use of unassigned local variable 'count'
+```
+
+:::warning[Achtung]
+<Misconception id="m04-l05-local-gets-default" />
+
+**„Eine lokale Variable startet mit ihrem Standardwert (`0`, `null`, `false`).“** Das stimmt nicht. Eine lokale Variable hat nach der Deklaration keinen Wert. Liest du sie vor der ersten Zuweisung, meldet der Compiler einen Fehler. Nur Felder und Array-Elemente bekommen den Standardwert automatisch. Willst du den Standardwert, schreibst du ihn selbst: `int count = default;`.
+:::
+
+## Lückenbeispiel
+
+`ReadNumber` gibt für den Text `many` aktuell `0` zurück, und `Show` schreibt `Number: 0`. Es soll `No number` erscheinen. Ändere die Methode so, dass sie bei einem Text ohne Zahl `null` zurückgibt.
+
+<CSharpRunner id="m04-l05-gaps" code={readNumberGaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ersatz entfernen:** `return 0;` am Ende von `ReadNumber` wird zu `return null;`.
+2. **Typ beachten:** Das geht, weil der Rückgabetyp `int?` ist.
+
+Die Ausgabe ist dann `Number: 42` und `No number`. `0` wäre nicht ehrlich, denn `0` ist eine mögliche Zahl.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog kann `null` für „kein Benutzer“ liefern (`FindUser`). Die Anzahl der Fehlversuche liest es aus der zweiten Eingabezeile in `failedText`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block mit `failedText`, den Block *Find the user of a line …* und die Funktion `FindUser`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe direkt nach der Funktion `FindUser` die lokale Funktion `int? FailuresOrNull(string? text)`. Sie gibt die Zahl zurück, wenn `int.TryParse` den Text lesen kann, sonst `null`. Schreibe nach dem Block *Find the user of a line, or null if it has none* den Block `// Read a number of failures, or null if the text is not a number`. Er gibt `Failures from input: 5` aus (`FailuresOrNull(failedText)`), dann `Number in "many": False` (`FailuresOrNull("many").HasValue`) und `Sum with a missing number is null: True` (`FailuresOrNull(failedText) + FailuresOrNull("many") == null`).
+
+<CSharpRunner id="m04-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-types-solution.cs" />
+
+1. **Funktion schreiben:** `FailuresOrNull` ruft `int.TryParse` auf. Bei `true` gibt sie `number` zurück, sonst `null`. Der Parameter ist `string?`, denn `failedText` kommt von `Console.ReadLine()`.
+2. **Lesen:** Der Interpolations-Ausdruck setzt eine Zahl oder nichts ein. `HasValue` fragt, ob eine Zahl da ist.
+3. **Rechnen:** Die Summe mit einem fehlenden Wert ist selbst `null`. Der Vergleich mit `null` ergibt `True`.
+
+</details>
+
+**Neuer Stand:** SecLog kann auch „keine Zahl“ ausdrücken und unterscheidet sie von `0`.
+
+<details>
+<summary>Vertiefung: Nullable-Werttypen in der Spezifikation (optional)</summary>
+
+`T?` ist die Kurzschreibweise für `System.Nullable<T>`. Die Instanz hat die Eigenschaften `HasValue` und `Value`. Das Lesen von `Value` bei einer Instanz ohne Wert löst eine `System.InvalidOperationException` aus. Von `T` nach `T?` gibt es eine implizite Umwandlung ([§8.3.12 Nullable value types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8312-nullable-value-types)).
+
+Gehobene Operatoren erlauben es, vordefinierte Operatoren auch mit der Nullable-Form eines Werttyps zu benutzen ([§12.4.8 Lifted operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1248-lifted-operators)).
+
+Statische Variablen, Instanzvariablen und Array-Elemente werden automatisch mit ihrem Standardwert initialisiert. Lokale Variablen gehören nicht dazu ([§9.3 Default values](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#93-default-values)).
+</details>
+
+## Zusammenfassung
+
+Ein `int?` enthält eine Zahl oder `null`. `HasValue` fragt, ob eine Zahl da ist, `Value` liefert sie, `GetValueOrDefault()` liefert die Zahl oder `0`. Rechenoperatoren geben `null` zurück, wenn ein Operand `null` ist, Vergleiche mit `<` oder `>` ergeben `false`. Jeder Typ hat einen Standardwert, den `default` anschreibt. Felder und Array-Elemente bekommen ihn automatisch, lokale Variablen nicht: Sie müssen vor dem Lesen zugewiesen sein.
+
+## Prüfe dein Wissen
+
+<Quiz id="m04-l05-q1" />
+
+<Quiz id="m04-l05-q2" />
+
+<Quiz id="m04-l05-q3" />
+
+<Quiz id="m04-l05-q4" />
+
+<Quiz id="m04-l05-q5" />
+
+<Quiz id="m04-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m04-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m04-l05-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§8.3.12 Nullable value types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#8312-nullable-value-types)
+- Microsoft Learn: [Nullable value types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/nullable-value-types)
