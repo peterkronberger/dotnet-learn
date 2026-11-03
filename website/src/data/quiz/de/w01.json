@@ -587,6 +587,518 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm `TryParse` und `??` zusammen einsetzen? Beschreibe die Situation und was der Code bei fehlender oder falscher Eingabe tut.",
       "modelAnswer": "Zum Beispiel beim Einlesen einer Anzahl von der Konsole. `Console.ReadLine()` kann `null` liefern, `??` setzt dann einen Ersatztext. `TryParse` prüft, ob der Text eine Zahl ist, und liefert `false` statt eines Fehlers. Bei fehlender oder falscher Eingabe nimmt das Programm den `else`-Zweig, zum Beispiel eine Meldung oder einen Standardwert."
+    },
+    {
+      "id": "w01-l02-q1",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "`switch`-Anweisung mit Abschnitten und `break`",
+          "correct": true
+        },
+        {
+          "text": "`switch`-Ausdruck mit Mustern"
+        },
+        {
+          "text": "Bedingter Operator `?:`"
+        },
+        {
+          "text": "`do … while`-Schleife"
+        }
+      ],
+      "explanation": "Das Konzept ist die `switch`-Anweisung: jeder Abschnitt endet mit `break`, und es gibt kein Durchfallen. Du kennst es aus der Lektion „Die switch-Anweisung“ (`m02-l05`)."
+    },
+    {
+      "type": "cloze",
+      "question": "Ergänze die Lücken: Das Programm gibt für `level = 2` den Text `medium` aus. Jeder Abschnitt soll enden, bevor der nächste beginnt, und alle anderen Werte sollen `high` ergeben.",
+      "example": "w01/l02/switch-sections.cs",
+      "blanks": [
+        {
+          "text": "break",
+          "hint": "Eine Anweisung beendet den Abschnitt, damit der nächste nicht mitläuft."
+        },
+        {
+          "text": "default",
+          "hint": "Die Marke für alle übrigen Werte hat ein eigenes Schlüsselwort."
+        }
+      ],
+      "explanation": "`break` beendet den Abschnitt. Ohne `break` am Ende ist der Code ein Fehler, denn ein Abschnitt darf nicht in den nächsten durchfallen. `default` fängt alle Werte ab, für die keine `case`-Marke passt.",
+      "id": "w01-l02-q2",
+      "lesson": "w01-l02"
+    },
+    {
+      "id": "w01-l02-q3",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Im Programm fehlt in `case 1:` die Zeile `break;`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil der Abschnitt nicht enden darf, ohne dass er verlassen wird.",
+          "correct": true,
+          "feedback": "Richtig: In C# darf ein Abschnitt nicht in den nächsten durchfallen."
+        },
+        {
+          "text": "Nach `case 1` läuft der Code von `case 2` einfach mit.",
+          "feedback": "Das gilt in manchen anderen Sprachen. In C# ist es ein Compilerfehler.",
+          "misconception": "m02-l05-case-falls-through"
+        },
+        {
+          "text": "Das Programm ignoriert `case 1` und springt zu `default`.",
+          "feedback": "Es gibt keine Sonderregel für fehlende `break`-Zeilen: Der Compiler lehnt den Code ab."
+        },
+        {
+          "text": "Das Programm läuft normal, weil `break` in `switch` freiwillig ist.",
+          "feedback": "`break` oder eine andere Sprunganweisung ist Pflicht am Ende eines Abschnitts."
+        }
+      ],
+      "explanation": "Jeder `switch`-Abschnitt muss mit einer Sprunganweisung wie `break` enden. Durchfallen in den nächsten Abschnitt gibt es in C# nicht."
+    },
+    {
+      "id": "w01-l02-q4",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Ergebnis einer String-Methode der Variablen zuweisen",
+          "correct": true
+        },
+        {
+          "text": "Null-Koaleszenz `??`"
+        },
+        {
+          "text": "Gleichheit mit `ReferenceEquals`"
+        },
+        {
+          "text": "Boxing"
+        }
+      ],
+      "explanation": "Das Konzept ist die Unveränderlichkeit von Strings: eine Methode wie `Trim()` liefert einen neuen String. Du kennst es aus der Lektion „Strings sind unveränderlich“ (`m04-l07`)."
+    },
+    {
+      "type": "cloze",
+      "question": "Ergänze die Lücke: Die Variable `name` soll nach der Zeile den bereinigten Text `Bob` enthalten.",
+      "example": "w01/l02/trim-name.cs",
+      "blanks": [
+        {
+          "text": "name = name.Trim();",
+          "accept": [
+            "name = name.Trim();"
+          ],
+          "hint": "Das Ergebnis von `Trim()` muss irgendwo gespeichert werden.",
+          "wrongAnswers": [
+            {
+              "text": "name.Trim();",
+              "feedback": "`Trim()` ändert den String nicht, es liefert einen neuen. Ohne Zuweisung geht das Ergebnis verloren.",
+              "misconception": "m04-l07-string-method-changes-string"
+            }
+          ]
+        }
+      ],
+      "explanation": "Ein String ist unveränderlich. `Trim()` erzeugt einen neuen String ohne Leerzeichen am Rand und gibt ihn zurück. Erst die Zuweisung `name = …` lässt die Variable darauf zeigen.",
+      "id": "w01-l02-q5",
+      "lesson": "w01-l02"
+    },
+    {
+      "id": "w01-l02-q6",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Vergleich mit `==` statt Zuweisung mit `=`",
+          "correct": true
+        },
+        {
+          "text": "Explizite Umwandlung"
+        },
+        {
+          "text": "Verkettung von Text"
+        },
+        {
+          "text": "Ganzzahldivision"
+        }
+      ],
+      "explanation": "Das Konzept ist der Unterschied zwischen `=` (Zuweisung) und `==` (Vergleich). Du kennst es aus der Lektion „Variablen und eingebaute Typen“ (`m01-l02`) und „Entscheidungen mit if und else“ (`m02-l01`)."
+    },
+    {
+      "type": "cloze",
+      "question": "Ergänze die Lücke: Das Programm soll `Alert` ausgeben, wenn `failures` den Wert 3 hat. Setze den richtigen Operator ein.",
+      "example": "w01/l02/compare-failures.cs",
+      "blanks": [
+        {
+          "text": "==",
+          "hint": "Die Bedingung fragt, ob zwei Werte gleich sind. Sie soll nichts speichern.",
+          "wrongAnswers": [
+            {
+              "text": "=",
+              "feedback": "`=` weist zu. Eine Bedingung braucht einen Vergleich, der `true` oder `false` liefert.",
+              "misconception": "m01-l02-assignment-is-comparison"
+            }
+          ]
+        }
+      ],
+      "explanation": "`==` vergleicht und liefert einen `bool`. `=` weist einen Wert zu und passt nicht in eine Bedingung.",
+      "id": "w01-l02-q7",
+      "lesson": "w01-l02"
+    },
+    {
+      "id": "w01-l02-q8",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Überladen von Methoden",
+          "correct": true
+        },
+        {
+          "text": "Optionale Parameter"
+        },
+        {
+          "text": "`out`-Parameter"
+        },
+        {
+          "text": "Lokale Funktionen"
+        }
+      ],
+      "explanation": "Das Konzept ist das Überladen: Methoden mit gleichem Namen und verschiedener Signatur. Du kennst es aus der Lektion „Methoden überladen“ (`m03-l05`)."
+    },
+    {
+      "id": "w01-l02-q9",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Es gibt schon `string Describe(int value)`. Welche weitere Methode kannst du daneben als Überladung schreiben?",
+      "options": [
+        {
+          "text": "`string Describe(double value)`",
+          "correct": true,
+          "feedback": "Richtig: Der Parametertyp ist anders, also ist die Signatur anders."
+        },
+        {
+          "text": "`int Describe(int value)`",
+          "feedback": "Der Rückgabetyp gehört nicht zur Signatur. Beide Methoden hätten dieselbe Signatur.",
+          "misconception": "m03-l05-return-type-overloads"
+        },
+        {
+          "text": "`void Describe(int value)`",
+          "feedback": "Auch `void` ändert die Signatur nicht. Name und Parametertypen sind gleich.",
+          "misconception": "m03-l05-return-type-overloads"
+        }
+      ],
+      "explanation": "Die Signatur besteht aus dem Namen und den Parametertypen. Der Rückgabetyp zählt nicht dazu. Nur ein anderer Parametertyp oder eine andere Parameteranzahl gibt eine gültige Überladung."
+    },
+    {
+      "id": "w01-l02-q10",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Schleifendurchlauf überspringen mit `continue`",
+          "correct": true
+        },
+        {
+          "text": "Schleife beenden mit `break`"
+        },
+        {
+          "text": "Verschachtelte Schleifen"
+        },
+        {
+          "text": "`do … while`-Schleife"
+        }
+      ],
+      "explanation": "Das Konzept ist `continue`: Der Rest des aktuellen Durchlaufs wird übersprungen, die Schleife läuft weiter. Du kennst es aus der Lektion „Schleifen steuern: break und continue“ (`m02-l08`)."
+    },
+    {
+      "id": "w01-l02-q11",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Was macht `continue` in einer `for`-Schleife?",
+      "options": [
+        {
+          "text": "Es überspringt den Rest des aktuellen Durchlaufs und macht mit dem nächsten weiter.",
+          "correct": true,
+          "feedback": "Richtig: Danach läuft der Zähler weiter."
+        },
+        {
+          "text": "Es beendet die ganze Schleife.",
+          "feedback": "Das macht `break`. `continue` springt nur zum nächsten Durchlauf.",
+          "misconception": "m02-l08-continue-ends-loop"
+        },
+        {
+          "text": "Es beendet die Methode, in der die Schleife steht.",
+          "feedback": "Eine Methode beendet `return`. `continue` betrifft nur die Schleife."
+        }
+      ],
+      "explanation": "`continue` springt zum nächsten Durchlauf. Bei `for` wird zuerst der Zähler erhöht, dann die Bedingung geprüft."
+    },
+    {
+      "id": "w01-l02-q12",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Text in eine Zahl umwandeln mit `TryParse`",
+          "correct": true
+        },
+        {
+          "text": "Verkettung von Text"
+        },
+        {
+          "text": "Explizite Umwandlung (Cast)"
+        },
+        {
+          "text": "Interpolation mit Formatangabe"
+        }
+      ],
+      "explanation": "Das Konzept ist `TryParse`: Der `bool`-Rückgabewert sagt, ob die Umwandlung geklappt hat. Du kennst es aus der Lektion „Text in Zahlen umwandeln: Parse und TryParse“ (`m01-l08`)."
+    },
+    {
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Das Programm wandelt `text` um und gibt je nach Ergebnis die Zahl oder einen Hinweis aus.",
+      "example": "w01/l02/try-parse-flow.cs",
+      "distractors": [
+        "int number = int.Parse(text);"
+      ],
+      "explanation": "Zuerst braucht `text` einen Wert. Dann prüft `if` das `bool`-Ergebnis von `TryParse`, und `out int number` legt die Zahl an. Im `if`-Zweig steht die Ausgabe der Zahl, im `else`-Zweig der Hinweis. `int.Parse` gehört nicht dazu: Die Zeile legt `number` schon an, und `TryParse` im `if` könnte es nicht noch einmal deklarieren.",
+      "id": "w01-l02-q13",
+      "lesson": "w01-l02"
+    },
+    {
+      "id": "w01-l02-q14",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "`int n = 5;` und danach `int.TryParse(\"abc\", out n);`. Welchen Wert hat `n` danach?",
+      "options": [
+        {
+          "text": "`0`",
+          "correct": true,
+          "feedback": "Richtig: Bei einem Fehler ist die Zahl immer `0`."
+        },
+        {
+          "text": "`5`",
+          "feedback": "Der alte Wert bleibt nicht erhalten: `out` setzt `n` immer, auch bei Fehlschlag.",
+          "misconception": "m01-l08-tryparse-keeps-old-value"
+        },
+        {
+          "text": "`-1`",
+          "feedback": "Einen Fehlerwert wie `-1` setzt `TryParse` nicht. Es setzt `0`."
+        },
+        {
+          "text": "Das Programm bricht mit einem Fehler ab.",
+          "feedback": "`TryParse` löst bei ungültigem Text keinen Fehler aus. Es liefert `false`."
+        }
+      ],
+      "explanation": "Bei ungültigem Text liefert `TryParse` `false` und setzt `n` auf `0`. Der frühere Wert geht verloren. Deshalb prüfst du immer zuerst das `bool`-Ergebnis."
+    },
+    {
+      "id": "w01-l02-q15",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Mehrere Ergebnisse mit einem `out`-Parameter zurückgeben",
+          "correct": true
+        },
+        {
+          "text": "Wertparameter"
+        },
+        {
+          "text": "Rekursion"
+        },
+        {
+          "text": "Optionale Parameter"
+        }
+      ],
+      "explanation": "Das Konzept ist der `out`-Parameter: Die Methode muss ihn auf jedem Weg zuweisen. Du kennst es aus der Lektion „ref, out und in“ (`m03-l08`)."
+    },
+    {
+      "type": "cloze",
+      "question": "Ergänze die Lücken: `TryHalf` gibt die Hälfte über einen Ausgabeparameter zurück. Bei ungeraden Zahlen soll sie `false` liefern, aber `half` trotzdem einen Wert haben.",
+      "example": "w01/l02/try-half.cs",
+      "blanks": [
+        {
+          "text": "out",
+          "hint": "Der Parameter gibt einen Wert an den Aufrufer zurück. Er muss vorher keinen Wert haben.",
+          "wrongAnswers": [
+            {
+              "text": "ref",
+              "feedback": "Ein `ref`-Argument braucht schon vor dem Aufruf einen Wert. `result` ist aber noch nicht zugewiesen.",
+              "misconception": "m03-l08-out-may-stay-unassigned"
+            }
+          ]
+        },
+        {
+          "text": "half = 0;",
+          "accept": [
+            "half = 0;",
+            "half=0;"
+          ],
+          "hint": "Der Parameter wird zugewiesen, bevor die Methode im ungeraden Fall zurückkehrt."
+        }
+      ],
+      "explanation": "`out` verlangt keinen Wert vor dem Aufruf, aber die Methode muss den Parameter auf jedem Weg zuweisen, bevor sie zurückkehrt. Die Zuweisung `half = 0;` steht deshalb vor dem frühen `return false`.",
+      "id": "w01-l02-q16",
+      "lesson": "w01-l02"
+    },
+    {
+      "id": "w01-l02-q17",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Du löschst in `TryHalf` die Zeile `half = 0;`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `half` beim `return false` noch nicht zugewiesen ist.",
+          "correct": true,
+          "feedback": "Richtig: Ein `out`-Parameter muss vor jedem `return` einen Wert haben."
+        },
+        {
+          "text": "Das Programm läuft, `half` bleibt einfach leer.",
+          "feedback": "Einen leeren `out`-Parameter gibt es nicht. Der Compiler verlangt eine Zuweisung auf jedem Weg.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        },
+        {
+          "text": "Das Programm läuft, `half` ist beim `return false` automatisch `0`.",
+          "feedback": "Ein `out`-Parameter bekommt keinen automatischen Wert. Du musst zuweisen.",
+          "misconception": "m03-l08-out-may-stay-unassigned"
+        }
+      ],
+      "explanation": "Der Compiler prüft, dass ein `out`-Parameter auf jedem Weg zugewiesen ist, bevor die Methode zurückkehrt."
+    },
+    {
+      "id": "w01-l02-q18",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Gleichheit von Objekten prüfen: `==`, `Equals` und `ReferenceEquals`",
+          "correct": true
+        },
+        {
+          "text": "Boxing und Unboxing"
+        },
+        {
+          "text": "Nullable-Verweistypen"
+        },
+        {
+          "text": "Kopie eines Werttyps"
+        }
+      ],
+      "explanation": "Das Konzept ist die Gleichheit bei Strings: `==` vergleicht den Inhalt, `ReferenceEquals` das Objekt. Du kennst es aus der Lektion „Gleichheit: == und Equals“ (`m04-l08`)."
+    },
+    {
+      "id": "w01-l02-q19",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Zwei Strings `a` und `b` haben denselben Text `ab`, sind aber zwei getrennte Objekte (zum Beispiel aus zwei `StringBuilder.ToString()`-Aufrufen). Was liefern `a == b` und `object.ReferenceEquals(a, b)`?",
+      "options": [
+        {
+          "text": "`True` und `False`",
+          "correct": true,
+          "feedback": "Richtig: gleicher Inhalt, aber nicht dasselbe Objekt."
+        },
+        {
+          "text": "`True` und `True`",
+          "feedback": "`ReferenceEquals` fragt, ob beide Variablen auf dasselbe Objekt zeigen. Das ist hier nicht der Fall.",
+          "misconception": "m04-l08-string-equality-compares-references"
+        },
+        {
+          "text": "`False` und `False`",
+          "feedback": "Bei `string` vergleicht `==` den Inhalt, nicht die Verweise. Der Inhalt ist gleich.",
+          "misconception": "m04-l08-string-equality-compares-references"
+        },
+        {
+          "text": "`False` und `True`",
+          "feedback": "Das ist umgekehrt: `==` vergleicht den Inhalt, `ReferenceEquals` das Objekt."
+        }
+      ],
+      "explanation": "`string` vergleicht mit `==` den Inhalt. `object.ReferenceEquals` prüft, ob beide Verweise auf dasselbe Objekt zeigen."
+    },
+    {
+      "id": "w01-l02-q20",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Ganzzahldivision und Umwandlung mit `(double)`",
+          "correct": true
+        },
+        {
+          "text": "Verkettung von Text und Zahlen"
+        },
+        {
+          "text": "Parse und TryParse"
+        },
+        {
+          "text": "Überlauf mit `checked`"
+        }
+      ],
+      "explanation": "Das Konzept ist Ganzzahldivision: Mit zwei `int`-Operanden wird der Rest abgeschnitten. Ein Cast auf `double` vor der Division behält die Nachkommastellen. Du kennst es aus der Lektion „Ganzzahlen, Gleitkommazahlen und decimal“ (`m01-l03`) und „Explizite Umwandlungen und Überlauf“ (`m01-l07`)."
+    },
+    {
+      "id": "w01-l02-q21",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Rekursion mit Basisfall",
+          "correct": true
+        },
+        {
+          "text": "Wertparameter"
+        },
+        {
+          "text": "`out`-Parameter"
+        },
+        {
+          "text": "Überladen"
+        }
+      ],
+      "explanation": "Das Konzept ist Rekursion: Die Methode ruft sich mit einem kleineren Problem selbst auf und hat einen Basisfall. Du kennst es aus der Lektion „Rekursion und der Aufrufstapel“ (`m03-l10`)."
+    },
+    {
+      "id": "w01-l02-q22",
+      "lesson": "w01-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier?",
+      "options": [
+        {
+          "text": "Ersatzwert für `null` mit `??`",
+          "correct": true
+        },
+        {
+          "text": "Bedingter Operator `?:`"
+        },
+        {
+          "text": "Parse und TryParse"
+        },
+        {
+          "text": "Boxing"
+        }
+      ],
+      "explanation": "Das Konzept ist der Null-Koaleszenz-Operator `??`: Er liefert den Ersatzwert, wenn der linke Wert `null` ist. Du kennst es aus der Lektion „Null-sichere Operatoren“ (`m04-l06`)."
+    },
+    {
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wie erkennst du bei einer Aufgabe, welches Konzept sie braucht? Nenne ein Beispiel aus dieser Lektion.",
+      "modelAnswer": "Ich suche in der Aufgabe das auffällige Merkmal: einen Vergleich, eine Division mit zwei `int`-Werten, einen Text, der zu einer Zahl werden soll, oder einen Wert, der `null` sein kann. Dann frage ich mich, welches Konzept dieses Verhalten bestimmt, bevor ich Code schreibe.\n\nBeispiel: Soll ein Durchschnitt `3.5` ergeben, brauche ich eine Umwandlung nach `double` vor der Division. Sonst rechnet C# mit `int` und schneidet den Rest ab.",
+      "id": "w01-l02-q23",
+      "lesson": "w01-l02"
+    },
+    {
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm eine Methode mit `out`-Parameter nach dem Muster von `TryHalf` schreiben, und warum ist sie dort besser als eine Methode, die bei einem Fehler einen Sonderwert zurückgibt?",
+      "modelAnswer": "Zum Beispiel beim Lesen einer Zahl aus einer Konfiguration oder einer Log-Zeile: `bool TryReadCount(string text, out int count)`. Der `bool` sagt, ob es geklappt hat, und `count` liefert den Wert.\n\nEin Sonderwert wie `-1` kann selbst ein gültiges Ergebnis sein. Der `bool` trennt Erfolg und Wert eindeutig.",
+      "id": "w01-l02-q24",
+      "lesson": "w01-l02"
     }
   ]
 }
