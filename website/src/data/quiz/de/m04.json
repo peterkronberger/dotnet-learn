@@ -1,4 +1,272 @@
 {
   "module": "m04",
-  "questions": []
+  "questions": [
+    {
+      "id": "m04-l01-q1",
+      "lesson": "m04-l01",
+      "type": "single",
+      "question": "Welcher dieser Typen ist ein Referenztyp?",
+      "options": [
+        { "text": "`int`", "feedback": "`int` ist ein Werttyp. Die Variable enthält die Zahl selbst." },
+        { "text": "`StringBuilder`", "correct": true, "feedback": "Eine Variable vom Typ `StringBuilder` enthält nur einen Verweis auf ein Objekt." },
+        { "text": "`bool`", "feedback": "`bool` ist ein Werttyp. Die Variable enthält `true` oder `false` selbst." },
+        { "text": "`char`", "feedback": "`char` ist ein Werttyp. Die Variable enthält das Zeichen selbst." }
+      ],
+      "explanation": "Bei einem Werttyp enthält die Variable den Wert. Bei einem Referenztyp enthält sie einen Verweis auf ein Objekt. `int`, `bool` und `char` sind Werttypen, `StringBuilder` ist ein Referenztyp."
+    },
+    {
+      "id": "m04-l01-q2",
+      "lesson": "m04-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l01/quiz-copy.cs",
+      "explanation": "`b = a` kopiert die Zahl, darum ändert `b++` nur `b`: Die erste Zeile ist `1 2`. `y = x` kopiert nur den Verweis. `x` und `y` zeigen auf dasselbe Objekt, und `Append` hängt dort `1` an. Beide Variablen zeigen darum `11`."
+    },
+    {
+      "id": "m04-l01-q3",
+      "lesson": "m04-l01",
+      "type": "single",
+      "question": "Es gilt `var a = new StringBuilder(\"x\"); var b = a; b.Append(\"y\");`. Welchen Text zeigt `a` danach?",
+      "options": [
+        { "text": "`x`, weil `b = a` das Objekt kopiert hat", "misconception": "m04-l01-assignment-copies-object", "feedback": "Die Zuweisung kopiert bei einem Referenztyp nur den Verweis. Es gibt weiterhin nur ein Objekt." },
+        { "text": "`xy`, weil `a` und `b` auf dasselbe Objekt zeigen", "correct": true, "feedback": "Es gibt ein Objekt. `Append` ändert es, und beide Variablen zeigen darauf." },
+        { "text": "`y`, weil `Append` den alten Text ersetzt", "feedback": "`Append` hängt Text an, es ersetzt nichts." },
+        { "text": "Der Compiler meldet einen Fehler, weil zwei Variablen nicht dasselbe Objekt haben dürfen", "feedback": "Zwei Variablen dürfen auf dasselbe Objekt zeigen. Das ist bei Referenztypen der Normalfall." }
+      ],
+      "explanation": "`var b = a;` kopiert den Verweis, nicht das Objekt. Danach zeigen `a` und `b` auf dasselbe Objekt, und jede Änderung über `b` ist auch über `a` zu sehen."
+    },
+    {
+      "id": "m04-l01-q4",
+      "lesson": "m04-l01",
+      "type": "single",
+      "question": "Was ist `int` im Verhältnis zu `System.Int32`?",
+      "options": [
+        { "text": "Ein anderer Name für denselben Typ, einen vordefinierten Werttyp", "correct": true, "feedback": "`int` ist das Schlüsselwort für `System.Int32`." },
+        { "text": "Ein eigener Referenztyp, der `System.Int32` umhüllt", "feedback": "Es gibt keine Umhüllung. Beide Namen bezeichnen denselben Werttyp." },
+        { "text": "Ein Typ mit weniger Bits als `System.Int32`", "feedback": "Beide haben dieselbe Größe, denn es ist derselbe Typ." }
+      ],
+      "explanation": "Die einfachen Typen sind Schlüsselwörter für vordefinierte Werttypen im Namespace `System`. `int` und `Int32` sind austauschbar."
+    },
+    {
+      "id": "m04-l01-q5",
+      "lesson": "m04-l01",
+      "type": "multi",
+      "question": "Welche Aussagen stimmen?",
+      "options": [
+        { "text": "Zwei Variablen können auf dasselbe Objekt zeigen.", "correct": true },
+        { "text": "Jeder Typ stammt direkt oder indirekt von `object` ab.", "correct": true },
+        { "text": "Bei einem Werttyp hat jede Variable ihre eigene Kopie des Werts.", "correct": true },
+        { "text": "Eine Zuweisung zwischen zwei Variablen eines Referenztyps kopiert das Objekt.", "misconception": "m04-l01-assignment-copies-object", "feedback": "Sie kopiert nur den Verweis. Das Objekt bleibt dasselbe." }
+      ],
+      "explanation": "Werttypen kopieren den Wert, Referenztypen kopieren den Verweis. Darum können mehrere Variablen ein Objekt teilen. `object` ist die Wurzel aller Typen."
+    },
+    {
+      "id": "m04-l01-q6",
+      "lesson": "m04-l01",
+      "type": "single",
+      "question": "Was bewirkt `var findings = new StringBuilder();`?",
+      "options": [
+        { "text": "Es erzeugt ein neues Objekt, und `findings` enthält den Verweis darauf.", "correct": true, "feedback": "`new` erzeugt das Objekt, die Variable merkt sich nur den Verweis." },
+        { "text": "Es legt einen leeren Text direkt in der Variablen ab, wie bei `int`.", "feedback": "Die Variable eines Referenztyps enthält nie das Objekt selbst, sondern einen Verweis." },
+        { "text": "Es kopiert ein vorhandenes `StringBuilder`-Objekt.", "feedback": "`new` erzeugt immer ein neues Objekt. Es kopiert nichts." }
+      ],
+      "explanation": "`new StringBuilder()` erzeugt ein Objekt. Das Ergebnis ist ein Verweis, den `var findings` speichert."
+    },
+    {
+      "id": "m04-l01-q7",
+      "lesson": "m04-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum nach `var b = a;` bei einem `StringBuilder` beide Variablen denselben Text zeigen, bei einem `int` aber nicht.",
+      "modelAnswer": "Bei einem `int` enthält die Variable die Zahl selbst. `b = a` kopiert die Zahl, und danach sind beide Variablen unabhängig.\n\nBei einem `StringBuilder` enthält die Variable nur einen Verweis auf ein Objekt. `b = a` kopiert den Verweis. Es gibt weiterhin nur ein Objekt, und beide Variablen zeigen darauf. Eine Änderung über `b` ist darum auch über `a` zu sehen."
+    },
+    {
+      "id": "m04-l01-q8",
+      "lesson": "m04-l01",
+      "type": "single",
+      "question": "Zwei Stellen von SecLog sollen ihre Befunde in denselben Text schreiben. Was löst das?",
+      "options": [
+        { "text": "Beide Stellen nutzen Variablen, die auf dasselbe `StringBuilder`-Objekt zeigen.", "correct": true, "feedback": "Ein gemeinsames Objekt sieht jede Änderung für alle, die darauf zeigen." },
+        { "text": "Jede Stelle bekommt ihre eigene `int`-Variable mit einem Teil des Textes.", "feedback": "Ein `int` enthält eine Zahl, keinen Text. Außerdem wäre jede Variable eine eigene Kopie." },
+        { "text": "Jede Stelle kopiert den Text mit `=` in ein eigenes Objekt und ändert es.", "misconception": "m04-l01-assignment-copies-object", "feedback": "`=` kopiert bei einem Referenztyp nur den Verweis und legt kein eigenes Objekt an. Ein eigenes Objekt braucht `new`, und es würde den Text nicht teilen." }
+      ],
+      "explanation": "Ein Referenztyp passt, wenn mehrere Stellen dasselbe Objekt ändern sollen. Bei einem Werttyp hätte jede Stelle ihre eigene Kopie."
+    },
+    {
+      "id": "m04-l02-q1",
+      "lesson": "m04-l02",
+      "type": "single",
+      "question": "Welche Aussage über den Ort von Werten ist richtig?",
+      "options": [
+        { "text": "Die Sprache legt nicht fest, wo ein Wert im Speicher liegt.", "correct": true, "feedback": "Die Sprache verlangt nur automatische Speicherverwaltung. Der Ort ist ein Detail der Laufzeitumgebung." },
+        { "text": "Werte von Werttypen liegen immer auf dem Stack.", "misconception": "m04-l02-value-types-on-stack", "feedback": "Das ist keine Regel der Sprache. Das Stack-Heap-Modell beschreibt eine Laufzeitumgebung, nicht die Sprache." },
+        { "text": "Der Heap ist ein Teil der Sprache C#, so wie `if`.", "feedback": "Stack und Heap kommen in den Regeln der Sprache nicht vor. Es ist ein Modell der Laufzeitumgebung." },
+        { "text": "Objekte von Referenztypen liegen auf dem Stack, sobald sie klein sind.", "feedback": "Eine solche Regel gibt es in der Sprache nicht." }
+      ],
+      "explanation": "Die Sprache verspricht automatische Speicherverwaltung, aber keinen bestimmten Ort. Darum ist \"Werttypen liegen immer auf dem Stack\" keine Aussage über C#."
+    },
+    {
+      "id": "m04-l02-q2",
+      "lesson": "m04-l02",
+      "type": "single",
+      "question": "Was ist das Stack-Heap-Modell?",
+      "options": [
+        { "text": "Ein Denkmodell, das beschreibt, wo Werte in einer Laufzeitumgebung liegen könnten", "correct": true, "feedback": "Das Modell hilft beim Verstehen. Es gehört zur Laufzeitumgebung, nicht zur Sprache." },
+        { "text": "Eine Regel der Sprache, die jeder Compiler einhalten muss", "feedback": "Die Sprachregeln verlangen nur automatische Speicherverwaltung." },
+        { "text": "Ein Befehl, mit dem du Speicher selbst anforderst", "feedback": "In C# forderst du Speicher für Objekte nicht selbst an oder gibst ihn frei." }
+      ],
+      "explanation": "Das Modell zeigt: Aufrufe haben Frames auf dem Stack, Objekte liegen auf dem Heap. Es ist eine Hilfe zum Verstehen und keine Regel der Sprache."
+    },
+    {
+      "id": "m04-l02-q3",
+      "lesson": "m04-l02",
+      "type": "multi",
+      "question": "Was bedeutet automatische Speicherverwaltung für dich?",
+      "options": [
+        { "text": "Du musst Speicher für Objekte nicht selbst freigeben.", "correct": true },
+        { "text": "Der Garbage Collector gibt Objekte frei, die das Programm nicht mehr erreichen kann.", "correct": true },
+        { "text": "Du bestimmst den genauen Zeitpunkt, zu dem ein Objekt freigegeben wird.", "feedback": "Den Zeitpunkt legt die Laufzeitumgebung fest, nicht du." },
+        { "text": "Die Sprache legt fest, dass alle Objekte auf dem Heap liegen.", "feedback": "Die Sprache nennt keinen Ort. Das Modell ist ein Detail der Laufzeitumgebung." }
+      ],
+      "explanation": "Die Laufzeitumgebung verwaltet den Speicher. Du schreibst kein Freigeben von Objekten."
+    },
+    {
+      "id": "m04-l02-q4",
+      "lesson": "m04-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l02/quiz-frames.cs",
+      "explanation": "`alias` und `target` zeigen auf dasselbe Objekt wie `report`. `Append(\"!\")` ändert dieses eine Objekt. Wenn `Mark` endet, verschwindet der Frame, aber `report` zeigt weiter auf das Objekt: `bob!`."
+    },
+    {
+      "id": "m04-l02-q5",
+      "lesson": "m04-l02",
+      "type": "single",
+      "question": "Im Stack-Heap-Modell: Wo liegt was bei `var text = new StringBuilder(\"log\");` im Hauptprogramm?",
+      "options": [
+        { "text": "Die Variable `text` mit dem Verweis liegt im Frame, das `StringBuilder`-Objekt liegt auf dem Heap.", "correct": true, "feedback": "So zeigt es das Modell: Der Frame hält den Verweis, das Objekt liegt auf dem Heap." },
+        { "text": "Beides liegt im Frame, weil `text` eine lokale Variable ist.", "feedback": "Nach dem Modell liegen die Objekte von Referenztypen auf dem Heap." },
+        { "text": "Beides liegt auf dem Heap, ein Frame ist nur für Methoden da.", "feedback": "Auch das Hauptprogramm läuft in einem Frame, der seine lokalen Variablen hält." }
+      ],
+      "explanation": "Die Variable ist ein Verweis und liegt im Frame. Das Objekt, auf das sie zeigt, liegt auf dem Heap."
+    },
+    {
+      "id": "m04-l02-q6",
+      "lesson": "m04-l02",
+      "type": "single",
+      "question": "Eine Methode legt mit `new StringBuilder()` ein Objekt an und gibt die Variable als Ergebnis zurück. Was passiert mit dem Objekt, wenn der Frame der Methode verschwindet?",
+      "options": [
+        { "text": "Es bleibt bestehen, solange eine Variable darauf zeigt.", "correct": true, "feedback": "Der Frame verschwindet, das Objekt nicht. Es wird erst freigegeben, wenn es niemand mehr erreichen kann." },
+        { "text": "Es wird sofort mit dem Frame gelöscht.", "feedback": "Das Objekt liegt nach dem Modell auf dem Heap und gehört nicht zum Frame." },
+        { "text": "Du musst es selbst freigeben, sonst bleibt es für immer.", "feedback": "Das übernimmt der Garbage Collector." }
+      ],
+      "explanation": "Ein Frame verschwindet mit dem Aufruf. Objekte auf dem Heap bleiben, bis das Programm sie nicht mehr erreichen kann. Dann gibt der Garbage Collector sie frei."
+    },
+    {
+      "id": "m04-l02-q7",
+      "lesson": "m04-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum das Stack-Heap-Modell eine Eigenschaft der Laufzeitumgebung beschreibt und keine Regel der Sprache ist.",
+      "modelAnswer": "Die Sprache C# verlangt nur automatische Speicherverwaltung: Du forderst Objekte an, und die Laufzeitumgebung gibt sie wieder frei. Wo ein Wert liegt, steht nicht in den Regeln der Sprache.\n\nStack und Heap beschreiben, wie eine Laufzeitumgebung es tun könnte. Das Modell hilft beim Verstehen von Aufrufen und Objekten, aber ein Programm darf sich nicht darauf verlassen."
+    },
+    {
+      "id": "m04-l02-q8",
+      "lesson": "m04-l02",
+      "type": "single",
+      "question": "Ein Kollege sagt: \"Ein `int` liegt immer auf dem Stack, darum musst du dich nie um den Speicher kümmern.\" Was passt als Antwort?",
+      "options": [
+        { "text": "Du musst dich um den Speicher ohnehin nicht kümmern, denn die Sprache verwaltet ihn automatisch. Wo ein Wert liegt, legt sie nicht fest.", "correct": true, "feedback": "Das Ergebnis stimmt, die Begründung nicht: Der Ort ist ein Detail der Laufzeitumgebung." },
+        { "text": "Stimmt, das ist eine feste Regel von C#.", "misconception": "m04-l02-value-types-on-stack", "feedback": "Eine solche Regel gibt es nicht." },
+        { "text": "Stimmt nicht: `int` liegt immer auf dem Heap.", "feedback": "Auch das legt die Sprache nicht fest." }
+      ],
+      "explanation": "Die Sprache gibt keinen Ort vor. Dass du Speicher nicht selbst verwaltest, liegt an der automatischen Speicherverwaltung."
+    },
+    {
+      "id": "m04-l03-q1",
+      "lesson": "m04-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m04/l03/quiz-ref-builder.cs",
+      "explanation": "`left` und `right` sind Aliase für `a` und `b`. `Swap` vertauscht, welche Verweise die Variablen des Aufrufers enthalten: `a` zeigt danach auf das Objekt `b`, und `b` auf das Objekt `a`. Die Ausgabe ist `b a`."
+    },
+    {
+      "id": "m04-l03-q2",
+      "lesson": "m04-l03",
+      "type": "single",
+      "question": "Eine Methode bekommt einen `StringBuilder` als Wertparameter und ruft `Append` auf. Sieht der Aufrufer die Änderung?",
+      "options": [
+        { "text": "Ja, denn der Parameter enthält eine Kopie des Verweises auf dasselbe Objekt.", "correct": true, "feedback": "Beide Verweise zeigen auf ein Objekt, und `Append` ändert dieses Objekt." },
+        { "text": "Nein, denn ein Wertparameter bekommt immer eine Kopie des Objekts.", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Kopiert wird nur der Verweis, nicht das Objekt." },
+        { "text": "Nein, denn ohne `ref` kann eine Methode keine Objekte ändern.", "feedback": "`ref` braucht man nicht, um ein Objekt zu ändern, sondern um die Variable des Aufrufers zu ändern." }
+      ],
+      "explanation": "Der Wertparameter enthält eine Kopie des Verweises. Die Methode kann damit das Objekt ändern, das der Aufrufer auch sieht."
+    },
+    {
+      "id": "m04-l03-q3",
+      "lesson": "m04-l03",
+      "type": "single",
+      "question": "Eine Methode mit Wertparameter `StringBuilder builder` führt `builder = new StringBuilder(\"new\");` aus. Was sieht der Aufrufer?",
+      "options": [
+        { "text": "Seine Variable zeigt weiter auf das alte Objekt.", "correct": true, "feedback": "Die Zuweisung ändert nur den Parameter, also die Kopie des Verweises." },
+        { "text": "Seine Variable zeigt jetzt auf das neue Objekt, weil Referenztypen per Referenz übergeben werden.", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Ohne `ref` wird der Verweis als Wert übergeben. Eine Zuweisung an den Parameter erreicht den Aufrufer nicht." },
+        { "text": "Das Programm lässt sich nicht übersetzen.", "feedback": "Die Zuweisung an einen Parameter ist erlaubt." }
+      ],
+      "explanation": "Der Parameter ist eine eigene lokale Variable. Die Zuweisung ersetzt nur seinen Verweis."
+    },
+    {
+      "id": "m04-l03-q4",
+      "lesson": "m04-l03",
+      "type": "single",
+      "question": "Was wird ohne `ref` beim Aufruf mit einem Referenztyp übergeben?",
+      "options": [
+        { "text": "Eine Kopie des Verweises", "correct": true, "feedback": "Der Parameter bekommt eine Kopie des Werts der Variablen, und dieser Wert ist der Verweis." },
+        { "text": "Eine Kopie des Objekts", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Das Objekt wird nie kopiert." },
+        { "text": "Die Variable des Aufrufers selbst", "feedback": "Das passiert nur mit `ref`." }
+      ],
+      "explanation": "Ohne `ref` wird immer der Wert der Variablen übergeben. Bei einem Referenztyp ist dieser Wert der Verweis."
+    },
+    {
+      "id": "m04-l03-q5",
+      "lesson": "m04-l03",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `ref StringBuilder builder` und führt `builder = new StringBuilder(\"new\");` aus. Was sieht der Aufrufer?",
+      "options": [
+        { "text": "Seine Variable zeigt jetzt auf das neue Objekt.", "correct": true, "feedback": "Der Parameter ist ein zweiter Name für die Variable des Aufrufers." },
+        { "text": "Seine Variable zeigt weiter auf das alte Objekt.", "feedback": "Das wäre bei einem Wertparameter so. Mit `ref` ist der Parameter dieselbe Variable." },
+        { "text": "Beide Objekte werden zu einem zusammengeführt.", "feedback": "Objekte werden nie zusammengeführt. Es ändert sich nur, worauf die Variable zeigt." }
+      ],
+      "explanation": "Ein `ref`-Parameter ist ein Alias für die Variable des Aufrufers. Eine Zuweisung an ihn ändert diese Variable."
+    },
+    {
+      "id": "m04-l03-q6",
+      "lesson": "m04-l03",
+      "type": "multi",
+      "question": "Welche Aussagen stimmen?",
+      "options": [
+        { "text": "Ein Wertparameter eines Referenztyps kann das Objekt ändern.", "correct": true },
+        { "text": "Ein `ref`-Parameter kann die Variable des Aufrufers auf ein anderes Objekt zeigen lassen.", "correct": true },
+        { "text": "Ein `int` als Wertparameter kann die Variable des Aufrufers nicht ändern.", "correct": true },
+        { "text": "Referenztypen werden ohne `ref` per Referenz übergeben.", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Ohne `ref` wird ein Wert übergeben. Bei einem Referenztyp ist dieser Wert ein Verweis." }
+      ],
+      "explanation": "Zwei Fragen sind getrennt: Ist der Typ ein Werttyp oder Referenztyp? Und ist der Parameter ein Wertparameter oder ein `ref`-Parameter?"
+    },
+    {
+      "id": "m04-l03-q7",
+      "lesson": "m04-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen \"Referenztyp\" und \"Übergabe per Referenz\".",
+      "modelAnswer": "\"Referenztyp\" sagt etwas über den Typ: Die Variable enthält einen Verweis auf ein Objekt.\n\n\"Übergabe per Referenz\" sagt etwas über den Parameter: Er ist mit `ref` ein zweiter Name für die Variable des Aufrufers.\n\nOhne `ref` wird auch bei einem Referenztyp ein Wert übergeben, nämlich eine Kopie des Verweises. Die Methode kann damit das Objekt ändern, aber nicht die Variable des Aufrufers."
+    },
+    {
+      "id": "m04-l03-q8",
+      "lesson": "m04-l03",
+      "type": "single",
+      "question": "Eine Methode soll die Variable des Aufrufers durch einen neuen, leeren `StringBuilder` ersetzen. Was brauchst du?",
+      "options": [
+        { "text": "Einen `ref`-Parameter, denn die Variable des Aufrufers soll sich ändern.", "correct": true, "feedback": "Nur ein Alias für die Variable kann sie auf ein neues Objekt zeigen lassen." },
+        { "text": "Einen Wertparameter, denn ein `StringBuilder` ist ein Referenztyp und wird per Referenz übergeben.", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Ein Wertparameter bekommt eine Kopie des Verweises. Die Zuweisung erreicht die Variable des Aufrufers nicht." },
+        { "text": "Gar nichts, `new` in der Methode reicht.", "feedback": "Das neue Objekt gehört dann nur dem Parameter." }
+      ],
+      "explanation": "Soll sich die Variable des Aufrufers ändern, braucht die Methode einen `ref`-Parameter. Soll nur das Objekt ändern, reicht ein Wertparameter."
+    }
+  ]
 }

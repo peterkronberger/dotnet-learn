@@ -117,34 +117,38 @@
       "term": "Value Type",
       "german": "Werttyp",
       "category": "language",
-      "definition": "Ein Typ, dessen Variable den Wert selbst enthält. Eine Zuweisung kopiert den Wert. Beispiele: `int`, `double`, `bool`.",
+      "definition": "Ein Typ, dessen Variable den Wert selbst enthält. Eine Zuweisung kopiert den Wert, danach sind beide Variablen unabhängig. Beispiele: `int`, `double`, `bool`, `char`, Tupel.",
       "aliases": [
         "Werttypen"
       ],
       "related": [
-        "reference-type"
+        "reference-type",
+        "simple-type"
       ],
       "source": {
         "title": "Value types (C# reference)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/value-types"
-      }
+      },
+      "lesson": "m04-l01"
     },
     {
       "id": "reference-type",
       "term": "Reference Type",
       "german": "Referenztyp",
       "category": "language",
-      "definition": "Ein Typ, dessen Variable nur einen Verweis auf ein Objekt enthält. Eine Zuweisung kopiert den Verweis, nicht das Objekt. Beispiele: `string`, Arrays, Klassen.",
+      "definition": "Ein Typ, dessen Variable nur einen Verweis auf ein Objekt enthält. Eine Zuweisung kopiert den Verweis, nicht das Objekt. Beispiele: `string`, `StringBuilder`.",
       "aliases": [
         "Referenztypen"
       ],
       "related": [
-        "value-type"
+        "value-type",
+        "object"
       ],
       "source": {
         "title": "Reference types (C# reference)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/reference-types"
-      }
+      },
+      "lesson": "m04-l01"
     },
     {
       "id": "integer-division",
@@ -2447,6 +2451,157 @@
       "source": {
         "title": "StackOverflowException (.NET API)",
         "url": "https://learn.microsoft.com/dotnet/api/system.stackoverflowexception"
+      }
+    },
+    {
+      "id": "object",
+      "term": "Object",
+      "german": "Objekt",
+      "category": "language",
+      "definition": "Eine Instanz eines Referenztyps. Eine Variable eines Referenztyps enthält einen Verweis auf ein Objekt. Zwei Variablen können auf dasselbe Objekt zeigen. `object` ist außerdem der Typ, von dem alle Typen abstammen.",
+      "aliases": [
+        "Objekte",
+        "object"
+      ],
+      "related": [
+        "reference-type",
+        "value-type"
+      ],
+      "lesson": "m04-l01",
+      "source": {
+        "title": "Types: General (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#81-general"
+      }
+    },
+    {
+      "id": "simple-type",
+      "term": "Simple Type",
+      "german": "einfacher Typ",
+      "category": "language",
+      "definition": "Ein Schlüsselwort wie `int`, `double`, `bool` oder `char`. Es ist ein anderer Name für einen vordefinierten Werttyp im Namespace `System`, zum Beispiel `int` für `System.Int32`.",
+      "aliases": [
+        "einfache Typen",
+        "Alias"
+      ],
+      "related": [
+        "value-type",
+        "built-in-type"
+      ],
+      "lesson": "m04-l01",
+      "source": {
+        "title": "Simple types (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#835-simple-types"
+      }
+    },
+    {
+      "id": "string-builder",
+      "term": "StringBuilder",
+      "german": "veränderbarer Text",
+      "category": "platform",
+      "definition": "Ein Referenztyp aus `System.Text`, der einen veränderbaren Text aufnimmt. `Append` hängt Text an dasselbe Objekt an, `ToString()` liefert den Text als `string`.",
+      "aliases": [
+        "StringBuilder"
+      ],
+      "related": [
+        "reference-type",
+        "object"
+      ],
+      "lesson": "m04-l01",
+      "source": {
+        "title": "StringBuilder Class (.NET API)",
+        "url": "https://learn.microsoft.com/dotnet/api/system.text.stringbuilder"
+      }
+    },
+    {
+      "id": "stack",
+      "term": "Stack",
+      "german": "Stapelspeicher",
+      "category": "platform",
+      "definition": "Im Stack-Heap-Modell der Bereich, in dem jeder laufende Methodenaufruf einen Frame mit seinen Parametern und lokalen Variablen hat. Das Modell beschreibt die Laufzeitumgebung, nicht die Sprache.",
+      "related": [
+        "heap",
+        "call-stack"
+      ],
+      "lesson": "m04-l02",
+      "source": {
+        "title": "Automatic memory management (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#78-automatic-memory-management"
+      }
+    },
+    {
+      "id": "heap",
+      "term": "Heap",
+      "german": "Halde",
+      "category": "platform",
+      "definition": "Im Stack-Heap-Modell der Bereich, in dem die Objekte der Referenztypen liegen. Der Garbage Collector gibt den Speicher von Objekten frei, die nicht mehr gebraucht werden.",
+      "aliases": [
+        "Managed Heap",
+        "verwalteter Heap"
+      ],
+      "related": [
+        "stack",
+        "garbage-collector"
+      ],
+      "lesson": "m04-l02",
+      "source": {
+        "title": "Fundamentals of garbage collection (.NET)",
+        "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/fundamentals"
+      }
+    },
+    {
+      "id": "garbage-collector",
+      "term": "Garbage Collector",
+      "german": "Speicherbereinigung",
+      "category": "platform",
+      "definition": "Der Teil der Laufzeitumgebung, der den Speicher von Objekten freigibt, die das Programm nicht mehr erreichen kann. Du musst Objekte nicht selbst freigeben.",
+      "aliases": [
+        "GC",
+        "Müllsammler"
+      ],
+      "related": [
+        "automatic-memory-management",
+        "heap"
+      ],
+      "lesson": "m04-l02",
+      "source": {
+        "title": "Automatic memory management (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#78-automatic-memory-management"
+      }
+    },
+    {
+      "id": "automatic-memory-management",
+      "term": "Automatic Memory Management",
+      "german": "automatische Speicherverwaltung",
+      "category": "language",
+      "definition": "C# befreit Programmierer davon, Speicher für Objekte selbst anzufordern und freizugeben. Wo Werte im Speicher liegen, legt die Sprache nicht fest.",
+      "related": [
+        "garbage-collector",
+        "heap"
+      ],
+      "lesson": "m04-l02",
+      "source": {
+        "title": "Automatic memory management (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#78-automatic-memory-management"
+      }
+    },
+    {
+      "id": "pass-by-reference",
+      "term": "Pass by Reference",
+      "german": "Übergabe per Referenz",
+      "category": "language",
+      "definition": "Der Parameter ist ein zweiter Name für die Variable des Aufrufers. In C# steht dafür `ref` vor Parameter und Argument. Ohne `ref` wird immer ein Wert übergeben, bei einem Referenztyp ist dieser Wert der Verweis.",
+      "aliases": [
+        "Übergabe per Referenz",
+        "by reference"
+      ],
+      "related": [
+        "reference-parameter",
+        "value-parameter"
+      ],
+      "lesson": "m04-l03",
+      "source": {
+        "title": "Reference parameters (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#156233-reference-parameters"
       }
     }
   ]
