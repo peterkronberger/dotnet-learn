@@ -11,6 +11,8 @@ import readName from '!!raw-loader!@site/examples/dev/read-name.cs';
 import readNameInput from '!!raw-loader!@site/examples/dev/read-name.in.txt';
 import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
 import foldedDemo from '!!raw-loader!@site/examples/dev/folded-demo.cs';
+import fileIoCheck from '!!raw-loader!@site/examples/dev/file-io-check.cs';
+import fileIoCheckOutput from '!!raw-loader!@site/examples/dev/file-io-check.out.txt';
 import FoldedCode from '@site/src/components/FoldedCode';
 
 // Technical demo for spike S7, not learning content.
@@ -49,6 +51,14 @@ export default function RunnerDemo() {
         <CSharpRunner id="fold-demo" code={foldedDemo} />
         <p>Dieselbe Datei als Musterlösung: Die ausgeblendeten Blöcke lassen sich einzeln aufklappen.</p>
         <FoldedCode code={foldedDemo} title="folded-demo.cs" />
+        <h2>Dateien (In-Memory-Dateisystem)</h2>
+        <p>
+          Prüft die <code>System.IO</code>-Methoden im Browser. Erwartete Ausgabe:
+        </p>
+        <pre>
+          <code>{fileIoCheckOutput}</code>
+        </pre>
+        <CSharpRunner id="file-io-check" code={fileIoCheck} />
         <h2>Entladen weit entfernter Runner</h2>
         <p>
           Runner, die weit außerhalb des Fensters liegen (etwa drei Bildschirmhöhen), werden entladen und beim

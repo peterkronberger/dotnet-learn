@@ -49,6 +49,7 @@ Message protocol (S7, available; origin check `window.location.origin` in both d
 - The editor grows with its code (minimum about 3 lines) and never scrolls vertically; long lines wrap. The highlight overlay keeps identical text metrics.
 - Loop guard (stop after about 3 s with a German message and line number) – available (S3). No guard in operators, accessors and expression bodies; `catch (Exception)` in user code catches it.
 - Compiler errors as a list with line/column (available).
+- File system (expected available, browser check pending): in-memory, empty at start, lost on reload. CI-checked APIs: `Directory.CreateTempSubdirectory`, `Path.Combine`/`GetFileName`/`GetExtension`, `File.WriteAllText`/`ReadAllText`/`WriteAllLines`/`ReadAllLines`/`ReadLines`/`AppendAllText`/`Exists`/`Delete`, `StreamWriter`, `StreamReader`, `Encoding.UTF8`, `FileNotFoundException`, `DirectoryNotFoundException`, `catch (IOException)`, `Directory.Delete(path, true)` (`website/examples/dev/file-io-check.cs`). The run in the playground is still to be confirmed by a human on `/dev/runner-demo`, section "Dateien (In-Memory-Dateisystem)".
 - Step-by-step visualization (variables, heap model), switchable per runner with `trace` – available (S5).
 - Fixed preloaded packages (`Microsoft.Extensions.DependencyInjection`, `…Logging`) – available (S6); Configuration and Hosting are missing. No free NuGet install.
 - `InvariantGlobalization=true`: numbers always appear with a dot (`3.5`). CI must run with `InvariantCulture` so that shown outputs match.
