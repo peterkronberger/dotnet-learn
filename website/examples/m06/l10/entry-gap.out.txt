@@ -1,0 +1,2 @@
+SecLog started
+Arguments: 0

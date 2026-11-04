@@ -4341,6 +4341,87 @@
         "title": "Implicit using directives (.NET project SDK overview)",
         "url": "https://learn.microsoft.com/dotnet/core/project-sdk/overview#implicit-using-directives"
       }
+    },
+    {
+      "id": "entry-point",
+      "term": "Entry point",
+      "german": "Einstiegspunkt",
+      "category": "language",
+      "definition": "Die Methode, mit der ein Programm startet. Ein Programm hat genau einen. Er ist eine eigene statische Methode `Main` oder die Methode, die der Compiler aus Anweisungen auf oberster Ebene erzeugt.",
+      "aliases": [
+        "entry points",
+        "Startpunkt"
+      ],
+      "related": [
+        "main-method",
+        "top-level-statements"
+      ],
+      "lesson": "m06-l10",
+      "source": {
+        "title": "Application startup and termination (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#71-application-startup-and-termination"
+      }
+    },
+    {
+      "id": "main-method",
+      "term": "Main method",
+      "german": "Main-Methode",
+      "category": "language",
+      "definition": "Eine statische Methode namens `Main` als Einstiegspunkt. Sie gibt `void`, `int`, `Task` oder `Task<int>` zurück und hat keinen Parameter oder einen `string[]`.",
+      "aliases": [
+        "Main"
+      ],
+      "related": [
+        "entry-point",
+        "command-line-argument",
+        "exit-code"
+      ],
+      "lesson": "m06-l10",
+      "source": {
+        "title": "Named entry points (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#712-named-entry-points"
+      }
+    },
+    {
+      "id": "command-line-argument",
+      "term": "Command-line argument",
+      "german": "Befehlszeilenargument",
+      "category": "language",
+      "definition": "Ein Text, den man beim Start an ein Programm übergibt. Das Programm liest ihn aus dem Feld `args` (ein `string[]`). Ohne Argumente ist `args` leer und nie `null`.",
+      "aliases": [
+        "command-line arguments",
+        "args",
+        "Befehlszeilenargumente"
+      ],
+      "related": [
+        "entry-point",
+        "main-method"
+      ],
+      "lesson": "m06-l10",
+      "source": {
+        "title": "Main() and command-line arguments",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/main-command-line"
+      }
+    },
+    {
+      "id": "exit-code",
+      "term": "Exit code",
+      "german": "Exitcode",
+      "category": "language",
+      "definition": "Eine ganze Zahl, die ein Programm beim Ende an seine Umgebung meldet. Es ist der `int`-Wert des Einstiegspunkts, sonst 0. Üblich ist 0 für Erfolg und ein anderer Wert für einen Fehler.",
+      "aliases": [
+        "exit codes",
+        "Rückgabecode"
+      ],
+      "related": [
+        "entry-point",
+        "main-method"
+      ],
+      "lesson": "m06-l10",
+      "source": {
+        "title": "Entry point invocation (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#716-entry-point-invocation"
+      }
     }
   ]
 }
