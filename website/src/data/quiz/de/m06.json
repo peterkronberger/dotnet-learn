@@ -983,6 +983,143 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm Namespaces einsetzen, und wann hilft dir ein `using`-Alias?",
       "modelAnswer": "Namespaces ordnen die Typen eines größeren Programms, zum Beispiel `SecLog.Model` für `LogEvent` und `Incident`, und sie verhindern Namenskonflikte mit Typen anderer Teile oder Bibliotheken. Ein `using`-Alias hilft, wenn zwei Namespaces einen Typ mit gleichem Namen haben, etwa `Notice` für Mail und SMS. Dann gibst du jedem Typ einen eigenen kurzen Namen wie `MailNotice` und `SmsNotice`."
+    },
+    {
+      "id": "m06-l10-q1",
+      "lesson": "m06-l10",
+      "type": "single",
+      "question": "Ein Programm besteht nur aus der Zeile `Console.WriteLine(\"Hallo\");`. Wie startet es?",
+      "options": [
+        {
+          "text": "Der Compiler erzeugt aus den Anweisungen eine Einstiegsmethode, und das Programm hat genau einen Einstiegspunkt.",
+          "correct": true
+        },
+        {
+          "text": "Es hat keine `Main`-Methode und keinen Einstiegspunkt. Der Computer führt die Datei einfach von oben nach unten aus.",
+          "feedback": "Jedes Programm startet an genau einem Einstiegspunkt. Bei Anweisungen auf oberster Ebene erzeugt der Compiler die Methode dafür selbst.",
+          "misconception": "m06-l10-top-level-has-no-main"
+        },
+        {
+          "text": "Es startet erst, wenn du selbst eine Methode `Main` ergänzt.",
+          "feedback": "Das ist nicht nötig. Der Compiler erzeugt die Einstiegsmethode aus den Anweisungen. Du darfst zusätzlich eine eigene `Main` schreiben, aber sie wird dann nicht als Einstieg gewählt.",
+          "misconception": "m06-l10-top-level-has-no-main"
+        }
+      ],
+      "explanation": "Anweisungen auf oberster Ebene sind eine Kurzschreibweise: Der Compiler macht daraus den Rumpf einer erzeugten statischen Methode. Sie ist der Einstiegspunkt."
+    },
+    {
+      "id": "m06-l10-q2",
+      "lesson": "m06-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus, wenn es ohne Argumente gestartet wird?",
+      "example": "m06/l10/quiz-entry.cs",
+      "explanation": "Der Einstieg ist `Main`. Ohne Argumente ist `args.Length` gleich 0, deshalb erscheint `No arguments`. Danach folgt `End`, und `return 0;` beendet das Programm mit Exitcode 0."
+    },
+    {
+      "id": "m06-l10-q3",
+      "lesson": "m06-l10",
+      "type": "single",
+      "question": "Welche Methode kann als Einstiegspunkt eines Programms dienen?",
+      "options": [
+        {
+          "text": "`static int Main(string[] args)`",
+          "correct": true
+        },
+        {
+          "text": "`static string Main()`",
+          "feedback": "Der Rückgabetyp muss `void`, `int`, `Task` oder `Task<int>` sein. `string` ist nicht erlaubt."
+        },
+        {
+          "text": "`void Main()` ohne `static`",
+          "feedback": "Der Einstieg muss `static` sein. Beim Start gibt es noch kein Objekt, auf dem die Methode laufen könnte."
+        },
+        {
+          "text": "`static void Main(int count)`",
+          "feedback": "Die Parameterliste ist leer, oder sie hat genau einen Parameter vom Typ `string[]`."
+        }
+      ],
+      "explanation": "Ein Einstieg heißt `Main`, ist `static`, und hat den Rückgabetyp `void`, `int`, `Task` oder `Task<int>`. Die Parameterliste ist leer oder `string[]`."
+    },
+    {
+      "id": "m06-l10-q4",
+      "lesson": "m06-l10",
+      "type": "single",
+      "question": "Ein Programm mit Anweisungen auf oberster Ebene endet ohne eine `return`-Anweisung. Welchen Exitcode meldet es, wenn es normal zu Ende läuft?",
+      "options": [
+        {
+          "text": "0",
+          "correct": true
+        },
+        {
+          "text": "1",
+          "feedback": "Der Wert 1 steht in der Praxis für einen Fehler. Ein Programm, das ohne Wert endet, meldet 0."
+        },
+        {
+          "text": "Keinen Exitcode, das Programm kann ihn nur mit `return` melden.",
+          "feedback": "Jeder Prozess hat einen Exitcode. Gibt der Einstieg keinen Wert zurück, ist er 0."
+        }
+      ],
+      "explanation": "Gibt der Einstieg einen `int` zurück, ist das der Exitcode. Sonst ist er 0. Mit `return 1;` meldest du dem aufrufenden Programm einen Fehler."
+    },
+    {
+      "id": "m06-l10-q5",
+      "lesson": "m06-l10",
+      "type": "multi",
+      "question": "Welche Aussagen über Einstiegspunkt und Argumente stimmen?",
+      "options": [
+        {
+          "text": "`args` ist ein `string[]` und nie `null`. Ohne Argumente ist seine Länge 0.",
+          "correct": true
+        },
+        {
+          "text": "Von allen Dateien eines Programms darf nur eine Anweisungen auf oberster Ebene enthalten.",
+          "correct": true
+        },
+        {
+          "text": "Zwei Klassen mit je einer Methode `static void Main()` sind erlaubt, der Compiler nimmt die erste.",
+          "feedback": "Ein Programm darf nur einen Einstiegspunkt haben. Der Compiler meldet CS0017."
+        },
+        {
+          "text": "`args[0]` ist immer vorhanden, auch wenn das Programm ohne Argumente startet.",
+          "feedback": "Ohne Argumente ist die Länge 0. Dann gibt `args[0]` einen Fehler. Prüfe vorher `args.Length`."
+        }
+      ],
+      "explanation": "`args` bekommt die Befehlszeilenargumente und ist nie `null`. Das Programm hat genau einen Einstiegspunkt, und nur eine Datei darf Anweisungen auf oberster Ebene haben."
+    },
+    {
+      "id": "m06-l10-q6",
+      "lesson": "m06-l10",
+      "type": "single",
+      "question": "Ein Programm mit Anweisungen auf oberster Ebene wird mit `dotnet run datei.cs -- sample log` gestartet. Was ist `args.Length`?",
+      "options": [
+        {
+          "text": "2, denn `sample` und `log` sind zwei Argumente.",
+          "correct": true
+        },
+        {
+          "text": "1, denn `sample log` ist ein Text.",
+          "feedback": "Leerzeichen trennen die Argumente. Willst du ein Argument mit Leerzeichen, setzt du es in Anführungszeichen."
+        },
+        {
+          "text": "3, denn der Dateiname zählt mit.",
+          "feedback": "Der Dateiname und die Optionen von `dotnet run` gehören nicht zu `args`. Nur, was nach `--` kommt, wird übergeben."
+        }
+      ],
+      "explanation": "Hinter `--` beginnen die Argumente für dein Programm. Sie werden an den Leerzeichen getrennt, hier also `args[0]` gleich `sample` und `args[1]` gleich `log`."
+    },
+    {
+      "id": "m06-l10-q7",
+      "lesson": "m06-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was der Einstiegspunkt eines Programms ist und was der Compiler bei Anweisungen auf oberster Ebene daraus macht.",
+      "modelAnswer": "Der Einstiegspunkt ist die Methode, mit der das Programm startet. Ein Programm hat genau einen. Schreibst du selbst eine Methode `static void Main(string[] args)`, ist sie der Einstieg. Bei Anweisungen auf oberster Ebene erzeugt der Compiler eine solche Methode und legt deine Anweisungen in ihren Rumpf. Deshalb kannst du dort auch `args` benutzen und mit `return` einen Exitcode zurückgeben."
+    },
+    {
+      "id": "m06-l10-q8",
+      "lesson": "m06-l10",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm Befehlszeilenargumente und einen Exitcode einsetzen?",
+      "modelAnswer": "Argumente passen, wenn ein Programm für verschiedene Eingaben laufen soll, ohne dass man es ändert, zum Beispiel der Name der Logdatei, die SecLog prüft. Ein Exitcode passt, wenn ein anderes Programm oder ein Skript wissen soll, ob alles geklappt hat: 0 für Erfolg, ein anderer Wert wie 1, wenn zum Beispiel das Argument fehlt."
     }
   ]
 }

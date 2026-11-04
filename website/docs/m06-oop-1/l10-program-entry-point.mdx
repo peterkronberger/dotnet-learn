@@ -1,0 +1,237 @@
+---
+title: Wo das Programm startet
+sidebar_position: 10
+description: Jedes C#-Programm startet an genau einem Einstiegspunkt. Der Compiler erzeugt ihn aus Anweisungen auf oberster Ebene, oder du schreibst selbst eine Methode Main.
+lesson_id: m06-l10
+duration_min: 20
+---
+
+import topLevelEntry from '!!raw-loader!@site/examples/m06/l10/top-level-entry.cs';
+import topLevelEntryOutput from '!!raw-loader!@site/examples/m06/l10/top-level-entry.out.txt';
+import mainExplicit from '!!raw-loader!@site/examples/m06/l10/main-explicit.cs';
+import twoEntryPoints from '!!raw-loader!@site/examples/m06/l10/two-entry-points.snippet.cs';
+import topLevelAndMain from '!!raw-loader!@site/examples/m06/l10/top-level-and-main.snippet.cs';
+import mainWithArgs from '!!raw-loader!@site/examples/m06/l10/main-with-args.snippet.cs';
+import mainInt from '!!raw-loader!@site/examples/m06/l10/main-int.cs';
+import mainIntOutput from '!!raw-loader!@site/examples/m06/l10/main-int.out.txt';
+import exitCodeFailure from '!!raw-loader!@site/examples/m06/l10/main-exit-code-failure.snippet.cs';
+import entryGap from '!!raw-loader!@site/examples/m06/l10/entry-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l10/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l10/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l10/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l10/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Wo das Programm startet
+
+:::note[Lernziele]
+- Du kannst erklären, dass der Compiler aus Anweisungen auf oberster Ebene eine Einstiegsmethode erzeugt.
+- Du kannst ein Programm mit einer eigenen `Main`-Methode schreiben und ihre erlaubten Formen nennen.
+- Du kannst Befehlszeilenargumente über `args` lesen und einen Exitcode zurückgeben.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l01-q1" />
+
+<Quiz id="m06-l08-q3" />
+
+<Quiz id="m06-l09-q3" />
+
+## Ein Programm braucht einen Anfang
+
+Seit der ersten Lektion schreibst du Anweisungen in eine Datei, und sie laufen von oben nach unten. Aber womit beginnt das Programm? Das Betriebssystem muss wissen, welche Methode es zuerst aufruft. Diese Methode ist der <Term id="entry-point">Einstiegspunkt (Entry Point)</Term> des Programms. Ein Programm hat genau einen ([§7.1 Application startup and termination](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#71-application-startup-and-termination)).
+
+Du hast den Einstiegspunkt bisher nie geschrieben, denn bei <Term id="top-level-statements">Anweisungen auf oberster Ebene</Term> erzeugt ihn der Compiler. Er legt deine Anweisungen in den Rumpf einer statischen Methode. Diese Methode nimmt einen Parameter `args` entgegen, deshalb darfst du `args` in jedem Programm dieses Kurses benutzen ([§7.1.3 Using top-level statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#713-using-top-level-statements)). Der Typ von `args` ist ein Array von Texten, `string[]`, wie du es aus Modul 5 kennst.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der Runner startet es ohne Argumente. `GetType()` fragt den Typ eines Objekts ab.
+:::
+
+<CSharpRunner id="m06-l10-top-level" code={topLevelEntry} predict expected={topLevelEntryOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Arguments: 0`, `System.String[]` und `No arguments given`.
+
+1. **Länge:** Ohne Argumente ist `args` ein leeres Array. `args` ist nie `null`.
+2. **Typ:** `System.String[]` ist der vollqualifizierte Name von `string[]`, wie in der letzten Lektion.
+3. **Verzweigung:** `args.Length == 0` stimmt, deshalb läuft der `if`-Block.
+
+Ein Programm mit Anweisungen auf oberster Ebene hat also eine Einstiegsmethode, du siehst sie nur nicht.
+
+</details>
+
+## Eine eigene Main-Methode
+
+Du kannst den Einstiegspunkt auch selbst schreiben. Er ist eine <Term id="main-method">Methode `Main`</Term> in einer Klasse. Sie ist `static`, weil beim Start noch kein Objekt existiert, auf dem sie laufen könnte (Lektion 8).
+
+<CSharpRunner id="m06-l10-main" code={mainExplicit} />
+
+Die Ausgabe ist `Started in Main` und `Arguments: 0`. Das Programm hat keine Anweisungen auf oberster Ebene, alles steht in der Klasse.
+
+Eine Methode ist ein möglicher Einstiegspunkt, wenn sie diese Regeln erfüllt ([§7.1.2 Named entry points](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#712-named-entry-points)):
+
+| Regel | Erlaubt |
+| --- | --- |
+| Name | `Main` |
+| Modifizierer | `static` |
+| Rückgabetyp | `void`, `int`, `Task` oder `Task<int>` |
+| Parameter | keiner oder genau einer vom Typ `string[]` |
+
+<Forward concepts={['`async`/`await`']} module="13" />
+
+`Task` und `Task<int>` brauchst du für asynchrone Programme. Das lernst du in Modul 13. Bis dahin sind `void` und `int` wichtig. Die Sichtbarkeit (`public`, `private`) spielt für den Start keine Rolle.
+
+Die Namen der Parameter dürfen anders lauten, aber `args` ist üblich. Eine Datei mit einem Namespace-Block oder dateibezogenem Namespace (Lektion 9) darf ebenfalls `Main` enthalten, solange sie keine Anweisungen auf oberster Ebene hat, denn ein dateibezogener Namespace verträgt sich nicht mit ihnen.
+
+## Nur ein Einstiegspunkt
+
+Ein Programm mit zwei Methoden `Main` in verschiedenen Klassen übersetzt der Compiler nicht. Er meldet CS0017: Das Programm hat mehr als einen Einstiegspunkt.
+
+<CodeBlock language="csharp" title="two-entry-points.snippet.cs">{twoEntryPoints}</CodeBlock>
+
+Mit Anweisungen auf oberster Ebene gilt: Nur eine Datei des Programms darf sie enthalten. Gibt es zusätzlich eine eigene `Main`, wählt der Compiler den Einstieg der Anweisungen und warnt mit CS7022, dass er die `Main` ignoriert ([§7.1.5 Entry point selection](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#715-entry-point-selection)).
+
+<CodeBlock language="csharp" title="top-level-and-main.snippet.cs">{topLevelAndMain}</CodeBlock>
+
+Die Ausgabe dieses Programms ist nur `Top-level statements`. Die Klasse heißt hier `Starter` und nicht `Program`, denn der Compiler legt die Anweisungen in eine Klasse `Program` (§7.1.3). Eine eigene Klasse `Program` in derselben Datei erzeugt den Fehler CS0260.
+
+## Befehlszeilenargumente lesen
+
+Ein <Term id="command-line-argument">Befehlszeilenargument (Command-line Argument)</Term> ist ein Text, den du beim Start hinter den Programmnamen schreibst. Das Programm bekommt alle Argumente als Array `args`. Die Werte legt die Umgebung fest, die das Programm startet, aber sie sind nie `null` ([§7.1.6 Entry point invocation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#716-entry-point-invocation)).
+
+<CodeBlock language="csharp" title="main-with-args.snippet.cs">{mainWithArgs}</CodeBlock>
+
+Auf deinem Rechner startest du es mit `dotnet run main-with-args.snippet.cs -- a b`. Alles hinter `--` geht an dein Programm. Die Ausgabe eines echten Laufs ist:
+
+<CodeBlock language="text">{`Argument: a
+Argument: b`}</CodeBlock>
+
+Im Runner auf dieser Seite gibt es keine Argumente: Er ruft den Einstieg mit einem leeren Array auf. Deshalb prüfen die Beispiele mit `args.Length`, ob ein Argument da ist, bevor sie `args[0]` lesen. Ohne die Prüfung würde `args[0]` bei einem leeren Array einen Fehler auslösen.
+
+## Einen Exitcode zurückgeben
+
+Wenn ein Programm endet, meldet es seiner Umgebung eine ganze Zahl, den <Term id="exit-code">Exitcode (Exit Code)</Term>. Gibt der Einstiegspunkt einen `int` zurück, ist das der Exitcode. Sonst ist er 0 (§7.1.6). Üblich ist 0 für Erfolg und ein anderer Wert für einen Fehler. Ein Skript kann damit prüfen, ob das Programm geklappt hat.
+
+Bei Anweisungen auf oberster Ebene gibst du den Exitcode mit `return` am Ende zurück. Dann erzeugt der Compiler eine Einstiegsmethode mit dem Rückgabetyp `int`.
+
+:::info[Vorhersage]
+Was gibt das Programm aus, wenn der Runner es ohne Argumente startet? Welchen Exitcode hat es?
+:::
+
+<CSharpRunner id="m06-l10-exit" code={mainInt} predict expected={mainIntOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Analyzed log: sample log`, der Exitcode ist 0.
+
+1. **Argument prüfen:** `args.Length > 0` ist falsch, also wählt der bedingte Ausdruck `"sample log"`.
+2. **Ausgeben:** Der Text kommt in die Zeile.
+3. **Beenden:** `return 0;` gibt den Exitcode 0 zurück. Der Runner zeigt ihn nicht an.
+
+Was passiert, wenn du `return 0;` weglässt und den Rückgabetyp `int` stehen lässt? Dann meldet der Compiler einen Fehler, weil nicht alle Wege einen Wert zurückgeben.
+
+</details>
+
+Ein Programm, das ein Argument verlangt, meldet bei fehlendem Argument einen Fehler. Der Code unten ist kein Runner-Beispiel, denn der Runner zeigt den Exitcode nicht und CI darf nur Programme mit Exitcode 0 starten.
+
+<CodeBlock language="csharp" title="main-exit-code-failure.snippet.cs">{exitCodeFailure}</CodeBlock>
+
+Auf einem Linux- oder macOS-Rechner zeigt `echo $?` den Exitcode des letzten Programms. Ein echter Lauf von `dotnet run main-exit-code-failure.snippet.cs` ohne Argumente gibt `Usage: pass the name of a log` aus und endet mit Exitcode 1. Mit `-- sample` gibt er `Analyzed log: sample` aus und endet mit 0.
+
+## Lückenbeispiel
+
+Das Programm nutzt Anweisungen auf oberster Ebene. Schreibe es als eigene Einstiegsmethode: Setze die zwei Zeilen in `static void Main(string[] args)` in einer Klasse `Program`. Die Ausgabe `SecLog started` und `Arguments: 0` bleibt gleich.
+
+<CSharpRunner id="m06-l10-gaps" code={entryGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Klasse:** `class Program { … }` umschließt die Methode.
+2. **Methode:** `static void Main(string[] args) { … }` bekommt beide `Console.WriteLine`-Zeilen.
+3. **Prüfen:** Die Datei hat jetzt keine Anweisungen auf oberster Ebene mehr, und `args` ist der Parameter der Methode.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat sein Modell im Namespace `SecLog.Model`. Das Programm hat viele Blöcke aus Anweisungen auf oberster Ebene und lokale Funktionen am Ende.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block und die Klasse `LogEvent`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach dem ausgeblendeten Code, vor die lokalen Funktionen, den Block `// Read the name of the log from the command-line arguments`. Er liest den Namen des Logs aus `args`: `string logName = args.Length > 0 ? args[0] : "sample log";`. Gib ihn als `Analyzed log: sample log` aus. Beende die Anweisungen auf oberster Ebene mit `return 0;`. Das ist der letzte Block: Spätere Schritte ergänzen ihre Blöcke vor `return 0;`. Die lokalen Funktionen danach stehen weiter an ihrem Platz.
+
+<CSharpRunner id="m06-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Argument lesen:** `args.Length > 0 ? args[0] : "sample log"` nimmt das erste Argument, oder einen festen Namen, wenn keines da ist.
+2. **Ausgeben:** `Analyzed log: sample log` ist die neue Zeile. Der Runner startet ohne Argumente.
+3. **Beenden:** `return 0;` macht die erzeugte Einstiegsmethode zu einer, die einen `int` zurückgibt: Exitcode 0 heißt Erfolg. Die lokalen Funktionen nach `return 0;` übersetzen ohne Warnung.
+
+</details>
+
+**Neuer Stand:** SecLog liest den Namen des Logs aus den Argumenten und endet mit dem Exitcode 0.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l10-top-level-has-no-main" />
+
+**„Ein Programm mit Anweisungen auf oberster Ebene hat keine `Main`-Methode.“** Das stimmt nicht. Der Compiler erzeugt aus den Anweisungen eine Einstiegsmethode, und das Programm hat genau einen Einstiegspunkt. Du siehst die Methode nur nicht im Code. Schreibst du zusätzlich eine eigene `Main`, ignoriert der Compiler sie und warnt.
+:::
+
+<details>
+<summary>Vertiefung: Die erzeugte Signatur (optional)</summary>
+
+Welche Signatur der Compiler erzeugt, hängt vom Inhalt der Anweisungen ab ([§7.1.3 Using top-level statements](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#713-using-top-level-statements)):
+
+| Die Anweisungen enthalten | Erzeugte Signatur |
+| --- | --- |
+| weder `await` noch `return` mit Wert | `static void Main(string[] args)` |
+| `return` mit Wert | `static int Main(string[] args)` |
+| `await` | `static async Task Main(string[] args)` |
+| `await` und `return` mit Wert | `static async Task<int> Main(string[] args)` |
+
+Der echte Name der Methode ist nicht `Main` und im Code nicht ansprechbar. Die Spezifikation nennt `Main` hier nur als Platzhalter.
+
+</details>
+
+## Zusammenfassung
+
+Jedes Programm startet an genau einem Einstiegspunkt. Bei Anweisungen auf oberster Ebene erzeugt ihn der Compiler, sonst ist es eine statische Methode `Main` mit dem Rückgabetyp `void`, `int`, `Task` oder `Task<int>` und optional einem Parameter `string[] args`. `args` enthält die Befehlszeilenargumente und ist nie `null`. Gibt der Einstieg einen `int` zurück, ist das der Exitcode, sonst ist er 0.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l10-q1" />
+
+<Quiz id="m06-l10-q2" />
+
+<Quiz id="m06-l10-q3" />
+
+<Quiz id="m06-l10-q4" />
+
+<Quiz id="m06-l10-q5" />
+
+<Quiz id="m06-l10-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l10-q7" />
+
+### Transferfrage
+
+<Quiz id="m06-l10-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Application startup and termination](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#71-application-startup-and-termination)
+- Microsoft Learn: [Main() and command-line arguments](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/main-command-line)
+- Microsoft Learn: [Top-level statements](https://learn.microsoft.com/dotnet/csharp/fundamentals/program-structure/top-level-statements)
