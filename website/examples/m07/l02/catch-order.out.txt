@@ -1,0 +1,4 @@
+5 -> 20
+abc -> FormatException
+99999999999 -> OverflowException
+0 -> other: DivideByZeroException

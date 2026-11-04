@@ -1,0 +1,213 @@
+---
+title: Mehrere catch-Klauseln und Ausnahmefilter
+sidebar_position: 2
+description: Die erste passende catch-Klausel gewinnt, deshalb stehen spezielle Typen zuerst. Mit when entscheidest du zusätzlich, ob eine Klausel fängt.
+lesson_id: m07-l02
+duration_min: 22
+---
+
+import catchOrder from '!!raw-loader!@site/examples/m07/l02/catch-order.cs';
+import catchOrderOutput from '!!raw-loader!@site/examples/m07/l02/catch-order.out.txt';
+import catchOrderError from '!!raw-loader!@site/examples/m07/l02/catch-order-error.snippet.cs';
+import propagation from '!!raw-loader!@site/examples/m07/l02/propagation.cs';
+import propagationOutput from '!!raw-loader!@site/examples/m07/l02/propagation.out.txt';
+import unhandled from '!!raw-loader!@site/examples/m07/l02/unhandled.snippet.cs';
+import exceptionFilter from '!!raw-loader!@site/examples/m07/l02/exception-filter.cs';
+import filterGap from '!!raw-loader!@site/examples/m07/l02/filter-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l02/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l02/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l02/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l02/seclog-exceptions-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Mehrere catch-Klauseln und Ausnahmefilter
+
+:::note[Lernziele]
+- Du kannst mehrere `catch`-Klauseln in der richtigen Reihenfolge schreiben.
+- Du kannst vorhersagen, welche `catch`-Klausel eine Exception fängt – auch wenn sie in einer aufgerufenen Methode ausgelöst wurde.
+- Du kannst mit `when` einen Ausnahmefilter schreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l01-q1" />
+
+<Quiz id="m03-l10-q2" />
+
+<Quiz id="m05-l06-q1" />
+
+## Mehrere Klauseln für mehrere Fehler
+
+Ein Aufruf kann auf verschiedene Weise scheitern. `int.Parse` löst eine `FormatException` aus, wenn der Text keine Zahl ist, und eine `OverflowException`, wenn die Zahl zu groß für einen `int` ist. Auf beide Fälle willst du verschieden reagieren. Dafür darf eine `try`-Anweisung mehrere `catch`-Klauseln haben.
+
+Wenn eine Exception ausgelöst wird, prüft C# die Klauseln der Reihe nach, von oben nach unten. Die erste Klausel, deren Typ passt, fängt die Exception. Alle weiteren Klauseln werden übersprungen ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+Ein Typ passt, wenn er der Typ der Exception ist oder ein allgemeinerer Typ, von dem dieser abstammt. Exception-Typen bilden eine Familie: Jede `FormatException` ist eine Art von `SystemException`, und jede `SystemException` ist eine Art von `Exception`. Deshalb fängt `catch (Exception ex)` jede Exception.
+
+<Forward concepts={['Vererbung']} module="8" />
+
+Das Wort „ist eine Art von“ reicht hier. Wie man solche Familien selbst baut, lernst du in Modul 8.
+
+:::info[Vorhersage]
+Das Programm verarbeitet vier Texte. Welche Zeile gibt es für jeden Text? `100 / int.Parse(text)` rechnet die Division erst aus, wenn das Parsen gelungen ist.
+:::
+
+<CSharpRunner id="m07-l02-order" code={catchOrder} predict expected={catchOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5 -> 20`, `abc -> FormatException`, `99999999999 -> OverflowException` und `0 -> other: DivideByZeroException`.
+
+1. **`5`:** Parsen und Teilen gelingen, keine Klausel läuft.
+2. **`abc`:** `int.Parse` löst eine `FormatException` aus. Die erste Klausel passt.
+3. **`99999999999`:** Die Zahl passt nicht in einen `int`. Das löst eine `OverflowException` aus. Die erste Klausel passt nicht, die zweite schon.
+4. **`0`:** Das Parsen gelingt, aber `100 / 0` löst eine `DivideByZeroException` aus. Weder die erste noch die zweite Klausel passen. Die allgemeine Klausel `catch (Exception ex)` fängt sie.
+
+Was passiert, wenn du die allgemeine Klausel an den Anfang stellst? Dann fängt sie jede Exception, und der Compiler meldet einen Fehler (siehe unten).
+
+</details>
+
+Die Reihenfolge ist also wichtig: Spezielle Typen kommen zuerst, die allgemeine Klausel `catch (Exception)` kommt zuletzt. Stellst du sie vor eine spezielle Klausel, würde diese nie erreicht. Der Compiler verbietet das: Eine spätere Klausel darf nicht denselben Typ oder einen abgeleiteten Typ einer früheren Klausel haben ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+<CodeBlock language="csharp" title="catch-order-error.snippet.cs">{catchOrderError}</CodeBlock>
+
+Der Compiler meldet CS0160 in Zeile 9: Eine frühere `catch`-Klausel fängt schon alle Exceptions dieses Typs oder eines Obertyps.
+
+## Die Suche geht nach außen
+
+Was passiert, wenn die Exception nicht in der Methode ausgelöst wird, die das `try` enthält, sondern in einer Methode, die sie aufruft? Die Suche nach einer passenden Klausel geht dann weiter nach außen: erst die `try`-Anweisungen in der Methode, in der die Exception entstand, dann in der aufrufenden Methode, dann in deren Aufrufer, und so fort entlang des <Term id="call-stack">Aufrufstapels</Term> ([§22.4 How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)). Man nennt das <Term id="exception-propagation">Weitergabe der Exception</Term>.
+
+:::info[Vorhersage]
+`DoubleOf` hat kein `try`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l02-propagation" code={propagation} predict expected={propagationOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Reading 8`, `Read 8`, `16`, `Reading eight`, `Caught in the caller: FormatException` und `Program continues`.
+
+1. **Erster Aufruf:** `DoubleOf("8")` gelingt und gibt 16 zurück.
+2. **Auslösen:** Im zweiten Aufruf löst `int.Parse` die Exception in `DoubleOf` aus. `Read …` und `return` in `DoubleOf` laufen nicht mehr.
+3. **Weitergeben:** `DoubleOf` hat keine passende Klausel. Die Suche geht zur aufrufenden Stelle, die im `try`-Block steht.
+4. **Fangen:** Die `catch`-Klausel passt. `Both done` im `try`-Block wird übersprungen, `Program continues` läuft.
+
+</details>
+
+Findet die Suche am Ende keine passende Klausel, endet das Programm. Der Code unten fängt nur `FormatException`, aber `int.Parse` löst hier eine `OverflowException` aus. Er ist kein Runner-Beispiel, weil er mit einer nicht behandelten Exception endet.
+
+<CodeBlock language="csharp" title="unhandled.snippet.cs">{unhandled}</CodeBlock>
+
+Das Programm gibt weder `Not a number` noch `After the try statement` aus, es endet mit einer Fehlermeldung. Wie du diese Meldung liest und was darin steht, zeigt Lektion 3.
+
+## Ausnahmefilter mit when
+
+Manchmal reicht der Typ allein nicht. Dann hängst du an die `catch`-Klausel einen <Term id="exception-filter">Ausnahmefilter</Term>: `catch (FormatException) when (Bedingung)`. Die Klausel fängt die Exception nur, wenn der Typ passt und die Bedingung `true` ergibt. Ist sie `false`, geht die Suche bei den nächsten Klauseln weiter ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+Zwei Klauseln mit demselben Typ sind erlaubt, wenn die frühere einen Filter hat: Dann ist sie nicht in jedem Fall zuständig.
+
+:::info[Vorhersage]
+Welche Zeile gibt es für jeden der drei Texte?
+:::
+
+<CSharpRunner id="m07-l02-filter" code={exceptionFilter} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `12`, `Empty text` und `Not a number: abc`.
+
+1. **`12`:** Das Parsen gelingt, keine Klausel läuft.
+2. **Leerer Text:** `int.Parse("")` löst eine `FormatException` aus. Der Filter `text.Length == 0` ist `true`, die erste Klausel fängt.
+3. **`abc`:** Die `FormatException` passt zum Typ der ersten Klausel, aber der Filter ist `false`. Die Suche geht weiter, und die zweite Klausel fängt.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm unterscheidet in der `catch`-Klausel mit `if`, ob der Text leer ist. Schreibe es um: zwei `catch`-Klauseln für `FormatException`, die erste mit `when`. Die Ausgabe bleibt gleich.
+
+<CSharpRunner id="m07-l02-gaps" code={filterGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Filtern:** `catch (FormatException) when (text.Length == 0) { Console.WriteLine("Empty text"); }` behandelt den leeren Text.
+2. **Rest:** `catch (FormatException) { Console.WriteLine($"Not a number: {text}"); }` behandelt alle anderen Fälle.
+3. **Reihenfolge:** Die Klausel mit Filter steht zuerst, sonst würde die allgemeinere sie verdecken.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält das Beispiel-Log in einem Array und fängt einen Fehler beim Lesen einer Zahl mit `try`/`catch` ab.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, das Array `sampleLog`, den Platz für den neuen Block und `return 0;`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `return 0;` den Block `// Read sample lines by number and handle wrong numbers`. Er geht durch die Texte `"2"`, `"15"` und `"two"` (eine Collection Expression) und liest mit `int.Parse` die Zeilennummer. Dann gibt er `sampleLog[number - 1]` aus. Eine `IndexOutOfRangeException` fängst du mit `No line 15 in the sample log`, eine `FormatException` mit `Not a line number: two`, jeweils in einer eigenen `catch`-Klausel.
+
+<CSharpRunner id="m07-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Durchlaufen:** `foreach` geht durch die drei Texte, jeder Durchlauf hat sein eigenes `try`.
+2. **Parsen und lesen:** `int.Parse` macht aus dem Text die Zeilennummer, `sampleLog[number - 1]` liest die Zeile. Die Nummer 15 liegt außerhalb des Arrays.
+3. **Fangen:** Die zwei Klauseln haben verschiedene Typen, ihre Reihenfolge ist hier egal. Jede gibt ihre Meldung aus, und die Schleife macht mit dem nächsten Text weiter.
+
+</details>
+
+**Neuer Stand:** SecLog liest Zeilen des Beispiel-Logs nach Nummer und behandelt falsche Nummern und Texte getrennt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l02-catch-order-irrelevant" />
+
+**„C# sucht sich die am besten passende `catch`-Klausel, die Reihenfolge ist egal.“** Das stimmt nicht. C# nimmt die erste Klausel, die passt. Deshalb stehen spezielle Typen vor allgemeinen, und `catch (Exception)` steht ganz am Ende. Steht eine allgemeine Klausel vor einer speziellen, meldet der Compiler einen Fehler.
+:::
+
+<details>
+<summary>Vertiefung: Was passiert im Filter? (optional)</summary>
+
+Der Filter läuft, bevor die Ausführung zur `catch`-Klausel springt. Die Spezifikation legt fest: Löst der Filter selbst eine Exception aus, wird diese gefangen, und der Filter zählt als `false` ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)). Deshalb solltest du Filter kurz und einfach halten.
+
+Eine `catch`-Klausel ohne Typ (`catch { … }`) fängt jede Exception wie `catch (Exception)`, aber ohne Zugriff auf das Exception-Objekt.
+
+</details>
+
+## Zusammenfassung
+
+Eine `try`-Anweisung darf mehrere `catch`-Klauseln haben. Die erste passende gewinnt, deshalb stehen spezielle Typen zuerst und `catch (Exception)` zuletzt, sonst meldet der Compiler einen Fehler. Löst eine aufgerufene Methode die Exception aus und fängt sie nicht, geht die Suche nach außen entlang des Aufrufstapels. Findet sich nirgends eine Klausel, endet das Programm. Mit `when` entscheidest du zusätzlich per Bedingung, ob eine Klausel fängt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l02-q1" />
+
+<Quiz id="m07-l02-q2" />
+
+<Quiz id="m07-l02-q3" />
+
+<Quiz id="m07-l02-q4" />
+
+<Quiz id="m07-l02-q5" />
+
+<Quiz id="m07-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m07-l02-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)
+- C#-Spezifikation: [The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)
+- Microsoft Learn: [Exception-handling statements](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements)
