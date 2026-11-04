@@ -4121,6 +4121,87 @@
         "title": "Primary constructors (Microsoft Learn)",
         "url": "https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/primary-constructors"
       }
+    },
+    {
+      "id": "static-member",
+      "term": "Static member",
+      "german": "statischer Member",
+      "category": "language",
+      "definition": "Ein Member mit `static` gehört zum Typ und nicht zu einem Objekt. Du erreichst ihn über den Typnamen, zum Beispiel `Math.Max`. Ein statisches Feld gibt es nur einmal für alle Objekte.",
+      "aliases": [
+        "static members",
+        "statisches Feld",
+        "statische Methode"
+      ],
+      "related": [
+        "instance-member",
+        "static-class",
+        "member"
+      ],
+      "lesson": "m06-l08",
+      "source": {
+        "title": "Static and instance members (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members"
+      }
+    },
+    {
+      "id": "instance-member",
+      "term": "Instance member",
+      "german": "Instanzmember",
+      "category": "language",
+      "definition": "Ein Member ohne `static`. Er gehört zu einem Objekt und wird über eine Variable erreicht, die auf das Objekt verweist. Jedes Objekt hat seine eigenen Instanzfelder.",
+      "aliases": [
+        "instance members",
+        "Instanzfeld"
+      ],
+      "related": [
+        "static-member",
+        "instance",
+        "field"
+      ],
+      "lesson": "m06-l08",
+      "source": {
+        "title": "Static and instance members (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members"
+      }
+    },
+    {
+      "id": "static-class",
+      "term": "Static class",
+      "german": "statische Klasse",
+      "category": "language",
+      "definition": "Eine Klasse mit `static` vor `class`. Sie enthält nur statische Member, und du kannst von ihr keine Objekte erzeugen. Sie eignet sich für Hilfsmethoden.",
+      "aliases": [
+        "static classes"
+      ],
+      "related": [
+        "static-member",
+        "class"
+      ],
+      "lesson": "m06-l08",
+      "source": {
+        "title": "Static classes (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15224-static-classes"
+      }
+    },
+    {
+      "id": "static-constructor",
+      "term": "Static constructor",
+      "german": "statischer Konstruktor",
+      "category": "language",
+      "definition": "Ein Konstruktor mit `static`, ohne Parameter und ohne Zugriffsmodifizierer. Er bereitet die Klasse vor und läuft höchstens einmal: vor dem ersten erzeugten Objekt oder dem ersten Zugriff auf einen statischen Member.",
+      "aliases": [
+        "static constructors"
+      ],
+      "related": [
+        "constructor",
+        "static-member"
+      ],
+      "lesson": "m06-l08",
+      "source": {
+        "title": "Static constructors (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors"
+      }
     }
   ]
 }

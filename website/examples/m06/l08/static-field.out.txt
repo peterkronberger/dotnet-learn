@@ -1,0 +1,3 @@
+Many failed logins has number 1
+Disk full has number 2
+Tickets created: 2

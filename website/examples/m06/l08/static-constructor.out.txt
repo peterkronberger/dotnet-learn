@@ -1,0 +1,5 @@
+Program starts
+Static constructor runs
+Instance constructor runs
+Instance constructor runs
+Two markers created

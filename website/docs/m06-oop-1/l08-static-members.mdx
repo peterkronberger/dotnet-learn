@@ -1,0 +1,231 @@
+---
+title: Statische Member und statische Klassen
+sidebar_position: 8
+description: Ein statischer Member gehört zum Typ und nicht zu einem Objekt. Ein statisches Feld gibt es nur einmal, statische Klassen sammeln Hilfsmethoden.
+lesson_id: m06-l08
+duration_min: 23
+---
+
+import staticField from '!!raw-loader!@site/examples/m06/l08/static-field.cs';
+import staticFieldOutput from '!!raw-loader!@site/examples/m06/l08/static-field.out.txt';
+import staticMethods from '!!raw-loader!@site/examples/m06/l08/static-methods.cs';
+import staticErrors from '!!raw-loader!@site/examples/m06/l08/static-errors.snippet.cs';
+import staticSharedChange from '!!raw-loader!@site/examples/m06/l08/static-shared-change.cs';
+import staticSharedChangeOutput from '!!raw-loader!@site/examples/m06/l08/static-shared-change.out.txt';
+import staticReadonly from '!!raw-loader!@site/examples/m06/l08/static-readonly.cs';
+import staticConstructor from '!!raw-loader!@site/examples/m06/l08/static-constructor.cs';
+import staticConstructorOutput from '!!raw-loader!@site/examples/m06/l08/static-constructor.out.txt';
+import staticGap from '!!raw-loader!@site/examples/m06/l08/static-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l08/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l08/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l08/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l08/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Statische Member und statische Klassen
+
+:::note[Lernziele]
+- Du kannst Instanzmember und statische Member unterscheiden und richtig aufrufen.
+- Du kannst eine statische Klasse für Hilfsmethoden schreiben.
+- Du kannst erklären, wann ein statischer Konstruktor läuft und dass ein statisches Feld veränderbar ist.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l07-q1" />
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m06-l02-q1" />
+
+## Zum Typ oder zum Objekt
+
+Bisher gehörte jeder Member zu einem Objekt: Jedes Objekt hat seine eigenen Felder, und eine Methode arbeitet mit den Feldern des Objekts, über das du sie aufrufst. So einen Member nennt man <Term id="instance-member">Instanzmember (Instance Member)</Term>.
+
+Ein <Term id="static-member">statischer Member (Static Member)</Term> trägt dagegen `static` und gehört zum Typ. Du erreichst ihn über den Typnamen, nicht über ein Objekt. Ein statisches Feld gibt es nur einmal, egal wie viele Objekte entstehen. Alle Objekte teilen es sich ([§15.3.8 Static and instance members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Jedes `Ticket` zählt das statische Feld `created` hoch und merkt sich den Stand als eigene `Number`.
+:::
+
+<CSharpRunner id="m06-l08-field" code={staticField} predict expected={staticFieldOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Many failed logins has number 1`, `Disk full has number 2` und `Tickets created: 2`.
+
+1. **Feld einmal:** `created` ist statisch. Es gibt nur ein Feld, und es startet mit dem Standardwert 0.
+2. **Eigene Nummer:** `Number { get; } = ++created` läuft bei jedem `new`. Es erhöht das gemeinsame Feld und speichert den neuen Wert in der Eigenschaft des Objekts. Das erste Ticket bekommt 1, das zweite 2.
+3. **Zugriff über den Typ:** `Created` ist eine statische Eigenschaft. Du liest sie mit `Ticket.Created`, weil sie zum Typ gehört. Nach zwei Tickets steht dort 2.
+
+Was passiert, wenn du `created` nicht als `static` deklarierst? Dann hat jedes Ticket sein eigenes Feld, und `++created` ergibt immer 1. Die Eigenschaft `Created` ließe sich dann nicht mehr `static` machen, weil eine statische Eigenschaft kein Instanzfeld lesen kann.
+
+</details>
+
+## Statische Methoden
+
+Auch Methoden können statisch sein. Eine statische Methode arbeitet mit keinem bestimmten Objekt. Deshalb darfst du in ihr `this` nicht benutzen, und sie sieht nur ihre Parameter und andere statische Member. Du kennst solche Methoden schon: `Math.Max`, `int.Parse` und `Console.WriteLine` sind statische Methoden. Der Name vor dem Punkt ist ein Typ, kein Objekt.
+
+<CSharpRunner id="m06-l08-methods" code={staticMethods} />
+
+Die Ausgabe ist `5 42`, danach `quiet` und `check the log`.
+
+- `Math.Max(3, 5)` und `int.Parse("42")` laufen ohne ein Objekt.
+- `Rating.Describe(0)` ruft eine eigene statische Methode auf. Sie braucht nur den Parameter `failures`.
+
+Falsch gemischt lehnt der Compiler ab: Einen Instanzmember über den Typnamen zu erreichen geht nicht, und ein Objekt von einer statischen Klasse (nächster Abschnitt) zu erzeugen auch nicht.
+
+<CodeBlock language="csharp" title="static-errors.snippet.cs">{staticErrors}</CodeBlock>
+
+Zeile 2 meldet CS0120: Für `Title` ist ein Objekt nötig. Zeile 3 meldet CS0723 und CS0712: Von einem statischen Typ gibt es keine Variable und keine Instanz.
+
+## Statische Klassen
+
+Eine Klasse nur mit statischen Membern markierst du mit `static` vor `class`. Dann ist sie eine <Term id="static-class">statische Klasse (Static Class)</Term>. Sie enthält nur statische Member, und du kannst kein Objekt von ihr erzeugen ([§15.2.2.4 Static classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15224-static-classes)). Das passt zu Hilfsmethoden, die nur ihre Parameter brauchen. `static class Rating` im Beispiel oben ist so eine Klasse, und `static class Report` aus SecLog ist es auch. Dort hast du in Modul 3 gesehen, dass die Methoden `public static` heißen.
+
+Weitere Modifizierer für Klassen sind `sealed`, `abstract` und `partial`. `sealed` und `abstract` gehören zur Vererbung. `partial` erlaubt, eine Klasse in mehreren Teilen zu deklarieren.
+
+<Forward concepts={['`sealed`', '`abstract`']} module="8" />
+
+Das Schlüsselwort `static` hast du schon bei lokalen Funktionen gesehen (Lektion „Lokale Funktionen“). Es ist dasselbe Wort mit einer anderen Bedeutung: Dort sagt es, dass die Funktion keine Variablen der äußeren Methode benutzt.
+
+## Ein statisches Feld ändert sich
+
+`static` sagt nur, wohin ein Member gehört: zum Typ. Es sagt nicht, dass der Wert fest ist. Du kannst ein statisches Feld ändern, und jedes Objekt sieht die Änderung.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Beide Alarme prüfen vier Fehlversuche gegen `Alarm.Limit`. Dazwischen ändert das Programm das Limit.
+:::
+
+<CSharpRunner id="m06-l08-shared" code={staticSharedChange} predict expected={staticSharedChangeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `False`.
+
+1. **Erste Prüfung:** `Limit` ist 3, und 4 ist mindestens 3. Das Ergebnis ist `True`.
+2. **Ändern:** `Alarm.Limit = 5` setzt das eine Feld des Typs. Es gibt keine Kopie je Objekt.
+3. **Beide Objekte:** `night` und `day` lesen dasselbe Feld. Beide sehen 5, und 4 ist kleiner als 5. Beide Ergebnisse sind `False`.
+
+Was passiert, wenn `Limit` nicht `static` ist? Dann gäbe es zwei Felder, und `Alarm.Limit` würde nicht mehr übersetzen.
+
+</details>
+
+Ein Wert, der fest bleiben soll, braucht `const` oder `readonly` (Lektion 2). Beides lässt sich mit `static` kombinieren. Eine Konstante ist schon von sich aus statisch und braucht ein Ergebnis, das der Compiler beim Übersetzen kennt. `static readonly` wird erst beim Start des Typs gesetzt und eignet sich für Werte wie eine Liste oder ein Array. Das Feld selbst ist danach fest, die Elemente eines Arrays dahinter nicht.
+
+<CSharpRunner id="m06-l08-readonly" code={staticReadonly} />
+
+Die Ausgabe ist `5`, `3` und `login-failed`. Die Konstante `MaxAttempts` und das Feld `EventTypes` erreichst du beide über den Typnamen.
+
+## Der statische Konstruktor
+
+Ein <Term id="static-constructor">statischer Konstruktor (Static Constructor)</Term> bereitet den Typ vor, nicht ein einzelnes Objekt. Er hat `static`, keine Parameter und keinen Zugriffsmodifizierer. Du rufst ihn nie selbst auf. Er läuft höchstens einmal: Ausgelöst wird er vom ersten der beiden Ereignisse, dass ein Objekt der Klasse entsteht oder dass auf einen statischen Member der Klasse zugegriffen wird ([§15.12 Static constructors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus, und in welcher Reihenfolge? `Marker` hat einen statischen und einen gewöhnlichen Konstruktor. Zwei Objekte entstehen.
+:::
+
+<CSharpRunner id="m06-l08-constructor" code={staticConstructor} predict expected={staticConstructorOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe steht oben im Runner. Zuerst kommt `Program starts`, dann einmal `Static constructor runs` und zweimal `Instance constructor runs`, zuletzt `Two markers created`.
+
+1. **Vor dem ersten Objekt:** Bis zum ersten `new Marker()` läuft der statische Konstruktor nicht. Deshalb steht `Program starts` ganz oben.
+2. **Einmal:** Der erste `new` löst den statischen Konstruktor aus. Er läuft vor dem Instanzkonstruktor.
+3. **Nicht noch einmal:** Beim zweiten `new` läuft nur der Instanzkonstruktor, weil der Typ schon vorbereitet ist.
+
+Was passiert, wenn das Programm nie ein `Marker` erzeugt und nie einen statischen Member benutzt? Dann läuft der statische Konstruktor nie.
+
+</details>
+
+## Lückenbeispiel
+
+`Calculator` braucht kein Objekt, denn `Double` benutzt nur den Parameter. Forme die Klasse in eine statische Klasse um. Die Ausgabe `8` und `10` soll gleich bleiben. Tipp: Die Variable `calculator` entfällt, und die Methode wird über den Typnamen aufgerufen.
+
+<CSharpRunner id="m06-l08-gaps" code={staticGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Klasse:** `static class Calculator` statt `class Calculator`.
+2. **Methode:** `public static int Double(int value)`. In einer statischen Klasse muss jeder Member `static` sein.
+3. **Aufruf:** `Calculator.Double(4)` ohne `new` und ohne Variable.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klassen `LogEvent` und `Incident`. `Incident` hat den Primärkonstruktor `Incident(string user)` und die Eigenschaft `User`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Blöcke, die einen `Incident` erzeugen und ausgeben, sowie die Klasse `Incident`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Jeder neue `Incident` bekommt die nächste Nummer. `Incident` bekommt dafür das statische Feld `private static int nextNumber;`, die Eigenschaft `public int Number { get; } = ++nextNumber;` und die statische Eigenschaft `public static int Count => nextNumber;`. `Summary()` beginnt mit der Nummer, zum Beispiel `Incident #1 bob: …`. Schreibe danach, nach dem Block `// Print the user of each incident through the User property`, den Block `// Count the incidents with a static property`: Er gibt `Incidents: 2` mit `Incident.Count` aus.
+
+<CSharpRunner id="m06-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Gemeinsamer Zähler:** `nextNumber` ist statisch, es gibt nur ein Feld für alle Vorfälle.
+2. **Eigene Nummer:** `Number { get; } = ++nextNumber` läuft bei jedem `new Incident(…)` und speichert den neuen Stand im Objekt. Bob bekommt 1, Dave 2.
+3. **Zählen:** `Count => nextNumber` ist eine statische Eigenschaft. Du liest sie über den Typ: `Incident.Count`.
+4. **Ausgeben:** `Summary()` setzt `#{Number}` vor den Benutzer. Dadurch ändern sich die beiden Zeilen, die `Summary()` ausgeben.
+
+</details>
+
+**Neuer Stand:** SecLog nummeriert seine Vorfälle über ein statisches Feld und kennt ihre Anzahl über `Incident.Count`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l08-static-means-unchangeable" />
+
+**„`static` heißt: Der Wert kann sich nicht ändern.“** Das stimmt nicht. `static` bedeutet, dass ein Member zum Typ gehört. Ein statisches Feld kann neue Werte bekommen, und jedes Objekt sieht die Änderung. Unveränderlich wird ein Wert erst durch `const` oder `readonly`.
+:::
+
+<details>
+<summary>Vertiefung: Was vor dem statischen Konstruktor passiert (optional)</summary>
+
+Beim Vorbereiten eines Typs bekommen die statischen Felder zuerst ihre Standardwerte. Danach laufen ihre Initialisierer, dann der statische Konstruktor, falls es einen gibt ([§15.12 Static constructors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors)). Ein statischer Konstruktor wird nicht vererbt und lässt sich nicht direkt aufrufen.
+
+Ein statisches Feld mit Initialisierer, zum Beispiel `public static readonly string[] EventTypes = […]`, braucht daher oft keinen statischen Konstruktor. Der Konstruktor lohnt sich, wenn die Vorbereitung mehrere Anweisungen braucht.
+
+</details>
+
+## Zusammenfassung
+
+Ein statischer Member trägt `static` und gehört zum Typ. Du erreichst ihn über den Typnamen, und eine statische Methode hat kein `this`. Ein statisches Feld gibt es nur einmal für alle Objekte, und es lässt sich ändern. Unveränderlich machen es `const` oder `readonly`. Eine statische Klasse enthält nur statische Member und hat keine Objekte. Ein statischer Konstruktor läuft höchstens einmal, vor dem ersten Objekt oder dem ersten Zugriff auf einen statischen Member.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l08-q1" />
+
+<Quiz id="m06-l08-q2" />
+
+<Quiz id="m06-l08-q3" />
+
+<Quiz id="m06-l08-q4" />
+
+<Quiz id="m06-l08-q5" />
+
+<Quiz id="m06-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m06-l08-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Static and instance members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1538-static-and-instance-members)
+- C#-Spezifikation: [Static constructors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors)
+- Microsoft Learn: [Static classes and static class members](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/static-classes-and-static-class-members)
