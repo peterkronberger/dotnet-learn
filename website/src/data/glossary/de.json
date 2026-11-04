@@ -4220,6 +4220,127 @@
         "title": "Static constructors (C# language specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors"
       }
+    },
+    {
+      "id": "namespace",
+      "term": "Namespace",
+      "german": "Namensraum",
+      "category": "language",
+      "definition": "Eine Gruppe von Typen unter einem gemeinsamen Namen, zum Beispiel `System.IO`. Der Namespace ist Teil des vollständigen Namens eines Typs und schützt vor Namenskonflikten.",
+      "aliases": [
+        "namespaces"
+      ],
+      "related": [
+        "fully-qualified-name",
+        "using-directive",
+        "type"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Namespace declarations (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#143-namespace-declarations"
+      }
+    },
+    {
+      "id": "fully-qualified-name",
+      "term": "Fully qualified name",
+      "german": "vollqualifizierter Name",
+      "category": "language",
+      "definition": "Der Name eines Typs mit allen Namespaces davor, zum Beispiel `System.Console`. Mit ihm ist ein Typ ohne `using`-Direktive eindeutig erreichbar.",
+      "aliases": [
+        "fully qualified names",
+        "full name"
+      ],
+      "related": [
+        "namespace",
+        "using-directive"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Namespace declarations (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#143-namespace-declarations"
+      }
+    },
+    {
+      "id": "using-directive",
+      "term": "Using directive",
+      "german": "using-Direktive",
+      "category": "language",
+      "definition": "Eine Zeile wie `using System.Text;` am Anfang einer Datei. Sie erlaubt, die Typen dieses Namespace mit ihrem kurzen Namen zu schreiben. Sie lädt nichts und fügt keine Typen hinzu.",
+      "aliases": [
+        "using directives",
+        "using"
+      ],
+      "related": [
+        "namespace",
+        "using-alias",
+        "global-using"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Using directives (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#146-using-directives"
+      }
+    },
+    {
+      "id": "using-alias",
+      "term": "Using alias",
+      "german": "using-Alias",
+      "category": "language",
+      "definition": "Eine Direktive wie `using Mail = Alerts.Mail.Notice;`. Sie gibt einem Namespace oder Typ einen eigenen kurzen Namen, zum Beispiel wenn zwei Typen gleich heißen.",
+      "aliases": [
+        "using aliases",
+        "alias directive"
+      ],
+      "related": [
+        "using-directive",
+        "fully-qualified-name"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Using alias directives (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#1462-using-alias-directives"
+      }
+    },
+    {
+      "id": "global-using",
+      "term": "Global using",
+      "german": "globale using-Direktive",
+      "category": "language",
+      "definition": "Eine Direktive mit `global using` am Anfang einer Datei. Sie gilt für alle Dateien des Programms, nicht nur für die eine Datei.",
+      "aliases": [
+        "global using directive",
+        "global usings"
+      ],
+      "related": [
+        "using-directive",
+        "implicit-usings"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Global using directives (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#145-global-using-directives"
+      }
+    },
+    {
+      "id": "implicit-usings",
+      "term": "Implicit usings",
+      "german": "implizite using-Direktiven",
+      "category": "platform",
+      "definition": "Globale `using`-Direktiven, die das .NET SDK für ein Projekt erzeugt, zum Beispiel für `System` und `System.Linq`. Deshalb kommt ein einfaches Programm ohne eigene `using`-Zeilen aus.",
+      "aliases": [
+        "implicit using directives",
+        "ImplicitUsings"
+      ],
+      "related": [
+        "global-using",
+        "using-directive"
+      ],
+      "lesson": "m06-l09",
+      "source": {
+        "title": "Implicit using directives (.NET project SDK overview)",
+        "url": "https://learn.microsoft.com/dotnet/core/project-sdk/overview#implicit-using-directives"
+      }
     }
   ]
 }
