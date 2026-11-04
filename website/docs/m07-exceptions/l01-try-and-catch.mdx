@@ -1,0 +1,180 @@
+---
+title: Exceptions abfangen mit try und catch
+sidebar_position: 1
+description: Ein Laufzeitfehler löst eine Exception aus. Mit try und catch fängst du sie ab, und das Programm läuft hinter der try-Anweisung weiter.
+lesson_id: m07-l01
+duration_min: 20
+---
+
+import tryCatchBasic from '!!raw-loader!@site/examples/m07/l01/try-catch-basic.cs';
+import tryCatchBasicOutput from '!!raw-loader!@site/examples/m07/l01/try-catch-basic.out.txt';
+import unhandled from '!!raw-loader!@site/examples/m07/l01/unhandled.snippet.cs';
+import exceptionTypes from '!!raw-loader!@site/examples/m07/l01/exception-types.cs';
+import catchGap from '!!raw-loader!@site/examples/m07/l01/catch-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l01/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l01/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l01/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l01/seclog-exceptions-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Exceptions abfangen mit try und catch
+
+:::note[Lernziele]
+- Du kannst erklären, was beim Auslösen einer Exception mit dem restlichen Code passiert.
+- Du kannst eine Anweisung, die fehlschlagen kann, mit `try`/`catch` absichern und `Message` der Exception ausgeben.
+- Du kannst häufige Exception-Typen den Fehlern zuordnen, die sie auslösen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog fängt Fehler beim Verarbeiten von Log-Zeilen ab, statt abzustürzen.
+- SecLog weist ungültige Log-Zeilen mit einer eigenen Exception zurück.
+- SecLog liest das Log aus einer Datei und gibt die Datei danach sauber wieder frei.
+:::
+
+## Rückblick
+
+<Quiz id="m01-l08-q1" />
+
+<Quiz id="m03-l10-q1" />
+
+<Quiz id="m00-l05-q1" />
+
+## Wenn eine Anweisung fehlschlägt
+
+Bisher hast du Fehler zur Laufzeit gesehen, zum Beispiel bei `int.Parse` mit einem Text, der keine Zahl ist. Hinter solchen Fehlern steckt ein Mechanismus: Wenn eine Operation nicht gelingt, <Term id="throw-exception">löst</Term> das Programm eine <Term id="exception">Exception (Ausnahme)</Term> aus ([§22.2 Causes of exceptions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#222-causes-of-exceptions)). Eine Exception ist ein Objekt, das den Fehler beschreibt. Ihre Eigenschaft `Message` enthält eine lesbare Beschreibung ([§22.3 The System.Exception class](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#223-the-systemexception-class)).
+
+Sobald eine Exception ausgelöst ist, läuft die nächste Anweisung nicht mehr. Das Programm sucht stattdessen jemanden, der die Exception behandelt. Findet es niemanden, endet das Programm mit einer Fehlermeldung. Du kannst die Behandlung selbst schreiben, mit einer <Term id="try-statement">`try`-Anweisung</Term>:
+
+- Der `try`-Block enthält die Anweisungen, die fehlschlagen können.
+- Eine <Term id="catch-clause">`catch`-Klausel</Term> sagt, welchen <Term id="exception-type">Exception-Typ</Term> sie behandelt, und gibt der Exception einen Namen. Ihr Block läuft nur, wenn der `try`-Block eine passende Exception auslöst.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp für jede Zeile. Achte besonders darauf, ob die Zeile `Number: …` erscheint.
+:::
+
+<CSharpRunner id="m07-l01-basic" code={tryCatchBasic} predict expected={tryCatchBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe hat drei Zeilen: `Before the try block`, die Beschreibung der Exception und `After the try statement`. Die Zeile `Number: …` fehlt.
+
+1. **Ausführen:** `int.Parse("seven")` kann den Text nicht lesen und löst eine `FormatException` aus.
+2. **Abbrechen:** Der Rest des `try`-Blocks wird übersprungen. Deshalb gibt es kein `Number: …`.
+3. **Fangen:** Der Typ `FormatException` passt zur `catch`-Klausel. `ex` ist die Exception, `ex.Message` ihre Beschreibung.
+4. **Weitermachen:** Nach der `catch`-Klausel läuft das Programm hinter der ganzen `try`-Anweisung weiter ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+Was passiert, wenn du `"seven"` durch `"7"` ersetzt? Dann löst nichts eine Exception aus. Der `try`-Block läuft ganz durch, und die `catch`-Klausel wird übersprungen.
+
+</details>
+
+Ohne die `try`-Anweisung wäre der Ablauf anders. Der Code unten ist kein Runner-Beispiel: Er endet mit einer nicht behandelten Exception, und die Fehlermeldung des Programms ist hier nicht abgedruckt.
+
+<CodeBlock language="csharp" title="unhandled.snippet.cs">{unhandled}</CodeBlock>
+
+Das Programm gibt `Before` aus. Dann löst `int.Parse` die `FormatException` aus, niemand fängt sie, und das Programm endet. `Number: …` und `After` erscheinen nie. Die Meldung, die du dann siehst, lesen wir in einer der nächsten Lektionen.
+
+## Welche Fehler gibt es?
+
+Jede Exception hat einen Typ, und der Typ sagt, was schiefging. Die `catch`-Klausel nennt den Typ, den sie fängt. Eine Klausel für `FormatException` fängt also keine `DivideByZeroException`. Die C#-Spezifikation nennt dafür einige häufige Typen ([§22.5 Common exception classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#225-common-exception-classes)). Das Beispiel löst fünf davon nacheinander aus und fängt jede in einem eigenen `try`.
+
+<CSharpRunner id="m07-l01-types" code={exceptionTypes} />
+
+| Exception-Typ | Auslöser | Bekannt aus |
+| --- | --- | --- |
+| `DivideByZeroException` | Ganzzahldivision durch 0 | Modul 1 |
+| `IndexOutOfRangeException` | Index außerhalb eines Arrays | Modul 5 |
+| `InvalidCastException` | Umwandlung eines `object` in den falschen Typ | Modul 4 |
+| `NullReferenceException` | Zugriff auf ein Mitglied von `null` | Modul 4 |
+| `OverflowException` | Überlauf in einem `checked`-Kontext | Modul 1, Lektion 7 |
+| `FormatException` | Text hat nicht die erwartete Form, etwa bei `int.Parse` | Modul 1, Lektion 8 |
+| `InvalidOperationException` | `.Value` eines `int?` ohne Wert | Modul 4 |
+| `KeyNotFoundException` | Schlüssel fehlt im `Dictionary` | Modul 5 |
+
+`FormatException` und `KeyNotFoundException` stehen in der Bibliothek von .NET, nicht in der Liste der Spezifikation. Im Beispiel ist `names` ein neues Array mit einem Element, und ein Element eines Textarrays ist anfangs `null`. Die Meldungen stammen aus einem echten Lauf.
+
+## Lückenbeispiel
+
+Das Programm prüft mit `int.TryParse` und gibt `Not a number: 4x2` aus. Schreibe es um: Rufe `int.Parse` im `try`-Block auf und fange die `FormatException`. Die Ausgabe bleibt gleich.
+
+<CSharpRunner id="m07-l01-gaps" code={catchGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Absichern:** `try { int number = int.Parse(text); Console.WriteLine($"Number: {number}"); }` enthält die Anweisung, die fehlschlagen kann, und die Ausgabe des Ergebnisses.
+2. **Fangen:** `catch (FormatException) { Console.WriteLine($"Not a number: {text}"); }` behandelt den Fehlerfall.
+3. **Weitermachen:** `Console.WriteLine("Done");` steht hinter der `try`-Anweisung und läuft in beiden Fällen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält das Beispiel-Log, zählt Fehlversuche, modelliert Ereignisse und Vorfälle als Klassen und endet mit dem Exitcode 0. Eine Zahl aus Text liest es bisher mit `int.TryParse`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Block mit dem Text `badText`, den Platz für den neuen Block und `return 0;`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `return 0;` den Block `// Parse a failure count with int.Parse and catch the error`. Er ruft in einem `try`-Block `int.Parse` für `"7"` und für die vorhandene Variable `badText` (`"seven"`) auf. Für `"7"` gibt er `Failure count: 7` aus. Hinter dem zweiten `int.Parse` steht eine Zeile, die die Zahl ausgibt: Sie darf nie laufen. In `catch (FormatException ex)` gibst du `Not a number: seven` und danach `ex.Message` aus.
+
+<CSharpRunner id="m07-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Absichern:** Beide `int.Parse`-Aufrufe stehen im `try`-Block. Der erste (`"7"`) gelingt und gibt `Failure count: 7` aus.
+2. **Auslösen:** `int.Parse(badText)` löst die `FormatException` aus. Die Zeile dahinter wird übersprungen.
+3. **Fangen:** Die `catch`-Klausel gibt `Not a number: seven` und die `Message` der Exception aus.
+4. **Weitermachen:** Der Rest des Programms, hier `return 0;`, läuft normal.
+
+</details>
+
+**Neuer Stand:** SecLog fängt den Fehler beim Lesen einer Zahl ab und läuft danach weiter.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l01-resume-after-error" />
+
+**„Nach dem `catch` macht das Programm mit der Zeile nach der fehlerhaften Anweisung weiter.“** Das stimmt nicht. Der Rest des `try`-Blocks wird übersprungen, und das Programm macht hinter der ganzen `try`-Anweisung weiter. Eine Anweisung, die nach der fehlerhaften im `try`-Block steht, läuft nie, auch nicht nach dem `catch`.
+:::
+
+<details>
+<summary>Vertiefung: Wann ist ein Fehler eine Exception? (optional)</summary>
+
+Die Spezifikation nennt zwei Ursachen für Exceptions: die Anweisung `throw` und Operationen, die nicht gelingen ([§22.2 Causes of exceptions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#222-causes-of-exceptions)). `throw` lernst du in Lektion 5. Nicht jeder Fehler braucht eine Exception: `int.TryParse` meldet einen ungültigen Text über seinen Rückgabewert. Wann welcher Weg passt, vergleicht Lektion 7.
+
+Ein `try`-Block ohne Exception läuft bis zum Ende. Dann springt das Programm zum Ende der `try`-Anweisung, ohne eine `catch`-Klausel auszuführen ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+</details>
+
+## Zusammenfassung
+
+Eine Operation, die nicht gelingt, löst eine Exception aus. Der restliche Code im selben Ablauf läuft dann nicht mehr, bis jemand die Exception behandelt. Mit `try` sicherst du Anweisungen ab, eine `catch`-Klausel fängt eine Exception ihres Typs. Der Rest des `try`-Blocks wird übersprungen, und das Programm macht hinter der `try`-Anweisung weiter. `ex.Message` beschreibt den Fehler. Der Typ der Exception, etwa `FormatException` oder `DivideByZeroException`, sagt, was schiefging.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l01-q1" />
+
+<Quiz id="m07-l01-q2" />
+
+<Quiz id="m07-l01-q3" />
+
+<Quiz id="m07-l01-q4" />
+
+<Quiz id="m07-l01-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l01-q6" />
+
+### Transferfrage
+
+<Quiz id="m07-l01-q7" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)
+- C#-Spezifikation: [Exceptions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions)
+- Microsoft Learn: [Exceptions and exception handling](https://learn.microsoft.com/dotnet/csharp/fundamentals/exceptions/)

@@ -1,0 +1,5 @@
+Division: Attempted to divide by zero.
+Index: Index was outside the bounds of the array.
+Cast: Unable to cast object of type 'System.String' to type 'System.Int32'.
+Null: Object reference not set to an instance of an object.
+Overflow: Arithmetic operation resulted in an overflow.

@@ -1,4 +1,244 @@
 {
   "module": "m07",
-  "questions": []
+  "questions": [
+    {
+      "id": "m07-l01-q1",
+      "lesson": "m07-l01",
+      "type": "single",
+      "question": "Eine Anweisung im `try`-Block löst eine Exception aus, und eine `catch`-Klausel passt dazu. Was passiert danach?",
+      "options": [
+        {
+          "text": "Der Rest des `try`-Blocks wird übersprungen, die `catch`-Klausel läuft, danach geht es hinter der ganzen `try`-Anweisung weiter.",
+          "correct": true
+        },
+        {
+          "text": "Die `catch`-Klausel läuft, danach macht das Programm mit der Zeile nach der fehlerhaften Anweisung im `try`-Block weiter.",
+          "misconception": "m07-l01-resume-after-error",
+          "feedback": "Die Zeilen nach der fehlerhaften Anweisung im `try`-Block werden nie ausgeführt. Das Programm kehrt nicht in den `try`-Block zurück."
+        },
+        {
+          "text": "Das Programm endet, weil eine Exception immer das Ende bedeutet.",
+          "feedback": "Eine passende `catch`-Klausel fängt die Exception ab. Dann läuft das Programm weiter."
+        },
+        {
+          "text": "Der `try`-Block wird von vorn wiederholt, bis die Anweisung klappt.",
+          "feedback": "Es gibt keine automatische Wiederholung. Der `try`-Block läuft höchstens einmal."
+        }
+      ],
+      "explanation": "Beim Auslösen springt die Ausführung sofort aus dem `try`-Block zur passenden `catch`-Klausel. Alle Anweisungen danach im `try`-Block werden übersprungen. Nach der `catch`-Klausel geht es hinter der ganzen `try`-Anweisung weiter."
+    },
+    {
+      "id": "m07-l01-q2",
+      "lesson": "m07-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l01/skipped-line.cs",
+      "explanation": "`int.Parse(\"12x\")` löst eine `FormatException` aus. „Step 2“ wird übersprungen, die `catch`-Klausel gibt „Step 3“ aus, und hinter der `try`-Anweisung läuft „Step 4“."
+    },
+    {
+      "id": "m07-l01-q3",
+      "lesson": "m07-l01",
+      "type": "single",
+      "question": "Welche Exception löst `int.Parse(\"12x\")` aus?",
+      "options": [
+        {
+          "text": "`FormatException`",
+          "correct": true
+        },
+        {
+          "text": "`OverflowException`",
+          "feedback": "`OverflowException` kommt, wenn der Text eine Zahl ist, die nicht in einen `int` passt, zum Beispiel `99999999999`."
+        },
+        {
+          "text": "`InvalidCastException`",
+          "feedback": "`InvalidCastException` entsteht bei einer fehlgeschlagenen Umwandlung von Typen, nicht beim Lesen eines Textes."
+        },
+        {
+          "text": "`NullReferenceException`",
+          "feedback": "Der Text ist nicht `null`. Diese Exception entsteht erst, wenn man ein Mitglied von `null` benutzt."
+        }
+      ],
+      "explanation": "Der Text hat nicht die Form einer ganzen Zahl. Dafür ist `FormatException` der passende Exception-Typ."
+    },
+    {
+      "id": "m07-l01-q4",
+      "lesson": "m07-l01",
+      "type": "match",
+      "question": "Ordne jedem Ausdruck die Exception zu, die er auslöst. `zero` ist 0, `numbers` hat 3 Elemente, `text` ist ein `object` mit einem Text, `names` ist ein Array mit einem Element, das noch `null` ist.",
+      "pairs": [
+        {
+          "left": "`10 / zero`",
+          "right": "`DivideByZeroException`"
+        },
+        {
+          "left": "`numbers[5]`",
+          "right": "`IndexOutOfRangeException`"
+        },
+        {
+          "left": "`(int)text`",
+          "right": "`InvalidCastException`"
+        },
+        {
+          "left": "`names[0].Length`",
+          "right": "`NullReferenceException`"
+        }
+      ],
+      "explanation": "Der Typ der Exception sagt, was schiefging: Division durch 0, ein Index außerhalb des Arrays, eine falsche Umwandlung und der Zugriff auf `null`."
+    },
+    {
+      "id": "m07-l01-q5",
+      "lesson": "m07-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über `try` und `catch` stimmen?",
+      "options": [
+        {
+          "text": "Die `catch`-Klausel läuft nur, wenn im `try`-Block eine passende Exception ausgelöst wurde.",
+          "correct": true
+        },
+        {
+          "text": "Der Code hinter der `try`-Anweisung läuft auch nach einer abgefangenen Exception.",
+          "correct": true
+        },
+        {
+          "text": "In der `catch`-Klausel gibt `ex.Message` eine Beschreibung des Fehlers.",
+          "correct": true
+        },
+        {
+          "text": "Die `catch`-Klausel läuft bei jedem Durchlauf, auch ohne Fehler.",
+          "feedback": "Ohne Exception wird die `catch`-Klausel übersprungen."
+        },
+        {
+          "text": "Die Anweisungen nach der fehlerhaften Zeile im `try`-Block laufen nach der `catch`-Klausel weiter.",
+          "misconception": "m07-l01-resume-after-error",
+          "feedback": "Der Rest des `try`-Blocks wird übersprungen."
+        }
+      ],
+      "explanation": "Die `catch`-Klausel ist nur für den Fehlerfall da. `Message` ist die lesbare Beschreibung der Exception. Der Rest des `try`-Blocks nach der Fehlerstelle läuft nie, aber der Code hinter der `try`-Anweisung schon."
+    },
+    {
+      "id": "m07-l01-q6",
+      "lesson": "m07-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was passiert mit dem restlichen Code, wenn eine Anweisung eine Exception auslöst? Wie hilft `try`/`catch` dabei?",
+      "modelAnswer": "Eine Exception unterbricht die normale Ausführung sofort. Die Anweisungen, die danach kämen, laufen nicht. Ohne passende `catch`-Klausel endet das Programm. Mit `try`/`catch` springt die Ausführung aus dem `try`-Block in die passende `catch`-Klausel, der Rest des `try`-Blocks wird übersprungen, und danach läuft das Programm hinter der `try`-Anweisung normal weiter."
+    },
+    {
+      "id": "m07-l01-q7",
+      "lesson": "m07-l01",
+      "type": "explain",
+      "question": "Transfer: SecLog liest Zahlen aus Log-Zeilen. Wo würdest du dort `try`/`catch` einsetzen, und wo würdest du lieber `int.TryParse` nehmen? Begründe kurz.",
+      "modelAnswer": "`try`/`catch` passt, wo ein Fehler wirklich unerwartet ist und das Programm an einer Stelle darauf reagieren soll, zum Beispiel wenn eine Zahl in einer Zeile stehen muss und ein anderer Text ein Defekt ist. `int.TryParse` passt, wenn ein ungültiger Text ein normaler, häufiger Fall ist, den man mit einem einfachen `if` behandelt. Beides ist möglich; die Wahl hängt davon ab, wie oft der Fehler vorkommt und wo er behandelt werden soll."
+    },
+    {
+      "id": "m07-l02-q1",
+      "lesson": "m07-l02",
+      "type": "single",
+      "question": "Ein `try` hat zuerst `catch (Exception ex)` und danach `catch (FormatException)`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die allgemeine Klausel die zweite nie erreichen lässt.",
+          "correct": true
+        },
+        {
+          "text": "Bei einer `FormatException` läuft die zweite Klausel, weil sie besser passt.",
+          "misconception": "m07-l02-catch-order-irrelevant",
+          "feedback": "C# wählt nicht die am besten passende Klausel, sondern die erste, die passt. Hier käme sie nie an die Reihe, deshalb ist es ein Fehler."
+        },
+        {
+          "text": "Beide Klauseln laufen nacheinander.",
+          "feedback": "Es läuft höchstens eine `catch`-Klausel pro Exception."
+        },
+        {
+          "text": "Das Programm übersetzt, die zweite Klausel läuft nie, und der Compiler warnt nur.",
+          "feedback": "Der Compiler meldet hier einen Fehler, keine Warnung."
+        }
+      ],
+      "explanation": "Die `catch`-Klauseln werden der Reihe nach geprüft, und die erste passende gewinnt. `Exception` passt auf jede Exception. Eine spätere Klausel mit demselben oder einem davon abgeleiteten Typ wäre nie erreichbar, deshalb ist das ein Fehler zur Übersetzungszeit."
+    },
+    {
+      "id": "m07-l02-q2",
+      "lesson": "m07-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l02/catch-order.cs",
+      "explanation": "„5“ gibt 100 / 5 = 20 aus. „abc“ löst eine `FormatException` aus, „99999999999“ eine `OverflowException`, beide haben eine eigene Klausel. „0“ löst eine `DivideByZeroException` aus, die erst die allgemeine Klausel fängt."
+    },
+    {
+      "id": "m07-l02-q3",
+      "lesson": "m07-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l02/propagation.cs",
+      "explanation": "Die Exception entsteht in `DoubleOf`, das keine `catch`-Klausel hat. Die Suche geht in die aufrufende Methode, wo die `catch`-Klausel passt. „Read eight“ und „Both done“ werden nie ausgegeben, das Programm läuft hinter der `try`-Anweisung weiter."
+    },
+    {
+      "id": "m07-l02-q4",
+      "lesson": "m07-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l02/exception-filter.cs",
+      "explanation": "Beide Klauseln haben denselben Typ. Die erste fängt nur, wenn der Filter `text.Length == 0` wahr ist. Bei „abc“ ist er falsch, die Suche geht weiter, und die zweite Klausel fängt."
+    },
+    {
+      "id": "m07-l02-q5",
+      "lesson": "m07-l02",
+      "type": "multi",
+      "question": "Welche Aussagen über Ausnahmefilter mit `when` stimmen?",
+      "options": [
+        {
+          "text": "Der Filter wird ausgewertet, bevor entschieden wird, ob die Klausel die Exception fängt.",
+          "correct": true
+        },
+        {
+          "text": "Ist der Filter `false`, sucht das Programm bei den folgenden Klauseln weiter.",
+          "correct": true
+        },
+        {
+          "text": "Zwei Klauseln mit demselben Typ sind erlaubt, wenn die frühere einen Filter hat.",
+          "correct": true
+        },
+        {
+          "text": "Ist der Filter `false`, endet das Programm sofort.",
+          "feedback": "Die Suche geht weiter. Das Programm endet nur, wenn keine Klausel passt."
+        },
+        {
+          "text": "Die Reihenfolge der Klauseln spielt mit Filtern keine Rolle mehr.",
+          "misconception": "m07-l02-catch-order-irrelevant",
+          "feedback": "Die Klauseln werden weiterhin der Reihe nach geprüft, und die erste passende gewinnt."
+        }
+      ],
+      "explanation": "Eine Klausel passt, wenn der Typ passt und der Filter `true` ergibt. Ist er `false`, prüft das Programm die nächsten Klauseln."
+    },
+    {
+      "id": "m07-l02-q6",
+      "lesson": "m07-l02",
+      "type": "find-bug",
+      "question": "Dieser Code übersetzt nicht. Welche Zeile ist das Problem?",
+      "example": "m07/l02/catch-order-error.snippet.cs",
+      "bugLines": [
+        9
+      ],
+      "lineFeedback": {
+        "9": {
+          "feedback": "Richtig: Die Klausel für `FormatException` steht hinter `catch (Exception)`. Sie wäre nie erreichbar.",
+          "misconception": "m07-l02-catch-order-irrelevant"
+        }
+      },
+      "explanation": "Die allgemeine Klausel `catch (Exception ex)` fängt jede Exception. Die Klausel für `FormatException` dahinter wäre nie erreichbar, deshalb meldet der Compiler CS0160 in dieser Zeile. Die spezielle Klausel muss vor der allgemeinen stehen."
+    },
+    {
+      "id": "m07-l02-q7",
+      "lesson": "m07-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wie entscheidet C#, welche `catch`-Klausel eine Exception fängt, und was passiert, wenn die Exception in einer aufgerufenen Methode ausgelöst wurde?",
+      "modelAnswer": "C# prüft die Klauseln des `try` der Reihe nach und nimmt die erste, deren Typ passt (und deren `when`-Filter `true` ist). Deshalb stehen spezielle Typen vor allgemeinen. Gibt es in der Methode keine passende Klausel, sucht C# in der aufrufenden Methode weiter, dann in deren Aufrufer. Findet es nirgends eine, endet das Programm."
+    },
+    {
+      "id": "m07-l02-q8",
+      "lesson": "m07-l02",
+      "type": "explain",
+      "question": "Transfer: Eine Methode von SecLog liest eine Zeilennummer aus einem Text und gibt die Zeile zurück. Wo schreibst du die `try`/`catch`-Anweisung: in der Methode oder im Aufrufer? Begründe.",
+      "modelAnswer": "Das hängt davon ab, wo man sinnvoll auf den Fehler reagieren kann. Weiß die Methode nicht, was bei einer falschen Nummer zu tun ist, lässt sie die Exception weiterreichen, und der Aufrufer fängt sie (zum Beispiel, um eine Meldung auszugeben). Kann die Methode selbst einen Ersatz liefern, fängt sie die Exception selbst."
+    }
+  ]
 }

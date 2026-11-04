@@ -4422,6 +4422,130 @@
         "title": "Entry point invocation (C# language specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#716-entry-point-invocation"
       }
+    },
+    {
+      "id": "try-statement",
+      "term": "try Statement",
+      "german": "try-Anweisung",
+      "category": "language",
+      "definition": "Eine Anweisung aus einem `try`-Block und mindestens einer `catch`-Klausel. Löst eine Anweisung im `try`-Block eine Exception aus, springt das Programm zur passenden `catch`-Klausel und macht danach hinter der ganzen `try`-Anweisung weiter.",
+      "aliases": [
+        "try-Block",
+        "try/catch"
+      ],
+      "related": [
+        "catch-clause",
+        "exception",
+        "throw-exception"
+      ],
+      "lesson": "m07-l01",
+      "source": {
+        "title": "Exception-handling statements – C# reference",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements"
+      }
+    },
+    {
+      "id": "catch-clause",
+      "term": "catch Clause",
+      "german": "catch-Klausel",
+      "category": "language",
+      "definition": "Der Teil einer `try`-Anweisung, der eine Exception eines bestimmten Typs behandelt. Sie steht in der Form `catch (Typ name) { … }`; `name` ist die ausgelöste Exception.",
+      "aliases": [
+        "catch",
+        "catch-Block",
+        "catch-Klauseln"
+      ],
+      "related": [
+        "try-statement",
+        "exception-type",
+        "exception-filter"
+      ],
+      "lesson": "m07-l01",
+      "source": {
+        "title": "Exception-handling statements – C# reference",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements"
+      }
+    },
+    {
+      "id": "throw-exception",
+      "term": "Throw (eine Exception auslösen)",
+      "german": "eine Exception auslösen",
+      "category": "language",
+      "definition": "Eine Exception wird ausgelöst, wenn ein Vorgang zur Laufzeit nicht gelingt, zum Beispiel `int.Parse(\"abc\")`. Der Code danach läuft nicht weiter, bis eine passende `catch`-Klausel die Exception behandelt.",
+      "aliases": [
+        "Exception auslösen"
+      ],
+      "related": [
+        "exception",
+        "try-statement",
+        "catch-clause"
+      ],
+      "lesson": "m07-l01",
+      "source": {
+        "title": "Exceptions and exception handling",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/exceptions/"
+      }
+    },
+    {
+      "id": "exception-type",
+      "term": "Exception Type",
+      "german": "Exception-Typ",
+      "category": "language",
+      "definition": "Der Typ des Exception-Objekts, zum Beispiel `FormatException` oder `DivideByZeroException`. Er sagt, welche Art von Fehler aufgetreten ist, und entscheidet, welche `catch`-Klausel passt.",
+      "aliases": [
+        "Exception-Typen",
+        "Ausnahmetyp"
+      ],
+      "related": [
+        "exception",
+        "catch-clause"
+      ],
+      "lesson": "m07-l01",
+      "source": {
+        "title": "Exceptions and exception handling",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/exceptions/"
+      }
+    },
+    {
+      "id": "exception-filter",
+      "term": "Exception Filter",
+      "german": "Ausnahmefilter",
+      "category": "language",
+      "definition": "Eine Bedingung `when (…)` hinter einer `catch`-Klausel. Die Klausel fängt die Exception nur, wenn der Typ passt und die Bedingung `true` ergibt, sonst geht die Suche weiter.",
+      "aliases": [
+        "Exception-Filter",
+        "Ausnahmefilter"
+      ],
+      "related": [
+        "catch-clause",
+        "exception-propagation"
+      ],
+      "lesson": "m07-l02",
+      "source": {
+        "title": "Exception-handling statements – C# reference",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements"
+      }
+    },
+    {
+      "id": "exception-propagation",
+      "term": "Exception Propagation",
+      "german": "Weitergabe einer Exception durch den Aufrufstapel",
+      "category": "language",
+      "definition": "Findet die Methode, in der die Exception ausgelöst wurde, keine passende `catch`-Klausel, sucht das Programm in der aufrufenden Methode weiter, dann in deren Aufrufer und so fort. Findet es keine, endet das Programm.",
+      "aliases": [
+        "Propagation",
+        "Weitergabe"
+      ],
+      "related": [
+        "call-stack",
+        "catch-clause",
+        "exception"
+      ],
+      "lesson": "m07-l02",
+      "source": {
+        "title": "Exceptions – C# language specification, How exceptions are handled",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled"
+      }
     }
   ]
 }
