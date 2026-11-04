@@ -91,6 +91,23 @@ Die Ausgabe ist `12` und `22`.
 
 </details>
 
+### Was bedeutet `static`?
+
+Das Wort `static` bedeutet auf Deutsch „statisch", also „nicht beweglich" oder „fest". In C# ist es ein <Term id="modifier">Modifizierer (Modifier)</Term>, ein Wort vor einer Deklaration, das ihre Eigenschaften festlegt. Hier legt es fest: Die Funktion hängt an nichts, was in der umgebenden Methode gerade vorhanden ist. Sie ist in sich geschlossen.
+
+Ein Vergleich aus dem Alltag: Ein Rezept kann auf zwei Arten geschrieben sein.
+
+- **Ohne `static`:** „Nimm das Mehl, das gerade auf dem Tisch steht." Das Rezept greift auf etwas in der Küche zu. Du verstehst es erst, wenn du weißt, was auf dem Tisch steht. Das Ergebnis hängt davon ab, was dort liegt.
+- **Mit `static`:** „Nimm 200 Gramm Mehl, 2 Eier und 1 Prise Salz." Alles Nötige steht im Rezept selbst. Du kannst es in jeder Küche verwenden, und bei gleichen Zutaten kommt dasselbe heraus.
+
+Die Zutaten einer Funktion sind ihre Parameter. Eine statische lokale Funktion bekommt alles, was sie braucht, nur über ihre Parameter. Deshalb genügt ein Blick auf die Kopfzeile, um sie zu verstehen. Das Schlüsselwort ist ein Schutz: Wenn du aus Versehen doch eine Variable von außen benutzt, meldet der Compiler einen Fehler.
+
+`static` steht in C# nicht nur vor lokalen Funktionen. Später steht es auch vor Methoden und Klassen. Die Grundidee bleibt ähnlich: Das Gemeinte gehört nicht zu einem einzelnen Objekt oder Zustand, sondern steht für sich. Dafür brauchst du aber Klassen und Objekte, die du in Modul 6 kennenlernst.
+
+<Forward concepts={['`static` vor Methoden und Klassen', 'Objekte']} module="6" />
+
+### Die Regel für lokale Funktionen
+
 Mit dem Modifizierer `static` wird eine lokale Funktion zur <Term id="static-local-function">statischen lokalen Funktion (Static Local Function)</Term>. Sie darf keine lokalen Variablen und Parameter der umgebenden Methode erfassen. Alles, was sie braucht, muss als Parameter hineinkommen. Der Compiler meldet sonst einen Fehler.
 
 <CodeBlock language="csharp" title="static-capture-error.snippet.cs">{staticError}</CodeBlock>

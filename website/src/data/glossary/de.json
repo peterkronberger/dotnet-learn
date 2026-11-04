@@ -2070,6 +2070,24 @@
       }
     },
     {
+      "id": "modifier",
+      "term": "Modifier",
+      "german": "Modifizierer",
+      "category": "language",
+      "definition": "Ein Schlüsselwort vor einer Deklaration, das ihre Eigenschaften festlegt, zum Beispiel `static` vor einer lokalen Funktion oder `ref` vor einem Parameter.",
+      "aliases": [
+        "Modifizierer"
+      ],
+      "related": [
+        "static-local-function"
+      ],
+      "lesson": "m03-l04",
+      "source": {
+        "title": "Local function declarations (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1364-local-function-declarations"
+      }
+    },
+    {
       "id": "static-local-function",
       "term": "Static Local Function",
       "german": "statische lokale Funktion",
