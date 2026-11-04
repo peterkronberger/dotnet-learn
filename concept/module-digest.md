@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-03. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-04. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -26,7 +26,6 @@ Each module section has these fields:
 - **Glossary terms:** top-level-statements, literal, compiler, seclog, statement, console-output, keyword, csharp, method, dotnet, roslyn, clr, bcl, sdk, language-specification, dotnet-framework, dotnet-core, dotnet-standard, mono, ef-core, lts, sts, end-of-support, il, jit, ready-to-run, native-aot, compile-error, runtime-error
 - **Misconception ids:** m00-l01-text-without-quotes, m00-l01-statement-order, m00-l02-csharp-is-dotnet, m00-l02-console-is-language, m00-l03-dotnet-core-is-ef-core, m00-l03-framework-is-current, m00-l04-sts-is-preview, m00-l04-newest-has-longest-support, m00-l05-compiles-to-machine-code, m00-l05-compile-error-at-runtime
 - **Open forward references:**
-  - Klasse, Methode `Main` → M6 (`m00-l01`)
   - Typen, `int`/`string`/`bool`, `typeof` → M1 (`m00-l02`; taught in `m01-l02`)
   - Variablen, `var`, Division mit ganzen Zahlen, String-Interpolation → M1 (`m00-l05`)
   - `try`/`catch`, Exceptions → M7 (`m00-l05`)
@@ -51,7 +50,6 @@ Each module section has these fields:
 - **Glossary terms:** comment, escape-sequence, verbatim-string-literal, identifier, declaration, assignment, definite-assignment, variable, type, static-typing, built-in-type, integer-division, integral-type, floating-point-type, operand, decimal-type, numeric-promotion, nan, round-off-error, exception, expression, operator, operator-precedence, compound-assignment, increment-operator, type-inference, constant, constant-expression, implicitly-typed-variable, string-interpolation, string-concatenation, format-string, raw-string-literal, culture, cast, implicit-conversion, explicit-conversion, overflow, checked-context, parsing, console-input
 - **Misconception ids:** m01-l01-comment-is-executed, m01-l01-escape-in-verbatim, m01-l02-assignment-is-comparison, m01-l02-variable-remembers-old-values, m01-l03-integer-division-rounds, m01-l03-double-is-exact, m01-l04-postfix-returns-new-value, m01-l04-left-to-right-always, m01-l05-var-is-dynamic, m01-l05-const-from-variable, m01-l06-string-plus-number-adds, m01-l06-toupper-changes-variable, m01-l07-cast-rounds, m01-l07-overflow-always-error, m01-l08-parse-accepts-decimals, m01-l08-tryparse-keeps-old-value, m01-l09-readline-reads-all, m01-l09-readline-returns-number
 - **Open forward references:**
-  - Member (Mitglied) eines Typs → M6 (`m01-l06`)
   - Exceptions (Ausnahmen) → M7 (`m01-l07`, `m01-l08`)
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
@@ -96,8 +94,6 @@ Each module section has these fields:
 - **Glossary terms:** parameter, argument, return-type, void, method-call, return-value, return-statement, expression-body, scope, local-variable, value-parameter, declaration-space, local-function, static-local-function, capture, signature, overloading, overload-resolution, optional-parameter, default-argument, named-argument, parameter-array, reference-parameter, output-parameter, input-parameter, tuple, tuple-element, deconstruction, recursion, base-case, call-stack, stack-overflow
 - **Misconception ids:** m03-l01-declaration-runs-code, m03-l02-return-prints, m03-l03-method-changes-caller-variable, m03-l04-declare-before-call, m03-l05-return-type-overloads, m03-l06-default-from-variable, m03-l07-params-not-last, m03-l08-out-may-stay-unassigned, m03-l09-tuple-is-reference-type, m03-l10-no-base-case
 - **Open forward references:**
-  - die erzeugte Methode `Main`, Klassen → M6 (`m03-l04`)
-  - `static class`, `public static` → M6 (`m03-l05`)
 - **SecLog end state:** `website/examples/m03/l10/seclog-methods-solution.cs` – the M2 end state split into methods: check a line, read the user (`TryReadUser` with `out`), return user and IP together as a tuple (`ReadUserAndIp`), overloaded report lines, optional IP argument, static local helper, recursion. Each task file equals the previous solution.
 - **Notes for later modules:**
   - Methods in examples are local functions in top-level code. Overloads live in a `static class` (Forward to M6).
@@ -119,9 +115,6 @@ Each module section has these fields:
 - **Glossary terms:** value-type, reference-type, object, simple-type, string-builder, stack, heap, garbage-collector, automatic-memory-management, pass-by-reference, null, nullable-reference-type, nullable-context, null-state-analysis, null-forgiving-operator, nullable-value-type, lifted-operator, default-value, null-conditional-operator, null-coalescing-operator, null-coalescing-assignment, null-conditional-assignment, immutable, reference-equality, value-equality, boxing, unboxing
 - **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack, m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null, m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
 - **Open forward references:**
-  - Namespaces, `using`, Klassen, Konstruktoren → M6 (`m04-l01`)
-  - Felder → M6 (`m04-l05`, `m04-l06`)
-  - Eigenschaften (Properties) → M6 (`m04-l06`)
   - Exceptions → M7 (`m04-l04`, `m04-l05`, `m04-l09`)
   - Projektdatei (nullable setting) → M14 (`m04-l04`)
 - **SecLog end state:** `website/examples/m04/l08/seclog-types-solution.cs` – the M3 end state plus: findings in one `StringBuilder` passed to a method (`l03`), `FindUser` returns `string?` (`l04`), `FailuresOrNull` returns `int?` (`l05`), `??`, `?.`, `??=` for missing values (`l06`), `Trim().ToLower()` for user names (`l07`), `==`/`Equals`/`ReferenceEquals` (`l08`). `l02` and `l09` have no step. Chain: `m03/l10` → `m04/l01` → `l03` → `l04` → `l05` → `l06` → `l07` → `l08`.
@@ -156,6 +149,34 @@ Each module section has these fields:
   - No current time in runnable examples. Parse timestamps with `DateTimeOffset` and `CultureInfo.InvariantCulture`.
   - The order of `HashSet` and `Dictionary` elements is not promised. Do not print them unsorted in outputs.
   - Compare texts with an explicit `StringComparison` (ordinal for logs).
+
+## M6 OOP I
+
+- **Lessons:**
+  - `m06-l01` Klassen und Objekte – a class describes a type with fields and methods; `new` creates an object.
+  - `m06-l02` Konstruktoren – constructors, `this(…)` chaining, `readonly` fields.
+  - `m06-l03` Kapselung und Zugriffsmodifizierer – `private`/`public`/`internal`, accessibility domain, documentation comments.
+  - `m06-l04` Eigenschaften – property with `get`/`set` and a backing field, validation in `set`.
+  - `m06-l05` Objektinitialisierer und zieltypisiertes `new` – `new T(…) { P = v }`, `new(…)`.
+  - `m06-l06` Eigenschaften im Detail – auto-property, `init`, `required`, `field` (C# 14), computed property.
+  - `m06-l07` Primärkonstruktoren – `class C(string p)`, capture (C# 12).
+  - `m06-l08` Statische Member und statische Klassen – `static` fields/methods/properties/constructors, `static class`.
+  - `m06-l09` Namespaces und `using`-Direktiven – `namespace`, `using`, alias, `global using`, implicit usings.
+  - `m06-l10` Wo das Programm startet – entry point, top-level statements, `args`, exit code.
+- **Constructs taught:** `class`, field, `new T()`, `.` member access, instance method (`m06-l01`), constructor, `this(…)`, `this.x`, `readonly` (`m06-l02`), `private`, `public`, `internal`, `///` with `<summary>`, `<param>`, `<returns>` (`m06-l03`), `get`, `set`, `value`, property (`m06-l04`), object initializer, `new(…)` (`m06-l05`), `{ get; }`, `{ get; set; }`, `init`, `required`, `field`, `=>` property (`m06-l06`), primary constructor (`m06-l07`), `static` member, `static class`, static constructor (`m06-l08`), `namespace`, `using`, alias, `global using` (`m06-l09`), `Main`, `args`, `return` exit code (`m06-l10`). `sealed` and `partial` are named only.
+- **Glossary terms:** see the `"lesson": "m06-l…"` fields: class, instance, field, member, instance-method, object-creation, constructor, default-constructor, constructor-chaining, this-access, readonly-field, encapsulation, access-modifier, accessibility-domain, documentation-comment, property, accessor, backing-field, computed-property, object-initializer, auto-property, init-accessor, required-member, field-keyword, primary-constructor, static-member, instance-member, static-class, static-constructor, namespace, fully-qualified-name, using-directive, using-alias, global-using, implicit-usings, entry-point, main-method, command-line-argument, exit-code
+- **Misconception ids:** m06-l01-class-declaration-creates-object, m06-l02-readonly-object-immutable, m06-l03-private-per-object, m06-l04-property-is-field, m06-l05-initializer-before-constructor, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable, m06-l09-using-adds-library, m06-l10-top-level-has-no-main
+- **Open forward references:** 
+  - Exceptions → M7 (`m06-l03`, `m06-l04`)
+  - `protected`, inheritance, records, `sealed`, `abstract` → M8 (`m06-l03`, `m06-l07`, `m06-l08`)
+  - `with` expression → M12 (`m06-l06`)
+  - `async`/`await` → M13 (`m06-l10`)
+  - Projects and assemblies, project file, attributes → M14 (`m06-l03`, `m06-l06`, `m06-l09`)
+- **SecLog end state:** `website/examples/m06/l10/seclog-classes-solution.cs` – the M5 end state plus: `LogEvent` (events from the sample log, `Describe()`) and `Incident` (failed logins of one user, validated `Status`, `required Source`, static `Count`). Both live in the namespace `SecLog.Model` at the end of the file. Chain: `m05/l11` → `m06/l01` → … → `m06/l10`. M6 milestone reached.
+- **Notes for later modules:**
+  - Classes do not override `ToString()` yet (M8).
+  - New top-level blocks go **before** `return 0;` (since `m06-l10`).
+  - M6 rejects invalid values without exceptions (`Add` returns `bool`, `Status` ignores bad values); M7 may change this.
 
 ## W1 Wiederholung M1–M4
 
