@@ -1,0 +1,18 @@
+CreateTempSubdirectory: True
+Path.Combine: notes.txt
+GetFileName: notes.txt
+GetExtension: .txt
+WriteAllText/ReadAllText: first
+AppendAllText: first second
+WriteAllLines/ReadAllLines: 3
+ReadLines: 3
+StreamWriter.WriteLine: done
+StreamReader.ReadLine: 2
+Encoding.UTF8: plain ascii
+Exists before Delete: True
+Exists after Delete: False
+Missing file: FileNotFoundException
+Missing directory: DirectoryNotFoundException
+catch (IOException): file
+catch (IOException): directory
+Directory.Delete: True
