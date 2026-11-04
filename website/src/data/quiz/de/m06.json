@@ -589,6 +589,125 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm eine `required`-Eigenschaft mit `init` einsetzen, und wo eine Eigenschaft mit `field`?",
       "modelAnswer": "`required` mit `init`: Eine Klasse `Bestellung` braucht beim Erzeugen immer eine `Kundennummer`, die sich danach nicht mehr ändert. Mit `field`: Eine Eigenschaft `Rabatt` soll nur Werte von 0 bis 100 annehmen. Der `set`-Accessor prüft den Wert und speichert ihn in `field`, ohne dass ein eigenes privates Feld nötig ist."
+    },
+    {
+      "id": "m06-l07-q1",
+      "lesson": "m06-l07",
+      "type": "single",
+      "question": "Wo gilt ein Parameter des Primärkonstruktors, zum Beispiel `title` in `class Alert(string title)`?",
+      "options": [
+        {
+          "text": "In der ganzen Klassendeklaration: in Methoden, Eigenschaften und Initialisierern.",
+          "correct": true
+        },
+        {
+          "text": "Nur in einem Konstruktorkörper. Die Klasse hat aber keinen, deshalb ist der Parameter wirkungslos.",
+          "feedback": "Der Primärkonstruktor hat keinen eigenen Körper. Seine Parameter sind im gesamten Rumpf der Klasse sichtbar."
+        },
+        {
+          "text": "Nur in der Zeile `class Alert(string title)`. Danach ist der Name nicht mehr bekannt.",
+          "feedback": "Der Parameter steht im ganzen Klassenrumpf zur Verfügung, nicht nur in der Kopfzeile."
+        }
+      ],
+      "explanation": "Die Parameterliste hinter dem Klassennamen gehört zum Primärkonstruktor. Seine Parameter sind im ganzen Klassenrumpf im Gültigkeitsbereich."
+    },
+    {
+      "id": "m06-l07-q2",
+      "lesson": "m06-l07",
+      "type": "single",
+      "question": "Was gilt für `title` in `class Alert(string title)`, wenn der Code `alert.title` außerhalb der Klasse schreibt?",
+      "options": [
+        {
+          "text": "Es gibt kein Member `title`. Der Compiler lehnt den Zugriff ab.",
+          "correct": true
+        },
+        {
+          "text": "`title` ist eine öffentliche Eigenschaft, `alert.title` liefert den Wert.",
+          "misconception": "m06-l07-primary-parameter-is-property",
+          "feedback": "Ein Parameter des Primärkonstruktors ist keine Eigenschaft. Von außen gibt es kein Member mit diesem Namen. Eine Eigenschaft müsstest du selbst deklarieren, zum Beispiel `public string Title => title;`."
+        },
+        {
+          "text": "`title` ist ein privates Feld. Der Zugriff scheitert nur, weil er außerhalb der Klasse steht.",
+          "misconception": "m06-l07-primary-parameter-is-property",
+          "feedback": "Auch das ist kein Feld, das du ansprechen kannst: Der Name ist ein Parameter und kein Member. Auch innerhalb der Klasse schreibst du `title`, nicht `this.title`."
+        }
+      ],
+      "explanation": "Parameter des Primärkonstruktors sind keine Member der Klasse. Von außen führt kein Weg zu ihnen. Willst du den Wert zeigen, deklarierst du eine Eigenschaft, die ihn zurückgibt."
+    },
+    {
+      "id": "m06-l07-q3",
+      "lesson": "m06-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l07/quiz-primary.cs",
+      "explanation": "`name` ist der Parameter des Primärkonstruktors und behält den Wert `\"logins\"`. `value` ist ein Feld mit Startwert 0, `Add()` erhöht es zweimal. Die Ausgabe ist deshalb `logins: 2`."
+    },
+    {
+      "id": "m06-l07-q4",
+      "lesson": "m06-l07",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler?",
+      "example": "m06/l07/primary-outside.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`title` ist ein Parameter des Primärkonstruktors und kein Member von `Alert`. Der Zugriff `alert.title` übersetzt nicht. Mit `public string Title => title;` in der Klasse wäre `alert.Title` möglich."
+    },
+    {
+      "id": "m06-l07-q5",
+      "lesson": "m06-l07",
+      "type": "single",
+      "question": "Eine Klasse hat einen Primärkonstruktor und einen weiteren Konstruktor. Was muss der weitere Konstruktor tun?",
+      "options": [
+        {
+          "text": "Er muss mit `: this(…)` den Primärkonstruktor aufrufen, direkt oder über einen anderen Konstruktor.",
+          "correct": true
+        },
+        {
+          "text": "Nichts Besonderes. Er darf die Felder wie in einer Klasse ohne Primärkonstruktor selbst setzen.",
+          "feedback": "Dann wären die Parameter des Primärkonstruktors nie gesetzt. Deshalb verlangt die Sprache den Aufruf mit `this(…)`."
+        },
+        {
+          "text": "Er darf den Aufruf weglassen, wenn seine Parameter dieselben Namen wie die des Primärkonstruktors haben.",
+          "feedback": "Gleiche Namen reichen nicht. Der Aufruf `: this(…)` ist immer nötig, damit der Primärkonstruktor läuft."
+        }
+      ],
+      "explanation": "Jeder andere Konstruktor einer Klasse mit Primärkonstruktor muss `this(…)` aufrufen. So bekommen die Parameter ihren Wert, und die Verkettung ist dieselbe wie in Lektion 2."
+    },
+    {
+      "id": "m06-l07-q6",
+      "lesson": "m06-l07",
+      "type": "single",
+      "question": "In welchem Fall legt der Compiler für einen Parameter des Primärkonstruktors einen versteckten Speicher an?",
+      "options": [
+        {
+          "text": "Wenn ein Member der Klasse, zum Beispiel eine Methode, den Parameter benutzt.",
+          "correct": true
+        },
+        {
+          "text": "Immer, sobald die Klasse einen Primärkonstruktor hat.",
+          "feedback": "Wird ein Parameter nur im Initialisierer einer Eigenschaft gelesen, braucht die Klasse ihn danach nicht mehr. Dann wird nichts gespeichert."
+        },
+        {
+          "text": "Nie. Der Parameter lebt nur während des Konstruktoraufrufs.",
+          "feedback": "Benutzt eine Methode den Parameter, muss sein Wert nach dem Aufruf noch da sein. Der Compiler erfasst ihn dann und speichert ihn im Objekt."
+        }
+      ],
+      "explanation": "Benutzt ein Member den Parameter, erfasst der Compiler ihn und speichert den Wert im Objekt (Capture). Wird der Parameter nur zum Initialisieren benutzt, entfällt dieser Speicher."
+    },
+    {
+      "id": "m06-l07-q7",
+      "lesson": "m06-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Parameter des Primärkonstruktors keine Eigenschaft ist, und wie du seinen Wert trotzdem nach außen gibst.",
+      "modelAnswer": "Der Parameter steht in der Kopfzeile der Klasse und ist im ganzen Klassenrumpf sichtbar. Er ist aber nur ein Parameter, kein Member: Von außen gibt es keinen Namen, über den man ihn erreicht. Benutzt eine Methode den Parameter, speichert der Compiler den Wert im Objekt (Capture), das macht ihn aber nicht zum Member. Um den Wert zu zeigen, deklarierst du selbst eine Eigenschaft, zum Beispiel `public string User => user;`."
+    },
+    {
+      "id": "m06-l07-q8",
+      "lesson": "m06-l07",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm einen Primärkonstruktor einsetzen, und wo lieber einen gewöhnlichen Konstruktor?",
+      "modelAnswer": "Primärkonstruktor: Eine Klasse `Mailer` bekommt beim Erzeugen eine Adresse, die mehrere Methoden nur lesen. Der Primärkonstruktor spart das Feld und die Zuweisung. Gewöhnlicher Konstruktor: Eine Klasse prüft die Werte beim Erzeugen oder berechnet mehrere Felder daraus. Dort ist ein Konstruktorkörper mit Anweisungen übersichtlicher."
     }
   ]
 }
