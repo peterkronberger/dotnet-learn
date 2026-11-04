@@ -269,7 +269,15 @@ Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, po
     - `DateTime` vs. `DateTimeOffset` (`m05-l11`)
     - ordinal vs. culture-sensitive comparison (`m05-l10`)
   - Misconception ids: m05-l01-index-starts-at-one, m05-l03-range-end-inclusive, m05-l05-change-list-in-foreach, m05-l07-add-duplicate-throws, m05-l10-replace-changes-string
-- **M6**: Filled by the module review of M6.
+- **M6**:
+  - Concepts:
+    - field vs. property (`m06-l04`)
+    - `readonly` vs. `const` vs. `static` (`m06-l02`, `m06-l08`)
+    - `init` vs. `set` vs. `required` (`m06-l06`)
+    - primary constructor parameter vs. property (`m06-l07`)
+    - object initializer vs. constructor order (`m06-l05`)
+    - instance vs. static member (`m06-l08`)
+  - Misconception ids: m06-l02-readonly-object-immutable, m06-l04-property-is-field, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable
 - **M7**: Filled by the module review of M7.
 - **M8**: Filled by the module review of M8.
 - ▶: all covered modules are runnable.
