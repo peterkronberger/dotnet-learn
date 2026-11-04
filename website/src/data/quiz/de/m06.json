@@ -708,6 +708,143 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm einen Primärkonstruktor einsetzen, und wo lieber einen gewöhnlichen Konstruktor?",
       "modelAnswer": "Primärkonstruktor: Eine Klasse `Mailer` bekommt beim Erzeugen eine Adresse, die mehrere Methoden nur lesen. Der Primärkonstruktor spart das Feld und die Zuweisung. Gewöhnlicher Konstruktor: Eine Klasse prüft die Werte beim Erzeugen oder berechnet mehrere Felder daraus. Dort ist ein Konstruktorkörper mit Anweisungen übersichtlicher."
+    },
+    {
+      "id": "m06-l08-q1",
+      "lesson": "m06-l08",
+      "type": "single",
+      "question": "Die Klasse `Ticket` hat das statische Feld `created`. Das Programm erzeugt drei Objekte mit `new Ticket(…)`. Wie viele Exemplare von `created` gibt es?",
+      "options": [
+        {
+          "text": "Eines. Alle drei Objekte teilen sich das Feld, und es gehört zum Typ `Ticket`.",
+          "correct": true
+        },
+        {
+          "text": "Drei, für jedes Objekt eines.",
+          "feedback": "So ist es bei Instanzfeldern. Ein statisches Feld gehört zum Typ und existiert nur einmal."
+        },
+        {
+          "text": "Vier: eines für den Typ und je eines für jedes Objekt.",
+          "feedback": "Es gibt nur das eine Feld des Typs. Die Objekte haben dafür keine eigene Kopie."
+        }
+      ],
+      "explanation": "Ein statisches Feld gibt es einmal pro Typ, egal wie viele Objekte entstehen. Ein Instanzfeld gibt es dagegen in jedem Objekt."
+    },
+    {
+      "id": "m06-l08-q2",
+      "lesson": "m06-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l08/quiz-static.cs",
+      "explanation": "`Own` ist ein Instanzfeld: `a` zählt zweimal, `b` einmal. `Total` ist statisch und gehört zum Typ: Alle drei Aufrufe von `Visit` erhöhen dasselbe Feld, am Ende steht dort 3. Die Ausgabe ist `2 1 3`."
+    },
+    {
+      "id": "m06-l08-q3",
+      "lesson": "m06-l08",
+      "type": "single",
+      "question": "Die Klasse `Rating` enthält die Methode `public static string Describe(int failures)`. Wie rufst du sie auf?",
+      "options": [
+        {
+          "text": "Über den Typnamen: `Rating.Describe(3)`.",
+          "correct": true
+        },
+        {
+          "text": "Über ein Objekt: `new Rating().Describe(3)`.",
+          "feedback": "Eine statische Methode gehört zum Typ. Über eine Variable oder einen Ausdruck mit `new` ruft man sie nicht auf; der Compiler lehnt das ab."
+        },
+        {
+          "text": "Mit `Describe(3)` allein, überall im Programm.",
+          "feedback": "Außerhalb der Klasse braucht die Methode den Typnamen davor, so wie bei `Math.Max`."
+        }
+      ],
+      "explanation": "Statische Member erreichst du über den Typnamen, zum Beispiel `Math.Max(3, 5)`. Instanzmember erreichst du über ein Objekt."
+    },
+    {
+      "id": "m06-l08-q4",
+      "lesson": "m06-l08",
+      "type": "single",
+      "question": "Ein Feld ist als `public static int Limit = 3;` deklariert. Was bedeutet `static` hier?",
+      "options": [
+        {
+          "text": "Das Feld gehört zum Typ. Es gibt es einmal, und sein Wert darf sich ändern.",
+          "correct": true
+        },
+        {
+          "text": "Der Wert von `Limit` kann sich nach dem Start nicht mehr ändern.",
+          "feedback": "Das ist `const` oder `readonly`. Ein statisches Feld kann neue Werte bekommen, und jedes Objekt sieht die Änderung.",
+          "misconception": "m06-l08-static-means-unchangeable"
+        },
+        {
+          "text": "Das Feld ist nur während des Konstruktoraufrufs vorhanden.",
+          "feedback": "Ein statisches Feld lebt für das ganze Programm. Mit dem Konstruktor hat `static` hier nichts zu tun."
+        },
+        {
+          "text": "Jedes Objekt bekommt beim Erzeugen einen festen Wert, der sich nicht mehr ändert.",
+          "feedback": "Das Feld gehört nicht zu einem Objekt. Es ändert sich für alle zugleich, wenn du es setzt.",
+          "misconception": "m06-l08-static-means-unchangeable"
+        }
+      ],
+      "explanation": "`static` legt fest, wohin ein Member gehört: zum Typ. Ob sich der Wert ändern darf, regeln `const` und `readonly`."
+    },
+    {
+      "id": "m06-l08-q5",
+      "lesson": "m06-l08",
+      "type": "single",
+      "question": "Die Klasse `Marker` hat einen statischen Konstruktor. Das Programm erzeugt zehn `Marker`-Objekte. Wie oft läuft der statische Konstruktor?",
+      "options": [
+        {
+          "text": "Höchstens einmal, vor dem ersten erzeugten Objekt oder dem ersten Zugriff auf einen statischen Member.",
+          "correct": true
+        },
+        {
+          "text": "Zehnmal, bei jedem `new`.",
+          "feedback": "Bei jedem `new` läuft der Instanzkonstruktor. Der statische Konstruktor bereitet den Typ vor und läuft nur einmal."
+        },
+        {
+          "text": "Nie, weil man ihn nicht selbst aufrufen kann.",
+          "feedback": "Du rufst ihn nicht auf, aber das Laufzeitsystem startet ihn von selbst."
+        }
+      ],
+      "explanation": "Ein statischer Konstruktor läuft höchstens einmal. Ausgelöst wird er vom ersten erzeugten Objekt oder vom ersten Zugriff auf einen statischen Member."
+    },
+    {
+      "id": "m06-l08-q6",
+      "lesson": "m06-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über eine statische Klasse wie `static class Report` stimmen?",
+      "options": [
+        {
+          "text": "Sie enthält nur statische Member.",
+          "correct": true
+        },
+        {
+          "text": "Du kannst von ihr kein Objekt mit `new` erzeugen.",
+          "correct": true
+        },
+        {
+          "text": "Jedes Objekt der Klasse hat eigene Felder.",
+          "feedback": "Es gibt keine Objekte. Statische Felder gibt es einmal für den Typ."
+        },
+        {
+          "text": "Sie darf einen Konstruktor mit Parametern haben, um Objekte zu erzeugen.",
+          "feedback": "Eine statische Klasse hat keine Instanzkonstruktoren, weil sie nicht instanziert wird."
+        }
+      ],
+      "explanation": "Eine statische Klasse enthält nur statische Member und kann nicht instanziert werden. Sie passt zu Hilfsmethoden, die keine Objektdaten brauchen."
+    },
+    {
+      "id": "m06-l08-q7",
+      "lesson": "m06-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen einem Instanzfeld und einem statischen Feld. Sage auch, wer bei einem statischen Feld die Änderung eines Werts sieht.",
+      "modelAnswer": "Ein Instanzfeld gehört zu einem Objekt: Jedes Objekt hat seine eigene Kopie, und eine Änderung betrifft nur dieses Objekt. Ein statisches Feld gehört zum Typ und existiert nur einmal. Ändert man es, sehen alle Objekte und jeder Zugriff über den Typnamen den neuen Wert. `static` sagt also, wohin das Feld gehört, nicht, dass der Wert fest ist. Fest ist ein Wert durch `const` oder `readonly`."
+    },
+    {
+      "id": "m06-l08-q8",
+      "lesson": "m06-l08",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm eine statische Klasse oder ein statisches Feld einsetzen, und wo lieber ein Objekt mit Instanzfeldern?",
+      "modelAnswer": "Statische Klasse: Hilfsmethoden, die nur ihre Parameter brauchen, zum Beispiel `Report.Line(label, value)`, die eine Zeile formatiert. Statisches Feld: ein Zähler, den alle Objekte teilen, wie die Nummer der Vorfälle in SecLog. Objekt mit Instanzfeldern: Daten, die zu genau einem Ding gehören, etwa die Fehlversuche eines Benutzers in einem `Incident`. Hat jedes Ding seinen eigenen Zustand, passt ein Objekt."
     }
   ]
 }
