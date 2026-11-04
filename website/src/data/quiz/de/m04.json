@@ -55,7 +55,6 @@
       "question": "Welche Aussagen stimmen?",
       "options": [
         { "text": "Zwei Variablen können auf dasselbe Objekt zeigen.", "correct": true },
-        { "text": "Jeder Typ stammt direkt oder indirekt von `object` ab.", "correct": true },
         { "text": "Bei einem Werttyp hat jede Variable ihre eigene Kopie des Werts.", "correct": true },
         { "text": "Eine Zuweisung zwischen zwei Variablen eines Referenztyps kopiert das Objekt.", "misconception": "m04-l01-assignment-copies-object", "feedback": "Sie kopiert nur den Verweis. Das Objekt bleibt dasselbe." }
       ],
@@ -247,7 +246,6 @@
       "options": [
         { "text": "Ein Wertparameter eines Referenztyps kann das Objekt ändern.", "correct": true },
         { "text": "Ein `ref`-Parameter kann die Variable des Aufrufers auf ein anderes Objekt zeigen lassen.", "correct": true },
-        { "text": "Ein `int` als Wertparameter kann die Variable des Aufrufers nicht ändern.", "correct": true },
         { "text": "Referenztypen werden ohne `ref` per Referenz übergeben.", "misconception": "m04-l03-reference-types-passed-by-reference", "feedback": "Ohne `ref` wird ein Wert übergeben. Bei einem Referenztyp ist dieser Wert ein Verweis." }
       ],
       "explanation": "Zwei Fragen sind getrennt: Ist der Typ ein Werttyp oder Referenztyp? Und ist der Parameter ein Wertparameter oder ein `ref`-Parameter?"
@@ -778,7 +776,6 @@
       "question": "Es gilt `string raw = \"  Bob \";`. Welche Aussagen über `string clean = raw.Trim().ToLower();` stimmen?",
       "options": [
         { "text": "`raw` enthält danach weiter `\"  Bob \"`.", "correct": true },
-        { "text": "`clean` enthält `\"bob\"`.", "correct": true },
         { "text": "`Trim()` liefert ein neues `string`-Objekt, auf dem `ToLower()` aufgerufen wird.", "correct": true },
         { "text": "`raw` enthält danach `\"bob\"`.", "feedback": "Keine der beiden Methoden ändert `raw`.", "misconception": "m04-l07-string-method-changes-string" }
       ],
@@ -957,7 +954,6 @@
       "question": "Welche Aussagen über Boxing stimmen?",
       "options": [
         { "text": "Beim Boxing entsteht ein neues Objekt.", "correct": true },
-        { "text": "Beim Boxing wird der Wert kopiert.", "correct": true },
         { "text": "Unboxing braucht eine explizite Umwandlung wie `(int)o`.", "correct": true },
         { "text": "Eine Box bleibt mit der ursprünglichen Variable verbunden.", "feedback": "Nach dem Boxing sind beide unabhängig.", "misconception": "m04-l09-box-shares-value" }
       ],

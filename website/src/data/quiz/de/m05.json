@@ -1091,11 +1091,6 @@
           "feedback": "Der ordinale Vergleich nutzt keine Sprachregeln."
         },
         {
-          "text": "Für Bezeichner wie Ereignistypen im Log passt ein ordinaler Vergleich.",
-          "correct": true,
-          "feedback": "Solche Werte sind keine Sprache, sondern feste Zeichenfolgen."
-        },
-        {
           "text": "Ein kulturabhängiger Vergleich passt zu Text, den Benutzer sehen.",
           "correct": true,
           "feedback": "Dafür gelten die Regeln der Kultur."

@@ -496,7 +496,9 @@
       "lesson": "m01-l04",
       "type": "output",
       "placement": true,
-      "placementLessons": ["m01-l03"],
+      "placementLessons": [
+        "m01-l03"
+      ],
       "question": "Was gibt das Programm aus? Werte jede Zeile nach Rangfolge und Assoziativität aus.",
       "example": "m01/l04/quiz-evaluate.cs",
       "explanation": "`8 - 2 - 3` wird von links nach rechts gerechnet: `6 - 3` ergibt `3`. Bei `8 / 2 * 3` stehen `/` und `*` auf gleicher Stufe, also links zuerst: `4 * 3` ergibt `12`. `8 + 2 * 3` ergibt `8 + 6`, also `14`. Bei `-8 % 3` wird zuerst das Vorzeichen angewendet, dann der Rest: Der Rest von `-8` geteilt durch `3` ist `-2`."
@@ -1294,10 +1296,6 @@
           "correct": true
         },
         {
-          "text": "`\"-7\"`",
-          "correct": true
-        },
-        {
           "text": "`\"3.5\"`",
           "misconception": "m01-l08-parse-accepts-decimals",
           "feedback": "Ein Dezimalpunkt gehört nicht zu einer ganzen Zahl."
@@ -1536,10 +1534,6 @@
         },
         {
           "text": "Das Ergebnis ist Text, auch wenn die Zeile nur Ziffern enthält.",
-          "correct": true
-        },
-        {
-          "text": "Der Zeilenumbruch am Ende der Zeile gehört nicht zum Ergebnis.",
           "correct": true
         },
         {

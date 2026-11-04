@@ -396,17 +396,9 @@
           "correct": true
         },
         {
-          "text": "Die Bedingung davor muss ein `bool` ergeben.",
-          "correct": true
-        },
-        {
           "text": "Er wertet beide Zweige aus und wählt dann einen.",
           "misconception": "m02-l03-both-branches-evaluated",
           "feedback": "Nur der gewählte Zweig wird ausgewertet."
-        },
-        {
-          "text": "Er ersetzt ein `if`-`else`, wenn beide Zweige nur einen Wert liefern.",
-          "correct": true
         },
         {
           "text": "Er eignet sich am besten für Entscheidungen mit vielen Fällen.",
@@ -537,14 +529,6 @@
       "options": [
         {
           "text": "Er ist ein Ausdruck und liefert einen Wert.",
-          "correct": true
-        },
-        {
-          "text": "Die Zweige werden von oben nach unten geprüft, der erste passende gewinnt.",
-          "correct": true
-        },
-        {
-          "text": "Relationale Muster wie `>= 5` sind erlaubt.",
           "correct": true
         },
         {
@@ -684,14 +668,6 @@
           "correct": true
         },
         {
-          "text": "Mehrere Labels können zu einem Abschnitt gehören.",
-          "correct": true
-        },
-        {
-          "text": "Der Abschnitt `default` fängt Werte auf, die zu keinem anderen Label passen.",
-          "correct": true
-        },
-        {
           "text": "Ein Abschnitt ohne `break;` läuft in den nächsten weiter.",
           "misconception": "m02-l05-case-falls-through",
           "feedback": "Das ist in C# ein Fehler."
@@ -828,14 +804,6 @@
           "correct": true
         },
         {
-          "text": "Bei `do` läuft der Block mindestens einmal.",
-          "correct": true
-        },
-        {
-          "text": "Die Bedingung wird vor jedem Durchlauf des `while`-Blocks geprüft.",
-          "correct": true
-        },
-        {
           "text": "Die Bedingung wird nur einmal geprüft, danach läuft der Block immer weiter.",
           "misconception": "m02-l06-condition-checked-once",
           "feedback": "Die Bedingung wird bei jedem Durchlauf neu ausgewertet."
@@ -966,10 +934,6 @@
       "options": [
         {
           "text": "Eine Variable, die im Kopf von `for` deklariert wird, gilt nur in dieser Schleife.",
-          "correct": true
-        },
-        {
-          "text": "Zwei aufeinanderfolgende `for`-Schleifen dürfen beide eine Variable `i` deklarieren.",
           "correct": true
         },
         {
@@ -1107,14 +1071,6 @@
           "correct": true
         },
         {
-          "text": "`continue` überspringt den Rest des aktuellen Durchlaufs.",
-          "correct": true
-        },
-        {
-          "text": "Nach `continue` kann die Schleife noch weitere Durchläufe haben.",
-          "correct": true
-        },
-        {
           "text": "`continue` beendet die Schleife wie `break`.",
           "misconception": "m02-l08-continue-ends-loop",
           "feedback": "`continue` führt zum nächsten Durchlauf, `break` verlässt die Schleife."
@@ -1196,7 +1152,9 @@
       "id": "m02-l09-q4",
       "lesson": "m02-l09",
       "placement": true,
-      "placementLessons": ["m02-l08"],
+      "placementLessons": [
+        "m02-l08"
+      ],
       "type": "single",
       "question": "Ein Programm findet in der inneren Schleife ein Ergebnis und schreibt dort `break;`, weil es alles beenden will. Danach läuft die äußere Schleife aber weiter. Was ist die Ursache?",
       "options": [
@@ -1224,14 +1182,6 @@
       "options": [
         {
           "text": "Die innere Schleife startet bei jedem Durchlauf der äußeren neu.",
-          "correct": true
-        },
-        {
-          "text": "Die beiden Schleifenvariablen brauchen verschiedene Namen.",
-          "correct": true
-        },
-        {
-          "text": "`continue` in der inneren Schleife springt zum nächsten Durchlauf der inneren Schleife.",
           "correct": true
         },
         {

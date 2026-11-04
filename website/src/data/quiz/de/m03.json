@@ -122,10 +122,6 @@
           "correct": true
         },
         {
-          "text": "Nach dem Ende des Rumpfs macht das Programm hinter dem Aufruf weiter.",
-          "correct": true
-        },
-        {
           "text": "Die Parameter einer Methode bekommen ihre Werte von den Argumenten des Aufrufs.",
           "correct": true
         },
@@ -155,7 +151,9 @@
       "id": "m03-l02-q1",
       "lesson": "m03-l02",
       "placement": true,
-      "placementLessons": ["m03-l01"],
+      "placementLessons": [
+        "m03-l01"
+      ],
       "type": "single",
       "question": "Die Methode `int Square(int n) { return n * n; }` ist deklariert. Das Programm enthält nur die Anweisung `Square(4);`. Was erscheint in der Konsole?",
       "options": [
@@ -253,10 +251,6 @@
       "options": [
         {
           "text": "`return` beendet die Methode sofort.",
-          "correct": true
-        },
-        {
-          "text": "Den Rückgabewert kannst du in einer Variable speichern.",
           "correct": true
         },
         {
@@ -817,10 +811,6 @@
           "correct": true
         },
         {
-          "text": "Die Argumente werden in der Reihenfolge ausgewertet, in der sie im Aufruf stehen.",
-          "correct": true
-        },
-        {
           "text": "Der Standardwert eines Parameters muss ein konstanter Ausdruck sein.",
           "correct": true
         },
@@ -956,10 +946,6 @@
           "correct": true
         },
         {
-          "text": "Beim Aufruf darfst du die Argumente einzeln, durch Kommas getrennt, angeben.",
-          "correct": true
-        },
-        {
           "text": "Das Wort `params` gehört nicht zur Signatur der Methode.",
           "correct": true
         },
@@ -989,7 +975,9 @@
       "id": "m03-l08-q1",
       "lesson": "m03-l08",
       "placement": true,
-      "placementLessons": ["m03-l09"],
+      "placementLessons": [
+        "m03-l09"
+      ],
       "type": "single",
       "question": "Warum hat `int.TryParse(text, out int number)` einen `out`-Parameter?",
       "options": [
