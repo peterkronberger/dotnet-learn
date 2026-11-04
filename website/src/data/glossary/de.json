@@ -4100,6 +4100,27 @@
         "title": "The field contextual keyword (C# feature specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/field-keyword"
       }
+    },
+    {
+      "id": "primary-constructor",
+      "term": "Primary constructor",
+      "german": "Primärkonstruktor",
+      "category": "language",
+      "definition": "Ein Primärkonstruktor steht als Parameterliste hinter dem Klassennamen, zum Beispiel `class Alert(string title)`. Seine Parameter gelten im ganzen Klassenrumpf, sind aber keine Member. Benutzt ein Member einen Parameter, speichert der Compiler dessen Wert im Objekt.",
+      "aliases": [
+        "Primärer Konstruktor",
+        "primary constructors"
+      ],
+      "related": [
+        "constructor",
+        "constructor-chaining",
+        "capture"
+      ],
+      "lesson": "m06-l07",
+      "source": {
+        "title": "Primary constructors (Microsoft Learn)",
+        "url": "https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/primary-constructors"
+      }
     }
   ]
 }

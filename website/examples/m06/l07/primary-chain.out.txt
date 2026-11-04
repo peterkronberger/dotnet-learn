@@ -1,0 +1,3 @@
+one parameter: Disk full
+Many failed logins: level 3
+Disk full: level 1

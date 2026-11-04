@@ -1,0 +1,186 @@
+---
+title: Primärkonstruktoren
+sidebar_position: 7
+description: Ein Primärkonstruktor steht in der Kopfzeile der Klasse. Seine Parameter gelten im ganzen Klassenrumpf, sind aber keine Eigenschaften.
+lesson_id: m06-l07
+duration_min: 22
+---
+
+import primaryBasic from '!!raw-loader!@site/examples/m06/l07/primary-basic.cs';
+import primaryBasicOutput from '!!raw-loader!@site/examples/m06/l07/primary-basic.out.txt';
+import primaryProperty from '!!raw-loader!@site/examples/m06/l07/primary-property.cs';
+import primaryPropertyOutput from '!!raw-loader!@site/examples/m06/l07/primary-property.out.txt';
+import primaryOutside from '!!raw-loader!@site/examples/m06/l07/primary-outside.snippet.cs';
+import primaryChain from '!!raw-loader!@site/examples/m06/l07/primary-chain.cs';
+import primaryChainOutput from '!!raw-loader!@site/examples/m06/l07/primary-chain.out.txt';
+import primaryGap from '!!raw-loader!@site/examples/m06/l07/primary-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l07/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l07/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l07/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l07/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Primärkonstruktoren
+
+:::note[Lernziele]
+- Du kannst eine Klasse mit Primärkonstruktor deklarieren und seine Parameter in Membern verwenden.
+- Du kannst erklären, warum ein Parameter des Primärkonstruktors keine Eigenschaft ist.
+- Du kannst einen weiteren Konstruktor mit `this(…)` an den Primärkonstruktor binden.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l02-q1" />
+
+<Quiz id="m06-l06-q1" />
+
+<Quiz id="m03-l04-q1" />
+
+## Die Parameterliste hinter dem Klassennamen
+
+<Since csharp="12" dotnet="8" />
+
+Ein Konstruktor aus Lektion 2 braucht meist drei Dinge: ein Feld, einen Parameter und eine Zuweisung `this.title = title;`. Ein <Term id="primary-constructor">Primärkonstruktor</Term> (Primary Constructor) kürzt das ab. Du schreibst die Parameterliste direkt hinter den Klassennamen: `class Alert(string title, int level)`. Die Parameter gelten im ganzen Klassenrumpf, also in Methoden, Eigenschaften und Initialisierern ([Primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/primary-constructors)).
+
+Benutzt ein Member einen Parameter, erfasst der Compiler ihn (<Term id="capture">Capture</Term>): Er legt dafür im Objekt einen versteckten Speicher an und schreibt den Wert beim Erzeugen hinein. So ist der Wert auch noch da, wenn die Methode später läuft. Ein Feld und eine Zuweisung brauchst du nicht zu schreiben.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Die Methode `Describe` benutzt die beiden Parameter der Kopfzeile.
+:::
+
+<CSharpRunner id="m06-l07-basic" code={primaryBasic} predict expected={primaryBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Many failed logins: level 3` und `Disk full: level 1`.
+
+1. **Aufruf:** `new Alert("Many failed logins", 3)` ruft den Primärkonstruktor auf. Die Werte kommen in die Parameter `title` und `level`.
+2. **Erfassen:** `Describe` liest beide Parameter. Der Compiler speichert deshalb die Werte im Objekt.
+3. **Eigene Werte:** Jedes Objekt hat seine eigenen Werte, wie bei Feldern.
+
+Was passiert, wenn `Describe` den Parameter `level` nicht benutzt? Dann speichert der Compiler `level` nicht. Das Programm läuft trotzdem.
+
+</details>
+
+## Ein Parameter ist keine Eigenschaft
+
+Ein Parameter des Primärkonstruktors ist kein Member der Klasse. Er ist nur ein Name, der im Klassenrumpf gilt. Von außen führt kein Weg zu ihm: `alert.title` übersetzt nicht ([Primary constructors](https://github.com/dotnet/csharplang/blob/main/proposals/csharp-12.0/primary-constructors.md)).
+
+<CodeBlock language="csharp" title="primary-outside.snippet.cs">{primaryOutside}</CodeBlock>
+
+Die zweite Zeile ist der Fehler. Der Compiler meldet, dass `Alert` keine Definition für `title` enthält (CS1061).
+
+Willst du den Wert zeigen, deklarierst du selbst eine Eigenschaft. Ein Parameter kann außerdem eine Eigenschaft oder ein Feld initialisieren, zum Beispiel `public int Level { get; } = level;`.
+
+<CSharpRunner id="m06-l07-property" code={primaryProperty} />
+
+Die Ausgabe ist `Many failed logins / 3` und `Many failed logins: level 3`.
+
+- `Title => title` ist eine Eigenschaft ohne Speicher von uns. Sie liest den erfassten Parameter.
+- `Level { get; } = level` kopiert den Wert beim Erzeugen in das Hintergrundfeld der Eigenschaft. Der Parameter `level` wird nur dort gelesen, also erfasst der Compiler ihn nicht.
+
+Records machen aus Parametern der Kopfzeile automatisch Eigenschaften. Bei einer Klasse tust du das selbst.
+
+<Forward concepts={['Records']} module="8" />
+
+## Weitere Konstruktoren
+
+Eine Klasse mit Primärkonstruktor darf weitere Konstruktoren haben. Jeder von ihnen muss mit `: this(…)` den Primärkonstruktor aufrufen, direkt oder über einen anderen Konstruktor. Sonst bekämen die Parameter keinen Wert. Die Verkettung kennst du aus Lektion 2 (<Term id="constructor-chaining">Konstruktorverkettung</Term>).
+
+:::info[Vorhersage]
+Was gibt das Programm aus, und in welcher Reihenfolge? Der zweite Konstruktor hat nur einen Parameter.
+:::
+
+<CSharpRunner id="m06-l07-chain" code={primaryChain} predict expected={primaryChainOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `one parameter: Disk full`, danach `Many failed logins: level 3` und `Disk full: level 1`.
+
+1. **Erster Aufruf:** `new Alert("Many failed logins", 3)` nutzt den Primärkonstruktor. Er druckt nichts.
+2. **Zweiter Aufruf:** `new Alert("Disk full")` ruft `this(title, 1)` auf. Der Primärkonstruktor läuft zuerst, danach der Körper mit `Console.WriteLine`.
+3. **Reihenfolge:** Beide `new`-Zeilen laufen vor den `Describe`-Aufrufen. Deshalb steht die Zeile des Konstruktors oben.
+
+Was passiert, wenn du `: this(title, 1)` weglässt? Der Compiler lehnt den Konstruktor ab.
+
+</details>
+
+## Lückenbeispiel
+
+Die Klasse `Alert` hat zwei Felder und einen Konstruktor, der sie setzt. Forme sie in eine Klasse mit Primärkonstruktor um. Die Ausgabe `Disk full: level 2` soll gleich bleiben. Tipp: Die Felder und der Konstruktor entfallen, der Parameter `title` steht in der Kopfzeile.
+
+<CSharpRunner id="m06-l07-gaps" code={primaryGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Kopfzeile:** `class Alert(string title, int level)`.
+2. **Entfernen:** Die beiden Felder und der Konstruktor entfallen.
+3. **Behalten:** `Describe` bleibt unverändert, weil `title` und `level` jetzt Parameter sind.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klassen `LogEvent` und `Incident`. `Incident` hat ein Feld `user`, einen eigenen Konstruktor und die Pflicht-Eigenschaft `Source`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Blöcke, die einen `Incident` erzeugen und die Quelle ausgeben, sowie die Klasse `Incident`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** `Incident` bekommt den Primärkonstruktor `class Incident(string user)`. Das Feld `user` und der eigene Konstruktor entfallen, die Methoden benutzen den Parameter `user`. Eine neue Eigenschaft `public string User => user;` gibt den Namen nach außen. Schreibe danach, nach dem Block `// Print the source of each incident`, den Block `// Print the user of each incident through the User property`: Er gibt `User of bob: …` und `User of dave: …` aus.
+
+<CSharpRunner id="m06-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Kopfzeile:** `class Incident(string user)` ersetzt Feld und Konstruktor. Die beiden `new`-Zeilen bleiben gleich.
+2. **Erfassen:** `Add` und `Summary` benutzen `user` weiter. Der Compiler speichert den Wert.
+3. **Zeigen:** `User => user` ist die Eigenschaft für den Zugriff von außen.
+4. **Ausgeben:** Der neue Block liest `User` von beiden Vorfällen.
+
+</details>
+
+**Neuer Stand:** `Incident` kommt ohne Feld und Konstruktor für den Benutzer aus und zeigt den Namen über die Eigenschaft `User`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l07-primary-parameter-is-property" />
+
+**„Ein Parameter des Primärkonstruktors ist eine Eigenschaft.“** Das stimmt nicht. Der Parameter gilt nur im Klassenrumpf. Von außen gibt es kein Member mit diesem Namen. Eine Eigenschaft musst du selbst deklarieren, zum Beispiel `public string User => user;`.
+:::
+
+## Zusammenfassung
+
+Ein Primärkonstruktor steht als Parameterliste hinter dem Klassennamen. Seine Parameter gelten im ganzen Klassenrumpf. Benutzt ein Member einen Parameter, erfasst der Compiler ihn und speichert den Wert im Objekt. Die Parameter sind keine Member, deshalb ist `obj.user` von außen nicht möglich. Eine Eigenschaft wie `User => user` gibt den Wert weiter. Jeder weitere Konstruktor ruft mit `this(…)` den Primärkonstruktor auf.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l07-q1" />
+
+<Quiz id="m06-l07-q2" />
+
+<Quiz id="m06-l07-q3" />
+
+<Quiz id="m06-l07-q4" />
+
+<Quiz id="m06-l07-q5" />
+
+<Quiz id="m06-l07-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m06-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Primary constructors](https://learn.microsoft.com/en-us/dotnet/csharp/whats-new/tutorials/primary-constructors)
+- Microsoft Learn: [Constructors](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/constructors)
