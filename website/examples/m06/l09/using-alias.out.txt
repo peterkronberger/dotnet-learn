@@ -1,0 +1,2 @@
+mail: Disk full
+sms: Disk full

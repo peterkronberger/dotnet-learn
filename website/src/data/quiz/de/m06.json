@@ -845,6 +845,144 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm eine statische Klasse oder ein statisches Feld einsetzen, und wo lieber ein Objekt mit Instanzfeldern?",
       "modelAnswer": "Statische Klasse: Hilfsmethoden, die nur ihre Parameter brauchen, zum Beispiel `Report.Line(label, value)`, die eine Zeile formatiert. Statisches Feld: ein Zähler, den alle Objekte teilen, wie die Nummer der Vorfälle in SecLog. Objekt mit Instanzfeldern: Daten, die zu genau einem Ding gehören, etwa die Fehlversuche eines Benutzers in einem `Incident`. Hat jedes Ding seinen eigenen Zustand, passt ein Objekt."
+    },
+    {
+      "id": "m06-l09-q1",
+      "lesson": "m06-l09",
+      "type": "single",
+      "question": "Die Klasse `Notice` steht im Block `namespace Alerts.Mail { … }`. Wie lautet ihr vollqualifizierter Name?",
+      "options": [
+        {
+          "text": "`Alerts.Mail.Notice`",
+          "correct": true
+        },
+        {
+          "text": "`Notice`, solange das Programm eine `using`-Direktive dafür enthält.",
+          "feedback": "Die `using`-Direktive erlaubt nur den kurzen Namen beim Schreiben. Der vollqualifizierte Name ändert sich dadurch nicht."
+        },
+        {
+          "text": "`Mail.Notice`, weil ein Namespace nur aus dem letzten Teil besteht.",
+          "feedback": "Der Name `Alerts.Mail` ist der ganze Namespace. Beide Teile gehören zum vollständigen Namen."
+        }
+      ],
+      "explanation": "Der vollqualifizierte Name besteht aus dem Namespace und dem Typnamen: `Alerts.Mail.Notice`. Das zeigt auch `typeof(Notice).FullName`."
+    },
+    {
+      "id": "m06-l09-q2",
+      "lesson": "m06-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m06/l09/quiz-namespace.cs",
+      "explanation": "Die Direktive `using Tools.Counting;` erlaubt den kurzen Namen `Counter`. `FullName` zeigt trotzdem den vollständigen Namen `Tools.Counting.Counter`. Danach zählt `Add` zweimal, also steht dort 2."
+    },
+    {
+      "id": "m06-l09-q3",
+      "lesson": "m06-l09",
+      "type": "single",
+      "question": "Ein Programm beginnt mit `using System.Text;`. Was bewirkt diese Zeile?",
+      "options": [
+        {
+          "text": "Das Programm darf die Typen aus `System.Text` mit ihrem kurzen Namen schreiben, zum Beispiel `StringBuilder`.",
+          "correct": true
+        },
+        {
+          "text": "Sie lädt die Bibliothek `System.Text` in das Programm, damit ihre Typen vorhanden sind.",
+          "feedback": "Die Direktive lädt nichts. Die Typen müssen schon zu einer Bibliothek gehören, die das Projekt kennt. Die Zeile kürzt nur Namen ab.",
+          "misconception": "m06-l09-using-adds-library"
+        },
+        {
+          "text": "Sie macht alle Typen aus `System.Text` zu Typen des eigenen Programms.",
+          "feedback": "Die Typen bleiben in ihrem Namespace. Die Direktive fügt dem Programm keinen Typ hinzu.",
+          "misconception": "m06-l09-using-adds-library"
+        },
+        {
+          "text": "Sie ist nötig, sonst kann das Programm `StringBuilder` nicht benutzen, auch nicht mit dem vollqualifizierten Namen.",
+          "feedback": "Mit `System.Text.StringBuilder` funktioniert der Typ auch ohne Direktive.",
+          "misconception": "m06-l09-using-adds-library"
+        }
+      ],
+      "explanation": "Eine `using`-Direktive ändert nur, wie du Namen schreiben darfst. Welche Typen es gibt, legen die Bibliotheken fest, die das Projekt verwendet."
+    },
+    {
+      "id": "m06-l09-q4",
+      "lesson": "m06-l09",
+      "type": "single",
+      "question": "Das Programm hat `using Alerts.Mail;` und `using Alerts.Sms;`. Beide Namespaces enthalten eine Klasse `Notice`. Was passiert bei `Notice notice = …;`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `Notice` mehrdeutig ist. Ein `using`-Alias oder der vollqualifizierte Name löst das.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler nimmt die Klasse aus dem Namespace, dessen `using` zuerst steht.",
+          "feedback": "Die Reihenfolge der Direktiven spielt keine Rolle. Zwei gleiche Namen sind mehrdeutig."
+        },
+        {
+          "text": "Der Compiler nimmt immer die zuletzt deklarierte Klasse.",
+          "feedback": "Eine solche Regel gibt es nicht. Der Name bleibt mehrdeutig, bis du ihn eindeutig schreibst."
+        }
+      ],
+      "explanation": "Importieren zwei Namespaces denselben Typnamen, ist der kurze Name mehrdeutig (Fehler CS0104). Ein Alias wie `using MailNotice = Alerts.Mail.Notice;` wählt einen der Typen aus."
+    },
+    {
+      "id": "m06-l09-q5",
+      "lesson": "m06-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Namespaces und `using` stimmen?",
+      "options": [
+        {
+          "text": "`using static System.Math;` erlaubt `Max(3, 5)` statt `Math.Max(3, 5)`.",
+          "correct": true
+        },
+        {
+          "text": "Ein `global using` in einer Datei gilt für alle Dateien des Programms.",
+          "correct": true
+        },
+        {
+          "text": "Ein Namespace ohne Modifizierer ist `private`.",
+          "feedback": "Namespaces sind immer öffentlich. Du kannst keinen Zugriffsmodifizierer dafür angeben."
+        },
+        {
+          "text": "Ein Programm mit Anweisungen auf oberster Ebene darf mit `namespace Alerts.Mail;` (ohne Block) beginnen.",
+          "feedback": "Ein Namespace ohne Block lässt sich nicht mit Anweisungen auf oberster Ebene in derselben Datei verbinden. Dort brauchst du die Blockform."
+        }
+      ],
+      "explanation": "`using static` importiert die statischen Member eines Typs, `global using` gilt für das ganze Programm. Namespaces sind immer öffentlich, und ein Namespace ohne Block verträgt sich nicht mit Anweisungen auf oberster Ebene."
+    },
+    {
+      "id": "m06-l09-q6",
+      "lesson": "m06-l09",
+      "type": "single",
+      "question": "Ein neues Konsolenprojekt kommt ohne eine einzige eigene `using`-Zeile aus, und `File.Exists(…)` aus `System.IO` funktioniert trotzdem. Woran liegt das?",
+      "options": [
+        {
+          "text": "Das .NET SDK erzeugt implizite globale `using`-Direktiven, unter anderem für `System.IO`.",
+          "correct": true
+        },
+        {
+          "text": "Alle Namespaces von .NET sind immer importiert.",
+          "feedback": "Nur eine feste Liste von Namespaces ist importiert. Für andere, zum Beispiel `System.Text`, brauchst du eine Direktive."
+        },
+        {
+          "text": "Der Compiler ergänzt fehlende `using`-Zeilen selbst, sobald er einen unbekannten Typ findet.",
+          "feedback": "Der Compiler rät keine Namespaces. Fehlt die Direktive, meldet er einen Fehler."
+        }
+      ],
+      "explanation": "Die impliziten `using`-Direktiven sind globale Direktiven für eine Liste von Namespaces, die das SDK in eine erzeugte Datei schreibt."
+    },
+    {
+      "id": "m06-l09-q7",
+      "lesson": "m06-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen dem vollqualifizierten Namen eines Typs und einer `using`-Direktive. Sage auch, was die Direktive nicht tut.",
+      "modelAnswer": "Der vollqualifizierte Name nennt den Namespace und den Typ, zum Beispiel `System.Text.StringBuilder`. Damit ist der Typ immer eindeutig erreichbar. Eine `using`-Direktive wie `using System.Text;` erlaubt nur, den Typ kurz als `StringBuilder` zu schreiben. Sie lädt keine Bibliothek und fügt dem Programm keinen Typ hinzu, und der vollqualifizierte Name bleibt derselbe."
+    },
+    {
+      "id": "m06-l09-q8",
+      "lesson": "m06-l09",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm Namespaces einsetzen, und wann hilft dir ein `using`-Alias?",
+      "modelAnswer": "Namespaces ordnen die Typen eines größeren Programms, zum Beispiel `SecLog.Model` für `LogEvent` und `Incident`, und sie verhindern Namenskonflikte mit Typen anderer Teile oder Bibliotheken. Ein `using`-Alias hilft, wenn zwei Namespaces einen Typ mit gleichem Namen haben, etwa `Notice` für Mail und SMS. Dann gibst du jedem Typ einen eigenen kurzen Namen wie `MailNotice` und `SmsNotice`."
     }
   ]
 }

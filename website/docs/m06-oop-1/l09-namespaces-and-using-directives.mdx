@@ -1,0 +1,239 @@
+---
+title: Namespaces und using-Direktiven
+sidebar_position: 9
+description: Ein Namespace gruppiert Typen unter einem Namen. Eine using-Direktive kürzt nur die Schreibweise der Namen.
+lesson_id: m06-l09
+duration_min: 22
+---
+
+import namespaceFullName from '!!raw-loader!@site/examples/m06/l09/namespace-full-name.cs';
+import namespaceFullNameOutput from '!!raw-loader!@site/examples/m06/l09/namespace-full-name.out.txt';
+import usingDirective from '!!raw-loader!@site/examples/m06/l09/using-directive.cs';
+import usingAlias from '!!raw-loader!@site/examples/m06/l09/using-alias.cs';
+import usingAliasOutput from '!!raw-loader!@site/examples/m06/l09/using-alias.out.txt';
+import usingAmbiguous from '!!raw-loader!@site/examples/m06/l09/using-ambiguous.snippet.cs';
+import usingStatic from '!!raw-loader!@site/examples/m06/l09/using-static.cs';
+import fileScoped from '!!raw-loader!@site/examples/m06/l09/file-scoped.snippet.cs';
+import fileScopedError from '!!raw-loader!@site/examples/m06/l09/file-scoped-error.snippet.cs';
+import globalUsing from '!!raw-loader!@site/examples/m06/l09/global-using.snippet.cs';
+import globalAlias from '!!raw-loader!@site/examples/m06/l09/global-alias.cs';
+import globalAliasError from '!!raw-loader!@site/examples/m06/l09/global-alias-error.snippet.cs';
+import usingGap from '!!raw-loader!@site/examples/m06/l09/using-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m06/l09/seclog-classes-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m06/l09/seclog-classes-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m06/l09/seclog-classes-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m06/l09/seclog-classes-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Namespaces und using-Direktiven
+
+:::note[Lernziele]
+- Du kannst Typen in einem Namespace deklarieren und über den vollqualifizierten Namen oder eine `using`-Direktive verwenden.
+- Du kannst block- und dateibezogene Namespaces, `global using` und die impliziten `using`-Direktiven des SDK unterscheiden.
+- Du kannst einen `using`-Alias und `using static` einsetzen.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l11-q2" />
+
+<Quiz id="m06-l08-q1" />
+
+<Quiz id="m06-l03-q1" />
+
+## Ein Name für eine Gruppe von Typen
+
+Ein Programm wächst, und irgendwann heißen zwei Typen gleich. Ein <Term id="namespace">Namespace (Namensraum)</Term> löst das: Er gruppiert Typen unter einem gemeinsamen Namen. Du kennst Namespaces schon, auch ohne den Begriff: `Console` gehört zum Namespace `System`, und `StringBuilder` zu `System.Text`.
+
+Du deklarierst einen Namespace mit dem Schlüsselwort `namespace`, einem Namen und einem Block. Typen im Block gehören zu ihm. Der Name darf Punkte enthalten. `namespace Alerts.Mail` ist dasselbe wie ein Namespace `Mail` in einem Namespace `Alerts` ([§14.3 Namespace declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#143-namespace-declarations)).
+
+Der <Term id="fully-qualified-name">vollqualifizierte Name (Fully Qualified Name)</Term> eines Typs besteht aus dem Namespace und dem Typnamen: `Alerts.Mail.Notice`. Mit ihm erreichst du den Typ von überall. Die Eigenschaft `FullName` von `typeof(…)` liefert ihn als Text.
+
+Anweisungen auf oberster Ebene stehen in der Datei vor den Namespace-Deklarationen. Deshalb steht der Namespace im Beispiel am Ende, wie schon die Klassen in den Lektionen davor.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Es benutzt `Notice` und `Console` mit ihrem vollqualifizierten Namen oder fragt ihn ab.
+:::
+
+<CSharpRunner id="m06-l09-full-name" code={namespaceFullName} predict expected={namespaceFullNameOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Disk full`, `Alerts.Mail.Notice` und `System.Console`.
+
+1. **Deklarieren:** `class Notice` steht im Block `namespace Alerts.Mail`. Der Typ heißt damit `Alerts.Mail.Notice`.
+2. **Benutzen:** Außerhalb des Blocks schreibst du den ganzen Namen, damit der Compiler weiß, welcher Typ gemeint ist.
+3. **Abfragen:** `typeof(…).FullName` gibt den vollständigen Namen aus. Bei `Console` ist das `System.Console`: Auch `Console.WriteLine` war immer eine Kurzschreibweise.
+
+Was passiert, wenn du `new Alerts.Mail.Notice(…)` zu `new Notice(…)` kürzt? Der Compiler kennt `Notice` dann nicht, weil das Programm außerhalb von `Alerts.Mail` steht. Der nächste Abschnitt zeigt den Weg dazu.
+
+</details>
+
+Ein Typ, den du ohne Modifizierer direkt in einem Namespace oder in der Datei deklarierst, ist `internal` ([§14.8 Type declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#148-type-declarations)). Du kennst das aus Lektion 3: Er ist nur im eigenen Projekt sichtbar. Der Namespace selbst ist immer öffentlich, und du schreibst keinen Modifizierer davor.
+
+## Die using-Direktive kürzt Namen
+
+Den ganzen Namen zu schreiben wird lästig. Eine <Term id="using-directive">`using`-Direktive (Using Directive)</Term> am Anfang der Datei erlaubt, die Typen eines Namespace mit ihrem kurzen Namen zu schreiben ([§14.6 Using directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#146-using-directives)). Du kennst sie von `using System.Text;` in SecLog.
+
+<CSharpRunner id="m06-l09-using" code={usingDirective} />
+
+Die Ausgabe ist `Disk full` und `Alerts.Mail.Notice`. Im Code steht nur noch `Notice`, aber der vollqualifizierte Name hat sich nicht geändert. Die Direktive ändert die Schreibweise, nicht den Typ. Sie fügt dem Programm auch keinen Typ hinzu.
+
+Die Direktive importiert nur die Typen des genannten Namespace, nicht die Namespaces darin. Nach `using Alerts;` brauchst du für `Alerts.Mail.Notice` weiter `Mail.Notice`.
+
+## Gleiche Namen: using-Alias
+
+Heißen zwei Typen in verschiedenen Namespaces gleich und importierst du beide Namespaces, ist der kurze Name mehrdeutig. Der Compiler meldet CS0104.
+
+<CodeBlock language="csharp" title="using-ambiguous.snippet.cs">{usingAmbiguous}</CodeBlock>
+
+Zwei Auswege gibt es: den vollqualifizierten Namen schreiben oder einen <Term id="using-alias">`using`-Alias (Using Alias)</Term> einführen. Ein Alias gibt einem Typ oder Namespace einen eigenen Namen, und der Zugriff darüber ergibt genau dasselbe wie der Zugriff über den echten Namen ([§14.6.2 Using alias directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#1462-using-alias-directives)).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? `Mail` und `Sms` haben je eine Klasse `Notice`. Zwei Aliase unterscheiden sie.
+:::
+
+<CSharpRunner id="m06-l09-alias" code={usingAlias} predict expected={usingAliasOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `mail: Disk full` und `sms: Disk full`.
+
+1. **Alias anlegen:** `using MailNotice = Alerts.Mail.Notice;` ordnet den Namen `MailNotice` genau einem Typ zu.
+2. **Alias benutzen:** `new MailNotice(…)` erzeugt ein Objekt der Mail-Klasse, `new SmsNotice(…)` eines der SMS-Klasse.
+3. **Methode:** `Describe()` gehört zur jeweiligen Klasse. Deshalb steht vorn `mail:` oder `sms:`.
+
+Was passiert, wenn du beide Aliase durch `using Alerts.Mail;` und `using Alerts.Sms;` ersetzt? Dann ist `Notice` mehrdeutig, und das Programm übersetzt nicht.
+
+</details>
+
+## using static und global::
+
+Eine `using`-Direktive gibt es noch in einer zweiten Form. `using static` plus ein Typ importiert dessen statische Member ([§14.6.4 Using static directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#1464-using-static-directives)). Du schreibst dann `Max(3, 5)` statt `Math.Max(3, 5)`. Den Typ aus Lektion 8 kannst du genauso importieren.
+
+<CSharpRunner id="m06-l09-static" code={usingStatic} />
+
+Die Ausgabe ist `5`, `quiet` und `check the log`. `using static System.Math;` macht `Max` kurz, und `using static Alerts.Rating;` macht `Describe` kurz. Importierst du mehrere Typen mit gleichen Membernamen, sind die Namen mehrdeutig, wie bei den Namespaces.
+
+Kann ein kurzer Name auf etwas Falsches zeigen, hilft `global::`. Es beginnt die Suche beim obersten Namespace des Programms ([§14.9 Qualified alias member](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#149-qualified-alias-member)). Im Beispiel gibt es einen Namespace `Alerts.System`. Innerhalb von `Alerts` zeigt dann `System` auf diesen, nicht auf den Namespace von .NET.
+
+<CSharpRunner id="m06-l09-global" code={globalAlias} />
+
+Die Ausgabe ist `Disk full`. `global::System.Console` meint den Namespace `System` von .NET. Ohne `global::` meldet der Compiler CS0234:
+
+<CodeBlock language="csharp" title="global-alias-error.snippet.cs">{globalAliasError}</CodeBlock>
+
+## Dateibezogene und globale Direktiven
+
+Der Namespace-Block kostet eine Einrückungsstufe für den ganzen Inhalt der Datei. Ein **dateibezogener Namespace (File-scoped Namespace)** spart sie: `namespace Alerts.Mail;` mit Semikolon gilt für den Rest der Datei ([§14.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#143-namespace-declarations)).
+
+<CodeBlock language="csharp" title="file-scoped.snippet.cs">{fileScoped}</CodeBlock>
+
+Eine Datei darf nur einen dateibezogenen Namespace haben, und sie darf ihn nicht mit einem Namespace-Block mischen. Mit Anweisungen auf oberster Ebene in derselben Datei verträgt er sich ebenfalls nicht. Der Compiler meldet CS8956:
+
+<CodeBlock language="csharp" title="file-scoped-error.snippet.cs">{fileScopedError}</CodeBlock>
+
+Deshalb benutzen die Beispiele dieser Lektion den Block. Der dateibezogene Namespace passt zu einer Datei, die nur Typen enthält. Wo das Programm startet, wenn es keine Anweisungen auf oberster Ebene gibt, zeigt die nächste Lektion.
+
+Eine <Term id="global-using">`global using`-Direktive (Global Using)</Term> gilt für alle Dateien des Programms und nicht nur für die eine Datei, in der sie steht ([§14.5 Global using directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#145-global-using-directives)). Sie steht ganz am Anfang der Datei, vor den gewöhnlichen `using`-Zeilen.
+
+<CodeBlock language="csharp" title="global-using.snippet.cs">{globalUsing}</CodeBlock>
+
+Der Kurs zeigt `global using` nur als Code und lässt es nicht im Runner laufen. Mit `dotnet run` auf deinem Rechner funktioniert es auch in einer einzelnen Datei.
+
+Das SDK nutzt das selbst: Die <Term id="implicit-usings">impliziten `using`-Direktiven (Implicit Usings)</Term> sind globale Direktiven, die das .NET SDK in eine erzeugte Datei schreibt. Für Projekte mit `Microsoft.NET.Sdk` sind das `System`, `System.Collections.Generic`, `System.IO`, `System.Linq`, `System.Net.Http`, `System.Threading` und `System.Threading.Tasks` ([Implicit using directives](https://learn.microsoft.com/dotnet/core/project-sdk/overview#implicit-using-directives)). Darum kommt ein neues Programm ohne `using System;` aus.
+
+<Forward concepts={['Projektdatei']} module="14" />
+
+Ob die Funktion eingeschaltet ist, steht in der Projektdatei (Eigenschaft `ImplicitUsings`). Die Runner auf dieser Seite haben eigene globale Direktiven. Ihre Liste stimmt nicht mit der des SDK überein, es fehlt zum Beispiel `System.Net.Http`.
+
+## Lückenbeispiel
+
+Das Programm schreibt `Alerts.Mail.Notice` dreimal ganz aus. Füge am Anfang eine `using`-Direktive ein und kürze die Namen. Die Ausgabe `Disk full` und `Many failed logins` bleibt gleich.
+
+<CSharpRunner id="m06-l09-gaps" code={usingGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Direktive:** `using Alerts.Mail;` als erste Zeile der Datei, vor allen Anweisungen.
+2. **Kürzen:** `Notice first = new Notice("Disk full");` und `Notice second = new Notice("Many failed logins");`.
+3. **Prüfen:** Der Rest bleibt, auch der Block `namespace Alerts.Mail`. Die Typen liegen weiter in ihrem Namespace.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klassen `LogEvent` und `Incident`. `Incident` nummeriert seine Vorfälle über ein statisches Feld.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den letzten Block und die Klasse `LogEvent`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** `LogEvent` und `Incident` kommen in einen Namespace-Block `SecLog.Model`. Der Block beginnt vor `LogEvent` und endet nach dem ausgeblendeten `Incident`. `static class Report` bleibt, wo sie ist. Die Datei bekommt `using SecLog.Model;` neben den anderen `using`-Zeilen. Schreibe danach, nach dem Block `// Count the incidents with a static property`, den Block `// Print the full name of the LogEvent type`: Er gibt `typeof(LogEvent).FullName` aus. Die Ausgabe ist `SecLog.Model.LogEvent`.
+
+<CSharpRunner id="m06-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-classes-solution.cs" />
+
+1. **Namespace:** `namespace SecLog.Model { … }` umschließt `LogEvent` und `Incident`. Der Inhalt rückt eine Stufe ein.
+2. **Kurze Namen:** `using SecLog.Model;` am Anfang erlaubt, im Programm weiter `LogEvent` und `Incident` zu schreiben. `Report` bleibt außerhalb des Namespace.
+3. **Ausgeben:** `typeof(LogEvent).FullName` gibt den vollqualifizierten Namen aus, `SecLog.Model.LogEvent`.
+
+</details>
+
+**Neuer Stand:** SecLog ordnet sein Modell in den Namespace `SecLog.Model` und importiert ihn mit einer `using`-Direktive.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m06-l09-using-adds-library" />
+
+**„Eine `using`-Direktive lädt eine Bibliothek ins Programm.“** Das stimmt nicht. Die Direktive erlaubt nur den kurzen Namen für die Typen eines Namespace. Die Typen müssen schon vorhanden sein, weil das SDK oder das Projekt die Bibliothek bereitstellt. Fehlt sie, hilft keine `using`-Zeile, sondern ein Verweis im Projekt.
+:::
+
+<Forward concepts={['Verweise im Projekt']} module="14" />
+
+<details>
+<summary>Vertiefung: Wie der Compiler einen kurzen Namen findet (optional)</summary>
+
+Beim Auflösen eines Namens sucht der Compiler von innen nach außen: erst im eigenen Namespace, dann in den äußeren, zuletzt in den importierten. Namen, die ein `using` importiert, verdeckt ein gleichnamiger Typ im eigenen Namespace ([§14.6.3 Using namespace directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces#1463-using-namespace-directives)).
+
+Eine `using`-Direktive trägt keinen Member zu einem Namespace bei. Sie wirkt nur in der Datei oder dem Block, in dem sie steht. `global using` wirkt dagegen im ganzen Programm.
+
+</details>
+
+## Zusammenfassung
+
+Ein Namespace gruppiert Typen unter einem Namen, der Teil des vollqualifizierten Namens ist. Eine `using`-Direktive erlaubt nur den kurzen Namen und lädt nichts. Ein `using`-Alias löst gleiche Namen auf, und `using static` importiert statische Member. Ein dateibezogener Namespace endet mit einem Semikolon und geht nicht zusammen mit Anweisungen auf oberster Ebene. `global using` gilt für das ganze Programm, und das SDK erzeugt für die Standardnamespaces implizite Direktiven.
+
+## Prüfe dein Wissen
+
+<Quiz id="m06-l09-q1" />
+
+<Quiz id="m06-l09-q2" />
+
+<Quiz id="m06-l09-q3" />
+
+<Quiz id="m06-l09-q4" />
+
+<Quiz id="m06-l09-q5" />
+
+<Quiz id="m06-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m06-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m06-l09-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Namespaces](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/namespaces)
+- Microsoft Learn: [Implicit using directives](https://learn.microsoft.com/dotnet/core/project-sdk/overview#implicit-using-directives)
+- Microsoft Learn: [The using directive](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/using-directive)

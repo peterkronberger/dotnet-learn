@@ -46,7 +46,7 @@
         { "text": "Ein eigener Referenztyp, der `System.Int32` umhüllt", "feedback": "Es gibt keine Umhüllung. Beide Namen bezeichnen denselben Werttyp." },
         { "text": "Ein Typ mit weniger Bits als `System.Int32`", "feedback": "Beide haben dieselbe Größe, denn es ist derselbe Typ." }
       ],
-      "explanation": "Die einfachen Typen sind Schlüsselwörter für vordefinierte Werttypen im Namespace `System`. `int` und `Int32` sind austauschbar."
+      "explanation": "Die einfachen Typen sind Schlüsselwörter für vordefinierte Werttypen aus `System`. `int` und `Int32` sind austauschbar."
     },
     {
       "id": "m04-l01-q5",
