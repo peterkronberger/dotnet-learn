@@ -1,0 +1,222 @@
+---
+title: 'Ressourcen freigeben: using und IDisposable'
+sidebar_position: 8
+description: Ein Objekt mit einer Ressource hat Dispose – using ruft es für dich auf, auch wenn eine Exception auftritt.
+lesson_id: m07-l08
+duration_min: 22
+---
+
+import usingStatement from '!!raw-loader!@site/examples/m07/l08/using-statement.cs';
+import usingStatementOutput from '!!raw-loader!@site/examples/m07/l08/using-statement.out.txt';
+import usingDeclaration from '!!raw-loader!@site/examples/m07/l08/using-declaration.cs';
+import usingDeclarationOutput from '!!raw-loader!@site/examples/m07/l08/using-declaration.out.txt';
+import disposeOrder from '!!raw-loader!@site/examples/m07/l08/dispose-order.cs';
+import disposeOrderOutput from '!!raw-loader!@site/examples/m07/l08/dispose-order.out.txt';
+import usingGap from '!!raw-loader!@site/examples/m07/l08/using-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l08/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l08/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l08/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l08/seclog-exceptions-solution.cs';
+
+# Ressourcen freigeben: using und IDisposable
+
+:::note[Lernziele]
+- Du kannst mit einer `using`-Anweisung und einer `using`-Deklaration dafür sorgen, dass `Dispose` aufgerufen wird.
+- Du kannst die Reihenfolge vorhersagen, in der mehrere Ressourcen freigegeben werden.
+- Du kannst erklären, wofür `Dispose` da ist und was der Garbage Collector macht.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l04-q2" />
+
+<Quiz id="m07-l07-q7" />
+
+<Quiz id="m04-l02-q3" />
+
+## Ressourcen und Dispose
+
+Eine <Term id="resource">Ressource</Term> (Resource) ist etwas, das ein Objekt vom System belegt und wieder abgeben muss, zum Beispiel eine geöffnete Datei oder eine Verbindung. Der Speicher des Objekts zählt nicht dazu: Ihn gibt der <Term id="garbage-collector">Garbage Collector</Term> frei, wenn das Programm das Objekt nicht mehr erreichen kann (Modul 4). Wann das geschieht, bestimmt er selbst.
+
+Eine Datei darf aber nicht warten, bis der Garbage Collector Zeit hat. Ein Objekt, das eine solche Ressource hält, hat deshalb eine Methode <Term id="dispose">`Dispose`</Term>. Sie gibt die Ressource sofort frei, und du rufst sie auf, sobald du fertig bist. Nach dem Aufruf ist das Objekt nicht mehr benutzbar.
+
+Ein Typ meldet das mit `IDisposable`. Das ist ein Interface: ein Vertrag, der sagt, dass der Typ die Methode `Dispose` anbietet. Für diese Lektion genügt der Satz „Der Typ hat eine Methode `Dispose`“ ([IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)).
+
+<Forward concepts={['Interfaces']} module="8" />
+
+`Dispose` von Hand aufzurufen ist fehleranfällig. Löst eine Anweisung vorher eine Exception aus, wird der Aufruf übersprungen und die Ressource bleibt belegt. Das kennst du aus Lektion 4: Dafür gibt es `finally`. Die Sprache bietet dafür eine Kurzform an.
+
+## Die using-Anweisung
+
+Die <Term id="using-statement">`using`-Anweisung</Term> (using Statement) erwirbt eine Ressource, führt einen Block aus und ruft danach `Dispose` auf. Sie ist als `try` mit einem `finally`-Block definiert, der `Dispose` aufruft. Ist die Ressource `null`, ruft C# `Dispose` nicht auf und löst keine Exception aus ([§13.14.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13141-general)).
+
+Das Beispiel benutzt `StringReader` aus `System.IO`. Er liest einen Text Zeile für Zeile. `ReadLine()` gibt die nächste Zeile zurück. Der `StringReader` ist zwar nur ein Text im Speicher, aber er hat wie ein Dateileser die Methode `Dispose`.
+
+Die `using`-Anweisung hat nichts mit der `using`-Direktive am Dateianfang zu tun (Modul 6), die Namespaces bekannt macht.
+
+:::info[Vorhersage]
+Der Reader liest im `using`-Block zwei Zeilen. Danach versucht das Programm, noch einmal zu lesen. Welche Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m07-l08-statement" code={usingStatement} predict expected={usingStatementOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `first`, `second` und `Disposed: ObjectDisposedException`.
+
+1. **Erwerben:** Die Variable `reader` hält den `StringReader`. `using (reader)` nimmt ihn als Ressource.
+2. **Benutzen:** Im Block liest `ReadLine()` zwei Zeilen.
+3. **Freigeben:** Am Ende des Blocks ruft C# `Dispose` auf. Ein Aufruf danach löst eine `ObjectDisposedException` aus, und der `catch` meldet den Typnamen.
+
+Was passiert, wenn im Block eine Exception auftritt? `Dispose` läuft trotzdem, bevor die Exception weitergeht.
+
+</details>
+
+## Die using-Deklaration
+
+Oft steht die Ressource bis zum Ende einer Methode im Gebrauch. Dann ist ein zusätzlicher Block unnötig. Die <Term id="using-declaration">`using`-Deklaration</Term> (using Declaration) schreibt `using` vor die Deklaration der Variablen und hat keinen Block. `Dispose` wird am Ende des Blocks aufgerufen, in dem die Deklaration steht ([§13.14.2 Using declaration](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13142-using-declaration)). Sie ist seit C# 8 verfügbar.
+
+Wähle die Anweisung mit Block, wenn die Ressource früh wieder frei sein soll. Wähle die Deklaration, wenn sie bis zum Ende des Blocks gebraucht wird.
+
+:::info[Vorhersage]
+`Join` schreibt zwei Texte in einen `StringWriter` und gibt das Ergebnis zurück. Welche Zeile gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l08-declaration" code={usingDeclaration} predict expected={usingDeclarationOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `a+b`.
+
+1. **Erwerben:** `using StringWriter writer = new();` erzeugt den Writer. Der `StringWriter` sammelt Text im Speicher.
+2. **Benutzen:** `Write` hängt `a`, `+` und `b` an. `ToString()` gibt den Text zurück.
+3. **Freigeben:** Beim Verlassen von `Join` ruft C# `Dispose` auf. Der Rückgabewert ist ein `string` und bleibt gültig.
+
+</details>
+
+## Die Reihenfolge der Freigabe
+
+Mehrere Ressourcen gibt C# in umgekehrter Reihenfolge frei: Was zuletzt erworben wurde, wird zuerst freigegeben. Das gilt für mehrere `using`-Deklarationen in einem Block ([§13.14.2 Using declaration](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13142-using-declaration)). Es ist sinnvoll, weil eine spätere Ressource von einer früheren abhängen kann.
+
+Das Beispiel hat einen eigenen Typ `Resource`, dessen `Dispose` nur eine Zeile ausgibt.
+
+<Forward concepts={['Klassen mit `: IDisposable`']} module="8" />
+
+`Work` erwirbt zwei Ressourcen und löst dann eine Exception aus. Der Aufrufer fängt sie.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus, und in welcher Reihenfolge?
+:::
+
+<CSharpRunner id="m07-l08-order" code={disposeOrder} predict expected={disposeOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Working`, `Dispose second`, `Dispose first` und `Caught: Step failed`.
+
+1. **Erwerben:** `first` und `second` werden nacheinander erzeugt.
+2. **Auslösen:** `Work` gibt `Working` aus und löst die Exception aus.
+3. **Freigeben:** Beim Verlassen von `Work` ruft C# `Dispose` auf, zuerst für `second`, dann für `first`.
+4. **Fangen:** Erst danach läuft der `catch` im Aufrufer.
+
+Was passiert, wenn du die beiden Zeilen mit `using` vertauschst? Dann steht `Dispose first` vor `Dispose second`.
+
+</details>
+
+## Lückenbeispiel
+
+`Read` ruft `Dispose` mit `try`/`finally` von Hand auf. Ersetze das durch eine `using`-Deklaration. Die Ausgabe bleibt `Working`, `Dispose log` und `Done`.
+
+<CSharpRunner id="m07-l08-gaps" code={usingGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Deklaration:** `using Resource log = new("log");`
+2. **Aufräumen entfernen:** Der `try`-Block, der `finally`-Block und der Aufruf `log.Dispose()` entfallen.
+3. **Ergebnis:** Die Methode behält nur `Console.WriteLine("Working");`. `Dispose log` erscheint beim Verlassen von `Read`, vor `Done`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt gute und schlechte Zeilen eines gemischten Logs mit `TryParseLine`, ohne Exceptions.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block und `return 0;`, die Funktion `TryParseLine` und das Ende von `namespace SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+Die nächste Lektion liest das Log aus einer Datei. Dieser Schritt bereitet das vor, mit einem `StringReader` statt einer Datei.
+
+**Neue Anforderung:** Schreibe vor `return 0;` den Block `// Read the sample log line by line with a StringReader`.
+
+1. Füge `sampleLog` mit `string.Join("\n", sampleLog)` zu einem Text zusammen.
+2. Lies den Text mit einem `StringReader` in einer `using`-Anweisung mit Block. Die Anweisung passt hier besser als die Deklaration, weil der Reader nur in diesem Block gebraucht wird und danach sofort freigegeben ist.
+3. Rufe `ReadLine()` auf, bis es `null` zurückgibt, und prüfe jede Zeile mit `TryParseLine`. Zähle die Zeilen und die gültigen Events.
+4. Gib hinter dem `using`-Block `Lines read: 14, events: 14` aus.
+
+<CSharpRunner id="m07-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Text vorbereiten:** `string.Join` macht aus den 14 Zeilen einen Text mit Zeilenumbrüchen.
+2. **Ressource erwerben:** `using (StringReader reader = new(logText))` gibt den Reader am Ende des Blocks frei.
+3. **Zeilen lesen:** Die Schleife läuft, bis `ReadLine()` den Wert `null` liefert. Jede Zeile geht an `TryParseLine`.
+4. **Ausgeben:** Die Zähler stehen vor dem Block, deshalb kann die Ausgabe hinter dem Block stehen.
+
+</details>
+
+**Neuer Stand:** SecLog liest das Beispiel-Log Zeile für Zeile aus einem `StringReader` und gibt den Reader danach frei.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l08-dispose-frees-memory" />
+
+**„`Dispose` gibt den Speicher des Objekts frei.“** Das stimmt nicht. `Dispose` gibt andere Ressourcen frei, zum Beispiel Dateien und Verbindungen. Den Speicher des Objekts gibt der Garbage Collector später frei, wenn das Programm das Objekt nicht mehr erreichen kann.
+:::
+
+<details>
+<summary>Vertiefung: Finalizer und Dispose-Muster (optional)</summary>
+
+Ein <Term id="finalizer">Finalizer</Term> ist eine Methode, die der Garbage Collector aufrufen kann, bevor er ein Objekt entfernt. Wann das geschieht, steht nicht fest, deshalb gilt: Für ein bestimmtes Verhalten benutzt du `Dispose` ([§15.13 Finalizers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1513-finalizers)). Anwendungscode braucht selten einen Finalizer: Er ist nur nötig, wenn ein Typ nicht verwaltete (unmanaged) Ressourcen direkt hält, und das lässt sich meist vermeiden ([Implement a Dispose method](https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose)). Wenn du einen eigenen Typ mit Ressourcen schreibst, gibt es dafür das Dispose-Muster (Dispose Pattern) mit einer festen Struktur. Es braucht Vererbung und wird in Modul 8 vorbereitet. Für diese Lektion genügt: Typen der Bibliothek wie `StreamReader` haben es schon, und du rufst nur `Dispose` über `using` auf.
+
+</details>
+
+## Zusammenfassung
+
+Ein Objekt, das eine Ressource hält, hat eine Methode `Dispose`, die sie sofort freigibt. Die `using`-Anweisung und die `using`-Deklaration rufen `Dispose` für dich auf, auch wenn eine Exception auftritt, weil sie ein `finally` ersetzen. Mehrere Ressourcen werden in umgekehrter Reihenfolge freigegeben. `Dispose` gibt keinen Speicher frei, das macht der Garbage Collector.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l08-q1" />
+
+<Quiz id="m07-l08-q2" />
+
+<Quiz id="m07-l08-q3" />
+
+<Quiz id="m07-l08-q4" />
+
+<Quiz id="m07-l08-q5" />
+
+<Quiz id="m07-l08-q6" />
+
+<Quiz id="m07-l08-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l08-q8" />
+
+### Transferfrage
+
+<Quiz id="m07-l08-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [The using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1314-the-using-statement)
+- Microsoft Learn: [Implement a Dispose method](https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose)
+- Microsoft Learn: [Using objects that implement IDisposable](https://learn.microsoft.com/dotnet/standard/garbage-collection/using-objects)

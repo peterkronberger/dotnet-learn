@@ -1,0 +1,227 @@
+---
+title: Exception oder nicht?
+sidebar_position: 7
+description: Unerwartete Fehler sind ein Fall für Exceptions – erwartete Fehler meldest du mit dem Try-Muster oder einem Rückgabewert.
+lesson_id: m07-l07
+duration_min: 21
+---
+
+import threeWays from '!!raw-loader!@site/examples/m07/l07/three-ways.cs';
+import threeWaysOutput from '!!raw-loader!@site/examples/m07/l07/three-ways.out.txt';
+import tryPattern from '!!raw-loader!@site/examples/m07/l07/try-pattern.cs';
+import tryPatternOutput from '!!raw-loader!@site/examples/m07/l07/try-pattern.out.txt';
+import catchAll from '!!raw-loader!@site/examples/m07/l07/catch-all.cs';
+import catchAllOutput from '!!raw-loader!@site/examples/m07/l07/catch-all.out.txt';
+import tryGap from '!!raw-loader!@site/examples/m07/l07/try-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l07/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l07/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l07/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l07/seclog-exceptions-solution.cs';
+
+# Exception oder nicht?
+
+:::note[Lernziele]
+- Du kannst für einen Fehlerfall begründen, ob eine Exception, das Try-Muster oder ein Rückgabewert (zum Beispiel `null`) passt.
+- Du kannst eine `Try…`-Methode mit `bool`-Ergebnis und `out`-Parameter schreiben.
+- Du kannst erklären, warum `catch (Exception)` an jeder Stelle Fehler versteckt.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l06-q1" />
+
+<Quiz id="m03-l08-q1" />
+
+<Quiz id="m04-l04-q8" />
+
+## Erwarteter oder unerwarteter Fehler?
+
+Du kennst jetzt `try`/`catch`, `throw` und eigene Exceptions. Die Frage dieser Lektion: Wann ist eine Exception das richtige Mittel?
+
+Entscheidend ist, wie oft der Fehler vorkommt:
+
+- **Unerwartet** ist ein Fehler, der nicht zum normalen Ablauf gehört: ein Programmierfehler, ein Zustand, der nicht eintreten darf, oder eine Datei, die fehlt, obwohl sie da sein muss. Dafür passt eine Exception.
+- **Erwartet** ist ein Fehler, der oft vorkommt und zum normalen Ablauf gehört: Benutzer tippen falsche Zahlen, eine Log-Datei enthält kaputte Zeilen, ein Name fehlt in einer Liste. Dafür passen ein Rückgabewert oder das Try-Muster. Eine Exception auszulösen ist deutlich langsamer als ein normaler Rückgabewert, und der Aufrufer müsste für jeden dieser Fälle ein `try`/`catch` schreiben ([Handle common conditions to avoid exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)).
+
+## Drei Wege, einen Fehler zu melden
+
+Dasselbe Problem – „es gibt kein Limit für `carol`“ – lässt sich auf drei Arten melden:
+
+1. **Exception:** Der Indexer des `Dictionary` löst eine `KeyNotFoundException` aus (Modul 5).
+2. **Try-Methode:** `TryGetValue` gibt `false` zurück und liefert den Wert über einen `out`-Parameter (Modul 3).
+3. **Rückgabewert:** Eine eigene Methode gibt `null` zurück, wenn es nichts zu finden gibt. Dafür braucht der Rückgabetyp ein `?`, hier `int?` (Modul 4).
+
+:::info[Vorhersage]
+Das Programm sucht dreimal das Limit von `carol`, die nicht im Dictionary steht. Welche Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m07-l07-ways" code={threeWays} predict expected={threeWaysOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Exception: KeyNotFoundException`, `Try method: no limit for carol` und `Return value is null: True`.
+
+1. **Exception:** Der Indexer findet den Schlüssel nicht und löst die Exception aus. Der `catch`-Block gibt den Typnamen aus.
+2. **Try-Methode:** `TryGetValue` gibt `false` zurück, und der `else`-Zweig läuft. Es gibt keine Exception.
+3. **Rückgabewert:** `FindLimit` gibt `null` zurück. Der Aufrufer prüft mit `found == null`.
+
+Was passiert, wenn du `"alice"` statt `"carol"` suchst? Alle drei Wege liefern dann das Limit 3, und es gibt keinen Fehler.
+
+</details>
+
+Die Wahl hängt vom Fall ab:
+
+| Fall | Passende Form |
+| --- | --- |
+| Der Fehler ist selten oder ein Programmierfehler | Exception |
+| Der Fehler kommt oft vor, und der Aufrufer braucht den Grund nicht | Rückgabewert (`null`) |
+| Der Fehler kommt oft vor, und es gibt ein Ergebnis | Try-Muster |
+
+## Das Try-Muster
+
+Das <Term id="try-pattern">Try-Muster</Term> (Try Pattern) hat drei Merkmale:
+
+1. Der Name beginnt mit `Try`.
+2. Die Methode gibt einen `bool` zurück: `true` bei Erfolg, `false` bei Misserfolg.
+3. Das Ergebnis kommt über einen `out`-Parameter. Bei `false` ist es der Standardwert, hier `0`.
+
+Das Muster gilt nur für den klar benannten, erwarteten Fehler. Scheitert die Methode aus einem anderen Grund, löst sie weiterhin eine Exception aus ([Exceptions and Performance](https://learn.microsoft.com/dotnet/standard/design-guidelines/exceptions-and-performance)). `int.TryParse` ist das bekannteste Beispiel. Das Programm schreibt eine eigene Methode `TryParsePort`: Eine Portnummer ist gültig, wenn sie eine Zahl von 1 bis 65535 ist.
+
+Die Methode hat keinen `try`-Block und kein `catch`. Sie prüft die Eingabe selbst und meldet das Ergebnis.
+
+:::info[Vorhersage]
+`TryParsePort` bekommt `"8080"`, `"http"` und `"70000"`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l07-try" code={tryPattern} predict expected={tryPatternOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Port 8080`, `Not a port: http` und `Not a port: 70000`.
+
+1. **Zahl lesen:** `int.TryParse` schreibt das Ergebnis in `port`. Bei `"http"` gibt es `false` zurück, die Methode ebenfalls.
+2. **Bereich prüfen:** `70000` ist eine Zahl, aber größer als 65535. Die Methode setzt `port` auf `0` und gibt `false` zurück.
+3. **Aufrufen:** Der Aufrufer prüft den `bool` mit `if` und benutzt `port` nur im Erfolgsfall.
+
+Was passiert, wenn du `port = 0;` weglässt? Der Aufrufer bekäme bei `"70000"` zwar `false`, aber in `port` stünde `70000`. Setze den `out`-Wert bei `false` immer auf einen Standardwert.
+
+</details>
+
+## Nur fangen, was du behandeln kannst
+
+Wenn eine Exception das richtige Mittel ist, kommt die nächste Frage: Wo fängst du sie? Die Regel lautet: Fange eine Exception nur dort, wo du sinnvoll darauf reagieren kannst. Für alle anderen Exceptions gibt es eine Stelle weiter außen, die sie meldet oder das Programm beendet.
+
+Ein allgemeines `catch (Exception)` fängt jede Exception. Wenn es nur einen Ersatzwert liefert, nennt man das <Term id="swallowing-exceptions">Exceptions verschlucken</Term> (Swallowing Exceptions): Der Fehler ist weg, aber niemand hat ihn gesehen.
+
+:::info[Vorhersage]
+`CountGeneral` fängt jede Exception, `CountSpecific` nur die `FormatException`. Die dritte Zeile `"failures"` hat kein `=`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l07-catch" code={catchAll} predict expected={catchAllOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist dreimal `General catch:` mit `4`, `0`, `0`, danach `Specific catch: 4`, `Specific catch: 0` und `Bug found: IndexOutOfRangeException`.
+
+1. **Gutfall:** `"failures=4"` ergibt 4 in beiden Methoden.
+2. **Erwarteter Fehler:** `"failures=x"` löst eine `FormatException` aus. Beide Methoden geben 0 zurück, hier ist das gewollt.
+3. **Fehler im Code:** Bei `"failures"` hat `Split('=')` nur ein Element, und `[1]` löst eine `IndexOutOfRangeException` aus. `CountGeneral` fängt auch sie und gibt 0 zurück, sodass sie nicht von `"failures=x"` zu unterscheiden ist. `CountSpecific` fängt sie nicht, und der äußere `catch` meldet den Fehler.
+
+Was passiert, wenn der äußere `catch` fehlt? Das Programm endet mit einer nicht behandelten Exception, und der Stack Trace zeigt die Stelle.
+
+</details>
+
+## Lückenbeispiel
+
+`TryParsePercent` soll `true` und die Zahl liefern, wenn der Text eine Zahl von 0 bis 100 ist. Sonst gibt sie `false` zurück und setzt `percent` auf `0`. Schreibe die drei Schritte aus den Kommentaren, ohne `throw` und ohne `catch`. Die Ausgabe soll `85%`, `Not a percent: 140` und `Not a percent: high` sein.
+
+<CSharpRunner id="m07-l07-gaps" code={tryGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Lesen:** `if (!int.TryParse(text, out percent)) { return false; }`
+2. **Bereich prüfen:** `if (percent < 0 || percent > 100) { percent = 0; return false; }`
+3. **Ergebnis:** `return true;`
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog weist ungültige Log-Zeilen mit `ParseLine` zurück, indem es eine `InvalidLogLineException` auslöst. Dazu gehören Zeilennummer und Ursache.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block und `return 0;`, die Funktion `ParseLine` mit dem Platz dahinter und das Ende von `namespace SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+Ein Log enthält fast immer einige kaputte Zeilen. Sie sind erwartet, darum passt das Try-Muster besser als eine Exception.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `ParseLine` die lokale Funktion `bool TryParseLine(string line, out LogEvent? logEvent)`. Sie gibt `false` zurück und setzt `logEvent` auf `null`, wenn `ParseLine` die Zeile ablehnen würde: bei einer falschen Zahl von Teilen, einem ungültigen Zeitstempel oder einem unbekannten Ereignistyp. Sie löst nichts aus und fängt nichts. Lies den Zeitstempel mit `DateTimeOffset.TryParse(text, CultureInfo.InvariantCulture, DateTimeStyles.None, out …)`. Bei einer gültigen Zeile setzt sie `logEvent` auf ein neues `LogEvent` und gibt `true` zurück.
+2. Schreibe vor `return 0;` den Block `// Count invalid lines of a mixed log without exceptions`. Rufe `TryParseLine` für die drei Zeilen des vorigen Blocks (`candidates`) und für `sampleLog[13]` auf, zähle gute und schlechte Zeilen und gib `Good lines: 2, bad lines: 2` aus.
+
+<CSharpRunner id="m07-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Rückgabewert vorbereiten:** `logEvent` ist von Anfang an `null`. So ist der `out`-Parameter auf jedem Weg gesetzt.
+2. **Regeln prüfen:** Jede Regel von `ParseLine` ist ein `if` mit `return false`. Der Zeitstempel kommt von `DateTimeOffset.TryParse`, das bei Fehlern `false` meldet.
+3. **Erfolg melden:** Bei einer gültigen Zeile entsteht das `LogEvent`, und die Funktion gibt `true` zurück.
+4. **Zählen:** Der Block geht durch die vier Zeilen und erhöht je nach Ergebnis `goodLines` oder `badLines`.
+
+</details>
+
+**Neuer Stand:** SecLog zählt ungültige Log-Zeilen, ohne dass dafür Exceptions ausgelöst oder gefangen werden.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l07-catch-exception-everywhere-is-safe" />
+
+**„Wer überall `catch (Exception)` schreibt, macht sein Programm sicher.“** Das stimmt nicht. Das Programm stürzt dann zwar seltener ab, aber es versteckt auch Fehler im Code, zum Beispiel eine `NullReferenceException`. Es arbeitet danach mit einem falschen Zustand weiter. Fange konkrete Typen dort, wo du reagieren kannst, und lass den Rest zu einer Stelle laufen, die ihn meldet.
+:::
+
+<details>
+<summary>Vertiefung: Tester-Doer-Muster (optional)</summary>
+
+Neben dem Try-Muster gibt es das Tester-Doer-Muster: Eine Eigenschaft oder Methode prüft vorher (Tester), eine zweite führt die Aktion aus (Doer). Bei einer Sammlung prüft `IsReadOnly`, ob `Add` erlaubt ist. Das Try-Muster ist für sehr leistungskritische Methoden noch schneller, weil es die Prüfung und die Aktion in einem Aufruf erledigt ([Exceptions and Performance](https://learn.microsoft.com/dotnet/standard/design-guidelines/exceptions-and-performance)). Zu jeder `Try…`-Methode gehört üblicherweise eine Variante, die bei einem Fehler eine Exception auslöst, wie `int.Parse` zu `int.TryParse`.
+
+</details>
+
+## Zusammenfassung
+
+Eine Exception passt zu unerwarteten Fehlern wie Programmfehlern. Ein erwarteter Fehler, der oft vorkommt, wird besser mit einem Rückgabewert wie `null` oder mit dem Try-Muster gemeldet: `Try…`-Methode, `bool`-Ergebnis und `out`-Parameter. Fange eine Exception nur dort, wo du darauf reagieren kannst. Ein allgemeines `catch (Exception)` verschluckt auch Fehler im Code.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l07-q1" />
+
+<Quiz id="m07-l07-q2" />
+
+<Quiz id="m07-l07-q3" />
+
+<Quiz id="m07-l07-q4" />
+
+<Quiz id="m07-l07-q5" />
+
+<Quiz id="m07-l07-q6" />
+
+<Quiz id="m07-l07-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l07-q8" />
+
+### Transferfrage
+
+<Quiz id="m07-l07-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)
+- Microsoft Learn: [Exceptions and Performance](https://learn.microsoft.com/dotnet/standard/design-guidelines/exceptions-and-performance)

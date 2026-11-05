@@ -748,6 +748,295 @@
       "type": "explain",
       "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem du eine Geschäftsregel an einer Stelle prüfst und bei einem Verstoß eine Exception mit innerer Exception auslöst.",
       "modelAnswer": "Beim Einlesen einer Log-Zeile prüft `ParseLine` alle Regeln an einer Stelle: vier Teile, gültiger Zeitstempel, bekannter Ereignistyp. Gelingt das Lesen des Zeitstempels nicht, löse ich eine `InvalidLogLineException` mit der `FormatException` als innerer Exception aus. So sieht der Aufrufer die Fachmeldung und die ursprüngliche Ursache."
+    },
+    {
+      "id": "m07-l07-q1",
+      "lesson": "m07-l07",
+      "type": "single",
+      "question": "Ein Benutzer tippt eine Portnummer ein, und falsche Eingaben kommen oft vor. Wie meldest du ein ungültiges Ergebnis am besten?",
+      "options": [
+        {
+          "text": "Mit einer `Try…`-Methode, die `false` zurückgibt und die Zahl in einem `out`-Parameter liefert.",
+          "correct": true
+        },
+        {
+          "text": "Mit einer Exception, denn jeder Fehler ist ein Fall für `throw`.",
+          "feedback": "Falsche Eingaben sind hier der Normalfall. Für erwartete Fehler passt das Try-Muster besser: Der Aufrufer prüft einen `bool` und braucht kein `try`/`catch`."
+        },
+        {
+          "text": "Gar nicht, das Programm nimmt die letzte gültige Zahl.",
+          "feedback": "Ein Fehler, den niemand meldet, bleibt unbemerkt. Der Aufrufer muss erfahren, dass die Eingabe ungültig war."
+        }
+      ],
+      "explanation": "Ein erwarteter Fehler ist Teil des normalen Ablaufs. Das Try-Muster meldet ihn mit `false`, ohne eine Exception auszulösen."
+    },
+    {
+      "id": "m07-l07-q2",
+      "lesson": "m07-l07",
+      "type": "single",
+      "question": "Eine Methode `Reserve(int count)` bekommt `-3`. Das ist ein Fehler im aufrufenden Code, den der Aufrufer nicht erwarten darf. Was passt?",
+      "options": [
+        {
+          "text": "Eine Exception, zum Beispiel `ArgumentOutOfRangeException`.",
+          "correct": true
+        },
+        {
+          "text": "Ein Rückgabewert `null`.",
+          "feedback": "`null` passt zu „nicht gefunden“, einem erwarteten Ergebnis. Ein Programmierfehler soll nicht still durch einen Rückgabewert verschwinden."
+        },
+        {
+          "text": "Eine `Try…`-Methode mit `out`-Parameter.",
+          "feedback": "Das Try-Muster passt zu Fehlern, die häufig vorkommen. Ein falscher Aufruf ist ein Fehler im Programm und kein erwarteter Fall."
+        }
+      ],
+      "explanation": "Ein Programmierfehler oder ein unerwarteter Zustand ist ein Fall für eine Exception. Erwartete, häufige Fehler meldest du mit dem Try-Muster oder einem Rückgabewert."
+    },
+    {
+      "id": "m07-l07-q3",
+      "lesson": "m07-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l07/three-ways.cs",
+      "explanation": "Der Indexer löst für `\"carol\"` eine `KeyNotFoundException` aus. `TryGetValue` gibt `false` zurück, deshalb läuft der `else`-Zweig. `FindLimit` gibt `null` zurück, der Vergleich `found == null` ist `True`."
+    },
+    {
+      "id": "m07-l07-q4",
+      "lesson": "m07-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l07/catch-all.cs",
+      "explanation": "Mit `catch (Exception)` liefert `CountGeneral` für `\"failures\"` ebenfalls 0, obwohl dort `Split('=')[1]` einen `IndexOutOfRangeException` auslöst. Der Fehler im Code bleibt unsichtbar. `CountSpecific` fängt nur die `FormatException`, deshalb kommt der Fehler bei der dritten Zeile bis zum äußeren `catch`."
+    },
+    {
+      "id": "m07-l07-q5",
+      "lesson": "m07-l07",
+      "type": "single",
+      "question": "Ein Kollege schreibt in jede Methode `catch (Exception) { return 0; }`. Was stimmt?",
+      "options": [
+        {
+          "text": "Das Programm läuft zwar weiter, aber auch Programmierfehler wie ein Zugriff außerhalb des Arrays werden verschluckt.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm ist jetzt sicher, weil kein Fehler mehr bis zum Ende durchkommt.",
+          "feedback": "Das Programm stürzt nicht mehr ab, aber es arbeitet mit falschen Werten weiter und der Fehler bleibt unentdeckt.",
+          "misconception": "m07-l07-catch-exception-everywhere-is-safe"
+        },
+        {
+          "text": "`catch (Exception)` fängt nur Fehler, die man vorhersehen kann.",
+          "feedback": "Die Klausel fängt jede Exception, auch die, mit der niemand gerechnet hat.",
+          "misconception": "m07-l07-catch-exception-everywhere-is-safe"
+        },
+        {
+          "text": "Das ist Pflicht, sonst übersetzt der Compiler den Code nicht.",
+          "feedback": "Der Compiler verlangt kein `catch`. Eine nicht gefangene Exception beendet das Programm zur Laufzeit."
+        }
+      ],
+      "explanation": "Eine allgemeine `catch`-Klausel behandelt Fehler, die du nicht kennst, als wären sie erwartet. Fange konkrete Typen dort, wo du reagieren kannst, und lass den Rest an eine Stelle laufen, die ihn meldet."
+    },
+    {
+      "id": "m07-l07-q6",
+      "lesson": "m07-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über Methoden nach dem Try-Muster stimmen?",
+      "options": [
+        {
+          "text": "Sie geben einen `bool` zurück, der den Erfolg meldet.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis kommt über einen `out`-Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Bei einer ungültigen Eingabe lösen sie keine Exception aus.",
+          "correct": true
+        },
+        {
+          "text": "Sie lösen bei jedem Fehler eine Exception aus und fangen sie selbst.",
+          "feedback": "Eine `Try…`-Methode soll gar keine Exception brauchen. Sie prüft die Eingabe und gibt `false` zurück."
+        }
+      ],
+      "explanation": "Das Try-Muster besteht aus dem `bool`-Ergebnis und dem `out`-Parameter. Der Misserfolg ist ein normaler Rückgabewert."
+    },
+    {
+      "id": "m07-l07-q7",
+      "lesson": "m07-l07",
+      "type": "single",
+      "question": "Wann fängst du eine Exception mit `catch`?",
+      "options": [
+        {
+          "text": "Wenn du an dieser Stelle sinnvoll auf den Fehler reagieren kannst, zum Beispiel mit einem Ersatzwert oder einer Meldung.",
+          "correct": true
+        },
+        {
+          "text": "Immer, damit das Programm nie abbricht.",
+          "feedback": "Ein Programm, das Fehler überall wegfängt, versteckt Fehler im Code. Fange nur, was du behandeln kannst.",
+          "misconception": "m07-l07-catch-exception-everywhere-is-safe"
+        },
+        {
+          "text": "Nie, Exceptions sind nur für Entwickler gedacht.",
+          "feedback": "Exceptions gehören zum Programm. Fange sie dort, wo du sie behandeln kannst."
+        }
+      ],
+      "explanation": "Fange eine Exception nur dort, wo du darauf reagieren kannst. Andere Exceptions laufen weiter nach außen."
+    },
+    {
+      "id": "m07-l07-q8",
+      "lesson": "m07-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum versteckt `catch (Exception)` an jeder Stelle Fehler?",
+      "modelAnswer": "Die Klausel fängt jede Exception, auch solche, die auf einen Fehler im Code hinweisen, zum Beispiel einen Zugriff außerhalb eines Arrays. Wenn der `catch`-Block nur einen Ersatzwert liefert, sieht niemand, dass etwas schiefging, und das Programm arbeitet mit falschen Werten weiter. Besser fange ich konkrete Typen, bei denen ich reagieren kann, und lasse den Rest zu einer Stelle laufen, die ihn meldet."
+    },
+    {
+      "id": "m07-l07-q9",
+      "lesson": "m07-l07",
+      "type": "explain",
+      "question": "Transfer: Nenne einen Fall aus einem eigenen Programm, in dem du das Try-Muster einer Exception vorziehst, und einen, in dem eine Exception besser passt.",
+      "modelAnswer": "Beim Lesen eines Logs sind ungültige Zeilen zu erwarten. Dafür passt eine Methode wie `TryParseLine`, die `false` zurückgibt und das Log weiter verarbeitet. Eine Exception passt, wenn ein Programmierfehler vorliegt, zum Beispiel ein negativer Wert für eine Anzahl, die nie negativ sein darf: Der Aufrufer hat die Methode falsch benutzt."
+    },
+    {
+      "id": "m07-l08-q1",
+      "lesson": "m07-l08",
+      "type": "single",
+      "question": "Wofür ist die Methode `Dispose` da?",
+      "options": [
+        {
+          "text": "Sie gibt Ressourcen frei, die das Objekt hält, zum Beispiel eine Datei oder eine Verbindung.",
+          "correct": true
+        },
+        {
+          "text": "Sie gibt den Speicher des Objekts frei.",
+          "feedback": "Den Speicher des Objekts gibt der Garbage Collector später frei. `Dispose` gibt andere Ressourcen frei.",
+          "misconception": "m07-l08-dispose-frees-memory"
+        },
+        {
+          "text": "Sie löscht die Variable, die auf das Objekt zeigt.",
+          "feedback": "Die Variable bleibt bestehen. `Dispose` ändert nur den Zustand des Objekts, indem es Ressourcen freigibt."
+        }
+      ],
+      "explanation": "`Dispose` gibt Ressourcen frei, die das Objekt hält. Der Speicher des Objekts selbst gehört dem Garbage Collector."
+    },
+    {
+      "id": "m07-l08-q2",
+      "lesson": "m07-l08",
+      "type": "single",
+      "question": "Ein Kollege sagt: „Ich rufe `Dispose` auf, danach ist der Speicher des Objekts frei.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Nein. `Dispose` gibt die Ressourcen frei, den Speicher gibt der Garbage Collector später frei, wenn das Objekt nicht mehr erreichbar ist.",
+          "correct": true
+        },
+        {
+          "text": "Ja, `Dispose` ist der Weg, Speicher freizugeben.",
+          "feedback": "Speicher von Objekten verwaltet der Garbage Collector. Du musst ihn nicht selbst freigeben.",
+          "misconception": "m07-l08-dispose-frees-memory"
+        },
+        {
+          "text": "Ja, aber nur bei Objekten, die eine Datei halten.",
+          "feedback": "Auch bei Dateien gibt `Dispose` die Datei frei und nicht den Speicher des Objekts.",
+          "misconception": "m07-l08-dispose-frees-memory"
+        }
+      ],
+      "explanation": "`Dispose` und Speicherbereinigung sind getrennte Dinge: `Dispose` räumt Ressourcen auf, der Garbage Collector gibt Speicher frei."
+    },
+    {
+      "id": "m07-l08-q3",
+      "lesson": "m07-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l08/dispose-order.cs",
+      "explanation": "`Work` gibt zuerst `Working` aus und löst dann die Exception aus. Beim Verlassen der Methode ruft C# `Dispose` in umgekehrter Reihenfolge auf: erst `second`, dann `first`. Danach fängt der äußere `catch` die Exception."
+    },
+    {
+      "id": "m07-l08-q4",
+      "lesson": "m07-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l08/using-statement.cs",
+      "explanation": "Innerhalb des `using`-Blocks liest der Reader beide Zeilen. Am Ende des Blocks wird `Dispose` aufgerufen. Der Zugriff danach löst eine `ObjectDisposedException` aus, die der `catch`-Block meldet."
+    },
+    {
+      "id": "m07-l08-q5",
+      "lesson": "m07-l08",
+      "type": "single",
+      "question": "Wann wird die Variable einer `using`-Deklaration (`using StringReader reader = new(text);`) freigegeben?",
+      "options": [
+        {
+          "text": "Am Ende des Blocks, in dem die Deklaration steht, auch wenn eine Exception auftritt.",
+          "correct": true
+        },
+        {
+          "text": "Sofort nach der Zeile mit der Deklaration.",
+          "feedback": "Dann könntest du das Objekt nicht benutzen. Es lebt bis zum Ende des Blocks."
+        },
+        {
+          "text": "Erst, wenn der Garbage Collector das Objekt entfernt.",
+          "feedback": "`using` ruft `Dispose` selbst auf, unabhängig vom Garbage Collector."
+        }
+      ],
+      "explanation": "Die `using`-Deklaration ruft `Dispose` am Ende des umgebenden Blocks auf. Bei mehreren Deklarationen in umgekehrter Reihenfolge."
+    },
+    {
+      "id": "m07-l08-q6",
+      "lesson": "m07-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über die `using`-Anweisung stimmen?",
+      "options": [
+        {
+          "text": "`Dispose` wird auch aufgerufen, wenn im Block eine Exception auftritt.",
+          "correct": true
+        },
+        {
+          "text": "Sie entspricht einem `try`-Block mit einem `finally`-Block, der `Dispose` aufruft.",
+          "correct": true
+        },
+        {
+          "text": "Ist die Ressource `null`, ruft C# `Dispose` nicht auf und löst keine Exception aus.",
+          "correct": true
+        },
+        {
+          "text": "Sie gibt den Speicher des Objekts sofort frei.",
+          "feedback": "Den Speicher gibt der Garbage Collector frei, nicht `using`.",
+          "misconception": "m07-l08-dispose-frees-memory"
+        }
+      ],
+      "explanation": "`using` ist eine Kurzform für `try` und `finally` mit `Dispose`. Bei `null` passiert nichts. Der Speicher des Objekts bleibt Sache des Garbage Collectors."
+    },
+    {
+      "id": "m07-l08-q7",
+      "lesson": "m07-l08",
+      "type": "single",
+      "question": "Eine Methode öffnet eine Ressource, und danach löst eine Anweisung eine Exception aus. Warum ist `using` sicherer als ein `Dispose()`-Aufruf am Ende der Methode?",
+      "options": [
+        {
+          "text": "Weil `Dispose` auch bei einer Exception läuft, der Aufruf am Ende der Methode aber übersprungen wird.",
+          "correct": true
+        },
+        {
+          "text": "Weil `using` die Exception unterdrückt.",
+          "feedback": "`using` fängt nichts. Die Exception läuft nach dem Aufruf von `Dispose` weiter."
+        },
+        {
+          "text": "Weil `Dispose` am Ende der Methode nie aufgerufen werden darf.",
+          "feedback": "Man darf es aufrufen. Es wird nur nicht erreicht, wenn vorher eine Exception die Methode verlässt."
+        }
+      ],
+      "explanation": "Eine Exception überspringt den Rest der Methode. Der versteckte `finally`-Block der `using`-Anweisung läuft trotzdem."
+    },
+    {
+      "id": "m07-l08-q8",
+      "lesson": "m07-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wofür ist `Dispose` da, und was macht der Garbage Collector?",
+      "modelAnswer": "`Dispose` gibt Ressourcen frei, die ein Objekt hält, zum Beispiel eine geöffnete Datei, und zwar sofort, wenn ich fertig bin. Der Garbage Collector gibt den Speicher von Objekten frei, die das Programm nicht mehr erreicht, aber zu einem Zeitpunkt, den er selbst bestimmt. Darum rufe ich `Dispose` über `using` auf und verlasse mich dafür nicht auf ihn."
+    },
+    {
+      "id": "m07-l08-q9",
+      "lesson": "m07-l08",
+      "type": "explain",
+      "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem du `using` einsetzt, und erkläre, was ohne `using` passieren könnte.",
+      "modelAnswer": "SecLog liest das Log aus einer Datei. Dafür öffne ich einen Reader in einer `using`-Anweisung. Ohne `using` bliebe die Datei offen, wenn beim Lesen eine Exception auftritt, und andere Programme könnten sie nicht benutzen."
     }
   ]
 }

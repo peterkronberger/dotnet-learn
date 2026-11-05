@@ -4793,6 +4793,147 @@
         "guard-clause"
       ],
       "lesson": "m07-l06"
+    },
+    {
+      "id": "try-pattern",
+      "term": "Try Pattern",
+      "german": "Try-Muster",
+      "category": "language",
+      "definition": "Eine Methode `TryXyz` gibt einen `bool` zurück, der Erfolg oder Misserfolg meldet, und liefert das Ergebnis über einen `out`-Parameter. Sie löst bei einem erwarteten Fehler keine Exception aus.",
+      "aliases": [
+        "Try-Muster",
+        "Try-Methode"
+      ],
+      "related": [
+        "exception",
+        "swallowing-exceptions"
+      ],
+      "lesson": "m07-l07",
+      "source": {
+        "title": "Best practices for exceptions",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "swallowing-exceptions",
+      "term": "Swallowing Exceptions",
+      "german": "Exceptions verschlucken",
+      "category": "language",
+      "definition": "Eine Exception fangen und nichts damit tun, oder mit einem allgemeinen `catch (Exception)` auch Fehler fangen, die du nicht behandeln kannst. Der Fehler bleibt unbemerkt.",
+      "aliases": [
+        "Exceptions verschlucken",
+        "Exception verschlucken"
+      ],
+      "related": [
+        "exception",
+        "try-pattern"
+      ],
+      "lesson": "m07-l07",
+      "source": {
+        "title": "Best practices for exceptions",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "resource",
+      "term": "Resource",
+      "german": "Ressource",
+      "category": "platform",
+      "definition": "Etwas, das ein Objekt vom System belegt und wieder abgeben muss, zum Beispiel eine geöffnete Datei oder eine Verbindung. Der Speicher des Objekts selbst zählt hier nicht.",
+      "aliases": [
+        "Ressource",
+        "Ressourcen"
+      ],
+      "related": [
+        "dispose",
+        "garbage-collector"
+      ],
+      "lesson": "m07-l08",
+      "source": {
+        "title": "Implement a Dispose method",
+        "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose"
+      }
+    },
+    {
+      "id": "dispose",
+      "term": "Dispose",
+      "category": "platform",
+      "definition": "Die Methode, mit der ein Objekt seine Ressourcen freigibt. Sie gehört zu Typen, die `IDisposable` anbieten. Den Speicher des Objekts gibt sie nicht frei.",
+      "aliases": [
+        "IDisposable",
+        "Dispose-Methode"
+      ],
+      "related": [
+        "resource",
+        "using-statement",
+        "garbage-collector"
+      ],
+      "lesson": "m07-l08",
+      "source": {
+        "title": "Implement a Dispose method",
+        "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose"
+      }
+    },
+    {
+      "id": "using-statement",
+      "term": "using Statement",
+      "german": "using-Anweisung",
+      "category": "language",
+      "definition": "`using (…) { … }` erwirbt eine Ressource, führt den Block aus und ruft danach `Dispose` auf, auch wenn eine Exception auftritt. Sie ist nicht die `using`-Direktive für Namespaces.",
+      "aliases": [
+        "using-Anweisung",
+        "using statement"
+      ],
+      "related": [
+        "using-declaration",
+        "dispose",
+        "using-directive",
+        "finally-block"
+      ],
+      "lesson": "m07-l08",
+      "source": {
+        "title": "C# language specification: The using statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1314-the-using-statement"
+      }
+    },
+    {
+      "id": "using-declaration",
+      "term": "using Declaration",
+      "german": "using-Deklaration",
+      "category": "language",
+      "definition": "`using Typ name = …;` ohne Block. `Dispose` wird am Ende des umgebenden Blocks aufgerufen, bei mehreren Deklarationen in umgekehrter Reihenfolge.",
+      "aliases": [
+        "using-Deklaration",
+        "using declaration"
+      ],
+      "related": [
+        "using-statement",
+        "dispose"
+      ],
+      "lesson": "m07-l08",
+      "source": {
+        "title": "C# language specification: Using declaration",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13142-using-declaration"
+      }
+    },
+    {
+      "id": "finalizer",
+      "term": "Finalizer",
+      "german": "Finalizer",
+      "category": "platform",
+      "definition": "Eine Methode, die der Garbage Collector aufrufen kann, bevor er ein Objekt entfernt. Normaler Anwendungscode braucht sie fast nie.",
+      "aliases": [
+        "Destruktor"
+      ],
+      "related": [
+        "garbage-collector",
+        "dispose"
+      ],
+      "lesson": "m07-l08",
+      "source": {
+        "title": "Implement a Dispose method",
+        "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose"
+      }
     }
   ]
 }

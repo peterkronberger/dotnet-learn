@@ -1,0 +1,3 @@
+Exception: KeyNotFoundException
+Try method: no limit for carol
+Return value is null: True
