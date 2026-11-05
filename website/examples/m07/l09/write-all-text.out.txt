@@ -1,0 +1,2 @@
+After two WriteAllText: two
+After AppendAllText: two-three

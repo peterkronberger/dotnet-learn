@@ -1037,6 +1037,147 @@
       "type": "explain",
       "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem du `using` einsetzt, und erkläre, was ohne `using` passieren könnte.",
       "modelAnswer": "SecLog liest das Log aus einer Datei. Dafür öffne ich einen Reader in einer `using`-Anweisung. Ohne `using` bliebe die Datei offen, wenn beim Lesen eine Exception auftritt, und andere Programme könnten sie nicht benutzen."
+    },
+    {
+      "id": "m07-l09-q1",
+      "lesson": "m07-l09",
+      "type": "single",
+      "question": "Die Datei `note.txt` enthält den Text `one`. Dann läuft `File.WriteAllText(\"note.txt\", \"two\");`. Was enthält die Datei danach?",
+      "options": [
+        {
+          "text": "Nur `two`: Die Methode überschreibt den alten Inhalt.",
+          "correct": true
+        },
+        {
+          "text": "`onetwo`: Die Methode hängt den Text an.",
+          "feedback": "Anhängen macht `File.AppendAllText`. `WriteAllText` legt die Datei neu an oder überschreibt sie.",
+          "misconception": "m07-l09-writealltext-appends"
+        },
+        {
+          "text": "`one`: Die Methode ändert eine vorhandene Datei nicht.",
+          "feedback": "Die Methode ändert die Datei. Sie ersetzt den Inhalt durch den neuen Text."
+        }
+      ],
+      "explanation": "`File.WriteAllText` erzeugt die Datei, oder es überschreibt den Inhalt einer vorhandenen Datei. `File.AppendAllText` hängt Text an."
+    },
+    {
+      "id": "m07-l09-q2",
+      "lesson": "m07-l09",
+      "type": "single",
+      "question": "Ein Programm soll bei jedem Start eine neue Zeile an eine Protokolldatei anhängen, ohne die alten Zeilen zu verlieren. Welche Methode passt?",
+      "options": [
+        {
+          "text": "`File.AppendAllText`",
+          "correct": true
+        },
+        {
+          "text": "`File.WriteAllText`",
+          "feedback": "Sie überschreibt die Datei bei jedem Start. Die alten Zeilen gehen verloren.",
+          "misconception": "m07-l09-writealltext-appends"
+        },
+        {
+          "text": "`File.ReadAllLines`",
+          "feedback": "Sie liest eine Datei und schreibt nichts."
+        }
+      ],
+      "explanation": "Nur `AppendAllText` hängt Text an das Ende einer vorhandenen Datei an."
+    },
+    {
+      "id": "m07-l09-q3",
+      "lesson": "m07-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l09/write-all-text.cs",
+      "explanation": "Das zweite `WriteAllText` überschreibt `one`, die Datei enthält danach `two`. `AppendAllText` hängt `-three` an."
+    },
+    {
+      "id": "m07-l09-q4",
+      "lesson": "m07-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l09/file-errors.cs",
+      "explanation": "Die erste Datei fehlt: `FileNotFoundException`. Der Ordner `none` fehlt beim Schreiben: `DirectoryNotFoundException`. Beim dritten Versuch passt `catch (IOException)`, weil `DirectoryNotFoundException` eine Art von `IOException` ist. Es gilt der Typ der ausgelösten Exception."
+    },
+    {
+      "id": "m07-l09-q5",
+      "lesson": "m07-l09",
+      "type": "single",
+      "question": "Ein Programm schreibt mit `File.WriteAllText` in eine schreibgeschützte Datei und löst eine `UnauthorizedAccessException` aus. Fängt `catch (IOException)` sie?",
+      "options": [
+        {
+          "text": "Nein: `UnauthorizedAccessException` ist keine `IOException`. Sie braucht eine eigene `catch`-Klausel.",
+          "correct": true
+        },
+        {
+          "text": "Ja: Alle Fehler beim Zugriff auf Dateien sind `IOException`s.",
+          "feedback": "Die Dokumentation von `File.WriteAllText` nennt `IOException` und `UnauthorizedAccessException` als getrennte Exceptions. `UnauthorizedAccessException` gehört nicht zur Familie `IOException`."
+        },
+        {
+          "text": "Ja, aber nur wenn die Datei fehlt.",
+          "feedback": "Der Zustand der Datei ändert den Typ nicht. Er bleibt `UnauthorizedAccessException`."
+        }
+      ],
+      "explanation": "`UnauthorizedAccessException` ist von `SystemException` abgeleitet und nicht von `IOException`. `catch (IOException)` fängt sie nicht."
+    },
+    {
+      "id": "m07-l09-q6",
+      "lesson": "m07-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Streams und Dateien stimmen?",
+      "options": [
+        {
+          "text": "Ein `StreamReader` liest die Daten Stück für Stück, hier Zeile für Zeile.",
+          "correct": true
+        },
+        {
+          "text": "Ein `StreamReader` hält die Datei offen, bis `Dispose` aufgerufen wird, zum Beispiel durch `using`.",
+          "correct": true
+        },
+        {
+          "text": "`File.ReadLines` liefert die Zeilen nacheinander, `File.ReadAllLines` liefert alle Zeilen als Array.",
+          "correct": true
+        },
+        {
+          "text": "Ein `StreamReader` braucht kein `Dispose`, weil der Garbage Collector die Datei sofort schließt.",
+          "feedback": "Der Garbage Collector bestimmt selbst, wann er arbeitet. Die Datei bleibt bis dahin belegt. Deshalb steht der Reader in einem `using`."
+        }
+      ],
+      "explanation": "Streams arbeiten Stück für Stück und halten eine Ressource, die `using` freigibt. `ReadLines` und `ReadAllLines` unterscheiden sich darin, wann die Zeilen bereitstehen."
+    },
+    {
+      "id": "m07-l09-q7",
+      "lesson": "m07-l09",
+      "type": "single",
+      "question": "Ein Kollege prüft mit `if (File.Exists(path))` und liest die Datei dann ohne `try`/`catch`. Warum reicht das nicht?",
+      "options": [
+        {
+          "text": "Zwischen der Prüfung und dem Lesen kann sich die Datei ändern, zum Beispiel durch ein anderes Programm. Außerdem gibt es andere Fehler als „Datei fehlt“.",
+          "correct": true
+        },
+        {
+          "text": "`File.Exists` löst bei einer fehlenden Datei selbst eine Exception aus.",
+          "feedback": "`File.Exists` gibt `false` zurück, wenn die Datei fehlt. Es löst keine Exception aus."
+        },
+        {
+          "text": "`File.Exists` darf nur vor `WriteAllText` stehen.",
+          "feedback": "Es gibt keine solche Regel. Die Prüfung ist erlaubt, aber sie ersetzt das `catch` nicht."
+        }
+      ],
+      "explanation": "Die Prüfung zeigt nur den Zustand zu einem Zeitpunkt. Ein anderes Programm kann die Datei danach löschen oder verändern. Das `catch` fängt, was trotzdem schiefgeht."
+    },
+    {
+      "id": "m07-l09-q8",
+      "lesson": "m07-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wann benutzt du `File.ReadAllLines` und wann einen `StreamReader` in einem `using`? Was passiert mit der Datei, wenn beim Lesen eine Exception auftritt?",
+      "modelAnswer": "`File.ReadAllLines` liest die ganze Datei auf einmal in ein Array, das passt für kleine Dateien. Einen `StreamReader` benutze ich, wenn ich Zeile für Zeile lesen will. Er steht in einem `using`, weil `Dispose` auch bei einer Exception aufgerufen wird und die Datei dann nicht offen bleibt."
+    },
+    {
+      "id": "m07-l09-q9",
+      "lesson": "m07-l09",
+      "type": "explain",
+      "question": "Transfer: Nenne eine Datei, die ein eigenes Programm lesen könnte, und welche zwei Dateifehler dabei auftreten können. Wie reagiert dein Programm darauf?",
+      "modelAnswer": "SecLog liest eine Log-Datei. Die Datei kann fehlen (`FileNotFoundException`), oder der Ordner fehlt (`DirectoryNotFoundException`). Mit `catch (FileNotFoundException)` melde ich den Dateinamen und mache weiter, ohne dass das Programm abstürzt."
     }
   ]
 }

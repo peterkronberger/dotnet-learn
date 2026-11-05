@@ -1,0 +1,263 @@
+---
+title: Dateien lesen und schreiben
+sidebar_position: 9
+description: File und Path lesen und schreiben ganze Textdateien, StreamReader und StreamWriter arbeiten Zeile für Zeile – Dateifehler kommen als IOException.
+lesson_id: m07-l09
+duration_min: 24
+---
+
+import writeAndRead from '!!raw-loader!@site/examples/m07/l09/write-and-read.cs';
+import writeAndReadOutput from '!!raw-loader!@site/examples/m07/l09/write-and-read.out.txt';
+import writeAllText from '!!raw-loader!@site/examples/m07/l09/write-all-text.cs';
+import writeAllTextOutput from '!!raw-loader!@site/examples/m07/l09/write-all-text.out.txt';
+import streamReader from '!!raw-loader!@site/examples/m07/l09/stream-reader.cs';
+import streamReaderOutput from '!!raw-loader!@site/examples/m07/l09/stream-reader.out.txt';
+import fileErrors from '!!raw-loader!@site/examples/m07/l09/file-errors.cs';
+import fileErrorsOutput from '!!raw-loader!@site/examples/m07/l09/file-errors.out.txt';
+import fileGap from '!!raw-loader!@site/examples/m07/l09/file-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l09/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l09/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l09/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l09/seclog-exceptions-solution.cs';
+
+# Dateien lesen und schreiben
+
+:::note[Lernziele]
+- Du kannst eine Textdatei mit `File.WriteAllLines`/`File.AppendAllText` schreiben und mit `File.ReadAllLines` oder `File.ReadLines` lesen.
+- Du kannst einen Pfad mit `Path.Combine` bilden.
+- Du kannst eine Datei mit `StreamReader` in einem `using` Zeile für Zeile lesen.
+- Du kannst `FileNotFoundException` und andere `IOException`s gezielt abfangen.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l08-q1" />
+
+<Quiz id="m07-l07-q7" />
+
+<Quiz id="m05-l10-q1" />
+
+## Dateien, Pfade und Kodierung
+
+Bisher kam das Log aus dem Programm selbst. Echte Programme lesen es aus einer Datei. Eine Datei liegt unter einem <Term id="file-path">Dateipfad</Term> (File Path): einem Text wie `logs/sample.log`. Ein absoluter Pfad nennt den ganzen Weg ab der Wurzel des Laufwerks. Ein relativer Pfad beginnt im aktuellen Arbeitsordner des Programms ([File path formats](https://learn.microsoft.com/dotnet/standard/io/file-path-formats)).
+
+Die Klasse `Path` aus `System.IO` arbeitet mit Pfaden als Text:
+
+- `Path.Combine(a, b)` setzt Teile mit dem Trennzeichen des Systems zusammen. Du musst `/` oder `\` nicht selbst schreiben.
+- `Path.GetFileName(path)` gibt den Dateinamen zurück, zum Beispiel `sample.log`.
+- `Path.GetExtension(path)` gibt die Endung zurück, zum Beispiel `.log`.
+
+([Path](https://learn.microsoft.com/dotnet/api/system.io.path))
+
+Eine Datei speichert Bytes, keinen Text. Eine <Term id="text-encoding">Zeichenkodierung</Term> (Text Encoding) legt fest, wie Text zu Bytes wird und zurück. Die Methoden von `File` benutzen UTF-8, wenn du keine Kodierung angibst, und schreiben es ohne Byte-Order-Mark ([File.WriteAllText](https://learn.microsoft.com/dotnet/api/system.io.file.writealltext)). Wer eine Datei mit UTF-8 schreibt und liest, muss sich um die Kodierung nicht kümmern.
+
+:::note[Dateien im Playground]
+Die Beispiele legen ihre Dateien in einem frischen, temporären Ordner an, den `Directory.CreateTempSubdirectory("seclog-")` erzeugt. Am Ende löschen sie den Ordner mit `Directory.Delete(ordner, true)`. Das `true` löscht auch die Dateien darin. Im Runner liegen die Dateien nur im Speicher des Browsers und sind nach einem Neuladen der Seite weg.
+:::
+
+## Ganze Dateien schreiben und lesen
+
+Für kleine Textdateien reichen Methoden der Klasse `File`, die eine Datei in einem Schritt behandeln ([File](https://learn.microsoft.com/dotnet/api/system.io.file)):
+
+| Methode | Wirkung |
+| --- | --- |
+| `File.WriteAllText(path, text)` | Schreibt den Text. Legt die Datei an oder überschreibt eine vorhandene. |
+| `File.WriteAllLines(path, lines)` | Schreibt jede Zeile der Sammlung als eigene Zeile. Auch sie überschreibt eine vorhandene Datei. |
+| `File.AppendAllText(path, text)` | Hängt den Text an das Ende der Datei an. |
+| `File.ReadAllText(path)` | Liest die ganze Datei als einen `string`. |
+| `File.ReadAllLines(path)` | Liest alle Zeilen in ein `string[]`. Erst wenn die ganze Datei gelesen ist, gibt es das Array. |
+| `File.ReadLines(path)` | Liefert die Zeilen nacheinander. Eine `foreach`-Schleife kann beginnen, bevor die ganze Datei gelesen ist. |
+| `File.Exists(path)` | Gibt `true` zurück, wenn es die Datei gibt, sonst `false`. |
+
+([ReadLines](https://learn.microsoft.com/dotnet/api/system.io.file.readlines), [File.Exists](https://learn.microsoft.com/dotnet/api/system.io.file.exists))
+
+Eine Zeile endet mit einem Zeilenumbruch. Steht am Dateiende ein Zeilenumbruch, entsteht daraus keine zusätzliche leere Zeile.
+
+:::info[Vorhersage]
+Das Programm schreibt zwei Zeilen und hängt dann `third` mit einem Zeilenumbruch an. Wie viele Zeilen liest es? Was gibt `File.Exists` vorher und nachher aus?
+:::
+
+<CSharpRunner id="m07-l09-write-read" code={writeAndRead} predict expected={writeAndReadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe zeigt `Exists before: False`, `Exists after: True` und `Lines: 3`.
+
+1. **Pfad bilden:** `Path.Combine` setzt den Ordner und `notes.txt` zusammen. `GetFileName` und `GetExtension` liefern `notes.txt` und `.txt`.
+2. **Schreiben:** `WriteAllLines` legt die Datei mit `first` und `second` an. `AppendAllText` hängt `third` und einen Zeilenumbruch an.
+3. **Lesen:** `ReadAllLines` gibt ein Array mit drei Zeilen zurück. `ReadLines` liefert dieselben drei Zeilen nacheinander.
+4. **Aufräumen:** Der `finally`-Block löscht den Ordner, auch wenn oben eine Exception auftritt (Lektion 4).
+
+</details>
+
+:::warning[Achtung]
+<Misconception id="m07-l09-writealltext-appends" />
+
+**„`File.WriteAllText` hängt den Text an eine vorhandene Datei an.“** Das stimmt nicht. `WriteAllText` legt die Datei neu an oder überschreibt den Inhalt einer vorhandenen Datei. Zum Anhängen gibt es `File.AppendAllText`.
+:::
+
+:::info[Vorhersage]
+Das Programm schreibt zweimal mit `WriteAllText` und hängt dann einmal mit `AppendAllText` an. Was steht nach jedem Schritt in der Datei?
+:::
+
+<CSharpRunner id="m07-l09-write-all-text" code={writeAllText} predict expected={writeAllTextOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `After two WriteAllText: two` und `After AppendAllText: two-three`.
+
+1. **Erstes Schreiben:** Die Datei enthält `one`.
+2. **Zweites Schreiben:** `WriteAllText` überschreibt den Inhalt. Von `one` bleibt nichts übrig.
+3. **Anhängen:** `AppendAllText` hängt `-three` an das Ende an.
+
+</details>
+
+## Zeile für Zeile mit Streams
+
+Die Methoden von `File` laden eine Datei als Ganzes. Ein <Term id="stream">Stream</Term> (Datenstrom) liest oder schreibt die Daten dagegen Stück für Stück. Ein `StreamReader` liest Text aus einer Datei, ein `StreamWriter` schreibt ihn ([File and stream I/O](https://learn.microsoft.com/dotnet/standard/io/)).
+
+- `new StreamWriter(path)` öffnet die Datei zum Schreiben. `WriteLine(text)` schreibt eine Zeile.
+- `new StreamReader(path)` öffnet die Datei zum Lesen. `ReadLine()` gibt die nächste Zeile zurück und am Ende der Datei `null`.
+
+Beide halten die geöffnete Datei als <Term id="resource">Ressource</Term>. Du gibst sie mit `Dispose` frei, und das übernimmt die `using`-Anweisung aus Lektion 8. Das gilt besonders beim Schreiben: Gepufferte Daten gelangen beim Freigeben in die Datei, und andere Programme können die Datei danach wieder benutzen.
+
+:::info[Vorhersage]
+Welche Zeilen liest das Programm, und wie viele davon sind `login-failed`?
+:::
+
+<CSharpRunner id="m07-l09-stream" code={streamReader} predict expected={streamReaderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Read: login-failed`, `Read: logout`, `Read: login-failed` und `Failed: 2`.
+
+1. **Schreiben:** Der `StreamWriter` steht in einem `using`. Am Ende des Blocks ist die Datei geschrieben und freigegeben.
+2. **Öffnen:** Ein `StreamReader` öffnet dieselbe Datei in einem zweiten `using`.
+3. **Lesen:** Die Schleife ruft `ReadLine()` auf, bis es `null` zurückgibt. Jede Zeile wird ausgegeben und bei `login-failed` gezählt.
+4. **Freigeben:** `using` ruft `Dispose` auf, auch wenn in der Schleife eine Exception auftritt.
+
+</details>
+
+## Dateifehler als IOException
+
+Dateien sind der Teil des Programms, den es nicht kontrolliert: Eine Datei kann fehlen, ein Ordner kann fehlen, ein anderes Programm kann sie gerade benutzen. Fehler dieser Art löst .NET als <Term id="io-exception">`IOException`</Term> oder als einer ihrer Untertypen aus ([IOException](https://learn.microsoft.com/dotnet/api/system.io.ioexception)):
+
+- `FileNotFoundException`: Die Datei gibt es nicht.
+- `DirectoryNotFoundException`: Ein Ordner im Pfad gibt es nicht.
+
+Beide sind eine Art von `IOException` (wie in Lektion 2: „ist eine Art von“). Ein `catch (IOException)` fängt deshalb beide, und ein `catch (FileNotFoundException)` nur den ersten Fall. Wie bei jeder Reihenfolge von `catch`-Klauseln steht der genauere Typ zuerst.
+
+`UnauthorizedAccessException` gehört **nicht** zur Familie. Sie ist von `SystemException` abgeleitet und wird zum Beispiel ausgelöst, wenn die Datei schreibgeschützt ist oder der Pfad ein Ordner ist ([UnauthorizedAccessException](https://learn.microsoft.com/dotnet/api/system.unauthorizedaccessexception)). Wer beides behandeln will, schreibt zwei Klauseln.
+
+Die `Message` dieser Exceptions enthält meist den Pfad der Datei. Gib sie in einer Meldung an Nutzer nur aus, wenn der Pfad kein Geheimnis ist. Die Beispiele drucken deshalb nur den Typnamen oder den Dateinamen.
+
+Auch `File.Exists` ersetzt das `catch` nicht. Es zeigt nur, ob die Datei im Moment der Prüfung da ist. Danach kann ein anderes Programm die Datei verändern oder löschen, und `Exists` gibt auch bei anderen Fehlern einfach `false` zurück, statt sie zu melden ([File.Exists](https://learn.microsoft.com/dotnet/api/system.io.file.exists)). Mit `File.Exists` kannst du eine Meldung früher zeigen, das `catch` brauchst du trotzdem.
+
+:::info[Vorhersage]
+Das Programm versucht drei Dateizugriffe, die alle fehlschlagen. Welche Typnamen druckt es?
+:::
+
+<CSharpRunner id="m07-l09-errors" code={fileErrors} predict expected={fileErrorsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1: FileNotFoundException`, `2: DirectoryNotFoundException` und `3: DirectoryNotFoundException`.
+
+1. **Datei fehlt:** `ReadAllText` löst eine `FileNotFoundException` aus. Die Klausel passt.
+2. **Ordner fehlt:** `WriteAllText` legt keine Ordner an. Es löst eine `DirectoryNotFoundException` aus.
+3. **Allgemeine Klausel:** Beim Lesen im fehlenden Ordner ist die Exception wieder eine `DirectoryNotFoundException`. `catch (IOException)` fängt sie, weil sie eine Art von `IOException` ist. `ex.GetType().Name` zeigt den echten Typ.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm liest die Datei mit `File.ReadAllLines` und zählt `login-failed`. Ersetze das `foreach` durch einen `StreamReader` in einem `using` mit `ReadLine()`. Die Ausgabe bleibt `Failed: 2`.
+
+<CSharpRunner id="m07-l09-gaps" code={fileGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Öffnen:** `using (StreamReader reader = new(path))`
+2. **Lesen:** `string? line = reader.ReadLine();` und `while (line != null)`
+3. **Weiterlesen:** Am Ende der Schleife steht `line = reader.ReadLine();`. Ohne diese Zeile endet die Schleife nie.
+4. **Zählen:** Der Vergleich mit `login-failed` und `failed++` bleiben unverändert.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog weist ungültige Log-Zeilen mit `InvalidLogLineException` zurück und liest das Beispiel-Log Zeile für Zeile aus einem `StringReader`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block und `return 0;`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen. Die Funktion `ParseLine` ist unter den ausgeblendeten Zeilen.
+
+Dieser Schritt erreicht den Meilenstein des Moduls: SecLog weist ungültige Zeilen mit einer eigenen Exception zurück und liest das Log aus einer Datei.
+
+**Neue Anforderung:** Schreibe vor `return 0;` den Block `// Write the sample log to a file and read it back`.
+
+1. Lege mit `Directory.CreateTempSubdirectory("seclog-")` einen Ordner an. Schreibe `sampleLog` mit `File.WriteAllLines` in die Datei `sample.log` in diesem Ordner.
+2. Lies die Datei mit einem `StreamReader` in einem `using` Zeile für Zeile. Prüfe jede Zeile mit `ParseLine` (Zeilennummern ab 1) und fange `InvalidLogLineException` für jede Zeile einzeln. Zähle die Events und gib `Events from sample.log: 14` aus (den Dateinamen liefert `Path.GetFileName`).
+3. Lies `missing.log` im selben Ordner mit `File.ReadAllLines`. `catch (FileNotFoundException)` gibt `File not found: missing.log` aus, ohne Pfad und ohne `Message`, weil die Message den Pfad enthält.
+4. Lösche den Ordner in einem `finally`-Block mit `Directory.Delete(ordner.FullName, true)`.
+
+<CSharpRunner id="m07-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Ordner anlegen:** Der Ordner ist neu und leer. `try`/`finally` sorgt dafür, dass er am Ende gelöscht wird.
+2. **Schreiben:** `WriteAllLines` schreibt die 14 Zeilen in `sample.log`.
+3. **Lesen:** Der `StreamReader` steht in einem `using`. Jede Zeile geht an `ParseLine`, eine ungültige Zeile würde nur ihre eigene Meldung ausgeben.
+4. **Fehlende Datei:** `ReadAllLines` löst für `missing.log` eine `FileNotFoundException` aus. Der `catch` druckt nur den Dateinamen.
+5. **Aufräumen:** `finally` löscht den Ordner mit allen Dateien.
+
+</details>
+
+**Neuer Stand:** SecLog schreibt das Beispiel-Log in eine Datei, liest es Zeile für Zeile zurück, zählt 14 Events und meldet eine fehlende Datei, ohne abzustürzen.
+
+<details>
+<summary>Vertiefung: Kodierung und Zeilenenden (optional)</summary>
+
+`File.ReadLines` und `File.ReadAllLines` lesen mit UTF-8, wenn du keine Kodierung angibst ([File.ReadLines](https://learn.microsoft.com/dotnet/api/system.io.file.readlines)). Eine Überladung nimmt ein `Encoding`, zum Beispiel `Encoding.UTF8`. Eine Zeile endet mit `\n`, mit `\r` oder mit `\r\n`. Daher liefern Dateien von Windows und Linux dieselben Zeilen. Am Ende der Datei zählt ein einzelner Zeilenumbruch nicht als zusätzliche leere Zeile (ebenda).
+
+</details>
+
+## Zusammenfassung
+
+Mit `Path.Combine` bildest du Pfade. `File.WriteAllLines` und `File.WriteAllText` legen eine Datei an oder überschreiben sie, `File.AppendAllText` hängt an. `File.ReadAllLines` liefert alle Zeilen als Array, `File.ReadLines` nacheinander. Ein `StreamReader` oder `StreamWriter` in einem `using` arbeitet Zeile für Zeile und gibt die Datei frei. Dateifehler sind `IOException`s, zum Beispiel `FileNotFoundException`. `UnauthorizedAccessException` gehört nicht dazu. `File.Exists` ersetzt das `catch` nicht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l09-q1" />
+
+<Quiz id="m07-l09-q2" />
+
+<Quiz id="m07-l09-q3" />
+
+<Quiz id="m07-l09-q4" />
+
+<Quiz id="m07-l09-q5" />
+
+<Quiz id="m07-l09-q6" />
+
+<Quiz id="m07-l09-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l09-q8" />
+
+### Transferfrage
+
+<Quiz id="m07-l09-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [File and stream I/O](https://learn.microsoft.com/dotnet/standard/io/)
+- Microsoft Learn: [Common I/O tasks](https://learn.microsoft.com/dotnet/standard/io/common-i-o-tasks)
+- Microsoft Learn: [File class](https://learn.microsoft.com/dotnet/api/system.io.file)

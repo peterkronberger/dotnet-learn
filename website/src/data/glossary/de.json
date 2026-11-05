@@ -4934,6 +4934,90 @@
         "title": "Implement a Dispose method",
         "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-dispose"
       }
+    },
+    {
+      "id": "file-path",
+      "term": "File Path",
+      "german": "Dateipfad",
+      "category": "platform",
+      "definition": "Der Text, der eine Datei oder einen Ordner beschreibt, zum Beispiel `logs/sample.log`. Ein absoluter Pfad nennt den ganzen Weg ab der Wurzel, ein relativer Pfad beginnt im aktuellen Arbeitsordner des Programms. `Path.Combine` setzt Teile eines Pfads zusammen.",
+      "aliases": [
+        "Pfad",
+        "Path"
+      ],
+      "related": [
+        "stream",
+        "io-exception"
+      ],
+      "lesson": "m07-l09",
+      "source": {
+        "title": "File path formats on Windows systems",
+        "url": "https://learn.microsoft.com/dotnet/standard/io/file-path-formats"
+      }
+    },
+    {
+      "id": "stream",
+      "term": "Stream",
+      "german": "Datenstrom",
+      "category": "platform",
+      "definition": "Eine Folge von Bytes, die ein Programm Stück für Stück liest oder schreibt, zum Beispiel den Inhalt einer Datei. `StreamReader` und `StreamWriter` lesen und schreiben Text über einen Stream.",
+      "aliases": [
+        "Stream",
+        "StreamReader",
+        "StreamWriter"
+      ],
+      "related": [
+        "text-encoding",
+        "dispose",
+        "resource"
+      ],
+      "lesson": "m07-l09",
+      "source": {
+        "title": "File and stream I/O",
+        "url": "https://learn.microsoft.com/dotnet/standard/io/"
+      }
+    },
+    {
+      "id": "text-encoding",
+      "term": "Text Encoding",
+      "german": "Zeichenkodierung",
+      "category": "platform",
+      "definition": "Die Regel, die Text in Bytes umwandelt und zurück. Dateien speichern Bytes, keinen Text. Die Methoden von `File` und die Klassen `StreamReader` und `StreamWriter` benutzen standardmäßig UTF-8.",
+      "aliases": [
+        "Encoding",
+        "UTF-8",
+        "Kodierung"
+      ],
+      "related": [
+        "stream",
+        "file-path"
+      ],
+      "lesson": "m07-l09",
+      "source": {
+        "title": "Character encoding in .NET",
+        "url": "https://learn.microsoft.com/dotnet/standard/base-types/character-encoding-introduction"
+      }
+    },
+    {
+      "id": "io-exception",
+      "term": "IOException",
+      "german": "Ein-/Ausgabe-Exception",
+      "category": "platform",
+      "definition": "Der Basistyp für Fehler bei der Ein- und Ausgabe, zum Beispiel `FileNotFoundException` (Datei fehlt) und `DirectoryNotFoundException` (Ordner fehlt). `UnauthorizedAccessException` gehört nicht dazu.",
+      "aliases": [
+        "IOException",
+        "FileNotFoundException",
+        "DirectoryNotFoundException"
+      ],
+      "related": [
+        "exception",
+        "file-path"
+      ],
+      "lesson": "m07-l09",
+      "source": {
+        "title": "IOException Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.io.ioexception"
+      }
     }
   ]
 }
