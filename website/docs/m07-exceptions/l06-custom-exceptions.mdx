@@ -1,0 +1,209 @@
+---
+title: Eigene Exceptions und Geschäftsregeln
+sidebar_position: 6
+description: Eine eigene Exception-Klasse benennt einen Fachfehler und trägt Zusatzdaten – Geschäftsregeln prüfst du an einer Stelle.
+lesson_id: m07-l06
+duration_min: 22
+---
+
+import customException from '!!raw-loader!@site/examples/m07/l06/custom-exception.cs';
+import customExceptionOutput from '!!raw-loader!@site/examples/m07/l06/custom-exception.out.txt';
+import innerException from '!!raw-loader!@site/examples/m07/l06/inner-exception.cs';
+import innerExceptionOutput from '!!raw-loader!@site/examples/m07/l06/inner-exception.out.txt';
+import businessRule from '!!raw-loader!@site/examples/m07/l06/business-rule.cs';
+import businessRuleOutput from '!!raw-loader!@site/examples/m07/l06/business-rule.out.txt';
+import customGap from '!!raw-loader!@site/examples/m07/l06/custom-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l06/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l06/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l06/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l06/seclog-exceptions-solution.cs';
+
+# Eigene Exceptions und Geschäftsregeln
+
+:::note[Lernziele]
+- Du kannst eine eigene Exception-Klasse mit einer zusätzlichen Eigenschaft schreiben.
+- Du kannst entscheiden, ob ein Standard-Exception-Typ reicht oder ein eigener Typ nötig ist.
+- Du kannst eine Geschäftsregel an einer Stelle prüfen und bei einer Verletzung eine Exception mit innerer Exception (`InnerException`) auslösen.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l05-q3" />
+
+<Quiz id="m06-l02-q1" />
+
+<Quiz id="m06-l06-q6" />
+
+## Standardtyp oder eigener Typ?
+
+Lektion 5 hat Standardtypen wie `ArgumentException` und `InvalidOperationException` benutzt. Sie reichen für viele Fehler. Ein eigener Typ lohnt sich erst, wenn kein Standardtyp den Fehler beschreibt und mindestens eines davon gilt:
+
+- Aufrufer wollen genau diesen Fachfehler fangen, ohne andere Fehler mitzufangen.
+- Die Exception soll zusätzliche Daten tragen, zum Beispiel die Nummer einer abgelehnten Zeile.
+
+Die Regel „Standardtypen zuerst, einen neuen Typ nur, wenn keiner passt“ steht auch in den Empfehlungen für Exceptions ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)).
+
+## Eine eigene Exception-Klasse schreiben
+
+Eine <Term id="custom-exception">eigene Exception</Term> ist eine Klasse (Lektion „Klassen“ aus Modul 6) mit drei Merkmalen:
+
+1. Ihr Name endet auf `Exception`.
+2. Hinter dem Klassennamen steht `: Exception`. Das heißt: Sie ist eine Art von `Exception`.
+3. Der Konstruktor gibt die Meldung mit `: base(message)` an `Exception` weiter. Eigene Eigenschaften setzt er wie in jeder Klasse.
+
+<Forward concepts={['Vererbung', '`base`']} module="8" />
+
+Das Beispiel prüft Benutzernamen. `UnknownUserException` trägt den Namen in der Eigenschaft `User`.
+
+:::info[Vorhersage]
+Das Programm prüft zwei Namen. Welche Zeilen gibt es für jeden Namen?
+:::
+
+<CSharpRunner id="m07-l06-custom" code={customException} predict expected={customExceptionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `bob is known`, `UnknownUserException: The user is not in the log.` und `User in the exception: bo`.
+
+1. **Prüfen:** `CheckUser` vergleicht den Namen mit den vier bekannten Benutzern.
+2. **Auslösen:** Für `"bo"` erzeugt die Methode die eigene Exception mit dem Namen und der Meldung. Der Konstruktor gibt die Meldung an `Exception` weiter und setzt `User`.
+3. **Fangen:** Die `catch`-Klausel nennt den eigenen Typ. Sie liest `Message` und die eigene Eigenschaft `User`.
+
+Was passiert, wenn du `catch (InvalidOperationException)` schreibst? Die Klausel passt nicht zum Typ der Exception, und das Programm würde mit einer nicht behandelten Exception enden.
+
+</details>
+
+## Eine Ursache mitgeben: InnerException
+
+Oft entsteht ein Fachfehler aus einem technischen Fehler: Ein Text lässt sich nicht lesen, und der Aufrufer soll das als „ungültige Zahl“ erfahren. Dann fängt der Code den technischen Fehler und löst die Fachexception aus. Die ursprüngliche Exception geht in `InnerException` der neuen mit. `InnerException` verweist auf die Exception, die den aktuellen Fehler verursacht hat, und ist sonst `null` ([§22.3 The System.Exception class](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#223-the-systemexception-class)). Der Konstruktor bekommt dafür einen zweiten Parameter, den er mit `: base(message, innerException)` weitergibt. Man nennt sie <Term id="inner-exception">innere Exception</Term>.
+
+:::info[Vorhersage]
+`ParseCount` fängt die `FormatException` von `int.Parse` und löst eine `InvalidCountException` aus. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l06-inner" code={innerException} predict expected={innerExceptionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `7`, `InvalidCountException: Not a count: seven`, `Cause: FormatException` und `Cause message: The input string 'seven' was not in a correct format.`
+
+1. **Gutfall:** `ParseCount("7")` gibt 7 zurück.
+2. **Fangen und umwandeln:** Bei `"seven"` löst `int.Parse` eine `FormatException` aus. Die `catch`-Klausel in `ParseCount` löst die `InvalidCountException` aus und gibt die `FormatException` als zweites Argument mit.
+3. **Ursache lesen:** Der Aufrufer fängt die Fachexception. Über `InnerException` sieht er die ursprüngliche Ursache. Das `?` bei `cause?.` verhindert einen Fehler, falls es keine innere Exception gäbe.
+
+</details>
+
+## Geschäftsregeln an einer Stelle prüfen
+
+Eine <Term id="business-rule">Geschäftsregel</Term> (Business Rule) ist eine Regel der Fachwelt, zum Beispiel „Ein Vorfall braucht mindestens 3 fehlgeschlagene Anmeldungen“. Prüfe sie dort, wo die Daten in das Programm kommen, und nur an einer Stelle. Die Exception sagt, welche Regel verletzt wurde. So gilt eine Änderung der Regel für alle Aufrufer, und keine Prüfung weicht von den anderen ab.
+
+:::info[Vorhersage]
+Die Regel steht in `CheckFailures`, zwei Methoden rufen sie auf. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l06-rule" code={businessRule} predict expected={businessRuleOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Incident opened for bob`, danach zweimal `Rule broken: An incident needs at least 3 failures, found 1.`
+
+1. **Regel:** `CheckFailures` prüft, ob die Zahl mindestens 3 ist. Sonst löst sie eine `InvalidOperationException` aus, denn der Zustand erlaubt die Aktion nicht.
+2. **Erster `try`-Block:** `Open("bob", 5)` besteht. Bei `Open("alice", 1)` löst die Regel aus, der Rest des Blocks läuft nicht.
+3. **Zweiter `try`-Block:** `Escalate` nutzt dieselbe Prüfung und liefert dieselbe Meldung. Hier reicht ein Standardtyp, weil kein Aufrufer diesen Fehler gesondert fangen muss.
+
+</details>
+
+## Lückenbeispiel
+
+`InvalidPortException` soll die Portnummer tragen. Ergänze im Konstruktor einen Parameter `int port`, der `Port` setzt, und übergib die Nummer beim `throw`. Die Ausgabe soll `Rejected port: 70000` sein.
+
+<CSharpRunner id="m07-l06-gaps" code={customGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Konstruktor:** `public InvalidPortException(int port, string message) : base(message)` mit dem Rumpf `Port = port;`.
+2. **Auslösen:** `throw new InvalidPortException(port, "The port is too large.");`
+3. **Ergebnis:** Die `catch`-Klausel liest `ex.Port` und gibt `Rejected port: 70000` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog weist ungültige Status-Werte und Events ohne Ereignistyp mit einer Exception zurück. `TimestampOf` löst bei einem ungültigen Zeitstempel eine `FormatException` aus, `EventTypeOf` liest den Ereignistyp.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block und `return 0;`, die Hilfsfunktionen `EventTypeOf` und `TimestampOf` mit dem Platz dahinter und das Ende von `namespace SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in `namespace SecLog.Model` hinter `Incident` die Klasse `InvalidLogLineException` mit der Eigenschaft `LineNumber` und zwei Konstruktoren: einer mit `lineNumber` und `message`, einer mit zusätzlicher `innerException`. Dokumentiere sie mit `///`-Kommentaren.
+2. Schreibe hinter `TimestampOf` die lokale Funktion `LogEvent ParseLine(string line, int lineNumber)`. Sie löst eine `InvalidLogLineException` aus, wenn die Zeile (an den Leerzeichen geteilt) nicht 4 Teile hat, wenn der Zeitstempel nicht gelesen werden kann (fange die `FormatException` von `TimestampOf` und gib sie als innere Exception mit) oder wenn der Ereignistyp nicht `login-success`, `login-failed` oder `logout` ist (Vergleich mit `StringComparison.Ordinal`). Sonst gibt sie ein `new LogEvent(…)` mit `TimestampOf`, dem Ereignistyp und `FindUser` zurück.
+3. Schreibe vor `return 0;` den Block `// Reject invalid log lines with an own exception`. Für `sampleLog[1]`, `"broken line"` und `"2026-13-02T08:01:40Z login-failed user=bob ip=203.0.113.7"` (Zeilennummern 1 bis 3) rufst du `ParseLine` in `try` auf. Eine gute Zeile gibst du mit `Describe()` aus. `catch (InvalidLogLineException ex)` gibt `Line {ex.LineNumber} rejected: {ex.Message}` aus und, falls es eine gibt, den Typnamen von `ex.InnerException` (`Cause: …`). Am Ende gibst du die Zahl der akzeptierten Zeilen aus (`Accepted lines: 1`).
+
+<CSharpRunner id="m07-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Eigener Typ:** `InvalidLogLineException` trägt die Zeilennummer. Der zweite Konstruktor gibt zusätzlich die innere Exception an `Exception` weiter.
+2. **Regeln an einer Stelle:** `ParseLine` prüft Teilezahl, Zeitstempel und Ereignistyp. Jeder Verstoß nennt die Regel in der Meldung.
+3. **Ursache mitgeben:** Die `FormatException` von `TimestampOf` wird gefangen und als `InnerException` weitergegeben.
+4. **Aufrufen:** Der Block ruft `ParseLine` für drei Zeilen auf, gibt gute Zeilen aus und meldet abgelehnte mit Nummer, Meldung und Ursache.
+
+</details>
+
+**Neuer Stand:** SecLog weist ungültige Log-Zeilen mit einer eigenen Exception zurück, die Zeilennummer und Ursache trägt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l06-own-exception-for-every-error" />
+
+**„Für jeden Fehler braucht man eine eigene Exception-Klasse.“** Das stimmt nicht. Nimm einen Standardtyp, wenn er den Fehler beschreibt, zum Beispiel `ArgumentException` oder `InvalidOperationException`. Ein eigener Typ lohnt sich, wenn Aufrufer genau diesen Fachfehler fangen wollen oder wenn die Exception zusätzliche Daten trägt.
+:::
+
+<details>
+<summary>Vertiefung: Die drei üblichen Konstruktoren (optional)</summary>
+
+Eigene Exception-Klassen haben üblicherweise drei Konstruktoren: ohne Parameter, mit einer Meldung und mit einer Meldung und einer inneren Exception ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)). `InvalidLogLineException` hat nur die zwei, die SecLog braucht. Zusätzliche Eigenschaften gibt es nur, wenn ein Programm die Daten wirklich nutzt, wie `FileNotFoundException` mit `FileName`.
+
+</details>
+
+## Zusammenfassung
+
+Standardtypen zuerst: Ein eigener Exception-Typ lohnt sich, wenn Aufrufer genau diesen Fachfehler fangen wollen oder Zusatzdaten brauchen. Der Name endet auf `Exception`, `: base(…)` gibt Meldung und innere Exception weiter, eigene Eigenschaften trägt die Klasse selbst. `InnerException` zeigt auf die Ursache. Eine Geschäftsregel prüfst du an einer Stelle, und die Exception nennt die verletzte Regel.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l06-q1" />
+
+<Quiz id="m07-l06-q2" />
+
+<Quiz id="m07-l06-q3" />
+
+<Quiz id="m07-l06-q4" />
+
+<Quiz id="m07-l06-q5" />
+
+<Quiz id="m07-l06-q6" />
+
+<Quiz id="m07-l06-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l06-q8" />
+
+### Transferfrage
+
+<Quiz id="m07-l06-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [The System.Exception class](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#223-the-systemexception-class)
+- Microsoft Learn: [Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)
+- Microsoft Learn: [How to create user-defined exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/how-to-create-user-defined-exceptions)

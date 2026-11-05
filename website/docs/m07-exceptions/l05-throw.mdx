@@ -1,0 +1,242 @@
+---
+title: Exceptions auslösen mit throw
+sidebar_position: 5
+description: Mit throw meldet dein Code einen Fehler selbst – mit passendem Typ, Throw-Helpern und throw; für das erneute Auslösen.
+lesson_id: m07-l05
+duration_min: 22
+---
+
+import throwBasic from '!!raw-loader!@site/examples/m07/l05/throw-basic.cs';
+import throwBasicOutput from '!!raw-loader!@site/examples/m07/l05/throw-basic.out.txt';
+import throwHelpers from '!!raw-loader!@site/examples/m07/l05/throw-helpers.cs';
+import throwHelpersOutput from '!!raw-loader!@site/examples/m07/l05/throw-helpers.out.txt';
+import throwExpression from '!!raw-loader!@site/examples/m07/l05/throw-expression.cs';
+import throwExpressionOutput from '!!raw-loader!@site/examples/m07/l05/throw-expression.out.txt';
+import rethrow from '!!raw-loader!@site/examples/m07/l05/rethrow.cs';
+import rethrowOutput from '!!raw-loader!@site/examples/m07/l05/rethrow.out.txt';
+import throwGap from '!!raw-loader!@site/examples/m07/l05/throw-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l05/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l05/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l05/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l05/seclog-exceptions-solution.cs';
+
+# Exceptions auslösen mit throw
+
+:::note[Lernziele]
+- Du kannst mit `throw` eine passende Exception mit einer klaren Meldung auslösen.
+- Du kannst Argumente mit Throw-Helfern wie `ArgumentNullException.ThrowIfNull` prüfen.
+- Du kannst `throw;` und `throw ex;` in einem `catch`-Block unterscheiden.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l03-q1" />
+
+<Quiz id="m07-l04-q2" />
+
+<Quiz id="m06-l04-q3" />
+
+## Eine Exception selbst auslösen
+
+Bisher hat die Laufzeit Exceptions ausgelöst, zum Beispiel `int.Parse` bei einem falschen Text. Dein Code kann das auch selbst tun, wenn er einen ungültigen Wert findet. Dafür gibt es die <Term id="throw-statement">`throw`-Anweisung</Term>: `throw` mit einem Exception-Objekt löst diese Exception sofort aus, und die Anweisung dahinter läuft nicht mehr ([§13.10.6 The throw statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13106-the-throw-statement)).
+
+Das Objekt entsteht mit `new`, so wie bei jeder Klasse. Der Konstruktor nimmt die Meldung entgegen, die später in `Message` steht. Eine gute Meldung nennt den Fehler in einem ganzen Satz.
+
+Welchen Typ wählst du? Nimm einen Typ, der den Fehler beschreibt:
+
+| Fehler | Typ |
+| --- | --- |
+| Ein Argument ist `null`, obwohl es das nicht sein darf | `ArgumentNullException` |
+| Ein Argument liegt außerhalb des erlaubten Bereichs | `ArgumentOutOfRangeException` |
+| Ein anderes Argument ist ungültig | `ArgumentException` |
+| Der Zustand des Objekts erlaubt den Aufruf nicht | `InvalidOperationException` |
+
+Die drei Argument-Typen haben einen Konstruktor, der zuerst den Namen des Parameters nimmt und danach die Meldung. Der Name steht als Text in Anführungszeichen. Er erscheint in der Meldung als `(Parameter 'text')`.
+
+:::info[Vorhersage]
+`ParseFailures` löst eine Exception aus, wenn die Zahl negativ ist. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l05-basic" code={throwBasic} predict expected={throwBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Failures: 12`, dann `ArgumentOutOfRangeException: A failure count cannot be negative. (Parameter 'text')` und `InvalidOperationException: The incident is already closed.`
+
+1. **Prüfen:** `ParseFailures` liest die Zahl und prüft, ob sie kleiner als 0 ist.
+2. **Auslösen:** Bei `"-5"` löst `throw new ArgumentOutOfRangeException(…)` die Exception aus. `return count;` läuft nicht mehr.
+3. **Fangen:** Die `catch`-Klausel in der Schleife gibt Typ und Meldung aus. Die Schleife endet danach normal.
+4. **Zustand:** `CloseIncident(false)` löst eine `InvalidOperationException` aus, weil nicht das Argument falsch ist, sondern der Zustand nicht zum Aufruf passt.
+
+Was passiert, wenn du die Meldung weglässt? Die Exception bekommt dann eine Standardmeldung des Typs. Eine eigene Meldung hilft beim Suchen des Fehlers mehr.
+
+</details>
+
+## Argumente prüfen mit Throw-Helpern
+
+Eine Prüfung am Anfang einer Methode, die ungültige Argumente sofort zurückweist, heißt <Term id="guard-clause">Guard Clause</Term> (Schutzklausel, Argumentprüfung). So findet der Fehler dort statt, wo er entsteht, und nicht erst weit entfernt.
+
+Für häufige Prüfungen hat .NET <Term id="throw-helper">Throw-Helper</Term>, statische Methoden, die das Argument prüfen und bei einem Fehler selbst die passende Exception auslösen. Du schreibst `if` und `throw` nicht mehr selbst ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)). Drei Beispiele:
+
+- `ArgumentNullException.ThrowIfNull(wert)` löst bei `null` eine `ArgumentNullException` aus.
+- `ArgumentException.ThrowIfNullOrEmpty(text)` löst bei `null` eine `ArgumentNullException` und bei einem leeren Text eine `ArgumentException` aus.
+- `ArgumentOutOfRangeException.ThrowIfNegative(zahl)` löst bei einer negativen Zahl eine `ArgumentOutOfRangeException` aus. <Since csharp="12" dotnet="8" />
+
+Der Parametername wird automatisch in die Meldung eingetragen.
+
+:::info[Vorhersage]
+`Check` prüft zuerst auf `null`, dann auf einen leeren Text, dann auf eine negative Zahl. Welche Zeile gibt es für jeden der vier Aufrufe?
+:::
+
+<CSharpRunner id="m07-l05-helpers" code={throwHelpers} predict expected={throwHelpersOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `ArgumentNullException: Value cannot be null. (Parameter 'user')`, `ArgumentOutOfRangeException: negative count`, `ArgumentException: The value cannot be an empty string. (Parameter 'user')` und `bob: 5 failures`.
+
+1. **`null`:** `ThrowIfNull(user)` löst die `ArgumentNullException` aus. Die erste `catch`-Klausel gibt Typ und Meldung aus.
+2. **`-1`:** `user` ist `"bob"`, die ersten zwei Prüfungen bestehen. `ThrowIfNegative(failures)` löst die `ArgumentOutOfRangeException` aus.
+3. **`""`:** `ThrowIfNullOrEmpty(user)` löst eine `ArgumentException` aus. Die `catch`-Klauseln stehen vom spezifischen zum allgemeinen Typ, deshalb trifft hier die letzte.
+4. **`"bob"`, 5:** Keine Prüfung schlägt an, die Methode gibt die Zeile aus.
+
+</details>
+
+## throw als Ausdruck
+
+Ein `throw` kann auch dort stehen, wo ein Wert erwartet wird. Dann heißt es <Term id="throw-expression">Throw Expression</Term> (`throw`-Ausdruck). Erlaubt ist es an drei Stellen: als rechter Teil von `??`, als zweiter oder dritter Teil von `?:` und als Körper eines Members mit `=>` ([§12.19 The throw expression operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1219-the-throw-expression-operator)). Der Ausdruck liefert nie einen Wert, denn er verlässt die Methode.
+
+:::info[Vorhersage]
+Zwei Methoden mit `=>` nutzen einen `throw`-Ausdruck. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l05-expression" code={throwExpression} predict expected={throwExpressionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `bob`, `high`, `Rejected: -1` und `Value cannot be null. (Parameter 'user')`.
+
+1. **`??`:** Ist `user` nicht `null`, gilt der linke Wert. Bei `null` löst der rechte Teil die Exception aus.
+2. **`?:`:** Bei `failures >= 0` gilt der zweite Teil (`high` oder `low`). Sonst löst der dritte Teil eine `ArgumentOutOfRangeException` aus.
+3. **Kurz:** Die ganze Prüfung steht in einem Ausdruck, ohne `if`-Block.
+
+</details>
+
+## Erneut auslösen: throw; und throw ex;
+
+Manchmal soll ein `catch`-Block den Fehler nur bemerken, zum Beispiel eine Meldung ausgeben, und die Exception dann weitergeben. Dafür gibt es das <Term id="rethrow">erneute Auslösen</Term>. `throw;` ohne Ausdruck ist nur in einem `catch`-Block erlaubt und löst die Exception aus, die der Block gerade behandelt ([§13.10.6 The throw statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13106-the-throw-statement)).
+
+Es gibt auch `throw ex;` mit dem gefangenen Objekt. Der Unterschied liegt im <Term id="stack-trace">Stack Trace</Term>: Bei `throw ex;` beginnt er an der aktuellen Stelle neu, und die Frames zwischen dem ursprünglichen Ort und hier gehen verloren. Bei `throw;` bleibt er erhalten ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)).
+
+Das folgende Programm zeigt beide Formen. `Outer` fängt die `FormatException` von `Inner` und löst sie wieder aus. Die Schleife läuft zweimal, einmal mit `throw;` und einmal mit `throw same;`. Dabei ist `same` das gefangene Objekt unter einem zweiten Namen, also dasselbe wie `throw ex;`. Der Grund steht in der Vertiefung unten. Wie in Lektion 3 zeigt das Programm nur die Frames der eigenen Klasse.
+
+:::info[Vorhersage]
+Welche Frames stehen im Stack Trace, wenn `Outer` mit `throw;` weitergibt, und welche, wenn es das gefangene Objekt noch einmal auslöst?
+:::
+
+<CSharpRunner id="m07-l05-rethrow" code={rethrow} predict expected={rethrowOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist zweimal `Outer saw the error`. Mit `throw;` folgen die Frames `at LogTools.Inner(String text)` und `at LogTools.Outer(String text, Boolean keep)`. Mit dem gefangenen Objekt folgt nur `at LogTools.Outer(String text, Boolean keep)`.
+
+1. **Auslösen:** `int.Parse` in `Inner` löst die `FormatException` aus. `Outer` fängt sie und gibt eine Zeile aus.
+2. **Mit `throw;`:** Die Exception geht mit ihrem Stack Trace weiter. Der Frame von `Inner`, also der Ort des Fehlers, bleibt sichtbar.
+3. **Mit dem Objekt:** Der Stack Trace beginnt in `Outer`. Man sieht nicht mehr, dass der Fehler in `Inner` entstand.
+
+</details>
+
+## Lückenbeispiel
+
+`Open` soll drei Argumente prüfen. Schreibe die drei Guard Clauses mit Throw-Helpern unter die Kommentare. Die Ausgabe soll `ArgumentNullException`, `ArgumentException`, `ArgumentOutOfRangeException` und `Port 8080` sein. Das erste Argument prüft der Helper für `null`, das zweite der für `null` oder leer, den Port der für negative Zahlen.
+
+<CSharpRunner id="m07-l05-gaps" code={throwGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **`null`:** `ArgumentNullException.ThrowIfNull(host);`
+2. **Leer:** `ArgumentException.ThrowIfNullOrEmpty(host);`
+3. **Negativ:** `ArgumentOutOfRangeException.ThrowIfNegative(port);`
+4. **Ergebnis:** Für `null` löst schon der erste Helper aus. Für `""` besteht der erste, und der zweite löst eine `ArgumentException` aus. Der Port `-1` fällt bei der dritten Prüfung durch. `"ok"` mit 8080 besteht alle Prüfungen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog fängt Fehler beim Verarbeiten von Zeilen und Zahlen ab und zählt verarbeitete und abgelehnte Zeilen. Ein ungültiger `Status` wird bisher einfach ignoriert (Modul 6).
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Block `// Change the status of the incident`, den Platz für den neuen Block und `return 0;`, die Eigenschaft `Status` der Klasse `Incident` und den Konstruktor von `LogEvent`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Die Eigenschaft `Status` löst bei einem unbekannten Wert eine `ArgumentException` mit der Meldung `Unknown status: unknown` aus, statt den alten Wert zu behalten. Passe den `///`-Kommentar an.
+2. Im Block `// Change the status of the incident` steht die Zuweisung von `"unknown"` in einem `try`-Block. `catch (ArgumentException ex)` gibt die Meldung aus. Danach wird der Status ausgegeben, er ist weiter `investigating`.
+3. Der Konstruktor von `LogEvent` ruft als erste Anweisung `ArgumentException.ThrowIfNullOrEmpty(eventType)` auf.
+4. Schreibe vor `return 0;` den Block `// Reject an event without event type`. Er erzeugt in `try` ein `LogEvent` mit `""` als Ereignistyp (nimm `sampleEvent.Timestamp` als Zeitpunkt und `null` als Benutzer), fängt die `ArgumentException` und gibt `Rejected event: ` und die Meldung aus.
+
+<CSharpRunner id="m07-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Prüfen im Setter:** Ist der Wert keiner der drei bekannten Status, löst `Status` die `ArgumentException` aus. Sonst wird `field` gesetzt.
+2. **Fangen am Aufruf:** Die Zuweisung steht in `try`. Weil der Setter vor `field = value;` auslöst, bleibt der alte Status `investigating`.
+3. **Guard Clause im Konstruktor:** `ThrowIfNullOrEmpty` steht als erste Anweisung, so entsteht kein halbfertiges Objekt.
+4. **Neuer Block:** Der Aufruf mit `""` löst im Konstruktor aus, `catch` gibt die Meldung aus.
+
+</details>
+
+**Neuer Stand:** SecLog weist ungültige Status-Werte und Events ohne Ereignistyp mit einer Exception zurück, statt sie still zu ignorieren.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l05-throw-ex-keeps-stack-trace" />
+
+**„`throw ex;` gibt die Exception unverändert weiter, genau wie `throw;`.“** Das stimmt nicht. `throw ex;` setzt den Stack Trace an der aktuellen Stelle zurück, der ursprüngliche Ort des Fehlers geht verloren. `throw;` behält ihn. Schreibe in einem `catch`-Block `throw;`, wenn du dieselbe Exception weitergeben willst.
+:::
+
+<details>
+<summary>Vertiefung: Warum das Beispiel `throw same;` benutzt (optional)</summary>
+
+Die Code-Analyse-Regel CA2200 meldet eine Warnung, wenn ein `catch`-Block die gefangene Exception mit `throw ex;` auslöst, denn dabei geht Stack-Trace-Information verloren ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)). Das Beispiel schreibt das gefangene Objekt deshalb über eine zweite Variable, damit die Ausgabe des Compilers sauber bleibt. Das Verhalten ist dasselbe wie bei `throw ex;`. Außerhalb eines `catch`-Blocks gilt: Soll eine Exception mit ihrem Stack Trace später noch einmal ausgelöst werden, gibt es dafür `ExceptionDispatchInfo`. Das ist ein Thema für spätere Module.
+
+</details>
+
+## Zusammenfassung
+
+Mit `throw` und einem Exception-Objekt löst dein Code eine Exception selbst aus. Der Typ beschreibt den Fehler, die Meldung nennt ihn in einem Satz. Throw-Helper wie `ThrowIfNull` prüfen Argumente am Anfang einer Methode in einer Zeile. Ein `throw`-Ausdruck steht in `??`, `?:` und im Körper mit `=>`. In einem `catch`-Block gibt `throw;` die Exception mit ihrem Stack Trace weiter, `throw ex;` beginnt den Stack Trace neu.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l05-q1" />
+
+<Quiz id="m07-l05-q2" />
+
+<Quiz id="m07-l05-q3" />
+
+<Quiz id="m07-l05-q4" />
+
+<Quiz id="m07-l05-q5" />
+
+<Quiz id="m07-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m07-l05-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [The throw statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13106-the-throw-statement)
+- C#-Spezifikation: [The throw expression operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1219-the-throw-expression-operator)
+- Microsoft Learn: [Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)

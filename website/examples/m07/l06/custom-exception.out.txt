@@ -1,0 +1,3 @@
+bob is known
+UnknownUserException: The user is not in the log.
+User in the exception: bo

@@ -1,0 +1,4 @@
+ArgumentNullException: Value cannot be null. (Parameter 'user')
+ArgumentOutOfRangeException: negative count
+ArgumentException: The value cannot be an empty string. (Parameter 'user')
+bob: 5 failures
