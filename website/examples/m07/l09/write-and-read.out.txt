@@ -1,0 +1,8 @@
+Name: notes.txt
+Extension: .txt
+Exists before: False
+Exists after: True
+Lines: 3
+- first
+- second
+- third
