@@ -233,6 +233,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 - **Library (not spec):** argument guard helpers (throw helpers on exception types), `IDisposable`, best practices for exceptions (Microsoft Learn), `System.IO` (`File`, `Path`, streams, text encoding), `IOException` family.
 - **Note (decision 2026-11-01):** runnable file examples may use an in-memory file system of the playground. Files do not need to survive a reload. One technical check for the M7 work: verify in the playground that the `System.IO` APIs used in the lesson work. If not, the lesson falls back to normal code blocks with CI-produced output.
 - More misconceptions: `finally` runs only when there was no exception; catching `Exception` everywhere is safe practice.
+- **Module review (2026-11-05):** all spec and library items are taught (lessons `m07-l01` … `m07-l09`); the two extra misconceptions are `m07-l04-finally-only-without-exception` and `m07-l07-catch-exception-everywhere-is-safe`. File check result (#352): the `System.IO` APIs of `website/examples/dev/file-io-check.cs` pass the CI check on disk; the run in the browser playground (in-memory file system) is still to be confirmed by a human on `/dev/runner-demo`. The file examples of `m07-l09` follow the rule in `.claude/rules/examples.md`.
 
 ### M8 OOP II ▶
 Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · equality of objects.
@@ -278,7 +279,15 @@ Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, po
     - object initializer vs. constructor order (`m06-l05`)
     - instance vs. static member (`m06-l08`)
   - Misconception ids: m06-l02-readonly-object-immutable, m06-l04-property-is-field, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable
-- **M7**: Filled by the module review of M7.
+- **M7**:
+  - Concepts:
+    - `throw;` vs. `throw ex;` (stack trace kept or reset) (`m07-l05`)
+    - `finally` vs. `using` / `Dispose` (`m07-l04`, `m07-l08`)
+    - exception vs. Try pattern vs. return value; `Dictionary` indexer / `TryGetValue` (`m07-l07`, `m05-l06`)
+    - `when` in a `catch` filter vs. `when` in `switch` and `if` in the catch block (`m07-l02`)
+    - guard clause (`throw` for a bad argument) vs. validation in a property `set` (`m07-l05`, `m06-l04`)
+    - `File.WriteAllText` vs. `AppendAllText`; `IOException` vs. `UnauthorizedAccessException` (`m07-l09`)
+  - Misconception ids: m07-l02-catch-order-irrelevant, m07-l04-finally-only-without-exception, m07-l05-throw-ex-keeps-stack-trace, m07-l07-catch-exception-everywhere-is-safe, m07-l08-dispose-frees-memory
 - **M8**: Filled by the module review of M8.
 - ▶: all covered modules are runnable.
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
@@ -523,7 +532,7 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
-- Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7 are decided: in-memory file system, ▶.)
+- Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
 - M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
 - M8: current wording of the .NET design guidelines on sealing and the id of the analysis rule that suggests sealing internal types.
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.

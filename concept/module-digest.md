@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-04. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-05. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -28,7 +28,6 @@ Each module section has these fields:
 - **Open forward references:**
   - Typen, `int`/`string`/`bool`, `typeof` → M1 (`m00-l02`; taught in `m01-l02`)
   - Variablen, `var`, Division mit ganzen Zahlen, String-Interpolation → M1 (`m00-l05`)
-  - `try`/`catch`, Exceptions → M7 (`m00-l05`)
 - **SecLog end state:** `website/examples/m00/l05/seclog-profile-solution.cs` – prints a project profile of 8 lines (purpose, language, platform, variant, version, end of support, execution model).
 - **Notes for later modules:**
   - `how-this-course-works.mdx` is not a lesson. No later module depends on it.
@@ -50,7 +49,6 @@ Each module section has these fields:
 - **Glossary terms:** comment, escape-sequence, verbatim-string-literal, identifier, declaration, assignment, definite-assignment, variable, type, static-typing, built-in-type, integer-division, integral-type, floating-point-type, operand, decimal-type, numeric-promotion, nan, round-off-error, exception, expression, operator, operator-precedence, compound-assignment, increment-operator, type-inference, constant, constant-expression, implicitly-typed-variable, string-interpolation, string-concatenation, format-string, raw-string-literal, culture, cast, implicit-conversion, explicit-conversion, overflow, checked-context, parsing, console-input
 - **Misconception ids:** m01-l01-comment-is-executed, m01-l01-escape-in-verbatim, m01-l02-assignment-is-comparison, m01-l02-variable-remembers-old-values, m01-l03-integer-division-rounds, m01-l03-double-is-exact, m01-l04-postfix-returns-new-value, m01-l04-left-to-right-always, m01-l05-var-is-dynamic, m01-l05-const-from-variable, m01-l06-string-plus-number-adds, m01-l06-toupper-changes-variable, m01-l07-cast-rounds, m01-l07-overflow-always-error, m01-l08-parse-accepts-decimals, m01-l08-tryparse-keeps-old-value, m01-l09-readline-reads-all, m01-l09-readline-returns-number
 - **Open forward references:**
-  - Exceptions (Ausnahmen) → M7 (`m01-l07`, `m01-l08`)
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
   - `if` is taught in `m02-l01` (M1 only pointed to it). In M1, `bool` only stores `true`/`false` and the result of `TryParse`.
@@ -115,7 +113,6 @@ Each module section has these fields:
 - **Glossary terms:** value-type, reference-type, object, simple-type, string-builder, stack, heap, garbage-collector, automatic-memory-management, pass-by-reference, null, nullable-reference-type, nullable-context, null-state-analysis, null-forgiving-operator, nullable-value-type, lifted-operator, default-value, null-conditional-operator, null-coalescing-operator, null-coalescing-assignment, null-conditional-assignment, immutable, reference-equality, value-equality, boxing, unboxing
 - **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack, m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null, m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
 - **Open forward references:**
-  - Exceptions → M7 (`m04-l04`, `m04-l05`, `m04-l09`)
   - Projektdatei (nullable setting) → M14 (`m04-l04`)
 - **SecLog end state:** `website/examples/m04/l08/seclog-types-solution.cs` – the M3 end state plus: findings in one `StringBuilder` passed to a method (`l03`), `FindUser` returns `string?` (`l04`), `FailuresOrNull` returns `int?` (`l05`), `??`, `?.`, `??=` for missing values (`l06`), `Trim().ToLower()` for user names (`l07`), `==`/`Equals`/`ReferenceEquals` (`l08`). `l02` and `l09` have no step. Chain: `m03/l10` → `m04/l01` → `l03` → `l04` → `l05` → `l06` → `l07` → `l08`.
 - **Notes for later modules:**
@@ -142,7 +139,6 @@ Each module section has these fields:
 - **Open forward references:**
   - Key equality of `Dictionary`/`HashSet` (`Equals`/`GetHashCode`) → M8 (`m05-l06`, `m05-l07`)
   - Generics (`List<T>` as a generic type) → M9
-  - Exceptions (`KeyNotFoundException`, `InvalidOperationException`) → M7
   - `Span<T>`, `ref struct` → named only, not taught
 - **SecLog end state:** `website/examples/m05/l11/seclog-collections-solution.cs` – the M4 end state plus: whole sample log in an array/list, failures per user in a `Dictionary`, distinct IPs in a `HashSet`, timestamps as `DateTimeOffset`, alert "5 failed attempts in 10 minutes". New local functions: `PrintAlerts`, `EventTypeOf`, `TimestampOf`. Chain: `m04/l08` → `m05/l01` → … → `m05/l11`. M5 milestone reached.
 - **Notes for later modules:**
@@ -167,7 +163,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m06-l…"` fields: class, instance, field, member, instance-method, object-creation, constructor, default-constructor, constructor-chaining, this-access, readonly-field, encapsulation, access-modifier, accessibility-domain, documentation-comment, property, accessor, backing-field, computed-property, object-initializer, auto-property, init-accessor, required-member, field-keyword, primary-constructor, static-member, instance-member, static-class, static-constructor, namespace, fully-qualified-name, using-directive, using-alias, global-using, implicit-usings, entry-point, main-method, command-line-argument, exit-code
 - **Misconception ids:** m06-l01-class-declaration-creates-object, m06-l02-readonly-object-immutable, m06-l03-private-per-object, m06-l04-property-is-field, m06-l05-initializer-before-constructor, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable, m06-l09-using-adds-library, m06-l10-top-level-has-no-main
 - **Open forward references:** 
-  - Exceptions → M7 (`m06-l03`, `m06-l04`)
   - `protected`, inheritance, records, `sealed`, `abstract` → M8 (`m06-l03`, `m06-l07`, `m06-l08`)
   - `with` expression → M12 (`m06-l06`)
   - `async`/`await` → M13 (`m06-l10`)
@@ -177,6 +172,30 @@ Each module section has these fields:
   - Classes do not override `ToString()` yet (M8).
   - New top-level blocks go **before** `return 0;` (since `m06-l10`).
   - M6 rejects invalid values without exceptions (`Add` returns `bool`, `Status` ignores bad values); M7 may change this.
+
+## M7 Exceptions
+
+- **Lessons:**
+  - `m07-l01` Exceptions abfangen mit try und catch – `try`/`catch` handles an exception; code after the error in the `try` block is skipped.
+  - `m07-l02` Mehrere catch-Klauseln und Ausnahmefilter – catch order (specific first), `when` filter, propagation.
+  - `m07-l03` Stack Traces lesen – read a stack trace; runtime vs. compile vs. logic errors (no project step on purpose).
+  - `m07-l04` Aufräumen mit finally – `finally` runs with and without an exception.
+  - `m07-l05` Exceptions auslösen mit throw – `throw`, `throw;` vs. `throw ex;`, throw expression, guard clauses and throw helpers.
+  - `m07-l06` Eigene Exceptions und Geschäftsregeln – own exception class, `InnerException`, business rules in one place.
+  - `m07-l07` Exception oder nicht? – exception vs. Try pattern vs. return value; when to catch.
+  - `m07-l08` Ressourcen freigeben: using und IDisposable – `using` statement and declaration, `Dispose`, disposal order.
+  - `m07-l09` Dateien lesen und schreiben – `System.IO` (`File`, `Path`, streams), `IOException` family.
+- **Constructs taught:** `try`, `catch`, `catch (T ex)`, `Message`, common exception types (`m07-l01`), catch order, `when` (`m07-l02`), stack trace (`m07-l03`), `finally` (`m07-l04`), `throw`, `throw;`, throw expression with `??`, `ArgumentNullException.ThrowIfNull` and other throw helpers (`m07-l05`), custom class `: Exception` with `base(…)` (used, inheritance marked), `InnerException` (`m07-l06`), Try pattern `bool TryX(…, out T)` (`m07-l07`), `using (…) { }`, `using T x = …;`, `IDisposable`, `Dispose()` (`m07-l08`), `File.*`, `Path.*`, `StreamReader`, `StreamWriter`, `Directory.CreateTempSubdirectory`, `FileNotFoundException`, `IOException` (`m07-l09`). Finalizers and the dispose pattern: deep dive only (`m07-l08`).
+- **Glossary terms:** see the `"lesson": "m07-l…"` fields: try-statement, catch-clause, throw-exception, exception-type, exception-filter, exception-propagation, stack-trace, stack-frame, logic-error, unhandled-exception, finally-block, throw-statement, throw-expression, rethrow, guard-clause, throw-helper, custom-exception, inner-exception, business-rule, try-pattern, swallowing-exceptions, resource, dispose, using-statement, using-declaration, finalizer, file-path, stream, text-encoding, io-exception
+- **Misconception ids:** m07-l01-resume-after-error, m07-l02-catch-order-irrelevant, m07-l03-first-line-is-the-bug, m07-l04-finally-only-without-exception, m07-l05-throw-ex-keeps-stack-trace, m07-l06-own-exception-for-every-error, m07-l07-catch-exception-everywhere-is-safe, m07-l08-dispose-frees-memory, m07-l09-writealltext-appends
+- **Open forward references:**
+  - Inheritance, `base` → M8 (`m07-l02`, `m07-l06`)
+  - Interfaces, classes with `: IDisposable` → M8 (`m07-l08`)
+- **SecLog end state:** `website/examples/m07/l09/seclog-exceptions-solution.cs` – the M6 end state plus: `InvalidLogLineException` (line number, `InnerException`), `ParseLine` (throws) and `TryParseLine` (Try pattern), `Incident.Status` throws `ArgumentException` for unknown values, and the sample log is written to a temp file and read with `StreamReader` in `using`; bad lines are reported, not fatal. Chain: `m06/l10` → `m07/l01` → `l02` → `l04` → … → `l09` (`l03` has no step). M7 milestone reached.
+- **Notes for later modules:**
+  - `Incident.Status` throws now (M6 ignored bad values); `ParseLine` throws, `TryParseLine` returns `false`.
+  - File examples create a temp directory, write every file they read, delete it at the end and never print a full path (`.claude/rules/examples.md`).
+  - Exceptions in async code are not covered → M13.
 
 ## W1 Wiederholung M1–M4
 
