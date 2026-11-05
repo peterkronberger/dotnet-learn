@@ -1,0 +1,6 @@
+General catch: 4
+General catch: 0
+General catch: 0
+Specific catch: 4
+Specific catch: 0
+Bug found: IndexOutOfRangeException
