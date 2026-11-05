@@ -1,0 +1,3 @@
+Inner: finally runs on the way out
+Caught in the caller: FormatException
+Program continues

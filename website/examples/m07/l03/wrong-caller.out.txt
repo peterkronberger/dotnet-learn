@@ -1,0 +1,3 @@
+DivideByZeroException: Attempted to divide by zero.
+at Report.Share(Int32 failures, Int32 events)
+at Report.Summary(Int32 failures, Int32 events)

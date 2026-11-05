@@ -239,6 +239,251 @@
       "type": "explain",
       "question": "Transfer: Eine Methode von SecLog liest eine Zeilennummer aus einem Text und gibt die Zeile zurück. Wo schreibst du die `try`/`catch`-Anweisung: in der Methode oder im Aufrufer? Begründe.",
       "modelAnswer": "Das hängt davon ab, wo man sinnvoll auf den Fehler reagieren kann. Weiß die Methode nicht, was bei einer falschen Nummer zu tun ist, lässt sie die Exception weiterreichen, und der Aufrufer fängt sie (zum Beispiel, um eine Meldung auszugeben). Kann die Methode selbst einen Ersatz liefern, fängt sie die Exception selbst."
+    },
+    {
+      "id": "m07-l03-q1",
+      "lesson": "m07-l03",
+      "type": "single",
+      "question": "Ein Stack Trace beginnt mit der Zeile `at System.Int32.Parse(String s)`. Was sagt diese oberste Zeile?",
+      "options": [
+        {
+          "text": "Die Exception wurde in `Int32.Parse` ausgelöst. Die Ursache liegt oft in einem Aufrufer weiter unten.",
+          "correct": true
+        },
+        {
+          "text": "Hier steckt der Fehler in deinem Code, du musst `Int32.Parse` ändern.",
+          "misconception": "m07-l03-first-line-is-the-bug",
+          "feedback": "`Int32.Parse` ist Code von .NET, den du nicht ändern kannst. Die oberste Zeile zeigt nur, wo die Exception ausgelöst wurde. Suche weiter unten die erste Zeile deines eigenen Codes."
+        },
+        {
+          "text": "Das ist die letzte Methode, die vor dem Fehler aufgerufen wurde, und sie hat ihn schon behoben.",
+          "feedback": "Der Stack Trace beschreibt, wo die Exception ausgelöst wurde. Behoben wird dort nichts."
+        },
+        {
+          "text": "Die oberste Zeile ist immer die Methode `Main`.",
+          "feedback": "`Main` steht bei einem Programm mit Top-Level-Anweisungen ganz unten, weil der Aufruf von dort ausging."
+        }
+      ],
+      "explanation": "Die oberste Zeile ist die Stelle, an der die Exception ausgelöst wurde. Das ist oft Code von .NET. Die Ursache liegt meist in der ersten Zeile deines eigenen Codes weiter unten oder sogar in einem Aufrufer, der einen falschen Wert übergeben hat."
+    },
+    {
+      "id": "m07-l03-q2",
+      "lesson": "m07-l03",
+      "type": "single",
+      "question": "Eine Exception hat diesen Stack Trace:\n\nat System.Number.ThrowFormatException[TChar](ReadOnlySpan`1 value)\nat System.Int32.Parse(String s)\nat LogTools.ParseCount(String text)\nat LogTools.Total(String first, String second)\nat Program.<Main>$(String[] args)\n\nWelche Zeile ist die erste Zeile deines eigenen Codes, wenn `LogTools` und `Program` dein Code sind?",
+      "options": [
+        {
+          "text": "`at LogTools.ParseCount(String text)`",
+          "correct": true
+        },
+        {
+          "text": "Die oberste Zeile, `at System.Number.ThrowFormatException…`",
+          "misconception": "m07-l03-first-line-is-the-bug",
+          "feedback": "Das ist die oberste Zeile, aber `System.Number` gehört zu .NET."
+        },
+        {
+          "text": "`at LogTools.Total(String first, String second)`",
+          "feedback": "`Total` ist auch dein Code, aber `ParseCount` steht weiter oben und ist die erste eigene Zeile."
+        },
+        {
+          "text": "`at Program.<Main>$(String[] args)`",
+          "feedback": "Das ist deine unterste Zeile, der Einstieg des Programms. Die erste eigene Zeile von oben ist eine andere."
+        }
+      ],
+      "explanation": "Du liest von oben nach unten und überspringst Zeilen von .NET (`System…`). Die erste Zeile mit deinem Code ist `LogTools.ParseCount`. Dort wurde `int.Parse` mit dem falschen Text aufgerufen."
+    },
+    {
+      "id": "m07-l03-q3",
+      "lesson": "m07-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l03/logic-error.cs",
+      "explanation": "`failures / events` rechnet mit `int`: 5 / 14 ergibt 0. Mal 100 bleibt 0. Das Programm läuft ohne Exception und liefert trotzdem ein falsches Ergebnis. Das ist ein Logikfehler. Die zweite Zeile rechnet mit `double` und ergibt 36."
+    },
+    {
+      "id": "m07-l03-q4",
+      "lesson": "m07-l03",
+      "type": "match",
+      "question": "Ordne jedem Fall die Art des Fehlers zu.",
+      "pairs": [
+        {
+          "left": "Ein Semikolon fehlt, das Programm startet nicht.",
+          "right": "Compilerfehler"
+        },
+        {
+          "left": "`int.Parse(\"x\")` löst eine `FormatException` aus.",
+          "right": "Laufzeitfehler"
+        },
+        {
+          "left": "Der Anteil wird mit `int` gerechnet und zeigt 0 % statt 36 %.",
+          "right": "Logikfehler"
+        }
+      ],
+      "explanation": "Ein Compilerfehler tritt vor dem Start auf. Ein Laufzeitfehler tritt während des Laufs auf, meist als Exception. Bei einem Logikfehler läuft das Programm ohne Exception, aber das Ergebnis ist falsch."
+    },
+    {
+      "id": "m07-l03-q5",
+      "lesson": "m07-l03",
+      "type": "single",
+      "question": "`Report.Share(3, 0)` löst eine `DivideByZeroException` aus. Der Stack Trace hat als erste eigene Zeile `at Report.Share(Int32 failures, Int32 events)` und darunter `at Report.Summary(Int32 failures, Int32 events)`. `Summary` hat `0` für `events` übergeben bekommen. Wo liegt die Ursache?",
+      "options": [
+        {
+          "text": "Beim Aufrufer: Er hat den Wert 0 übergeben, mit dem `Share` nicht rechnen kann.",
+          "correct": true
+        },
+        {
+          "text": "In `Share`, weil dort die Exception ausgelöst wurde und die oberste eigene Zeile immer den Fehler zeigt.",
+          "misconception": "m07-l03-first-line-is-the-bug",
+          "feedback": "`Share` löst die Exception aus, aber die Rechnung ist in Ordnung. Der falsche Wert kam vom Aufrufer."
+        },
+        {
+          "text": "Beim Compiler, weil er die Division nicht geprüft hat.",
+          "feedback": "Der Compiler kann den Wert von `events` zur Laufzeit nicht kennen."
+        },
+        {
+          "text": "Die Ursache lässt sich aus dem Stack Trace nicht eingrenzen.",
+          "feedback": "Doch: Der Stack Trace zeigt die Aufrufer. Du prüfst die Eingaben in jeder eigenen Zeile."
+        }
+      ],
+      "explanation": "Der Stack Trace zeigt, wo die Exception ausgelöst wurde und wer die Methode aufgerufen hat. Die Ursache steckt oft in einem Aufrufer, der einen falschen Wert übergibt. Deshalb prüfst du die Eingaben in der ersten eigenen Zeile und danach in den Aufrufern."
+    },
+    {
+      "id": "m07-l03-q6",
+      "lesson": "m07-l03",
+      "type": "single",
+      "question": "Was druckt .NET, wenn eine Exception von keiner `catch`-Klausel gefangen wird?",
+      "options": [
+        {
+          "text": "Eine Fehlermeldung mit Exception-Typ, Meldung und Stack Trace. Danach endet das Programm.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, das Programm läuft ungestört weiter.",
+          "feedback": "Ohne passende `catch`-Klausel geht die Suche nach außen bis zum Start des Programms. Findet sie nichts, endet das Programm."
+        },
+        {
+          "text": "Nur die Meldung, der Stack Trace wird nie ausgegeben.",
+          "feedback": "Bei einer nicht behandelten Exception steht auch der Stack Trace in der Ausgabe."
+        }
+      ],
+      "explanation": "Eine nicht behandelte Exception beendet das Programm. Der Text beginnt mit `Unhandled exception.` und nennt Typ, Meldung und die Zeilen des Stack Trace. Wie genau das Ende aussieht, legt die Spezifikation nicht fest."
+    },
+    {
+      "id": "m07-l03-q7",
+      "lesson": "m07-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wie gehst du mit einem Stack Trace vor, um die Ursache eines Fehlers einzugrenzen?",
+      "modelAnswer": "Zuerst lese ich Typ und Meldung der Exception. Dann gehe ich die Zeilen von oben nach unten durch und überspringe Zeilen von .NET, bis ich die erste Zeile meines eigenen Codes finde. Dort prüfe ich, mit welchen Werten die Methode aufgerufen wurde. Waren sie falsch, suche ich im Aufrufer weiter, der darunter steht."
+    },
+    {
+      "id": "m07-l03-q8",
+      "lesson": "m07-l03",
+      "type": "explain",
+      "question": "Transfer: SecLog meldet beim Einlesen einer Datei eine nicht behandelte Exception mit einem langen Stack Trace. Wie nutzt du den Stack Trace, und worauf achtest du, bevor du den Code änderst?",
+      "modelAnswer": "Ich lese Typ und Meldung, suche die erste Zeile mit SecLog-Code und prüfe die Eingaben dort, zum Beispiel die Log-Zeile. Danach schaue ich in die Aufrufer darunter, ob ein falscher Wert von dort kam. Erst wenn ich die Ursache kenne, ändere ich den Code. Die Zeilen von .NET ändere ich nicht."
+    },
+    {
+      "id": "m07-l04-q1",
+      "lesson": "m07-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l04/finally-return.cs",
+      "explanation": "Der `finally`-Block läuft auch dann, wenn die Methode im `try`-Block mit `return` verlassen wird. Er läuft vor der Rückgabe: Zuerst „Leaving FirstNumber“, danach gibt der Aufrufer „Result: 12“ aus."
+    },
+    {
+      "id": "m07-l04-q2",
+      "lesson": "m07-l04",
+      "type": "single",
+      "question": "Wann läuft der `finally`-Block einer `try`-Anweisung?",
+      "options": [
+        {
+          "text": "Immer, wenn die `try`-Anweisung verlassen wird: nach dem normalen Ende, nach `return` und bei einer Exception.",
+          "correct": true
+        },
+        {
+          "text": "Nur, wenn keine Exception ausgelöst wurde.",
+          "misconception": "m07-l04-finally-only-without-exception",
+          "feedback": "Auch bei einer Exception läuft `finally`, egal ob eine `catch`-Klausel sie fängt oder nicht."
+        },
+        {
+          "text": "Nur, wenn eine Exception ausgelöst wurde.",
+          "feedback": "`finally` läuft auch ohne Exception."
+        },
+        {
+          "text": "Nur, wenn es keine `catch`-Klausel gibt.",
+          "feedback": "`finally` darf mit oder ohne `catch`-Klauseln stehen und läuft in beiden Fällen."
+        }
+      ],
+      "explanation": "Der `finally`-Block läuft immer, wenn die Kontrolle die `try`-Anweisung verlässt: bei normalem Ende, bei `return`, `break` und `continue` und bei einer Exception."
+    },
+    {
+      "id": "m07-l04-q3",
+      "lesson": "m07-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l04/finally-outward.cs",
+      "explanation": "`int.Parse(\"x\")` löst in `Inner` eine `FormatException` aus. `Inner` hat keine `catch`-Klausel, aber der `finally`-Block läuft, bevor die Exception nach außen weitergegeben wird. Dann fängt der Aufrufer sie, und das Programm macht hinter seiner `try`-Anweisung weiter."
+    },
+    {
+      "id": "m07-l04-q4",
+      "lesson": "m07-l04",
+      "type": "multi",
+      "question": "Welche Formen der `try`-Anweisung sind erlaubt?",
+      "options": [
+        {
+          "text": "`try` mit `catch`",
+          "correct": true
+        },
+        {
+          "text": "`try` mit `finally`",
+          "correct": true
+        },
+        {
+          "text": "`try` mit `catch` und `finally`",
+          "correct": true
+        },
+        {
+          "text": "`try` ohne `catch` und ohne `finally`",
+          "feedback": "Eine `try`-Anweisung braucht mindestens eine `catch`-Klausel oder einen `finally`-Block."
+        }
+      ],
+      "explanation": "Eine `try`-Anweisung hat mindestens eine `catch`-Klausel oder einen `finally`-Block. Alle drei Kombinationen sind erlaubt."
+    },
+    {
+      "id": "m07-l04-q5",
+      "lesson": "m07-l04",
+      "type": "single",
+      "question": "Eine Methode hat `try { … } finally { … }` ohne `catch`. Im `try`-Block wird eine Exception ausgelöst, die keine andere Stelle fängt. Was passiert mit dem `finally`-Block?",
+      "options": [
+        {
+          "text": "Er läuft, bevor die Exception nach außen weitergegeben wird.",
+          "correct": true
+        },
+        {
+          "text": "Er läuft nicht, weil keine `catch`-Klausel die Exception gefangen hat.",
+          "misconception": "m07-l04-finally-only-without-exception",
+          "feedback": "Der `finally`-Block läuft auch dann, wenn die Exception weiter nach außen geht."
+        },
+        {
+          "text": "Er läuft, danach macht die Methode hinter der `try`-Anweisung weiter.",
+          "feedback": "Ohne `catch` ist die Exception nicht behandelt. Die Methode wird verlassen, die Exception geht weiter nach außen."
+        }
+      ],
+      "explanation": "Beim Verlassen der `try`-Anweisung läuft `finally`. Die Exception ist damit nicht behandelt, sie geht weiter an den Aufrufer."
+    },
+    {
+      "id": "m07-l04-q6",
+      "lesson": "m07-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wann läuft ein `finally`-Block, und wofür setzt du ihn ein?",
+      "modelAnswer": "Ein `finally`-Block läuft jedes Mal, wenn die `try`-Anweisung verlassen wird: nach dem normalen Ende, nach `return` und bei einer Exception, egal ob sie gefangen wird. Ich setze ihn für Code ein, der in jedem Fall laufen soll, zum Beispiel zum Zählen oder Aufräumen."
+    },
+    {
+      "id": "m07-l04-q7",
+      "lesson": "m07-l04",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in SecLog einen `finally`-Block einsetzen? Nenne ein Beispiel und begründe, warum der Code dort nicht einfach hinter der `try`-Anweisung stehen kann.",
+      "modelAnswer": "Zum Beispiel beim Verarbeiten einer Log-Zeile: Ich zähle jede verarbeitete Zeile im `finally`-Block. Stünde der Zähler nur im `try`-Block, würde er bei einer Exception übersprungen. Hinter der `try`-Anweisung würde er bei einer nicht gefangenen Exception oder einem `return` nicht erreicht."
     }
   ]
 }

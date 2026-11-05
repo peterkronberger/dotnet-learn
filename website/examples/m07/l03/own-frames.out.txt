@@ -1,0 +1,3 @@
+FormatException: The input string 'x' was not in a correct format.
+at LogTools.ParseCount(String text)
+at LogTools.Total(String first, String second)

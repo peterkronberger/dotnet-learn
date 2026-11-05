@@ -1,0 +1,185 @@
+---
+title: Aufräumen mit finally
+sidebar_position: 4
+description: Ein finally-Block läuft, wenn die try-Anweisung verlassen wird – mit oder ohne Exception und auch bei return.
+lesson_id: m07-l04
+duration_min: 20
+---
+
+import finallyBasic from '!!raw-loader!@site/examples/m07/l04/finally-basic.cs';
+import finallyBasicOutput from '!!raw-loader!@site/examples/m07/l04/finally-basic.out.txt';
+import finallyReturn from '!!raw-loader!@site/examples/m07/l04/finally-return.cs';
+import finallyReturnOutput from '!!raw-loader!@site/examples/m07/l04/finally-return.out.txt';
+import finallyOutward from '!!raw-loader!@site/examples/m07/l04/finally-outward.cs';
+import finallyOutwardOutput from '!!raw-loader!@site/examples/m07/l04/finally-outward.out.txt';
+import finallyGap from '!!raw-loader!@site/examples/m07/l04/finally-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m07/l04/seclog-exceptions-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m07/l04/seclog-exceptions-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m07/l04/seclog-exceptions-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m07/l04/seclog-exceptions-solution.cs';
+
+# Aufräumen mit finally
+
+:::note[Lernziele]
+- Du kannst vorhersagen, wann ein `finally`-Block läuft – mit und ohne Exception, und auch bei `return` im `try`-Block.
+- Du kannst `try`–`finally` und `try`–`catch`–`finally` passend einsetzen.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l01-q1" />
+
+<Quiz id="m07-l02-q1" />
+
+<Quiz id="m02-l08-q2" />
+
+## Code, der immer laufen soll
+
+Manchmal soll ein Stück Code in jedem Fall laufen: Du zählst einen Versuch, gibst etwas wieder frei oder meldest, dass ein Schritt vorbei ist. Im `try`-Block ist das unsicher, denn eine Exception überspringt den Rest. Hinter der `try`-Anweisung reicht es auch nicht, denn ein `return` oder eine nicht gefangene Exception verlässt die Methode vorher.
+
+Dafür gibt es den <Term id="finally-block">`finally`-Block</Term>. Die Anweisungen darin laufen immer, wenn die Kontrolle die `try`-Anweisung verlässt: nach dem normalen Ende, nach `return`, `break` oder `continue` und bei einer Exception ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+Eine `try`-Anweisung hat drei erlaubte Formen: `try`–`catch`, `try`–`finally` und `try`–`catch`–`finally`. Sie braucht mindestens eine `catch`-Klausel oder einen `finally`-Block. Der `finally`-Block steht immer hinter allen `catch`-Klauseln.
+
+:::info[Vorhersage]
+Das Programm verarbeitet zwei Texte. Welche Zeilen gibt es für jeden Text, und in welcher Reihenfolge?
+:::
+
+<CSharpRunner id="m07-l04-basic" code={finallyBasic} predict expected={finallyBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Parsed: 8`, `Done with 8`, `Not a number: eight` und `Done with eight`.
+
+1. **`8`:** Das Parsen gelingt, der `try`-Block endet normal. Danach läuft `finally`.
+2. **`eight`:** `int.Parse` löst eine `FormatException` aus. Die `catch`-Klausel läuft, danach `finally`.
+3. **Reihenfolge:** `finally` läuft in beiden Fällen als letzter Teil der `try`-Anweisung.
+
+Was passiert, wenn du die `catch`-Klausel entfernst? Dann ist `try`–`finally` übrig. `finally` läuft trotzdem, aber die Exception wird nicht gefangen (siehe unten).
+
+</details>
+
+## finally und return
+
+Auch ein `return` im `try`-Block überspringt den `finally`-Block nicht. Die Methode wertet den Rückgabewert aus, führt dann `finally` aus und gibt den Wert zurück. Ein `return` im `finally`-Block selbst ist dagegen ein Compilerfehler ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)).
+
+:::info[Vorhersage]
+Die Methode hat in `try` und in `catch` ein `return`. Welche Zeilen gibt das Programm für die zwei Aufrufe aus?
+:::
+
+<CSharpRunner id="m07-l04-return" code={finallyReturn} predict expected={finallyReturnOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Reading the first number`, `Leaving FirstNumber`, `Result: 12`, dann `Reading the first number`, `No number found`, `Leaving FirstNumber` und `Result: -1`.
+
+1. **`"12 34"`:** `Split` liefert `12`, `int.Parse` gelingt, das `return` im `try`-Block verlässt die Methode. Vorher läuft `finally`. Erst danach gibt der Aufrufer `Result: 12` aus.
+2. **`""`:** `Split` liefert einen leeren Text, `int.Parse` löst eine `FormatException` aus. Die `catch`-Klausel gibt `No number found` aus und verlässt die Methode mit `return -1`. Auch hier läuft vorher `finally`.
+
+</details>
+
+## finally bei einer nicht gefangenen Exception
+
+Fängt keine Klausel der `try`-Anweisung die Exception, läuft `finally` trotzdem, bevor die Exception nach außen weitergegeben wird. Auf der Suche nach einer passenden `catch`-Klausel führt das Programm die `finally`-Blöcke der verlassenen `try`-Anweisungen aus ([§22.4 How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)).
+
+:::info[Vorhersage]
+`Inner` hat `try`–`finally` ohne `catch`. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m07-l04-outward" code={finallyOutward} predict expected={finallyOutwardOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Inner: finally runs on the way out`, `Caught in the caller: FormatException` und `Program continues`.
+
+1. **Auslösen:** `int.Parse("x")` löst in `Inner` eine `FormatException` aus.
+2. **Verlassen:** `Inner` hat keine passende `catch`-Klausel. Beim Verlassen der `try`-Anweisung läuft `finally`.
+3. **Weitergeben:** Die Exception geht an den Aufrufer, dessen `catch`-Klausel sie fängt. Danach läuft das Programm normal weiter.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm zählt die Versuche hinter der `try`-Anweisung. Schreibe es um: Der Zähler `attempts++;` steht in einem `finally`-Block hinter der `catch`-Klausel. Die Ausgabe bleibt gleich.
+
+<CSharpRunner id="m07-l04-gaps" code={finallyGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Fangen:** Die `catch`-Klausel zählt `failed++`.
+2. **Zählen:** Direkt dahinter steht `finally { attempts++; }`.
+3. **Ergebnis:** Die Ausgabe ist `Attempts: 3, failed: 1`. Der Unterschied zeigt sich erst, wenn die Schleife verlassen wird, zum Beispiel durch `continue` in der `catch`-Klausel: Dann zählt nur die Version mit `finally` jeden Versuch.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest Zeilennummern und Zahlen mit `try`/`catch`. Lektion 3 hatte keinen Projektschritt. `TimestampOf` liest den Zeitstempel aus einer Log-Zeile.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, das Array `sampleLog`, den Platz für den neuen Block und `return 0;`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `return 0;` den Block `// Count the processed lines with finally`. Er geht durch `sampleLog[1]` und `"broken line"` (eine Collection Expression) und ruft für jede Zeile `TimestampOf(line)` in einem `try`-Block auf. In `catch (FormatException)` zählst du die abgelehnte Zeile und gibst `Rejected: broken line` aus. In `finally` zählst du jede verarbeitete Zeile. Am Ende gibst du `Processed: 2, rejected: 1` aus.
+
+<CSharpRunner id="m07-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-exceptions-solution.cs" />
+
+1. **Durchlaufen:** `foreach` geht durch die zwei Zeilen, jede hat ihr eigenes `try`.
+2. **Prüfen und ablehnen:** `TimestampOf("broken line")` löst eine `FormatException` aus. Die `catch`-Klausel zählt die Zeile als abgelehnt und gibt die Meldung aus.
+3. **Zählen:** Der `finally`-Block zählt jede Zeile, ob sie gelungen oder abgelehnt wurde.
+
+</details>
+
+**Neuer Stand:** SecLog zählt verarbeitete und abgelehnte Zeilen, und der Zähler stimmt auch bei abgelehnten Zeilen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l04-finally-only-without-exception" />
+
+**„`finally` läuft nur, wenn keine Exception ausgelöst wurde.“** Das stimmt nicht. Der `finally`-Block läuft in beiden Fällen: nach dem normalen Ende, nach `return` und bei einer Exception, ob sie gefangen wird oder nicht.
+:::
+
+<details>
+<summary>Vertiefung: Reihenfolge von Filter und finally (optional)</summary>
+
+Bei einer Exception prüft das Programm zuerst die Ausnahmefilter der `catch`-Klauseln. Erst wenn eine Klausel passt, laufen die `finally`-Blöcke der verlassenen `try`-Anweisungen, und danach beginnt die `catch`-Klausel. In einem Beispiel der Spezifikation erscheinen deshalb `Filter`, `Finally` und `Catch` in dieser Reihenfolge ([§13.11 The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)). Löst ein `finally`-Block selbst eine Exception aus, die er nicht fängt, geht sie nach außen, und eine Exception, die gerade weitergegeben wurde, geht verloren. Halte `finally`-Blöcke deshalb einfach.
+
+</details>
+
+## Zusammenfassung
+
+Der `finally`-Block läuft, wenn die Kontrolle die `try`-Anweisung verlässt: nach dem normalen Ende, nach `return`, `break` oder `continue` und bei einer Exception. Erlaubt sind `try`–`catch`, `try`–`finally` und `try`–`catch`–`finally`. Ohne passende `catch`-Klausel läuft `finally` vor der Weitergabe der Exception. Du setzt `finally` für Code ein, der in jedem Fall laufen soll.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l04-q1" />
+
+<Quiz id="m07-l04-q2" />
+
+<Quiz id="m07-l04-q3" />
+
+<Quiz id="m07-l04-q4" />
+
+<Quiz id="m07-l04-q5" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l04-q6" />
+
+### Transferfrage
+
+<Quiz id="m07-l04-q7" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [The try statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1311-the-try-statement)
+- C#-Spezifikation: [How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)
+- Microsoft Learn: [Exception-handling statements](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements)

@@ -4546,6 +4546,98 @@
         "title": "Exceptions – C# language specification, How exceptions are handled",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled"
       }
+    },
+    {
+      "id": "stack-trace",
+      "term": "Stack Trace",
+      "german": "Aufrufliste einer Exception",
+      "category": "platform",
+      "definition": "Der Text, der die Methodenaufrufe auflistet, die beim Auslösen einer Exception aktiv waren. Die oberste Zeile ist die Stelle, an der sie ausgelöst wurde, darunter folgen die Aufrufer.",
+      "aliases": [
+        "Stacktrace",
+        "Stack Traces"
+      ],
+      "related": [
+        "stack-frame",
+        "call-stack",
+        "exception"
+      ],
+      "lesson": "m07-l03",
+      "source": {
+        "title": "Exception.StackTrace Property",
+        "url": "https://learn.microsoft.com/dotnet/api/system.exception.stacktrace"
+      }
+    },
+    {
+      "id": "stack-frame",
+      "term": "Stack Frame",
+      "german": "Zeile eines Stack Trace",
+      "category": "platform",
+      "definition": "Eine Zeile eines Stack Trace. Sie steht für einen Methodenaufruf und beginnt mit `at` und dem Namen der Methode samt Parametertypen.",
+      "aliases": [
+        "Stack Frames"
+      ],
+      "related": [
+        "stack-trace",
+        "call-stack"
+      ],
+      "lesson": "m07-l03",
+      "source": {
+        "title": "Exception.StackTrace Property",
+        "url": "https://learn.microsoft.com/dotnet/api/system.exception.stacktrace"
+      }
+    },
+    {
+      "id": "logic-error",
+      "term": "Logikfehler",
+      "category": "course",
+      "definition": "Ein Fehler, bei dem das Programm ohne Exception läuft, aber ein falsches Ergebnis liefert, zum Beispiel wegen einer falschen Formel.",
+      "aliases": [
+        "logischer Fehler"
+      ],
+      "related": [
+        "compile-error",
+        "runtime-error"
+      ],
+      "lesson": "m07-l03"
+    },
+    {
+      "id": "unhandled-exception",
+      "term": "Unhandled Exception",
+      "german": "nicht behandelte Exception",
+      "category": "language",
+      "definition": "Eine Exception, für die die Suche nach außen keine passende `catch`-Klausel findet. Das Programm endet und gibt Typ, Meldung und Stack Trace aus.",
+      "aliases": [
+        "unbehandelte Exception"
+      ],
+      "related": [
+        "exception-propagation",
+        "stack-trace"
+      ],
+      "lesson": "m07-l03",
+      "source": {
+        "title": "Exceptions – C# language specification, How exceptions are handled",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled"
+      }
+    },
+    {
+      "id": "finally-block",
+      "term": "finally-Block",
+      "category": "language",
+      "definition": "Ein Block hinter `try` (und `catch`), der läuft, wenn die `try`-Anweisung verlassen wird: nach dem normalen Ende, nach `return`, `break` oder `continue` und bei einer Exception.",
+      "aliases": [
+        "finally",
+        "finally-Klausel"
+      ],
+      "related": [
+        "try-statement",
+        "catch-clause"
+      ],
+      "lesson": "m07-l04",
+      "source": {
+        "title": "Exception-handling statements – C# reference",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements"
+      }
     }
   ]
 }
