@@ -1,0 +1,7 @@
+Reading the first number
+Leaving FirstNumber
+Result: 12
+Reading the first number
+No number found
+Leaving FirstNumber
+Result: -1

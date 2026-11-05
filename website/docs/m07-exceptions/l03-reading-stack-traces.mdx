@@ -1,0 +1,203 @@
+---
+title: Stack Traces lesen
+sidebar_position: 3
+description: Ein Stack Trace zeigt, wo eine Exception ausgelöst wurde und wer die Methoden aufgerufen hat. Du findest damit die erste Zeile deines eigenen Codes und grenzt die Ursache ein.
+lesson_id: m07-l03
+duration_min: 22
+---
+
+import stackTrace from '!!raw-loader!@site/examples/m07/l03/stack-trace.cs';
+import stackTraceOutput from '!!raw-loader!@site/examples/m07/l03/stack-trace.out.txt';
+import unhandled from '!!raw-loader!@site/examples/m07/l03/unhandled.snippet.cs';
+import ownFrames from '!!raw-loader!@site/examples/m07/l03/own-frames.cs';
+import ownFramesOutput from '!!raw-loader!@site/examples/m07/l03/own-frames.out.txt';
+import wrongCaller from '!!raw-loader!@site/examples/m07/l03/wrong-caller.cs';
+import wrongCallerOutput from '!!raw-loader!@site/examples/m07/l03/wrong-caller.out.txt';
+import logicError from '!!raw-loader!@site/examples/m07/l03/logic-error.cs';
+import logicErrorOutput from '!!raw-loader!@site/examples/m07/l03/logic-error.out.txt';
+import ownFramesGap from '!!raw-loader!@site/examples/m07/l03/own-frames-gap.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Stack Traces lesen
+
+:::note[Lernziele]
+- Du kannst in einem Stack Trace den Exception-Typ, die Meldung und die erste Zeile deines eigenen Codes finden.
+- Du kannst Compilerfehler, Laufzeitfehler und Logikfehler an Beispielen unterscheiden.
+- Du kannst beschreiben, wie du mit einem Stack Trace die Ursache eines Fehlers eingrenzt.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l02-q1" />
+
+<Quiz id="m03-l10-q2" />
+
+<Quiz id="m00-l05-q7" />
+
+## Was ein Stack Trace ist
+
+Lektion 2 endete mit einer Exception, die keine `catch`-Klausel fängt: Die Suche geht nach außen bis zum Start des Programms, und das Programm endet. Was dann auf dem Bildschirm steht, hilft dir, den Fehler zu finden. Die Spezifikation legt nur fest, dass die Ausführung endet. Wie das aussieht, bestimmt die Implementierung ([§22.4 How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)). In .NET beginnt der Text mit `Unhandled exception.`, danach folgen der Typ, die Meldung und eine Liste von Zeilen. Man nennt eine solche <Term id="unhandled-exception">nicht behandelte Exception</Term>.
+
+Diese Liste ist der <Term id="stack-trace">Stack Trace</Term>. Er zeigt die Methodenaufrufe, die beim Auslösen der Exception aktiv waren, also den <Term id="call-stack">Aufrufstapel</Term> ([Exception.StackTrace](https://learn.microsoft.com/dotnet/api/system.exception.stacktrace)). Jede Zeile ist ein <Term id="stack-frame">Stack Frame</Term> und beginnt mit `at`. Die oberste Zeile ist die Stelle, an der die Exception ausgelöst wurde. Darunter folgt jeweils der Aufrufer, ganz unten steht der Einstieg des Programms.
+
+Das Programm unten löst eine Exception aus, fängt sie aber selbst. So kannst du `ex.StackTrace` ausgeben, ohne dass das Programm endet. Der Code schneidet jede Zeile bei ` in ` ab, damit kein Dateipfad und keine Zeilennummer im Text stehen. Die Methoden stehen in einer `static class` mit dem Namen `LogTools`, damit die Frames lesbare Namen haben.
+
+<CodeBlock language="csharp" title="stack-trace.cs">{stackTrace}</CodeBlock>
+
+Das Programm gibt dies aus:
+
+<CodeBlock language="text" title="Ausgabe">{stackTraceOutput}</CodeBlock>
+
+Von oben nach unten liest du:
+
+1. **Typ und Meldung:** Die erste Zeile nennt `FormatException` und sagt, dass der Text `x` keine gültige Zahl ist.
+2. **Frames von .NET:** `System.Number…` und `System.Int32.Parse` sind Code von .NET. Du kannst ihn nicht ändern.
+3. **Erste eigene Zeile:** `LogTools.ParseCount` ist deine Methode. Hier rufst du `int.Parse` mit dem falschen Text auf.
+4. **Aufrufer:** `LogTools.Total` hat `ParseCount` aufgerufen, und `Program.<Main>$` ist der Einstieg des Programms mit den Top-Level-Anweisungen.
+
+Das Programm endet nicht. Wäre die Exception nicht gefangen worden, bräche es nach den Zeilen von oben ab. Der Code unten tut genau das. Er ist kein Runner-Beispiel, weil er mit einer nicht behandelten Exception endet.
+
+<CodeBlock language="csharp" title="unhandled.snippet.cs">{unhandled}</CodeBlock>
+
+Auf der Konsole steht `Unhandled exception.` und danach derselbe Typ, dieselbe Meldung und dieselben Frames, nur mit Dateipfad und Zeilennummer hinter jedem eigenen Frame. Das Programm endet danach.
+
+## Die erste eigene Zeile finden
+
+Die Frames von .NET zeigen dir, wo die Exception ausgelöst wurde. Für die Suche nach der Ursache zählt die erste Zeile deines eigenen Codes. Das Programm zeigt nur Frames, die mit `at LogTools` beginnen, und überspringt die Frames von .NET.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Denke an die Frames im Stack Trace oben.
+:::
+
+<CSharpRunner id="m07-l03-own-frames" code={ownFrames} predict expected={ownFramesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `FormatException: The input string 'x' was not in a correct format.`, danach `at LogTools.ParseCount(String text)` und `at LogTools.Total(String first, String second)`.
+
+1. **Typ und Meldung:** Die erste Zeile nennt den Typ und die Meldung der Exception.
+2. **Filtern:** `StartsWith("at LogTools")` lässt nur die Frames der eigenen Klasse durch.
+3. **Reihenfolge:** `ParseCount` steht oben, weil dort die Exception ausgelöst wurde. `Total` steht darunter, weil es `ParseCount` aufgerufen hat.
+
+Was passiert, wenn du `Total("x", "4")` aufrufst? Dann scheitert schon der erste Aufruf von `ParseCount`. Die Frames bleiben dieselben, die Meldung nennt aber den Text `x`. Der Stack Trace zeigt den Weg, nicht die Werte: Welcher Text falsch war, steht in der Meldung.
+
+</details>
+
+## Der Fehler steckt oft im Aufrufer
+
+Die oberste eigene Zeile zeigt, wo die Exception ausgelöst wurde. Die Ursache kann trotzdem weiter unten liegen, wenn ein Aufrufer einen falschen Wert übergibt. Im nächsten Programm rechnet `Share` den Anteil der Fehlschläge aus. `Summary` übergibt dafür `events`. Der Aufruf `Report.Summary(3, 0)` übergibt 0.
+
+:::info[Vorhersage]
+Welche Exception wird ausgelöst, und welche Frames zeigt das Programm? Welche Methode würdest du ändern?
+:::
+
+<CSharpRunner id="m07-l03-wrong-caller" code={wrongCaller} predict expected={wrongCallerOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `DivideByZeroException: Attempted to divide by zero.`, danach `at Report.Share(Int32 failures, Int32 events)` und `at Report.Summary(Int32 failures, Int32 events)`.
+
+1. **Typ lesen:** `DivideByZeroException`: Irgendwo wird durch 0 geteilt.
+2. **Erste eigene Zeile:** `Share`. Die Division `failures * 100 / events` ist hier richtig geschrieben.
+3. **Eingaben prüfen:** In `Share` ist `events` gleich 0. Das hat der Aufrufer übergeben.
+4. **Aufrufer prüfen:** Der Aufruf `Report.Summary(3, 0)` übergibt die 0. Dort liegt die Ursache. Je nach Fall prüfst du die Zahl vor dem Aufruf oder behandelst den Fall `events == 0` in `Share`.
+
+</details>
+
+## Compilerfehler, Laufzeitfehler, Logikfehler
+
+Aus [Lektion 5 in Modul 0](../m00-orientation/l05-from-code-to-program) kennst du zwei Arten von Fehlern: Ein <Term id="compile-error">Compilerfehler</Term> tritt vor dem Start auf, ein <Term id="runtime-error">Laufzeitfehler</Term> tritt auf, während das Programm läuft. Exceptions gehören zu den Laufzeitfehlern ([§22.2 Causes of exceptions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#222-causes-of-exceptions)). Dazu kommt eine dritte Art: der <Term id="logic-error">Logikfehler</Term>. Das Programm läuft ohne Exception, liefert aber ein falsches Ergebnis. Es gibt dann keinen Stack Trace, der dich zur Stelle führt.
+
+:::info[Vorhersage]
+Von 14 Ereignissen sind 5 fehlgeschlagen. Welche Anteile geben die zwei Zeilen aus?
+:::
+
+<CSharpRunner id="m07-l03-logic" code={logicError} predict expected={logicErrorOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Failure share: 0 %` und `Failure share, rounded: 36 %`.
+
+1. **Ganzzahl-Division:** `failures / events` ist 5 / 14 und ergibt bei `int` den Wert 0 (die Nachkommastellen fallen weg).
+2. **Weiterrechnen:** 0 mal 100 bleibt 0.
+3. **Richtige Rechnung:** In der zweiten Zeile ist `100.0` ein `double`. Dadurch rechnet C# mit Nachkommastellen, und `Math.Round` rundet 35,7 auf 36.
+
+Das Programm läuft ohne Fehlermeldung. Du erkennst den Logikfehler nur, wenn du das Ergebnis mit dem vergleichst, was du erwartest.
+
+</details>
+
+Beim Suchen hilft dir diese Reihenfolge:
+
+1. **Typ und Meldung lesen.**
+2. **Die erste Zeile deines eigenen Codes finden.**
+3. **Die Eingaben dort prüfen.**
+4. **Im Aufrufer weitersuchen**, wenn die Eingaben falsch waren.
+
+## Lückenbeispiel
+
+Das Programm gibt alle eigenen Frames aus. Ändere es so, dass nur der erste eigene Frame erscheint. Ein Schleifendurchlauf lässt sich mit `break` vorzeitig beenden ([§13.10.2 The break statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13102-the-break-statement)).
+
+<CSharpRunner id="m07-l03-gaps" code={ownFramesGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ausgeben:** Die Zeile `Console.WriteLine(cut >= 0 ? frame[..cut] : frame);` bleibt.
+2. **Abbrechen:** Direkt dahinter steht `break;`. Die Schleife endet nach dem ersten Treffer.
+3. **Ergebnis:** Nur `at LogTools.ParseCount(String text)` erscheint. Das ist die erste eigene Zeile.
+
+</details>
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog alle seine Exceptions abfängt und deshalb keinen Stack Trace ausgibt; du übst das Lesen an den Beispielen oben.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m07-l03-first-line-is-the-bug" />
+
+**„Die oberste Zeile des Stack Trace zeigt die Stelle, an der der Fehler im eigenen Code steckt.“** Das stimmt nicht. Die oberste Zeile zeigt, wo die Exception ausgelöst wurde, und das ist oft Code von .NET wie `Int32.Parse`. Die Ursache liegt meist in der ersten Zeile deines eigenen Codes weiter unten, oder sogar in einem Aufrufer, der einen falschen Wert übergeben hat.
+:::
+
+<details>
+<summary>Vertiefung: Was in einem Stack Trace stehen kann (optional)</summary>
+
+`Exception.StackTrace` ist eine Eigenschaft vom Typ `string`. Sie enthält die Aufrufe, die zum Auslösen der Exception geführt haben ([Exception.StackTrace](https://learn.microsoft.com/dotnet/api/system.exception.stacktrace)). Wie der Text genau aussieht, ist nicht Teil der Sprache. Die Spezifikation legt nur fest, dass ein Thread endet, wenn die Suche nach einer `catch`-Klausel den Start des Threads erreicht, und dass die Folgen dieses Endes von der Implementierung abhängen ([§22.4 How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)). Verlass dich deshalb nicht darauf, dass der Text in jeder Umgebung gleich aussieht.
+
+</details>
+
+## Zusammenfassung
+
+Ein Stack Trace listet die Methodenaufrufe auf, die beim Auslösen einer Exception aktiv waren. Oben steht die Stelle, an der sie ausgelöst wurde, darunter folgen die Aufrufer. Du liest zuerst Typ und Meldung, überspringst die Frames von .NET und findest die erste Zeile deines eigenen Codes. Dort prüfst du die Eingaben, und bei falschen Werten suchst du im Aufrufer weiter. Compilerfehler tritt vor dem Start auf, Laufzeitfehler wie Exceptions während des Laufs, und ein Logikfehler liefert ohne Exception ein falsches Ergebnis.
+
+## Prüfe dein Wissen
+
+<Quiz id="m07-l03-q1" />
+
+<Quiz id="m07-l03-q2" />
+
+<Quiz id="m07-l03-q3" />
+
+<Quiz id="m07-l03-q4" />
+
+<Quiz id="m07-l03-q5" />
+
+<Quiz id="m07-l03-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m07-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m07-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Exception.StackTrace](https://learn.microsoft.com/dotnet/api/system.exception.stacktrace)
+- C#-Spezifikation: [How exceptions are handled](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#224-how-exceptions-are-handled)
+- Microsoft Learn: [Exception-handling statements](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements)

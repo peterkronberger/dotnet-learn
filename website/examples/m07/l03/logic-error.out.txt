@@ -1,0 +1,2 @@
+Failure share: 0 %
+Failure share, rounded: 36 %

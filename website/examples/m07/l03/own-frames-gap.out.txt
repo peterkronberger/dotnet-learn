@@ -1,0 +1,2 @@
+at LogTools.ParseCount(String text)
+at LogTools.Total(String first, String second)

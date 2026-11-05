@@ -1,0 +1,6 @@
+FormatException: The input string 'x' was not in a correct format.
+at System.Number.ThrowFormatException[TChar](ReadOnlySpan`1 value)
+at System.Int32.Parse(String s)
+at LogTools.ParseCount(String text)
+at LogTools.Total(String first, String second)
+at Program.<Main>$(String[] args)
