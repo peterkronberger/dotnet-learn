@@ -48,6 +48,7 @@ const config = {
   ],
 
   // Lesson index (title, duration, learning goals, module) for the Lernstand page.
+  clientModules: [require.resolve('./src/lib/chunk-reload.js')],
   plugins: [require.resolve('./plugins/lesson-index.js'), require.resolve('./plugins/search-index.js')],
 
   themeConfig:
