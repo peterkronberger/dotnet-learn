@@ -4,6 +4,7 @@
     {
       "id": "m07-l01-q1",
       "lesson": "m07-l01",
+      "placement": true,
       "type": "single",
       "question": "Eine Anweisung im `try`-Block löst eine Exception aus, und eine `catch`-Klausel passt dazu. Was passiert danach?",
       "options": [
@@ -132,6 +133,7 @@
     {
       "id": "m07-l02-q1",
       "lesson": "m07-l02",
+      "placement": true,
       "type": "single",
       "question": "Ein `try` hat zuerst `catch (Exception ex)` und danach `catch (FormatException)`. Was passiert?",
       "options": [
@@ -324,6 +326,7 @@
     {
       "id": "m07-l03-q5",
       "lesson": "m07-l03",
+      "placement": true,
       "type": "single",
       "question": "`Report.Share(3, 0)` löst eine `DivideByZeroException` aus. Der Stack Trace hat als erste eigene Zeile `at Report.Share(Int32 failures, Int32 events)` und darunter `at Report.Summary(Int32 failures, Int32 events)`. `Summary` hat `0` für `events` übergeben bekommen. Wo liegt die Ursache?",
       "options": [
@@ -521,6 +524,7 @@
     {
       "id": "m07-l05-q3",
       "lesson": "m07-l05",
+      "placement": true,
       "type": "single",
       "question": "In einem `catch`-Block steht `throw ex;`, wobei `ex` die gefangene Exception ist. Was passiert mit dem Stack Trace?",
       "options": [
@@ -602,6 +606,7 @@
     {
       "id": "m07-l06-q1",
       "lesson": "m07-l06",
+      "placement": true,
       "type": "single",
       "question": "Wann lohnt sich eine eigene Exception-Klasse?",
       "options": [
@@ -810,6 +815,7 @@
     {
       "id": "m07-l07-q5",
       "lesson": "m07-l07",
+      "placement": true,
       "type": "single",
       "question": "Ein Kollege schreibt in jede Methode `catch (Exception) { return 0; }`. Was stimmt?",
       "options": [
@@ -1006,6 +1012,8 @@
     {
       "id": "m07-l08-q7",
       "lesson": "m07-l08",
+      "placement": true,
+      "placementLessons": ["m07-l04"],
       "type": "single",
       "question": "Eine Methode öffnet eine Ressource, und danach löst eine Anweisung eine Exception aus. Warum ist `using` sicherer als ein `Dispose()`-Aufruf am Ende der Methode?",
       "options": [
@@ -1147,6 +1155,7 @@
     {
       "id": "m07-l09-q7",
       "lesson": "m07-l09",
+      "placement": true,
       "type": "single",
       "question": "Ein Kollege prüft mit `if (File.Exists(path))` und liest die Datei dann ohne `try`/`catch`. Warum reicht das nicht?",
       "options": [
