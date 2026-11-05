@@ -1,0 +1,3 @@
+Incident opened for bob
+Rule broken: An incident needs at least 3 failures, found 1.
+Rule broken: An incident needs at least 3 failures, found 1.

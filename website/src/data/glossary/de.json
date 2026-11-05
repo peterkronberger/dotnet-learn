@@ -4638,6 +4638,161 @@
         "title": "Exception-handling statements – C# reference",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements"
       }
+    },
+    {
+      "id": "throw-statement",
+      "term": "throw-Anweisung",
+      "category": "language",
+      "definition": "Die Anweisung `throw ausdruck;` löst die Exception aus, die der Ausdruck liefert. Danach läuft die Anweisung hinter `throw` nicht mehr.",
+      "aliases": [
+        "throw",
+        "throw-Statement"
+      ],
+      "related": [
+        "throw-exception",
+        "rethrow",
+        "throw-expression"
+      ],
+      "lesson": "m07-l05",
+      "source": {
+        "title": "C# language specification: The throw statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13106-the-throw-statement"
+      }
+    },
+    {
+      "id": "throw-expression",
+      "term": "Throw Expression",
+      "german": "throw-Ausdruck",
+      "category": "language",
+      "definition": "Ein `throw` als Ausdruck: Er steht als rechter Teil von `??`, als zweiter oder dritter Teil von `?:` oder als Körper eines Members mit `=>` und löst dort eine Exception aus.",
+      "aliases": [
+        "throw-Ausdruck",
+        "Throw Expressions"
+      ],
+      "related": [
+        "throw-statement"
+      ],
+      "lesson": "m07-l05",
+      "source": {
+        "title": "C# language specification: The throw expression operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1219-the-throw-expression-operator"
+      }
+    },
+    {
+      "id": "rethrow",
+      "term": "Rethrow",
+      "german": "erneut auslösen",
+      "category": "language",
+      "definition": "In einem `catch`-Block löst `throw;` die gerade behandelte Exception noch einmal aus und behält ihren Stack Trace. `throw ex;` beginnt den Stack Trace dagegen an der aktuellen Stelle neu.",
+      "aliases": [
+        "throw;",
+        "Exception weitergeben"
+      ],
+      "related": [
+        "throw-statement",
+        "stack-trace",
+        "catch-clause"
+      ],
+      "lesson": "m07-l05",
+      "source": {
+        "title": "Best practices for exceptions: Capture and rethrow exceptions properly",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "guard-clause",
+      "term": "Guard Clause",
+      "german": "Schutzklausel, Argumentprüfung",
+      "category": "language",
+      "definition": "Eine Prüfung am Anfang einer Methode, die ungültige Argumente sofort mit einer Exception zurückweist, bevor die Methode weiterläuft.",
+      "aliases": [
+        "Schutzklausel",
+        "Argumentprüfung"
+      ],
+      "related": [
+        "throw-helper",
+        "throw-statement"
+      ],
+      "lesson": "m07-l05",
+      "source": {
+        "title": "Best practices for exceptions: Use predefined exception types",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "throw-helper",
+      "term": "Throw Helper",
+      "german": "Wurf-Hilfsmethode",
+      "category": "platform",
+      "definition": "Eine statische Methode der .NET-Bibliothek, die ein Argument prüft und bei einem Fehler selbst die passende Exception auslöst, zum Beispiel `ArgumentNullException.ThrowIfNull(wert)`.",
+      "aliases": [
+        "Throw Helpers",
+        "ThrowIfNull"
+      ],
+      "related": [
+        "guard-clause",
+        "throw-statement"
+      ],
+      "lesson": "m07-l05",
+      "source": {
+        "title": "Best practices for exceptions: Use exception builder methods",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "custom-exception",
+      "term": "Custom Exception",
+      "german": "eigene Exception",
+      "category": "language",
+      "definition": "Eine selbst geschriebene Exception-Klasse für einen Fachfehler. Ihr Name endet auf `Exception`, und sie kann zusätzliche Eigenschaften tragen.",
+      "aliases": [
+        "eigene Exception",
+        "benutzerdefinierte Exception"
+      ],
+      "related": [
+        "exception-type",
+        "inner-exception"
+      ],
+      "lesson": "m07-l06",
+      "source": {
+        "title": "Best practices for exceptions: Custom exception types",
+        "url": "https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions"
+      }
+    },
+    {
+      "id": "inner-exception",
+      "term": "Inner Exception",
+      "german": "innere Exception",
+      "category": "language",
+      "definition": "Die Eigenschaft `InnerException` einer Exception verweist auf die Exception, die den aktuellen Fehler verursacht hat, oder ist `null`.",
+      "aliases": [
+        "InnerException",
+        "innere Exception"
+      ],
+      "related": [
+        "custom-exception"
+      ],
+      "lesson": "m07-l06",
+      "source": {
+        "title": "C# language specification: The System.Exception class",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/exceptions#223-the-systemexception-class"
+      }
+    },
+    {
+      "id": "business-rule",
+      "term": "Business Rule",
+      "german": "Geschäftsregel, Fachregel",
+      "category": "course",
+      "definition": "Eine Regel der Fachwelt, die das Programm durchsetzt, zum Beispiel „Ein Vorfall braucht mindestens 3 fehlgeschlagene Anmeldungen“. Sie wird an einer Stelle geprüft.",
+      "aliases": [
+        "Geschäftsregel",
+        "Fachregel"
+      ],
+      "related": [
+        "custom-exception",
+        "guard-clause"
+      ],
+      "lesson": "m07-l06"
     }
   ]
 }

@@ -1,0 +1,3 @@
+Failures: 12
+ArgumentOutOfRangeException: A failure count cannot be negative. (Parameter 'text')
+InvalidOperationException: The incident is already closed.

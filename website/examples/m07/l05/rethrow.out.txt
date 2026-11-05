@@ -1,0 +1,7 @@
+Outer saw the error
+With throw;
+at LogTools.Inner(String text)
+at LogTools.Outer(String text, Boolean keep)
+Outer saw the error
+With throw ex;
+at LogTools.Outer(String text, Boolean keep)

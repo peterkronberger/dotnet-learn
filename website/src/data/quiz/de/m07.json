@@ -484,6 +484,270 @@
       "type": "explain",
       "question": "Transfer: Wo würdest du in SecLog einen `finally`-Block einsetzen? Nenne ein Beispiel und begründe, warum der Code dort nicht einfach hinter der `try`-Anweisung stehen kann.",
       "modelAnswer": "Zum Beispiel beim Verarbeiten einer Log-Zeile: Ich zähle jede verarbeitete Zeile im `finally`-Block. Stünde der Zähler nur im `try`-Block, würde er bei einer Exception übersprungen. Hinter der `try`-Anweisung würde er bei einer nicht gefangenen Exception oder einem `return` nicht erreicht."
+    },
+    {
+      "id": "m07-l05-q1",
+      "lesson": "m07-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l05/throw-basic.cs",
+      "explanation": "`ParseFailures(\"12\")` gibt 12 zurück. Bei `\"-5\"` löst `throw new ArgumentOutOfRangeException(…)` eine Exception mit der Meldung aus. Der Rest der Methode läuft nicht mehr, die `catch`-Klausel gibt Typ und Meldung aus. `CloseIncident(false)` löst eine `InvalidOperationException` aus, denn der Zustand des Vorfalls passt nicht zur Operation."
+    },
+    {
+      "id": "m07-l05-q2",
+      "lesson": "m07-l05",
+      "type": "single",
+      "question": "Eine Methode erwartet einen Prozentwert von 0 bis 100 und bekommt 150. Welcher Exception-Typ passt am besten?",
+      "options": [
+        {
+          "text": "`ArgumentOutOfRangeException`",
+          "correct": true
+        },
+        {
+          "text": "`InvalidOperationException`",
+          "feedback": "Dieser Typ passt, wenn der Zustand des Objekts den Aufruf nicht erlaubt. Hier ist das Argument selbst ungültig."
+        },
+        {
+          "text": "`NullReferenceException`",
+          "feedback": "Diesen Typ löst die Laufzeit aus, wenn eine `null`-Referenz benutzt wird. Eigener Code löst ihn nicht aus."
+        },
+        {
+          "text": "`FormatException`",
+          "feedback": "Dieser Typ meldet einen Text im falschen Format. Der Wert 150 hat ein gültiges Format, aber er liegt außerhalb des erlaubten Bereichs."
+        }
+      ],
+      "explanation": "Ein Argument mit einem Wert außerhalb des erlaubten Bereichs meldet `ArgumentOutOfRangeException`. Ein falscher Zustand des Objekts meldet `InvalidOperationException`."
+    },
+    {
+      "id": "m07-l05-q3",
+      "lesson": "m07-l05",
+      "type": "single",
+      "question": "In einem `catch`-Block steht `throw ex;`, wobei `ex` die gefangene Exception ist. Was passiert mit dem Stack Trace?",
+      "options": [
+        {
+          "text": "Er beginnt an dieser Stelle neu, die Frames zwischen der ursprünglichen Stelle und hier gehen verloren.",
+          "correct": true
+        },
+        {
+          "text": "Er bleibt unverändert, genau wie bei `throw;`.",
+          "feedback": "Nur `throw;` behält den Stack Trace. `throw ex;` setzt ihn an der aktuellen Stelle zurück.",
+          "misconception": "m07-l05-throw-ex-keeps-stack-trace"
+        },
+        {
+          "text": "Er wird leer, die Exception hat keinen Stack Trace mehr.",
+          "feedback": "Der Stack Trace beginnt neu, er ist aber nicht leer: Er enthält die Frames ab der Stelle von `throw ex;`."
+        },
+        {
+          "text": "Die Exception wird verschluckt, es wird nichts weitergegeben.",
+          "feedback": "`throw ex;` löst die Exception erneut aus. Sie geht an den Aufrufer weiter."
+        }
+      ],
+      "explanation": "`throw ex;` löst das gefangene Objekt neu aus, und der Stack Trace beginnt an dieser Stelle. Der ursprüngliche Ort des Fehlers geht verloren. `throw;` löst die gerade behandelte Exception weiter aus und behält den Stack Trace."
+    },
+    {
+      "id": "m07-l05-q4",
+      "lesson": "m07-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l05/rethrow.cs",
+      "explanation": "In beiden Durchläufen fängt `Outer` die `FormatException` und löst sie erneut aus. Mit `throw;` bleibt der Frame von `Inner` im Stack Trace, mit `throw same;` (das gefangene Objekt noch einmal) beginnt der Stack Trace in `Outer`, und `Inner` fehlt."
+    },
+    {
+      "id": "m07-l05-q5",
+      "lesson": "m07-l05",
+      "type": "multi",
+      "question": "Wo darf ein `throw`-Ausdruck (Throw Expression) stehen?",
+      "options": [
+        {
+          "text": "Als rechter Teil von `??`",
+          "correct": true
+        },
+        {
+          "text": "Als dritter Teil von `?:`",
+          "correct": true
+        },
+        {
+          "text": "Als Körper einer Methode mit `=>`",
+          "correct": true
+        },
+        {
+          "text": "Als Operand von `+`",
+          "feedback": "Ein `throw`-Ausdruck ist nur in `??`, `?:` und als Körper mit `=>` erlaubt, nicht überall, wo ein Wert steht."
+        }
+      ],
+      "explanation": "Ein `throw`-Ausdruck steht als zweiter Teil von `??`, als zweiter oder dritter Teil von `?:` oder als Körper eines Members mit `=>`."
+    },
+    {
+      "id": "m07-l05-q6",
+      "lesson": "m07-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l05/throw-helpers.cs",
+      "explanation": "`ThrowIfNull(user)` löst bei `null` eine `ArgumentNullException` aus, `ThrowIfNullOrEmpty(user)` bei `\"\"` eine `ArgumentException`. `ThrowIfNegative(failures)` löst bei `-1` eine `ArgumentOutOfRangeException` aus. Beim letzten Aufruf sind alle Prüfungen bestanden. Die `catch`-Klauseln stehen vom spezifischen zum allgemeinen Typ."
+    },
+    {
+      "id": "m07-l05-q7",
+      "lesson": "m07-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was ist der Unterschied zwischen `throw;` und `throw ex;` in einem `catch`-Block?",
+      "modelAnswer": "`throw;` löst die gerade behandelte Exception weiter aus und behält ihren Stack Trace, sodass man die ursprüngliche Stelle des Fehlers sieht. `throw ex;` löst das gefangene Objekt neu aus, und der Stack Trace beginnt an dieser Stelle neu. Deshalb benutze ich in einem `catch`-Block `throw;`."
+    },
+    {
+      "id": "m07-l05-q8",
+      "lesson": "m07-l05",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in SecLog eine Argumentprüfung (Guard Clause) mit einem Throw-Helper einsetzen? Nenne ein Beispiel und sage, welche Exception dabei ausgelöst wird.",
+      "modelAnswer": "Im Konstruktor von `LogEvent` prüfe ich als Erstes `eventType` mit `ArgumentException.ThrowIfNullOrEmpty(eventType)`. Ein Event ohne Typ wird so sofort mit einer `ArgumentException` zurückgewiesen, statt später falsche Ergebnisse zu liefern."
+    },
+    {
+      "id": "m07-l06-q1",
+      "lesson": "m07-l06",
+      "type": "single",
+      "question": "Wann lohnt sich eine eigene Exception-Klasse?",
+      "options": [
+        {
+          "text": "Wenn Aufrufer genau diesen Fachfehler fangen wollen oder zusätzliche Daten brauchen und kein Standardtyp den Fehler beschreibt.",
+          "correct": true
+        },
+        {
+          "text": "Für jeden Fehler, damit der Code besser lesbar ist.",
+          "feedback": "Standardtypen wie `ArgumentException` oder `InvalidOperationException` reichen, wenn sie den Fehler beschreiben. Ein eigener Typ lohnt sich nur bei einem Fachfehler, den Aufrufer gezielt fangen, oder wenn er Zusatzdaten trägt.",
+          "misconception": "m07-l06-own-exception-for-every-error"
+        },
+        {
+          "text": "Immer, wenn eine Methode einen Parameter prüft.",
+          "feedback": "Für ungültige Argumente gibt es `ArgumentException` und ihre Untertypen. Ein eigener Typ ist dafür nicht nötig.",
+          "misconception": "m07-l06-own-exception-for-every-error"
+        },
+        {
+          "text": "Nur, damit die Meldung (`Message`) gesetzt werden kann.",
+          "feedback": "Jede Exception hat eine `Message`, auch die Standardtypen."
+        }
+      ],
+      "explanation": "Benutze die Standardtypen, wenn sie den Fehler beschreiben. Ein eigener Typ lohnt sich, wenn Aufrufer genau diesen Fachfehler fangen wollen oder zusätzliche Daten brauchen."
+    },
+    {
+      "id": "m07-l06-q2",
+      "lesson": "m07-l06",
+      "type": "single",
+      "question": "Eine Methode bekommt `null` für einen Parameter, der nicht `null` sein darf. Brauchst du dafür eine eigene Exception-Klasse?",
+      "options": [
+        {
+          "text": "Nein, `ArgumentNullException` beschreibt den Fehler bereits.",
+          "correct": true
+        },
+        {
+          "text": "Ja, jeder Fehler braucht eine eigene Klasse mit dem Namen des Fehlers.",
+          "feedback": "Ein Standardtyp reicht, wenn er den Fehler beschreibt. Für `null`-Argumente gibt es `ArgumentNullException` und `ArgumentNullException.ThrowIfNull`.",
+          "misconception": "m07-l06-own-exception-for-every-error"
+        },
+        {
+          "text": "Ja, weil Standardtypen keine Meldung tragen können.",
+          "feedback": "Auch Standardtypen tragen eine Meldung in `Message`."
+        }
+      ],
+      "explanation": "Für ein `null`-Argument gibt es `ArgumentNullException`. Ein eigener Typ wäre nur nötig, wenn Aufrufer genau diesen Fachfehler gezielt fangen oder Zusatzdaten brauchen."
+    },
+    {
+      "id": "m07-l06-q3",
+      "lesson": "m07-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l06/custom-exception.cs",
+      "explanation": "`CheckUser(\"bob\")` gibt `bob is known` zurück. Für `\"bo\"` löst die Methode eine `UnknownUserException` aus. Die `catch`-Klausel gibt Typname und Meldung aus und danach die Eigenschaft `User`, die der Konstruktor aus dem ersten Argument gesetzt hat."
+    },
+    {
+      "id": "m07-l06-q4",
+      "lesson": "m07-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m07/l06/inner-exception.cs",
+      "explanation": "`ParseCount(\"7\")` gibt 7 zurück. Bei `\"seven\"` löst `int.Parse` eine `FormatException` aus. `ParseCount` fängt sie und löst eine `InvalidCountException` aus, die die `FormatException` als `InnerException` mitträgt. Der Aufrufer sieht beide: die Fachmeldung und die ursprüngliche Ursache."
+    },
+    {
+      "id": "m07-l06-q5",
+      "lesson": "m07-l06",
+      "type": "single",
+      "question": "Was liefert die Eigenschaft `InnerException` einer Exception?",
+      "options": [
+        {
+          "text": "Die Exception, die den aktuellen Fehler verursacht hat, oder `null`.",
+          "correct": true
+        },
+        {
+          "text": "Die Exception, die als Nächstes ausgelöst wird.",
+          "feedback": "`InnerException` zeigt zurück auf die Ursache, nicht nach vorn."
+        },
+        {
+          "text": "Den Stack Trace als Text.",
+          "feedback": "Der Stack Trace steht in `StackTrace`. `InnerException` ist ein Exception-Objekt."
+        },
+        {
+          "text": "Immer die letzte Exception des Programms.",
+          "feedback": "`InnerException` gehört zu genau einer Exception und zeigt auf ihre Ursache."
+        }
+      ],
+      "explanation": "`InnerException` verweist auf die Exception, die den aktuellen Fehler verursacht hat. Gibt es keine, ist der Wert `null`."
+    },
+    {
+      "id": "m07-l06-q6",
+      "lesson": "m07-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über eine eigene Exception-Klasse stimmen?",
+      "options": [
+        {
+          "text": "Ihr Name endet auf `Exception`.",
+          "correct": true
+        },
+        {
+          "text": "Eine zusätzliche Eigenschaft ist sinnvoll, wenn Aufrufer die Daten brauchen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Konstruktor kann `Message` und die innere Exception weitergeben.",
+          "correct": true
+        },
+        {
+          "text": "Sie muss mindestens drei zusätzliche Eigenschaften haben.",
+          "feedback": "Zusätzliche Eigenschaften sind nur nötig, wenn sie einen Zweck haben. Es gibt keine Mindestzahl."
+        }
+      ],
+      "explanation": "Der Name endet auf `Exception`, zusätzliche Eigenschaften gibt es nur bei Bedarf, und Konstruktoren geben Meldung und innere Exception weiter."
+    },
+    {
+      "id": "m07-l06-q7",
+      "lesson": "m07-l06",
+      "type": "single",
+      "question": "Warum prüfst du eine Geschäftsregel an einer Stelle und nicht bei jedem Aufrufer?",
+      "options": [
+        {
+          "text": "Die Regel steht nur einmal im Code. Ändert sie sich, gilt die Änderung für alle Aufrufer gleich.",
+          "correct": true
+        },
+        {
+          "text": "Weil mehrere Prüfungen immer eine Exception auslösen.",
+          "feedback": "Mehrere gleiche Prüfungen lösen nicht automatisch eine Exception aus. Sie sind nur doppelter Code, der sich leicht unterscheidet."
+        },
+        {
+          "text": "Weil Aufrufer keine Exceptions fangen können.",
+          "feedback": "Aufrufer können Exceptions fangen. Genau das tun sie mit der Prüfung an einer Stelle."
+        }
+      ],
+      "explanation": "Eine Regel an einer Stelle kann nicht je nach Aufrufer anders ausfallen, und man ändert sie an einem Ort."
+    },
+    {
+      "id": "m07-l06-q8",
+      "lesson": "m07-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wann reicht ein Standard-Exception-Typ, und wann schreibst du einen eigenen?",
+      "modelAnswer": "Ein Standardtyp wie `ArgumentException` oder `InvalidOperationException` reicht, wenn er den Fehler beschreibt. Einen eigenen Typ schreibe ich, wenn Aufrufer genau diesen Fachfehler gezielt fangen wollen oder wenn die Exception zusätzliche Daten trägt, zum Beispiel die Nummer der abgelehnten Zeile."
+    },
+    {
+      "id": "m07-l06-q9",
+      "lesson": "m07-l06",
+      "type": "explain",
+      "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem du eine Geschäftsregel an einer Stelle prüfst und bei einem Verstoß eine Exception mit innerer Exception auslöst.",
+      "modelAnswer": "Beim Einlesen einer Log-Zeile prüft `ParseLine` alle Regeln an einer Stelle: vier Teile, gültiger Zeitstempel, bekannter Ereignistyp. Gelingt das Lesen des Zeitstempels nicht, löse ich eine `InvalidLogLineException` mit der `FormatException` als innerer Exception aus. So sieht der Aufrufer die Fachmeldung und die ursprüngliche Ursache."
     }
   ]
 }
