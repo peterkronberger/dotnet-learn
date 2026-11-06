@@ -1,0 +1,6 @@
+T is Int32
+10
+T is String
+twenty
+T is Double
+1
