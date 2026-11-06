@@ -1,0 +1,280 @@
+---
+title: Objekte vergleichen und sortieren
+sidebar_position: 11
+description: Ein Typ legt seine natürliche Ordnung mit IComparable<T> fest, ein eigener IComparer<T> liefert eine zweite Ordnung. List<T>.Sort braucht eine von beiden.
+lesson_id: m08-l11
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import compareTo from '!!raw-loader!@site/examples/m08/l11/compare-to.cs';
+import compareToOutput from '!!raw-loader!@site/examples/m08/l11/compare-to.out.txt';
+import sortComparable from '!!raw-loader!@site/examples/m08/l11/sort-comparable.cs';
+import sortComparableOutput from '!!raw-loader!@site/examples/m08/l11/sort-comparable.out.txt';
+import sortWithoutOrder from '!!raw-loader!@site/examples/m08/l11/sort-without-order.cs';
+import sortWithoutOrderOutput from '!!raw-loader!@site/examples/m08/l11/sort-without-order.out.txt';
+import sortComparer from '!!raw-loader!@site/examples/m08/l11/sort-comparer.cs';
+import sortComparerOutput from '!!raw-loader!@site/examples/m08/l11/sort-comparer.out.txt';
+import compareVsEquals from '!!raw-loader!@site/examples/m08/l11/compare-vs-equals.cs';
+import compareVsEqualsOutput from '!!raw-loader!@site/examples/m08/l11/compare-vs-equals.out.txt';
+import sortGap from '!!raw-loader!@site/examples/m08/l11/sort-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l11/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l11/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l11/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l11/seclog-oop-solution.cs';
+
+# Objekte vergleichen und sortieren
+
+:::note[Lernziele]
+- Du kannst `IComparable<T>` implementieren und das Ergebnis von `CompareTo` deuten (kleiner, gleich, größer als 0).
+- Du kannst mit einer eigenen `IComparer<T>`-Klasse eine zweite Sortierung schreiben.
+- Du kannst vorhersagen, was `List<T>.Sort` mit eigenen Objekten ohne Vergleich tut.
+- Du kannst Gleichheit (Lektion 9) und Ordnung unterscheiden.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l09-q2" />
+
+<Quiz id="m08-l05-q4" />
+
+<Quiz id="m05-l04-q2" />
+
+## Die natürliche Ordnung: IComparable&lt;T&gt;
+
+Zahlen und Texte lassen sich sortieren, eigene Objekte nicht ohne Weiteres: Der Compiler weiß nicht, ob ein `Player` mit 10 Punkten vor oder nach einem mit 30 Punkten steht. Das legt der Typ selbst fest. Er setzt das <Term id="interface">Interface</Term> `IComparable<T>` um, und der <Term id="comparable">vergleichbare</Term> Typ bekommt die Methode `CompareTo`. Das <Term id="type-argument">Typargument</Term> `T` ist der Typ selbst, wie bei `List<T>` die Elemente: `IComparable<Player>` ([IComparable&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.icomparable-1)).
+
+`CompareTo` vergleicht das aktuelle Objekt mit einem anderen und liefert eine Zahl, die die <Term id="sort-order">Sortierreihenfolge</Term> beschreibt:
+
+| Ergebnis | Bedeutung |
+| --- | --- |
+| kleiner als 0 | Das aktuelle Objekt steht vor dem anderen. |
+| 0 | Beide stehen an derselben Position. |
+| größer als 0 | Das aktuelle Objekt steht nach dem anderen. |
+
+Auf das Vorzeichen kommt es an, nicht auf die genaue Zahl. Per Definition steht jedes Objekt nach `null`: `CompareTo(null)` liefert eine Zahl größer als 0 ([IComparable&lt;T&gt;.CompareTo](https://learn.microsoft.com/dotnet/api/system.icomparable-1.compareto)). Deshalb prüft `CompareTo` im Beispiel zuerst `other is null`.
+
+Eingebaute Typen sind schon vergleichbar: `int`, `string`, `DateTimeOffset` und Enums (Lektion 7). Im Beispiel gibt `Score.CompareTo(other.Score)` den Vergleich der `int`-Werte weiter.
+
+:::info[Vorhersage]
+`Player` ist nach Punkten geordnet. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l11-compare-to" code={compareTo} predict expected={compareToOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist viermal `True`.
+
+1. **Vor:** `low` hat 10, `high` hat 30. `low.CompareTo(high)` ist kleiner als 0.
+2. **Nach:** Umgekehrt ist `high.CompareTo(low)` größer als 0.
+3. **Gleiche Position:** `low` und `same` haben beide 10 Punkte. `CompareTo` liefert 0.
+4. **`null`:** `low.CompareTo(null)` ist größer als 0.
+
+Was passiert, wenn `high` nur 5 Punkte hätte? Dann wäre die erste Zeile `False`, denn `low` stünde nach `high`.
+
+</details>
+
+## Sort benutzt die Ordnung
+
+`List<T>.Sort()` ruft `CompareTo` der Elemente auf und ordnet die Liste danach ([List&lt;T&gt;.Sort](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.sort)). Du schreibst die Ordnung einmal in den Typ, und jedes `Sort()` benutzt sie. Für Arrays gibt es `Array.Sort` mit demselben Prinzip.
+
+:::info[Vorhersage]
+In welcher Reihenfolge gibt das Programm die drei Spieler aus?
+:::
+
+<CSharpRunner id="m08-l11-sort-comparable" code={sortComparable} predict expected={sortComparableOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `ann: 10`, `dee: 20` und `bob: 30`.
+
+1. **Ordnung:** `CompareTo` vergleicht die Punkte, kleinere zuerst.
+2. **Sortieren:** `players.Sort()` ordnet die Liste aufsteigend nach dieser Ordnung.
+3. **Ausgeben:** `foreach` geht die sortierte Liste der Reihe nach durch.
+
+Was passiert, wenn `CompareTo` `other.Score.CompareTo(Score)` zurückgibt? Dann kehrt sich die Ordnung um: bob, dee, ann.
+
+</details>
+
+## Ohne Ordnung geht es nicht
+
+Ein Typ ohne `IComparable<T>` hat keine natürliche Ordnung. `Sort()` fragt dann vergeblich nach einer und wirft eine `InvalidOperationException` (Lektion 2 von Modul 7: Ausnahmen fängst du mit `try`/`catch`).
+
+:::info[Vorhersage]
+`Plain` hat nur eine Eigenschaft `Name` und setzt kein Interface um. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l11-sort-without-order" code={sortWithoutOrder} predict expected={sortWithoutOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Failed: InvalidOperationException` und `bob ann`.
+
+1. **Keine Ordnung:** `Plain` setzt weder `IComparable<T>` noch `IComparable` um. `Sort()` bekommt keinen Vergleicher und findet keine Ordnung ([List&lt;T&gt;.Sort()](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.sort#system-collections-generic-list-1-sort)).
+2. **Ausnahme:** `Sort` wirft die `InvalidOperationException`. Das `catch` gibt ihren Typnamen aus, die Zeile `sorted` kommt nicht.
+3. **Liste:** Die Liste bleibt in der alten Reihenfolge: `bob ann`.
+
+Was passiert, wenn `Name` ein `int` wäre? Auch dann hat `Plain` keine Ordnung. `Sort` sortiert nie "nach der ersten Eigenschaft", es fragt nur nach `CompareTo` oder nach einem Vergleicher.
+
+</details>
+
+## Eine zweite Ordnung: IComparer&lt;T&gt;
+
+Ein Typ hat nur ein `CompareTo`, also eine natürliche Ordnung. Soll dieselbe Liste einmal anders sortiert werden, schreibst du einen eigenen <Term id="comparer">Vergleicher</Term>: eine Klasse, die `IComparer<T>` umsetzt. Ihre Methode `Compare(x, y)` liefert dieselben Zahlen wie `CompareTo`, aber für zwei übergebene Objekte. Das Objekt der Klasse gibst du an `Sort` weiter: `players.Sort(new NameComparer())` ([IComparer&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1)).
+
+Im Beispiel vergleicht `NameComparer` die Namen mit `string.CompareOrdinal`, also Zeichen für Zeichen ohne Kultur (Lektion 10 von Modul 5). Beide Parameter können `null` sein, und `null` steht vorn. Zuerst prüft `ReferenceEquals`, ob es dasselbe Objekt ist (Modul 4).
+
+<Forward concepts={['Lambda-Ausdrücke', '`Comparer<T>.Create`']} module="10" />
+
+<Forward concepts={['LINQ', '`OrderBy`']} module="11" />
+
+Kurze Vergleiche lassen sich später auch ohne eigene Klasse schreiben, und `OrderBy` liefert eine sortierte Kopie. Für diese Lektion brauchst du beides nicht.
+
+:::info[Vorhersage]
+`Player` hat die natürliche Ordnung nach Punkten, `NameComparer` ordnet nach Namen. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l11-sort-comparer" code={sortComparer} predict expected={sortComparerOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `By score: ann, dee, bob` und `By name: ann, bob, dee`.
+
+1. **Natürliche Ordnung:** `players.Sort()` benutzt `CompareTo` und ordnet nach Punkten.
+2. **Zweite Ordnung:** `players.Sort(new NameComparer())` benutzt `Compare` und ordnet nach Namen. `Player` ändert sich dabei nicht.
+3. **Ausgeben:** Die Funktion `Names` setzt die Namen mit `string.Join` zu einer Zeile zusammen.
+
+Was passiert, wenn du `NameComparer` weglässt und nur `Sort()` aufrufst? Dann gilt wieder die Ordnung nach Punkten.
+
+</details>
+
+## Gleichheit und Ordnung
+
+In Lektion 9 hast du gelernt, wann zwei Objekte gleich sind (`Equals`, <Term id="equality-contract">Gleichheitsvertrag</Term>). Ordnung ist eine andere Frage: `CompareTo` liefert 0, wenn zwei Objekte in der Sortierung dieselbe Position haben. Das müssen nicht dieselben Objekte sein und auch keine gleichen im Sinne von `Equals`.
+
+:::info[Vorhersage]
+Zwei Spieler haben gleiche Punkte. `Player` überschreibt `Equals` nicht. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l11-compare-vs-equals" code={compareVsEquals} predict expected={compareVsEqualsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Same place in the order: True`, `Equal: False` und `Set size: 2`.
+
+1. **Ordnung:** `CompareTo` vergleicht nur die Punkte: beide 10, also 0.
+2. **Gleichheit:** `Equals` ist nicht überschrieben und vergleicht die Verweise. Es sind zwei Objekte: `False`.
+3. **Menge:** Das `HashSet` benutzt `Equals` und `GetHashCode`, nicht `CompareTo`. Es hält beide Objekte: 2.
+
+Was passiert, wenn du `Equals` und `GetHashCode` nach Lektion 9 so überschreibst, dass sie nur die Punkte vergleichen? Dann wären `ann` und `cy` gleich, und die Menge hätte 1 Element. Die Ordnung und die Gleichheit eines Typs sollten zusammenpassen, aber der Compiler prüft das nicht.
+
+</details>
+
+<details>
+<summary>Vertiefung: Reihenfolge gleich geordneter Elemente (optional)</summary>
+
+`List<T>.Sort` führt eine unstabile Sortierung aus: Stehen zwei Elemente an derselben Position, kann sich ihre Reihenfolge ändern ([List&lt;T&gt;.Sort, Remarks](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.sort#remarks)). Ein Beispiel mit `ann` und `cy` (je 10 Punkte) darf deshalb nicht ausgeben, wer von beiden zuerst kommt. In SecLog legt `IncidentComparer` darum für gleich viele Fehlversuche eine zweite Regel fest, den Benutzernamen.
+
+Für `CompareTo` gilt außerdem: `A.CompareTo(A)` liefert 0, und liefert `A.CompareTo(B)` einen Wert ungleich 0, dann liefert `B.CompareTo(A)` einen Wert mit umgekehrtem Vorzeichen ([IComparable&lt;T&gt;.CompareTo, Notes to Implementers](https://learn.microsoft.com/dotnet/api/system.icomparable-1.compareto#notes-to-implementers)).
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die zwei Stellen aus den Kommentaren. Das Programm soll `fig, kiwi, pear, apple` ausgeben: kürzere Wörter zuerst, bei gleicher Länge nach `string.CompareOrdinal`.
+
+<CSharpRunner id="m08-l11-gaps" code={sortGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Länge vergleichen:** `int byLength = x.Length.CompareTo(y.Length);`, bei einem Ergebnis ungleich 0 `return byLength;`.
+2. **Bei gleicher Länge:** `return string.CompareOrdinal(x, y);`.
+3. **Sortieren:** `words.Sort(new LengthComparer());` steht vor der Ausgabe.
+4. **Ergebnis:** `fig` (3), dann `kiwi` und `pear` (je 4, ordinal `kiwi` vor `pear`), dann `apple` (5).
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog speichert Ereignisse als `SecurityEvent`-Records. Die lokale Funktion `SeverityOf` macht aus einer Anzahl Fehlversuche einen Wert des Enums `Severity`. `bobIncident` und `daveIncident` sind die Vorfälle der Beispieldatei.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block, die Funktion `SeverityOf` und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model` kommt `sealed class IncidentComparer : IComparer<Incident>` mit `public int Compare(Incident? x, Incident? y)`. Mehr Fehlversuche (`FailureCount`) stehen vorn. Bei gleicher Anzahl entscheidet der Benutzername (`User`) in ordinaler Reihenfolge.
+2. Vor `// End with exit code 0 …` kommt der Block `// Sort the incidents: most failed logins first`. Er legt `List<Incident> sortedIncidents = [daveIncident, bobIncident];` an und sortiert sie mit `sortedIncidents.Sort(new IncidentComparer());`.
+3. Der Block gibt von jedem Vorfall `Summary()` aus. Danach gibt er `$"Severity of the first: {SeverityOf(sortedIncidents[0].FailureCount)}"` aus.
+
+<CSharpRunner id="m08-l11-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Null abfangen:** `Compare` darf `null` bekommen. Dieselbe Referenz liefert 0, `null` steht vorn.
+2. **Nach Fehlversuchen ordnen:** `y.FailureCount.CompareTo(x.FailureCount)` hat die Seiten vertauscht, deshalb steht der Vorfall mit mehr Fehlversuchen vorn.
+3. **Bei Gleichstand:** Ist der Unterschied 0, entscheidet `string.CompareOrdinal(x.User, y.User)`.
+4. **Sortieren:** `Sort(new IncidentComparer())` ordnet die Liste. `daveIncident` stand vorn und hat 1 Fehlversuch, `bobIncident` hat 5 und kommt nach vorn.
+5. **Bewerten:** Der erste Vorfall der sortierten Liste ist der schwerste. `SeverityOf` gibt für 5 Fehlversuche `High` zurück.
+
+</details>
+
+**Neuer Stand:** SecLog hat den Meilenstein dieses Moduls erreicht: Enums beschreiben Ereignistyp (`EventType`) und Schweregrad (`Severity`), der Record `SecurityEvent` speichert Ereignisse nach ihren Werten, und austauschbare Regeln (`IDetectionRule`, `Detector`) prüfen Vorfälle. Neu ist die Ordnung der Vorfälle durch `IncidentComparer`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l11-sort-knows-order" />
+
+**„`List<T>.Sort` weiß von selbst, wie es meine eigenen Objekte ordnen soll, zum Beispiel nach der ersten Eigenschaft.“** Das stimmt nicht. `Sort` kennt keine Eigenschaften. Die Ordnung ist das, was `CompareTo` oder `Compare` sagt. Hat der Typ kein `IComparable<T>` und bekommt `Sort` keinen Vergleicher, wirft `Sort()` eine `InvalidOperationException`.
+:::
+
+## Zusammenfassung
+
+Ein Typ legt seine natürliche Ordnung mit `IComparable<T>` fest. `CompareTo` liefert eine Zahl kleiner, gleich oder größer als 0. Eine weitere Ordnung steckt in einem eigenen Vergleicher, einer Klasse mit `IComparer<T>`. `List<T>.Sort()` benutzt `CompareTo`, `Sort(comparer)` benutzt `Compare`. Fehlt beides, wirft `Sort()` eine `InvalidOperationException`. Gleiche Position in der Ordnung bedeutet nicht gleich im Sinne von `Equals`.
+
+Damit endet Modul 8. In Modul 9 geht es um Generics: wie `List<T>` und `IComparable<T>` ein Typargument bekommen und wie du eigene generische Typen schreibst.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l11-q1" />
+
+<Quiz id="m08-l11-q2" />
+
+<Quiz id="m08-l11-q3" />
+
+<Quiz id="m08-l11-q4" />
+
+<Quiz id="m08-l11-q5" />
+
+<Quiz id="m08-l11-q6" />
+
+<Quiz id="m08-l11-q7" />
+
+<Quiz id="m08-l11-q8" />
+
+<Quiz id="m08-l11-q9" />
+
+<Quiz id="m08-l11-q10" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l11-q11" />
+
+### Transferfrage
+
+<Quiz id="m08-l11-q12" />
+
+## Weiterlesen
+
+- API-Referenz: [IComparable&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.icomparable-1) und [IComparer&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1)
+- API-Referenz: [List&lt;T&gt;.Sort](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.sort)

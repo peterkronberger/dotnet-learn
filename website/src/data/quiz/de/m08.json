@@ -1433,6 +1433,187 @@
       "type": "explain",
       "question": "Transfer: Wofür würdest du in einem eigenen Programm einen Record nehmen, und wofür eine Klasse?",
       "modelAnswer": "Einen Record nehme ich für Daten, die durch ihre Werte bestimmt sind, etwa das Ereignis `SecurityEvent` mit Zeit, Typ und Benutzer: Zwei Ereignisse mit gleichen Werten sollen gleich sein. Eine Klasse nehme ich für Objekte mit Identität und veränderlichem Zustand, etwa einen `Incident`, dessen Status sich ändert."
+    },
+    {
+      "id": "m08-l11-q1",
+      "lesson": "m08-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l11/compare-to.cs",
+      "explanation": "`CompareTo` vergleicht die Punktzahlen. `low` (10) steht vor `high` (30): Das Ergebnis ist negativ, der Vergleich `< 0` ergibt `True`. Umgekehrt ist es positiv. `low` und `same` haben beide 10 Punkte, also liefert `CompareTo` 0. Ein Objekt steht per Definition nach `null`: Das Ergebnis ist positiv."
+    },
+    {
+      "id": "m08-l11-q2",
+      "lesson": "m08-l11",
+      "type": "single",
+      "question": "`a.CompareTo(b)` liefert eine negative Zahl. Was bedeutet das?",
+      "options": [
+        {
+          "text": "`a` steht in der Sortierreihenfolge vor `b`.",
+          "correct": true
+        },
+        {
+          "text": "`a` steht in der Sortierreihenfolge nach `b`.",
+          "feedback": "Das wäre eine positive Zahl."
+        },
+        {
+          "text": "`a` und `b` stehen an derselben Position.",
+          "feedback": "Dafür liefert `CompareTo` genau 0."
+        },
+        {
+          "text": "`a.Equals(b)` ist `false`, und `b` ist `null`.",
+          "feedback": "Das Vorzeichen sagt nur etwas über die Reihenfolge. `Equals` ist eine eigene Frage."
+        }
+      ],
+      "explanation": "Kleiner als 0 heißt: Das aktuelle Objekt steht vor dem anderen. Null heißt: gleiche Position. Größer als 0 heißt: danach. Auf die genaue Zahl kommt es nicht an, nur auf das Vorzeichen."
+    },
+    {
+      "id": "m08-l11-q3",
+      "lesson": "m08-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l11/sort-comparable.cs",
+      "explanation": "`Player` setzt `IComparable<Player>` um und vergleicht die Punktzahlen. `players.Sort()` benutzt diese Ordnung und sortiert aufsteigend: ann (10), dee (20), bob (30)."
+    },
+    {
+      "id": "m08-l11-q4",
+      "lesson": "m08-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l11/sort-without-order.cs",
+      "explanation": "`Plain` setzt weder `IComparable<T>` noch `IComparable` um, und `Sort()` bekommt keinen Vergleicher. Es gibt keine Ordnung, und `Sort` wirft eine `InvalidOperationException`. Das `catch` gibt ihren Typnamen aus. Die Liste bleibt in der alten Reihenfolge: `bob ann`."
+    },
+    {
+      "id": "m08-l11-q5",
+      "lesson": "m08-l11",
+      "type": "single",
+      "question": "`Plain` hat die Eigenschaften `Name` und `Number` und setzt kein Interface um. Was passiert bei `items.Sort();` für eine `List<Plain>` mit zwei Objekten?",
+      "options": [
+        {
+          "text": "`Sort` sortiert nach `Name`, der ersten Eigenschaft.",
+          "misconception": "m08-l11-sort-knows-order",
+          "feedback": "`Sort` kennt keine Eigenschaften. Die Ordnung kommt von `CompareTo` oder von einem Vergleicher."
+        },
+        {
+          "text": "`Sort` wirft eine `InvalidOperationException`.",
+          "correct": true
+        },
+        {
+          "text": "`Sort` sortiert nach der Reihenfolge, in der die Objekte erzeugt wurden.",
+          "misconception": "m08-l11-sort-knows-order",
+          "feedback": "Die Erzeugungsreihenfolge ist keine Ordnung, die `Sort` kennt."
+        },
+        {
+          "text": "`Sort` tut nichts und wirft keine Ausnahme.",
+          "feedback": "Ohne Ordnung kann `Sort` nicht arbeiten. Es meldet das mit einer Ausnahme."
+        }
+      ],
+      "explanation": "`Sort()` ohne Vergleicher braucht, dass der Typ `IComparable<T>` oder `IComparable` umsetzt. Fehlt beides, wirft es eine `InvalidOperationException`. Die Ordnung steht nie von selbst fest: Sie ist das, was `CompareTo` oder `Compare` sagt."
+    },
+    {
+      "id": "m08-l11-q6",
+      "lesson": "m08-l11",
+      "type": "single",
+      "question": "`Player` ist nach Punkten geordnet (`IComparable<Player>`). Eine Liste soll einmal auch nach Namen sortiert werden, ohne `Player` zu ändern. Was tust du?",
+      "options": [
+        {
+          "text": "Du schreibst eine Klasse, die `IComparer<Player>` umsetzt, und gibst ein Objekt an `Sort` weiter.",
+          "correct": true
+        },
+        {
+          "text": "Du schreibst in `Player` eine zweite Methode `CompareTo`, die nach dem Namen vergleicht.",
+          "feedback": "`IComparable<Player>` verlangt genau eine Methode `CompareTo(Player?)`. Eine zweite Ordnung braucht ein eigenes Objekt."
+        },
+        {
+          "text": "Du überschreibst `Equals` in `Player`, damit es Namen vergleicht.",
+          "feedback": "`Equals` beantwortet, ob zwei Objekte gleich sind. Es legt keine Reihenfolge fest."
+        },
+        {
+          "text": "Du setzt `IComparable<Player>` ein zweites Mal um.",
+          "feedback": "Ein Interface lässt sich mit demselben Typargument nur einmal umsetzen. Eine zweite Ordnung braucht ein eigenes Objekt."
+        }
+      ],
+      "explanation": "`IComparable<T>` ist die eine natürliche Ordnung eines Typs. Jede weitere Ordnung steckt in einem eigenen Vergleicher, einer Klasse mit `IComparer<T>`. `List<T>.Sort(comparer)` benutzt ihn."
+    },
+    {
+      "id": "m08-l11-q7",
+      "lesson": "m08-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l11/sort-comparer.cs",
+      "explanation": "`players.Sort()` benutzt `CompareTo` und ordnet nach Punkten: ann, dee, bob. `players.Sort(new NameComparer())` benutzt stattdessen `Compare` von `NameComparer`, das die Namen ordinal vergleicht: ann, bob, dee. Das Objekt `Player` bleibt in beiden Fällen unverändert."
+    },
+    {
+      "id": "m08-l11-q8",
+      "lesson": "m08-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l11/compare-vs-equals.cs",
+      "explanation": "`CompareTo` vergleicht nur die Punktzahlen: Beide haben 10, also gleiche Position (`True`). `Equals` ist nicht überschrieben und vergleicht die Verweise: Es sind zwei Objekte (`False`). Das `HashSet` benutzt `Equals` und `GetHashCode`, nicht `CompareTo`, und hält deshalb beide Objekte: 2. Gleichheit und Ordnung sind zwei getrennte Fragen."
+    },
+    {
+      "id": "m08-l11-q9",
+      "lesson": "m08-l11",
+      "type": "multi",
+      "question": "Welche Aussagen über Vergleichen und Sortieren stimmen?",
+      "options": [
+        {
+          "text": "Liefert `CompareTo` 0, stehen die zwei Objekte in der Sortierung an derselben Position.",
+          "correct": true
+        },
+        {
+          "text": "`x.CompareTo(null)` ist größer als 0: Jedes Objekt steht nach `null`.",
+          "correct": true
+        },
+        {
+          "text": "`List<T>.Sort` ist nicht stabil: Elemente an gleicher Position können ihre Reihenfolge tauschen.",
+          "correct": true
+        },
+        {
+          "text": "Liefert `CompareTo` 0, ist `Equals` automatisch `true`.",
+          "feedback": "Das stimmt nicht. Im Beispiel haben zwei Spieler gleiche Punkte, sind aber verschiedene Objekte."
+        }
+      ],
+      "explanation": "0 bedeutet nur: gleiche Position in der Ordnung. Ob die Objekte auch gleich im Sinne von `Equals` sind, ist eine eigene Frage. `Sort` ist nicht stabil, deshalb darf eine Ausgabe nicht von der Reihenfolge gleich geordneter Elemente abhängen."
+    },
+    {
+      "id": "m08-l11-q10",
+      "lesson": "m08-l11",
+      "type": "single",
+      "question": "In `Compare(Player? x, Player? y)` steht `return x.Score.CompareTo(y.Score);` (ohne `null`-Prüfung gezeigt). `Sort` ordnet damit aufsteigend. Wie ordnest du absteigend, also höchste Punktzahl zuerst?",
+      "options": [
+        {
+          "text": "Du vertauschst die Seiten: `return y.Score.CompareTo(x.Score);`.",
+          "correct": true
+        },
+        {
+          "text": "Du lässt `Compare` unverändert. `Sort` ordnet immer absteigend, wenn ein Vergleicher da ist.",
+          "feedback": "`Sort` folgt dem Vorzeichen des Ergebnisses. Ohne Änderung bleibt es aufsteigend."
+        },
+        {
+          "text": "Du gibst immer `0` zurück.",
+          "feedback": "Bei 0 stehen alle Objekte an gleicher Position. Es entsteht keine Ordnung."
+        },
+        {
+          "text": "Du rufst `Equals` statt `CompareTo` auf.",
+          "feedback": "`Equals` liefert `bool`, aber `Compare` muss eine Zahl liefern."
+        }
+      ],
+      "explanation": "Mit vertauschten Seiten dreht sich das Vorzeichen um: Wer mehr Punkte hat, bekommt ein negatives Ergebnis und steht davor. So macht es auch `IncidentComparer` in SecLog: Mehr Fehlversuche stehen vorn."
+    },
+    {
+      "id": "m08-l11-q11",
+      "lesson": "m08-l11",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `List<T>.Sort` die Reihenfolge eigener Objekte bestimmt: Was leistet `IComparable<T>`, was `IComparer<T>`, und was passiert, wenn beides fehlt?",
+      "modelAnswer": "`Sort` kennt keine Reihenfolge von sich aus, es fragt immer einen Vergleich. `IComparable<T>` legt die natürliche Ordnung des Typs fest: Die Methode `CompareTo` liefert eine Zahl kleiner, gleich oder größer 0. `Sort()` ohne Argument benutzt sie. Eine weitere Ordnung steckt in einem eigenen Vergleicher: Eine Klasse mit `IComparer<T>` und der Methode `Compare(x, y)`, die an `Sort` übergeben wird. Fehlt beides, wirft `Sort()` eine `InvalidOperationException`."
+    },
+    {
+      "id": "m08-l11-q12",
+      "lesson": "m08-l11",
+      "type": "explain",
+      "question": "Transfer: Du hast eine Klasse `Ticket` mit Titel, Priorität und Erstellungszeit. Wann würdest du `IComparable<Ticket>` umsetzen, und wann einen `IComparer<Ticket>` schreiben?",
+      "modelAnswer": "`IComparable<Ticket>` setze ich um, wenn es eine Reihenfolge gibt, die für Tickets fast immer gilt, zum Beispiel nach Priorität. Dann reicht `tickets.Sort()`. Einen `IComparer<Ticket>` schreibe ich für jede zusätzliche Reihenfolge, etwa nach Erstellungszeit oder nach Titel, ohne `Ticket` zu ändern. Gleichheit und Ordnung halte ich getrennt: Zwei Tickets mit gleicher Priorität stehen an derselben Position, sind aber nicht gleich."
     }
   ]
 }
