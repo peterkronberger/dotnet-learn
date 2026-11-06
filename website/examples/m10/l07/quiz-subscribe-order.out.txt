@@ -1,0 +1,6 @@
+ring
+a
+b
+ring
+a
+b

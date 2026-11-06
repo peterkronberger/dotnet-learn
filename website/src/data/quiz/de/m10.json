@@ -926,6 +926,165 @@
       "type": "explain",
       "question": "Transferfrage: SecLog will einen Vorfall an mehrere Stellen melden (Konsole, Zähler, Liste). Warum ist `Action<Incident>` dafür besser geeignet als `Func<Incident, bool>`?",
       "modelAnswer": "Bei `Action<Incident>` gibt es keinen Rückgabewert, der verloren gehen kann. Jedes Ziel macht seine Arbeit, und es ist egal, dass nur das letzte etwas zurückgäbe. Bei `Func<Incident, bool>` bekäme der Aufrufer nur das Ergebnis des letzten Ziels."
+    },
+    {
+      "id": "m10-l07-q1",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "`public Action<string>? Found;` ist ein öffentliches Feld vom Delegate-Typ. Welche zwei Probleme hat es für Code außerhalb der Klasse?",
+      "options": [
+        {
+          "text": "Fremder Code kann es mit `=` überschreiben und damit alle Abonnenten verlieren, und er kann es selbst aufrufen.",
+          "correct": true
+        },
+        {
+          "text": "Man kann keine Methode mit `+=` anmelden.",
+          "feedback": "`+=` funktioniert bei einem Delegate-Feld. Das Problem ist, dass auch mehr möglich ist."
+        },
+        {
+          "text": "Das Feld kann nie `null` sein, daher stürzt jeder Aufruf ab.",
+          "feedback": "Ein Delegate-Feld ist `null`, solange niemand angemeldet ist."
+        },
+        {
+          "text": "Der Delegate kann nur eine Methode gleichzeitig aufnehmen.",
+          "feedback": "Ein Delegate kann mehrere Methoden aufnehmen (Multicast)."
+        }
+      ],
+      "explanation": "Ein öffentliches Delegate-Feld erlaubt jede Operation. Mit `=` ersetzt fremder Code die Aufrufliste, und er kann das Feld aufrufen. Das Schlüsselwort `event` lässt von außen nur `+=` und `-=` zu."
+    },
+    {
+      "id": "m10-l07-q2",
+      "lesson": "m10-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Reihenfolge.",
+      "example": "m10/l07/quiz-subscribe-order.cs",
+      "explanation": "`Ring` schreibt zuerst `ring` und löst dann das Event aus. Die Abonnenten laufen in der Reihenfolge des Anmeldens: `a`, dann `b`. Das passiert bei jedem Aufruf von `Ring`."
+    },
+    {
+      "id": "m10-l07-q3",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "`Scanner` deklariert `public event Action<string>? Found;`. Außerhalb der Klasse steht `scanner.Found?.Invoke(\"x\");`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler: Ein Event kann von außen nur mit `+=` und `-=` benutzt werden.",
+          "correct": true
+        },
+        {
+          "text": "Das Event wird ausgelöst und alle Abonnenten laufen.",
+          "feedback": "Nur Code in der deklarierenden Klasse kann das Event auslösen.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Es wird nichts ausgelöst, aber der Code übersetzt.",
+          "feedback": "Der Compiler lehnt die Zeile ab, es gibt kein stilles Nichtstun.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Eine `NullReferenceException` zur Laufzeit.",
+          "feedback": "Das Problem erkennt der Compiler schon vorher."
+        }
+      ],
+      "explanation": "Auch wenn das Event `public` ist, erlaubt es von außen nur das An- und Abmelden. Das Auslösen bleibt der deklarierenden Klasse vorbehalten (Fehler CS0070)."
+    },
+    {
+      "id": "m10-l07-q4",
+      "lesson": "m10-l07",
+      "type": "multi",
+      "question": "`Found` ist ein Event der Klasse `Scanner` vom Typ `Action<string>?`. Welche Zeilen übersetzen außerhalb von `Scanner`?",
+      "options": [
+        {
+          "text": "`scanner.Found += Print;`",
+          "correct": true
+        },
+        {
+          "text": "`scanner.Found -= Print;`",
+          "correct": true
+        },
+        {
+          "text": "`scanner.Found = Print;`",
+          "feedback": "Die Zuweisung mit `=` ist von außen nicht erlaubt."
+        },
+        {
+          "text": "`scanner.Found(\"x\");`",
+          "feedback": "Der Aufruf ist von außen nicht erlaubt.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        }
+      ],
+      "explanation": "Von außen sind nur `+=` und `-=` erlaubt. Zuweisen und Aufrufen kann nur die Klasse, die das Event deklariert."
+    },
+    {
+      "id": "m10-l07-q5",
+      "lesson": "m10-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l07/quiz-remove-lambda.cs",
+      "explanation": "`hello` steht in einer Variablen, `-=` findet denselben Delegate und entfernt ihn. Das zweite Lambda wird mit `-=` als neues Lambda angegeben, das nicht in der Liste steht. Also bleibt `again`."
+    },
+    {
+      "id": "m10-l07-q6",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "Warum steht beim Auslösen eines Events meist `Found?.Invoke(name)` statt `Found(name)`?",
+      "options": [
+        {
+          "text": "Ohne Abonnent hat das Event den Wert `null`. `?.Invoke` ruft dann nichts auf, statt eine `NullReferenceException` auszulösen.",
+          "correct": true
+        },
+        {
+          "text": "`?.Invoke` ruft die Abonnenten parallel auf.",
+          "feedback": "Die Abonnenten laufen weiter nacheinander."
+        },
+        {
+          "text": "Ein Event kann nur mit `Invoke` aufgerufen werden, nie mit Klammern.",
+          "feedback": "Beides ist möglich. Der Unterschied liegt beim `null`-Fall."
+        },
+        {
+          "text": "`?.Invoke` verhindert, dass `-=` den Abonnenten entfernt.",
+          "feedback": "Das Abmelden hat damit nichts zu tun."
+        }
+      ],
+      "explanation": "Ein Delegate ohne Ziel ist `null`. Der Operator `?.` aus Modul 4 ruft die Methode nur auf, wenn der Ausdruck davor nicht `null` ist."
+    },
+    {
+      "id": "m10-l07-q7",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "Ein Event hat eigene `add`- und `remove`-Accessoren. Was gilt dann in der Klasse?",
+      "options": [
+        {
+          "text": "Es gibt kein verstecktes Delegate-Feld. Du kannst das Event dort nicht wie einen Delegate aufrufen, sondern verwaltest die Abonnenten selbst.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler erzeugt weiterhin ein Delegate-Feld, das du mit `Found?.Invoke` aufrufst.",
+          "feedback": "Das gilt nur für Events ohne Accessoren (field-like)."
+        },
+        {
+          "text": "Das Event kann dann auch von außen ausgelöst werden.",
+          "feedback": "Von außen bleiben nur `+=` und `-=` möglich.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Die Accessoren werden ignoriert, solange niemand `+=` benutzt.",
+          "feedback": "`+=` ruft `add` auf und `-=` ruft `remove` auf."
+        }
+      ],
+      "explanation": "Bei einem field-like Event legt der Compiler ein verstecktes Delegate-Feld an. Mit eigenen Accessoren fehlt es, und das Event darf nur links von `+=` oder `-=` stehen (CS0079)."
+    },
+    {
+      "id": "m10-l07-q8",
+      "lesson": "m10-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Event von außen nur mit `+=` und `-=` benutzt werden kann und wer es auslösen darf. Gehe auch darauf ein, was ein öffentliches Delegate-Feld anders macht.",
+      "modelAnswer": "Ein Event schützt den Delegate dahinter: Fremder Code kann sich anmelden und abmelden, aber nicht die ganze Aufrufliste ersetzen und das Event nicht selbst auslösen. Auslösen darf nur die Klasse, die das Event deklariert. Bei einem öffentlichen Delegate-Feld könnte jeder mit `=` alle Abonnenten überschreiben und das Feld aufrufen."
+    },
+    {
+      "id": "m10-l07-q9",
+      "lesson": "m10-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Event statt einer einfachen Callback-Methode als Parameter einsetzen? Nenne ein Beispiel und eine Bedingung, unter der du dich dafür entscheidest.",
+      "modelAnswer": "Ein Event passt, wenn eine Klasse Ereignisse meldet und mehrere fremde Stellen unabhängig voneinander zuhören sollen, zum Beispiel ein Monitor, der gefundene Vorfälle an Konsole, Zähler und Liste meldet. Die Zuhörer können sich zur Laufzeit an- und abmelden, und die Klasse kennt sie nicht. Ein einzelner Callback-Parameter reicht, wenn genau eine Stelle für genau einen Aufruf etwas wissen soll."
     }
   ]
 }
