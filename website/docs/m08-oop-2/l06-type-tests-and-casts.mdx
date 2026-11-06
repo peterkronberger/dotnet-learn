@@ -1,0 +1,239 @@
+---
+title: Typprüfungen und Casts
+sidebar_position: 6
+description: Mit is, as und einem Cast prüfst du zur Laufzeit, von welchem Typ ein Objekt ist. Eine Verweisumwandlung ändert nie das Objekt, nur die Sicht darauf.
+lesson_id: m08-l06
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import typeTests from '!!raw-loader!@site/examples/m08/l06/type-tests.cs';
+import typeTestsOutput from '!!raw-loader!@site/examples/m08/l06/type-tests.out.txt';
+import castAndAs from '!!raw-loader!@site/examples/m08/l06/cast-and-as.cs';
+import castAndAsOutput from '!!raw-loader!@site/examples/m08/l06/cast-and-as.out.txt';
+import castNoConversion from '!!raw-loader!@site/examples/m08/l06/cast-no-conversion.snippet.cs';
+import asValueType from '!!raw-loader!@site/examples/m08/l06/as-value-type.snippet.cs';
+import sameObject from '!!raw-loader!@site/examples/m08/l06/same-object.cs';
+import sameObjectOutput from '!!raw-loader!@site/examples/m08/l06/same-object.out.txt';
+import typeGap from '!!raw-loader!@site/examples/m08/l06/type-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l06/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l06/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l06/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l06/seclog-oop-solution.cs';
+
+# Typprüfungen und Casts
+
+:::note[Lernziele]
+- Du kannst mit `is` prüfen, ob ein Objekt von einem Typ ist, und es dabei gleich in einer Variablen erhalten.
+- Du kannst `as` und einen Cast vergleichen und vorhersagen, was bei einem falschen Typ passiert.
+- Du kannst implizite und explizite Verweisumwandlungen unterscheiden.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l05-q2" />
+
+<Quiz id="m08-l01-q7" />
+
+<Quiz id="m04-l09-q4" />
+
+## Was die Variable sieht und was das Objekt ist
+
+Eine Variable vom Typ `Device` kann ein `Printer`-Objekt halten. Über die Variable erreichst du nur die Member von `Device` (Lektion 1). Das Objekt selbst ist weiter ein `Printer`. Auch eine Variable vom Typ `ILabeled` sieht nur die Member des Interface (Lektion 5).
+
+Oft willst du zur Laufzeit wissen, was wirklich im Objekt steckt. Ein <Term id="type-test">Typtest</Term> (Type Test) prüft das. C# kennt dafür drei Werkzeuge: `is`, `as` und den Cast.
+
+## Mit is prüfen
+
+Der Ausdruck `x is T` ist `true`, wenn das Objekt, auf das `x` verweist, zur Laufzeit ein `T` ist: der Typ `T` selbst, ein von ihm abgeleiteter Typ oder, bei einem Interface, ein Typ, der es implementiert. Ist `x` gleich `null`, ist das Ergebnis `false`.
+
+Mit einem Namen hinter dem Typ prüfst du und erhältst das Objekt in einer Variablen des neuen Typs: `device is Printer printer`. Das ist ein <Term id="declaration-pattern">Declaration Pattern</Term> (Deklarationsmuster), eine Form des <Term id="pattern">Patterns</Term> aus Modul 2. Die Variable `printer` hat den Typ `Printer` und hat einen Wert, wenn der Test gelingt ([§11.2.2 Declaration pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern)).
+
+<Forward concepts={['weitere Muster (Pattern Matching)']} module="12" />
+
+:::info[Vorhersage]
+`device` hat den Typ `Device` und verweist auf einen `Printer`. `missing` ist `null`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l06-type-tests" code={typeTests} predict expected={typeTestsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `False` und `Pages per minute: 40`.
+
+1. **Abgeleiteten Typ prüfen:** `device is Printer` ist `True`, denn das Objekt ist ein `Printer`.
+2. **Anderen Typ prüfen:** `device is Scanner` ist `False`. `Printer` und `Scanner` leiten beide von `Device` ab, aber sie sind keine Art des anderen.
+3. **null prüfen:** `missing is Device` ist `False`, denn `null` verweist auf kein Objekt ([§12.15.12.1 The is-type operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1215121-the-is-type-operator)).
+4. **Variable erhalten:** Im `if`-Block hat `printer` den Typ `Printer`. Deshalb ist `PagesPerMinute` erreichbar, was über `device` nicht ginge.
+
+Was passiert, wenn du `device is Printer printer` schreibst und `device` ein `Scanner` ist? Der Test ist `false`, der Block läuft nicht. Die Variable `printer` hat dann keinen Wert und darf nicht benutzt werden.
+
+</details>
+
+## as und Cast
+
+Neben `is` gibt es zwei Wege, ein Objekt unter einem anderen Typ zu sehen. Beide prüfen den Typ zur Laufzeit.
+
+- Der **Cast** `(Printer)device` verlangt, dass das Objekt ein `Printer` ist. Ist es das nicht, wirft er eine `InvalidCastException` (Ausnahme für ungültige Umwandlung). Du kennst das Muster aus Modul 4: Das Unboxing mit falschem Typ wirft dieselbe Ausnahme.
+- Der <Term id="as-operator">`as`-Operator</Term> `device as Printer` wirft nie. Passt der Typ nicht, ist das Ergebnis `null`. Deshalb muss der Typ `null` erlauben: ein Verweistyp oder ein Nullable-Typ ([§12.15.13 The as operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#121513-the-as-operator)).
+
+Die Schreibweise des Casts kennst du aus Modul 1 (`(int)3.99`) und aus Modul 4 (`(int)obj` beim Unboxing). Der Cast ist dieselbe Schreibweise für verschiedene Umwandlungen. Hier geht es um Verweise auf Objekte.
+
+:::info[Vorhersage]
+`device` verweist auf einen `Scanner`. Welche drei Zeilen gibt das Programm aus? Das Programm fängt die Ausnahme ab.
+:::
+
+<CSharpRunner id="m08-l06-cast-and-as" code={castAndAs} predict expected={castAndAsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `InvalidCastException` und `archive scanner`.
+
+1. **as:** Das Objekt ist kein `Printer`. `device as Printer` gibt `null` zurück, und `byAs is null` ist `True`.
+2. **Cast mit falschem Typ:** `(Printer)device` wirft eine `InvalidCastException`. Der `catch`-Block gibt den Namen des Ausnahmetyps aus.
+3. **Cast mit passendem Typ:** `(Scanner)device` gelingt, und `scanner.Name` gibt den Namen aus.
+
+Was passiert, wenn du die `try`-Anweisung weglässt? Das Programm bricht an der Cast-Zeile mit einer unbehandelten `InvalidCastException` ab (Modul 7).
+
+Zwei Fehler meldet schon der Compiler. Ein Cast zwischen Klassen, die nicht in einer Ableitungsbeziehung stehen, ist ein Fehler beim Übersetzen. Und `as` ist bei einem Typ, der nicht `null` sein darf, nicht erlaubt:
+
+<CodeBlock language="csharp" title="cast-no-conversion.snippet.cs">{castNoConversion}</CodeBlock>
+
+```text
+error CS0030: Cannot convert type 'Printer' to 'Scanner'
+```
+
+<CodeBlock language="csharp" title="as-value-type.snippet.cs">{asValueType}</CodeBlock>
+
+```text
+error CS0077: The as operator must be used with a reference type or nullable type ('int' is a non-nullable value type)
+```
+
+</details>
+
+## Implizite und explizite Verweisumwandlungen
+
+Eine <Term id="reference-conversion">Verweisumwandlung</Term> (Reference Conversion) wechselt den Typ eines Verweises auf ein Objekt. Es gibt zwei Arten:
+
+- Eine **implizite** Verweisumwandlung schreibst du nicht hin. Sie gelingt immer, ohne Prüfung zur Laufzeit. Beispiele: von einer abgeleiteten Klasse zu ihrer Basisklasse (`Device device = printer;`), von einer Klasse zu einem Interface, das sie implementiert (`ILabeled item = printer;`), und von jedem Verweistyp zu `object` ([§10.2.8 Implicit reference conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1028-implicit-reference-conversions)).
+- Eine **explizite** Verweisumwandlung verlangt einen Cast, denn sie kann scheitern. Beispiele: von der Basisklasse zu einer abgeleiteten Klasse, von einem Interface zu einer Klasse, von `object` zu jedem Verweistyp. Gelingt die Prüfung nicht, wirft sie eine `InvalidCastException`. Ein `null`-Wert besteht die Prüfung immer ([§10.3.5 Explicit reference conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1035-explicit-reference-conversions)).
+
+Die Richtung ist die Regel: „Aufwärts“ zur Basisklasse oder zum Interface ist implizit, denn ein `Printer` ist immer ein `Device`. „Abwärts“ ist explizit, denn ein `Device` ist nicht immer ein `Printer`.
+
+## Ein Cast ändert das Objekt nicht
+
+Eine Verweisumwandlung ändert nie das Objekt, auf das der Verweis zeigt, und auch nicht seine Identität. Sie ändert nur den Typ der Variablen und damit, was der Compiler dir zu erreichen erlaubt.
+
+:::info[Vorhersage]
+`printer`, `device` und `again` verweisen auf dasselbe Objekt oder auf verschiedene? Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l06-same-object" code={sameObject} predict expected={sameObjectOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `True` und `40`.
+
+1. **Aufwärts:** `Device device = printer;` ist implizit und legt keine Kopie an. `object.ReferenceEquals(printer, device)` ist `True`.
+2. **Abwärts:** `(Printer)device` ist explizit. Die Prüfung gelingt, und `again` zeigt auf dasselbe Objekt.
+3. **Die Sicht ändert sich:** Über `again` ist `PagesPerMinute` wieder erreichbar. Das Objekt hatte es die ganze Zeit.
+
+Was passiert, wenn das Objekt ein `Device` wäre und kein `Printer`? Dann wirft der Cast. Das Objekt wird nicht umgebaut, es gibt kein `Printer`-Objekt, das der Cast zurückgeben könnte.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm durchläuft ein Array mit einem `Printer` und einem `Scanner`. Ergänze die Stellen aus den Kommentaren. Es soll `office printer`, `40`, `archive scanner` und `Scanners: 1` ausgeben, jeweils in eigener Zeile und in dieser Reihenfolge.
+
+<CSharpRunner id="m08-l06-gaps" code={typeGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Mit is prüfen:** `if (device is Printer printer) { Console.WriteLine(printer.PagesPerMinute); }`.
+2. **Mit as zählen:** `Scanner? found = device as Scanner;`, dann `if (found != null) { scanners++; }`.
+3. **Hinweis:** Beide Wege prüfen den Laufzeittyp. Brauchst du das Objekt danach nicht, genügt `device is Scanner`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat das Interface `IDetectionRule`, die Regelklassen `FailedLoginRule`, `WatchListRule` und `StatusRule` und einen `Detector`, der die Regeln als Liste hält. Der `Detector` zählt, wie viele Regeln zu einem Vorfall passen.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block mit dem `Detector`, den Platz für den neuen Block mit `return 0;`. Die Typen sind ausgeblendet, du änderst sie nicht. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor `// End with exit code 0 …` den Block `// Find the threshold rules among the rules of the detector`. Er geht durch alle `IDetectionRule` in `detector.Rules`:
+
+1. Ist die Regel ein `FailedLoginRule`, hole sie mit `is` in die Variable `thresholdRule` und gib `$"{thresholdRule.Name}: threshold {thresholdRule.Threshold}"` aus.
+2. Wandle jede Regel mit `as DetectionRule` um und zähle die Ergebnisse, die nicht `null` sind.
+3. Gib nach der Schleife `$"Rules from DetectionRule: {count} of {detector.Rules.Count}"` aus.
+
+<CSharpRunner id="m08-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Mit is prüfen:** `rule is FailedLoginRule thresholdRule` gelingt nur für die Regel mit Schwellenwert. Nur dort ist `Threshold` erreichbar, denn `IDetectionRule` kennt es nicht.
+2. **Mit as umwandeln:** `rule as DetectionRule` gibt für `FailedLoginRule` und `WatchListRule` das Objekt zurück. Für `StatusRule` ist das Ergebnis `null`, denn sie erbt nicht von `DetectionRule`.
+3. **Zählen:** Zwei von drei Regeln kommen aus der Basisklasse. Das Programm gibt `2 of 3` aus.
+
+</details>
+
+**Neuer Stand:** SecLog erkennt zur Laufzeit, welche Regeln Schwellenwerte haben und welche aus der Basisklasse stammen, ohne die Regeln umzubauen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l06-cast-changes-object" />
+
+**„Ein Cast wie `(FailedLoginRule)rule` verwandelt das Objekt in ein anderes Objekt.“** Das stimmt nicht. Eine Verweisumwandlung behält dasselbe Objekt. Der Cast prüft zur Laufzeit den Typ und ändert nur, was der Compiler dir über diese Variable zu erreichen erlaubt. Ist das Objekt kein `FailedLoginRule`, entsteht keines: Der Cast wirft eine `InvalidCastException`.
+:::
+
+<details>
+<summary>Vertiefung: Eigene Umwandlungen (optional)</summary>
+
+Neben den eingebauten Umwandlungen kann eine Klasse oder ein Struct eigene deklarieren, mit `implicit operator` und `explicit operator`. Solche benutzerdefinierten Umwandlungen sind etwas anderes als Verweisumwandlungen: Sie berechnen ein neues Objekt oder einen neuen Wert ([§10.5 User-defined conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#105-user-defined-conversions)). Wie man sie schreibt, gehört nicht zu diesem Modul.
+
+</details>
+
+## Zusammenfassung
+
+`x is T` prüft zur Laufzeit, ob das Objekt von `T` ist, und ist bei `null` falsch. Mit einem Namen (`x is T t`) erhältst du das Objekt gleich im neuen Typ. `x as T` gibt `null` zurück, wenn der Typ nicht passt, und braucht einen Typ, der `null` erlaubt. Der Cast `(T)x` wirft bei einem falschen Typ eine `InvalidCastException`. Umwandlungen zur Basisklasse oder zum Interface sind implizit, Umwandlungen zurück sind explizit und werden geprüft. Eine Verweisumwandlung ändert nie das Objekt, nur die Sicht darauf.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l06-q1" />
+
+<Quiz id="m08-l06-q2" />
+
+<Quiz id="m08-l06-q3" />
+
+<Quiz id="m08-l06-q4" />
+
+<Quiz id="m08-l06-q5" />
+
+<Quiz id="m08-l06-q6" />
+
+<Quiz id="m08-l06-q7" />
+
+<Quiz id="m08-l06-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l06-q9" />
+
+### Transferfrage
+
+<Quiz id="m08-l06-q10" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Explicit reference conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1035-explicit-reference-conversions)
+- C#-Spezifikation: [The as operator](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#121513-the-as-operator)
+- C#-Spezifikation: [Declaration pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern)

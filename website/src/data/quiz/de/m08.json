@@ -675,6 +675,164 @@
       "type": "explain",
       "question": "Transfer: Wo würdest du in einem eigenen Programm ein Interface statt einer Basisklasse benutzen?",
       "modelAnswer": "In SecLog sollen Regeln austauschbar sein, auch wenn sie keinen Code teilen, etwa `FailedLoginRule` und `StatusRule`. Das Interface `IDetectionRule` legt fest, was jede Regel kann, und der `Detector` hält eine Liste davon. Ähnlich würde ich ein Interface nehmen, wenn mehrere Klassen Berichte ausgeben oder Daten speichern sollen und ich später eine weitere Klasse ergänzen will, ohne den Code zu ändern, der sie benutzt."
+    },
+    {
+      "id": "m08-l06-q1",
+      "lesson": "m08-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l06/type-tests.cs",
+      "explanation": "`device is Printer` ist wahr, `device is Scanner` falsch, und `null is Device` ist falsch. Im `if`-Block hat `printer` den Typ `Printer`, deshalb ist `PagesPerMinute` erreichbar."
+    },
+    {
+      "id": "m08-l06-q2",
+      "lesson": "m08-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l06/cast-and-as.cs",
+      "explanation": "`as` gibt für den `Scanner` kein `Printer`-Objekt, sondern `null`. Der Cast `(Printer)device` wirft eine `InvalidCastException`, die der `catch`-Block abfängt. `(Scanner)device` gelingt."
+    },
+    {
+      "id": "m08-l06-q3",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`Device device = new Scanner(\"archive scanner\");` Was passiert bei `Printer p = (Printer)device;`, wenn `Printer` und `Scanner` von `Device` ableiten?",
+      "options": [
+        {
+          "text": "Das Programm wirft zur Laufzeit eine `InvalidCastException`.",
+          "correct": true
+        },
+        {
+          "text": "`p` ist `null`.",
+          "feedback": "`null` liefert `as`. Ein Cast wirft stattdessen eine Ausnahme."
+        },
+        {
+          "text": "Das Objekt wird in einen `Printer` umgebaut und `p` zeigt darauf.",
+          "feedback": "Ein Cast baut kein Objekt um. Er prüft nur den Typ, und das Objekt ist ein `Scanner`.",
+          "misconception": "m08-l06-cast-changes-object"
+        }
+      ],
+      "explanation": "Der Cast ist eine explizite Verweisumwandlung. Sie prüft zur Laufzeit, ob das Objekt ein `Printer` ist. Es ist ein `Scanner`, also wirft sie."
+    },
+    {
+      "id": "m08-l06-q4",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`Printer printer = new(\"office printer\", 40); Device device = printer; Printer again = (Printer)device;` Was ergibt `object.ReferenceEquals(printer, again)`?",
+      "options": [
+        {
+          "text": "`True`: Alle drei Variablen verweisen auf dasselbe Objekt.",
+          "correct": true
+        },
+        {
+          "text": "`False`: Der Cast erzeugt ein neues `Printer`-Objekt.",
+          "feedback": "Ein Cast kopiert nichts. Er ändert nur den Typ der Variablen.",
+          "misconception": "m08-l06-cast-changes-object"
+        },
+        {
+          "text": "`False`: Die Umwandlung zu `Device` hat eine Kopie angelegt, und der Cast liefert wieder eine andere.",
+          "feedback": "Auch die Umwandlung zur Basisklasse legt keine Kopie an. Beide Umwandlungen lassen das Objekt unverändert.",
+          "misconception": "m08-l06-cast-changes-object"
+        }
+      ],
+      "explanation": "Eine Verweisumwandlung ändert nie das Objekt und nie seine Identität. Sie ändert nur die Sicht darauf."
+    },
+    {
+      "id": "m08-l06-q5",
+      "lesson": "m08-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über `as` stimmen?",
+      "options": [
+        {
+          "text": "`x as T` gibt `null` zurück, wenn das Objekt kein `T` ist.",
+          "correct": true
+        },
+        {
+          "text": "`as` wirft bei einem falschen Typ keine `InvalidCastException`.",
+          "correct": true
+        },
+        {
+          "text": "`as` ist bei einem Verweistyp oder einem Nullable-Typ erlaubt.",
+          "correct": true
+        },
+        {
+          "text": "`boxed as int` ist erlaubt und gibt bei falschem Typ `0` zurück.",
+          "feedback": "Bei `int` ist `as` ein Fehler beim Übersetzen (CS0077), denn `int` kann nicht `null` sein."
+        },
+        {
+          "text": "`as` wirft bei einem falschen Typ eine `InvalidCastException`.",
+          "feedback": "Das macht der Cast. `as` gibt `null` zurück."
+        }
+      ],
+      "explanation": "`as` ist die Variante ohne Ausnahme: Es liefert das Objekt unter dem neuen Typ oder `null`. Deshalb braucht der Zieltyp `null` als Wert."
+    },
+    {
+      "id": "m08-l06-q6",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "Welche Umwandlung ist implizit, braucht also keinen Cast?",
+      "options": [
+        {
+          "text": "`Device device = printer;` mit `Printer : Device`",
+          "correct": true
+        },
+        {
+          "text": "`Printer printer = device;` mit `Printer : Device`",
+          "feedback": "Von der Basisklasse zur abgeleiteten Klasse kann es scheitern. Das braucht einen Cast."
+        },
+        {
+          "text": "`Scanner scanner = printer;` mit `Printer : Device` und `Scanner : Device`",
+          "feedback": "`Printer` und `Scanner` stehen nicht in einer Ableitungsbeziehung. Auch mit Cast ist das ein Fehler beim Übersetzen."
+        }
+      ],
+      "explanation": "Aufwärts, zur Basisklasse oder zu einem implementierten Interface, ist implizit und gelingt immer. Abwärts ist explizit und wird zur Laufzeit geprüft."
+    },
+    {
+      "id": "m08-l06-q7",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`rule` hat den Typ `IDetectionRule`. Was bewirkt `if (rule is FailedLoginRule thresholdRule)`?",
+      "options": [
+        {
+          "text": "Sie prüft zur Laufzeit den Typ des Objekts und gibt es im Block als `thresholdRule` vom Typ `FailedLoginRule` heraus.",
+          "correct": true
+        },
+        {
+          "text": "Sie wandelt jede Regel in eine `FailedLoginRule` um, auch eine `StatusRule`.",
+          "feedback": "Es entsteht kein neues Objekt. Für eine `StatusRule` ist der Test falsch, der Block läuft nicht.",
+          "misconception": "m08-l06-cast-changes-object"
+        },
+        {
+          "text": "Sie wirft eine `InvalidCastException`, wenn die Regel keine `FailedLoginRule` ist.",
+          "feedback": "Der Test mit `is` wirft nie. Er ist einfach falsch."
+        }
+      ],
+      "explanation": "`is` mit Variable prüft und gibt das Objekt im passenden Typ weiter. Ist der Typ falsch, läuft der Block nicht."
+    },
+    {
+      "id": "m08-l06-q8",
+      "lesson": "m08-l06",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0030.",
+      "example": "m08/l06/cast-no-conversion.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`Printer` und `Scanner` leiten beide von `Device` ab, aber keine ist die Basis oder Ableitung der anderen. Zwischen ihnen gibt es keine Verweisumwandlung, auch keine explizite (CS0030)."
+    },
+    {
+      "id": "m08-l06-q9",
+      "lesson": "m08-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `is`, `as` und einem Cast und was eine Verweisumwandlung mit dem Objekt macht.",
+      "modelAnswer": "Alle drei prüfen zur Laufzeit den Typ des Objekts. `x is T` liefert `true` oder `false` (bei `null` `false`), und mit einem Namen (`x is T t`) gleich eine Variable vom Typ `T`. `x as T` liefert das Objekt als `T` oder `null`, wirft nie und braucht einen Typ, der `null` erlaubt. Der Cast `(T)x` liefert das Objekt als `T` oder wirft eine `InvalidCastException`. Eine Verweisumwandlung ändert das Objekt nie und auch nicht seine Identität, sie ändert nur die Sicht darauf."
+    },
+    {
+      "id": "m08-l06-q10",
+      "lesson": "m08-l06",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in einem eigenen Programm `is` mit einer Variable benutzen und wo `as`?",
+      "modelAnswer": "In SecLog hält der `Detector` Regeln als `IDetectionRule`. Will ich nur bei der Regel mit Schwellenwert dessen `Threshold` lesen, schreibe ich `rule is FailedLoginRule thresholdRule` und benutze `thresholdRule` im Block. `as` benutze ich, wenn ich das Ergebnis weiterreichen oder zählen will, etwa `rule as DetectionRule` und danach auf `null` prüfen. Ein Cast passt nur, wenn ich sicher bin, dass der Typ stimmt."
     }
   ]
 }

@@ -5425,6 +5425,86 @@
         "title": "Tutorial: Introduction to Inheritance",
         "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/inheritance"
       }
+    },
+    {
+      "id": "type-test",
+      "term": "Type test",
+      "german": "Typtest",
+      "category": "language",
+      "definition": "Eine Prüfung zur Laufzeit, von welchem Typ ein Objekt ist. Werkzeuge sind `is`, `as` und der Cast. Die Variable hat einen Typ, das Objekt einen Laufzeittyp.",
+      "aliases": [
+        "type check"
+      ],
+      "related": [
+        "as-operator",
+        "declaration-pattern",
+        "reference-conversion"
+      ],
+      "lesson": "m08-l06",
+      "source": {
+        "title": "12.15.12 The is operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#121512-the-is-operator"
+      }
+    },
+    {
+      "id": "as-operator",
+      "term": "as operator",
+      "german": "as-Operator",
+      "category": "language",
+      "definition": "`x as T` liefert das Objekt als `T` oder `null`, wenn die Umwandlung nicht möglich ist. Es wirft nie eine Ausnahme. `T` muss ein Verweistyp oder ein Nullable-Typ sein.",
+      "aliases": [
+        "as"
+      ],
+      "related": [
+        "type-test",
+        "cast"
+      ],
+      "lesson": "m08-l06",
+      "source": {
+        "title": "12.15.13 The as operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#121513-the-as-operator"
+      }
+    },
+    {
+      "id": "reference-conversion",
+      "term": "Reference conversion",
+      "german": "Verweisumwandlung",
+      "category": "language",
+      "definition": "Eine Umwandlung zwischen Verweistypen, zum Beispiel von einer abgeleiteten Klasse zur Basisklasse. Sie ändert nie das Objekt und seine Identität, nur den Typ des Verweises. Implizit gelingt sie immer, explizit wird sie zur Laufzeit geprüft.",
+      "aliases": [
+        "Verweisumwandlungen",
+        "reference conversions"
+      ],
+      "related": [
+        "cast",
+        "implicit-conversion",
+        "explicit-conversion",
+        "type-test"
+      ],
+      "lesson": "m08-l06",
+      "source": {
+        "title": "10.2.8 Implicit reference conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1028-implicit-reference-conversions"
+      }
+    },
+    {
+      "id": "declaration-pattern",
+      "term": "Declaration pattern",
+      "german": "Deklarationsmuster",
+      "category": "language",
+      "definition": "Ein Pattern der Form `x is T name`. Es prüft den Laufzeittyp und gibt das Objekt bei Erfolg in der Variablen `name` vom Typ `T` heraus.",
+      "aliases": [
+        "Deklarationspattern"
+      ],
+      "related": [
+        "pattern",
+        "type-test"
+      ],
+      "lesson": "m08-l06",
+      "source": {
+        "title": "11.2.2 Declaration pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern"
+      }
     }
   ]
 }
