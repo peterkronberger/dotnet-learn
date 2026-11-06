@@ -926,6 +926,348 @@
       "type": "explain",
       "question": "Transferfrage: SecLog will einen Vorfall an mehrere Stellen melden (Konsole, Zähler, Liste). Warum ist `Action<Incident>` dafür besser geeignet als `Func<Incident, bool>`?",
       "modelAnswer": "Bei `Action<Incident>` gibt es keinen Rückgabewert, der verloren gehen kann. Jedes Ziel macht seine Arbeit, und es ist egal, dass nur das letzte etwas zurückgäbe. Bei `Func<Incident, bool>` bekäme der Aufrufer nur das Ergebnis des letzten Ziels."
+    },
+    {
+      "id": "m10-l07-q1",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "`public Action<string>? Found;` ist ein öffentliches Feld vom Delegate-Typ. Welche zwei Probleme hat es für Code außerhalb der Klasse?",
+      "options": [
+        {
+          "text": "Fremder Code kann es mit `=` überschreiben und damit alle Abonnenten verlieren, und er kann es selbst aufrufen.",
+          "correct": true
+        },
+        {
+          "text": "Man kann keine Methode mit `+=` anmelden.",
+          "feedback": "`+=` funktioniert bei einem Delegate-Feld. Das Problem ist, dass auch mehr möglich ist."
+        },
+        {
+          "text": "Das Feld kann nie `null` sein, daher stürzt jeder Aufruf ab.",
+          "feedback": "Ein Delegate-Feld ist `null`, solange niemand angemeldet ist."
+        },
+        {
+          "text": "Der Delegate kann nur eine Methode gleichzeitig aufnehmen.",
+          "feedback": "Ein Delegate kann mehrere Methoden aufnehmen (Multicast)."
+        }
+      ],
+      "explanation": "Ein öffentliches Delegate-Feld erlaubt jede Operation. Mit `=` ersetzt fremder Code die Aufrufliste, und er kann das Feld aufrufen. Das Schlüsselwort `event` lässt von außen nur `+=` und `-=` zu."
+    },
+    {
+      "id": "m10-l07-q2",
+      "lesson": "m10-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Reihenfolge.",
+      "example": "m10/l07/quiz-subscribe-order.cs",
+      "explanation": "`Ring` schreibt zuerst `ring` und löst dann das Event aus. Die Abonnenten laufen in der Reihenfolge des Anmeldens: `a`, dann `b`. Das passiert bei jedem Aufruf von `Ring`."
+    },
+    {
+      "id": "m10-l07-q3",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "`Scanner` deklariert `public event Action<string>? Found;`. Außerhalb der Klasse steht `scanner.Found?.Invoke(\"x\");`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler: Ein Event kann von außen nur mit `+=` und `-=` benutzt werden.",
+          "correct": true
+        },
+        {
+          "text": "Das Event wird ausgelöst und alle Abonnenten laufen.",
+          "feedback": "Nur Code in der deklarierenden Klasse kann das Event auslösen.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Es wird nichts ausgelöst, aber der Code übersetzt.",
+          "feedback": "Der Compiler lehnt die Zeile ab, es gibt kein stilles Nichtstun.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Eine `NullReferenceException` zur Laufzeit.",
+          "feedback": "Das Problem erkennt der Compiler schon vorher."
+        }
+      ],
+      "explanation": "Auch wenn das Event `public` ist, erlaubt es von außen nur das An- und Abmelden. Das Auslösen bleibt der deklarierenden Klasse vorbehalten (Fehler CS0070)."
+    },
+    {
+      "id": "m10-l07-q4",
+      "lesson": "m10-l07",
+      "type": "multi",
+      "question": "`Found` ist ein Event der Klasse `Scanner` vom Typ `Action<string>?`. Welche Zeilen übersetzen außerhalb von `Scanner`?",
+      "options": [
+        {
+          "text": "`scanner.Found += Print;`",
+          "correct": true
+        },
+        {
+          "text": "`scanner.Found -= Print;`",
+          "correct": true
+        },
+        {
+          "text": "`scanner.Found = Print;`",
+          "feedback": "Die Zuweisung mit `=` ist von außen nicht erlaubt."
+        },
+        {
+          "text": "`scanner.Found(\"x\");`",
+          "feedback": "Der Aufruf ist von außen nicht erlaubt.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        }
+      ],
+      "explanation": "Von außen sind nur `+=` und `-=` erlaubt. Zuweisen und Aufrufen kann nur die Klasse, die das Event deklariert."
+    },
+    {
+      "id": "m10-l07-q5",
+      "lesson": "m10-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l07/quiz-remove-lambda.cs",
+      "explanation": "`hello` steht in einer Variablen, `-=` findet denselben Delegate und entfernt ihn. Das zweite Lambda wird mit `-=` als neues Lambda angegeben, das nicht in der Liste steht. Also bleibt `again`."
+    },
+    {
+      "id": "m10-l07-q6",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "Warum steht beim Auslösen eines Events meist `Found?.Invoke(name)` statt `Found(name)`?",
+      "options": [
+        {
+          "text": "Ohne Abonnent hat das Event den Wert `null`. `?.Invoke` ruft dann nichts auf, statt eine `NullReferenceException` auszulösen.",
+          "correct": true
+        },
+        {
+          "text": "`?.Invoke` ruft die Abonnenten parallel auf.",
+          "feedback": "Die Abonnenten laufen weiter nacheinander."
+        },
+        {
+          "text": "Ein Event kann nur mit `Invoke` aufgerufen werden, nie mit Klammern.",
+          "feedback": "Beides ist möglich. Der Unterschied liegt beim `null`-Fall."
+        },
+        {
+          "text": "`?.Invoke` verhindert, dass `-=` den Abonnenten entfernt.",
+          "feedback": "Das Abmelden hat damit nichts zu tun."
+        }
+      ],
+      "explanation": "Ein Delegate ohne Ziel ist `null`. Der Operator `?.` aus Modul 4 ruft die Methode nur auf, wenn der Ausdruck davor nicht `null` ist."
+    },
+    {
+      "id": "m10-l07-q7",
+      "lesson": "m10-l07",
+      "type": "single",
+      "question": "Ein Event hat eigene `add`- und `remove`-Accessoren. Was gilt dann in der Klasse?",
+      "options": [
+        {
+          "text": "Es gibt kein verstecktes Delegate-Feld. Du kannst das Event dort nicht wie einen Delegate aufrufen, sondern verwaltest die Abonnenten selbst.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler erzeugt weiterhin ein Delegate-Feld, das du mit `Found?.Invoke` aufrufst.",
+          "feedback": "Das gilt nur für Events ohne Accessoren (field-like)."
+        },
+        {
+          "text": "Das Event kann dann auch von außen ausgelöst werden.",
+          "feedback": "Von außen bleiben nur `+=` und `-=` möglich.",
+          "misconception": "m10-l07-event-raised-from-outside"
+        },
+        {
+          "text": "Die Accessoren werden ignoriert, solange niemand `+=` benutzt.",
+          "feedback": "`+=` ruft `add` auf und `-=` ruft `remove` auf."
+        }
+      ],
+      "explanation": "Bei einem field-like Event legt der Compiler ein verstecktes Delegate-Feld an. Mit eigenen Accessoren fehlt es, und das Event darf nur links von `+=` oder `-=` stehen (CS0079)."
+    },
+    {
+      "id": "m10-l07-q8",
+      "lesson": "m10-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Event von außen nur mit `+=` und `-=` benutzt werden kann und wer es auslösen darf. Gehe auch darauf ein, was ein öffentliches Delegate-Feld anders macht.",
+      "modelAnswer": "Ein Event schützt den Delegate dahinter: Fremder Code kann sich anmelden und abmelden, aber nicht die ganze Aufrufliste ersetzen und das Event nicht selbst auslösen. Auslösen darf nur die Klasse, die das Event deklariert. Bei einem öffentlichen Delegate-Feld könnte jeder mit `=` alle Abonnenten überschreiben und das Feld aufrufen."
+    },
+    {
+      "id": "m10-l07-q9",
+      "lesson": "m10-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Event statt einer einfachen Callback-Methode als Parameter einsetzen? Nenne ein Beispiel und eine Bedingung, unter der du dich dafür entscheidest.",
+      "modelAnswer": "Ein Event passt, wenn eine Klasse Ereignisse meldet und mehrere fremde Stellen unabhängig voneinander zuhören sollen, zum Beispiel ein Monitor, der gefundene Vorfälle an Konsole, Zähler und Liste meldet. Die Zuhörer können sich zur Laufzeit an- und abmelden, und die Klasse kennt sie nicht. Ein einzelner Callback-Parameter reicht, wenn genau eine Stelle für genau einen Aufruf etwas wissen soll."
+    },
+    {
+      "id": "m10-l08-q1",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Welche Signatur hat die Methode eines Handlers für `EventHandler<TEventArgs>`?",
+      "options": [
+        {
+          "text": "`void (object? sender, TEventArgs e)`",
+          "correct": true
+        },
+        {
+          "text": "`bool (TEventArgs e)`",
+          "feedback": "Der Rückgabetyp ist `void`, und es gibt zwei Parameter."
+        },
+        {
+          "text": "`void (TEventArgs e)`",
+          "feedback": "Der erste Parameter `sender` fehlt."
+        },
+        {
+          "text": "`TEventArgs (object? sender)`",
+          "feedback": "Die Methode gibt nichts zurück, und die Daten kommen als zweiter Parameter."
+        }
+      ],
+      "explanation": "Der Delegate-Typ `EventHandler<TEventArgs>` hat keinen Rückgabewert und zwei Parameter: den Absender als `object?` und die Ereignisdaten."
+    },
+    {
+      "id": "m10-l08-q2",
+      "lesson": "m10-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Reihenfolge und darauf, wann die Abonnenten laufen.",
+      "example": "m10/l08/quiz-handler-order.cs",
+      "explanation": "`Open` schreibt `open`, ruft `OnOpened` auf und schreibt danach `done`. In `OnOpened` laufen die Abonnenten in der Reihenfolge des Anmeldens mit denselben Daten `5`. Erst wenn beide fertig sind, geht `Open` weiter."
+    },
+    {
+      "id": "m10-l08-q3",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Wozu dient der Parameter `sender` in einem Event-Handler?",
+      "options": [
+        {
+          "text": "Er verweist auf das Objekt, das das Event ausgelöst hat (meist `this` des Publishers).",
+          "correct": true
+        },
+        {
+          "text": "Er enthält die Daten des Events.",
+          "feedback": "Die Daten stecken im zweiten Parameter, dem `EventArgs`-Objekt."
+        },
+        {
+          "text": "Er verweist auf den Abonnenten, der sich angemeldet hat.",
+          "feedback": "Der Absender ist der Publisher, nicht der Abonnent."
+        },
+        {
+          "text": "Er entscheidet, ob der Handler aufgerufen wird.",
+          "feedback": "Der Parameter nimmt keinen Einfluss darauf, ob ein Handler läuft."
+        }
+      ],
+      "explanation": "`sender` ist der Absender des Events. Mit ihm kann ein Handler, der für mehrere Publisher registriert ist, erkennen, woher das Event kommt."
+    },
+    {
+      "id": "m10-l08-q4",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Eine `sealed` Klasse löst ihr Event in einer Methode `OnIncidentFound` aus. Warum ist die Methode dort `private` und nicht `protected virtual`?",
+      "options": [
+        {
+          "text": "`protected virtual` erlaubt abgeleiteten Klassen, das Auslösen zu überschreiben. Von einer `sealed` Klasse kann niemand ableiten.",
+          "correct": true
+        },
+        {
+          "text": "`private` Methoden können als einzige ein Event auslösen.",
+          "feedback": "Jede Methode der deklarierenden Klasse kann das Event auslösen."
+        },
+        {
+          "text": "`protected` ist in `sealed` Klassen verboten.",
+          "feedback": "Der Modifizierer ist erlaubt, er bringt nur nichts."
+        },
+        {
+          "text": "Ein `virtual` Aufruf würde das Event löschen.",
+          "feedback": "Der Modifizierer ändert nichts am Event selbst."
+        }
+      ],
+      "explanation": "Der Zweck von `protected virtual` ist, dass abgeleitete Klassen das Auslösen überschreiben können. In einer `sealed` Klasse entfällt dieser Zweck."
+    },
+    {
+      "id": "m10-l08-q5",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Ein Objekt hat sich mit `publisher.Changed += OnChanged;` angemeldet und wird danach nicht mehr benutzt. Es hat sich nicht abgemeldet. Was passiert, wenn der Publisher `Changed` auslöst?",
+      "options": [
+        {
+          "text": "`OnChanged` läuft weiter. Die Anmeldung bleibt bestehen, bis jemand `-=` aufruft.",
+          "correct": true
+        },
+        {
+          "text": "Die Anmeldung endet automatisch, sobald das Objekt nicht mehr benutzt wird.",
+          "feedback": "Der Publisher hält über den Delegate eine Referenz auf den Handler, nichts meldet automatisch ab.",
+          "misconception": "m10-l08-subscribers-removed-automatically"
+        },
+        {
+          "text": "Der Compiler entfernt den Handler beim Übersetzen.",
+          "feedback": "Der Compiler kann nicht wissen, wann ein Objekt fertig ist.",
+          "misconception": "m10-l08-subscribers-removed-automatically"
+        },
+        {
+          "text": "Es gibt eine `InvalidOperationException`.",
+          "feedback": "Ein Handler eines nicht mehr benutzten Objekts löst keinen Fehler aus."
+        }
+      ],
+      "explanation": "Ein Event hält die Handler seiner Abonnenten in der Aufrufliste. Sie bleiben dort, bis `-=` sie entfernt oder der Publisher selbst nicht mehr erreichbar ist."
+    },
+    {
+      "id": "m10-l08-q6",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Warum sollte ein Abonnent sich abmelden, wenn er nicht mehr gebraucht wird?",
+      "options": [
+        {
+          "text": "Der Publisher hält über den Delegate eine Referenz auf den Handler. Ohne `-=` bleibt der Abonnent erreichbar, und sein Handler läuft weiter.",
+          "correct": true
+        },
+        {
+          "text": "Sonst sinkt die Geschwindigkeit, mit der der Publisher das Event auslöst, auf null.",
+          "feedback": "Das Event wird weiter ausgelöst. Es geht um die Referenz und den laufenden Handler."
+        },
+        {
+          "text": "Der Compiler verlangt für jedes `+=` ein passendes `-=`.",
+          "feedback": "Der Compiler prüft das nicht."
+        },
+        {
+          "text": "Nur Lambdas müssen sich abmelden, Methoden nicht.",
+          "feedback": "Die Aufrufliste hält Methoden und Lambdas gleichermaßen.",
+          "misconception": "m10-l08-subscribers-removed-automatically"
+        }
+      ],
+      "explanation": "Solange der Publisher erreichbar ist und den Handler in seiner Aufrufliste hält, kann der Garbage Collector den Abonnenten nicht entfernen. Der Handler läuft außerdem weiter."
+    },
+    {
+      "id": "m10-l08-q7",
+      "lesson": "m10-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l08/quiz-still-subscribed.cs",
+      "explanation": "`handler = null!;` ändert nur die Variable. Das Event hält den Delegate in seiner Aufrufliste, also läuft er beim zweiten `Ring` noch einmal. Abmelden geht nur mit `-=`."
+    },
+    {
+      "id": "m10-l08-q8",
+      "lesson": "m10-l08",
+      "type": "single",
+      "question": "Wie steht es um das Standard-Event-Muster (`EventHandler<TEventArgs>`, `sender`, `EventArgs`)?",
+      "options": [
+        {
+          "text": "Es ist eine Konvention der .NET-Bibliotheken. Die Sprache erzwingt sie nicht, ein Event darf jeden Delegate-Typ haben.",
+          "correct": true
+        },
+        {
+          "text": "Der C#-Compiler verlangt es für jedes Event.",
+          "feedback": "Das Event in Lektion 7 mit `Action<Incident>?` übersetzt auch."
+        },
+        {
+          "text": "Es gilt nur für Events der .NET-Bibliothek, nicht für eigene Klassen.",
+          "feedback": "Eigene Klassen können und sollen es ebenfalls benutzen."
+        },
+        {
+          "text": "Es ist Pflicht, sobald ein Event `public` ist.",
+          "feedback": "Die Sichtbarkeit des Events ändert nichts daran."
+        }
+      ],
+      "explanation": "Die Sprache kennt nur den Delegate-Typ des Events. Das Muster mit `sender` und `EventArgs` ist eine Konvention, an der sich Bibliotheken und Entwickler orientieren."
+    },
+    {
+      "id": "m10-l08-q9",
+      "lesson": "m10-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wozu `sender`, das `EventArgs`-Objekt und die `On…`-Methode im Standard-Event-Muster dienen.",
+      "modelAnswer": "`sender` sagt dem Handler, welches Objekt das Event ausgelöst hat. Das `EventArgs`-Objekt trägt die Daten des Ereignisses, unveränderlich, damit ein Abonnent sie nicht für den nächsten ändert. Die `On…`-Methode löst das Event an einer einzigen Stelle aus, mit `?.Invoke(this, e)`. In Klassen, von denen man ableiten kann, ist sie `protected virtual`, damit abgeleitete Klassen das Auslösen anpassen können."
+    },
+    {
+      "id": "m10-l08-q10",
+      "lesson": "m10-l08",
+      "type": "explain",
+      "question": "Transferfrage: Du schreibst eine Klasse, die ein Fenster oder eine Sitzung öffnet und dabei ein Event eines langlebigen Objekts abonniert. Was machst du, wenn die Sitzung endet, und warum?",
+      "modelAnswer": "Ich melde den Handler beim Ende der Sitzung mit `-=` ab. Das langlebige Objekt hält den Handler sonst in seiner Aufrufliste: Der Handler läuft weiter, obwohl die Sitzung vorbei ist, und das Objekt der Sitzung bleibt erreichbar. Deshalb gehört das `-=` an die Stelle, an der die Sitzung aufgeräumt wird."
     }
   ]
 }

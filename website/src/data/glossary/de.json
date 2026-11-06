@@ -6684,6 +6684,174 @@
         "title": "Delegates – Delegate instantiation",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#215-delegate-instantiation"
       }
+    },
+    {
+      "id": "event",
+      "term": "C#-Event",
+      "german": "Ereignismitglied",
+      "category": "language",
+      "definition": "Ein Mitglied einer Klasse vom Delegate-Typ. Code von außen kann sich nur mit `+=` anmelden und mit `-=` abmelden. Nur die deklarierende Klasse löst es aus.",
+      "aliases": [
+        "Events",
+        "event-Schlüsselwort"
+      ],
+      "related": [
+        "field-like-event",
+        "event-accessor",
+        "publisher",
+        "subscriber",
+        "multicast-delegate"
+      ],
+      "lesson": "m10-l07",
+      "source": {
+        "title": "Classes – Events",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
+      }
+    },
+    {
+      "id": "field-like-event",
+      "term": "Field-like Event",
+      "german": "feldähnliches Event",
+      "category": "language",
+      "definition": "Ein Event ohne eigene Accessoren. Der Compiler legt ein verstecktes Delegate-Feld an. In der Klasse benutzt du das Event wie dieses Feld, es ist `null`, solange niemand angemeldet ist.",
+      "aliases": [
+        "Field-like Events"
+      ],
+      "related": [
+        "event",
+        "event-accessor"
+      ],
+      "lesson": "m10-l07",
+      "source": {
+        "title": "Classes – Field-like events",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
+      }
+    },
+    {
+      "id": "event-accessor",
+      "term": "Event Accessor",
+      "german": "Event-Accessor",
+      "category": "language",
+      "definition": "Die Blöcke `add` und `remove` eines Events. `+=` ruft `add` auf, `-=` ruft `remove` auf. Der Parameter heißt `value` und hat den Typ des Events.",
+      "aliases": [
+        "add",
+        "remove",
+        "Event-Accessoren"
+      ],
+      "related": [
+        "event",
+        "field-like-event"
+      ],
+      "lesson": "m10-l07",
+      "source": {
+        "title": "Classes – Event accessors",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
+      }
+    },
+    {
+      "id": "publisher",
+      "term": "Publisher",
+      "german": "Herausgeber",
+      "category": "language",
+      "definition": "Die Klasse, die ein Event deklariert und auslöst. Sie kennt ihre Abonnenten nicht einzeln.",
+      "aliases": [
+        "Herausgeber",
+        "Event-Quelle"
+      ],
+      "related": [
+        "event",
+        "subscriber"
+      ],
+      "lesson": "m10-l07",
+      "source": {
+        "title": "Classes – Events",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
+      }
+    },
+    {
+      "id": "subscriber",
+      "term": "Subscriber",
+      "german": "Abonnent",
+      "category": "language",
+      "definition": "Code, der sich mit `+=` an ein Event anmeldet und mit `-=` wieder abmeldet. Seine Methode läuft, wenn der Publisher das Event auslöst.",
+      "aliases": [
+        "Abonnent",
+        "Abonnenten",
+        "Subscribers"
+      ],
+      "related": [
+        "event",
+        "publisher"
+      ],
+      "lesson": "m10-l07",
+      "source": {
+        "title": "Classes – Events",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
+      }
+    },
+    {
+      "id": "event-args",
+      "term": "EventArgs",
+      "german": "Ereignisdaten",
+      "category": "platform",
+      "definition": "Die Basisklasse für die Daten eines Events. Eine eigene Klasse erbt von `EventArgs` und bekommt die Daten als Eigenschaften. `EventArgs.Empty` steht für ein Event ohne Daten.",
+      "aliases": [
+        "EventArgs-Klasse",
+        "Event-Daten"
+      ],
+      "related": [
+        "event-handler",
+        "standard-event-pattern",
+        "event"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
+    },
+    {
+      "id": "event-handler",
+      "term": "EventHandler",
+      "german": "Event-Handler-Delegate",
+      "category": "platform",
+      "definition": "Der Delegate-Typ `EventHandler<TEventArgs>` hat die Signatur `void (object? sender, TEventArgs e)`. `EventHandler` ohne Typargument gilt für Events ohne eigene Daten.",
+      "aliases": [
+        "EventHandler<TEventArgs>",
+        "Event-Handler"
+      ],
+      "related": [
+        "event-args",
+        "standard-event-pattern",
+        "event"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
+    },
+    {
+      "id": "standard-event-pattern",
+      "term": "Standard Event Pattern",
+      "german": "Standard-Event-Muster",
+      "category": "platform",
+      "definition": "Die .NET-Konvention für Events: ein `EventHandler<TEventArgs>` mit `sender` und einer `EventArgs`-Klasse, ausgelöst in einer Methode `On…`. Es ist eine Konvention der Bibliotheken, keine Sprachregel.",
+      "aliases": [
+        "Event-Muster",
+        "Event Pattern"
+      ],
+      "related": [
+        "event",
+        "event-args",
+        "event-handler",
+        "subscriber"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
     }
   ]
 }

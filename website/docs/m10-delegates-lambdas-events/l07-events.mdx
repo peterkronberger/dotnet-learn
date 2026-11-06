@@ -1,0 +1,225 @@
+---
+title: Events
+sidebar_position: 7
+description: Ein Event ist ein Delegate-Mitglied, bei dem Code von außen sich nur an- und abmelden kann. Auslösen darf es nur die Klasse, die es deklariert.
+lesson_id: m10-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import delegateField from '!!raw-loader!@site/examples/m10/l07/delegate-field.cs';
+import delegateFieldOutput from '!!raw-loader!@site/examples/m10/l07/delegate-field.out.txt';
+import eventBasics from '!!raw-loader!@site/examples/m10/l07/event-basics.cs';
+import eventBasicsOutput from '!!raw-loader!@site/examples/m10/l07/event-basics.out.txt';
+import eventOutside from '!!raw-loader!@site/examples/m10/l07/event-outside.snippet.cs';
+import unsubscribeLambda from '!!raw-loader!@site/examples/m10/l07/unsubscribe-lambda.cs';
+import unsubscribeLambdaOutput from '!!raw-loader!@site/examples/m10/l07/unsubscribe-lambda.out.txt';
+import eventAccessors from '!!raw-loader!@site/examples/m10/l07/event-accessors.cs';
+import eventAccessorsOutput from '!!raw-loader!@site/examples/m10/l07/event-accessors.out.txt';
+import accessorsInvoke from '!!raw-loader!@site/examples/m10/l07/accessors-invoke.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m10/l07/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l07/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l07/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l07/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l07/seclog-delegates-solution.cs';
+
+# Events
+
+:::note[Lernziele]
+- Du kannst ein Event in einer Klasse deklarieren und auslösen.
+- Du kannst Methoden und Lambdas für ein Event an- und abmelden.
+- Du kannst erklären, warum ein Event von außen nur mit `+=` und `-=` benutzt werden kann.
+- Du kannst ein Event sicher auslösen, wenn niemand angemeldet ist (`?.Invoke`).
+:::
+
+## Rückblick
+
+<Quiz id="m10-l06-q7" />
+
+<Quiz id="m06-l03-q1" />
+
+<Quiz id="m04-l06-q1" />
+
+## Ein Delegate-Feld ist zu offen
+
+Eine Klasse soll melden, wenn sie etwas gefunden hat, und beliebig viele andere Stellen sollen zuhören. Mit den Mitteln der letzten Lektionen geht das mit einem öffentlichen Feld vom Typ <Term id="action-delegate">`Action<string>?`</Term>. Andere Klassen melden sich mit `+=` an, die Klasse ruft das Feld auf. Das Feld hat aber zwei Schwächen, wenn fremder Code darauf zugreift.
+
+:::info[Vorhersage]
+Zwei Methoden melden sich an. Danach weist der Code dem Feld mit `=` ein drittes Lambda zu und ruft das Feld selbst auf. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l07-field" code={delegateField} predict expected={delegateFieldOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `third: from outside` und `third: disk`.
+
+1. **Anmelden:** `+=` hängt `first` und `second` an die Aufrufliste.
+2. **Überschreiben:** `=` ersetzt die ganze Liste. `first` und `second` sind weg, nur `third` bleibt.
+3. **Fremder Aufruf:** `scanner.Found?.Invoke("from outside")` läuft von außen und löst eine Meldung aus, die `Scan` nie ausgelöst hat.
+4. **Eigener Aufruf:** `Scan("disk")` erreicht nur noch `third`.
+
+**Was passiert, wenn …?** … das Feld `private` ist? Dann kann niemand von außen darauf zugreifen, aber auch niemand mehr abonnieren.
+
+</details>
+
+Beide Schwächen verschwinden, wenn du `event` vor die Deklaration schreibst.
+
+## Das Schlüsselwort event
+
+Ein <Term id="event">Event</Term> ist ein Mitglied einer Klasse mit einem Delegate-Typ, das mit dem Schlüsselwort `event` deklariert wird. Von außen sind nur zwei Operationen erlaubt: `+=` meldet eine Methode an, `-=` meldet sie ab. Zuweisen und Aufrufen sind nur in der Klasse möglich, die das Event deklariert ([§15.8.1 Events, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events)). Die Klasse mit dem Event heißt <Term id="publisher">Publisher</Term>, der anmeldende Code <Term id="subscriber">Subscriber</Term>.
+
+Ein Event ohne eigene Accessoren heißt <Term id="field-like-event">Field-like Event</Term>. In der Klasse verhält es sich wie ein Delegate-Feld: Du rufst es mit `Found?.Invoke(…)` auf. Ist niemand angemeldet, hat es den Wert `null`. Dann überspringt `?.` den Aufruf, sonst gäbe es eine `NullReferenceException` (wie in Lektion 6). Wie ein <Term id="access-modifier">Zugriffsmodifizierer</Term> die <Term id="encapsulation">Kapselung</Term> sichert, schützt das Event den Delegate dahinter.
+
+:::info[Vorhersage]
+Ein Scanner ohne Abonnenten scannt zuerst. Dann melden sich eine Methode und ein Lambda an, es folgt ein Scan, `-=` und noch ein Scan. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l07-basics" code={eventBasics} predict expected={eventBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `scanning nobody listens`, `scanning disk`, `plain: disk`, `upper: DISK`, `scanning cpu`, `upper: CPU`.
+
+1. **Ohne Abonnent:** `Found` ist `null`, `?.Invoke` tut nichts, das Programm läuft weiter.
+2. **Anmelden:** `+=` hängt `PrintPlain` und das Lambda an, in dieser Reihenfolge.
+3. **Auslösen:** `Scan("disk")` ruft beide auf.
+4. **Abmelden:** Nach `-= PrintPlain` bleibt nur das Lambda übrig.
+
+**Was passiert, wenn …?** … der letzte Abonnent mit `-=` geht? Dann ist `Found` wieder `null`, und `?.Invoke` überspringt den Aufruf.
+
+</details>
+
+Von außen sind `=` und der Aufruf verboten. Der Compiler meldet für beide Zeilen denselben Fehler:
+
+<CodeBlock language="csharp" title="event-outside.snippet.cs">{eventOutside}</CodeBlock>
+
+Der Compiler meldet für Zeile 3 und Zeile 4 `error CS0070: The event 'Scanner.Found' can only appear on the left hand side of += or -= (except when used from within the type 'Scanner')`.
+
+## Lambdas an- und abmelden
+
+Mit einem Lambda meldest du dich an wie mit einer Methode. Zum Abmelden brauchst du denselben Delegate-Wert wie in Lektion 6: Ein Lambda mit gleichem Text ist ein neuer Delegate.
+
+:::info[Vorhersage]
+Das erste Lambda wird mit einem gleich aussehenden Lambda abgemeldet. Das zweite steht in einer Variablen. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l07-unsubscribe" code={unsubscribeLambda} predict expected={unsubscribeLambdaOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `log: disk`, `count: disk`, `log: cpu`.
+
+1. **Nicht gefunden:** `-=` mit einem neuen Lambda ändert nichts, `log` bleibt angemeldet.
+2. **Gespeichert:** `counter` steht in einer Variablen. `+=` und `-=` benutzen denselben Delegate.
+3. **Folge:** Beim zweiten Scan läuft nur noch `log`.
+
+Willst du ein Lambda später abmelden, speichere es in einer Variablen.
+
+</details>
+
+## Eigene Accessoren
+
+<details>
+<summary>Vertiefung: add und remove selbst schreiben (optional)</summary>
+
+Hinter `+=` und `-=` stehen zwei Blöcke, die <Term id="event-accessor">Event-Accessoren</Term> `add` und `remove`. Bei einem Field-like Event schreibt sie der Compiler. Du kannst sie selbst schreiben, zum Beispiel um die Abonnenten in einer eigenen Liste zu halten. Im Block heißt der angemeldete Delegate `value` ([§15.8.3 Event accessors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events)).
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l07-accessors" code={eventAccessors} predict expected={eventAccessorsOutput} />
+
+Die Ausgabe ist `add called` (zweimal), `one: disk` und `two: disk`. Jedes `+=` ruft `add` auf, `Scan` geht die Liste durch.
+
+Mit eigenen Accessoren gibt es kein verstecktes Delegate-Feld. Ein `Found?.Invoke(name)` in der Klasse wird dann nicht mehr übersetzt:
+
+<CodeBlock language="csharp" title="accessors-invoke.snippet.cs">{accessorsInvoke}</CodeBlock>
+
+Der Compiler meldet `error CS0079: The event 'Scanner.Found' can only appear on the left hand side of += or -=`.
+
+</details>
+
+## Lückenbeispiel
+
+Der `Sensor` soll ein Event `Raised` mit einem `int` melden. Deklariere es, löse es in `Measure` sicher aus, melde `PrintValue` an und danach wieder ab.
+
+<CSharpRunner id="m10-l07-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Deklarieren:** `public event Action<int>? Raised;` in `Sensor`.
+2. **Auslösen:** `Raised?.Invoke(value);` in `Measure`.
+3. **Anmelden und abmelden:** `sensor.Raised += PrintValue;` vor `sensor.Measure(1);` und `sensor.Raised -= PrintValue;` vor `sensor.Measure(2);`. Die Ausgabe ist `measured 1`, `value: 1` und `measured 2`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog prüft Vorfälle mit einem `Detector`, der Regeln zählt, und kann einen Vorfall an mehrere Methoden melden. `PrintAlert` aus Lektion 6 gibt eine Meldung aus.
+
+Im Runner siehst du nur die Stelle vor `return 0;` für den neuen Block. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe hinter `FuncRule` die Klasse `sealed class IncidentMonitor` mit dem Konstruktor `IncidentMonitor(Detector detector)`, dem Event `public event Action<Incident>? IncidentFound;` und der Methode `public void Check(IEnumerable<Incident> items)`. `Check` löst `IncidentFound` für jeden Vorfall aus, bei dem `detector.CountMatches(incident) > 0` gilt. Der Block `// Raise an event when an incident is found` kommt vor `// End with exit code 0 …`: Erzeuge einen Monitor mit `detector`, melde `PrintAlert` und ein Lambda an, das die gefundenen Vorfälle in einer lokalen Variablen zählt, und rufe `Check(incidents)` auf. Gib `Found: <Anzahl>` aus. Melde `PrintAlert` ab, rufe `Check` noch einmal auf und gib die Anzahl noch einmal aus.
+
+<CSharpRunner id="m10-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Deklarieren:** `IncidentMonitor` hält den `Detector` und deklariert das Event `IncidentFound`.
+2. **Auslösen:** `Check` geht die Vorfälle durch und ruft `IncidentFound?.Invoke(incident)` auf, wenn mindestens eine Regel passt.
+3. **Anmelden:** `PrintAlert` und das Lambda hängen sich mit `+=` an. Das Lambda erhöht die lokale Variable.
+4. **Abmelden:** Nach `-= PrintAlert` erscheinen keine Meldungen mehr, das Lambda zählt weiter: erst `2`, dann `4`.
+
+</details>
+
+**Neuer Stand:** SecLog meldet gefundene Vorfälle über ein Event. Wer zuhören will, meldet sich an und wieder ab.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l07-event-raised-from-outside" />
+
+**„Weil ein Event `public` ist, kann es jeder auslösen.“** Das stimmt nicht. Von außen kannst du ein Event nur mit `+=` und `-=` benutzen. Auslösen kann nur Code in der Klasse (oder Struktur), die es deklariert. Ein Aufruf von außen führt zu einem Compilerfehler.
+:::
+
+## Zusammenfassung
+
+Ein Event ist ein Delegate-Mitglied mit Schutz: Von außen melden Subscriber sich mit `+=` an und mit `-=` ab, auslösen kann nur der Publisher. In der Klasse löst du ein Field-like Event mit `?.Invoke(…)` aus, damit es ohne Abonnenten nicht abstürzt. Zum Abmelden eines Lambdas brauchst du denselben Delegate-Wert. Eigene `add`- und `remove`-Accessoren ersetzen das versteckte Feld.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l07-q1" />
+
+<Quiz id="m10-l07-q2" />
+
+<Quiz id="m10-l07-q3" />
+
+<Quiz id="m10-l07-q4" />
+
+<Quiz id="m10-l07-q5" />
+
+<Quiz id="m10-l07-q6" />
+
+<Quiz id="m10-l07-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l07-q8" />
+
+### Transferfrage
+
+<Quiz id="m10-l07-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§15.8 Events](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events)
+- Microsoft Learn: [Events (C#-Programmierhandbuch)](https://learn.microsoft.com/dotnet/csharp/programming-guide/events/)

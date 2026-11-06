@@ -1,0 +1,4 @@
+gate: bob failed 3 times
+log bob
+gate: dave failed 1 times
+log dave
