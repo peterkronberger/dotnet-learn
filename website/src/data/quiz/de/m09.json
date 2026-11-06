@@ -665,6 +665,174 @@
         }
       ],
       "explanation": "Mit `default` und dem Rückgabetyp `T?` meldet die Methode „kein Element“, ohne Ausnahme und für jeden Elementtyp."
+    },
+    {
+      "id": "m09-l05-q1",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine `List<int>` enthält die Zahlen 1, 2 und 3. Wie liegen die Zahlen in der Liste?",
+      "options": [
+        {
+          "text": "Direkt als `int`. Das Typargument `int` bestimmt, wie die Liste ihre Elemente speichert.",
+          "correct": true
+        },
+        {
+          "text": "Jede Zahl ist in ein Objekt verpackt (Boxing), weil eine Liste Referenzen speichert.",
+          "misconception": "m09-l05-generics-box-value-types",
+          "feedback": "Boxing entsteht bei `object`-Sammlungen wie `ArrayList`. Eine `List<int>` speichert `int`-Werte direkt."
+        },
+        {
+          "text": "Als Text, damit die Liste jeden Typ aufnehmen kann.",
+          "feedback": "Die Liste ist an `int` gebunden. Ein Text hätte den Typ `string`."
+        }
+      ],
+      "explanation": "Bei einem Werttyp als Typargument erzeugt die Laufzeit Code, der genau für diesen Werttyp gemacht ist. Deshalb liegen die `int`-Werte direkt in der Liste."
+    },
+    {
+      "id": "m09-l05-q2",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `IReadOnlyList<int> numbers`. Welches Argument nimmt sie **nicht** an?",
+      "options": [
+        {
+          "text": "Ein `HashSet<int>`.",
+          "correct": true
+        },
+        {
+          "text": "Ein `int[]`.",
+          "feedback": "Ein Array implementiert `IReadOnlyList<int>` und wird angenommen."
+        },
+        {
+          "text": "Eine `List<int>`.",
+          "feedback": "`List<T>` implementiert `IReadOnlyList<T>` und wird angenommen."
+        }
+      ],
+      "explanation": "Ein `HashSet<T>` hat keine Plätze mit Index. Er implementiert `ICollection<T>` und `IEnumerable<T>`, aber nicht `IReadOnlyList<T>`."
+    },
+    {
+      "id": "m09-l05-q3",
+      "lesson": "m09-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l05/quiz-collection-sum.cs",
+      "explanation": "`TotalLength` nimmt `IEnumerable<string>` und läuft mit `foreach` durch alle Elemente. Die Liste und das Array passen beide. Die Längen sind 1 + 2 + 3 = 6 und 4."
+    },
+    {
+      "id": "m09-l05-q4",
+      "lesson": "m09-l05",
+      "type": "multi",
+      "question": "Welche dieser Schnittstellen implementiert `List<T>`?",
+      "options": [
+        {
+          "text": "`IList<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IReadOnlyList<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IEnumerable<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IReadOnlyDictionary<TKey, TValue>`",
+          "feedback": "Das ist eine Schnittstelle für Wörterbücher, nicht für Listen."
+        }
+      ],
+      "explanation": "`List<T>` implementiert `IList<T>`, `ICollection<T>`, `IEnumerable<T>`, `IReadOnlyList<T>` und `IReadOnlyCollection<T>`."
+    },
+    {
+      "id": "m09-l05-q5",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Ein `Dictionary<string, int>` wird als `IEnumerable<…>` durchlaufen. Welchen Typ hat dann ein Element?",
+      "options": [
+        {
+          "text": "`KeyValuePair<string, int>`",
+          "correct": true
+        },
+        {
+          "text": "`int`, der Wert des Eintrags.",
+          "feedback": "Ein Element enthält Schlüssel und Wert zusammen."
+        },
+        {
+          "text": "`string`, der Schlüssel des Eintrags.",
+          "feedback": "Ein Element enthält Schlüssel und Wert zusammen."
+        }
+      ],
+      "explanation": "`Dictionary<TKey, TValue>` ist ein `IEnumerable<KeyValuePair<TKey, TValue>>`. Jedes Element ist ein Paar aus Schlüssel und Wert."
+    },
+    {
+      "id": "m09-l05-q6",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine Methode soll nur einmal durch alle Elemente laufen, zum Beispiel um sie zu zählen. Welcher Parametertyp nimmt die meisten Sammlungen an?",
+      "options": [
+        {
+          "text": "`IEnumerable<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IList<T>`",
+          "feedback": "`IList<T>` verlangt Indexzugriff und Änderungen. Ein `HashSet<T>` passt nicht."
+        },
+        {
+          "text": "`List<T>`",
+          "feedback": "Ein Array und ein `HashSet<T>` sind keine `List<T>`."
+        }
+      ],
+      "explanation": "Je weniger ein Parametertyp verlangt, desto mehr Sammlungen passen. `IEnumerable<T>` verlangt nur, dass man die Elemente nacheinander lesen kann."
+    },
+    {
+      "id": "m09-l05-q7",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Wann wird ein `int` in ein Objekt verpackt (Boxing)?",
+      "options": [
+        {
+          "text": "Wenn er in eine `ArrayList` eingefügt wird, deren Elemente den Typ `object` haben.",
+          "correct": true
+        },
+        {
+          "text": "Immer, wenn er in einer generischen Sammlung wie `List<int>` liegt.",
+          "misconception": "m09-l05-generics-box-value-types",
+          "feedback": "In einer `List<int>` liegt der `int` direkt. Es gibt kein Boxing."
+        },
+        {
+          "text": "Wenn er mit `+` zu einem anderen `int` addiert wird.",
+          "feedback": "Eine Addition von zwei `int` braucht kein Objekt."
+        }
+      ],
+      "explanation": "Boxing entsteht, wenn ein Wert in `object` oder in eine Schnittstelle umgewandelt wird. `ArrayList` speichert `object`, deshalb wird jeder eingefügte `int` verpackt."
+    },
+    {
+      "id": "m09-l05-q8",
+      "lesson": "m09-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum verpackt eine `List<int>` ihre Zahlen nicht, eine `ArrayList` aber schon, und was folgt daraus beim Lesen eines Elements?",
+      "modelAnswer": "Eine `List<int>` ist eine generische Klasse. Mit dem Typargument `int` speichert sie die Zahlen direkt als `int`. Eine `ArrayList` speichert nur `object`. Deshalb wird jede Zahl beim Einfügen verpackt, und beim Lesen braucht man einen Cast. Passt der Typ nicht, gibt es erst zur Laufzeit eine `InvalidCastException`. Bei `List<int>` meldet der Compiler einen falschen Typ schon beim Übersetzen."
+    },
+    {
+      "id": "m09-l05-q9",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Wo setzt du `IEnumerable<T>` ein? Eine Methode soll Zeilen ausgeben. Manche Aufrufer haben ein Array, andere eine `List<string>`. Was passt?",
+      "options": [
+        {
+          "text": "`static void PrintLines(IEnumerable<string> lines)`, denn Array und Liste passen beide.",
+          "correct": true
+        },
+        {
+          "text": "Zwei Überladungen: eine für `string[]` und eine für `List<string>`.",
+          "feedback": "Das funktioniert, ist aber doppelter Code. Ein `IEnumerable<string>` nimmt beide an."
+        },
+        {
+          "text": "`static void PrintLines(object lines)`, denn jede Sammlung ist ein `object`.",
+          "feedback": "Mit `object` kann die Methode nicht ohne Cast durch die Elemente laufen."
+        }
+      ],
+      "explanation": "Ein Parameter vom Typ `IEnumerable<string>` sagt: Die Methode braucht nur den Durchlauf. Array, Liste und Menge erfüllen das."
     }
   ]
 }

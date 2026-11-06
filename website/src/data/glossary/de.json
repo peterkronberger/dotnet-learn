@@ -6089,6 +6089,48 @@
         "title": "Expressions – Default value expressions",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12821-default-value-expressions"
       }
+    },
+    {
+      "id": "non-generic-collection",
+      "term": "Non-generic Collection",
+      "german": "Nicht generische Sammlung",
+      "category": "platform",
+      "definition": "Eine ältere Sammlung wie `ArrayList`, deren Elemente den Typ `object` haben. Werttypen werden beim Einfügen verpackt (Boxing), und beim Lesen braucht man einen Cast.",
+      "aliases": [
+        "nicht generische Sammlungen",
+        "ArrayList"
+      ],
+      "related": [
+        "boxing",
+        "list",
+        "generics"
+      ],
+      "lesson": "m09-l05",
+      "source": {
+        "title": "ArrayList Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.arraylist"
+      }
+    },
+    {
+      "id": "enumerable",
+      "term": "IEnumerable<T>",
+      "german": "Aufzählbare Sammlung",
+      "category": "platform",
+      "definition": "Die Schnittstelle `IEnumerable<T>` beschreibt eine Folge von Elementen vom Typ `T`, die man nacheinander lesen kann. `foreach` arbeitet mit ihr, und fast jede Sammlung implementiert sie.",
+      "aliases": [
+        "IEnumerable",
+        "aufzählbar"
+      ],
+      "related": [
+        "collection-interface",
+        "enumerator",
+        "generic-type"
+      ],
+      "lesson": "m09-l05",
+      "source": {
+        "title": "IEnumerable<T> Interface",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1"
+      }
     }
   ]
 }
