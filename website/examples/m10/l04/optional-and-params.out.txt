@@ -1,0 +1,4 @@
+[INFO] started
+[WARN] disk full
+0
+3

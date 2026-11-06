@@ -1,0 +1,218 @@
+---
+title: "Lambdas im Detail: natürlicher Typ, Rückgabetyp, Standardwerte"
+sidebar_position: 4
+description: Ein Lambda mit ausdrücklichen Parametertypen hat einen natürlichen Typ und passt zu var. Dazu kommen ein ausdrücklicher Rückgabetyp, Discard-Parameter und ab C# 12 optionale Parameter und params.
+lesson_id: m10-l04
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import naturalType from '!!raw-loader!@site/examples/m10/l04/natural-type.cs';
+import naturalTypeOutput from '!!raw-loader!@site/examples/m10/l04/natural-type.out.txt';
+import noNaturalType from '!!raw-loader!@site/examples/m10/l04/no-natural-type.snippet.cs';
+import discardParameters from '!!raw-loader!@site/examples/m10/l04/discard-parameters.cs';
+import discardParametersOutput from '!!raw-loader!@site/examples/m10/l04/discard-parameters.out.txt';
+import optionalAndParams from '!!raw-loader!@site/examples/m10/l04/optional-and-params.cs';
+import optionalAndParamsOutput from '!!raw-loader!@site/examples/m10/l04/optional-and-params.out.txt';
+import optionalNotFunc from '!!raw-loader!@site/examples/m10/l04/optional-not-func.snippet.cs';
+import simpleModifiers from '!!raw-loader!@site/examples/m10/l04/simple-parameter-modifiers.cs';
+import gaps from '!!raw-loader!@site/examples/m10/l04/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l04/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l04/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l04/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l04/seclog-delegates-solution.cs';
+
+# Lambdas im Detail: natürlicher Typ, Rückgabetyp, Standardwerte
+
+:::note[Lernziele]
+- Du kannst vorhersagen, wann `var` mit einem Lambda funktioniert (natürlicher Typ) und wann nicht.
+- Du kannst einem Lambda einen ausdrücklichen Rückgabetyp geben.
+- Du kannst Discard-Parameter (`_`) in Lambdas benutzen.
+- Du kannst Lambdas mit optionalen Parametern und `params` schreiben (C# 12).
+:::
+
+## Rückblick
+
+<Quiz id="m10-l03-q2" />
+
+<Quiz id="m03-l06-q4" />
+
+<Quiz id="m01-l05-q3" />
+
+## Der natürliche Typ
+
+In Lektion 3 hat der Zieltyp einem Lambda seine Typen gegeben: `Func<int, int> twice = x => x * 2;`. Schreibst du die Parametertypen selbst in das Lambda, braucht der Compiler kein Ziel mehr. Er gibt dem Lambda den <Term id="natural-type">natürlichen Typ</Term>: ein `Func<…>`, wenn es einen Wert zurückgibt, sonst ein `Action<…>`. Dann funktioniert `var`.
+
+```csharp
+var twice = (int x) => x * 2;   // Func<int, int>
+```
+
+Auch eine Methodengruppe hat einen natürlichen Typ, wenn es nur eine Überladung gibt: `var square = Square;` ist ein `Func<int, int>`.
+
+Der Rückgabetyp wird meist aus dem Körper bestimmt. Du kannst ihn aber vor die Parameterliste schreiben. Dann muss die Parameterliste in Klammern stehen: `int? (string text) => …`.
+
+:::info[Vorhersage]
+Alle vier Variablen sind mit `var` deklariert. Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l04-natural-type" code={naturalType} predict expected={naturalTypeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `42`, `> natural type`, `42`, `True` und `49`.
+
+1. **Natürlicher Typ:** `(int x) => x * 2` hat einen ausdrücklichen Parametertyp, `twice` ist ein `Func<int, int>`. `twice(21)` ergibt `42`. `show` ist ein `Action<string>`.
+2. **Ausdrücklicher Rückgabetyp:** `int? (string text) => …` gibt `int?` zurück. Für `"42"` kommt `42`, für `"x"` kommt `null`, und `is null` ergibt `True`.
+3. **Methodengruppe:** `Square` hat nur eine Überladung. `square` ist ein `Func<int, int>`, `square(7)` ergibt `49`.
+
+**Was passiert, wenn …?** … du `(int x) => x * 2` ohne Typ als `x => x * 2` schreibst? Dann gibt es keinen natürlichen Typ, und `var` geht nicht (siehe unten).
+
+</details>
+
+## Wann es nicht geht
+
+Ohne Parametertyp kann der Compiler die Typen nicht erfinden. Er leitet sie nicht aus dem Körper ab. Dasselbe gilt für eine Methodengruppe mit mehreren Überladungen, weil er keine auswählen kann:
+
+<CodeBlock language="csharp" title="no-natural-type.snippet.cs">{noNaturalType}</CodeBlock>
+
+Der Compiler meldet für beide Zeilen `error CS8917: The delegate type could not be inferred.` Mit einem Zieltyp geht es wieder: `Func<int, int> identity = x => x;`.
+
+## Discard-Parameter
+
+Manchmal verlangt ein Delegate-Typ Parameter, die dein Lambda nicht braucht. Nennst du zwei oder mehr Parameter `_`, sind sie <Term id="discard-parameter">Discard-Parameter</Term>: Ihre Werte werden ignoriert, und mehrere `_` stören sich nicht. Ein einzelnes `_` ist dagegen ein gewöhnlicher Parameter, der so heißt. Den Unterstrich als <Term id="discard">Platzhalter</Term> kennst du aus Mustern.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l04-discard" code={discardParameters} predict expected={discardParametersOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3 items` und `second argument`.
+
+1. **Discards:** In `(_, _, count)` sind die ersten zwei Parameter Discards. Das Lambda benutzt nur `count`.
+2. **Parameterzahl:** Das Lambda hat drei Parameter, weil der Delegate-Typ drei verlangt. Discards sparen nur die Namen.
+3. **Ein einzelnes `_`:** In `(_, text)` ist `_` ein gewöhnlicher Parameter. Das Lambda benutzt ihn nicht, er stört aber nicht.
+
+</details>
+
+## Optionale Parameter und params
+
+<Since csharp="12" dotnet="8" />
+
+Seit C# 12 darf ein Lambda <Term id="optional-parameter">optionale Parameter</Term> mit Standardwert und ein <Term id="parameter-array">Parameterarray</Term> mit `params` haben, wie eine Methode in Modul 3.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l04-optional" code={optionalAndParams} predict expected={optionalAndParamsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `[INFO] started`, `[WARN] disk full`, `0` und `3`.
+
+1. **Standardwert:** `log("started")` lässt `level` weg, es gilt `"INFO"`. Beim zweiten Aufruf ersetzt `"WARN"` den Standardwert.
+2. **params:** `count()` ruft das Lambda ohne Argument auf, das Array ist leer: `0`. `count(4, 8, 15)` hat drei Elemente: `3`.
+3. **Typ:** `log` und `count` sind mit `var` gespeichert. Der Compiler erzeugt dafür einen eigenen Delegate-Typ, weil `Func` und `Action` weder Standardwerte noch `params` kennen.
+
+</details>
+
+Ein Lambda mit optionalem Parameter passt deshalb nicht zu einem `Func`:
+
+<CodeBlock language="csharp" title="optional-not-func.snippet.cs">{optionalNotFunc}</CodeBlock>
+
+Der Compiler meldet `error CS0029: Cannot implicitly convert type '<anonymous delegate>' to 'System.Func<string, string, string>'`.
+
+<details>
+<summary>Vertiefung: Modifizierer ohne Parametertyp (optional)</summary>
+
+<Since csharp="14" dotnet="10" />
+
+Ein Parameter mit Modifizierer wie `ref` oder `out` musste im Lambda bisher auch seinen Typ nennen. Seit C# 14 darfst du den Typ weglassen und den Modifizierer behalten, wenn der Delegate-Typ bekannt ist. Mit `delegate void Doubler(ref int value);` ist `(ref x) => x *= 2` gültig ([Simple lambda parameters with modifiers](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/simple-lambda-parameters-with-modifiers)).
+
+<CSharpRunner id="m10-l04-modifiers" code={simpleModifiers} />
+
+Der Aufruf `twice(ref number)` gibt `42` aus. Dieselbe Regel wie sonst gilt: Das Lambda muss zum Delegate-Typ passen, auch im Modifizierer. Nur `params` darf ohne Typ nicht stehen.
+
+</details>
+
+## Lückenbeispiel
+
+Speichere ein Lambda mit `var`. Es hat den Parameter `text` und den optionalen Parameter `prefix` mit dem Standardwert `"-"` und gibt Präfix und Text zurück. Gib das Ergebnis für `"one"` und für `"two"` mit dem Präfix `"*"` aus.
+
+<CSharpRunner id="m10-l04-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Lambda speichern:** `var addPrefix = (string text, string prefix = "-") => $"{prefix} {text}";`. Die ausdrücklichen Typen geben dem Lambda den natürlichen Typ.
+2. **Aufrufen:** `Console.WriteLine(addPrefix("one"));` gibt `- one` aus, `Console.WriteLine(addPrefix("two", "*"));` gibt `* two` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog schreibt Regeln als Lambdas und sortiert Vorfälle mit `Comparer<Incident>.Create`. `bobIncident` und `daveIncident` sind die zwei Vorfälle des Beispiel-Logs.
+
+Im Runner siehst du nur die Stelle vor `return 0;` für den neuen Block. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** <Since csharp="12" dotnet="8" /> Vor `// End with exit code 0 …` kommt der Block `// Format alerts with a lambda that has a default value`. Er speichert ein Lambda mit `var`: Parameter `Incident incident` und optionaler Parameter `string level = "ALERT"`. Es gibt `$"[{level}] {incident.Summary()}"` zurück. Dann gibt der Block eine Zeile für `bobIncident` mit dem Standardwert aus und eine für `daveIncident` mit `"INFO"`.
+
+<CSharpRunner id="m10-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Natürlicher Typ:** Beide Parameter haben ausdrückliche Typen. Deshalb funktioniert `var formatAlert = …`.
+2. **Standardwert:** `formatAlert(bobIncident)` lässt `level` weg. `formatAlert(daveIncident, "INFO")` setzt es.
+
+</details>
+
+**Neuer Stand:** SecLog formatiert Meldungen mit einem Lambda, das einen Standardwert für die Stufe hat.
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l04-lambda-has-no-type" />
+
+**„Ein Lambda kann man nie mit `var` speichern.“** Das stimmt seit C# 10 nicht mehr. Hat jeder Parameter einen ausdrücklichen Typ, hat das Lambda einen natürlichen Typ, und `var` geht. Nur wenn der Compiler keine Parametertypen findet (oder bei einer Methodengruppe mit mehreren Überladungen), braucht er einen Zieltyp.
+:::
+
+## Zusammenfassung
+
+Ein Lambda mit ausdrücklichen Parametertypen hat einen natürlichen Typ (`Func` oder `Action`) und passt zu `var`. Ohne Parametertypen braucht der Compiler einen Zieltyp. Den Rückgabetyp kannst du vor die Parameterliste schreiben. Mehrere Parameter `_` sind Discards. Optionale Parameter und `params` in Lambdas gibt es seit C# 12. Der Compiler erzeugt dafür einen eigenen Delegate-Typ.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l04-q1" />
+
+<Quiz id="m10-l04-q2" />
+
+<Quiz id="m10-l04-q3" />
+
+<Quiz id="m10-l04-q4" />
+
+<Quiz id="m10-l04-q5" />
+
+<Quiz id="m10-l04-q6" />
+
+<Quiz id="m10-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m10-l04-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Lambda-Ausdrücke und anonyme Funktionen](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/lambda-expressions)
+- C#-Spezifikation: [§12.22.8 Anonymous function type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12228-anonymous-function-type)
