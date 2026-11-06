@@ -153,6 +153,7 @@
       "id": "m08-l02-q3",
       "lesson": "m08-l02",
       "type": "single",
+      "placement": true,
       "question": "`A` deklariert `public virtual string Name()`. `B : A` deklariert `public new string Name()`. Es gilt `A x = new B();`. Welche Version läuft bei `x.Name()`?",
       "options": [
         {
@@ -489,6 +490,7 @@
       "id": "m08-l04-q7",
       "lesson": "m08-l04",
       "type": "single",
+      "placement": true,
       "question": "Welche Deklaration lässt sich übersetzen?",
       "options": [
         {
@@ -566,6 +568,10 @@
       "id": "m08-l05-q4",
       "lesson": "m08-l05",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m08-l03"
+      ],
       "question": "Zwei Klassen, `Printer` und `Ticket`, teilen weder Code noch Zustand, sollen aber in einer Liste liegen und mit demselben Aufruf `Describe()` benutzt werden. Was passt am besten?",
       "options": [
         {
@@ -770,6 +776,10 @@
       "id": "m08-l06-q6",
       "lesson": "m08-l06",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m08-l01"
+      ],
       "question": "Welche Umwandlung ist implizit, braucht also keinen Cast?",
       "options": [
         {
@@ -854,6 +864,7 @@
       "id": "m08-l07-q3",
       "lesson": "m08-l07",
       "type": "single",
+      "placement": true,
       "question": "`Severity` hat die Member `None`, `Low`, `Medium` und `High` (Werte 0 bis 3). Was passiert bei `Severity odd = (Severity)42;`?",
       "options": [
         {
@@ -1151,6 +1162,7 @@
       "id": "m08-l09-q3",
       "lesson": "m08-l09",
       "type": "single",
+      "placement": true,
       "question": "Eine Klasse überschreibt `Equals`, aber nicht `GetHashCode`. Zwei Objekte mit gleichen Werten kommen in ein `HashSet`. Was passiert?",
       "options": [
         {
@@ -1394,6 +1406,10 @@
       "id": "m08-l10-q9",
       "lesson": "m08-l10",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m08-l08"
+      ],
       "question": "Welche Deklaration ergibt einen Werttyp, dessen positionale Eigenschaften nur lesbar sind?",
       "options": [
         {
@@ -1555,6 +1571,7 @@
       "id": "m08-l11-q9",
       "lesson": "m08-l11",
       "type": "multi",
+      "placement": true,
       "question": "Welche Aussagen über Vergleichen und Sortieren stimmen?",
       "options": [
         {

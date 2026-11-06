@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-05. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-06. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -137,7 +137,6 @@ Each module section has these fields:
 - **Glossary terms:** collection (`m05-l04`); see the `"lesson": "m05-l…"` fields: array-initializer, bounds-check, rank, multi-dimensional-array, jagged-array, index-from-end, list, type-argument, enumerator, iteration-variable, dictionary, key, key-value-pair, hash-set, set-operation, collection-expression, spread-element, collection-initializer, target-typed, queue, stack-collection, collection-interface, ordinal-comparison, culture-sensitive-comparison, separator, utc, timestamp, time-span, date-time-offset
 - **Misconception ids:** m05-l01-index-starts-at-one, m05-l02-jagged-same-as-multidimensional, m05-l03-range-end-inclusive, m05-l04-insert-overwrites, m05-l05-change-list-in-foreach, m05-l06-missing-key-gives-default, m05-l07-add-duplicate-throws, m05-l08-collection-expression-is-array, m05-l09-contains-same-cost, m05-l10-replace-changes-string, m05-l11-now-for-log-timestamps
 - **Open forward references:**
-  - Key equality of `Dictionary`/`HashSet` (`Equals`/`GetHashCode`) → M8 (`m05-l06`, `m05-l07`)
   - Generics (`List<T>` as a generic type) → M9
   - `Span<T>`, `ref struct` → named only, not taught
 - **SecLog end state:** `website/examples/m05/l11/seclog-collections-solution.cs` – the M4 end state plus: whole sample log in an array/list, failures per user in a `Dictionary`, distinct IPs in a `HashSet`, timestamps as `DateTimeOffset`, alert "5 failed attempts in 10 minutes". New local functions: `PrintAlerts`, `EventTypeOf`, `TimestampOf`. Chain: `m04/l08` → `m05/l01` → … → `m05/l11`. M5 milestone reached.
@@ -162,14 +161,12 @@ Each module section has these fields:
 - **Constructs taught:** `class`, field, `new T()`, `.` member access, instance method (`m06-l01`), constructor, `this(…)`, `this.x`, `readonly` (`m06-l02`), `private`, `public`, `internal`, `///` with `<summary>`, `<param>`, `<returns>` (`m06-l03`), `get`, `set`, `value`, property (`m06-l04`), object initializer, `new(…)` (`m06-l05`), `{ get; }`, `{ get; set; }`, `init`, `required`, `field`, `=>` property (`m06-l06`), primary constructor (`m06-l07`), `static` member, `static class`, static constructor (`m06-l08`), `namespace`, `using`, alias, `global using` (`m06-l09`), `Main`, `args`, `return` exit code (`m06-l10`). `sealed` and `partial` are named only.
 - **Glossary terms:** see the `"lesson": "m06-l…"` fields: class, instance, field, member, instance-method, object-creation, constructor, default-constructor, constructor-chaining, this-access, readonly-field, encapsulation, access-modifier, accessibility-domain, documentation-comment, property, accessor, backing-field, computed-property, object-initializer, auto-property, init-accessor, required-member, field-keyword, primary-constructor, static-member, instance-member, static-class, static-constructor, namespace, fully-qualified-name, using-directive, using-alias, global-using, implicit-usings, entry-point, main-method, command-line-argument, exit-code
 - **Misconception ids:** m06-l01-class-declaration-creates-object, m06-l02-readonly-object-immutable, m06-l03-private-per-object, m06-l04-property-is-field, m06-l05-initializer-before-constructor, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable, m06-l09-using-adds-library, m06-l10-top-level-has-no-main
-- **Open forward references:** 
-  - `protected`, inheritance, records, `sealed`, `abstract` → M8 (`m06-l03`, `m06-l07`, `m06-l08`)
+- **Open forward references:**
   - `with` expression → M12 (`m06-l06`)
   - `async`/`await` → M13 (`m06-l10`)
   - Projects and assemblies, project file, attributes → M14 (`m06-l03`, `m06-l06`, `m06-l09`)
 - **SecLog end state:** `website/examples/m06/l10/seclog-classes-solution.cs` – the M5 end state plus: `LogEvent` (events from the sample log, `Describe()`) and `Incident` (failed logins of one user, validated `Status`, `required Source`, static `Count`). Both live in the namespace `SecLog.Model` at the end of the file. Chain: `m05/l11` → `m06/l01` → … → `m06/l10`. M6 milestone reached.
 - **Notes for later modules:**
-  - Classes do not override `ToString()` yet (M8).
   - New top-level blocks go **before** `return 0;` (since `m06-l10`).
   - M6 rejects invalid values without exceptions (`Add` returns `bool`, `Status` ignores bad values); M7 may change this.
 
@@ -188,14 +185,40 @@ Each module section has these fields:
 - **Constructs taught:** `try`, `catch`, `catch (T ex)`, `Message`, common exception types (`m07-l01`), catch order, `when` (`m07-l02`), stack trace (`m07-l03`), `finally` (`m07-l04`), `throw`, `throw;`, throw expression with `??`, `ArgumentNullException.ThrowIfNull` and other throw helpers (`m07-l05`), custom class `: Exception` with `base(…)` (used, inheritance marked), `InnerException` (`m07-l06`), Try pattern `bool TryX(…, out T)` (`m07-l07`), `using (…) { }`, `using T x = …;`, `IDisposable`, `Dispose()` (`m07-l08`), `File.*`, `Path.*`, `StreamReader`, `StreamWriter`, `Directory.CreateTempSubdirectory`, `FileNotFoundException`, `IOException` (`m07-l09`). Finalizers and the dispose pattern: deep dive only (`m07-l08`).
 - **Glossary terms:** see the `"lesson": "m07-l…"` fields: try-statement, catch-clause, throw-exception, exception-type, exception-filter, exception-propagation, stack-trace, stack-frame, logic-error, unhandled-exception, finally-block, throw-statement, throw-expression, rethrow, guard-clause, throw-helper, custom-exception, inner-exception, business-rule, try-pattern, swallowing-exceptions, resource, dispose, using-statement, using-declaration, finalizer, file-path, stream, text-encoding, io-exception
 - **Misconception ids:** m07-l01-resume-after-error, m07-l02-catch-order-irrelevant, m07-l03-first-line-is-the-bug, m07-l04-finally-only-without-exception, m07-l05-throw-ex-keeps-stack-trace, m07-l06-own-exception-for-every-error, m07-l07-catch-exception-everywhere-is-safe, m07-l08-dispose-frees-memory, m07-l09-writealltext-appends
-- **Open forward references:**
-  - Inheritance, `base` → M8 (`m07-l02`, `m07-l06`)
-  - Interfaces, classes with `: IDisposable` → M8 (`m07-l08`)
+- **Open forward references:** none (inheritance, `base` and interfaces are taught in M8).
 - **SecLog end state:** `website/examples/m07/l09/seclog-exceptions-solution.cs` – the M6 end state plus: `InvalidLogLineException` (line number, `InnerException`), `ParseLine` (throws) and `TryParseLine` (Try pattern), `Incident.Status` throws `ArgumentException` for unknown values, and the sample log is written to a temp file and read with `StreamReader` in `using`; bad lines are reported, not fatal. Chain: `m06/l10` → `m07/l01` → `l02` → `l04` → … → `l09` (`l03` has no step). M7 milestone reached.
 - **Notes for later modules:**
   - `Incident.Status` throws now (M6 ignored bad values); `ParseLine` throws, `TryParseLine` returns `false`.
   - File examples create a temp directory, write every file they read, delete it at the end and never print a full path (`.claude/rules/examples.md`).
   - Exceptions in async code are not covered → M13.
+
+## M8 OOP II
+
+- **Lessons:**
+  - `m08-l01` Vererbung und Basisklassen – `class D : B`, inherited members, `protected`, `base(…)` constructor call; constructors are not inherited.
+  - `m08-l02` Virtuelle Methoden, override und Verdecken – `virtual`/`override`, polymorphism, `new` hiding, `base.M()`.
+  - `m08-l03` Abstrakte Klassen und Polymorphie – `abstract` class and members; no object of an abstract class.
+  - `m08-l04` Versiegelte Klassen und Member – `sealed` class, `sealed override`, CA1852; sealed is not immutable.
+  - `m08-l05` Interfaces – `interface`, implementation, explicit implementation, default interface members (C# 8), composition vs. inheritance.
+  - `m08-l06` Typprüfungen und Casts – `is`, `is T x`, `as`, cast, `InvalidCastException`, boxing named, user-defined conversions (short).
+  - `m08-l07` Enums – `enum`, underlying type, `[Flags]`, `Enum.Parse`/`TryParse`; any underlying value is valid.
+  - `m08-l08` Structs – value semantics, `readonly struct`, `readonly` members, `default`, boxing, no inheritance.
+  - `m08-l09` Gleichheit von Objekten – `Equals`/`GetHashCode` contract, `IEquatable<T>`, `operator ==`/`!=`.
+  - `m08-l10` Records – `record`, positional record, `record struct`, `readonly record struct`, generated members.
+  - `m08-l11` Objekte vergleichen und sortieren – `IComparable<T>`, `IComparer<T>`, `List<T>.Sort`; order vs. equality.
+- **Constructs taught:** `: Base`, `protected`, `base(…)` (`m08-l01`), `virtual`, `override`, `new` (hiding), `base.M()` (`m08-l02`), `abstract` (`m08-l03`), `sealed`, `sealed override` (`m08-l04`), `interface`, explicit interface implementation, default interface members (`m08-l05`), `is`, `is T x`, `as`, explicit cast, `implicit operator`/`explicit operator` (`m08-l06`), `enum`, `[Flags]`, `Enum.Parse`, `Enum.TryParse` (`m08-l07`), `struct`, `readonly struct`, `readonly` member, `default` (`m08-l08`), `Equals`, `GetHashCode`, `IEquatable<T>`, `operator ==`/`!=` (`m08-l09`), `record`, `record struct`, `readonly record struct` (`m08-l10`), `IComparable<T>`, `CompareTo`, `IComparer<T>`, `Compare`, `Sort` (`m08-l11`).
+- **Glossary terms:** see the `"lesson": "m08-l…"` fields: inheritance, base-class, derived-class, protected-access, base-constructor-call, virtual-member, override, polymorphism, member-hiding, base-access, abstract-class, abstract-member, sealed-class, sealed-member, code-analysis-rule, interface, interface-implementation, explicit-interface-implementation, default-interface-member, composition, type-test, as-operator, reference-conversion, declaration-pattern, enum, enum-member, underlying-type, flags-enum, struct, readonly-struct, readonly-member, equality-contract, hash-code, operator-overloading, record, positional-record, record-struct, compiler-generated-member, comparable, comparer, sort-order
+- **Misconception ids:** m08-l01-constructors-are-inherited, m08-l02-new-overrides-method, m08-l03-abstract-class-only-abstract-members, m08-l04-sealed-means-immutable, m08-l05-matching-methods-implement-interface, m08-l06-cast-changes-object, m08-l07-enum-only-named-values, m08-l08-struct-copy-changes-original, m08-l09-equals-without-gethashcode, m08-l10-record-always-immutable, m08-l11-sort-knows-order
+- **Open forward references:**
+  - More patterns (`m08-l06`), `with` expressions (`m08-l10`) → M12
+  - Lambdas, `Comparer<T>.Create` (`m08-l11`) → M10
+  - LINQ, `OrderBy` (`m08-l11`) → M11
+  - Attributes (`m08-l07`), assemblies (`m08-l04`) → M14
+- **SecLog end state:** `website/examples/m08/l11/seclog-oop-solution.cs` – the M7 end state plus: `IDetectionRule`, abstract `DetectionRule`, sealed `FailedLoginRule`/`WatchListRule`/`StatusRule`, `Detector`, enums `EventType`/`Severity`, `readonly struct TimeWindow`, `sealed record SecurityEvent`, `LogEvent` with value equality, `IncidentComparer : IComparer<Incident>`. Chain: `m07/l09` → `m08/l01` → … → `m08/l11`. M8 milestone reached.
+- **Notes for later modules:**
+  - `LogEvent` keeps its string `EventType`; `SecurityEvent` is the record form. `LogEvent` has value equality since `m08-l09`.
+  - `IDetectionRule` and `Detector` are the place for new rules.
+  - `Sort` is not stable: outputs must not depend on the order of equal elements.
 
 ## W1 Wiederholung M1–M4
 
