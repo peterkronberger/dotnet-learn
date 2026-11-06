@@ -6010,6 +6010,85 @@
         "title": "Types – Open and closed types",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#843-open-and-closed-types"
       }
+    },
+    {
+      "id": "type-parameter-constraint",
+      "term": "Type Parameter Constraint",
+      "german": "Einschränkung für Typparameter",
+      "category": "language",
+      "definition": "Eine `where`-Klausel, die festlegt, was ein Typargument sein oder können muss, zum Beispiel `where T : IComparable<T>`. Nur dann darf der Code die zugesicherten Member von `T` benutzen. Ein Typargument, das nicht passt, ist ein Fehler beim Übersetzen.",
+      "aliases": [
+        "Constraint",
+        "Typparameter-Einschränkung"
+      ],
+      "related": [
+        "type-parameter",
+        "constructor-constraint",
+        "generic-method"
+      ],
+      "lesson": "m09-l03",
+      "source": {
+        "title": "Classes – Type parameter constraints",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints"
+      }
+    },
+    {
+      "id": "constructor-constraint",
+      "term": "Constructor Constraint",
+      "german": "Konstruktor-Einschränkung",
+      "category": "language",
+      "definition": "Die Einschränkung `new()`. Das Typargument braucht einen öffentlichen Konstruktor ohne Parameter, und der Code darf `new T()` schreiben. Sie steht in der `where`-Klausel immer zuletzt.",
+      "aliases": [
+        "new()-Einschränkung"
+      ],
+      "related": [
+        "type-parameter-constraint",
+        "type-parameter"
+      ],
+      "lesson": "m09-l03",
+      "source": {
+        "title": "Classes – Type parameter constraints",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints"
+      }
+    },
+    {
+      "id": "default-value-expression",
+      "term": "Default Value Expression",
+      "german": "Standardwert-Ausdruck",
+      "category": "language",
+      "definition": "Der Ausdruck `default(T)`. Er liefert den Standardwert des Typs `T`: `null` für Referenztypen, Nullen für Werttypen. Bei einem Typparameter hängt der Wert vom Typargument ab.",
+      "aliases": [
+        "default(T)"
+      ],
+      "related": [
+        "default-literal",
+        "default-value",
+        "type-parameter"
+      ],
+      "lesson": "m09-l04",
+      "source": {
+        "title": "Expressions – Default value expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12821-default-value-expressions"
+      }
+    },
+    {
+      "id": "default-literal",
+      "term": "Default Literal",
+      "german": "Default-Literal",
+      "category": "language",
+      "definition": "Das Literal `default` ohne Typ. Es nimmt den Typ der Stelle an, an der es steht, zum Beispiel `T? x = default;`, und ergibt den Standardwert dieses Typs.",
+      "aliases": [
+        "default-Literal"
+      ],
+      "related": [
+        "default-value-expression",
+        "default-value"
+      ],
+      "lesson": "m09-l04",
+      "source": {
+        "title": "Expressions – Default value expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12821-default-value-expressions"
+      }
     }
   ]
 }

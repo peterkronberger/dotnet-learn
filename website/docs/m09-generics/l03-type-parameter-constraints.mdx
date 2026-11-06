@@ -1,0 +1,227 @@
+---
+title: Einschränkungen für Typparameter
+sidebar_position: 3
+description: Eine Einschränkung mit where sagt dem Compiler, was ein Typargument sein oder können muss. Nur dann darf der Code diese Member benutzen, und passende Typargumente werden geprüft.
+lesson_id: m09-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import compareWithout from '!!raw-loader!@site/examples/m09/l03/compare-without-constraint.snippet.cs';
+import maxOf from '!!raw-loader!@site/examples/m09/l03/max-of.cs';
+import maxOfOutput from '!!raw-loader!@site/examples/m09/l03/max-of.out.txt';
+import constraintNotMet from '!!raw-loader!@site/examples/m09/l03/constraint-not-met.snippet.cs';
+import constraintKinds from '!!raw-loader!@site/examples/m09/l03/constraint-kinds.cs';
+import constraintKindsOutput from '!!raw-loader!@site/examples/m09/l03/constraint-kinds.out.txt';
+import newWithout from '!!raw-loader!@site/examples/m09/l03/new-without-constraint.snippet.cs';
+import dictionaryNotnull from '!!raw-loader!@site/examples/m09/l03/dictionary-notnull.snippet.cs';
+import enumComparable from '!!raw-loader!@site/examples/m09/l03/enum-comparable.snippet.cs';
+import smallerGap from '!!raw-loader!@site/examples/m09/l03/smaller-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m09/l03/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l03/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l03/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l03/seclog-generics-solution.cs';
+
+# Einschränkungen für Typparameter
+
+:::note[Lernziele]
+- Du kannst erklären, warum man ohne Einschränkung mit `T` nur die Member von `object` benutzen kann.
+- Du kannst mit `where` eine Einschränkung schreiben (`class`, `struct`, `notnull`, Basisklasse, Interface, `new()`).
+- Du kannst vorhersagen, welche Typargumente eine Einschränkung erlaubt und welche der Compiler ablehnt.
+- Du kannst mehrere Einschränkungen und mehrere Typparameter kombinieren.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l01-q1" />
+
+<Quiz id="m09-l02-q1" />
+
+<Quiz id="m08-l11-q2" />
+
+## Die Lücke: ein Vergleich mit T
+
+In Lektion 1 ging es nicht, zwei Werte vom Typ `T` mit `>` zu vergleichen. Der Grund: Der Rumpf einer generischen Methode wird einmal übersetzt, für alle möglichen Typargumente zugleich. Über `T` weiß der Compiler nichts, außer dass es ein Typ ist. Deshalb bietet `T` nur die Member von `object` an.
+
+<CodeBlock language="csharp" title="compare-without-constraint.snippet.cs">{compareWithout}</CodeBlock>
+
+```text
+error CS0019: Operator '>' cannot be applied to operands of type 'T' and 'T'
+```
+
+Eine <Term id="type-parameter-constraint">Einschränkung</Term> (Constraint) schließt die Lücke. Sie steht in einer `where`-Klausel hinter der Parameterliste: `where T : IComparable<T>`. Das <Term id="interface">Interface</Term> `IComparable<T>` kennst du aus Modul 8. Es verspricht die Methode `CompareTo`. Die Einschränkung sagt: Jedes Typargument für `T` muss dieses Interface implementieren. Dafür darf der Rumpf `CompareTo` auf Werte vom Typ `T` anwenden.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m09-l03-max-of" code={maxOf} predict expected={maxOfOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `8`, `pear` und `2.5`.
+
+1. **Einschränkung lesen:** `where T : IComparable<T>` verlangt, dass `T` mit sich selbst vergleichbar ist (<Term id="comparable">`IComparable<T>`</Term>).
+2. **Typargumente prüfen:** `int`, `string` und `double` erfüllen die Einschränkung. Der Compiler leitet `T` aus den Argumenten ab, wie in Lektion 1.
+3. **Member benutzen:** `a.CompareTo(b)` ist erlaubt, weil die Einschränkung es garantiert. Ist das Ergebnis nicht negativ, ist `a` mindestens so groß wie `b`.
+
+Was passiert, wenn du `Max("pear", "apple")` durch `Max(3, "apple")` ersetzt? Der Compiler kann kein einzelnes `T` ableiten, denn `int` und `string` passen nicht zu einem gemeinsamen Typargument. Die Zeile lässt sich nicht übersetzen.
+
+</details>
+
+## Ein Typargument passt nicht
+
+Ein Typargument, das die Einschränkung nicht erfüllt, lehnt der Compiler ab. Ein reines `object` implementiert `IComparable<object>` nicht, ein `int` schon.
+
+<CodeBlock language="csharp" title="constraint-not-met.snippet.cs">{constraintNotMet}</CodeBlock>
+
+```text
+error CS0311: The type 'object' cannot be used as type parameter 'T' in the generic type or method 'Max<T>(T, T)'. There is no implicit reference conversion from 'object' to 'System.IComparable<object>'.
+```
+
+Der Fehler steht beim Aufruf, nicht im Rumpf. Das ist der Nutzen der Einschränkung: Eine falsche Benutzung fällt beim Übersetzen auf.
+
+## Die Arten von Einschränkungen
+
+Es gibt drei Gruppen. Eine **primäre Einschränkung** steht an erster Stelle, höchstens eine pro Typparameter: `class` (ein <Term id="reference-type">Referenztyp</Term>), `struct` (ein <Term id="value-type">Werttyp</Term>, der nicht nullable ist), `notnull` (ein Typ, der nicht `null` sein darf) oder eine <Term id="base-class">Basisklasse</Term> wie `where T : Animal`. Danach folgen beliebig viele **sekundäre Einschränkungen**: Interfaces (auch generische wie `IComparable<T>`) oder ein anderer Typparameter (`where TDerived : TBase`). Zuletzt kommt die <Term id="constructor-constraint">Konstruktor-Einschränkung</Term> `new()`: Das Typargument braucht einen öffentlichen Konstruktor ohne Parameter, und der Rumpf darf dann `new T()` schreiben. Sie steht immer am Ende, und `struct` kann nicht zusammen mit `new()` stehen.
+
+Das nächste Programm zeigt vier Arten. `Shout` bekommt nur `Animal` oder Unterklassen. `Same` darf mit `class` Referenzen vergleichen. `Show` nimmt nur Werttypen. `Make` kann mit `new()` ein neues Objekt erzeugen.
+
+:::info[Vorhersage]
+Welche sechs Zeilen gibt das Programm aus? Was ist der Unterschied zwischen den beiden `Same`-Aufrufen?
+:::
+
+<CSharpRunner id="m09-l03-constraint-kinds" code={constraintKinds} predict expected={constraintKindsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `CAT`, `False`, `True`, `struct: 42`, `unknown` und `0`.
+
+1. **Basisklasse:** `Shout<T>` mit `where T : Animal` darf `animal.Name` lesen, denn jedes `T` ist ein `Animal`.
+2. **`class`:** Mit `where T : class` vergleicht `a == b` die Referenzen. `cat` und `other` sind zwei Objekte mit gleichem Namen, also `False`. `Same(cat, cat)` vergleicht ein Objekt mit sich selbst, also `True`.
+3. **`struct`:** `Show(42)` geht, weil `int` ein Werttyp ist. `Show("text")` würde nicht übersetzt.
+4. **`new()`:** `Make<Animal>()` ruft den Konstruktor ohne Parameter auf, `Name` hat dann den Standardtext `unknown`. `Make<List<int>>()` erzeugt eine leere Liste mit `Count` 0.
+
+</details>
+
+Ohne `new()` ist `new T()` ein Fehler, weil nicht jeder Typ einen Konstruktor ohne Parameter hat:
+
+<CodeBlock language="csharp" title="new-without-constraint.snippet.cs">{newWithout}</CodeBlock>
+
+```text
+error CS0304: Cannot create an instance of the variable type 'T' because it does not have the new() constraint
+```
+
+## Mehrere Einschränkungen und mehrere Typparameter
+
+Einschränkungen lassen sich mit Komma verbinden: `where T : class, IComparable<T>, new()`. Die Reihenfolge ist fest: erst die primäre, dann die Interfaces, zuletzt `new()`. Hat eine Methode oder Klasse mehrere Typparameter, bekommt jeder seine eigene `where`-Klausel: `where TKey : notnull where TValue : class`. Einschränkungen gibt es an generischen Methoden und an generischen Klassen gleich. Zu `unmanaged` (eine weitere primäre Einschränkung) sei nur der Name genannt.
+
+Mit `class` ist `T` ein Referenztyp, der nicht `null` sein soll. Wer auch nullable Referenztypen zulassen will, schreibt `class?`. Die Einzelheiten kommen in der nächsten Lektion. Die Bibliothek benutzt `notnull` selbst: `Dictionary<TKey, TValue>` verlangt, dass der Schlüssel nicht `null` ist. Ein nullable Typargument bringt eine Warnung:
+
+<CodeBlock language="csharp" title="dictionary-notnull.snippet.cs">{dictionaryNotnull}</CodeBlock>
+
+```text
+warning CS8714: The type 'string?' cannot be used as type parameter 'TKey' in the generic type or method 'Dictionary<TKey, TValue>'. Nullability of type argument 'string?' doesn't match 'notnull' constraint.
+```
+
+## Lückenbeispiel
+
+`Smaller` hat eine Einschränkung. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l03-gaps" code={smallerGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Aufrufen:** `Console.WriteLine(Smaller("pear", "apple"));` gibt `apple` aus. `string` implementiert `IComparable<string>`.
+2. **Einschränkung wiederholen:** `static T Larger<T>(T a, T b) where T : IComparable<T>` mit `a.CompareTo(b) >= 0` im Rumpf. Der Aufruf `Larger(2.5, 1.5)` gibt `2.5` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog speichert Ereignisse, Vorfälle und Regeln in der generischen Klasse `Store<T>`. Die Daten des Beispiel-Logs (`sampleLog`) und die Funktionen `EventTypeOf` und `ReadUserAndIp` gibt es schon.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model`, nach `Store<T>`, kommt `class Counter<TKey> where TKey : notnull, IComparable<TKey>` mit einem privaten `Dictionary<TKey, int>`, `public void Add(TKey key)` (zählt eins hoch), `public int CountOf(TKey key)` (0, wenn der Schlüssel fehlt, mit `TryGetValue`) und `public List<TKey> SortedKeys()` (eine sortierte Kopie der Schlüssel, mit `Sort()`).
+2. Vor `// End with exit code 0 …` kommt der Block `// Count failures per user and per IP address with one generic counter`. Er füllt einen `Counter<string>` mit den Benutzern und einen zweiten mit den IP-Adressen der fehlgeschlagenen Anmeldungen (Zeilen des `sampleLog` mit `login-failed`) und gibt dann `Schlüssel: Anzahl` für jeden Schlüssel von `SortedKeys()` aus.
+3. Zuletzt gibt er `Failures of carol:` mit `CountOf("carol")` des Benutzerzählers aus (carol hat keine Fehlschläge, also `0`).
+
+<CSharpRunner id="m09-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Einschränkungen wählen:** `notnull` passt zu `Dictionary`, das keinen `null`-Schlüssel erlaubt. `IComparable<TKey>` braucht `Sort()`, um die Schlüssel zu ordnen.
+2. **Zählen und lesen:** `Add` holt den alten Wert mit `TryGetValue` (fehlt er, bleibt er 0) und speichert ihn plus eins. `CountOf` gibt 0 zurück, wenn der Schlüssel fehlt.
+3. **Benutzen:** Die Schleife wählt Zeilen mit `login-failed`, liest Benutzer und IP-Adresse mit `ReadUserAndIp` und ruft `Add` auf. Zwei Zähler, ein Code.
+
+Ein dritter Zähler `Counter<EventType>` geht nicht: Ein Enum implementiert `IComparable<EventType>` nicht, und der Compiler meldet das beim Typargument.
+
+<CodeBlock language="csharp" title="enum-comparable.snippet.cs">{enumComparable}</CodeBlock>
+
+```text
+error CS0315: The type 'Level' cannot be used as type parameter 'TKey' in the generic type or method 'Counter<TKey>'. There is no boxing conversion from 'Level' to 'System.IComparable<Level>'.
+```
+
+</details>
+
+**Neuer Stand:** SecLog zählt Fehlschläge pro Benutzer und pro IP-Adresse mit einer wiederverwendbaren Klasse. Die Zählung aus Modul 5 mit dem `Dictionary` bleibt, `Counter<TKey>` ist ihre wiederverwendbare Form.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l03-unconstrained-t-has-all-members" />
+
+**„Wenn ich `Max<int>(…)` aufrufe, kann ich in der Methode alles mit `T` machen, was `int` kann, zum Beispiel `<` oder `+`.“** Das stimmt nicht. Der Rumpf wird einmal für alle Typargumente geprüft. Ohne Einschränkung gibt es auf `T` nur die Member von `object`. Was `int` kann, zählt erst, wenn `T` eine Einschränkung hat, die es garantiert.
+:::
+
+<details>
+<summary>Vertiefung: Wann ein Typargument die Einschränkung erfüllt (optional)</summary>
+
+Bei jedem Aufruf prüft der Compiler die Typargumente gegen die Einschränkungen. Für Klassen, Interfaces und Typparameter muss das Typargument in den Einschränkungstyp umwandelbar sein: per Identität, per impliziter Referenzumwandlung oder per Boxing, wenn es ein nicht nullable Werttyp ist. Deshalb erfüllt `int` die Einschränkung `IComparable<int>` ([§8.4.5 Satisfying constraints](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#845-satisfying-constraints)). Ein nicht erfülltes Typargument ist ein Fehler beim Übersetzen. Die Einschränkung `new()` verlangt einen nicht abstrakten Typ mit öffentlichem Konstruktor ohne Parameter; alle Werttypen haben einen. Die Reihenfolge der Bestandteile einer `where`-Klausel legt die Spezifikation fest: primäre Einschränkung, sekundäre Einschränkungen, Konstruktor-Einschränkung ([§15.2.5 Type parameter constraints](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints)).
+
+Ein Wert vom Typ `T` lässt sich mit `==` und `!=` mit `null` vergleichen, außer `T` hat die Einschränkung `struct`. Das Literal `null` ist für `T` nur dann erlaubt, wenn `T` bekanntermaßen ein Referenztyp ist ([§8.5 Type parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#85-type-parameters)).
+
+</details>
+
+## Zusammenfassung
+
+Ohne Einschränkung bietet `T` nur die Member von `object`. Mit `where T : …` legst du fest, was ein Typargument sein oder können muss: `class`, `struct`, `notnull`, eine Basisklasse, ein Interface oder `new()`. Die Reihenfolge ist: primäre Einschränkung, Interfaces, `new()`. Jeder Typparameter hat seine eigene `where`-Klausel. Erfüllt ein Typargument die Einschränkung nicht, ist das ein Fehler beim Übersetzen, und der Rumpf darf die garantierten Member benutzen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l03-q1" />
+
+<Quiz id="m09-l03-q2" />
+
+<Quiz id="m09-l03-q3" />
+
+<Quiz id="m09-l03-q4" />
+
+<Quiz id="m09-l03-q5" />
+
+<Quiz id="m09-l03-q6" />
+
+<Quiz id="m09-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m09-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Constraints on type parameters](https://learn.microsoft.com/dotnet/csharp/programming-guide/generics/constraints-on-type-parameters)
+- C#-Spezifikation: [§15.2.5 Type parameter constraints](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1525-type-parameter-constraints)
+- C#-Spezifikation: [§8.4.5 Satisfying constraints](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#845-satisfying-constraints)

@@ -1,0 +1,6 @@
+CAT
+False
+True
+struct: 42
+unknown
+0
