@@ -1,4 +1,315 @@
 {
   "module": "m09",
-  "questions": []
+  "questions": [
+    {
+      "id": "m09-l01-q1",
+      "lesson": "m09-l01",
+      "type": "single",
+      "question": "Eine Methode `object Pick(bool takeFirst, object a, object b)` bekommt zwei `int`-Werte. Was ist der Nachteil gegenüber einer generischen Methode `T Pick<T>(…)`?",
+      "options": [
+        {
+          "text": "Die `int`-Werte werden in `object` verpackt (Boxing), und der Aufrufer braucht einen Cast, um wieder einen `int` zu bekommen. Ein falscher Cast fällt erst zur Laufzeit auf.",
+          "correct": true
+        },
+        {
+          "text": "Die Methode kann gar nicht mit `int`-Werten aufgerufen werden.",
+          "feedback": "Doch: Ein `int` lässt sich nach `object` umwandeln. Genau das ist das Boxing."
+        },
+        {
+          "text": "Die Methode läuft langsamer, weil der Compiler `object` nicht kennt.",
+          "feedback": "Der Compiler kennt `object` gut. Der Nachteil ist das Verpacken und der fehlende Typschutz beim Zurückholen."
+        }
+      ],
+      "explanation": "Mit `object` verliert der Rückgabewert seinen Typ. Der Aufrufer muss casten, und ein `int`-Wert wird dabei zuerst geboxt. Bei `T Pick<T>` bleibt der Typ erhalten, ohne Cast und ohne Boxing durch die Methode."
+    },
+    {
+      "id": "m09-l01-q2",
+      "lesson": "m09-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l01/quiz-first-of.cs",
+      "explanation": "Beim ersten Aufruf ist `T` gleich `string`, die Liste hat Einträge: `x`. Beim zweiten Aufruf steht `<int>` ausdrücklich da, die Liste ist leer, also kommt der Ersatzwert `-1`. Beim dritten Aufruf ist `T` gleich `int`, das erste Element ist `3`."
+    },
+    {
+      "id": "m09-l01-q3",
+      "lesson": "m09-l01",
+      "type": "single",
+      "question": "Welches Typargument leitet der Compiler bei `Pick(true, 1, 2.5)` für `static T Pick<T>(bool takeFirst, T a, T b)` ab?",
+      "options": [
+        {
+          "text": "`double`, denn `int` lässt sich implizit nach `double` umwandeln, aber nicht umgekehrt.",
+          "correct": true
+        },
+        {
+          "text": "`int`, denn das erste Argument bestimmt den Typ.",
+          "feedback": "Der Compiler betrachtet alle Argumente. Von `double` nach `int` gibt es keine implizite Umwandlung."
+        },
+        {
+          "text": "Gar keins: Der Aufruf ist ein Fehler, weil die Argumente verschiedene Typen haben.",
+          "feedback": "Es gibt einen Typ, in den beide Argumente passen: `double`. Dann ist die Ableitung erfolgreich."
+        }
+      ],
+      "explanation": "Die Argumente liefern die Kandidaten `int` und `double`. Gewählt wird der Typ, in den sich alle anderen Kandidaten implizit umwandeln lassen: `double`."
+    },
+    {
+      "id": "m09-l01-q4",
+      "lesson": "m09-l01",
+      "type": "single",
+      "question": "Die Methode `static T Create<T>()` hat keine Parameter. Was passiert bei `int number = Create();`?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler: Das Typargument lässt sich nicht ableiten. Es muss `Create<int>()` heißen.",
+          "correct": true
+        },
+        {
+          "text": "`T` wird zu `int`, weil die Variable `number` ein `int` ist.",
+          "misconception": "m09-l01-type-inferred-from-return-type",
+          "feedback": "Die Ableitung benutzt nur die Argumente des Aufrufs. Der Rückgabetyp und die Zielvariable zählen nicht."
+        },
+        {
+          "text": "Der Aufruf läuft, und `T` ist zur Laufzeit `object`.",
+          "feedback": "Der Compiler übersetzt den Aufruf gar nicht erst. Ein offenes `T` gibt es zur Laufzeit nicht."
+        }
+      ],
+      "explanation": "Ohne Argumente hat der Compiler nichts, woraus er `T` ableiten kann. Der Rückgabetyp und die Zielvariable werden nicht benutzt. Du gibst das Typargument selbst an: `Create<int>()`."
+    },
+    {
+      "id": "m09-l01-q5",
+      "lesson": "m09-l01",
+      "type": "match",
+      "question": "Ordne die Begriffe zu. Die Methode heißt `static T Pick<T>(bool takeFirst, T a, T b)`, der Aufruf `Pick<string>(true, \"a\", \"b\")`.",
+      "pairs": [
+        { "left": "`T` in `Pick<T>`", "right": "Typparameter" },
+        { "left": "`string` in `Pick<string>`", "right": "Typargument" },
+        { "left": "`true` im Aufruf", "right": "Argument (Wert)" }
+      ],
+      "explanation": "Ein Typparameter steht in der Deklaration und ist ein Platzhalter. Ein Typargument steht im Aufruf und ist der echte Typ. Ein normales Argument ist ein Wert für einen normalen Parameter."
+    },
+    {
+      "id": "m09-l01-q6",
+      "lesson": "m09-l01",
+      "type": "find-bug",
+      "question": "Dieser Code lässt sich nicht übersetzen. Welche Zeile ist die Ursache?",
+      "example": "m09/l01/operator-on-t.snippet.cs",
+      "bugLines": [3],
+      "lineFeedback": {
+        "3": { "feedback": "Ein `T` ohne Einschränkung bietet nur die Member von `object`. Der Operator `<` gehört nicht dazu." }
+      },
+      "explanation": "Der Compiler kennt `T` nur als beliebigen Typ. Ob ein Typ mit `<` vergleichbar ist, weiß er nicht. Deshalb meldet er CS0019. Einschränkungen für `T` kommen in Lektion 3."
+    },
+    {
+      "id": "m09-l01-q7",
+      "lesson": "m09-l01",
+      "type": "multi",
+      "question": "Gegeben sind `static void Swap<T>(ref T x, ref T y)` sowie `int a = 1; int b = 2; string s = \"s\";`. Welche Aufrufe lassen sich übersetzen?",
+      "options": [
+        { "text": "`Swap(ref a, ref b);`", "correct": true },
+        { "text": "`Swap<int>(ref a, ref b);`", "correct": true },
+        {
+          "text": "`Swap(ref a, ref s);`",
+          "feedback": "`T` kann nicht gleichzeitig `int` und `string` sein."
+        },
+        {
+          "text": "`Swap<string>(ref a, ref s);`",
+          "feedback": "Mit `<string>` muss `a` ein `string` sein. Ein `int` passt nicht."
+        }
+      ],
+      "explanation": "Beide Parameter haben denselben Typ `T`. Beide Argumente müssen deshalb denselben Typ haben. Das Typargument darf der Compiler ableiten oder du gibst es selbst an."
+    },
+    {
+      "id": "m09-l01-q8",
+      "lesson": "m09-l01",
+      "type": "single",
+      "question": "Was kannst du in einer generischen Methode `static void Show<T>(T value)` ohne Einschränkung mit `value` aufrufen?",
+      "options": [
+        {
+          "text": "`value.ToString()`, `value.Equals(…)` und `value.GetHashCode()`: die Member von `object`.",
+          "correct": true
+        },
+        {
+          "text": "Alle Member des Typs, der später als Typargument eingesetzt wird.",
+          "feedback": "Der Compiler prüft die Methode einmal für jedes `T`. Er kennt nur, was für jeden Typ gilt."
+        },
+        {
+          "text": "Gar nichts, `value` ist nur ein Platzhalter.",
+          "feedback": "Jeder Typ ist von `object` abgeleitet. Deshalb sind dessen Member immer da."
+        }
+      ],
+      "explanation": "Ohne Einschränkung ist über `T` nur bekannt, dass es ein Typ ist. Verfügbar sind die Member von `object`."
+    },
+    {
+      "id": "m09-l01-q9",
+      "lesson": "m09-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum ist eine generische Methode besser als eine Methode mit `object`-Parametern oder drei Überladungen für `int`, `string` und `double`?",
+      "modelAnswer": "Eine generische Methode schreibst du einmal, und sie funktioniert für viele Typen. Der Typ bleibt erhalten: Der Aufrufer bekommt wieder einen `int` oder `string`, ohne Cast und ohne dass die Methode Werte in `object` verpackt. Fehler wie ein falscher Typ fallen beim Übersetzen auf, nicht erst zur Laufzeit. Bei drei Überladungen müsstest du jeden neuen Typ von Hand nachtragen und denselben Code mehrfach pflegen."
+    },
+    {
+      "id": "m09-l01-q10",
+      "lesson": "m09-l01",
+      "type": "single",
+      "question": "Wo setzt du eine generische Methode ein? SecLog soll vorkommende Werte zählen: Texte, Werte von `EventType` und `LogEvent`-Objekte in Listen. Welcher Entwurf passt am besten?",
+      "options": [
+        {
+          "text": "Eine Methode `CountOf<T>(IReadOnlyList<T> items, T value)`, die mit `Equals` vergleicht.",
+          "correct": true
+        },
+        {
+          "text": "Eine Methode `CountOf(List<object> items, object value)`.",
+          "feedback": "Eine `List<string>` lässt sich nicht als `List<object>` übergeben, und Werte müssten verpackt werden."
+        },
+        {
+          "text": "Für jeden Typ eine eigene Methode mit eigenem Namen.",
+          "feedback": "Das geht, aber derselbe Code steht dann mehrfach da, und jeder neue Typ braucht eine weitere Kopie."
+        }
+      ],
+      "explanation": "Die Zähl-Logik ist für alle Typen gleich: Gleiche Elemente durchzählen. Das ist der typische Fall für eine generische Methode."
+    },
+    {
+      "id": "m09-l02-q1",
+      "lesson": "m09-l02",
+      "type": "single",
+      "question": "Wie heißt `Store<int>`, wenn `Store<T>` eine generische Klasse ist?",
+      "options": [
+        {
+          "text": "Ein konstruierter Typ. Er entsteht, wenn `Store<T>` ein Typargument bekommt.",
+          "correct": true
+        },
+        {
+          "text": "Ein offener Typ, weil `T` noch fehlt.",
+          "feedback": "In `Store<int>` ist `T` durch `int` ersetzt. Ein offener Typ enthält noch einen Typparameter."
+        },
+        {
+          "text": "Derselbe Typ wie `Store<string>`, nur mit anderem Inhalt.",
+          "feedback": "Es sind zwei verschiedene Typen."
+        }
+      ],
+      "explanation": "`Store<T>` ist die Vorlage, `Store<int>` ist ein konstruierter Typ daraus. Weil kein Typparameter mehr vorkommt, ist er auch ein geschlossener Typ."
+    },
+    {
+      "id": "m09-l02-q2",
+      "lesson": "m09-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l02/quiz-store-count.cs",
+      "explanation": "`Counter<int>` und `Counter<string>` sind verschiedene Typen mit je einem eigenen statischen Feld. Drei Objekte sind `Counter<int>` (`a`, `b`, `d`), eins ist `Counter<string>`. Die Ausgabe ist `3` und `1`."
+    },
+    {
+      "id": "m09-l02-q3",
+      "lesson": "m09-l02",
+      "type": "single",
+      "question": "Die generische Klasse `Store<T>` hat ein statisches Feld `Created`. Das Programm benutzt `Store<int>` und `Store<string>`. Wie viele Exemplare von `Created` gibt es?",
+      "options": [
+        {
+          "text": "Zwei: eins für `Store<int>` und eins für `Store<string>`.",
+          "correct": true
+        },
+        {
+          "text": "Eins. Alle konstruierten Typen von `Store<T>` teilen sich das statische Feld.",
+          "misconception": "m09-l02-constructed-types-share-statics",
+          "feedback": "Jeder geschlossene konstruierte Typ ist ein eigener Typ und hat eigene statische Felder."
+        },
+        {
+          "text": "Eins pro erzeugtem Objekt.",
+          "feedback": "Ein statisches Feld gehört zum Typ, nicht zu einem Objekt."
+        }
+      ],
+      "explanation": "Ein statisches Feld gehört zu einem Typ. `Store<int>` und `Store<string>` sind zwei Typen, also gibt es zwei Felder."
+    },
+    {
+      "id": "m09-l02-q4",
+      "lesson": "m09-l02",
+      "type": "match",
+      "question": "Ordne die Begriffe zu. Die Klasse heißt `class Store<T>`, im Programm steht `Store<string> words = new();`.",
+      "pairs": [
+        { "left": "`T` in `class Store<T>`", "right": "Typparameter" },
+        { "left": "`string` in `Store<string>`", "right": "Typargument" },
+        { "left": "`Store<string>`", "right": "geschlossener konstruierter Typ" },
+        { "left": "`Store<T>` im Rumpf der Klasse", "right": "offener Typ" }
+      ],
+      "explanation": "Typparameter stehen in der Deklaration, Typargumente in der Benutzung. Ein Typ mit einem Typparameter ist offen, ein Typ ohne Typparameter ist geschlossen."
+    },
+    {
+      "id": "m09-l02-q5",
+      "lesson": "m09-l02",
+      "type": "find-bug",
+      "question": "Welche Zeilen lassen sich nicht übersetzen?",
+      "example": "m09/l02/wrong-type-argument.snippet.cs",
+      "bugLines": [2, 3],
+      "lineFeedback": {
+        "1": { "feedback": "Diese Zeile ist richtig: `Store<int>` ist ein geschlossener Typ." },
+        "2": { "feedback": "Ein `Store<int>` nimmt nur `int` an. Der Text `\"ten\"` passt nicht." },
+        "3": { "feedback": "`Store` ohne Typargument gibt es nicht. Die Klasse ist generisch und braucht ein Typargument." }
+      },
+      "explanation": "In Zeile 2 passt das Argument nicht zum Typargument (CS1503). In Zeile 3 fehlt das Typargument (CS0305)."
+    },
+    {
+      "id": "m09-l02-q6",
+      "lesson": "m09-l02",
+      "type": "single",
+      "question": "Was ist `List<T>` aus der Bibliothek, und was ist `List<string>`?",
+      "options": [
+        {
+          "text": "`List<T>` ist eine generische Klasse, `List<string>` ein konstruierter Typ daraus.",
+          "correct": true
+        },
+        {
+          "text": "`List<T>` ist eine Methode, `List<string>` ihr Aufruf.",
+          "feedback": "`List<T>` ist ein Typ, kein Methodenaufruf."
+        },
+        {
+          "text": "Beide sind derselbe Typ.",
+          "feedback": "`List<string>` und `List<int>` sind verschiedene Typen."
+        }
+      ],
+      "explanation": "Du hast `List<string>` schon in Modul 5 benutzt. Jetzt kennst du die Rolle des Typarguments: Es macht aus der Vorlage `List<T>` einen konkreten Typ."
+    },
+    {
+      "id": "m09-l02-q7",
+      "lesson": "m09-l02",
+      "type": "multi",
+      "question": "Welche Aussagen über generische Typen stimmen?",
+      "options": [
+        { "text": "Auch ein `struct` kann generisch sein, zum Beispiel `struct Pair<T>`.", "correct": true },
+        { "text": "Auch ein `record` kann mehrere Typparameter haben, zum Beispiel `record Entry<TKey, TValue>(…)`.", "correct": true },
+        {
+          "text": "Eine generische Klasse hat immer genau einen Typparameter.",
+          "feedback": "Sie kann mehrere haben, getrennt durch Kommas, wie `Dictionary<TKey, TValue>`."
+        },
+        {
+          "text": "Eine generische Methode in einer generischen Klasse darf keinen eigenen Typparameter haben.",
+          "feedback": "Sie darf einen eigenen Typparameter haben, zum Beispiel `WithValue<TOther>`."
+        }
+      ],
+      "explanation": "Klassen, Structs, Records und Interfaces können generisch sein, mit einem oder mehreren Typparametern. Eine Methode darf zusätzlich eigene Typparameter haben."
+    },
+    {
+      "id": "m09-l02-q8",
+      "lesson": "m09-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was ist ein konstruierter Typ, und warum sind `Store<int>` und `Store<string>` zwei verschiedene Typen?",
+      "modelAnswer": "Eine generische Klasse wie `Store<T>` ist eine Vorlage. Setze ich ein Typargument ein, entsteht ein konstruierter Typ, zum Beispiel `Store<int>`. Jede andere Liste von Typargumenten ergibt einen eigenen Typ. Deshalb haben `Store<int>` und `Store<string>` getrennte statische Felder, und ein `Store<int>` lässt sich nicht als `Store<string>` benutzen."
+    },
+    {
+      "id": "m09-l02-q9",
+      "lesson": "m09-l02",
+      "type": "single",
+      "question": "Wo setzt du eine generische Klasse ein? SecLog soll Ereignisse, Vorfälle und Regeln speichern. Welcher Entwurf passt am besten?",
+      "options": [
+        {
+          "text": "Eine Klasse `Store<T>`, die ein `List<T>` verwaltet. Daraus entstehen `Store<LogEvent>`, `Store<Incident>` und `Store<IDetectionRule>`.",
+          "correct": true
+        },
+        {
+          "text": "Eine Klasse `Store` mit einer `List<object>`, in die alles hineinkommt.",
+          "feedback": "Dann musst du beim Lesen casten, und ein falscher Typ fällt erst zur Laufzeit auf."
+        },
+        {
+          "text": "Drei Klassen mit demselben Code, je eine pro Typ.",
+          "feedback": "Der Code steht dann dreimal da, und jeder neue Typ braucht eine weitere Kopie."
+        }
+      ],
+      "explanation": "Das Speichern ist für alle Typen gleich. Eine generische Klasse schreibst du einmal, und jeder konstruierte Typ bleibt typsicher."
+    }
+  ]
 }

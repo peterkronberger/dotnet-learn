@@ -1,0 +1,3 @@
+3 4
+Entry { Key = bob, Value = 5 }
+Entry { Key = bob, Value = 71.4 }

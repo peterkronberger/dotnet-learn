@@ -1,0 +1,200 @@
+---
+title: Generische Klassen und konstruierte Typen
+sidebar_position: 2
+description: Eine generische Klasse ist eine Vorlage für Typen. Jede Liste von Typargumenten ergibt einen konstruierten Typ, und Store<int> und Store<string> sind verschiedene Typen.
+lesson_id: m09-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import storeBasic from '!!raw-loader!@site/examples/m09/l02/store-basic.cs';
+import storeBasicOutput from '!!raw-loader!@site/examples/m09/l02/store-basic.out.txt';
+import staticFields from '!!raw-loader!@site/examples/m09/l02/static-fields.cs';
+import staticFieldsOutput from '!!raw-loader!@site/examples/m09/l02/static-fields.out.txt';
+import pairTypes from '!!raw-loader!@site/examples/m09/l02/pair-types.cs';
+import wrongTypeArgument from '!!raw-loader!@site/examples/m09/l02/wrong-type-argument.snippet.cs';
+import boxGap from '!!raw-loader!@site/examples/m09/l02/box-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m09/l02/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l02/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l02/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l02/seclog-generics-solution.cs';
+
+# Generische Klassen und konstruierte Typen
+
+:::note[Lernziele]
+- Du kannst eine generische Klasse mit einem oder mehreren Typparametern schreiben.
+- Du kannst erklären, was ein konstruierter Typ ist, und offene von geschlossenen Typen unterscheiden.
+- Du kannst vorhersagen, dass `Store<int>` und `Store<string>` verschiedene Typen mit eigenen statischen Feldern sind.
+- Du kannst `List<T>` als generische Klasse lesen.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l01-q4" />
+
+<Quiz id="m06-l08-q1" />
+
+<Quiz id="m06-l06-q1" />
+
+## Eine Klasse mit Typparameter
+
+In Lektion 1 hatte eine Methode einen Typparameter. Eine Klasse kann das auch. Der Typparameter steht dann nach dem Klassennamen: `class Store<T>`. Eine solche Klasse heißt <Term id="generic-type">generischer Typ</Term>. `T` darfst du in der ganzen Klasse benutzen: in Feldern, Eigenschaften, Konstruktoren und Methoden.
+
+Aus der Klasse wird ein benutzbarer Typ, wenn du <Term id="type-argument">Typargumente</Term> angibst: `Store<int>`. Einen Typ, der so aus einem generischen Typ entsteht, nennt man <Term id="constructed-type">konstruierten Typ</Term>. Die Klasse selbst ist nur die Vorlage. Du kennst das von `List<T>`: Die Klasse der Bibliothek ist eine generische Klasse, und `List<string>` aus Modul 5 ist ein konstruierter Typ daraus.
+
+Das Beispiel zeigt einen kleinen Speicher. Er hält seine Elemente in einer `List<T>`, deren Typargument der Typparameter `T` der Klasse ist.
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m09-l02-store-basic" code={storeBasic} predict expected={storeBasicOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2 numbers, second: 20` und `1 words, first: ten`.
+
+1. **Vorlage lesen:** `Store<T>` hat ein privates Feld `List<T> items`, die Methode `Add(T item)`, `Get(int index)` mit dem Rückgabetyp `T` und die berechnete Eigenschaft `Count`.
+2. **Typ konstruieren:** `Store<int>` setzt `int` für jedes `T` ein. `Add` nimmt dann einen `int`, `Get` gibt einen `int` zurück.
+3. **Zweiter Typ:** `Store<string>` ist ein anderer Typ. Dort gilt überall `string`. Ein Cast ist nirgends nötig.
+
+Was passiert, wenn du `words.Add(5)` schreibst? `Store<string>` nimmt nur `string` an, der Compiler meldet einen Fehler.
+
+</details>
+
+## Offene und geschlossene Typen
+
+Ein Typ, in dem noch ein Typparameter vorkommt, ist ein <Term id="open-type">offener Typ</Term>. Im Rumpf von `Store<T>` ist `Store<T>` ein offener Typ. Ein Typ ohne Typparameter ist ein <Term id="closed-type">geschlossener Typ</Term>, zum Beispiel `Store<int>`. Variablen und Objekte haben immer einen geschlossenen Typ. Offene Typen gibt es nur beim Übersetzen.
+
+Ein generischer Typ kann mehrere Typparameter haben, getrennt durch Kommas. `Dictionary<TKey, TValue>` aus Modul 5 hat zwei: `TKey` für die Schlüssel und `TValue` für die Werte. Ein `struct` und ein `record` können ebenfalls generisch sein. Eine Methode in einer generischen Klasse darf zusätzlich einen eigenen Typparameter haben, wie `WithValue<TOther>` im Beispiel.
+
+<CSharpRunner id="m09-l02-pair-types" code={pairTypes} />
+
+`Pair<T>` ist ein generischer `struct` mit einem Typparameter. `Entry<TKey, TValue>` ist ein generischer `record` mit zwei. Die Methode `WithValue<TOther>` bekommt ihren Typparameter zusätzlich. Dadurch ändert sie den Typ des Wertes: Aus `Entry<string, int>` wird `Entry<string, double>`.
+
+Ein falsches oder fehlendes Typargument erkennt der Compiler:
+
+<CodeBlock language="csharp" title="wrong-type-argument.snippet.cs">{wrongTypeArgument}</CodeBlock>
+
+```text
+error CS1503: Argument 1: cannot convert from 'string' to 'int'
+error CS0305: Using the generic type 'Store<T>' requires 1 type arguments
+```
+
+## Jeder konstruierte Typ ist ein eigener Typ
+
+`Store<int>` und `Store<string>` haben denselben Code als Vorlage, aber es sind zwei verschiedene Typen. Das zeigt sich an den statischen Feldern aus Modul 6: Jeder geschlossene konstruierte Typ hat seine eigenen. Ein `Store<int>` lässt sich auch nicht als `Store<string>` benutzen.
+
+:::info[Vorhersage]
+Die Klasse zählt in einem statischen Feld, wie viele Objekte erzeugt wurden. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m09-l02-static-fields" code={staticFields} predict expected={staticFieldsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2`, `1`, `True` und `False`.
+
+1. **Statisches Feld pro Typ:** `a` und `b` sind `Store<int>`, `c` ist `Store<string>`. Der Konstruktor zählt im Feld `Created` des jeweiligen Typs.
+2. **Zählen:** `Store<int>.Created` ist 2, `Store<string>.Created` ist 1.
+3. **Typen vergleichen:** `a.GetType() == b.GetType()` ist `True`, beide sind `Store<int>`. `a.GetType() == c.GetType()` ist `False`, denn `Store<int>` und `Store<string>` sind verschiedene Typen.
+
+Was passiert, wenn du ein weiteres `Store<int>` erzeugst? Dann ist `Store<int>.Created` gleich 3, und `Store<string>.Created` bleibt 1.
+
+</details>
+
+## Lückenbeispiel
+
+Das Programm läuft, aber `Box` speichert nur `string`. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l02-gaps" code={boxGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Typparameter einführen:** `class Box<T>`. Die Eigenschaft heißt `public T Value { get; }`, der Konstruktor nimmt `T value`.
+2. **Typ benutzen:** Aus `Box label = new("login-failed");` wird `Box<string> label = new("login-failed");`.
+3. **Zweiter Typ:** `Box<int> number = new(7);` und `Console.WriteLine(number.Value);` geben `7` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Texte, Enum-Werte und Ereignisse mit der generischen Methode `CountOf<T>`. Die Liste `logEvents`, die Vorfälle `bobIncident` und `daveIncident` und der `detector` mit seinen Regeln (`detector.Rules`) gibt es schon.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model`, nach `IncidentComparer`, kommt `class Store<T>` mit einem privaten `List<T>`-Feld, `public void Add(T item)`, `public int Count` (berechnet), `public T Get(int index)` und `public IReadOnlyList<T> Items`, das die Liste zurückgibt.
+2. Vor `// End with exit code 0 …` kommt der Block `// Store events, incidents and rules in one generic store`. Er legt `Store<LogEvent>`, `Store<Incident>` und `Store<IDetectionRule>` an und füllt sie aus `logEvents`, aus `bobIncident` und `daveIncident` und aus `detector.Rules`.
+3. Der Block gibt den `Count` der drei Speicher aus (`Stored events:`, `Stored incidents:`, `Stored rules:`) und je ein Element: das letzte Ereignis mit `Describe()`, den ersten Vorfall mit `Summary()` und den Namen der ersten Regel.
+
+<CSharpRunner id="m09-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Vorlage schreiben:** `Store<T>` kapselt eine `List<T>`. `Add`, `Get` und `Items` benutzen `T`. `Count` rechnet `items.Count` aus, es gibt kein eigenes Feld dafür.
+2. **Typen konstruieren:** `Store<LogEvent>`, `Store<Incident>` und `Store<IDetectionRule>` sind drei geschlossene Typen aus derselben Klasse. Jeder nimmt nur seinen Elementtyp an.
+3. **Füllen:** Zwei Schleifen und zwei Einzelaufrufe rufen `Add` auf. Die Regeln haben den Typ `IDetectionRule`, deshalb passt der Elementtyp zum `Rules`-Element des Detektors.
+4. **Lesen:** `Get(…)` gibt das Element ohne Cast zurück. `Items[0]` benutzt die schreibgeschützte Liste.
+
+</details>
+
+**Neuer Stand:** SecLog speichert Ereignisse, Vorfälle und Regeln in einer generischen Klasse. Der Speicher schreibt sich einmal und ist für jeden Elementtyp typsicher.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l02-constructed-types-share-statics" />
+
+**„`Store<int>` und `Store<string>` sind derselbe Typ und teilen sich statische Felder.“** Das stimmt nicht. Jeder geschlossene konstruierte Typ ist ein eigener Typ und hat eigene statische Felder. Ein Zähler in `Store<T>` zählt deshalb getrennt für `Store<int>` und für `Store<string>`.
+:::
+
+<details>
+<summary>Vertiefung: Offene Typen und typeof (optional)</summary>
+
+Zwei geschlossene konstruierte Typen aus derselben generischen Klasse mit verschiedenen Typargumenten haben jeweils eigene statische Variablen. Offene Typen gibt es zur Laufzeit nicht, also gehören ihnen auch keine statischen Variablen ([§8.4.3 Open and closed types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#843-open-and-closed-types)). Es gibt genau einen Satz statischer Felder für jeden geschlossenen konstruierten Typ, unabhängig von der Zahl der Objekte ([§15.5.2 Static and instance fields](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1552-static-and-instance-fields)).
+
+Eine Klasse mit Typparametern ist in der Spezifikation ein ungebundener generischer Typ. Er darf nur in `typeof` stehen ([§8.4.4 Bound and unbound types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#844-bound-and-unbound-types)).
+
+</details>
+
+## Zusammenfassung
+
+Eine generische Klasse hat Typparameter nach dem Namen, zum Beispiel `Store<T>`, und ist eine Vorlage. Mit Typargumenten entsteht ein konstruierter Typ wie `Store<int>`. Ein Typ mit Typparameter ist offen, ein Typ ohne ist geschlossen. Jeder geschlossene konstruierte Typ ist ein eigener Typ mit eigenen statischen Feldern. `List<T>` und `Dictionary<TKey, TValue>` aus der Bibliothek sind generische Klassen. Auch `struct` und `record` können generisch sein.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l02-q1" />
+
+<Quiz id="m09-l02-q2" />
+
+<Quiz id="m09-l02-q3" />
+
+<Quiz id="m09-l02-q4" />
+
+<Quiz id="m09-l02-q5" />
+
+<Quiz id="m09-l02-q6" />
+
+<Quiz id="m09-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m09-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Generics overview](https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics)
+- C#-Spezifikation: [§8.4 Constructed types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#84-constructed-types)
+- API-Referenz: [List&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)

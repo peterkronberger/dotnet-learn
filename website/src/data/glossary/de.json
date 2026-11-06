@@ -255,7 +255,7 @@
       "term": "Type Inference",
       "german": "Typinferenz",
       "category": "language",
-      "definition": "Der Compiler bestimmt den Typ selbst, bei `var` aus dem Wert rechts vom `=`. Der Typ steht danach beim Übersetzen fest.",
+      "definition": "Der Compiler bestimmt den Typ selbst: bei `var` aus dem Wert rechts vom `=`, bei einer generischen Methode aus den Argumenten des Aufrufs. Der Typ steht danach beim Übersetzen fest.",
       "aliases": [
         "var"
       ],
@@ -5864,6 +5864,151 @@
       "source": {
         "title": "IComparable<T>.CompareTo(T) Method",
         "url": "https://learn.microsoft.com/dotnet/api/system.icomparable-1.compareto"
+      }
+    },
+    {
+      "id": "generics",
+      "term": "Generics",
+      "german": "Generics (generische Typen und Methoden)",
+      "category": "language",
+      "definition": "Typen und Methoden mit Typparametern, die für viele Typen funktionieren und dabei typsicher bleiben. `List<T>` und `IComparable<T>` sind Beispiele.",
+      "aliases": [
+        "generisch",
+        "Generika"
+      ],
+      "related": [
+        "type-parameter",
+        "type-argument",
+        "generic-method",
+        "generic-type"
+      ],
+      "lesson": "m09-l01",
+      "source": {
+        "title": "Generics overview",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics"
+      }
+    },
+    {
+      "id": "type-parameter",
+      "term": "Type Parameter",
+      "german": "Typparameter",
+      "category": "language",
+      "definition": "Der Platzhalter für einen Typ in der Deklaration, zum Beispiel `T` in `Pick<T>`. Beim Aufruf oder beim Erzeugen wird er durch ein Typargument ersetzt.",
+      "aliases": [
+        "Typparameter"
+      ],
+      "related": [
+        "type-argument",
+        "generics",
+        "generic-method"
+      ],
+      "lesson": "m09-l01",
+      "source": {
+        "title": "Types – Type parameters",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#85-type-parameters"
+      }
+    },
+    {
+      "id": "generic-method",
+      "term": "Generic Method",
+      "german": "Generische Methode",
+      "category": "language",
+      "definition": "Eine Methode mit einer Liste von Typparametern nach dem Namen, zum Beispiel `static T Pick<T>(bool takeFirst, T a, T b)`. Sie funktioniert für viele Typen, ohne `object` und Casts.",
+      "aliases": [
+        "generische Methode"
+      ],
+      "related": [
+        "generics",
+        "type-parameter",
+        "type-argument",
+        "type-inference"
+      ],
+      "lesson": "m09-l01",
+      "source": {
+        "title": "Classes – Methods, General",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1561-general"
+      }
+    },
+    {
+      "id": "generic-type",
+      "term": "Generic Type",
+      "german": "Generischer Typ",
+      "category": "language",
+      "definition": "Ein Typ mit Typparametern, zum Beispiel `class Store<T>`. Er ist eine Vorlage: Erst mit Typargumenten entsteht ein konstruierter Typ.",
+      "aliases": [
+        "generische Klasse",
+        "generische Klassen"
+      ],
+      "related": [
+        "generics",
+        "constructed-type",
+        "type-parameter"
+      ],
+      "lesson": "m09-l02",
+      "source": {
+        "title": "Types – Constructed types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#84-constructed-types"
+      }
+    },
+    {
+      "id": "constructed-type",
+      "term": "Constructed Type",
+      "german": "Konstruierter Typ",
+      "category": "language",
+      "definition": "Ein Typ, der aus einem generischen Typ durch Typargumente entsteht, zum Beispiel `Store<int>`. Jede Liste von Typargumenten ergibt einen eigenen Typ.",
+      "aliases": [
+        "konstruierte Typen"
+      ],
+      "related": [
+        "generic-type",
+        "open-type",
+        "closed-type",
+        "type-argument"
+      ],
+      "lesson": "m09-l02",
+      "source": {
+        "title": "Types – Constructed types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#84-constructed-types"
+      }
+    },
+    {
+      "id": "open-type",
+      "term": "Open Type",
+      "german": "Offener Typ",
+      "category": "language",
+      "definition": "Ein Typ, in dem ein Typparameter vorkommt, zum Beispiel `Store<T>` im Rumpf der Klasse. Offene Typen gibt es nur beim Übersetzen.",
+      "aliases": [
+        "offene Typen"
+      ],
+      "related": [
+        "closed-type",
+        "constructed-type",
+        "type-parameter"
+      ],
+      "lesson": "m09-l02",
+      "source": {
+        "title": "Types – Open and closed types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#843-open-and-closed-types"
+      }
+    },
+    {
+      "id": "closed-type",
+      "term": "Closed Type",
+      "german": "Geschlossener Typ",
+      "category": "language",
+      "definition": "Ein Typ ohne Typparameter, zum Beispiel `Store<int>`. Jeder geschlossene konstruierte Typ hat eigene statische Felder.",
+      "aliases": [
+        "geschlossene Typen"
+      ],
+      "related": [
+        "open-type",
+        "constructed-type",
+        "static-member"
+      ],
+      "lesson": "m09-l02",
+      "source": {
+        "title": "Types – Open and closed types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#843-open-and-closed-types"
       }
     }
   ]

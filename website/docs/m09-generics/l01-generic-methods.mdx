@@ -1,0 +1,222 @@
+---
+title: Generische Methoden
+sidebar_position: 1
+description: Eine Methode mit einem Typparameter T funktioniert für viele Typen und bleibt typsicher. Der Compiler leitet das Typargument meist aus den Argumenten ab.
+lesson_id: m09-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import objectPick from '!!raw-loader!@site/examples/m09/l01/object-pick.cs';
+import objectPickOutput from '!!raw-loader!@site/examples/m09/l01/object-pick.out.txt';
+import genericPick from '!!raw-loader!@site/examples/m09/l01/generic-pick.cs';
+import genericPickOutput from '!!raw-loader!@site/examples/m09/l01/generic-pick.out.txt';
+import swap from '!!raw-loader!@site/examples/m09/l01/swap.cs';
+import inferenceFails from '!!raw-loader!@site/examples/m09/l01/inference-fails.snippet.cs';
+import operatorOnT from '!!raw-loader!@site/examples/m09/l01/operator-on-t.snippet.cs';
+import lastOfGap from '!!raw-loader!@site/examples/m09/l01/last-of-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m09/l01/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l01/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l01/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l01/seclog-generics-solution.cs';
+
+# Generische Methoden
+
+:::note[Lernziele]
+- Du kannst erklären, welches Problem Generics lösen: eine Methode für viele Typen, ohne `object` und Casts.
+- Du kannst eine generische Methode mit einem Typparameter schreiben und aufrufen.
+- Du kannst vorhersagen, welches Typargument der Compiler aus den Argumenten ableitet, und es bei Bedarf selbst angeben.
+- Du kannst Typparameter und Typargument unterscheiden.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog zählt Ereignisse, Benutzer und IP-Adressen mit einer generischen Hilfsmethode und einer generischen Zählerklasse.
+- SecLog speichert Ereignisse, Vorfälle und Regeln in einem generischen Speicher, der für jeden Typ funktioniert.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m04-l09-q1" />
+
+<Quiz id="m05-l04-q1" />
+
+## Das Problem: eine Methode für viele Typen
+
+Eine Methode, die zwei Werte nimmt und einen davon zurückgibt, soll für `int`, für `string` und für `double` funktionieren. Mit dem Wissen aus Modul 3 gibt es zwei Wege. Du schreibst drei <Term id="overloading">Überladungen</Term> mit demselben Rumpf. Oder du nimmst `object`, denn jeder Typ lässt sich nach `object` umwandeln. Der zweite Weg hat einen Preis: Ein `int` wird dabei geboxt (<Term id="boxing">Boxing</Term>), und der Aufrufer muss das Ergebnis wieder casten.
+
+:::info[Vorhersage]
+`Pick` gibt den ersten oder den zweiten Wert zurück. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m09-l01-object-pick" code={objectPick} predict expected={objectPickOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `21` und `InvalidCastException`.
+
+1. **Verpacken:** `Pick(true, 10, 20)` bekommt zwei `int`-Werte, die als `object` geboxt werden. Zurück kommt ein `object`.
+2. **Zurückholen:** `(int)first` entpackt den Wert. `number + 1` ist 21.
+3. **Falscher Cast:** `word` ist ein `string`. `(int)word` übersetzt der Compiler ohne Fehler, erst zur Laufzeit wirft der Cast eine `InvalidCastException`.
+
+Was passiert, wenn du `(int)word` durch `(string)word` ersetzt? Dann passt der Cast, und der Fehler verschwindet. Der Compiler hilft dir bei `object` weder beim richtigen noch beim falschen Cast.
+
+</details>
+
+## Die generische Methode
+
+Eine <Term id="generic-method">generische Methode</Term> hat nach dem Namen eine Liste von <Term id="type-parameter">Typparametern</Term> in spitzen Klammern: `Pick<T>`. `T` ist ein Platzhalter für einen Typ. Du kannst `T` im Parameter, im Rückgabetyp und im Rumpf benutzen. Als Name gilt die Konvention `T` oder ein Name, der mit `T` beginnt, wenn es mehrere Typparameter gibt (`TKey`, `TValue`). Mehrere trennst du mit Kommas.
+
+Diese Technik heißt <Term id="generics">Generics</Term>. Du kennst ihre Wirkung schon aus Modul 5: Bei `List<string>` ist `string` das <Term id="type-argument">Typargument</Term>. Es ersetzt den Typparameter `T` der Klasse `List<T>`. Bei einer generischen Methode ist es genauso: Der Typparameter steht in der Deklaration, das Typargument steht im Aufruf, ausdrücklich oder abgeleitet.
+
+Das nächste Programm benutzt `typeof(T).Name`, um zu zeigen, was `T` im jeweiligen Aufruf ist.
+
+:::info[Vorhersage]
+Welche sechs Zeilen gibt das Programm aus? Achte beim dritten Aufruf auf die Typen der beiden Werte.
+:::
+
+<CSharpRunner id="m09-l01-generic-pick" code={genericPick} predict expected={genericPickOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `T is Int32`, `10`, `T is String`, `twenty`, `T is Double` und `1`.
+
+1. **Argumente ansehen:** Im ersten Aufruf sind `10` und `20` vom Typ `int`, im zweiten sind `"ten"` und `"twenty"` vom Typ `string`.
+2. **Typargument ableiten:** Der Compiler setzt `int` beziehungsweise `string` für `T` ein. Die Rückgabe hat denselben Typ, also brauchst du keinen Cast.
+3. **Gemischte Typen:** Im dritten Aufruf sind `1` (ein `int`) und `2.5` (ein `double`) die Argumente. Beide müssen zu `T` passen. Ein `int` lässt sich implizit nach `double` umwandeln, ein `double` nicht nach `int`. Also ist `T` gleich `double`, und `1` wird zu `1.0`. Ausgegeben wird `1`.
+
+Was passiert, wenn du `Pick(true, 1, "a")` schreibst? Es gibt keinen Typ, in den beide Werte passen. Der Compiler meldet einen Fehler.
+
+</details>
+
+## Typargument ableiten oder angeben
+
+Der Compiler leitet das Typargument aus den Argumenten des Aufrufs ab (<Term id="type-inference">Typinferenz</Term>). Du kannst es auch selbst angeben, in spitzen Klammern hinter dem Methodennamen: `Swap<string>(…)`. Das geht immer, auch wenn die Ableitung gelingen würde.
+
+<CSharpRunner id="m09-l01-swap" code={swap} />
+
+`Swap` vertauscht zwei Variablen. Beide Parameter sind `ref T`, das Prinzip von `ref` kennst du aus Modul 3. Der erste Aufruf lässt den Compiler `int` ableiten, der zweite gibt `string` selbst an.
+
+Die Ableitung benutzt nur die Argumente. Hat eine Methode keine Parameter, aus denen `T` hervorgeht, bleibt nichts zum Ableiten übrig. Dann musst du das Typargument angeben. Der Compiler schaut weder auf den Rückgabetyp noch auf die Variable, in die das Ergebnis geht:
+
+<CodeBlock language="csharp" title="inference-fails.snippet.cs">{inferenceFails}</CodeBlock>
+
+```text
+error CS0411: The type arguments for method 'Create<T>()' cannot be inferred from the usage. Try specifying the type arguments explicitly.
+```
+
+Richtig ist `int number = Create<int>();`.
+
+## Was ein T kann
+
+Beim Übersetzen kennt der Compiler `T` nur als irgendeinen Typ. Er prüft die Methode einmal, nicht einmal pro Typargument. Deshalb sind in der Methode nur die Member verfügbar, die jeder Typ hat: die von `object`, also `ToString()`, `Equals(…)` und `GetHashCode()`. Ein Vergleich mit `<` gehört nicht dazu:
+
+<Forward concepts={['Einschränkungen für Typparameter (`where`)']} module="9" />
+
+<CodeBlock language="csharp" title="operator-on-t.snippet.cs">{operatorOnT}</CodeBlock>
+
+```text
+error CS0019: Operator '<' cannot be applied to operands of type 'T' and 'T'
+```
+
+Wie du `T` mehr Fähigkeiten gibst, steht in Lektion 3. Gleichheit dagegen geht schon jetzt: Die statische Methode `Equals(a, b)` (also `object.Equals`) vergleicht zwei Werte jedes Typs und kommt auch mit `null` zurecht. Das benutzt die Methode `CountOf` im Projektschritt.
+
+Auch eine lokale Funktion (Modul 3) darf generisch sein. Sie hat dann ihre Typparameter nach dem Namen, genau wie eine normale Methode.
+
+## Lückenbeispiel
+
+Das Programm läuft schon, aber `LastOf` kennt nur `List<int>`. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l01-gaps" code={lastOfGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Typparameter einführen:** `static T LastOf<T>(List<T> items)`. Der Rückgabetyp und der Parameter benutzen `T`.
+2. **Aufrufen:** `Console.WriteLine(LastOf<string>(names));`. Das Typargument ist hier `string`. Die Ableitung würde es auch finden, weil `names` eine `List<string>` ist.
+3. **Ergebnis:** Die Ausgabe ist `15` und `bob`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest das Beispiel-Log, wandelt die Zeilen in `LogEvent`-Objekte und Werte des Enums `EventType` um, sammelt Vorfälle und prüft sie mit austauschbaren Regeln. Die Variablen `sampleLog` (die 14 Zeilen), `logEvents` (die Ereignisse als Liste) und die lokalen Funktionen `EventTypeOf` und `ParseEventType` gibt es schon.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block und die Stelle für die neue lokale Funktion. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Nach den ausgeblendeten lokalen Funktionen, vor `static class Report`, kommt die lokale Funktion `static int CountOf<T>(IReadOnlyList<T> items, T value)`. Sie zählt die Elemente, die mit `Equals(item, value)` gleich `value` sind.
+2. Vor `// End with exit code 0 …` kommt der Block `// Count values with one generic method`. Er baut aus `sampleLog` mit `foreach` eine `List<string>` der Ereignistypen (`EventTypeOf`) und eine `List<EventType>` (`ParseEventType`).
+3. Der Block gibt drei Zeilen aus: `login-failed texts:` mit `CountOf<string>(…)` (Typargument angegeben), `LoginFailed values:` mit `CountOf(…)` für `EventType.LoginFailed` und `Same events:` mit der Anzahl von `logEvents[1]` in `logEvents`.
+
+<CSharpRunner id="m09-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Typparameter einführen:** `CountOf<T>` hat einen Typparameter. Liste und Wert benutzen beide `T`, also müssen sie zusammenpassen.
+2. **Zählen:** Die Schleife geht alle Elemente durch und erhöht `count` bei jedem, für das `Equals(item, value)` wahr ist. Die statische Methode `Equals` ist auch für `null` sicher.
+3. **Listen bauen:** Eine Schleife über `sampleLog` füllt die Liste der Texte und die Liste der `EventType`-Werte.
+4. **Aufrufen:** Bei `CountOf<string>(…)` steht das Typargument da. Bei den anderen beiden Aufrufen leitet der Compiler `EventType` und `LogEvent` aus den Argumenten ab. Bei `LogEvent` zählt der Wertevergleich aus Modul 8: nur das Ereignis selbst ist gleich, daher ist das Ergebnis 1.
+
+</details>
+
+**Neuer Stand:** SecLog zählt Texte, Enum-Werte und Ereignisse mit derselben Methode. Die M5-Blöcke mit dem `Dictionary` bleiben. In Lektion 3 entsteht daraus eine wiederverwendbare Zählerklasse.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l01-type-inferred-from-return-type" />
+
+**„Der Compiler leitet das Typargument auch aus dem Rückgabetyp oder aus der Zielvariablen ab, also `int x = Create();` ohne Typargument.“** Das stimmt nicht. Die Ableitung benutzt nur die Argumente des Aufrufs. Kommt `T` nur im Rückgabetyp vor, musst du das Typargument angeben: `int x = Create<int>();`.
+:::
+
+<details>
+<summary>Vertiefung: Wie der Compiler ableitet (optional)</summary>
+
+Der Compiler sammelt aus jedem Argument Schranken für `T`. Danach legt er `T` fest: Aus der Menge der Kandidaten bleibt der Typ, in den sich alle anderen Kandidaten implizit umwandeln lassen. Gibt es keinen solchen Typ, schlägt die Ableitung fehl ([§12.6.3.13 Fixing](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#126313-fixing)). Die Ableitung beginnt mit den Argumenten ([§12.6.3.2 The first phase](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12632-the-first-phase)).
+
+Ein Typparameter ist eine reine Übersetzungszeit-Konstruktion. Zur Laufzeit ist jeder Typparameter an einen konkreten Typ gebunden ([§8.5 Type parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#85-type-parameters)). Deshalb zeigt `typeof(T).Name` im Beispiel `Int32` und `String`.
+
+</details>
+
+## Zusammenfassung
+
+Eine generische Methode hat nach ihrem Namen Typparameter, zum Beispiel `Pick<T>`. Sie ist für viele Typen einmal geschrieben und bleibt typsicher, ohne `object` und Casts. Beim Aufruf steht für den Typparameter ein Typargument. Der Compiler leitet es aus den Argumenten ab, du kannst es aber auch angeben. Der Rückgabetyp und die Zielvariable spielen bei der Ableitung keine Rolle. Ohne Einschränkung kennt eine generische Methode von `T` nur die Member von `object`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l01-q1" />
+
+<Quiz id="m09-l01-q2" />
+
+<Quiz id="m09-l01-q3" />
+
+<Quiz id="m09-l01-q4" />
+
+<Quiz id="m09-l01-q5" />
+
+<Quiz id="m09-l01-q6" />
+
+<Quiz id="m09-l01-q7" />
+
+<Quiz id="m09-l01-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l01-q9" />
+
+### Transferfrage
+
+<Quiz id="m09-l01-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Generische Typparameter und Methoden (Generics overview)](https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics)
+- C#-Spezifikation: [§12.6.3 Type inference](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1263-type-inference)
