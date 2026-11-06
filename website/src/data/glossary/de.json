@@ -5220,6 +5220,111 @@
         "title": "Expressions – Base access",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12815-base-access"
       }
+    },
+    {
+      "id": "abstract-class",
+      "term": "Abstract class",
+      "german": "abstrakte Klasse",
+      "category": "language",
+      "definition": "Eine Klasse mit `abstract` vor `class`. Sie ist als Basisklasse gedacht, du kannst von ihr kein Objekt erzeugen. Sie darf Felder, Konstruktoren, normale und abstrakte Member enthalten.",
+      "aliases": [
+        "abstrakte Klassen",
+        "abstract classes"
+      ],
+      "related": [
+        "abstract-member",
+        "polymorphism",
+        "base-class"
+      ],
+      "lesson": "m08-l03",
+      "source": {
+        "title": "Classes – Abstract classes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15222-abstract-classes"
+      }
+    },
+    {
+      "id": "abstract-member",
+      "term": "Abstract member",
+      "german": "abstrakter Member",
+      "category": "language",
+      "definition": "Ein Member mit `abstract`, der keinen Rumpf hat (nur `;`). Er ist implizit virtuell, steht nur in abstrakten Klassen, und jede nicht abstrakte abgeleitete Klasse muss ihn mit `override` umsetzen.",
+      "aliases": [
+        "abstrakte Methode",
+        "abstract method",
+        "abstract members"
+      ],
+      "related": [
+        "abstract-class",
+        "override",
+        "virtual-member"
+      ],
+      "lesson": "m08-l03",
+      "source": {
+        "title": "Classes – Abstract methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1567-abstract-methods"
+      }
+    },
+    {
+      "id": "sealed-class",
+      "term": "Sealed class",
+      "german": "versiegelte Klasse",
+      "category": "language",
+      "definition": "Eine Klasse mit `sealed` vor `class`. Von ihr kann keine andere Klasse ableiten. Das betrifft die Vererbung, nicht den Zustand ihrer Objekte.",
+      "aliases": [
+        "versiegelte Klassen",
+        "sealed classes"
+      ],
+      "related": [
+        "sealed-member",
+        "inheritance",
+        "static-class"
+      ],
+      "lesson": "m08-l04",
+      "source": {
+        "title": "Classes – Sealed classes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15223-sealed-classes"
+      }
+    },
+    {
+      "id": "sealed-member",
+      "term": "Sealed member",
+      "german": "versiegelter Member",
+      "category": "language",
+      "definition": "Eine Überschreibung mit `sealed override`. Abgeleitete Klassen dürfen sie nicht erneut überschreiben. `sealed` ohne `override` ist nicht erlaubt.",
+      "aliases": [
+        "sealed override",
+        "versiegelte Methode",
+        "sealed method"
+      ],
+      "related": [
+        "sealed-class",
+        "override"
+      ],
+      "lesson": "m08-l04",
+      "source": {
+        "title": "Classes – Sealed methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1566-sealed-methods"
+      }
+    },
+    {
+      "id": "code-analysis-rule",
+      "term": "Code analysis rule",
+      "german": "Code-Analyse-Regel",
+      "category": "platform",
+      "definition": "Eine Regel des .NET-Compilers, die den Quelltext prüft und Hinweise oder Warnungen meldet, auch wenn der Code übersetzbar ist. Jede Regel hat eine Nummer wie CA1852.",
+      "aliases": [
+        "Analyzer-Regel",
+        "code analyzer rule",
+        "CA-Regel"
+      ],
+      "related": [
+        "sealed-class"
+      ],
+      "lesson": "m08-l04",
+      "source": {
+        "title": "CA1852: Seal internal types",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1852"
+      }
     }
   ]
 }

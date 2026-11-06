@@ -1,0 +1,177 @@
+---
+title: Abstrakte Klassen und Polymorphie
+sidebar_position: 3
+description: Eine abstrakte Klasse gibt vor, was abgeleitete Klassen umsetzen müssen – und eine Liste der Basisklasse ruft für jedes Objekt die passende Version auf.
+lesson_id: m08-l03
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import abstractClass from '!!raw-loader!@site/examples/m08/l03/abstract-class.cs';
+import abstractClassOutput from '!!raw-loader!@site/examples/m08/l03/abstract-class.out.txt';
+import abstractNew from '!!raw-loader!@site/examples/m08/l03/abstract-new.snippet.cs';
+import abstractNotOverridden from '!!raw-loader!@site/examples/m08/l03/abstract-not-overridden.snippet.cs';
+import abstractGap from '!!raw-loader!@site/examples/m08/l03/abstract-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l03/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l03/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l03/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l03/seclog-oop-solution.cs';
+
+# Abstrakte Klassen und Polymorphie
+
+:::note[Lernziele]
+- Du kannst eine abstrakte Klasse mit abstrakten und normalen Membern schreiben.
+- Du kannst erklären, warum man von einer abstrakten Klasse kein Objekt erzeugen kann.
+- Du kannst eine Liste vom Typ der Basisklasse durchlaufen und für jedes Objekt die passende Überschreibung aufrufen lassen.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l01-q2" />
+
+<Quiz id="m08-l02-q3" />
+
+<Quiz id="m05-l04-q4" />
+
+## Eine Klasse, die nur Basis sein soll
+
+In Lektion 2 hat `Device` eine Standardversion von `Describe()`. Manchmal gibt es keine sinnvolle Standardversion: Ein „allgemeines Gerät“ weiß nicht, wie es sich beschreibt, nur ein Drucker oder ein Scanner weiß es. Dann soll `Device` nur Basis sein, und jede abgeleitete Klasse muss die Methode selbst liefern.
+
+Dafür gibt es zwei Schlüsselwörter:
+
+1. Eine <Term id="abstract-class">abstrakte Klasse</Term> (Abstract Class) trägt `abstract` vor `class`. Sie ist unvollständig und nur als Basisklasse gedacht. Ein Ausdruck `new` auf sie ist ein Fehler beim Übersetzen.
+2. Ein <Term id="abstract-member">abstrakter Member</Term> trägt `abstract` und hat keinen Rumpf, nur ein Semikolon: `public abstract string Describe();`. Er ist implizit `virtual`, steht nur in abstrakten Klassen und wird in abgeleiteten Klassen mit `override` umgesetzt.
+
+Eine abstrakte Klasse darf aber mehr enthalten als abstrakte Member: Felder, Eigenschaften, einen Konstruktor und normale Methoden mit Rumpf. Abgeleitete Klassen erben sie wie bei jeder Basisklasse. Der Konstruktor läuft, wenn ein abgeleiteter Konstruktor ihn mit `base(…)` aufruft (Lektion 1). Weil nur abgeleitete Klassen ihn brauchen, schreibt man ihn oft `protected`.
+
+:::info[Vorhersage]
+Die Liste hat den Elementtyp `Device`, enthält aber einen `Printer` und einen `Scanner`. `Label()` ist eine normale Methode von `Device`, `Describe()` ist abstrakt. Welche zwei Zeilen gibt die Schleife aus?
+:::
+
+<CSharpRunner id="m08-l03-abstract" code={abstractClass} predict expected={abstractClassOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `[office printer] prints pages` und `[archive scanner] scans documents`.
+
+1. **Abstrakt deklarieren:** `Device` ist `abstract`. `Describe()` ist abstrakt und hat keinen Rumpf. `Name`, der Konstruktor und `Label()` sind normale Member.
+2. **Umsetzen:** `Printer` und `Scanner` überschreiben `Describe()` mit `override`. Ohne Überschreibung ließen sie sich nicht übersetzen.
+3. **Aufrufen:** Die Schleifenvariable hat den Typ `Device`. Bei jedem Objekt läuft `Label()` von `Device`, `Describe()` aber in der Version seiner Klasse. Das ist <Term id="polymorphism">Polymorphie</Term>: ein Aufruf, das Objekt entscheidet (Lektion 2).
+
+Was passiert, wenn du `new Device("router")` zur Liste hinzufügst? Das Programm lässt sich nicht übersetzen:
+
+<CodeBlock language="csharp" title="abstract-new.snippet.cs">{abstractNew}</CodeBlock>
+
+```text
+error CS0144: Cannot create an instance of the abstract type or interface 'Device'
+```
+
+</details>
+
+## Pflicht zum Überschreiben
+
+Eine abgeleitete Klasse, die nicht selbst abstrakt ist, muss jeden geerbten abstrakten Member überschreiben. Vergisst sie einen, meldet der Compiler einen Fehler. So ist garantiert, dass jedes Objekt, das es wirklich gibt, alle Member umgesetzt hat.
+
+<CodeBlock language="csharp" title="abstract-not-overridden.snippet.cs">{abstractNotOverridden}</CodeBlock>
+
+```text
+error CS0534: 'Printer' does not implement inherited abstract member 'Device.Describe()'
+```
+
+Das ist der Unterschied zu `virtual` aus Lektion 2: Bei `virtual` ist das Überschreiben erlaubt und die Basisversion läuft sonst weiter. Bei `abstract` ist es Pflicht, denn es gibt keine Basisversion.
+
+## Lückenbeispiel
+
+`Device` soll abstrakt werden, und `Scanner` soll `Describe()` umsetzen. Ergänze die Stellen aus den Kommentaren. Danach soll das Programm `Scanner: archive scanner` ausgeben.
+
+<CSharpRunner id="m08-l03-gaps" code={abstractGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Klasse abstrakt machen:** `abstract class Device`.
+2. **Member abstrakt machen:** `public abstract string Describe();` ohne Rumpf.
+3. **Umsetzen:** In `Scanner` steht `public override string Describe() => $"Scanner: {Name}";`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Basisklasse `DetectionRule` mit `Name`, `Describe()` und `ToString()` und die abgeleitete Regel `FailedLoginRule`. `Describe()` ist virtuell.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Platz für den neuen Block mit `return 0;` und die Klassen `DetectionRule` und `FailedLoginRule`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Mache `DetectionRule` abstrakt. Der Konstruktor darf `protected` sein. Füge den abstrakten Member `public abstract bool IsMatch(Incident incident);` hinzu.
+2. `FailedLoginRule` überschreibt `IsMatch`: Die Regel trifft zu, wenn `incident.FailureCount >= Threshold` gilt.
+3. Schreibe die neue Klasse `WatchListRule : DetectionRule` mit dem Konstruktor `WatchListRule(string watchedUser) : base("watch list")`, der Eigenschaft `WatchedUser` und `IsMatch`: Die Regel trifft zu, wenn `incident.User` und `WatchedUser` mit `StringComparison.Ordinal` gleich sind. Sie überschreibt auch `Describe()` mit `base.Describe() + $" ({WatchedUser})"`.
+4. Schreibe vor `// End with exit code 0 …` den Block `// Check the incidents with every detection rule`. Er legt `List<DetectionRule> rules = [failedRule, new WatchListRule("dave")];` an und gibt für jede Regel und jeden Vorfall aus `bobIncident` und `daveIncident` eine Zeile `{rule.Name} / {incident.User}: {rule.IsMatch(incident)}` aus.
+
+Die Blöcke aus Lektion 1 und 2 bleiben gültig: Sie erzeugen nie direkt eine `DetectionRule`, sondern nur eine `FailedLoginRule`.
+
+<CSharpRunner id="m08-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Basis abstrakt machen:** `abstract class DetectionRule` mit dem abstrakten Member `IsMatch`. Der geschützte Konstruktor wird von den abgeleiteten Klassen mit `base(…)` aufgerufen.
+2. **Umsetzen:** `FailedLoginRule` vergleicht `FailureCount` mit der Schwelle. `WatchListRule` vergleicht den Benutzer des Vorfalls mit dem beobachteten Benutzer.
+3. **Liste der Basisklasse:** `rules` hat den Elementtyp `DetectionRule` und enthält beide Regeln. Die innere Schleife ruft `rule.IsMatch(incident)` auf, und der Laufzeittyp der Regel wählt die Version.
+
+</details>
+
+**Neuer Stand:** SecLog hat zwei austauschbare Erkennungsregeln hinter einer abstrakten Basisklasse und prüft jeden Vorfall mit jeder Regel.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l03-abstract-class-only-abstract-members" />
+
+**„Eine abstrakte Klasse darf nur abstrakte Member enthalten.“** Das stimmt nicht. Eine abstrakte Klasse darf Felder, Konstruktoren und normale Methoden mit Rumpf enthalten. Nur die Member mit `abstract` haben keinen Rumpf.
+:::
+
+<details>
+<summary>Vertiefung: Die Regeln im Detail (optional)</summary>
+
+Die Modifizierer `abstract` markiert eine Klasse als unvollständig und nur als Basisklasse gedacht. Ein `new` auf eine abstrakte Klasse ist ein Fehler beim Übersetzen, und eine abstrakte Klasse darf (muss aber nicht) abstrakte Member enthalten. Eine nicht abstrakte Klasse, die von ihr ableitet, muss alle geerbten abstrakten Member mit echten Implementierungen überschreiben ([§15.2.2.2 Abstract classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15222-abstract-classes)).
+
+Eine abstrakte Methode ist implizit auch virtuell, trägt aber nie selbst `virtual`. Ihr Rumpf besteht nur aus einem Semikolon, und sie ist nur in abstrakten Klassen und Interfaces erlaubt ([§15.6.7 Abstract methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1567-abstract-methods)). Interfaces folgen in Lektion 5.
+
+</details>
+
+## Zusammenfassung
+
+Eine abstrakte Klasse trägt `abstract` und ist als Basisklasse gedacht. Von ihr gibt es kein Objekt, `new` ist ein Fehler. Sie darf Felder, Konstruktoren und normale Methoden enthalten, dazu abstrakte Member ohne Rumpf. Jede abgeleitete Klasse, die nicht abstrakt ist, muss jeden abstrakten Member mit `override` umsetzen. Eine Liste vom Typ der Basisklasse kann Objekte aller abgeleiteten Klassen halten, und jeder Aufruf führt die Version des jeweiligen Objekts aus.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l03-q1" />
+
+<Quiz id="m08-l03-q2" />
+
+<Quiz id="m08-l03-q3" />
+
+<Quiz id="m08-l03-q4" />
+
+<Quiz id="m08-l03-q5" />
+
+<Quiz id="m08-l03-q6" />
+
+<Quiz id="m08-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m08-l03-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Abstract classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15222-abstract-classes)
+- C#-Spezifikation: [Abstract methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1567-abstract-methods)

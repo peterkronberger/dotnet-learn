@@ -241,6 +241,282 @@
       "type": "explain",
       "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem ein Aufruf über die Basisklasse je nach Objekt etwas anderes tun soll.",
       "modelAnswer": "SecLog hält Erkennungsregeln in Variablen vom Typ `DetectionRule`. `Describe()` ist `virtual`. `FailedLoginRule` überschreibt die Methode und hängt die Schwelle an. Ein Aufruf `rule.Describe()` liefert für jede Regel ihren eigenen Text, ohne dass der aufrufende Code die Art der Regel kennen muss."
+    },
+    {
+      "id": "m08-l03-q1",
+      "lesson": "m08-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l03/abstract-class.cs",
+      "explanation": "`Device` ist abstrakt, die Liste enthält aber Objekte der abgeleiteten Klassen. `Label()` ist eine normale Methode von `Device`. `Describe()` ist abstrakt, deshalb läuft bei jedem Objekt die Überschreibung seiner Klasse."
+    },
+    {
+      "id": "m08-l03-q2",
+      "lesson": "m08-l03",
+      "type": "single",
+      "question": "`Device` ist `abstract`. Was meldet der Compiler bei `Device device = new Device(\"router\");`?",
+      "options": [
+        {
+          "text": "Einen Fehler (CS0144): Von einer abstrakten Klasse kann man kein Objekt erzeugen.",
+          "correct": true
+        },
+        {
+          "text": "Nichts. Das Objekt entsteht, nur die abstrakten Methoden haben keinen Rumpf.",
+          "feedback": "Es entsteht kein Objekt. `new` auf eine abstrakte Klasse ist ein Fehler beim Übersetzen."
+        },
+        {
+          "text": "Nur eine Warnung, und zur Laufzeit kommt eine Ausnahme.",
+          "feedback": "Es ist ein Fehler beim Übersetzen. Das Programm startet gar nicht erst."
+        }
+      ],
+      "explanation": "Eine abstrakte Klasse ist unvollständig und nur als Basisklasse gedacht. `new` darauf ist ein Fehler beim Übersetzen (CS0144)."
+    },
+    {
+      "id": "m08-l03-q3",
+      "lesson": "m08-l03",
+      "type": "single",
+      "question": "Welche Aussage über eine abstrakte Klasse stimmt?",
+      "options": [
+        {
+          "text": "Sie darf nur abstrakte Member enthalten.",
+          "feedback": "Sie darf auch Felder, Konstruktoren und normale Methoden mit Rumpf enthalten. Nur die `abstract`-Member haben keinen Rumpf.",
+          "misconception": "m08-l03-abstract-class-only-abstract-members"
+        },
+        {
+          "text": "Sie kann Felder, einen Konstruktor und normale Methoden enthalten, dazu abstrakte Member ohne Rumpf.",
+          "correct": true
+        },
+        {
+          "text": "Sie darf keinen Konstruktor haben, weil man kein Objekt von ihr erzeugt.",
+          "feedback": "Sie darf einen Konstruktor haben. Er läuft, wenn eine abgeleitete Klasse ihn mit `base(…)` aufruft.",
+          "misconception": "m08-l03-abstract-class-only-abstract-members"
+        }
+      ],
+      "explanation": "Nur die abstrakten Member haben keinen Rumpf. Alles andere darf eine abstrakte Klasse enthalten, auch einen Konstruktor, den die abgeleiteten Klassen mit `base(…)` aufrufen."
+    },
+    {
+      "id": "m08-l03-q4",
+      "lesson": "m08-l03",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0534.",
+      "example": "m08/l03/abstract-not-overridden.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "explanation": "`Printer` ist nicht abstrakt und erbt den abstrakten Member `Describe()`. Sie muss ihn mit `override` umsetzen, sonst meldet der Compiler CS0534."
+    },
+    {
+      "id": "m08-l03-q5",
+      "lesson": "m08-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über `public abstract string Describe();` stimmen?",
+      "options": [
+        {
+          "text": "Die Methode hat keinen Rumpf, nur ein Semikolon.",
+          "correct": true
+        },
+        {
+          "text": "Sie darf nur in einer abstrakten Klasse stehen.",
+          "correct": true
+        },
+        {
+          "text": "Jede nicht abstrakte abgeleitete Klasse muss sie mit `override` umsetzen.",
+          "correct": true
+        },
+        {
+          "text": "Sie braucht zusätzlich `virtual`, damit sie überschrieben werden kann.",
+          "feedback": "Ein abstrakter Member ist implizit virtuell. `virtual` darf nicht zusätzlich stehen."
+        },
+        {
+          "text": "Sie darf einen Rumpf mit einer Standardversion haben.",
+          "feedback": "Eine Standardversion hat nur ein `virtual`-Member. Ein abstrakter Member hat keinen Rumpf."
+        }
+      ],
+      "explanation": "Ein abstrakter Member hat keinen Rumpf, ist implizit virtuell und steht nur in abstrakten Klassen. Abgeleitete Klassen, die nicht abstrakt sind, müssen ihn überschreiben."
+    },
+    {
+      "id": "m08-l03-q6",
+      "lesson": "m08-l03",
+      "type": "single",
+      "question": "`Device` ist abstrakt, `Printer` ist von `Device` abgeleitet. Welche Zeile lässt sich übersetzen?",
+      "options": [
+        {
+          "text": "`List<Device> list = [new Printer(\"p\")];`",
+          "correct": true
+        },
+        {
+          "text": "`List<Device> list = [new Device(\"d\")];`",
+          "feedback": "Von der abstrakten Klasse selbst gibt es kein Objekt."
+        },
+        {
+          "text": "`Printer p = new Device(\"d\");`",
+          "feedback": "Ein `Device` ist kein `Printer`, und außerdem ist `Device` abstrakt."
+        }
+      ],
+      "explanation": "Variablen und Listen vom Typ der abstrakten Basisklasse dürfen Objekte der abgeleiteten Klassen halten. Objekte der abstrakten Klasse selbst gibt es nicht."
+    },
+    {
+      "id": "m08-l03-q7",
+      "lesson": "m08-l03",
+      "type": "single",
+      "question": "Wer ruft den Konstruktor einer abstrakten Klasse auf?",
+      "options": [
+        {
+          "text": "Der Konstruktor einer abgeleiteten Klasse über `base(…)`.",
+          "correct": true
+        },
+        {
+          "text": "Der Ausdruck `new` auf die abstrakte Klasse.",
+          "feedback": "`new` auf eine abstrakte Klasse ist ein Fehler."
+        },
+        {
+          "text": "Niemand. Eine abstrakte Klasse hat keinen Konstruktor.",
+          "feedback": "Sie darf einen haben. Er setzt zum Beispiel Eigenschaften, die alle abgeleiteten Klassen teilen.",
+          "misconception": "m08-l03-abstract-class-only-abstract-members"
+        }
+      ],
+      "explanation": "Der Konstruktor einer abstrakten Klasse läuft, wenn ein abgeleiteter Konstruktor `base(…)` aufruft. Er darf `protected` sein, weil nur abgeleitete Klassen ihn brauchen."
+    },
+    {
+      "id": "m08-l03-q8",
+      "lesson": "m08-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum man von einer abstrakten Klasse kein Objekt erzeugen kann und wozu sie trotzdem gut ist.",
+      "modelAnswer": "Eine abstrakte Klasse ist unvollständig, weil mindestens ein abstrakter Member keinen Rumpf hat. Ein Objekt dieser Klasse wüsste nicht, was bei einem Aufruf passiert, deshalb verbietet der Compiler `new`. Sie ist trotzdem nützlich: Sie legt gemeinsame Member und einen Konstruktor fest und zwingt jede abgeleitete Klasse, die abstrakten Member umzusetzen. Dann kann Code mit einer Liste vom Typ der Basisklasse arbeiten, und jedes Objekt führt seine eigene Version aus."
+    },
+    {
+      "id": "m08-l03-q9",
+      "lesson": "m08-l03",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in einem eigenen Programm eine abstrakte Klasse einsetzen?",
+      "modelAnswer": "SecLog hat mehrere Erkennungsregeln. `DetectionRule` ist abstrakt und verlangt `IsMatch(Incident)`. `FailedLoginRule` und `WatchListRule` setzen die Methode unterschiedlich um. Der Code, der die Regeln prüft, durchläuft eine `List<DetectionRule>` und ruft `IsMatch` auf, ohne die Art der Regel zu kennen."
+    },
+    {
+      "id": "m08-l04-q1",
+      "lesson": "m08-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l04/sealed-override.cs",
+      "explanation": "`Printer` versiegelt seine Überschreibung. Das ändert den Aufruf nicht: Über die Variable vom Typ `Device` läuft bei jedem Objekt die Version seiner Klasse. `sealed override` verbietet nur weitere Überschreibungen in abgeleiteten Klassen."
+    },
+    {
+      "id": "m08-l04-q2",
+      "lesson": "m08-l04",
+      "type": "single",
+      "question": "`Printer` ist `sealed`. Was meldet der Compiler bei `class LabelPrinter : Printer { }`?",
+      "options": [
+        {
+          "text": "Einen Fehler (CS0509): Von einer versiegelten Klasse kann man nicht ableiten.",
+          "correct": true
+        },
+        {
+          "text": "Nur eine Warnung, die man mit `new` abschaltet.",
+          "feedback": "Es ist ein Fehler. `new` verdeckt Member und hat damit nichts zu tun."
+        },
+        {
+          "text": "Nichts, `sealed` betrifft nur Objekte, nicht Klassen.",
+          "feedback": "`sealed` betrifft die Vererbung der Klasse, nicht ihre Objekte."
+        }
+      ],
+      "explanation": "Eine versiegelte Klasse kann keine Basisklasse sein. Die Ableitung ist ein Fehler beim Übersetzen (CS0509)."
+    },
+    {
+      "id": "m08-l04-q3",
+      "lesson": "m08-l04",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0239.",
+      "example": "m08/l04/sealed-override-derived.snippet.cs",
+      "bugLines": [
+        13
+      ],
+      "explanation": "`Printer` hat `Describe()` mit `sealed override` versiegelt. `LabelPrinter` darf die Methode nicht erneut überschreiben (CS0239)."
+    },
+    {
+      "id": "m08-l04-q4",
+      "lesson": "m08-l04",
+      "type": "single",
+      "question": "Die Klasse `Printer` ist `sealed` und hat die Eigenschaft `public string Name { get; set; }`. Was gilt?",
+      "options": [
+        {
+          "text": "Ein `Printer`-Objekt ist unveränderlich, weil die Klasse versiegelt ist.",
+          "feedback": "`sealed` betrifft nur die Vererbung. Mit `set` kann sich der Name weiter ändern.",
+          "misconception": "m08-l04-sealed-means-immutable"
+        },
+        {
+          "text": "`sealed` verbietet das Ableiten von `Printer`. Der Name lässt sich trotzdem ändern.",
+          "correct": true
+        },
+        {
+          "text": "`sealed` verbietet, dass man ein `Printer`-Objekt in einer Liste ablegt.",
+          "feedback": "Das hat mit `sealed` nichts zu tun. Eine versiegelte Klasse kann man wie jede andere benutzen.",
+          "misconception": "m08-l04-sealed-means-immutable"
+        }
+      ],
+      "explanation": "`sealed` regelt die Vererbung, nicht den Zustand. Unveränderlich wird ein Objekt durch Eigenschaften ohne `set` (oder mit `init`) und `readonly`-Felder."
+    },
+    {
+      "id": "m08-l04-q5",
+      "lesson": "m08-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l04/sealed-not-immutable.cs",
+      "explanation": "Der Name von `printer` ändert sich, obwohl `Printer` versiegelt ist. `Type.IsSealed` meldet für `Device` `False` und für `Printer` `True`."
+    },
+    {
+      "id": "m08-l04-q6",
+      "lesson": "m08-l04",
+      "type": "single",
+      "question": "Eine Klasse wird nur im eigenen Programm benutzt, und keine Klasse leitet von ihr ab. Was sagt die Regel CA1852?",
+      "options": [
+        {
+          "text": "Man sollte sie versiegeln, weil das die Leistung verbessern kann.",
+          "correct": true
+        },
+        {
+          "text": "Man darf sie nie versiegeln, weil jede Klasse erweiterbar bleiben muss.",
+          "feedback": "So eine Regel gibt es nicht. Für öffentliche Bibliothekstypen verlangt die Richtlinie nur einen guten Grund zum Versiegeln."
+        },
+        {
+          "text": "Man muss sie versiegeln, sonst lässt sich das Programm nicht übersetzen.",
+          "feedback": "Ohne `sealed` lässt sich die Klasse übersetzen. CA1852 ist ein Hinweis, kein Fehler, und in .NET 10 nicht standardmäßig aktiv."
+        }
+      ],
+      "explanation": "CA1852 schlägt vor, Typen zu versiegeln, die nur im eigenen Programm benutzt werden und von denen nichts ableitet. Das kann die Leistung verbessern. Die Regel ist in .NET 10 nicht standardmäßig eingeschaltet."
+    },
+    {
+      "id": "m08-l04-q7",
+      "lesson": "m08-l04",
+      "type": "single",
+      "question": "Welche Deklaration lässt sich übersetzen?",
+      "options": [
+        {
+          "text": "`public sealed override string Describe() => \"x\";` in einer Klasse, deren Basisklasse `Describe()` als `virtual` hat",
+          "correct": true
+        },
+        {
+          "text": "`public sealed string Describe() => \"x\";` in einer Klasse ohne Basisklasse",
+          "feedback": "`sealed` ist bei einem Member nur zusammen mit `override` erlaubt (CS0238)."
+        },
+        {
+          "text": "`abstract sealed class Device { }`",
+          "feedback": "Eine Klasse kann nicht abstrakt und versiegelt zugleich sein (CS0418)."
+        }
+      ],
+      "explanation": "Ein Member darf nur als `sealed override` versiegelt werden. Eine Klasse kann nicht zugleich abstrakt und versiegelt sein, weil abstrakt Ableiten verlangt und `sealed` es verbietet."
+    },
+    {
+      "id": "m08-l04-q8",
+      "lesson": "m08-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `sealed` bei einer Klasse und bei einer Überschreibung bewirkt und was es nicht bewirkt.",
+      "modelAnswer": "Bei einer Klasse verbietet `sealed`, von ihr abzuleiten. Bei einer Überschreibung (`sealed override`) verbietet es, die Methode in weiter abgeleiteten Klassen noch einmal zu überschreiben. Der Aufruf über die Basisklasse bleibt polymorph. `sealed` betrifft nur die Vererbung. Es macht Objekte nicht unveränderlich, ihre Eigenschaften mit `set` können sich weiter ändern."
+    },
+    {
+      "id": "m08-l04-q9",
+      "lesson": "m08-l04",
+      "type": "explain",
+      "question": "Transfer: Wann würdest du in einem eigenen Programm eine Klasse versiegeln und wann nicht?",
+      "modelAnswer": "In SecLog benutzt nur das Programm selbst `FailedLoginRule` und `WatchListRule`, und nichts leitet von ihnen ab. Deshalb versiegele ich beide. Die Basisklasse `DetectionRule` bleibt offen, denn sie ist zum Ableiten da. Bei einem öffentlichen Typ einer Bibliothek würde ich nur versiegeln, wenn ich dafür einen guten Grund habe, denn Nutzer wollen oft ableiten."
     }
   ]
 }
