@@ -1,0 +1,252 @@
+SecLog project profile
+Purpose: find suspicious logins in made-up login logs
+Language: C#
+Platform: .NET
+Variant: .NET (Linux server and Windows laptops)
+Version: .NET 10 (LTS)
+End of support: 2028-11-14
+Execution model: Native AOT
+
+First event:
+2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+User: bob
+IP: 203.0.113.7
+Event type: login-failed
+Failure rate (%): 50
+Failed logins of bob: 5
+Share of bob (%): 71.43
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Failure rate: 50.0 %
+Success share, cut off (%): 35
+Success share, rounded (%): 36
+Failure rate from input (%): 35.7
+Second text worked: False
+Second text number: 0
+Alert: many failed logins
+Suspicious: True
+Suspicious for login-success: False
+5 failed attempts
+5 failed attempts
+Severity: high
+Severity of bob: high
+Action: count the failure
+Failure streak: 5
+Attempt 1
+Attempt 2
+Attempt 3
+Attempt 4
+Attempt 5
+Dots in IP: 3
+203.0.113.7 has 3 dots
+Date: 2026-03-02
+Digits in IP: 8
+Failures: 7
+Failure rate (%): 50.0
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:42:11Z logout user=carol ip=unknown
+Failed in sample: 7
+User from line: bob
+Line ok: False
+User and IP: bob 203.0.113.7
+alice |#
+bob |#####
+carol |
+dave |#
+all |#######
+Findings: bob: 5 failed attempts; alice: 1 failed attempt; 
+User of sample line: bob
+User of broken line is missing: True
+Failures from input: 5
+Number in "many": False
+Sum with a missing number is null: True
+Shown user: unknown
+Length of user: 3
+Last IP: unknown
+Raw user: [  Bob ]
+Clean user: [bob]
+Is bob: True
+Equals bob: True
+Same findings object: True
+Lines in the sample log: 14
+First line: 2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+Last line: 2026-03-02T09:30:00Z logout user=alice ip=192.0.2.10
+User of line 2: bob
+alice | hour 8: 1 | hour 9: 0
+bob | hour 8: 5 | hour 9: 0
+carol | hour 8: 0 | hour 9: 0
+dave | hour 8: 0 | hour 9: 1
+Last line again: 2026-03-02T09:30:00Z logout user=alice ip=192.0.2.10
+Lines 2 to 7: 6
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:02:05Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:03:31Z login-success user=carol ip=198.51.100.23
+2026-03-02T08:04:02Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:05:15Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:06:48Z login-failed user=bob ip=203.0.113.7
+Last three lines: 3
+Date of line 1: 2026-03-02
+Failed lines: 7
+First failed line: 2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Failed lines of bob: 5
+Failed lines in total: 7
+alice: 1
+bob: 5
+carol: 0
+dave: 1
+Distinct IP addresses: 4
+Repeated IP addresses: 10
+Contains 203.0.113.7: True
+192.0.2.10
+203.0.113.7
+198.51.100.23
+198.51.100.8
+Watch bob: 5
+Watch dave: 1
+Alert: 2026-03-02T08:01:40Z
+Alert: 2026-03-02T08:02:05Z
+Alert: 2026-03-02T08:04:02Z
+Alert: 2026-03-02T08:05:15Z
+Alert: 2026-03-02T08:06:48Z
+login-success: 5
+login-failed: 7
+logout: 2
+Watch list: bob, dave
+Line 2 is LOGIN-FAILED, ignoring case: True
+bob: 5 failed logins within 10 minutes (08:01:40 to 08:06:48)
+Time span: 00:05:08
+2026-03-02 08:01 login-failed bob
+Events: 14
+2026-03-02 09:30 logout alice
+Incident #1 bob: 5 failed logins (sample log)
+Rejected events: 9
+Status: investigating
+Unknown status: unknown
+Status: investigating
+Incident #2 dave: 1 failed logins (sample log)
+Status: investigating
+Source of bob: sample log
+Source of dave: sample log
+User of bob: bob
+User of dave: dave
+Incidents: 2
+SecLog.Model.LogEvent
+Analyzed log: sample log
+Failure count: 7
+Not a number: seven
+The input string 'seven' was not in a correct format.
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+No line 15 in the sample log
+Not a line number: two
+Rejected: broken line
+Processed: 2, rejected: 1
+Rejected event: The value cannot be an empty string. (Parameter 'eventType')
+2026-03-02 08:01 login-failed bob
+Line 2 rejected: expected 4 parts, found 2
+Line 3 rejected: invalid timestamp
+Cause: FormatException
+Accepted lines: 1
+Good lines: 2, bad lines: 2
+Lines read: 14, events: 14
+Events from sample.log: 14
+File not found: missing.log
+Rule: failed logins (threshold 5)
+Threshold: 5
+failed logins
+Rule: failed logins (threshold 5)
+As text: Rule: failed logins (threshold 5)
+failed logins / bob: True
+failed logins / dave: False
+watch list / bob: False
+watch list / dave: True
+FailedLoginRule sealed: True
+WatchListRule sealed: True
+DetectionRule sealed: False
+bob: 2 of 3 rules match
+dave: 2 of 3 rules match
+failed logins: threshold 5
+Rules from DetectionRule: 2 of 3
+Event type: LoginFailed
+Severity of bob: High
+Severity of dave: Low
+Number of High: 3
+Medium parsed: True (Medium)
+Critical parsed: False (None)
+In the window: 5 of 5
+Copy has the same start: True
+Same reference with ==: False
+Same values with Equals: True
+Distinct events: 2
+As record: SecurityEvent { Timestamp = 03/02/2026 08:01:40 +00:00, Type = LoginFailed, User = bob }
+Records equal with ==: True
+bob: LoginFailed
+Incident #1 bob: 5 failed logins (sample log)
+Incident #2 dave: 1 failed logins (sample log)
+Severity of the first: High
+login-failed texts: 7
+LoginFailed values: 7
+Same events: 1
+Stored events: 14
+Stored incidents: 2
+Stored rules: 3
+Last event: 2026-03-02 09:30 logout alice
+First incident: Incident #1 bob: 5 failed logins (sample log)
+First rule: failed logins
+alice: 1
+bob: 5
+dave: 1
+192.0.2.10: 1
+198.51.100.8: 1
+203.0.113.7: 5
+Failures of carol: 0
+Event 99: (none)
+Count 99: 0
+TryGet 1: True, 5
+TryGet 99: False, null: True
+Watch list
+- bob
+- dave
+First lines
+- 2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+- 2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Distinct IPs
+- 192.0.2.10
+- 198.51.100.23
+- 198.51.100.8
+- 203.0.113.7
+Failure counts
+- 1
+- 5
+- 1
+Interface count: 2
+Events as objects
+- SecurityEvent { Timestamp = 03/02/2026 08:00:12 +00:00, Type = LoginSuccess, User = alice }
+- SecurityEvent { Timestamp = 03/02/2026 08:01:40 +00:00, Type = LoginFailed, User = bob }
+bob has many failures: True
+dave has many failures: False
+Many failures: 1
+Under investigation: 2
+many failures: Incident #1 bob: 5 failed logins (sample log)
+bob: 3 matches
+dave: 3 matches
+bob: 2 lambda matches
+dave: 2 lambda matches
+Incident #1 bob: 5 failed logins (sample log)
+Incident #2 dave: 1 failed logins (sample log)
+[ALERT] Incident #1 bob: 5 failed logins (sample log)
+[INFO] Incident #2 dave: 1 failed logins (sample log)
+at least 2 / dave: False
+at least 2 / bob: True
+at least 5 / dave: False
+at least 5 / bob: True
+no failures / dave: False
+Checked incidents: 2
+ALERT: Incident #1 bob: 5 failed logins (sample log)
+Severity: High
+Targets: 3
+ALERT: Incident #2 dave: 1 failed logins (sample log)
+Targets: 2
+Alerts counted: 2
+Incident #1 bob: 5 failed logins (sample log) (2 rules)
+Incident #2 dave: 1 failed logins (sample log) (2 rules)
+Found: 2
+Found: 4

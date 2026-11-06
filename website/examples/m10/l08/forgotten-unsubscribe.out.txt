@@ -1,0 +1,7 @@
+raise
+session handles the event
+session finished
+raise
+session handles the event
+session closed
+raise

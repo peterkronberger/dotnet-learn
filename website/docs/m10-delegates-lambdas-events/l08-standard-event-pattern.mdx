@@ -1,0 +1,208 @@
+---
+title: Das Standard-Event-Muster
+sidebar_position: 8
+description: .NET-Events folgen einer Konvention mit EventHandler<TEventArgs>, sender und EventArgs. Das Event wird in einer On…-Methode ausgelöst, und Abonnenten melden sich wieder ab.
+lesson_id: m10-l08
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import standardPattern from '!!raw-loader!@site/examples/m10/l08/standard-pattern.cs';
+import standardPatternOutput from '!!raw-loader!@site/examples/m10/l08/standard-pattern.out.txt';
+import eventArgsEmpty from '!!raw-loader!@site/examples/m10/l08/event-args-empty.cs';
+import eventArgsEmptyOutput from '!!raw-loader!@site/examples/m10/l08/event-args-empty.out.txt';
+import wrongHandler from '!!raw-loader!@site/examples/m10/l08/wrong-handler-signature.snippet.cs';
+import forgottenUnsubscribe from '!!raw-loader!@site/examples/m10/l08/forgotten-unsubscribe.cs';
+import forgottenUnsubscribeOutput from '!!raw-loader!@site/examples/m10/l08/forgotten-unsubscribe.out.txt';
+import gaps from '!!raw-loader!@site/examples/m10/l08/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l08/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l08/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l08/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l08/seclog-delegates-solution.cs';
+
+# Das Standard-Event-Muster
+
+:::note[Lernziele]
+- Du kannst ein Event nach dem .NET-Muster mit `EventHandler<TEventArgs>` deklarieren.
+- Du kannst eine eigene `EventArgs`-Klasse schreiben und Daten an Abonnenten übergeben.
+- Du kannst erklären, wozu `sender` und die `On…`-Methode dienen.
+- Du kannst begründen, warum Abonnenten sich abmelden sollen.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l07-q3" />
+
+<Quiz id="m08-l01-q1" />
+
+<Quiz id="m06-l06-q3" />
+
+## Eine Konvention für Events
+
+In Lektion 7 hatte das Event den Typ `Action<Incident>?`. Das funktioniert, aber es sagt dem Abonnenten nicht, wer das Event ausgelöst hat, und neue Daten würden die Signatur jedes Handlers ändern. Die .NET-Bibliotheken benutzen deshalb ein festes Muster, das <Term id="standard-event-pattern">Standard-Event-Muster</Term>. Es ist eine Konvention der Bibliotheken und keine Regel der Sprache: Der Compiler akzeptiert für ein Event jeden Delegate-Typ.
+
+Das Muster besteht aus vier Teilen ([Standard .NET event patterns](https://learn.microsoft.com/dotnet/csharp/event-pattern)):
+
+1. **Delegate-Typ:** <Term id="event-handler">`EventHandler<TEventArgs>`</Term> hat die Signatur `void (object? sender, TEventArgs e)`. Der Rückgabetyp ist `void`, weil ein Event viele Abonnenten haben kann.
+2. **Absender:** `sender` ist das Objekt, das das Event auslöst, meist `this` des Publishers. Sein Typ ist `object?`.
+3. **Daten:** Eine eigene Klasse erbt von <Term id="event-args">`EventArgs`</Term> (der <Term id="base-class">Basisklasse</Term> für Ereignisdaten) und trägt die Daten als Eigenschaften. Die Eigenschaften sollen <Term id="immutable">unveränderlich</Term> sein, damit kein Abonnent die Werte für den nächsten ändert.
+4. **Auslösen:** Eine Methode `On…` (hier `OnAttemptFailed`) ruft `AttemptFailed?.Invoke(this, e)` auf. Ist die Klasse `sealed`, wird sie `private`. Kann man von der Klasse ableiten, ist sie `protected virtual`, damit abgeleitete Klassen das Auslösen überschreiben können.
+
+:::info[Vorhersage]
+Zwei Abonnenten melden sich am `LoginWatcher` an, dann folgen zwei `Report`-Aufrufe. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l08-pattern" code={standardPattern} predict expected={standardPatternOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `gate: bob failed 3 times`, `log bob`, `gate: dave failed 1 times`, `log dave`.
+
+1. **Daten verpacken:** `Report` erzeugt ein `AttemptEventArgs` mit Benutzer und Anzahl.
+2. **Auslösen:** `OnAttemptFailed` ruft `AttemptFailed?.Invoke(this, e)` auf. `this` ist der Absender.
+3. **Absender lesen:** Das erste Lambda prüft mit `sender is LoginWatcher source`, dass der Absender ein `LoginWatcher` ist, und liest `source.Name`.
+4. **Reihenfolge:** Für jeden Aufruf von `Report` laufen beide Handler in der Reihenfolge des Anmeldens.
+
+**Was passiert, wenn …?** … niemand abonniert hat? Dann ist `AttemptFailed` `null`, und `?.Invoke` tut nichts.
+
+</details>
+
+Eine Methode, die nicht zu `EventHandler<TEventArgs>` passt, meldet der Compiler als Fehler. Hier fehlen `sender` und `e`:
+
+<CodeBlock language="csharp" title="wrong-handler-signature.snippet.cs">{wrongHandler}</CodeBlock>
+
+Der Compiler meldet für Zeile 2 `error CS0123: No overload for 'OnFound' matches delegate 'EventHandler<EventArgs>'`.
+
+## Events ohne Daten
+
+Hat ein Event keine Daten, nimmst du `EventHandler` ohne Typargument und übergibst `EventArgs.Empty`. Das ist ein fertiges, leeres `EventArgs`-Objekt.
+
+:::info[Vorhersage]
+Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l08-empty" code={eventArgsEmpty} predict expected={eventArgsEmptyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `tick, empty: True`.
+
+1. **Typ:** `EventHandler?` ist ein Event mit `sender` und `EventArgs`.
+2. **Leer:** `Tick` übergibt `EventArgs.Empty`.
+3. **Prüfen:** Das Lambda bekommt genau dieses Objekt, der Vergleich ergibt `True`.
+
+</details>
+
+Handler, die asynchron arbeiten, kommen später dazu.
+
+<Forward concepts={['Asynchrone Event-Handler']} module="13" />
+
+## Abmelden nicht vergessen
+
+Ein Event hält jeden Handler in seiner Aufrufliste. Der Publisher hat damit eine Referenz auf den Handler und über ihn auf das Objekt des Abonnenten. Solange der Publisher erreichbar ist und der Handler in der Liste steht, bleibt der Abonnent erreichbar ([Unsubscribing](https://learn.microsoft.com/dotnet/csharp/programming-guide/events/how-to-subscribe-to-and-unsubscribe-from-events)). Wie der <Term id="garbage-collector">Garbage Collector</Term> mit erreichbaren Objekten umgeht, kennst du aus Modul 4. Wer ein Objekt nicht mehr braucht, meldet seine Handler deshalb mit `-=` ab.
+
+:::info[Vorhersage]
+Eine `Session` meldet sich im Konstruktor an. `Finish` meldet nur das Ende der Arbeit, `Close` meldet ab. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l08-unsubscribe" code={forgottenUnsubscribe} predict expected={forgottenUnsubscribeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `raise`, `session handles the event`, `session finished`, `raise`, `session handles the event`, `session closed`, `raise`.
+
+1. **Anmelden:** Der Konstruktor hängt `OnChanged` mit `+=` an.
+2. **Fertig, aber angemeldet:** Nach `Finish` ist die Arbeit der Session beendet, der Handler läuft beim zweiten `raise` trotzdem noch.
+3. **Abmelden:** `Close` ruft `-=` auf. Beim dritten `raise` läuft kein Handler mehr.
+
+**Was passiert, wenn …?** … `Close` nie aufgerufen wird? Dann läuft der Handler bei jedem `raise` weiter, solange `feed` lebt.
+
+</details>
+
+## Lückenbeispiel
+
+Ein `Gauge` soll ein Event nach dem Standard-Muster auslösen. Schreibe `ThresholdEventArgs` mit der Eigenschaft `Level`, deklariere das Event `Reached` und löse es in `OnReached` aus. Rufe `OnReached` in `Check` auf.
+
+<CSharpRunner id="m10-l08-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Daten:** `sealed class ThresholdEventArgs : EventArgs` mit dem Konstruktor `ThresholdEventArgs(int level)` und der Eigenschaft `public int Level { get; }`.
+2. **Event:** `public event EventHandler<ThresholdEventArgs>? Reached;`
+3. **Auslösen:** `private void OnReached(ThresholdEventArgs e) { Reached?.Invoke(this, e); }` und in `Check`: `OnReached(new ThresholdEventArgs(level));`.
+4. **Prüfen:** Ein Handler, der `e.Level` ausgibt, läuft nach `checked 7` mit `7`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog meldet gefundene Vorfälle über das Event `IncidentFound` des `IncidentMonitor`. Handler bekommen nur den Vorfall.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block `// Raise an event when an incident is found` und den Anfang des Namensraums bis `IncidentMonitor`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor `IncidentMonitor` die Klasse `sealed class IncidentFoundEventArgs : EventArgs` mit den Eigenschaften `Incident Incident { get; }` und `int Matches { get; }`, die der Konstruktor `IncidentFoundEventArgs(Incident incident, int matches)` setzt. Ändere `IncidentMonitor`: Das Event hat den Typ `EventHandler<IncidentFoundEventArgs>?`, eine `private void OnIncidentFound(IncidentFoundEventArgs e)` löst es mit `IncidentFound?.Invoke(this, e)` aus, und `Check` ruft sie mit der Anzahl der passenden Regeln auf. Passe den Block an: Die Handler haben die Form `(sender, e) => …`. Der erste gibt `{e.Incident.Summary()} ({e.Matches} rules)` aus und wird zuletzt abgemeldet, dazu brauchst du ihn in einer Variablen vom Typ `EventHandler<IncidentFoundEventArgs>`. Der zweite zählt weiter.
+
+<CSharpRunner id="m10-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Daten:** `IncidentFoundEventArgs` trägt den Vorfall und die Anzahl der passenden Regeln, beides nur lesbar.
+2. **Event:** `IncidentFound` hat jetzt den Typ `EventHandler<IncidentFoundEventArgs>?`.
+3. **Auslösen:** `Check` zählt die Treffer und ruft `OnIncidentFound` auf. Die Methode ist `private`, weil `IncidentMonitor` `sealed` ist.
+4. **Abonnieren:** Der Block benutzt `(sender, e)`. Der erste Handler steht in einer Variablen, damit `-=` ihn wieder findet.
+
+Der Block wurde geändert statt ergänzt: Das alte `Action<Incident>`-Event gibt es nicht mehr, und die Änderung betrifft nur wenige sichtbare Zeilen des Blocks.
+
+</details>
+
+**Neuer Stand:** SecLog meldet Vorfälle nach dem Standard-Event-Muster, mit Absender und Daten. Das Event ist ein Teil des Meilensteins: SecLog löst ein Event aus, wenn ein Vorfall gefunden wird.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l08-subscribers-removed-automatically" />
+
+**„Ein Abonnent wird automatisch abgemeldet, wenn er nicht mehr gebraucht wird.“** Das stimmt nicht. Eine Anmeldung bleibt bestehen, bis der Abonnent `-=` aufruft oder der Publisher selbst nicht mehr erreichbar ist. Wer nicht abmeldet, lässt den Handler weiterlaufen und hält den Abonnenten am Leben.
+:::
+
+## Zusammenfassung
+
+Das Standard-Event-Muster ist eine Konvention der .NET-Bibliotheken: `EventHandler<TEventArgs>` mit `sender` und einem `EventArgs`-Objekt, ausgelöst in einer `On…`-Methode mit `?.Invoke(this, e)`. Die Daten stehen in einer eigenen Klasse mit unveränderlichen Eigenschaften, ohne Daten gilt `EventArgs.Empty`. Abonnenten melden sich mit `-=` ab, sonst bleiben ihre Handler in der Aufrufliste des Publishers.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l08-q1" />
+
+<Quiz id="m10-l08-q2" />
+
+<Quiz id="m10-l08-q3" />
+
+<Quiz id="m10-l08-q4" />
+
+<Quiz id="m10-l08-q5" />
+
+<Quiz id="m10-l08-q6" />
+
+<Quiz id="m10-l08-q7" />
+
+<Quiz id="m10-l08-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l08-q9" />
+
+### Transferfrage
+
+<Quiz id="m10-l08-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Standard .NET event patterns](https://learn.microsoft.com/dotnet/csharp/event-pattern)
+- Microsoft Learn: [Subscribe to and unsubscribe from events](https://learn.microsoft.com/dotnet/csharp/programming-guide/events/how-to-subscribe-to-and-unsubscribe-from-events)

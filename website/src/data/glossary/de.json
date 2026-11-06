@@ -6788,6 +6788,70 @@
         "title": "Classes – Events",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#158-events"
       }
+    },
+    {
+      "id": "event-args",
+      "term": "EventArgs",
+      "german": "Ereignisdaten",
+      "category": "platform",
+      "definition": "Die Basisklasse für die Daten eines Events. Eine eigene Klasse erbt von `EventArgs` und bekommt die Daten als Eigenschaften. `EventArgs.Empty` steht für ein Event ohne Daten.",
+      "aliases": [
+        "EventArgs-Klasse",
+        "Event-Daten"
+      ],
+      "related": [
+        "event-handler",
+        "standard-event-pattern",
+        "event"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
+    },
+    {
+      "id": "event-handler",
+      "term": "EventHandler",
+      "german": "Event-Handler-Delegate",
+      "category": "platform",
+      "definition": "Der Delegate-Typ `EventHandler<TEventArgs>` hat die Signatur `void (object? sender, TEventArgs e)`. `EventHandler` ohne Typargument gilt für Events ohne eigene Daten.",
+      "aliases": [
+        "EventHandler<TEventArgs>",
+        "Event-Handler"
+      ],
+      "related": [
+        "event-args",
+        "standard-event-pattern",
+        "event"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
+    },
+    {
+      "id": "standard-event-pattern",
+      "term": "Standard Event Pattern",
+      "german": "Standard-Event-Muster",
+      "category": "platform",
+      "definition": "Die .NET-Konvention für Events: ein `EventHandler<TEventArgs>` mit `sender` und einer `EventArgs`-Klasse, ausgelöst in einer Methode `On…`. Es ist eine Konvention der Bibliotheken, keine Sprachregel.",
+      "aliases": [
+        "Event-Muster",
+        "Event Pattern"
+      ],
+      "related": [
+        "event",
+        "event-args",
+        "event-handler",
+        "subscriber"
+      ],
+      "lesson": "m10-l08",
+      "source": {
+        "title": "Standard .NET event patterns",
+        "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
+      }
     }
   ]
 }
