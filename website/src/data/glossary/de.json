@@ -5800,6 +5800,71 @@
         "title": "Records – Members of a record type",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records"
       }
+    },
+    {
+      "id": "comparable",
+      "term": "Comparable",
+      "german": "vergleichbar",
+      "category": "language",
+      "definition": "Ein Typ ist vergleichbar, wenn er `IComparable<T>` umsetzt. Seine Methode `CompareTo` legt die natürliche Ordnung der Objekte fest, die `List<T>.Sort()` benutzt.",
+      "aliases": [
+        "IComparable",
+        "IComparable<T>",
+        "CompareTo"
+      ],
+      "related": [
+        "interface",
+        "comparer",
+        "sort-order",
+        "equality-contract"
+      ],
+      "lesson": "m08-l11",
+      "source": {
+        "title": "IComparable<T> Interface",
+        "url": "https://learn.microsoft.com/dotnet/api/system.icomparable-1"
+      }
+    },
+    {
+      "id": "comparer",
+      "term": "Comparer",
+      "german": "Vergleicher",
+      "category": "language",
+      "definition": "Ein eigenes Objekt, das `IComparer<T>` umsetzt. Seine Methode `Compare(x, y)` legt eine Ordnung für zwei Objekte fest, ohne den Typ der Objekte zu ändern. `List<T>.Sort(comparer)` benutzt sie.",
+      "aliases": [
+        "IComparer",
+        "IComparer<T>",
+        "Vergleichsobjekt"
+      ],
+      "related": [
+        "interface",
+        "comparable",
+        "sort-order"
+      ],
+      "lesson": "m08-l11",
+      "source": {
+        "title": "IComparer<T> Interface",
+        "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.icomparer-1"
+      }
+    },
+    {
+      "id": "sort-order",
+      "term": "Sort order",
+      "german": "Sortierreihenfolge",
+      "category": "language",
+      "definition": "Die Reihenfolge, in die `Sort` Elemente bringt. Ein Vergleich liefert eine Zahl kleiner als 0 (steht davor), 0 (gleiche Position) oder größer als 0 (steht danach). 0 heißt nicht automatisch gleich im Sinne von `Equals`.",
+      "aliases": [
+        "natürliche Ordnung"
+      ],
+      "related": [
+        "comparable",
+        "comparer",
+        "equality-contract"
+      ],
+      "lesson": "m08-l11",
+      "source": {
+        "title": "IComparable<T>.CompareTo(T) Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.icomparable-1.compareto"
+      }
     }
   ]
 }
