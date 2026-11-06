@@ -179,7 +179,7 @@ Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die S
 <details>
 <summary>Vertiefung: out und in, Varianz-Sicherheit (optional)</summary>
 
-Ein Typparameter kann in einer Interface- oder Delegate-Deklaration mit `out` oder `in` markiert werden. Mit `out` ist er kovariant, mit `in` kontravariant, ohne Markierung invariant ([§19.2.3.1 Variant type parameter lists, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19231-general)). Varianz gibt es nur bei Interfaces und Delegates, nicht bei Klassen.
+Ein Typparameter kann in einer Interface- oder Delegate-Deklaration mit `out` oder `in` markiert werden. Dieses Verhalten heißt <Term id="variance">Varianz</Term>. Mit `out` ist er kovariant, mit `in` <Term id="contravariance">kontravariant</Term>, ohne Markierung invariant ([§19.2.3.1 Variant type parameter lists, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19231-general)). Varianz gibt es nur bei Interfaces und Delegates, nicht bei Klassen.
 
 Der Compiler prüft, ob `T` nur an erlaubten Stellen vorkommt: Ein kovarianter Parameter darf nicht als Eingabe benutzt werden, ein kontravarianter nicht als Ausgabe ([§19.2.3.2 Variance safety](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19232-variance-safety)). Deshalb könnte `IList<T>` nicht kovariant sein: Es hat `Add`.
 
