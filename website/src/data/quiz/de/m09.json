@@ -310,6 +310,361 @@
         }
       ],
       "explanation": "Das Speichern ist für alle Typen gleich. Eine generische Klasse schreibst du einmal, und jeder konstruierte Typ bleibt typsicher."
+    },
+    {
+      "id": "m09-l03-q1",
+      "lesson": "m09-l03",
+      "type": "single",
+      "question": "Warum kann eine generische Methode ohne Einschränkung auf Werten vom Typ `T` nur `ToString`, `Equals` und `GetHashCode` aufrufen?",
+      "options": [
+        {
+          "text": "Der Rumpf wird einmal für alle möglichen Typargumente geprüft. Über `T` ist nur bekannt, dass es ein Typ ist, also gibt es die Member von `object`.",
+          "correct": true
+        },
+        {
+          "text": "Weil der Compiler `T` immer als `object` speichert.",
+          "feedback": "Das Typargument bleibt erhalten, `T` wird nicht zu `object`. Der Rumpf wird nur für alle Typargumente zugleich geprüft."
+        },
+        {
+          "text": "Weil Operatoren wie `<` in generischen Methoden verboten sind.",
+          "feedback": "Operatoren sind erlaubt, wenn eine Einschränkung sie garantiert. Ohne Einschränkung weiß der Compiler nichts über `T`."
+        }
+      ],
+      "explanation": "Der Compiler prüft den Rumpf einmal für jedes mögliche Typargument. Ohne Einschränkung ist über `T` nichts bekannt, also gelten nur die Member von `object`."
+    },
+    {
+      "id": "m09-l03-q2",
+      "lesson": "m09-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l03/quiz-constraint-call.cs",
+      "explanation": "`Pick` gibt `a` zurück, wenn `a` größer ist, sonst `b`. Bei `\"b\"` und `\"a\"` ist `\"b\"` größer, bei `3` und `7` gewinnt `7`. Bei `2.5` und `2.5` ist `a` nicht größer, also kommt `b` zurück: `2.5`."
+    },
+    {
+      "id": "m09-l03-q3",
+      "lesson": "m09-l03",
+      "type": "single",
+      "question": "Eine Methode `T Max<T>(T a, T b)` hat keine Einschränkung und wird mit `Max<int>(3, 8)` aufgerufen. Darf der Rumpf `a < b` schreiben?",
+      "options": [
+        {
+          "text": "Nein. Der Rumpf gilt für jedes `T`, und ohne Einschränkung gibt es `<` nicht.",
+          "correct": true
+        },
+        {
+          "text": "Ja, denn `T` ist hier `int`, und `int` kennt `<`.",
+          "misconception": "m09-l03-unconstrained-t-has-all-members",
+          "feedback": "Der Rumpf wird einmal für alle Typargumente übersetzt, nicht einzeln für `int`. Was `int` kann, zählt nur, wenn eine Einschränkung es garantiert."
+        },
+        {
+          "text": "Ja, aber nur mit einem Cast nach `int`.",
+          "misconception": "m09-l03-unconstrained-t-has-all-members",
+          "feedback": "Ein Cast nach `int` passt nicht für jedes `T`. Der Rumpf müsste für alle Typargumente gelten."
+        }
+      ],
+      "explanation": "Die Prüfung gilt für alle Typargumente zugleich. Ohne Einschränkung sind nur die Member von `object` bekannt, `<` gehört nicht dazu."
+    },
+    {
+      "id": "m09-l03-q4",
+      "lesson": "m09-l03",
+      "type": "find-bug",
+      "question": "Welche Zeile lässt sich nicht übersetzen?",
+      "example": "m09/l03/constraint-not-met.snippet.cs",
+      "bugLines": [
+        1
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Ein `object` implementiert `IComparable<object>` nicht. Das Typargument erfüllt die Einschränkung nicht (CS0311)."
+        },
+        "2": {
+          "feedback": "Diese Zeile ist richtig: `int` implementiert `IComparable<int>`."
+        }
+      },
+      "explanation": "Ein Typargument muss alle Einschränkungen erfüllen. `object` erfüllt `IComparable<object>` nicht, `int` erfüllt `IComparable<int>`."
+    },
+    {
+      "id": "m09-l03-q5",
+      "lesson": "m09-l03",
+      "type": "match",
+      "question": "Ordne jede Einschränkung ihrer Bedeutung zu.",
+      "pairs": [
+        {
+          "left": "`where T : struct`",
+          "right": "ein Werttyp, der nicht nullable ist"
+        },
+        {
+          "left": "`where T : class`",
+          "right": "ein Referenztyp"
+        },
+        {
+          "left": "`where T : new()`",
+          "right": "ein öffentlicher Konstruktor ohne Parameter, `new T()` ist erlaubt"
+        },
+        {
+          "left": "`where T : IComparable<T>`",
+          "right": "`T` hat die Methode `CompareTo`"
+        }
+      ],
+      "explanation": "Primäre Einschränkungen wie `class` und `struct` beschreiben die Art des Typs. Ein Interface garantiert Methoden, und `new()` erlaubt `new T()`."
+    },
+    {
+      "id": "m09-l03-q6",
+      "lesson": "m09-l03",
+      "type": "single",
+      "question": "Welche `where`-Klausel ist gültig?",
+      "options": [
+        {
+          "text": "`where T : class, IComparable<T>, new()`",
+          "correct": true
+        },
+        {
+          "text": "`where T : new(), IComparable<T>, class`",
+          "feedback": "Die Reihenfolge ist fest: erst die primäre Einschränkung, dann Interfaces, zuletzt `new()`."
+        },
+        {
+          "text": "`where T : struct, new()`",
+          "feedback": "Die Spezifikation verbietet `new()` zusammen mit `struct`, denn jeder Werttyp hat schon einen Konstruktor ohne Parameter."
+        }
+      ],
+      "explanation": "In einer `where`-Klausel steht zuerst die primäre Einschränkung, dann Interfaces und zuletzt `new()`. `struct` und `new()` lassen sich nicht verbinden."
+    },
+    {
+      "id": "m09-l03-q7",
+      "lesson": "m09-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Einschränkungen stimmen?",
+      "options": [
+        {
+          "text": "Ein Typargument, das die Einschränkung nicht erfüllt, ist ein Fehler beim Übersetzen.",
+          "correct": true
+        },
+        {
+          "text": "Bei mehreren Typparametern bekommt jeder seine eigene `where`-Klausel.",
+          "correct": true
+        },
+        {
+          "text": "Eine Einschränkung wird erst beim Ausführen des Programms geprüft.",
+          "feedback": "Der Compiler prüft die Typargumente beim Übersetzen."
+        },
+        {
+          "text": "Mit `where T : class` darf `T` auch ein `int` sein.",
+          "feedback": "`int` ist ein Werttyp. `class` verlangt einen Referenztyp."
+        }
+      ],
+      "explanation": "Einschränkungen prüft der Compiler beim Aufruf. Jeder Typparameter hat eine eigene `where`-Klausel, und `class` erlaubt nur Referenztypen."
+    },
+    {
+      "id": "m09-l03-q8",
+      "lesson": "m09-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum braucht `Max<T>` die Einschränkung `where T : IComparable<T>`, und was passiert, wenn ein Typargument sie nicht erfüllt?",
+      "modelAnswer": "Der Rumpf von `Max<T>` wird einmal für alle Typargumente geprüft. Ohne Einschränkung weiß der Compiler über `T` nur, was für `object` gilt, also gibt es kein `CompareTo`. Die Einschränkung garantiert, dass jedes `T` `IComparable<T>` implementiert, und erlaubt `CompareTo`. Ein Typargument, das das nicht tut, lehnt der Compiler beim Aufruf mit einem Fehler ab."
+    },
+    {
+      "id": "m09-l03-q9",
+      "lesson": "m09-l03",
+      "type": "single",
+      "question": "Wo setzt du eine Einschränkung ein? Eine generische Klasse soll ihre Schlüssel sortiert ausgeben. Was passt?",
+      "options": [
+        {
+          "text": "`where TKey : IComparable<TKey>`, damit die Schlüssel mit `Sort()` geordnet werden können.",
+          "correct": true
+        },
+        {
+          "text": "`where TKey : new()`, damit die Klasse Schlüssel erzeugen kann.",
+          "feedback": "`new()` erlaubt nur `new T()`. Zum Sortieren braucht es einen Vergleich."
+        },
+        {
+          "text": "Keine Einschränkung. `Sort()` geht mit jedem Typ.",
+          "feedback": "Ohne Vergleich weiß `Sort()` nicht, welcher Schlüssel zuerst kommt. Der Compiler verlangt `IComparable<TKey>` oder einen Comparer."
+        }
+      ],
+      "explanation": "Sortieren braucht eine Ordnung. `IComparable<TKey>` garantiert sie, und die Klasse `Counter<TKey>` in SecLog benutzt genau das."
+    },
+    {
+      "id": "m09-l04-q1",
+      "lesson": "m09-l04",
+      "type": "single",
+      "question": "Was ist `default(T)`, wenn `T` den Typ `int` hat, und was, wenn `T` den Typ `string` hat?",
+      "options": [
+        {
+          "text": "`0` bei `int` und `null` bei `string`.",
+          "correct": true
+        },
+        {
+          "text": "Immer `null`.",
+          "misconception": "m09-l04-default-t-is-null",
+          "feedback": "`int` kann nicht `null` sein. Der Standardwert von `int` ist `0`."
+        },
+        {
+          "text": "Bei beiden ein Fehler, weil `T` unbekannt ist.",
+          "feedback": "Zur Laufzeit ist `T` ein konkreter Typ, und `default(T)` ist dessen Standardwert."
+        }
+      ],
+      "explanation": "`default(T)` ist der Standardwert des Typarguments: `0` für Zahlen, `false` für `bool`, `null` für Referenztypen und bei Strukturen eine Struktur mit lauter Standardwerten."
+    },
+    {
+      "id": "m09-l04-q2",
+      "lesson": "m09-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l04/quiz-default-of.cs",
+      "explanation": "`Fallback<T>` gibt `default` zurück. Für `int` ist das `0`, für `bool` `False`. Für `string` ist es `null`, der Vergleich mit `null` ergibt `True`."
+    },
+    {
+      "id": "m09-l04-q3",
+      "lesson": "m09-l04",
+      "type": "single",
+      "question": "In einer Methode `T? Missing<T>()` ohne Einschränkung ist `T` gleich `int`. Welchen Typ hat dann `T?`?",
+      "options": [
+        {
+          "text": "`int`. Bei einem `T` ohne Einschränkung bleibt `T?` für `int` ein `int`.",
+          "correct": true
+        },
+        {
+          "text": "`int?`, denn das Fragezeichen macht jeden Typ nullable.",
+          "misconception": "m09-l04-default-t-is-null",
+          "feedback": "Bei einem `T` ohne Einschränkung macht `T?` aus `int` nicht `int?`. Das gilt nur mit `where T : struct`."
+        },
+        {
+          "text": "Das ist ein Fehler, weil `int` nicht `null` sein darf.",
+          "feedback": "Die Methode wird übersetzt. `T?` heißt hier nur, dass der Standardwert erlaubt ist."
+        }
+      ],
+      "explanation": "Ohne Einschränkung bedeutet `T?` „darf der Standardwert sein“. Für `int` ist das ein `int`, für `string` ein `string?`."
+    },
+    {
+      "id": "m09-l04-q4",
+      "lesson": "m09-l04",
+      "type": "find-bug",
+      "question": "Welche Zeile erzeugt die Warnung CS8603?",
+      "example": "m09/l04/default-warning.snippet.cs",
+      "bugLines": [
+        5
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Die Signatur ist in Ordnung. Der Rückgabetyp `T` ist das Problem erst für `default`."
+        },
+        "3": {
+          "feedback": "Die Bedingung ist in Ordnung."
+        },
+        "5": {
+          "feedback": "`default` kann `null` sein, der Rückgabetyp ist aber `T`. Mit dem Rückgabetyp `T?` ist die Warnung weg."
+        },
+        "7": {
+          "feedback": "`items[0]` liefert ein vorhandenes Element. Das ist in Ordnung."
+        }
+      },
+      "explanation": "Der Rückgabetyp `T` verspricht ein Element. `default` kann `null` sein, deshalb warnt der Compiler. `T?` als Rückgabetyp löst das."
+    },
+    {
+      "id": "m09-l04-q5",
+      "lesson": "m09-l04",
+      "type": "match",
+      "question": "Ordne zu: Was bedeutet `T?` mit `T = string` oder `T = int` in welcher Methode?",
+      "pairs": [
+        {
+          "left": "ohne Einschränkung, `T = int`",
+          "right": "`int`"
+        },
+        {
+          "left": "ohne Einschränkung, `T = string`",
+          "right": "`string?`, Standardwert `null`"
+        },
+        {
+          "left": "`where T : struct`, `T = int`",
+          "right": "`int?` (`Nullable<int>`)"
+        },
+        {
+          "left": "`where T : class`, `T = string`",
+          "right": "`string?`, nullable Referenztyp"
+        }
+      ],
+      "wrongMatches": [
+        {
+          "left": "ohne Einschränkung, `T = int`",
+          "right": "`int?` (`Nullable<int>`)",
+          "feedback": "Ohne Einschränkung bleibt `T?` für `int` ein `int`.",
+          "misconception": "m09-l04-default-t-is-null"
+        }
+      ],
+      "explanation": "Ohne Einschränkung gilt „darf der Standardwert sein“. Mit `struct` ist `T?` ein `Nullable<T>`, mit `class` ein nullable Referenztyp."
+    },
+    {
+      "id": "m09-l04-q6",
+      "lesson": "m09-l04",
+      "type": "single",
+      "question": "Wie sieht eine generische Try-Methode für den ersten Eintrag einer Liste aus?",
+      "options": [
+        {
+          "text": "`bool TryFirst<T>(List<T> items, out T? value)`: bei leerer Liste `value = default` und `false`.",
+          "correct": true
+        },
+        {
+          "text": "`T TryFirst<T>(List<T> items)`, bei leerer Liste wird eine Ausnahme geworfen.",
+          "feedback": "Das ist kein Try-Muster. Das Try-Muster meldet das Ergebnis mit `bool` und liefert den Wert über `out`."
+        },
+        {
+          "text": "`bool TryFirst<T>(List<T> items, out T value)`, bei leerer Liste `value = null`.",
+          "feedback": "`null` ist für ein `T` ohne Einschränkung nicht erlaubt. `default` gilt für jedes `T`."
+        }
+      ],
+      "explanation": "Das Try-Muster gibt `bool` zurück und setzt den Wert über `out`. Bei Misserfolg bekommt `value` den Standardwert."
+    },
+    {
+      "id": "m09-l04-q7",
+      "lesson": "m09-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über `default` stimmen?",
+      "options": [
+        {
+          "text": "Das `default`-Literal nimmt den Typ der Stelle an, an der es steht, zum Beispiel `T? x = default;`.",
+          "correct": true
+        },
+        {
+          "text": "`default(T)` für eine Struktur ist eine Struktur, deren Felder alle den Standardwert haben.",
+          "correct": true
+        },
+        {
+          "text": "`default(T)` ist für jedes `T` gleich `null`.",
+          "misconception": "m09-l04-default-t-is-null",
+          "feedback": "Nur für Referenztypen. Ein `int` hat den Standardwert `0`."
+        },
+        {
+          "text": "`default(T)` gibt es nur für Referenztypen.",
+          "feedback": "Es funktioniert für jeden Typ, auch für Werttypen."
+        }
+      ],
+      "explanation": "Das Literal `default` ist target-typed. Der Standardwert hängt vom Typ ab: `null` bei Referenztypen, Nullen bei Werttypen."
+    },
+    {
+      "id": "m09-l04-q8",
+      "lesson": "m09-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was bedeutet `T?` bei einem `T` ohne Einschränkung, und wie unterscheidet es sich von `T?` mit `where T : struct`?",
+      "modelAnswer": "Ohne Einschränkung heißt `T?`, dass der Wert der Standardwert sein darf. Bei `string` ist das `string?`, bei `int` bleibt es `int`, denn `0` ist schon der Standardwert. Mit `where T : struct` ist `T?` dagegen `Nullable<T>`, aus `int` wird also `int?` und `null` ist erlaubt."
+    },
+    {
+      "id": "m09-l04-q9",
+      "lesson": "m09-l04",
+      "type": "single",
+      "question": "Wo setzt du `default(T)` ein? Ein generischer Speicher soll bei einem ungültigen Index nicht abstürzen. Was passt?",
+      "options": [
+        {
+          "text": "`public T? GetOrDefault(int index)`, die `default` zurückgibt, wenn der Index außerhalb liegt.",
+          "correct": true
+        },
+        {
+          "text": "`public T Get(int index)`, die bei einem falschen Index `null` zurückgibt.",
+          "feedback": "`null` ist für ein `T` ohne Einschränkung nicht erlaubt, und der Rückgabetyp `T` verspricht ein Element."
+        },
+        {
+          "text": "Der Speicher fängt den Fehler nie ab, der Aufrufer muss den Index vorher prüfen.",
+          "feedback": "Das ist möglich, aber `GetOrDefault` und `TryGet` nehmen dem Aufrufer die Prüfung ab."
+        }
+      ],
+      "explanation": "Mit `default` und dem Rückgabetyp `T?` meldet die Methode „kein Element“, ohne Ausnahme und für jeden Elementtyp."
     }
   ]
 }

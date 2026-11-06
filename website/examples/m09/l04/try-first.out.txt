@@ -1,0 +1,2 @@
+First number: 4
+No word, value is null: True

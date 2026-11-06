@@ -1,0 +1,5 @@
+Int32: null=False, True
+Boolean: null=False, True
+String: null=True, True
+Point: null=False, True
+0 False 0 0

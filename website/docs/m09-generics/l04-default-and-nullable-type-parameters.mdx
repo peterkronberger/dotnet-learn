@@ -1,0 +1,203 @@
+---
+title: Standardwerte und Nullable bei Typparametern
+sidebar_position: 4
+description: default(T) gibt den Standardwert des Typarguments (null, 0, false, eine Struktur mit Nullen). T? bedeutet bei einem uneingeschränkten T, mit class und mit struct etwas anderes.
+lesson_id: m09-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import defaultValues from '!!raw-loader!@site/examples/m09/l04/default-values.cs';
+import defaultValuesOutput from '!!raw-loader!@site/examples/m09/l04/default-values.out.txt';
+import defaultWarning from '!!raw-loader!@site/examples/m09/l04/default-warning.snippet.cs';
+import nullableMeanings from '!!raw-loader!@site/examples/m09/l04/nullable-meanings.cs';
+import nullableMeaningsOutput from '!!raw-loader!@site/examples/m09/l04/nullable-meanings.out.txt';
+import tryFirst from '!!raw-loader!@site/examples/m09/l04/try-first.cs';
+import tryLastGap from '!!raw-loader!@site/examples/m09/l04/try-last-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m09/l04/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l04/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l04/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l04/seclog-generics-solution.cs';
+
+# Standardwerte und Nullable bei Typparametern
+
+:::note[Lernziele]
+- Du kannst mit `default(T)` und dem `default`-Literal den Standardwert eines Typparameters erzeugen.
+- Du kannst vorhersagen, welchen Wert `default(T)` für `int`, `bool`, `string` und eine Struktur hat.
+- Du kannst erklären, was `T?` bei einem `T` ohne Einschränkung, mit `class` und mit `struct` bedeutet.
+- Du kannst eine generische Try-Methode (`bool TryGet(…, out T value)`) schreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l03-q1" />
+
+<Quiz id="m04-l05-q1" />
+
+<Quiz id="m07-l07-q1" />
+
+## Der Standardwert von T
+
+Eine generische Methode soll manchmal „kein Wert“ zurückgeben, zum Beispiel wenn eine Liste leer ist. Aber welchen Wert? `null` geht nicht für jedes `T`: Ein `int` kann nicht `null` sein. Die Lösung ist der <Term id="default-value-expression">Standardwert-Ausdruck</Term> `default(T)`. Er liefert den <Term id="default-value">Standardwert</Term> des Typarguments, das für `T` eingesetzt ist: `null` für Referenztypen, `0` für Zahlen, `false` für `bool` und bei einer Struktur eine Struktur, deren Felder alle den Standardwert haben.
+
+Seit C# 7.1 genügt oft das <Term id="default-literal">`default`-Literal</Term>. Es hat keinen eigenen Typ und nimmt den Typ der Stelle an, an der es steht (`T? x = default;`).
+
+:::info[Vorhersage]
+`Show<T>` erzeugt den Standardwert auf zwei Arten. Dazu kommt eine Zeile mit drei Standardwerten. Welche fünf Zeilen gibt das Programm aus? (`T?` im Rumpf von `Show` erklärt der nächste Abschnitt. Lies es hier als „ein `T`, das auch den Standardwert sein darf“.)
+:::
+
+<CSharpRunner id="m09-l04-default-values" code={defaultValues} predict expected={defaultValuesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Int32: null=False, True`, `Boolean: null=False, True`, `String: null=True, True`, `Point: null=False, True` und `0 False 0 0`.
+
+1. **Typargument einsetzen:** Bei `Show<int>()` ist `default(T)` gleich `default(int)`, also `0`. Das ist nicht `null`. Bei `string` ist es `null`.
+2. **Zwei Schreibweisen:** `default(T)` und `default` ergeben denselben Wert. Deshalb ist der Vergleich mit `Equals` immer `True`.
+3. **Struktur:** `default` für `Point` ist ein `Point`, dessen `X` und `Y` beide `0` sind. Das ist kein `null`.
+
+</details>
+
+## T? bei einem Typparameter
+
+Ein Typparameter kann für einen Referenztyp stehen oder für einen Werttyp. Deshalb hängt die Bedeutung von `T?` davon ab, was über `T` bekannt ist:
+
+| Einschränkung | `T?` bedeutet | `T = int` | `T = string` |
+| --- | --- | --- | --- |
+| keine | „kann den Standardwert sein“ | `int` (bleibt `int`) | `string?` |
+| `where T : class` | nullable Referenztyp | – | `string?` |
+| `where T : struct` | `Nullable<T>` | `int?` | – |
+
+Ohne Einschränkung macht `T?` aus `int` also **nicht** `int?`. Die Annotation sagt nur: Der Wert darf der Standardwert sein, und der kann bei `string` `null` sein. Bei `struct` dagegen ist `T?` der nullable Werttyp (<Term id="nullable-value-type">`Nullable<T>`</Term>), bei `class` ein <Term id="nullable-reference-type">nullable Referenztyp</Term>. Mit der Einschränkung `where T : class` ist `T` selbst ein nicht nullable Referenztyp (siehe <Term id="type-parameter-constraint">Einschränkung</Term> in Lektion 3).
+
+:::info[Vorhersage]
+Das Programm weist vier Aufrufe an Variablen zu. Welche vier Zeilen gibt es aus? Warum übersetzt jede Zeile?
+:::
+
+<CSharpRunner id="m09-l04-nullable-meanings" code={nullableMeanings} predict expected={nullableMeaningsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0`, `True`, `False` und `True`.
+
+1. **Ohne Einschränkung:** `Missing<int>()` hat den Rückgabetyp `T?`, also `int`. Die Zuweisung an `int plain` geht, der Wert ist `0`. `Missing<string>()` ergibt `string?` und hier `null`.
+2. **Mit `struct`:** `NoValue<int>()` hat den Rückgabetyp `int?`. `null` ist dort erlaubt, `HasValue` ist `False`.
+3. **Mit `class`:** `NoReference<string>()` hat den Rückgabetyp `string?`. Der Wert ist `null`.
+
+</details>
+
+Wer `default` als `T` zurückgibt, ohne `T?` zu schreiben, bekommt eine Warnung. Der Compiler sieht: Für einen Referenztyp wäre der Wert `null`.
+
+<CodeBlock language="csharp" title="default-warning.snippet.cs">{defaultWarning}</CodeBlock>
+
+```text
+warning CS8603: Possible null reference return.
+```
+
+Die Lösung ist der Rückgabetyp `T?`, wie bei `Missing<T>` oben.
+
+## Eine generische Try-Methode
+
+Das Try-Muster aus Modul 7 (<Term id="try-pattern">Try-Muster</Term>) gibt `bool` zurück und liefert das Ergebnis über einen `out`-Parameter. Mit Generics funktioniert es für jeden Elementtyp: `bool TryFirst<T>(List<T> items, out T? value)`. Gibt es kein Element, bekommt `value` den Standardwert und die Methode `false`.
+
+<CSharpRunner id="m09-l04-try-first" code={tryFirst} />
+
+`TryFirst(numbers, out int number)` leitet `T` aus der Liste ab. `T?` ist dann `int`, deshalb passt `out int`. Bei `List<string>` ist `T?` gleich `string?`, deshalb heißt die Variable `string? word`. Die Alternative mit einem Attribut kommt später im Kurs.
+
+<Forward concepts={['Attribute für Nullable-Analyse']} module="14" />
+
+## Lückenbeispiel
+
+`TryFirst` ist fertig. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l04-gaps" code={tryLastGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Aufrufen:** `List<string> none = [];` und `if (!TryFirst(none, out string? text)) { Console.WriteLine("No first item"); }`.
+2. **Schreiben:** `static bool TryLast<T>(List<T> items, out T? value)` wie `TryFirst`, mit `items[items.Count - 1]` statt `items[0]`. Bei leerer Liste: `value = default; return false;`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlschläge pro Benutzer und IP-Adresse mit `Counter<TKey>`. `Store<T>` speichert Ereignisse, Vorfälle und Regeln. Die Speicher `eventStore` und `userCounter` gibt es schon.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block und die Klasse `Store<T>`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. `Store<T>` bekommt `public T? GetOrDefault(int index)` (gibt `default` zurück, wenn der Index außerhalb liegt) und `public bool TryGet(int index, out T? item)`.
+2. Vor `// End with exit code 0 …` kommt der Block `// Read from the store safely`. Er gibt `Event 99:` mit dem `Describe()` von `eventStore.GetOrDefault(99)` aus, oder `(none)`, wenn es `null` ist.
+3. Dann füllt er einen neuen `Store<int>` mit den Fehlschlägen pro Benutzer (aus `userCounter`) und gibt `Count 99:` mit `GetOrDefault(99)` aus (`0`).
+4. Zuletzt ruft er `TryGet` einmal mit einem gültigen Index (1) auf dem `Store<int>` und einmal mit 99 auf dem `eventStore` auf und gibt jeweils das Ergebnis aus (`TryGet 1: …` und `TryGet 99: …, null: …`).
+
+<CSharpRunner id="m09-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Rückgabetyp wählen:** `T?` erlaubt `default` ohne Warnung. Für `LogEvent` ist das `LogEvent?`, für `int` bleibt es `int`.
+2. **Grenzen prüfen:** Beide Methoden prüfen, ob der Index im Bereich liegt. Außerhalb geben sie `default` zurück, `TryGet` zusätzlich `false`.
+3. **Lesen:** `?.Describe() ?? "(none)"` fängt den `null`-Fall des Ereignisses ab. Beim `Store<int>` ist der Standardwert `0`.
+4. **Try benutzen:** `out int secondCount` passt zu `Store<int>`, `out LogEvent? missing` zu `Store<LogEvent>`.
+
+</details>
+
+**Neuer Stand:** SecLog liest aus dem generischen Speicher auch dann sicher, wenn der Index fehlt, ohne Ausnahme.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l04-default-t-is-null" />
+
+**„`default(T)` ist immer `null`“, oder: „`T?` macht aus `int` automatisch `int?`.“** Das stimmt nicht. `default(T)` ist der Standardwert des Typarguments: `0` für `int`, `false` für `bool`, `null` nur für Referenztypen. Bei einem `T` ohne Einschränkung bleibt `T?` für `int` ein `int`.
+:::
+
+<details>
+<summary>Vertiefung: Quellen zu default und T? (optional)</summary>
+
+Ein `default_literal` hat keinen eigenen Typ und lässt sich in jeden Typ umwandeln. Das Ergebnis ist der Standardwert dieses Typs ([§12.8.21 Default value expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12821-default-value-expressions)). Für einen Typparameter kann man `null` nicht schreiben, außer er ist bekanntermaßen ein Referenztyp; dafür gibt es den Standardwert-Ausdruck ([§8.5 Type parameters](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#85-type-parameters)).
+
+Seit C# 9 darf `?` auf jeden Typparameter angewendet werden. Bei `T = int` bleibt `T?` ein `int`, bei `T = string` ist es `string?` ([Feature-Spezifikation „Unconstrained type parameter annotations“](https://github.com/dotnet/csharplang/blob/main/proposals/csharp-9.0/unconstrained-type-parameter-annotations.md)). Dass `T?` bei `where T : struct` ein `Nullable<T>` ist, zeigt die Compilerausgabe im Beispiel `nullable-meanings.cs`; der Standardentwurf der Spezifikation sagt dazu nichts Ausdrückliches.
+
+</details>
+
+## Zusammenfassung
+
+`default(T)` und `default` liefern den Standardwert des Typarguments: `null` für Referenztypen, `0` oder `false` für einfache Werttypen, eine Struktur mit Standardwerten bei einer Struktur. Bei einem `T` ohne Einschränkung bedeutet `T?` „darf der Standardwert sein“. Mit `class` ist `T?` ein nullable Referenztyp, mit `struct` ein `Nullable<T>`. Eine generische Try-Methode gibt `bool` zurück und liefert das Ergebnis über `out T? value`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l04-q1" />
+
+<Quiz id="m09-l04-q2" />
+
+<Quiz id="m09-l04-q3" />
+
+<Quiz id="m09-l04-q4" />
+
+<Quiz id="m09-l04-q5" />
+
+<Quiz id="m09-l04-q6" />
+
+<Quiz id="m09-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m09-l04-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [default value expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/default)
+- C#-Spezifikation: [§12.8.21 Default value expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12821-default-value-expressions)
+- Microsoft Learn: [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references)
