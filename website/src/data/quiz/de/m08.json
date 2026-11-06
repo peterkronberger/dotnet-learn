@@ -80,7 +80,9 @@
       "type": "find-bug",
       "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0122.",
       "example": "m08/l01/private-in-derived.snippet.cs",
-      "bugLines": [8],
+      "bugLines": [
+        8
+      ],
       "explanation": "Die abgeleitete Klasse enthält auch die privaten Member der Basisklasse, darf aber nicht auf sie zugreifen. Für den Zugriff in abgeleiteten Klassen braucht das Feld `protected`.",
       "lineFeedback": {
         "8": {
@@ -517,6 +519,320 @@
       "type": "explain",
       "question": "Transfer: Wann würdest du in einem eigenen Programm eine Klasse versiegeln und wann nicht?",
       "modelAnswer": "In SecLog benutzt nur das Programm selbst `FailedLoginRule` und `WatchListRule`, und nichts leitet von ihnen ab. Deshalb versiegele ich beide. Die Basisklasse `DetectionRule` bleibt offen, denn sie ist zum Ableiten da. Bei einem öffentlichen Typ einer Bibliothek würde ich nur versiegeln, wenn ich dafür einen guten Grund habe, denn Nutzer wollen oft ableiten."
+    },
+    {
+      "id": "m08-l05-q1",
+      "lesson": "m08-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l05/interface-basics.cs",
+      "explanation": "Die Liste hat den Elementtyp `ILabeled`. Bei jedem Element läuft `Describe()` der Klasse des Objekts: erst `Printer`, dann `Ticket`. Beide Klassen haben keine gemeinsame Basisklasse, es genügt das gemeinsame Interface."
+    },
+    {
+      "id": "m08-l05-q2",
+      "lesson": "m08-l05",
+      "type": "single",
+      "question": "`ILabeled` verlangt `string Label { get; }` und `string Describe();`. Die Klasse `Scanner` hat beide Member als `public`, steht aber als `class Scanner` ohne Basisliste da. Was gilt?",
+      "options": [
+        {
+          "text": "`Scanner` implementiert `ILabeled` automatisch, weil alle Member passen.",
+          "feedback": "C# vergleicht keine Member. Die Klasse muss das Interface in ihrer Basisliste nennen.",
+          "misconception": "m08-l05-matching-methods-implement-interface"
+        },
+        {
+          "text": "`Scanner` implementiert `ILabeled` nicht. Ein `Scanner`-Objekt lässt sich nicht in einer Variablen vom Typ `ILabeled` speichern.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler ergänzt `: ILabeled` selbst, sobald ein `Scanner` einer `ILabeled`-Variablen zugewiesen wird.",
+          "feedback": "Der Compiler ergänzt nichts. Die Zuweisung ist ein Fehler beim Übersetzen.",
+          "misconception": "m08-l05-matching-methods-implement-interface"
+        }
+      ],
+      "explanation": "Ein Interface wird über die Basisliste umgesetzt, nicht durch passende Member. Ohne `: ILabeled` ist `Scanner` kein `ILabeled`, auch wenn alle Member vorhanden sind."
+    },
+    {
+      "id": "m08-l05-q3",
+      "lesson": "m08-l05",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0535.",
+      "example": "m08/l05/interface-missing-member.snippet.cs",
+      "bugLines": [
+        7
+      ],
+      "explanation": "`Scanner` nennt `ILabeled`, setzt aber `Describe()` nicht um. Die Klasse muss jedes Member des Interface liefern (CS0535)."
+    },
+    {
+      "id": "m08-l05-q4",
+      "lesson": "m08-l05",
+      "type": "single",
+      "question": "Zwei Klassen, `Printer` und `Ticket`, teilen weder Code noch Zustand, sollen aber in einer Liste liegen und mit demselben Aufruf `Describe()` benutzt werden. Was passt am besten?",
+      "options": [
+        {
+          "text": "Ein Interface mit `Describe()`, das beide Klassen implementieren.",
+          "correct": true
+        },
+        {
+          "text": "Eine gemeinsame Basisklasse, nur damit beide denselben Listentyp haben.",
+          "feedback": "Eine Basisklasse sagt „ist ein“ und gibt Code und Zustand weiter. Hier gibt es nichts zu teilen, und eine Klasse hat nur eine Basisklasse."
+        },
+        {
+          "text": "Beide Klassen bekommen `sealed`.",
+          "feedback": "`sealed` verbietet das Ableiten. Es macht Typen nicht austauschbar."
+        }
+      ],
+      "explanation": "Sind Typen sonst unverwandt und sollen nur austauschbar sein, beschreibt ein Interface die „kann“-Beziehung. Eine Basisklasse passt, wenn die Klassen Code oder Zustand teilen."
+    },
+    {
+      "id": "m08-l05-q5",
+      "lesson": "m08-l05",
+      "type": "single",
+      "question": "`Printer` setzt `Describe()` explizit um: `string ILabeled.Describe() => …`. Wie rufst du die Methode auf?",
+      "options": [
+        {
+          "text": "Über eine Variable vom Typ `ILabeled`, in der das `Printer`-Objekt liegt.",
+          "correct": true
+        },
+        {
+          "text": "Über eine Variable vom Typ `Printer`, mit `printer.Describe()`.",
+          "feedback": "Eine explizite Implementierung gehört nicht zur öffentlichen Schnittstelle der Klasse. Der Compiler meldet CS1061."
+        },
+        {
+          "text": "Über den Namen `Printer.ILabeled.Describe()`.",
+          "feedback": "Der qualifizierte Name steht nur in der Deklaration. Er ist in einem Aufruf nicht erlaubt."
+        }
+      ],
+      "explanation": "Ein explizit implementiertes Member ist nur über den Typ des Interface erreichbar."
+    },
+    {
+      "id": "m08-l05-q6",
+      "lesson": "m08-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über Interfaces stimmen?",
+      "options": [
+        {
+          "text": "Eine Klasse kann mehrere Interfaces implementieren.",
+          "correct": true
+        },
+        {
+          "text": "Mit `new ILabeled()` lässt sich kein Objekt erzeugen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Interface kann eine Eigenschaft wie `string Label { get; }` verlangen.",
+          "correct": true
+        },
+        {
+          "text": "Ein Interface darf Instanzfelder wie `int count;` enthalten.",
+          "feedback": "Ein Interface hat keinen eigenen Zustand. Instanzfelder sind dort ein Fehler beim Übersetzen."
+        },
+        {
+          "text": "Eine Klasse kann höchstens ein Interface implementieren.",
+          "feedback": "Die Beschränkung gilt für Basisklassen: höchstens eine. Interfaces darf sie beliebig viele nennen."
+        }
+      ],
+      "explanation": "Ein Interface ist ein Vertrag ohne Zustand und ohne Objekte. Eine Klasse hat eine Basisklasse und beliebig viele Interfaces."
+    },
+    {
+      "id": "m08-l05-q7",
+      "lesson": "m08-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l05/interface-explicit.cs",
+      "explanation": "`labeled.Describe()` ruft die explizite Implementierung über das Interface auf. `printer.Label` ist normal `public` und über die Klasse erreichbar."
+    },
+    {
+      "id": "m08-l05-q8",
+      "lesson": "m08-l05",
+      "type": "single",
+      "question": "Ein `Detector` hält eine Liste von Regeln und prüft sie nacheinander. Welche Beziehung beschreibt das?",
+      "options": [
+        {
+          "text": "Komposition: Der `Detector` hat Regeln und kennt sie über ein Interface.",
+          "correct": true
+        },
+        {
+          "text": "Vererbung: Der `Detector` ist eine Art Regel und erbt von ihr.",
+          "feedback": "Ein `Detector` ist keine Regel. Er hält Regeln und benutzt sie. Das ist „hat ein“, nicht „ist ein“."
+        },
+        {
+          "text": "Versiegeln: Der `Detector` verbietet das Ableiten der Regeln.",
+          "feedback": "Versiegeln betrifft nur das Ableiten. Es beschreibt keine Beziehung zwischen Objekten."
+        }
+      ],
+      "explanation": "Hält ein Objekt andere Objekte und benutzt sie, ist das Komposition („hat ein“). Vererbung beschreibt „ist ein“."
+    },
+    {
+      "id": "m08-l05-q9",
+      "lesson": "m08-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Interface ist, wie eine Klasse es umsetzt und warum Code, der den Typ des Interface benutzt, mit jeder Umsetzung funktioniert.",
+      "modelAnswer": "Ein Interface ist ein Vertrag aus Membern ohne Rumpf und ohne Zustand. Eine Klasse setzt ihn um, indem sie das Interface in ihrer Basisliste nennt und alle Member liefert. Nur passende Member reichen nicht. Code, der eine Variable, einen Parameter oder eine Liste vom Typ des Interface benutzt, kennt nur die Member des Vertrags. Jedes Objekt einer implementierenden Klasse erfüllt ihn, deshalb sind die Klassen austauschbar. Von einem Interface selbst gibt es kein Objekt."
+    },
+    {
+      "id": "m08-l05-q10",
+      "lesson": "m08-l05",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in einem eigenen Programm ein Interface statt einer Basisklasse benutzen?",
+      "modelAnswer": "In SecLog sollen Regeln austauschbar sein, auch wenn sie keinen Code teilen, etwa `FailedLoginRule` und `StatusRule`. Das Interface `IDetectionRule` legt fest, was jede Regel kann, und der `Detector` hält eine Liste davon. Ähnlich würde ich ein Interface nehmen, wenn mehrere Klassen Berichte ausgeben oder Daten speichern sollen und ich später eine weitere Klasse ergänzen will, ohne den Code zu ändern, der sie benutzt."
+    },
+    {
+      "id": "m08-l06-q1",
+      "lesson": "m08-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l06/type-tests.cs",
+      "explanation": "`device is Printer` ist wahr, `device is Scanner` falsch, und `null is Device` ist falsch. Im `if`-Block hat `printer` den Typ `Printer`, deshalb ist `PagesPerMinute` erreichbar."
+    },
+    {
+      "id": "m08-l06-q2",
+      "lesson": "m08-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l06/cast-and-as.cs",
+      "explanation": "`as` gibt für den `Scanner` kein `Printer`-Objekt, sondern `null`. Der Cast `(Printer)device` wirft eine `InvalidCastException`, die der `catch`-Block abfängt. `(Scanner)device` gelingt."
+    },
+    {
+      "id": "m08-l06-q3",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`Device device = new Scanner(\"archive scanner\");` Was passiert bei `Printer p = (Printer)device;`, wenn `Printer` und `Scanner` von `Device` ableiten?",
+      "options": [
+        {
+          "text": "Das Programm wirft zur Laufzeit eine `InvalidCastException`.",
+          "correct": true
+        },
+        {
+          "text": "`p` ist `null`.",
+          "feedback": "`null` liefert `as`. Ein Cast wirft stattdessen eine Ausnahme."
+        },
+        {
+          "text": "Das Objekt wird in einen `Printer` umgebaut und `p` zeigt darauf.",
+          "feedback": "Ein Cast baut kein Objekt um. Er prüft nur den Typ, und das Objekt ist ein `Scanner`.",
+          "misconception": "m08-l06-cast-changes-object"
+        }
+      ],
+      "explanation": "Der Cast ist eine explizite Verweisumwandlung. Sie prüft zur Laufzeit, ob das Objekt ein `Printer` ist. Es ist ein `Scanner`, also wirft sie."
+    },
+    {
+      "id": "m08-l06-q4",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`Printer printer = new(\"office printer\", 40); Device device = printer; Printer again = (Printer)device;` Was ergibt `object.ReferenceEquals(printer, again)`?",
+      "options": [
+        {
+          "text": "`True`: Alle drei Variablen verweisen auf dasselbe Objekt.",
+          "correct": true
+        },
+        {
+          "text": "`False`: Der Cast erzeugt ein neues `Printer`-Objekt.",
+          "feedback": "Ein Cast kopiert nichts. Er ändert nur den Typ der Variablen.",
+          "misconception": "m08-l06-cast-changes-object"
+        },
+        {
+          "text": "`False`: Die Umwandlung zu `Device` hat eine Kopie angelegt, und der Cast liefert wieder eine andere.",
+          "feedback": "Auch die Umwandlung zur Basisklasse legt keine Kopie an. Beide Umwandlungen lassen das Objekt unverändert.",
+          "misconception": "m08-l06-cast-changes-object"
+        }
+      ],
+      "explanation": "Eine Verweisumwandlung ändert nie das Objekt und nie seine Identität. Sie ändert nur die Sicht darauf."
+    },
+    {
+      "id": "m08-l06-q5",
+      "lesson": "m08-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über `as` stimmen?",
+      "options": [
+        {
+          "text": "`x as T` gibt `null` zurück, wenn das Objekt kein `T` ist.",
+          "correct": true
+        },
+        {
+          "text": "`as` wirft bei einem falschen Typ keine `InvalidCastException`.",
+          "correct": true
+        },
+        {
+          "text": "`as` ist bei einem Verweistyp oder einem Nullable-Typ erlaubt.",
+          "correct": true
+        },
+        {
+          "text": "`boxed as int` ist erlaubt und gibt bei falschem Typ `0` zurück.",
+          "feedback": "Bei `int` ist `as` ein Fehler beim Übersetzen (CS0077), denn `int` kann nicht `null` sein."
+        },
+        {
+          "text": "`as` wirft bei einem falschen Typ eine `InvalidCastException`.",
+          "feedback": "Das macht der Cast. `as` gibt `null` zurück."
+        }
+      ],
+      "explanation": "`as` ist die Variante ohne Ausnahme: Es liefert das Objekt unter dem neuen Typ oder `null`. Deshalb braucht der Zieltyp `null` als Wert."
+    },
+    {
+      "id": "m08-l06-q6",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "Welche Umwandlung ist implizit, braucht also keinen Cast?",
+      "options": [
+        {
+          "text": "`Device device = printer;` mit `Printer : Device`",
+          "correct": true
+        },
+        {
+          "text": "`Printer printer = device;` mit `Printer : Device`",
+          "feedback": "Von der Basisklasse zur abgeleiteten Klasse kann es scheitern. Das braucht einen Cast."
+        },
+        {
+          "text": "`Scanner scanner = printer;` mit `Printer : Device` und `Scanner : Device`",
+          "feedback": "`Printer` und `Scanner` stehen nicht in einer Ableitungsbeziehung. Auch mit Cast ist das ein Fehler beim Übersetzen."
+        }
+      ],
+      "explanation": "Aufwärts, zur Basisklasse oder zu einem implementierten Interface, ist implizit und gelingt immer. Abwärts ist explizit und wird zur Laufzeit geprüft."
+    },
+    {
+      "id": "m08-l06-q7",
+      "lesson": "m08-l06",
+      "type": "single",
+      "question": "`rule` hat den Typ `IDetectionRule`. Was bewirkt `if (rule is FailedLoginRule thresholdRule)`?",
+      "options": [
+        {
+          "text": "Sie prüft zur Laufzeit den Typ des Objekts und gibt es im Block als `thresholdRule` vom Typ `FailedLoginRule` heraus.",
+          "correct": true
+        },
+        {
+          "text": "Sie wandelt jede Regel in eine `FailedLoginRule` um, auch eine `StatusRule`.",
+          "feedback": "Es entsteht kein neues Objekt. Für eine `StatusRule` ist der Test falsch, der Block läuft nicht.",
+          "misconception": "m08-l06-cast-changes-object"
+        },
+        {
+          "text": "Sie wirft eine `InvalidCastException`, wenn die Regel keine `FailedLoginRule` ist.",
+          "feedback": "Der Test mit `is` wirft nie. Er ist einfach falsch."
+        }
+      ],
+      "explanation": "`is` mit Variable prüft und gibt das Objekt im passenden Typ weiter. Ist der Typ falsch, läuft der Block nicht."
+    },
+    {
+      "id": "m08-l06-q8",
+      "lesson": "m08-l06",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0030.",
+      "example": "m08/l06/cast-no-conversion.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`Printer` und `Scanner` leiten beide von `Device` ab, aber keine ist die Basis oder Ableitung der anderen. Zwischen ihnen gibt es keine Verweisumwandlung, auch keine explizite (CS0030)."
+    },
+    {
+      "id": "m08-l06-q9",
+      "lesson": "m08-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `is`, `as` und einem Cast und was eine Verweisumwandlung mit dem Objekt macht.",
+      "modelAnswer": "Alle drei prüfen zur Laufzeit den Typ des Objekts. `x is T` liefert `true` oder `false` (bei `null` `false`), und mit einem Namen (`x is T t`) gleich eine Variable vom Typ `T`. `x as T` liefert das Objekt als `T` oder `null`, wirft nie und braucht einen Typ, der `null` erlaubt. Der Cast `(T)x` liefert das Objekt als `T` oder wirft eine `InvalidCastException`. Eine Verweisumwandlung ändert das Objekt nie und auch nicht seine Identität, sie ändert nur die Sicht darauf."
+    },
+    {
+      "id": "m08-l06-q10",
+      "lesson": "m08-l06",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in einem eigenen Programm `is` mit einer Variable benutzen und wo `as`?",
+      "modelAnswer": "In SecLog hält der `Detector` Regeln als `IDetectionRule`. Will ich nur bei der Regel mit Schwellenwert dessen `Threshold` lesen, schreibe ich `rule is FailedLoginRule thresholdRule` und benutze `thresholdRule` im Block. `as` benutze ich, wenn ich das Ergebnis weiterreichen oder zählen will, etwa `rule as DetectionRule` und danach auf `null` prüfen. Ein Cast passt nur, wenn ich sicher bin, dass der Typ stimmt."
     }
   ]
 }

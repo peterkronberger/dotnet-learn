@@ -1,0 +1,4 @@
+True
+False
+False
+Pages per minute: 40
