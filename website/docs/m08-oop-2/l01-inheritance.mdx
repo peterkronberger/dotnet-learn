@@ -1,0 +1,278 @@
+---
+title: Vererbung und Basisklassen
+sidebar_position: 1
+description: Eine abgeleitete Klasse erbt die Member ihrer Basisklasse, fügt eigene hinzu und ruft mit base(…) einen Basiskonstruktor auf.
+lesson_id: m08-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import deviceInherit from '!!raw-loader!@site/examples/m08/l01/device-inherit.cs';
+import deviceInheritOutput from '!!raw-loader!@site/examples/m08/l01/device-inherit.out.txt';
+import constructorOrder from '!!raw-loader!@site/examples/m08/l01/constructor-order.cs';
+import constructorOrderOutput from '!!raw-loader!@site/examples/m08/l01/constructor-order.out.txt';
+import noBaseConstructor from '!!raw-loader!@site/examples/m08/l01/no-base-constructor.snippet.cs';
+import protectedAccess from '!!raw-loader!@site/examples/m08/l01/protected-access.cs';
+import protectedAccessOutput from '!!raw-loader!@site/examples/m08/l01/protected-access.out.txt';
+import privateInDerived from '!!raw-loader!@site/examples/m08/l01/private-in-derived.snippet.cs';
+import protectedOutside from '!!raw-loader!@site/examples/m08/l01/protected-outside.snippet.cs';
+import baseTypeVariable from '!!raw-loader!@site/examples/m08/l01/base-type-variable.cs';
+import baseTypeVariableOutput from '!!raw-loader!@site/examples/m08/l01/base-type-variable.out.txt';
+import baseVariableMember from '!!raw-loader!@site/examples/m08/l01/base-variable-member.snippet.cs';
+import inheritGap from '!!raw-loader!@site/examples/m08/l01/inherit-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l01/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l01/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l01/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l01/seclog-oop-solution.cs';
+
+# Vererbung und Basisklassen
+
+:::note[Lernziele]
+- Du kannst eine Klasse von einer Basisklasse ableiten und erklären, welche Member sie erbt.
+- Du kannst im Konstruktor der abgeleiteten Klasse mit `base(…)` einen Konstruktor der Basisklasse aufrufen.
+- Du kannst `protected` von `private` und `public` unterscheiden.
+- Du kannst ein Objekt der abgeleiteten Klasse in einer Variablen vom Typ der Basisklasse speichern.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog beschreibt Ereignistyp und Schweregrad mit Enums statt mit Texten.
+- SecLog speichert Ereignisse als Records, die nach ihren Werten verglichen werden.
+- SecLog prüft Vorfälle mit austauschbaren Erkennungsregeln.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l02-q1" />
+
+<Quiz id="m06-l03-q1" />
+
+<Quiz id="m07-l06-q1" />
+
+## Eine Klasse ableiten
+
+In Modul 7 hast du `class UnknownUserException : Exception` geschrieben und gesehen, dass die eigene Exception alles kann, was `Exception` kann. Dahinter steckt <Term id="inheritance">Vererbung</Term> (Inheritance): Eine Klasse kann von einer anderen abgeleitet werden. Die Klasse hinter dem Doppelpunkt heißt <Term id="base-class">Basisklasse</Term> (Base Class), die Klasse davor <Term id="derived-class">abgeleitete Klasse</Term> (Derived Class).
+
+Die abgeleitete Klasse enthält alle Member der Basisklasse, das sind Eigenschaften, Methoden und Felder, und kann eigene hinzufügen. Eine Klasse hat genau eine direkte Basisklasse. Schreibst du keine, ist `object` die Basisklasse.
+
+Das Beispiel hat die Basisklasse `Device` mit `Name` und `Describe()`. `Printer` ist davon abgeleitet und fügt `PagesPerMinute` hinzu.
+
+:::info[Vorhersage]
+Das Programm ruft an einem `Printer`-Objekt drei Member auf. Welche Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m08-l01-inherit" code={deviceInherit} predict expected={deviceInheritOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `office printer`, `Device: office printer` und `Pages per minute: 40`.
+
+1. **Ableiten:** `class Printer : Device` macht `Device` zur Basisklasse.
+2. **Geerbtes benutzen:** `printer.Name` und `printer.Describe()` stehen in `Device`, nicht in `Printer`. Sie sind am `Printer`-Objekt trotzdem aufrufbar.
+3. **Eigenes benutzen:** `PagesPerMinute` gehört nur zu `Printer`.
+
+Was passiert, wenn du `new Device(…)` statt `new Printer(…)` erzeugst? Dann fehlt `PagesPerMinute`, denn diese Eigenschaft hat nur `Printer`.
+
+</details>
+
+## Den Basiskonstruktor aufrufen
+
+Im Beispiel hat `Printer` einen eigenen Konstruktor mit `: base(name)`. Das ist der <Term id="base-constructor-call">Aufruf des Basiskonstruktors</Term>. Er steht hinter dem Konstruktorkopf, so ähnlich wie `: this(…)` aus <Term id="constructor-chaining">Konstruktorverkettung</Term>, ruft aber einen <Term id="constructor">Konstruktor</Term> der Basisklasse auf. Er läuft vor dem Rumpf des eigenen Konstruktors.
+
+Konstruktoren werden nicht vererbt. Jede Klasse hat nur die Konstruktoren, die sie selbst deklariert. Schreibt eine Klasse keinen `: base(…)`-Aufruf, ergänzt der Compiler `: base()`, also den Aufruf eines Konstruktors ohne Parameter.
+
+:::info[Vorhersage]
+`Device` und `Printer` geben in ihren Konstruktoren eine Zeile aus. In welcher Reihenfolge erscheinen die drei Zeilen?
+:::
+
+<CSharpRunner id="m08-l01-order" code={constructorOrder} predict expected={constructorOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Device constructor: office printer`, `Printer constructor` und `Created: office printer`.
+
+1. **Aufruf:** `new Printer("office printer")` startet den Konstruktor von `Printer`.
+2. **Basiskonstruktor zuerst:** `: base(name)` läuft vor dem Rumpf. Der Konstruktor von `Device` gibt seine Zeile aus und setzt `Name`.
+3. **Eigener Rumpf:** Danach läuft der Rumpf von `Printer`.
+
+Was passiert, wenn du `: base(name)` weglässt? Der Compiler ergänzt `: base()`. `Device` hat aber nur einen Konstruktor mit einem Parameter, und der Code wird nicht übersetzt:
+
+<CodeBlock language="csharp" title="no-base-constructor.snippet.cs">{noBaseConstructor}</CodeBlock>
+
+```text
+error CS7036: There is no argument given that corresponds to the required
+parameter 'name' of 'Device.Device(string)'
+```
+
+</details>
+
+Hat die Basisklasse keinen Konstruktor ohne Parameter, brauchst du in jedem Konstruktor der abgeleiteten Klasse einen `: base(…)`-Aufruf.
+
+## protected: sichtbar für abgeleitete Klassen
+
+Aus Modul 6 kennst du `private` (nur in der Klasse) und `public` (überall). Der <Term id="access-modifier">Zugriffsmodifizierer</Term> <Term id="protected-access">`protected`</Term> liegt dazwischen: Der Member ist in der Klasse selbst und in den abgeleiteten Klassen zugreifbar, aber nicht von außen.
+
+:::info[Vorhersage]
+`Device` hat das private Feld `secret` und das geschützte Feld `Kind`. Was geben die beiden Zeilen aus?
+:::
+
+<CSharpRunner id="m08-l01-protected" code={protectedAccess} predict expected={protectedAccessOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `device: office printer` und `6`.
+
+1. **protected in der abgeleiteten Klasse:** `Label()` in `Printer` liest `Kind`. Das ist erlaubt, weil `Kind` `protected` ist.
+2. **private bleibt privat:** `SecretLength()` steht in `Device` und darf `secret` lesen. `Printer` könnte das nicht.
+3. **Von außen:** Das Hauptprogramm benutzt nur öffentliche Member.
+
+Was passiert, wenn `Printer` direkt `secret.Length` liest? Das Feld ist `private`. Die abgeleitete Klasse enthält es zwar, darf aber nicht darauf zugreifen:
+
+<CodeBlock language="csharp" title="private-in-derived.snippet.cs">{privateInDerived}</CodeBlock>
+
+```text
+error CS0122: 'Device.secret' is inaccessible due to its protection level
+```
+
+</details>
+
+Auch von außen ist ein `protected`-Member nicht zugreifbar:
+
+<CodeBlock language="csharp" title="protected-outside.snippet.cs">{protectedOutside}</CodeBlock>
+
+```text
+error CS0122: 'Device.Kind' is inaccessible due to its protection level
+```
+
+## Ein Objekt in einer Variablen der Basisklasse
+
+Ein `Printer` ist ein `Device`. Deshalb darf ein `Printer`-Objekt in einer Variablen vom Typ `Device` stehen, ohne Umwandlung. Das ist eine <Term id="implicit-conversion">implizite Umwandlung</Term> von der abgeleiteten Klasse zur Basisklasse. Eine `List<Device>` kann deshalb `Device`- und `Printer`-Objekte gemeinsam halten.
+
+:::info[Vorhersage]
+Die Liste hält ein `Device` und einen `Printer`. Was gibt die Schleife aus?
+:::
+
+<CSharpRunner id="m08-l01-base-variable" code={baseTypeVariable} predict expected={baseTypeVariableOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Device: router` und `Device: office printer`.
+
+1. **Liste füllen:** Beide Objekte passen in `List<Device>`, weil `Printer` von `Device` abgeleitet ist.
+2. **Schleifenvariable:** `device` hat in jedem Durchlauf den Typ `Device`.
+3. **Aufruf:** `Describe()` gibt es nur einmal, in `Device`. Beide Objekte benutzen sie.
+
+Was passiert, wenn du `device.PagesPerMinute` schreibst? Über eine Variable vom Typ `Device` erreichst du nur die Member von `Device`:
+
+<CodeBlock language="csharp" title="base-variable-member.snippet.cs">{baseVariableMember}</CodeBlock>
+
+```text
+error CS1061: 'Device' does not contain a definition for 'PagesPerMinute' and no
+accessible extension method 'PagesPerMinute' accepting a first argument of type
+'Device' could be found (are you missing a using directive or an assembly
+reference?)
+```
+
+</details>
+
+Der Rückweg, von `Device` zu `Printer`, geht nicht automatisch. Er kommt in Lektion „Typprüfungen und Casts“ (Lektion 6 dieses Moduls).
+
+## Lückenbeispiel
+
+`Scanner` soll von `Device` abgeleitet sein und den Namen an die Basisklasse weitergeben. Ergänze die drei Stellen aus den Kommentaren. Danach soll das Programm `Resolution: 600 dpi` und `archive scanner` ausgeben.
+
+<CSharpRunner id="m08-l01-gaps" code={inheritGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Ableiten:** `class Scanner : Device`.
+2. **Basiskonstruktor:** `public Scanner(string name, int dpi) : base(name)`.
+3. **Ausgeben:** `Console.WriteLine(scanner.Name);`
+
+`Name` kommt aus `Device`. `Scanner` setzt nur `Dpi` selbst.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält Ereignisse und Vorfälle als Klassen, weist ungültige Log-Zeilen mit einer eigenen Exception zurück und liest das Log aus einer Datei.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die `using`-Zeilen, den Platz für den neuen Block mit `return 0;` und das Ende von `namespace SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in `namespace SecLog.Model` hinter `InvalidLogLineException` die Klasse `DetectionRule` mit der Eigenschaft `public string Name { get; }`, einem Konstruktor `DetectionRule(string name)` und der Methode `public string Describe()`, die `$"Rule: {Name}"` zurückgibt.
+2. Schreibe danach die Klasse `FailedLoginRule : DetectionRule` mit `public int Threshold { get; }` und dem Konstruktor `FailedLoginRule(int threshold) : base("failed logins")`, der `Threshold` setzt.
+3. Schreibe vor `// End with exit code 0 …` den Block `// Create a detection rule that inherits from DetectionRule`. Er erzeugt `FailedLoginRule failedRule = new(5);`, gibt `failedRule.Describe()` und `Threshold: 5` aus, speichert die Regel in `DetectionRule baseRule = failedRule;` und gibt `baseRule.Name` aus.
+
+<CSharpRunner id="m08-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Basisklasse:** `DetectionRule` hält `Name` und `Describe()` einmal für alle Regeln.
+2. **Ableiten:** `FailedLoginRule` erbt beides, fügt `Threshold` hinzu und gibt den festen Namen mit `: base("failed logins")` an die Basisklasse.
+3. **Benutzen:** Der Block ruft das geerbte `Describe()` auf und liest `Name` über eine Variable vom Typ `DetectionRule`.
+
+</details>
+
+**Neuer Stand:** SecLog hat die Basisklasse `DetectionRule` und eine abgeleitete Regel `FailedLoginRule`. Die Klasse `LogEvent` bleibt unverändert und behält ihren Ereignistyp als Text. Für neuen Code kommen später Enums und Records.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l01-constructors-are-inherited" />
+
+**„Eine abgeleitete Klasse erbt die Konstruktoren ihrer Basisklasse.“** Das stimmt nicht. Instanzkonstruktoren werden nicht vererbt. Die abgeleitete Klasse deklariert eigene Konstruktoren und ruft darin mit `: base(…)` einen Konstruktor der Basisklasse auf. Ohne Angabe ruft der Compiler `base()` auf.
+:::
+
+<details>
+<summary>Vertiefung: Was die abgeleitete Klasse alles enthält (optional)</summary>
+
+Eine Klasse enthält alle Member ihrer direkten Basisklasse außer den Instanzkonstruktoren, den Finalizern und den statischen Konstruktoren, unabhängig von ihrer Zugreifbarkeit ([§15.3.4 Inheritance](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1534-inheritance)). Private Member sind also im Objekt vorhanden, aber nicht zugreifbar.
+
+Neben `private`, `protected` und `public` gibt es `protected internal` (zugreifbar im selben Programm und in abgeleiteten Klassen) und `private protected` (zugreifbar im selben Programm und nur dort in abgeleiteten Klassen). Für `protected` gilt außerdem: Der Zugriff muss über eine Instanz der abgeleiteten Klasse selbst laufen ([§7.4.4 Protected access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#744-protected-access)).
+
+Hat ein Konstruktor keinen Initialisierer, ergänzt der Compiler `base()` ([§15.11.2 Constructor initializers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15112-constructor-initializers)).
+
+</details>
+
+## Zusammenfassung
+
+Mit `class D : B` ist `D` von `B` abgeleitet und enthält alle Member von `B` außer den Konstruktoren. `D` kann eigene Member hinzufügen. Der Konstruktor von `D` ruft mit `: base(…)` einen Konstruktor von `B` auf, und dieser Aufruf läuft vor dem eigenen Rumpf. `protected` erlaubt den Zugriff in der Klasse und in abgeleiteten Klassen, `private` nur in der Klasse. Ein `D`-Objekt darf in einer `B`-Variablen stehen, dann sind nur die Member von `B` erreichbar.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l01-q1" />
+
+<Quiz id="m08-l01-q2" />
+
+<Quiz id="m08-l01-q3" />
+
+<Quiz id="m08-l01-q4" />
+
+<Quiz id="m08-l01-q5" />
+
+<Quiz id="m08-l01-q6" />
+
+<Quiz id="m08-l01-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l01-q8" />
+
+### Transferfrage
+
+<Quiz id="m08-l01-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Classes – Inheritance](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1534-inheritance)
+- C#-Spezifikation: [Constructor initializers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15112-constructor-initializers)
+- C#-Spezifikation: [Implicit reference conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1028-implicit-reference-conversions)
