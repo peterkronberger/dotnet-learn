@@ -610,6 +610,322 @@
         }
       ],
       "explanation": "Mehrere Parameter namens `_` sind Discards: Ihre Werte werden ignoriert, und sie stören sich nicht. Die Parameteranzahl muss trotzdem zum Delegate-Typ passen."
+    },
+    {
+      "id": "m10-l05-q1",
+      "lesson": "m10-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, was mit `calls` passiert.",
+      "example": "m10/l05/quiz-captured-counter.cs",
+      "explanation": "Das Lambda erfasst `calls` selbst und ändert die Variable bei jedem Aufruf. Der erste Aufruf rechnet `10 + 1`, der zweite `10 + 2`. Am Ende hat die Variable `calls` außerhalb des Lambdas den Wert `2`."
+    },
+    {
+      "id": "m10-l05-q2",
+      "lesson": "m10-l05",
+      "type": "single",
+      "question": "`int x = 1; Func<int> read = () => x; x = 5; Console.WriteLine(read());` Was gibt das Programm aus?",
+      "options": [
+        {
+          "text": "`5`",
+          "correct": true
+        },
+        {
+          "text": "`1`",
+          "misconception": "m10-l05-lambda-captures-value",
+          "feedback": "Das Lambda hat nicht den Wert `1` gespeichert, sondern die Variable `x` erfasst. Beim Aufruf liest es den aktuellen Wert."
+        },
+        {
+          "text": "`6`",
+          "feedback": "Das Lambda rechnet nichts dazu. Es liest nur den Wert der Variablen."
+        },
+        {
+          "text": "Es gibt einen Compilerfehler, weil `x` nach dem Lambda geändert wird.",
+          "feedback": "Eine erfasste Variable darf nach dem Erstellen des Lambdas geändert werden."
+        }
+      ],
+      "explanation": "Ein Lambda erfasst die Variable, nicht ihren Wert. Läuft das Lambda, liest es den Wert, den die Variable gerade hat: `5`."
+    },
+    {
+      "id": "m10-l05-q3",
+      "lesson": "m10-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Wann läuft jedes Lambda, und welchen Wert hat `value` dann?",
+      "example": "m10/l05/quiz-shared-variable.cs",
+      "explanation": "Beide Lambdas erfassen dieselbe Variable `value`. Sie laufen erst in der `foreach`-Schleife, und dann hat `value` den Wert `3`. Deshalb erscheint zweimal `3`."
+    },
+    {
+      "id": "m10-l05-q4",
+      "lesson": "m10-l05",
+      "type": "single",
+      "question": "Eine `for`-Schleife `for (int i = 0; i < 3; i++)` fügt einer Liste in jeder Runde das Lambda `() => i` hinzu. Eine `foreach`-Schleife tut dasselbe mit ihrer Schleifenvariablen. Was stimmt, wenn die Lambdas danach laufen?",
+      "options": [
+        {
+          "text": "Die drei Lambdas der `for`-Schleife teilen sich eine Variable `i`, die der `foreach`-Schleife haben je eine eigene Variable.",
+          "correct": true
+        },
+        {
+          "text": "Jedes Lambda der `for`-Schleife hat sich den Wert von `i` zum Zeitpunkt des Hinzufügens gemerkt.",
+          "misconception": "m10-l05-lambda-captures-value",
+          "feedback": "Ein Lambda merkt sich keinen Wert, sondern erfasst die Variable. Die `for`-Schleife deklariert `i` nur einmal."
+        },
+        {
+          "text": "In beiden Schleifen teilen sich alle Lambdas eine Variable.",
+          "feedback": "Die Variable einer `foreach`-Schleife wird in jeder Runde neu angelegt."
+        },
+        {
+          "text": "In beiden Schleifen hat jedes Lambda eine eigene Variable.",
+          "feedback": "Die Variable einer `for`-Schleife wird nur einmal vor der ersten Runde angelegt."
+        }
+      ],
+      "explanation": "Die Variable der `for`-Schleife steht im Schleifenkopf und existiert einmal. Nach der Schleife hat sie den Endwert `3`, und alle drei Lambdas lesen ihn. Die Variable der `foreach`-Schleife gehört zum Schleifenkörper und wird in jeder Runde neu angelegt."
+    },
+    {
+      "id": "m10-l05-q5",
+      "lesson": "m10-l05",
+      "type": "single",
+      "question": "`const int Factor = 2; int offset = 10;` Welches Lambda lässt sich übersetzen?",
+      "options": [
+        {
+          "text": "`static number => number * Factor`",
+          "correct": true
+        },
+        {
+          "text": "`static number => number + offset`",
+          "feedback": "Ein `static` Lambda darf keine lokale Variable erfassen. Der Compiler meldet CS8820."
+        },
+        {
+          "text": "`static number => number + offset++`",
+          "feedback": "Auch das Ändern einer lokalen Variable ist ein Erfassen. Der Compiler meldet CS8820."
+        },
+        {
+          "text": "`static () => offset`",
+          "feedback": "Auch ohne Parameter darf ein `static` Lambda keine lokale Variable lesen."
+        }
+      ],
+      "explanation": "Ein `static` Lambda erfasst keine lokalen Variablen, Parameter und kein `this`. Konstanten und statische Member sind erlaubt."
+    },
+    {
+      "id": "m10-l05-q6",
+      "lesson": "m10-l05",
+      "type": "single",
+      "question": "`static Func<int, bool> AtLeast(int threshold) => value => value >= threshold;` Du rufst `AtLeast(2)` und danach `AtLeast(5)` auf. Was stimmt?",
+      "options": [
+        {
+          "text": "Jeder Aufruf legt sein eigenes `threshold` an. Das erste Lambda prüft weiter gegen `2`.",
+          "correct": true
+        },
+        {
+          "text": "Das zweite `threshold` ersetzt das erste. Beide Lambdas prüfen gegen `5`.",
+          "misconception": "m10-l05-lambda-captures-value",
+          "feedback": "Jeder Aufruf der Methode beginnt mit einer neuen Variablen `threshold`. Der zweite Aufruf ändert die erste nicht."
+        },
+        {
+          "text": "Das Lambda kann `threshold` nicht benutzen, weil die Methode schon beendet ist.",
+          "feedback": "Die erfasste Variable lebt so lange wie der Delegate."
+        },
+        {
+          "text": "Der Compiler lehnt die Methode ab, weil sie ein Lambda zurückgibt.",
+          "feedback": "Eine Methode darf einen Delegate zurückgeben, und ein Lambda ist ein Delegate-Wert."
+        }
+      ],
+      "explanation": "Jeder Eintritt in die Methode legt die Parameter neu an. Das Lambda erfasst die Variable seines eigenen Aufrufs, und sie lebt mindestens so lange wie der Delegate."
+    },
+    {
+      "id": "m10-l05-q7",
+      "lesson": "m10-l05",
+      "type": "single",
+      "question": "Eine Methode erzeugt eine lokale Variable `counter`, gibt ein Lambda zurück, das `counter` erfasst, und endet. Was passiert mit `counter`?",
+      "options": [
+        {
+          "text": "Die Variable lebt mindestens so lange weiter, bis der Delegate nicht mehr erreichbar ist.",
+          "correct": true
+        },
+        {
+          "text": "Sie wird beim Ende der Methode gelöscht, das Lambda liest danach einen Standardwert.",
+          "feedback": "Die Lebensdauer einer erfassten Variablen wird verlängert."
+        },
+        {
+          "text": "Der Compiler verbietet es, eine erfasste Variable aus der Methode herauszugeben.",
+          "feedback": "Das ist erlaubt. Der Delegate nimmt die Variable mit."
+        },
+        {
+          "text": "Das Lambda bekommt eine Kopie des Werts vom Ende der Methode.",
+          "misconception": "m10-l05-lambda-captures-value",
+          "feedback": "Es gibt keine Kopie. Das Lambda benutzt die Variable selbst."
+        }
+      ],
+      "explanation": "Die Lebensdauer einer erfassten Variablen wird mindestens bis zu dem Zeitpunkt verlängert, an dem der Delegate aufgeräumt werden kann."
+    },
+    {
+      "id": "m10-l05-q8",
+      "lesson": "m10-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Lambda erfasst, wenn es eine lokale Variable benutzt, und was das für eine Änderung der Variablen nach dem Erstellen des Lambdas bedeutet.",
+      "modelAnswer": "Das Lambda erfasst die Variable selbst, nicht ihren Wert zum Zeitpunkt des Erstellens. Ändert sich die Variable später, sieht das Lambda beim Aufruf den neuen Wert. Ändert das Lambda die Variable, sieht auch die Methode die Änderung. Die Variable lebt so lange, wie der Delegate sie braucht. Mit `static` verbietest du das Erfassen."
+    },
+    {
+      "id": "m10-l05-q9",
+      "lesson": "m10-l05",
+      "type": "explain",
+      "question": "Transferfrage: SecLog soll Regeln für „mindestens 2 Fehlversuche“ und „mindestens 5 Fehlversuche“ aus einer Methode bauen. Wo nutzt du ein Closure, und warum brauchst du nicht zwei getrennte Methoden?",
+      "modelAnswer": "Eine Methode wie `FailuresAtLeast(int threshold)` gibt ein Lambda zurück, das den Parameter `threshold` erfasst. Jeder Aufruf legt einen eigenen Schwellenwert an, deshalb liefert sie viele Regeln aus demselben Code. Ohne Closure bräuchte jede Schwelle eine eigene Methode."
+    },
+    {
+      "id": "m10-l06-q1",
+      "lesson": "m10-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte auf die Reihenfolge und auf die Anzahl der Einträge.",
+      "example": "m10/l06/quiz-order.cs",
+      "explanation": "`early` hat zuerst das Lambda `0`. Mit `early += show` kommen die Einträge von `show` dazu, in ihrer Reihenfolge: `1` und `2`. Die Aufrufliste hat drei Einträge, und sie laufen in der Reihenfolge des Kombinierens."
+    },
+    {
+      "id": "m10-l06-q2",
+      "lesson": "m10-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l06/quiz-last-value.cs",
+      "explanation": "Alle drei Lambdas laufen mit `10`. Den Rückgabewert liefert nur das letzte: `10 - 1` ergibt `9`. Die Werte `20` und `110` gehen verloren."
+    },
+    {
+      "id": "m10-l06-q3",
+      "lesson": "m10-l06",
+      "type": "single",
+      "question": "`Func<int> read = First; read += Second; read += Third;` Die Methoden geben `1`, `2` und `3` zurück. Was liefert `int result = read();`?",
+      "options": [
+        {
+          "text": "`3`, den Wert des letzten Ziels. Alle drei Methoden laufen.",
+          "correct": true
+        },
+        {
+          "text": "`6`, die Summe aller Rückgabewerte.",
+          "misconception": "m10-l06-multicast-returns-all-results",
+          "feedback": "Der Delegate rechnet nichts zusammen. Die Werte der früheren Ziele gehen verloren."
+        },
+        {
+          "text": "Ein Array `[1, 2, 3]` mit allen Werten.",
+          "misconception": "m10-l06-multicast-returns-all-results",
+          "feedback": "Der Rückgabetyp bleibt `int`. Es gibt kein Array."
+        },
+        {
+          "text": "`1`, den Wert des ersten Ziels.",
+          "feedback": "Den Rückgabewert liefert das letzte Ziel der Aufrufliste."
+        }
+      ],
+      "explanation": "Ein Multicast-Delegate ruft alle Ziele der Reihe nach auf, gibt aber nur den Wert des letzten zurück. Deshalb nutzt man Multicast meist mit `Action`."
+    },
+    {
+      "id": "m10-l06-q4",
+      "lesson": "m10-l06",
+      "type": "single",
+      "question": "`Action log = A; log += B;` Was passiert bei `log -= C;`, wenn `C` nicht in der Aufrufliste steht?",
+      "options": [
+        {
+          "text": "Nichts. Die Aufrufliste bleibt `A`, `B`.",
+          "correct": true
+        },
+        {
+          "text": "Es wird eine `InvalidOperationException` ausgelöst.",
+          "feedback": "Das Entfernen eines nicht vorhandenen Ziels ist kein Fehler."
+        },
+        {
+          "text": "Das letzte Ziel `B` wird entfernt.",
+          "feedback": "Nur ein Ziel, das in der Liste steht, kann entfernt werden."
+        },
+        {
+          "text": "`log` wird `null`.",
+          "feedback": "`null` entsteht erst, wenn kein Ziel mehr übrig ist."
+        }
+      ],
+      "explanation": "Wer ein Ziel entfernt, das nicht in der Liste steht, ändert nichts. Steht ein Ziel mehrmals in der Liste, entfernt `-=` das letzte Vorkommen."
+    },
+    {
+      "id": "m10-l06-q5",
+      "lesson": "m10-l06",
+      "type": "single",
+      "question": "`Action log = Print; log -= Print; log();` Was passiert?",
+      "options": [
+        {
+          "text": "Eine `NullReferenceException`, weil `log` nach dem Entfernen des letzten Ziels `null` ist.",
+          "correct": true
+        },
+        {
+          "text": "Es läuft nichts, und das Programm geht weiter.",
+          "feedback": "Ein Delegate mit dem Wert `null` kann man nicht aufrufen."
+        },
+        {
+          "text": "`Print` läuft noch einmal.",
+          "feedback": "`-=` hat das Ziel entfernt."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler bei `log -= Print`.",
+          "feedback": "Das Entfernen ist erlaubt. Der Fehler entsteht erst beim Aufruf."
+        }
+      ],
+      "explanation": "Ein Delegate ohne Ziele hat den Wert `null`. Wer ihn aufruft, löst eine `NullReferenceException` aus."
+    },
+    {
+      "id": "m10-l06-q6",
+      "lesson": "m10-l06",
+      "type": "single",
+      "question": "Ein Delegate hat drei Ziele. Das zweite löst eine Exception aus, die niemand im Ziel fängt. Was passiert mit dem dritten Ziel?",
+      "options": [
+        {
+          "text": "Es läuft nicht. Die Exception geht an den Aufrufer des Delegates.",
+          "correct": true
+        },
+        {
+          "text": "Es läuft trotzdem, danach geht die Exception weiter.",
+          "feedback": "Die Exception bricht den Aufruf der Liste ab."
+        },
+        {
+          "text": "Der Delegate fängt die Exception selbst und macht weiter.",
+          "feedback": "Ein Delegate fängt keine Exceptions."
+        },
+        {
+          "text": "Es läuft und liefert den Rückgabewert.",
+          "feedback": "Nach der Exception gibt es keinen Rückgabewert."
+        }
+      ],
+      "explanation": "Löst ein Ziel eine nicht gefangene Exception aus, wandert sie zum Aufrufer, und die restlichen Ziele werden nicht aufgerufen."
+    },
+    {
+      "id": "m10-l06-q7",
+      "lesson": "m10-l06",
+      "type": "single",
+      "question": "`Action log = () => Console.WriteLine(\"a\"); log += () => Console.WriteLine(\"b\"); log -= () => Console.WriteLine(\"b\");` Wie viele Ziele hat `log` danach?",
+      "options": [
+        {
+          "text": "Zwei. Das zweite Lambda ist ein anderer Delegate, `-=` findet es nicht.",
+          "correct": true
+        },
+        {
+          "text": "Eins. Beide Lambdas sehen gleich aus, also wird `b` entfernt.",
+          "feedback": "Zwei Lambdas mit gleichem Text sind zwei verschiedene Delegates."
+        },
+        {
+          "text": "Null. `-=` entfernt alle Lambdas.",
+          "feedback": "`-=` entfernt höchstens ein Ziel."
+        },
+        {
+          "text": "Der Compiler lehnt das ab.",
+          "feedback": "Der Code ist gültig. Das Entfernen bewirkt nur nichts."
+        }
+      ],
+      "explanation": "Zum Entfernen musst du denselben Delegate-Wert angeben, den du hinzugefügt hast. Speichere das Lambda deshalb in einer Variablen, wenn du es später entfernen willst."
+    },
+    {
+      "id": "m10-l06-q8",
+      "lesson": "m10-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Multicast-Delegate beim Aufruf tut. Gehe auf die Reihenfolge, den Rückgabewert und eine Exception in einem Ziel ein.",
+      "modelAnswer": "Der Delegate ruft die Ziele seiner Aufrufliste nacheinander in der Reihenfolge auf, in der sie hinzugefügt wurden, jedes mit denselben Argumenten. Hat der Delegate einen Rückgabewert, kommt nur der des letzten Ziels zurück. Löst ein Ziel eine nicht gefangene Exception aus, geht sie zum Aufrufer, und die restlichen Ziele laufen nicht mehr."
+    },
+    {
+      "id": "m10-l06-q9",
+      "lesson": "m10-l06",
+      "type": "explain",
+      "question": "Transferfrage: SecLog will einen Vorfall an mehrere Stellen melden (Konsole, Zähler, Liste). Warum ist `Action<Incident>` dafür besser geeignet als `Func<Incident, bool>`?",
+      "modelAnswer": "Bei `Action<Incident>` gibt es keinen Rückgabewert, der verloren gehen kann. Jedes Ziel macht seine Arbeit, und es ist egal, dass nur das letzte etwas zurückgäbe. Bei `Func<Incident, bool>` bekäme der Aufrufer nur das Ergebnis des letzten Ziels."
     }
   ]
 }

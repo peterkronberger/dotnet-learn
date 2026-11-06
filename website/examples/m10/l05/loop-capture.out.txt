@@ -1,0 +1,6 @@
+for: 3
+for: 3
+for: 3
+foreach: 0
+foreach: 1
+foreach: 2

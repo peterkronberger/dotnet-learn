@@ -1,0 +1,214 @@
+---
+title: Multicast-Delegates
+sidebar_position: 6
+description: Ein Delegate-Wert kann mehrere Methoden aufrufen. Mit += und -= fügst du Methoden hinzu und entfernst sie, und der Rückgabewert kommt von der letzten.
+lesson_id: m10-l06
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import multicastBasics from '!!raw-loader!@site/examples/m10/l06/multicast-basics.cs';
+import multicastBasicsOutput from '!!raw-loader!@site/examples/m10/l06/multicast-basics.out.txt';
+import multicastReturn from '!!raw-loader!@site/examples/m10/l06/multicast-return.cs';
+import multicastReturnOutput from '!!raw-loader!@site/examples/m10/l06/multicast-return.out.txt';
+import lambdaRemoval from '!!raw-loader!@site/examples/m10/l06/lambda-removal.cs';
+import lambdaRemovalOutput from '!!raw-loader!@site/examples/m10/l06/lambda-removal.out.txt';
+import exceptionStops from '!!raw-loader!@site/examples/m10/l06/exception-stops.cs';
+import exceptionStopsOutput from '!!raw-loader!@site/examples/m10/l06/exception-stops.out.txt';
+import gaps from '!!raw-loader!@site/examples/m10/l06/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l06/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l06/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l06/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l06/seclog-delegates-solution.cs';
+
+# Multicast-Delegates
+
+:::note[Lernziele]
+- Du kannst mit `+=` und `-=` Methoden zu einem Delegate hinzufügen und entfernen.
+- Du kannst die Aufrufreihenfolge eines Multicast-Delegates vorhersagen.
+- Du kannst erklären, welchen Rückgabewert ein Multicast-Delegate liefert und was bei einer Exception passiert.
+- Du kannst begründen, warum Multicast meist mit `Action` (ohne Rückgabewert) benutzt wird.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l01-q4" />
+
+<Quiz id="m10-l05-q2" />
+
+<Quiz id="m07-l02-q1" />
+
+## Ein Delegate, mehrere Methoden
+
+Bisher hat ein Delegate-Wert auf eine Methode gezeigt. Er kann aber mehrere aufrufen. Ein solcher <Term id="multicast-delegate">Multicast-Delegate</Term> hat eine <Term id="invocation-list">Aufrufliste</Term> (Invocation List) mit mindestens einem Eintrag. Beim Aufruf laufen alle Einträge nacheinander, jeder mit denselben Argumenten.
+
+Mit `+` und `+=` hängst du einen Delegate an die Liste an. Das nennt man <Term id="delegate-combination">Kombinieren</Term>. Mit `-` und `-=` entfernst du einen Eintrag. Steht eine Methode mehrmals in der Liste, entfernt `-=` das letzte Vorkommen. Fehlt sie, ändert sich nichts. Bleibt kein Eintrag übrig, ist der Delegate `null`. Mit `GetInvocationList()` liest du die Liste, `.Length` gibt die Anzahl der Einträge ([§21.5 Delegate instantiation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#215-delegate-instantiation)).
+
+:::info[Vorhersage]
+Welche acht Zeilen gibt das Programm aus? Schreibe die Reihenfolge der Ausgaben und die Zahlen auf.
+:::
+
+<CSharpRunner id="m10-l06-basics" code={multicastBasics} predict expected={multicastBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `disk`, `DISK`, `disk`, `3`, `cpu`, `CPU`, `2`, `True`.
+
+1. **Aufbauen:** `notify` beginnt mit `PrintPlain`. `+= PrintUpper` und `+= PrintPlain` hängen zwei Einträge an. Die Liste ist `PrintPlain`, `PrintUpper`, `PrintPlain`.
+2. **Aufrufen:** `notify("disk")` ruft die drei Einträge in dieser Reihenfolge auf. `GetInvocationList().Length` ist `3`.
+3. **Entfernen:** `-= PrintPlain` entfernt das **letzte** `PrintPlain`. Die Liste ist `PrintPlain`, `PrintUpper`. Der zweite Aufruf gibt `cpu` und `CPU` aus, die Länge ist `2`.
+4. **Leer:** Danach entfernen zwei weitere `-=` die letzten Einträge. Ohne Einträge ist `notify` `null`, und `notify is null` ergibt `True`.
+
+**Was passiert, wenn …?** … du `notify -= Other` mit einer Methode schreibst, die nicht in der Liste steht? Dann ändert sich nichts, und es gibt keinen Fehler.
+
+</details>
+
+Delegates ändern sich nie. `+=` erzeugt einen **neuen** Delegate mit der längeren Liste und weist ihn der Variablen zu. Eine zweite Variable, die den alten Delegate hielt, behält die alte Liste.
+
+Ruf einen `null`-Delegate nicht direkt auf: Das löst eine `NullReferenceException` aus. Der Compiler warnt, wenn `-=` die Variable auf `null` setzen kann. Mit `?.Invoke(…)` aus Lektion 1 umgehst du das.
+
+## Der Rückgabewert
+
+Hat der Delegate-Typ einen Rückgabewert, laufen trotzdem alle Ziele. Zurück kommt aber nur der Wert des **letzten** Ziels ([§21.6 Delegate invocation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#216-delegate-invocation)). Die Werte der anderen gehen verloren.
+
+:::info[Vorhersage]
+Drei Methoden geben `1`, `2` und `3` zurück. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l06-return" code={multicastReturn} predict expected={multicastReturnOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `First runs`, `Second runs`, `Third runs` und `result: 3`.
+
+1. **Alle laufen:** Jede Methode schreibt ihre Zeile, in der Reihenfolge des Kombinierens.
+2. **Ein Wert:** `read()` gibt nur `3` zurück, den Wert von `Third`. Die `1` und die `2` sind verloren.
+3. **Folge:** Multicast ist deshalb meist ein Fall für `Action`: Es gibt keinen Rückgabewert, der verloren gehen kann.
+
+</details>
+
+## Lambdas entfernen
+
+Zum Entfernen musst du denselben Delegate-Wert angeben. Zwei Lambdas mit gleichem Text sind zwei verschiedene Delegates.
+
+:::info[Vorhersage]
+Welche zwei Zahlen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l06-removal" code={lambdaRemoval} predict expected={lambdaRemovalOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2` und `2`.
+
+1. **Gleiches Aussehen, anderer Delegate:** `log -= () => Console.WriteLine("b");` erzeugt ein neues Lambda. Es steht nicht in der Liste, also ändert sich nichts. `log` hat weiter zwei Ziele.
+2. **Gespeichert:** `second` steht in einer Variablen. `log += second` und `log -= second` verwenden denselben Delegate, die Liste ist danach wieder so lang wie vorher: `2`.
+
+Willst du ein Lambda später entfernen, speichere es in einer Variablen.
+
+</details>
+
+## Exception in einem Ziel
+
+Löst ein Ziel eine Exception aus, die niemand im Ziel fängt, geht sie an den Aufrufer des Delegates. Die restlichen Ziele laufen nicht mehr. Das gilt für jede Exception, die du aus Modul 7 kennst.
+
+:::info[Vorhersage]
+Das zweite Ziel löst eine Exception aus. Welche Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l06-exception" code={exceptionStops} predict expected={exceptionStopsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `step 1` und `caught: step 2 failed`.
+
+1. **Erstes Ziel:** `step 1` erscheint.
+2. **Zweites Ziel:** Es löst die Exception aus, der Aufruf bricht ab.
+3. **Drittes Ziel:** `step 3` läuft nie.
+4. **Fangen:** Das `catch` um `steps()` fängt die Exception, als hätte der Aufrufer die Methode direkt aufgerufen.
+
+</details>
+
+## Lückenbeispiel
+
+`signal` ruft bisher nur `PrintDot` auf. Füge `Beep` mit `+=` hinzu und rufe `signal` auf. Gib die Anzahl der Ziele aus, entferne `PrintDot` und rufe `signal` noch einmal auf.
+
+<CSharpRunner id="m10-l06-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Hinzufügen:** `signal += Beep;`
+2. **Aufrufen und zählen:** `signal();` gibt `.` und `beep` aus. `Console.WriteLine(signal.GetInvocationList().Length);` gibt `2` aus.
+3. **Entfernen:** `signal -= PrintDot;` und `signal();` geben nur noch `beep` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog baut Regeln mit erfassten Schwellenwerten. Die lokale Funktion `SeverityOf` gibt die Schwere für eine Zahl von Fehlversuchen zurück.
+
+Im Runner siehst du nur die Stelle vor `return 0;` für den neuen Block und die Stelle dahinter für die neuen Methoden. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Hinter `return 0;` kommen zwei lokale Funktionen: `static void PrintAlert(Incident incident)` gibt `ALERT: {incident.Summary()}` aus, und `void PrintSeverity(Incident incident)` gibt `Severity: {SeverityOf(incident.FailureCount)}` aus. `PrintSeverity` ist nicht `static`, weil eine `static` lokale Funktion keine andere lokale Funktion benutzen darf, die nicht `static` ist. Vor `// End with exit code 0 …` kommt der Block `// Send one incident to several alert methods`: eine lokale Variable `int alertCount = 0;`, ein `Action<Incident> alerts = PrintAlert;` mit `alerts += PrintSeverity;` und einem Lambda, das `alertCount` erhöht. Rufe `alerts` für `bobIncident` auf und gib `Targets: <Anzahl>` aus. Entferne `PrintSeverity` mit `-=`, rufe `alerts` für `daveIncident` auf und gib die Anzahl noch einmal aus. Gib zuletzt `Alerts counted: <alertCount>` aus.
+
+<CSharpRunner id="m10-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Kombinieren:** `alerts` beginnt mit `PrintAlert`. `+= PrintSeverity` und das Lambda machen drei Ziele daraus.
+2. **Aufrufen:** Für `bobIncident` laufen alle drei: Meldung, Schwere, Zähler. `GetInvocationList().Length` ist `3`.
+3. **Entfernen:** Nach `-= PrintSeverity` bleiben zwei Ziele. Für `daveIncident` laufen die Meldung und der Zähler.
+4. **Zähler:** `alertCount` hat zwei Aufrufe gezählt.
+
+</details>
+
+**Neuer Stand:** SecLog meldet einen Vorfall mit einem Aufruf an mehrere Methoden und kann Methoden zur Laufzeit hinzufügen und entfernen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l06-multicast-returns-all-results" />
+
+**„Ein Multicast-Delegate gibt die Ergebnisse aller Ziele zurück.“** Das stimmt nicht. Alle Ziele laufen, aber der Aufruf liefert nur den Wert des letzten Ziels. Die anderen Werte gehen verloren. Brauchst du alle Ergebnisse, lies die Ziele mit `GetInvocationList()` und rufe sie einzeln auf.
+:::
+
+## Zusammenfassung
+
+Ein Multicast-Delegate hat eine Aufrufliste. `+=` hängt Ziele an, `-=` entfernt das letzte passende Vorkommen, und ohne Ziel ist der Delegate `null`. Die Ziele laufen in der Reihenfolge des Kombinierens. Den Rückgabewert liefert nur das letzte Ziel, und eine nicht gefangene Exception beendet den Aufruf. Deshalb nutzt man Multicast meist mit `Action`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l06-q1" />
+
+<Quiz id="m10-l06-q2" />
+
+<Quiz id="m10-l06-q3" />
+
+<Quiz id="m10-l06-q4" />
+
+<Quiz id="m10-l06-q5" />
+
+<Quiz id="m10-l06-q6" />
+
+<Quiz id="m10-l06-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l06-q8" />
+
+### Transferfrage
+
+<Quiz id="m10-l06-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§21.6 Delegate invocation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#216-delegate-invocation)
+- Microsoft Learn: [Delegate-Klasse (API-Referenz)](https://learn.microsoft.com/dotnet/api/system.delegate)

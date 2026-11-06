@@ -1,0 +1,207 @@
+---
+title: "Closures: erfasste Variablen"
+sidebar_position: 5
+description: Ein Lambda erfasst die Variablen der umgebenden Methode selbst, nicht ihre Werte. Das erklärt die Schleifenfalle bei for und foreach, und static verbietet das Erfassen.
+lesson_id: m10-l05
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import capturesVariable from '!!raw-loader!@site/examples/m10/l05/captures-variable.cs';
+import capturesVariableOutput from '!!raw-loader!@site/examples/m10/l05/captures-variable.out.txt';
+import loopCapture from '!!raw-loader!@site/examples/m10/l05/loop-capture.cs';
+import loopCaptureOutput from '!!raw-loader!@site/examples/m10/l05/loop-capture.out.txt';
+import factory from '!!raw-loader!@site/examples/m10/l05/factory.cs';
+import factoryOutput from '!!raw-loader!@site/examples/m10/l05/factory.out.txt';
+import staticLambda from '!!raw-loader!@site/examples/m10/l05/static-lambda.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m10/l05/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l05/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l05/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l05/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l05/seclog-delegates-solution.cs';
+
+# Closures: erfasste Variablen
+
+:::note[Lernziele]
+- Du kannst erklären, was ein Closure ist und welche Variablen ein Lambda erfasst.
+- Du kannst vorhersagen, welchen Wert ein Lambda sieht, wenn die erfasste Variable nach dem Erstellen geändert wird.
+- Du kannst den Unterschied zwischen `foreach`- und `for`-Schleifen beim Erfassen erklären.
+- Du kannst mit `static` verhindern, dass ein Lambda Variablen erfasst.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l03-q4" />
+
+<Quiz id="m10-l04-q1" />
+
+<Quiz id="m02-l07-q2" />
+
+## Ein Lambda benutzt Variablen der Methode
+
+Ein Lambda darf Variablen benutzen, die außerhalb von ihm stehen: lokale Variablen und Parameter der umgebenden Methode. Das sind seine <Term id="captured-variable">erfassten Variablen</Term> (Captured Variables). Ein Lambda, das so etwas tut, heißt <Term id="closure">Closure</Term>.
+
+Wichtig ist, **was** das Lambda erfasst: die Variable selbst, nicht ihren Wert. Das Lambda liest die Variable erst, wenn es läuft. Es sieht dann den Wert, den die Variable in diesem Moment hat. Ändert das Lambda die Variable, sieht auch die Methode die Änderung.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus? Achte darauf, wann `limit` geändert wird.
+:::
+
+<CSharpRunner id="m10-l05-captures" code={capturesVariable} predict expected={capturesVariableOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `7`.
+
+1. **Erfassen:** `over` benutzt `limit`. Das Lambda erfasst die Variable `limit`.
+2. **Später ändern:** Beim ersten Aufruf ist `limit` gleich `3`, also ist `5 > 3` wahr. Danach setzt der Code `limit` auf `10`. Beim zweiten Aufruf liest das Lambda `10`, und `5 > 10` ist falsch.
+3. **Lambda ändert die Variable:** `add` erhöht `total` bei jedem Aufruf. Nach `add(2)` und `add(5)` hat `total` außerhalb des Lambdas den Wert `7`.
+
+**Was passiert, wenn …?** … du `limit` nach dem Aufruf `over(5)` nicht änderst? Dann bleibt der zweite Aufruf bei `True`. Die Variable ist dieselbe, nur ihr Wert hat sich geändert.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wie lange lebt die erfasste Variable? (optional)</summary>
+
+Eine lokale Variable lebt normalerweise nur, solange der Block läuft, in dem sie steht. Eine erfasste Variable lebt länger: Ihre Lebensdauer wird mindestens bis zu dem Zeitpunkt verlängert, an dem der Delegate aufgeräumt werden kann ([§12.22.6.2 Captured outer variables](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122262-captured-outer-variables)). Deshalb kann eine Methode ein Lambda zurückgeben, das eine ihrer Variablen benutzt, auch wenn die Methode längst beendet ist.
+
+</details>
+
+## Schleifen: for und foreach
+
+Eine lokale Variable wird neu angelegt, sobald die Ausführung ihren Gültigkeitsbereich betritt ([§12.22.6.3 Instantiation of local variables](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122263-instantiation-of-local-variables)). Das spielt eine Rolle, wenn ein Lambda sie erfasst. Die Variable einer `foreach`-Schleife gehört zum Schleifenkörper, jede Runde bekommt eine eigene. Die Variable einer `for`-Schleife steht im Schleifenkopf und wird nur einmal angelegt, alle Runden teilen sie.
+
+:::info[Vorhersage]
+Beide Schleifen legen drei Lambdas in eine Liste. Die Lambdas laufen erst danach. Welche sechs Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l05-loops" code={loopCapture} predict expected={loopCaptureOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist dreimal `for: 3` und danach `foreach: 0`, `foreach: 1`, `foreach: 2`.
+
+1. **`for`:** Die Variable `i` ist eine einzige Variable. Die drei Lambdas erfassen alle dieselbe. Nach der Schleife hat `i` den Wert `3`, denn damit endet die Bedingung `i < 3`. Erst dann laufen die Lambdas, und alle lesen `3`.
+2. **`foreach`:** `number` wird in jeder Runde neu angelegt. Jedes Lambda erfasst seine eigene Variable mit dem Wert dieser Runde.
+3. **Lösung für `for`:** Kopiere den Wert in der Runde in eine neue lokale Variable im Körper, zum Beispiel `int copy = i;`, und erfasse `copy`. Sie wird in jeder Runde neu angelegt.
+
+</details>
+
+<details>
+<summary>Vertiefung: Die Regeln im Wortlaut (optional)</summary>
+
+Die Spezifikation legt fest, dass die Variable eines `foreach` innerhalb der Schleife angelegt wird: In jeder Runde gibt es eine eigene ([§13.9.5.2 The foreach statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13952-synchronous-foreach)). Eine Schleifenvariable, die eine `for`-Schleife im Kopf deklariert, gilt als außerhalb der Schleife deklariert ([§12.22.6.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122263-instantiation-of-local-variables)).
+
+</details>
+
+## Eine Methode, die ein Lambda zurückgibt
+
+Eine Methode darf ein Lambda zurückgeben. Ihre Parameter kann das Lambda erfassen. Jeder Aufruf der Methode legt die Parameter neu an, also hat jedes zurückgegebene Lambda seinen eigenen Wert.
+
+:::info[Vorhersage]
+`AtLeast` gibt ein Lambda zurück, das `threshold` erfasst. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l05-factory" code={factory} predict expected={factoryOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `True`.
+
+1. **Zwei Aufrufe, zwei Variablen:** `AtLeast(2)` legt ein `threshold` mit dem Wert `2` an, `AtLeast(5)` ein anderes mit `5`.
+2. **Prüfen:** `atLeast2(3)` ist `3 >= 2`, also `True`. `atLeast5(3)` ist `3 >= 5`, also `False`. `atLeast5(7)` ist `True`.
+3. **Lebensdauer:** Die Methode `AtLeast` ist längst beendet. Die Variablen leben weiter, solange die Delegates sie brauchen.
+
+</details>
+
+## static: kein Erfassen erlaubt
+
+Manchmal willst du sicher sein, dass ein Lambda nichts erfasst. Schreibst du <Term id="static-anonymous-function">`static`</Term> vor die Parameter, darf das Lambda keine lokalen Variablen, Parameter und kein `this` der umgebenden Methode benutzen. Konstanten sind erlaubt.
+
+<CodeBlock language="csharp" title="static-lambda.snippet.cs">{staticLambda}</CodeBlock>
+
+Der Compiler meldet für die letzte Zeile `error CS8820: A static anonymous function cannot contain a reference to 'offset'.` Die Zeile davor ist gültig, weil `Factor` eine Konstante ist.
+
+## Lückenbeispiel
+
+Das Lambda `addBonus` soll die Variable `bonus` zum Parameter addieren. Ändere danach `bonus` auf `5` und gib das Ergebnis für `10` noch einmal aus.
+
+<CSharpRunner id="m10-l05-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Variable erfassen:** `Func<int, int> addBonus = number => number + bonus;`
+2. **Ausgeben:** `Console.WriteLine(addBonus(10));` gibt `11` aus.
+3. **Variable ändern:** `bonus = 5;`, dann `Console.WriteLine(addBonus(10));` gibt `15` aus. Dasselbe Lambda liefert ein neues Ergebnis, weil es die Variable erfasst hat.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog formatiert Meldungen mit einem Lambda und hat zwei Vorfälle, `bobIncident` und `daveIncident`, in der Liste `incidents`. Die Klasse `FuncRule` bekommt ihre Prüfung als `Func<Incident, bool>`.
+
+Im Runner siehst du nur die Stelle vor `return 0;` für den neuen Block und die Stelle dahinter für die neue Methode. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Hinter `return 0;` kommt die lokale Funktion `static Func<Incident, bool> FailuresAtLeast(int threshold)`. Sie gibt ein Lambda zurück, das `threshold` erfasst und prüft, ob `incident.FailureCount >= threshold` ist. Vor `// End with exit code 0 …` kommt der Block `// Build threshold rules from captured values`. Er erzeugt `FuncRule("at least 2", FailuresAtLeast(2))` und `FuncRule("at least 5", FailuresAtLeast(5))` und gibt für jede Regel und jeden der beiden Vorfälle eine Zeile `<Regelname> / <dave oder bob>: <IsMatch>` aus, erst für `dave`, dann für `bob`. Danach kommt der Block `// Use a static lambda for a rule that needs no captured variable`: eine Regel `"no failures"` mit `static incident => incident.FailureCount == 0`, ausgegeben für `dave`. Zuletzt kommt der Block `// Count the checks of a rule in a captured local variable`: Eine lokale Variable `int checkedCount = 0;` und eine Regel `"counting"`, deren Lambda `checkedCount` bei jedem Aufruf erhöht und `incident.FailureCount > 0` zurückgibt. Lass die Regel über `incidents` laufen und gib `Checked incidents: <checkedCount>` aus.
+
+<CSharpRunner id="m10-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Closure bauen:** `FailuresAtLeast` gibt `incident => incident.FailureCount >= threshold` zurück. Das Lambda erfasst den Parameter `threshold`.
+2. **Zwei Regeln:** Jeder Aufruf legt ein eigenes `threshold` an. `at least 2` ist für `dave` (1 Fehlversuch) falsch und für `bob` (5) wahr, `at least 5` ist für `dave` falsch und für `bob` wahr.
+3. **`static`:** Die Regel `no failures` braucht keine Variable der Methode. `static` sichert das ab.
+4. **Zähler:** Das Lambda erhöht `checkedCount`. Zwei Vorfälle ergeben `2`.
+
+</details>
+
+**Neuer Stand:** SecLog baut Regeln mit Schwellenwerten aus einer Methode und zählt mit einem erfassten Zähler, wie oft eine Regel läuft.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l05-lambda-captures-value" />
+
+**„Ein Lambda merkt sich den Wert, den die Variable beim Erstellen hatte.“** Das stimmt nicht. Das Lambda erfasst die Variable selbst. Ändert sich die Variable, sieht das Lambda beim Aufruf den neuen Wert. Deshalb geben die Lambdas einer `for`-Schleife alle den Endwert aus. Willst du den Wert von damals, kopiere ihn in eine neue lokale Variable und erfasse die Kopie.
+:::
+
+## Zusammenfassung
+
+Ein Lambda erfasst lokale Variablen und Parameter der umgebenden Methode, nicht ihre Werte. Es sieht beim Aufruf den aktuellen Wert und kann die Variable ändern. Die Variable lebt mindestens so lange wie der Delegate. Eine `foreach`-Variable ist in jeder Runde neu, die `for`-Variable ist nur eine. Mit `static` verbietest du dem Lambda das Erfassen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l05-q1" />
+
+<Quiz id="m10-l05-q2" />
+
+<Quiz id="m10-l05-q3" />
+
+<Quiz id="m10-l05-q4" />
+
+<Quiz id="m10-l05-q5" />
+
+<Quiz id="m10-l05-q6" />
+
+<Quiz id="m10-l05-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l05-q8" />
+
+### Transferfrage
+
+<Quiz id="m10-l05-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Lambda-Ausdrücke und anonyme Funktionen](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/lambda-expressions)
+- C#-Spezifikation: [§12.22.6 Outer variables](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12226-outer-variables)

@@ -1,0 +1,8 @@
+disk
+DISK
+disk
+3
+cpu
+CPU
+2
+True

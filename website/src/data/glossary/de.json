@@ -6561,6 +6561,129 @@
         "title": "Expressions – Anonymous function signatures",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1222-anonymous-function-signatures"
       }
+    },
+    {
+      "id": "closure",
+      "term": "Closure",
+      "german": "Closure",
+      "category": "language",
+      "definition": "Ein Lambda, das Variablen der umgebenden Methode benutzt. Es trägt diese Variablen mit sich und liest und ändert sie, auch wenn die Methode längst weiter ist.",
+      "aliases": [
+        "Closures"
+      ],
+      "related": [
+        "captured-variable",
+        "lambda-expression",
+        "local-variable"
+      ],
+      "lesson": "m10-l05",
+      "source": {
+        "title": "Expressions – Outer variables",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12226-outer-variables"
+      }
+    },
+    {
+      "id": "captured-variable",
+      "term": "Captured Variable",
+      "german": "erfasste Variable",
+      "category": "language",
+      "definition": "Eine lokale Variable oder ein Parameter der umgebenden Methode, den ein Lambda benutzt. Das Lambda erfasst die Variable selbst, nicht ihren Wert. Sie lebt mindestens so lange wie der Delegate.",
+      "aliases": [
+        "erfasste Variablen",
+        "Captured Outer Variable"
+      ],
+      "related": [
+        "closure",
+        "lambda-expression",
+        "scope"
+      ],
+      "lesson": "m10-l05",
+      "source": {
+        "title": "Expressions – Captured outer variables",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122262-captured-outer-variables"
+      }
+    },
+    {
+      "id": "static-anonymous-function",
+      "term": "Static Anonymous Function",
+      "german": "statisches Lambda",
+      "category": "language",
+      "definition": "Ein Lambda mit `static` vor den Parametern, zum Beispiel `static x => x * 2`. Es darf keine lokalen Variablen, Parameter und kein `this` der umgebenden Methode benutzen. Konstanten sind erlaubt.",
+      "aliases": [
+        "static Lambda",
+        "statisches Lambda",
+        "static lambda"
+      ],
+      "related": [
+        "closure",
+        "captured-variable",
+        "lambda-expression"
+      ],
+      "lesson": "m10-l05",
+      "source": {
+        "title": "Expressions – Anonymous function expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12221-general"
+      }
+    },
+    {
+      "id": "multicast-delegate",
+      "term": "Multicast Delegate",
+      "german": "Multicast-Delegate",
+      "category": "language",
+      "definition": "Ein Delegate-Wert, der mehrere Methoden aufruft. Beim Aufruf laufen alle Methoden der Reihe nach mit denselben Argumenten. Den Rückgabewert liefert die letzte.",
+      "aliases": [
+        "Multicast-Delegates",
+        "Multicast"
+      ],
+      "related": [
+        "invocation-list",
+        "delegate-combination",
+        "delegate"
+      ],
+      "lesson": "m10-l06",
+      "source": {
+        "title": "Delegates – Delegate invocation",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#216-delegate-invocation"
+      }
+    },
+    {
+      "id": "invocation-list",
+      "term": "Invocation List",
+      "german": "Aufrufliste",
+      "category": "language",
+      "definition": "Die Liste der Methoden, die ein Delegate-Wert aufruft. Sie hat mindestens einen Eintrag. Mit `GetInvocationList()` liest du sie.",
+      "aliases": [
+        "Aufrufliste"
+      ],
+      "related": [
+        "multicast-delegate",
+        "delegate-combination"
+      ],
+      "lesson": "m10-l06",
+      "source": {
+        "title": "Delegates – Delegate instantiation",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#215-delegate-instantiation"
+      }
+    },
+    {
+      "id": "delegate-combination",
+      "term": "Delegate Combination",
+      "german": "Delegate-Kombination",
+      "category": "language",
+      "definition": "Das Zusammenfügen von Delegates mit `+` oder `+=`: Die Aufruflisten werden hintereinandergehängt. Mit `-` oder `-=` entfernst du das letzte passende Vorkommen. Beides erzeugt einen neuen Delegate.",
+      "aliases": [
+        "Kombinieren von Delegates",
+        "Delegate-Entfernung"
+      ],
+      "related": [
+        "multicast-delegate",
+        "invocation-list"
+      ],
+      "lesson": "m10-l06",
+      "source": {
+        "title": "Delegates – Delegate instantiation",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#215-delegate-instantiation"
+      }
     }
   ]
 }
