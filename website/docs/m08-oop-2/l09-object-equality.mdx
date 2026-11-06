@@ -1,0 +1,290 @@
+---
+title: Gleichheit von Objekten
+sidebar_position: 9
+description: Eine Klasse vergleicht standardmäßig Verweise. Wer Equals überschreibt, muss auch GetHashCode überschreiben, sonst finden HashSet und Dictionary gleiche Objekte nicht.
+lesson_id: m08-l09
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import equalityDefault from '!!raw-loader!@site/examples/m08/l09/equality-default.cs';
+import equalityDefaultOutput from '!!raw-loader!@site/examples/m08/l09/equality-default.out.txt';
+import equalsOverride from '!!raw-loader!@site/examples/m08/l09/equals-override.cs';
+import equalsOverrideOutput from '!!raw-loader!@site/examples/m08/l09/equals-override.out.txt';
+import equalsHashset from '!!raw-loader!@site/examples/m08/l09/equals-hashset.cs';
+import equalsHashsetOutput from '!!raw-loader!@site/examples/m08/l09/equals-hashset.out.txt';
+import equalsWithout from '!!raw-loader!@site/examples/m08/l09/equals-without-gethashcode.snippet.cs';
+import hashCollision from '!!raw-loader!@site/examples/m08/l09/hash-collision.cs';
+import hashCollisionOutput from '!!raw-loader!@site/examples/m08/l09/hash-collision.out.txt';
+import operatorOverload from '!!raw-loader!@site/examples/m08/l09/operator-overload.cs';
+import operatorOverloadOutput from '!!raw-loader!@site/examples/m08/l09/operator-overload.out.txt';
+import operatorPair from '!!raw-loader!@site/examples/m08/l09/operator-pair.snippet.cs';
+import indexer from '!!raw-loader!@site/examples/m08/l09/indexer.cs';
+import indexerOutput from '!!raw-loader!@site/examples/m08/l09/indexer.out.txt';
+import equalsGap from '!!raw-loader!@site/examples/m08/l09/equals-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l09/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l09/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l09/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l09/seclog-oop-solution.cs';
+
+# Gleichheit von Objekten
+
+:::note[Lernziele]
+- Du kannst `Equals` und `GetHashCode` für eine eigene Klasse passend überschreiben.
+- Du kannst erklären, warum `HashSet` und `Dictionary` beide Methoden brauchen.
+- Du kannst `IEquatable<T>` implementieren.
+- Du kannst vorhersagen, was `==` bei eigenen Klassen vergleicht.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l08-q1" />
+
+<Quiz id="m05-l06-q3" />
+
+<Quiz id="m05-l07-q1" />
+
+## Was Equals standardmäßig tut
+
+In Lektion 2 hast du gesehen, dass `ToString` ein virtueller Member von `object` ist. `object` hat weitere virtuelle Member: `Equals(object?)` fragt, ob zwei Objekte gleich sind, und `GetHashCode()` liefert eine Zahl, die ein Objekt beschreibt. Beide kannst du mit `override` überschreiben ([Object.Equals](https://learn.microsoft.com/dotnet/api/system.object.equals)).
+
+Ohne Überschreiben gilt bei einer Klasse die <Term id="reference-equality">Verweisgleichheit</Term> (Modul 4): Zwei Objekte sind nur gleich, wenn beide Variablen auf dasselbe Objekt zeigen. Der Operator `==` verhält sich ebenso, solange die Klasse ihn nicht überlädt ([§12.15.7 Reference type equality operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12157-reference-type-equality-operators)).
+
+Ein Struct vergleicht dagegen standardmäßig Feld für Feld ([ValueType.Equals](https://learn.microsoft.com/dotnet/api/system.valuetype.equals)). Das passt dazu, dass es ein Werttyp ist (Lektion 8).
+
+:::info[Vorhersage]
+`Ticket` ist eine Klasse, `Slot` ein Struct, beide ohne eigenes `Equals`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l09-default" code={equalityDefault} predict expected={equalityDefaultOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `False`, `False`, `True` und `True`.
+
+1. **Zwei Objekte:** `first` und `second` sind zwei Objekte mit gleichen Werten. `==` vergleicht die Verweise: `False`.
+2. **Standard-Equals:** Auch `first.Equals(second)` prüft bei einer Klasse nur die Verweise: `False`.
+3. **Derselbe Verweis:** `alias` zeigt auf dasselbe Objekt wie `first`: `True`.
+4. **Struct:** `slotA.Equals(slotB)` vergleicht die Felder: `True`.
+
+Was passiert, wenn `Ticket` ein Struct wäre? Dann wären auch die ersten beiden Zeilen `True`, aber nur, weil Structs standardmäßig Werte vergleichen. Den Operator `==` gibt es für ein eigenes Struct nicht von selbst.
+
+</details>
+
+## Equals überschreiben
+
+Eine Klasse, deren Objekte durch ihre Werte bestimmt sind, überschreibt `Equals`. Dabei gilt der <Term id="equality-contract">Gleichheitsvertrag</Term>: `Equals` ist reflexiv (ein Objekt ist gleich zu sich selbst), symmetrisch (`a.Equals(b)` und `b.Equals(a)` geben dasselbe) und transitiv (ist `a` gleich `b` und `b` gleich `c`, dann ist `a` gleich `c`). `x.Equals(null)` ergibt immer `false`. Und zwei gleiche Objekte müssen denselben Hash-Code liefern ([Hinweise für Erben in Object.Equals](https://learn.microsoft.com/dotnet/api/system.object.equals#notes-to-inheritors)).
+
+Der <Term id="hash-code">Hash-Code</Term> ist eine `int`-Zahl, die `GetHashCode()` für ein Objekt liefert. Du baust ihn aus den Werten, die auch `Equals` vergleicht. `HashCode.Combine(…)` mischt mehrere Werte zu einem Code ([HashCode.Combine](https://learn.microsoft.com/dotnet/api/system.hashcode.combine)).
+
+Dazu kommt das Interface `IEquatable<T>` (Modul 5: Typargument). Es verlangt eine Methode `Equals(T? other)` mit passendem Parameter. Für ein Struct spart das das Boxing, und es braucht keinen Cast ([IEquatable&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.iequatable-1)). Üblich ist, die Prüfung in der typisierten Methode zu schreiben und `Equals(object?)` an sie weiterzugeben.
+
+:::info[Vorhersage]
+`Seat` vergleicht `Row` und `Number`. Welche fünf Zeilen gibt das Programm aus? `==` ist nicht überladen.
+:::
+
+<CSharpRunner id="m08-l09-override" code={equalsOverride} predict expected={equalsOverrideOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `True`, `False` und `False`.
+
+1. **Typisierte Prüfung:** `Equals(Seat? other)` prüft zuerst, dass `other` nicht `null` ist, und vergleicht dann `Row` und `Number`.
+2. **Weitergabe:** `Equals(object? obj)` wandelt mit `as` um und ruft die typisierte Methode auf. Bei `null` oder einem anderen Typ ergibt `as` `null`, und das Ergebnis ist `false`.
+3. **Hash-Code:** `HashCode.Combine(Row, Number)` liefert für gleiche Werte denselben Code: `True`.
+4. **Operator:** `first == second` bleibt `False`. `==` vergleicht weiter die Verweise, denn die Klasse überlädt ihn nicht.
+5. **null:** `first.Equals(null)` ist `false`.
+
+Was passiert, wenn `Number` nicht in `Equals` vorkommt? Dann wären `first` und `other` gleich, und `GetHashCode` müsste die Nummer ebenfalls weglassen, sonst bekämen gleiche Objekte verschiedene Codes.
+
+</details>
+
+## Warum GetHashCode dazugehört
+
+`HashSet<T>` und `Dictionary<TKey, TValue>` (Modul 5) suchen nicht der Reihe nach. Sie berechnen zuerst den Hash-Code und schauen nur dort nach, wo Elemente mit diesem Code liegen. Erst bei gleichem Code fragen sie `Equals`. So finden sie ein Element schnell.
+
+Überschreibst du nur `Equals`, liefert `GetHashCode` weiter die Standardversion von `object`: einen eigenen Code pro Objekt. Zwei gleiche Objekte haben dann verschiedene Codes. Das `HashSet` schaut an der falschen Stelle nach und ruft `Equals` nie auf. Der Compiler warnt davor:
+
+<CodeBlock language="csharp" title="equals-without-gethashcode.snippet.cs">{equalsWithout}</CodeBlock>
+
+```text
+warning CS0659: 'HalfSeat' overrides Object.Equals(object o) but does not override Object.GetHashCode()
+```
+
+Im folgenden Beispiel steht vor `HalfSeat` die Zeile `#pragma warning disable CS0659`. Sie schaltet diese Warnung bis zur Zeile `#pragma warning restore CS0659` aus, damit das Beispiel ohne Meldung läuft.
+
+:::info[Vorhersage]
+`HalfSeat` überschreibt nur `Equals`, `FullSeat` auch `GetHashCode`. Jedes `HashSet` bekommt zwei gleiche Objekte, danach wird mit einem dritten gleichen Objekt gesucht. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l09-hashset" code={equalsHashset} predict expected={equalsHashsetOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Without GetHashCode: 2`, `False`, `With GetHashCode: 1` und `True`.
+
+1. **Ohne GetHashCode:** Die beiden `HalfSeat` haben verschiedene Hash-Codes. Das `HashSet` hält beide: 2.
+2. **Suche:** Ein drittes gleiches Objekt hat wieder einen eigenen Code. `Contains` findet nichts: `False`.
+3. **Mit GetHashCode:** Gleiche Werte ergeben denselben Code, dann entscheidet `Equals`: Ein Element.
+4. **Suche:** `Contains` findet das Objekt: `True`.
+
+Was passiert bei einem `Dictionary` mit `HalfSeat` als Schlüssel? Dasselbe: Der Zugriff mit einem gleichen Schlüsselobjekt findet den Eintrag nicht.
+
+</details>
+
+Die Regel gilt nur in einer Richtung. Gleiche Objekte brauchen gleiche Codes, aber gleiche Codes beweisen nicht, dass die Objekte gleich sind. Verschiedene Objekte dürfen denselben Code haben, dann entscheidet `Equals`.
+
+:::info[Vorhersage]
+`Tag.GetHashCode()` liefert die Länge des Namens. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l09-collision" code={hashCollision} predict expected={hashCollisionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `2`.
+
+1. **Gleicher Code:** `"ab"` und `"cd"` haben beide die Länge 2: `True`.
+2. **Nicht gleich:** `Equals` vergleicht die Namen: `False`.
+3. **HashSet:** `a` und `b` haben denselben Code, `Equals` unterscheidet sie. Das dritte Tag ist gleich `a`. Zwei Elemente.
+
+Ist ein solcher Code erlaubt? Ja, er erfüllt den Vertrag, aber das `HashSet` muss viele Elemente mit `Equals` prüfen und wird langsam. Gute Codes verteilen die Objekte gleichmäßig.
+
+</details>
+
+## == überladen
+
+Eine Klasse kann festlegen, was ein Operator für ihre Objekte bedeutet. Das ist <Term id="operator-overloading">Operatorüberladung</Term>: Du schreibst `public static bool operator ==(…)` in der Klasse. `==` und `!=` müssen als Paar deklariert werden ([§15.10 Operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1510-operators)).
+
+<CodeBlock language="csharp" title="operator-pair.snippet.cs">{operatorPair}</CodeBlock>
+
+```text
+error CS0216: The operator 'Seat.operator ==(Seat?, Seat?)' requires a matching operator '!=' to also be defined
+```
+
+Halte `==` und `Equals` im Einklang: Wer `==` überlädt, überschreibt auch `Equals` und `GetHashCode`, und alle drei sagen dasselbe. Sonst liefert `a == b` etwas anderes als `a.Equals(b)`. Der Compiler warnt, wenn `Equals` oder `GetHashCode` fehlen (CS0660 und CS0661).
+
+:::info[Vorhersage]
+Diesmal überlädt `Seat` `==` und `!=`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l09-operator" code={operatorOverload} predict expected={operatorOverloadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `True`.
+
+1. **Gleichheit:** `first == second` ruft den überladenen Operator auf. Er vergleicht `Row` und `Number`: `True`.
+2. **Ungleichheit:** `!=` verneint `==`: `False`.
+3. **Equals:** `Equals(object?)` ruft denselben Operator auf. Beide Wege stimmen überein: `True`.
+
+Warum prüft der Operator zuerst auf `null`? Beide Seiten können `null` sein. Ohne die Prüfung käme beim Zugriff auf `left.Row` eine `NullReferenceException`.
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die zwei Stellen aus den Kommentaren. Das Programm soll `True` und danach `1` ausgeben, jeweils in eigener Zeile.
+
+<CSharpRunner id="m08-l09-gaps" code={equalsGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Equals:** `return obj is Point other && X == other.X && Y == other.Y;` prüft Typ und Werte in einem Ausdruck.
+2. **GetHashCode:** `return HashCode.Combine(X, Y);` liefert für gleiche Punkte denselben Code.
+3. **Ergebnis:** Beide Punkte sind gleich, das `HashSet` hält einen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Klasse `LogEvent` mit `Timestamp`, `EventType` und `User` und die Methode `Describe()`. Zwei `LogEvent`-Objekte mit gleichen Werten sind bisher zwei verschiedene Objekte.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Klasse `LogEvent` und die Stelle vor `return 0;` für den neuen Block. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. `LogEvent` bekommt `IEquatable<LogEvent>`. `Equals(LogEvent? other)` ist `true`, wenn `Timestamp`, `EventType` und `User` gleich sind (`EventType` und `User` mit `string.Equals` und `StringComparison.Ordinal`). `Equals(object? obj)` ruft die typisierte Methode auf. `GetHashCode()` gibt `HashCode.Combine(Timestamp, EventType, User)` zurück. `ToString()` gibt `Describe()` zurück.
+2. Vor `// End with exit code 0 …` kommt der Block `// Compare two events by their values`. Er parst `sampleLog[1]` zweimal mit `ParseLine(…, 2)` zu `eventA` und `eventB` und gibt `$"Same reference with ==: {eventA == eventB}"` und `$"Same values with Equals: {eventA.Equals(eventB)}"` aus. Danach legt er `eventA`, `eventB` und `ParseLine(sampleLog[2], 3)` in ein `HashSet<LogEvent>` und gibt `$"Distinct events: {eventSet.Count}"` aus.
+
+<CSharpRunner id="m08-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Interface angeben:** `LogEvent : IEquatable<LogEvent>` verlangt die typisierte `Equals`-Methode.
+2. **Werte vergleichen:** Zeit, Typ und Benutzer müssen gleich sein. `User` darf `null` sein, `string.Equals` kommt damit zurecht.
+3. **Hash-Code und Text:** `HashCode.Combine` nutzt dieselben drei Werte wie `Equals`. `ToString()` gibt `Describe()` zurück.
+4. **Vergleichen:** `==` bleibt `False`, denn SecLog überlädt den Operator nicht. `Equals` ist `True`.
+5. **Menge:** Das `HashSet` erkennt `eventA` und `eventB` als dasselbe Ereignis und hält mit der dritten Zeile zwei.
+
+Die früheren Blöcke geben `Describe()` aus, nicht das Objekt. Deshalb ändert `ToString()` keine frühere Ausgabe.
+
+</details>
+
+**Neuer Stand:** SecLog vergleicht Ereignisse nach ihren Werten. Gleiche Ereignisse zählen in einer Menge nur einmal.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l09-equals-without-gethashcode" />
+
+**„Wenn ich nur `Equals` überschreibe und `GetHashCode` nicht, ist das harmlos.“** Das stimmt nicht. Ein `HashSet` oder `Dictionary` behandelt gleiche Objekte dann als verschieden, wie das Beispiel mit `HalfSeat` zeigt. Der Compiler warnt mit CS0659. Überschreibe immer beide Methoden und baue den Hash-Code aus denselben Werten, die `Equals` vergleicht.
+:::
+
+<details>
+<summary>Vertiefung: Indexer (optional)</summary>
+
+Du kennst `list[0]` und `dictionary["bob"]` aus Modul 5. Dahinter steckt ein Indexer: ein Member mit `this[int index]`, der wie eine Eigenschaft mit Parameter arbeitet. Er hat einen `get`- und optional einen `set`-Accessor ([§15.9 Indexers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#159-indexers)).
+
+<CSharpRunner id="m08-l09-indexer" code={indexer} predict expected={indexerOutput} />
+
+Die Ausgabe ist `alice`, `carol` und `dave`. `row[0]` ruft `get` mit `index = 0` auf, `row[1] = "dave"` ruft `set` auf. Der Wert steht dort in `value`.
+
+</details>
+
+## Zusammenfassung
+
+Eine Klasse vergleicht mit `Equals` und `==` standardmäßig Verweise, ein Struct Feld für Feld. Wer `Equals` überschreibt, hält den Gleichheitsvertrag ein und überschreibt auch `GetHashCode`, mit denselben Werten. `HashSet` und `Dictionary` suchen erst über den Hash-Code und fragen dann `Equals`. `IEquatable<T>` gibt `Equals` einen passenden Parameter. Überlädst du `==`, deklarierst du `!=` dazu und hältst alle drei Wege gleich.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l09-q1" />
+
+<Quiz id="m08-l09-q2" />
+
+<Quiz id="m08-l09-q3" />
+
+<Quiz id="m08-l09-q4" />
+
+<Quiz id="m08-l09-q5" />
+
+<Quiz id="m08-l09-q6" />
+
+<Quiz id="m08-l09-q7" />
+
+<Quiz id="m08-l09-q8" />
+
+<Quiz id="m08-l09-q9" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l09-q10" />
+
+### Transferfrage
+
+<Quiz id="m08-l09-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Object.Equals](https://learn.microsoft.com/dotnet/api/system.object.equals) und [Object.GetHashCode](https://learn.microsoft.com/dotnet/api/system.object.gethashcode)
+- Microsoft Learn: [IEquatable&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.iequatable-1)
+- C#-Spezifikation: [Operators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1510-operators)

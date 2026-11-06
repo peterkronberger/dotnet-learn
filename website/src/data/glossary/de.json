@@ -5655,6 +5655,151 @@
         "title": "Structs – Readonly members",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1632-readonly-members"
       }
+    },
+    {
+      "id": "equality-contract",
+      "term": "Equality contract",
+      "german": "Gleichheitsvertrag",
+      "category": "language",
+      "definition": "Die Regeln, die `Equals` und `GetHashCode` einhalten müssen: `Equals` ist reflexiv, symmetrisch und transitiv, `x.Equals(null)` ist `false`, und gleiche Objekte haben denselben Hash-Code.",
+      "aliases": [
+        "Gleichheitsvertrag",
+        "Equals-Vertrag"
+      ],
+      "related": [
+        "hash-code",
+        "value-equality",
+        "reference-equality"
+      ],
+      "lesson": "m08-l09",
+      "source": {
+        "title": "Object.Equals – Notes to inheritors",
+        "url": "https://learn.microsoft.com/dotnet/api/system.object.equals#notes-to-inheritors"
+      }
+    },
+    {
+      "id": "hash-code",
+      "term": "Hash code",
+      "german": "Hash-Code",
+      "category": "language",
+      "definition": "Eine `int`-Zahl, die `GetHashCode()` für ein Objekt liefert. Gleiche Objekte liefern denselben Hash-Code. Gleiche Hash-Codes beweisen nicht, dass die Objekte gleich sind.",
+      "aliases": [
+        "Hash-Codes",
+        "GetHashCode"
+      ],
+      "related": [
+        "equality-contract",
+        "hash-set",
+        "dictionary"
+      ],
+      "lesson": "m08-l09",
+      "source": {
+        "title": "Object.GetHashCode",
+        "url": "https://learn.microsoft.com/dotnet/api/system.object.gethashcode"
+      }
+    },
+    {
+      "id": "operator-overloading",
+      "term": "Operator overloading",
+      "german": "Operatorüberladung",
+      "category": "language",
+      "definition": "Eine Klasse legt mit `public static … operator ==(…)` fest, was ein Operator für ihre Objekte bedeutet. `==` und `!=` müssen als Paar deklariert werden.",
+      "aliases": [
+        "Operator überladen",
+        "operator"
+      ],
+      "related": [
+        "reference-equality",
+        "equality-contract"
+      ],
+      "lesson": "m08-l09",
+      "source": {
+        "title": "Classes – Operators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1510-operators"
+      }
+    },
+    {
+      "id": "record",
+      "term": "Record type",
+      "german": "Record-Typ",
+      "category": "language",
+      "definition": "Ein Typ, der mit `record` deklariert wird. Der Compiler erzeugt wertbasierte Gleichheit und `ToString`. `record` ist ein `record class`, `record struct` ein Werttyp.",
+      "aliases": [
+        "Records",
+        "record class"
+      ],
+      "related": [
+        "positional-record",
+        "record-struct",
+        "compiler-generated-member",
+        "value-equality"
+      ],
+      "lesson": "m08-l10",
+      "source": {
+        "title": "Records (C# 9 feature specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records"
+      }
+    },
+    {
+      "id": "positional-record",
+      "term": "Positional record",
+      "german": "positionaler Record",
+      "category": "language",
+      "definition": "Ein Record mit einer Parameterliste hinter dem Namen, zum Beispiel `record Point(int X, int Y);`. Der Compiler erzeugt dazu Konstruktor, Eigenschaften und `Deconstruct`.",
+      "aliases": [
+        "positionale Records"
+      ],
+      "related": [
+        "record",
+        "primary-constructor",
+        "deconstruction"
+      ],
+      "lesson": "m08-l10",
+      "source": {
+        "title": "Records – Positional record members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records"
+      }
+    },
+    {
+      "id": "record-struct",
+      "term": "Record struct",
+      "german": "Record-Struct",
+      "category": "language",
+      "definition": "Ein Record, der ein Werttyp ist: `record struct` oder `readonly record struct`. Bei `record struct` sind die positionalen Eigenschaften veränderbar, bei `readonly record struct` nur lesbar.",
+      "aliases": [
+        "Record-Structs",
+        "readonly record struct"
+      ],
+      "related": [
+        "record",
+        "struct",
+        "readonly-struct"
+      ],
+      "lesson": "m08-l10",
+      "source": {
+        "title": "Record structs (C# 10 feature specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-10.0/record-structs"
+      }
+    },
+    {
+      "id": "compiler-generated-member",
+      "term": "Compiler-generated member",
+      "german": "vom Compiler erzeugter Member",
+      "category": "language",
+      "definition": "Ein Member, den du nicht schreibst und den der Compiler selbst anlegt. Bei einem Record sind das zum Beispiel `Equals`, `GetHashCode`, `==`, `!=` und `ToString`.",
+      "aliases": [
+        "erzeugte Member",
+        "generierte Member"
+      ],
+      "related": [
+        "record",
+        "positional-record"
+      ],
+      "lesson": "m08-l10",
+      "source": {
+        "title": "Records – Members of a record type",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records"
+      }
     }
   ]
 }

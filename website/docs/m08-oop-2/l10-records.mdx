@@ -1,0 +1,286 @@
+---
+title: Records
+sidebar_position: 10
+description: Ein Record ist eine Klasse oder ein Struct, für das der Compiler wertbasierte Gleichheit, ToString und bei positionalen Records Konstruktor, Eigenschaften und Deconstruct erzeugt.
+lesson_id: m08-l10
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import recordBasics from '!!raw-loader!@site/examples/m08/l10/record-basics.cs';
+import recordBasicsOutput from '!!raw-loader!@site/examples/m08/l10/record-basics.out.txt';
+import recordSet from '!!raw-loader!@site/examples/m08/l10/record-set.cs';
+import recordSetOutput from '!!raw-loader!@site/examples/m08/l10/record-set.out.txt';
+import recordKinds from '!!raw-loader!@site/examples/m08/l10/record-kinds.cs';
+import recordKindsOutput from '!!raw-loader!@site/examples/m08/l10/record-kinds.out.txt';
+import recordInit from '!!raw-loader!@site/examples/m08/l10/record-init.snippet.cs';
+import recordMutable from '!!raw-loader!@site/examples/m08/l10/record-mutable.cs';
+import recordMutableOutput from '!!raw-loader!@site/examples/m08/l10/record-mutable.out.txt';
+import recordInherit from '!!raw-loader!@site/examples/m08/l10/record-inherit.snippet.cs';
+import recordInheritance from '!!raw-loader!@site/examples/m08/l10/record-inheritance.cs';
+import recordInheritanceOutput from '!!raw-loader!@site/examples/m08/l10/record-inheritance.out.txt';
+import recordGap from '!!raw-loader!@site/examples/m08/l10/record-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l10/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l10/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l10/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l10/seclog-oop-solution.cs';
+
+# Records
+
+:::note[Lernziele]
+- Du kannst einen positionalen Record deklarieren und erklären, welche Member der Compiler erzeugt.
+- Du kannst vorhersagen, wie zwei Records mit `==`, `Equals` und `ToString` verglichen und ausgegeben werden.
+- Du kannst `record class`, `record struct` und `readonly record struct` unterscheiden.
+- Du kannst einen Record in seine Werte zerlegen.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l09-q2" />
+
+<Quiz id="m06-l07-q2" />
+
+<Quiz id="m06-l06-q3" />
+
+## Ein Record in einer Zeile
+
+In Lektion 9 hast du `Equals`, `GetHashCode` und `ToString` von Hand geschrieben. Für Typen, die nur Werte tragen, übernimmt das der Compiler. Ein <Term id="record">Record</Term> deklarierst du mit `record`. Steht dahinter eine Parameterliste, ist es ein <Term id="positional-record">positionaler Record</Term>: Aus den Parametern entstehen ein Konstruktor und öffentliche Eigenschaften ([Records, Feature-Spezifikation C# 9](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records)).
+
+Das sieht aus wie ein Primärkonstruktor (Lektion 7 von Modul 6), verhält sich aber anders: Beim Primärkonstruktor einer Klasse ist ein Parameter keine Eigenschaft. Bei einem positionalen Record macht der Compiler aus jedem Parameter eine Eigenschaft mit <Term id="init-accessor">`init`</Term>.
+
+Dazu erzeugt der Compiler weitere Member, die <Term id="compiler-generated-member">vom Compiler erzeugten Member</Term>:
+
+- wertbasiertes `Equals`, `GetHashCode`, `==` und `!=`,
+- `ToString` im Format `Typname { Eigenschaft = Wert, … }`,
+- `Deconstruct` für positionale Records, mit dem du den Record in seine Werte zerlegst (<Term id="deconstruction">Dekonstruktion</Term> aus Modul 3),
+- einen Kopierkonstruktor, den der Compiler für Kopien braucht.
+
+<Forward concepts={['`with`-Ausdrücke']} module="12" />
+
+Der Kopierkonstruktor wird von `with`-Ausdrücken benutzt. Für diese Lektion brauchst du ihn nicht.
+
+:::info[Vorhersage]
+`Point` ist ein positionaler Record. Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l10-basics" code={recordBasics} predict expected={recordBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Point { X = 3, Y = 4 }`, `True`, `True`, `7` und `x=3, y=4`.
+
+1. **ToString:** Der erzeugte Text nennt den Typ und alle Eigenschaften.
+2. **Gleichheit:** `first == second` und `first.Equals(second)` vergleichen die Werte. Zwei Objekte mit gleichen Werten sind gleich: `True` und `True`.
+3. **Eigenschaften:** `X` und `Y` sind aus den Parametern entstanden: `3 + 4 = 7`.
+4. **Zerlegen:** `var (x, y) = first;` ruft `Deconstruct` auf und legt die Werte in `x` und `y`.
+
+Was passiert, wenn `Point` eine normale Klasse mit denselben Eigenschaften wäre? Dann wäre `first == second` `False`, und `ToString` gäbe nur den Typnamen aus.
+
+</details>
+
+## Gleichheit nach Werten
+
+Das erzeugte `Equals` vergleicht alle Eigenschaften. Das erzeugte `GetHashCode` baut den Hash-Code aus denselben Werten, so wie du es in Lektion 9 getan hast. Gleiche Records finden sich deshalb in einem `HashSet`.
+
+:::info[Vorhersage]
+`ClassSeat` ist eine Klasse, `RecordSeat` ein Record, beide mit `Row` und `Number`. Jedes `HashSet` bekommt zwei Objekte mit denselben Werten. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l10-set" code={recordSet} predict expected={recordSetOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2` und `1`.
+
+1. **Klasse:** Zwei Objekte, Verweisgleichheit: Das `HashSet` hält beide.
+2. **Record:** `Equals` und `GetHashCode` sind wertbasiert: Das `HashSet` hält ein Element.
+
+Was passiert, wenn du einen Record als Schlüssel eines `Dictionary` nimmst? Gleiche Werte finden denselben Eintrag, ohne dass du `Equals` und `GetHashCode` schreibst.
+
+</details>
+
+## record class, record struct und readonly record struct
+
+`record` allein steht für `record class`: einen Verweistyp. Mit `record struct` entsteht ein Werttyp, mit `readonly record struct` ein unveränderlicher Werttyp ([Record structs, Feature-Spezifikation C# 10](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-10.0/record-structs)).
+
+Die positionalen Eigenschaften unterscheiden sich:
+
+| Deklaration | Art | Positionale Eigenschaften |
+| --- | --- | --- |
+| `record P(int X)` | Verweistyp | `init` |
+| `record struct P(int X)` | Werttyp | `get` und `set` |
+| `readonly record struct P(int X)` | Werttyp | `init`, das Struct ist `readonly` |
+
+:::info[Vorhersage]
+Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l10-kinds" code={recordKinds} predict expected={recordKindsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `1 9` und dann drei Zeilen mit `ToString`.
+
+1. **record class:** `c2 = c1` kopiert den Verweis. Beide zeigen auf dasselbe Objekt: `True`.
+2. **record struct:** `s2 = s1` kopiert den Wert. `s2.X = 9` ändert nur `s2`: `1 9`.
+3. **ToString:** Alle drei Arten geben den Typnamen und die Werte aus.
+
+Was passiert, wenn du `r1.X = 9;` schreibst? Der Compiler lehnt es ab, denn bei `readonly record struct` ist `X` nur lesbar.
+
+</details>
+
+## Ist ein Record unveränderlich?
+
+Bei `record` und `readonly record struct` sind die positionalen Eigenschaften `init`. Ein späteres Zuweisen lehnt der Compiler ab:
+
+<CodeBlock language="csharp" title="record-init.snippet.cs">{recordInit}</CodeBlock>
+
+```text
+error CS8852: Init-only property or indexer 'Point.X' can only be assigned in an object initializer, or on 'this' or 'base' in an instance constructor or an 'init' accessor.
+```
+
+Das gilt aber nur für die positionalen Eigenschaften. Im Körper eines Records darfst du weitere Eigenschaften und Felder deklarieren, auch veränderbare. Und eine Eigenschaft, die eine `List<T>` hält, ist selbst nur lesbar, ihr Inhalt kann sich trotzdem ändern.
+
+:::info[Vorhersage]
+`Team` hat die positionale Eigenschaft `Name` und im Körper `Members` (eine Liste) und `Status` mit `set`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l10-mutable" code={recordMutable} predict expected={recordMutableOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `ops: 1 member, active` und `False`.
+
+1. **Liste ändern:** `Members` ist nur lesbar, aber `Add` ändert die Liste dahinter.
+2. **Status setzen:** `Status` hat `set` und lässt sich ändern.
+3. **Vergleich:** Das erzeugte `==` vergleicht auch `Members` und `Status`. Die Listen sind zwei verschiedene Objekte, und der Status ist verschieden: `False`.
+
+Was passiert, wenn `same` dieselbe Liste und denselben Status hätte? Dann wäre `==` `True`.
+
+</details>
+
+## Records und Vererbung
+
+Ein Record erbt nur von `object` oder von einem anderen Record. Eine normale Klasse als Basis lehnt der Compiler ab:
+
+<CodeBlock language="csharp" title="record-inherit.snippet.cs">{recordInherit}</CodeBlock>
+
+```text
+error CS8864: Records may only inherit from object or another record
+```
+
+Das erzeugte `Equals` vergleicht außerdem den Laufzeittyp. Intern dient dazu die Eigenschaft `EqualityContract`. Ein `record class` kann `sealed` sein (Lektion 4). Ein `record struct` ist wie jedes Struct implizit versiegelt (Lektion 8).
+
+:::info[Vorhersage]
+`Dog` erbt von `Animal` und ist `sealed`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l10-inheritance" code={recordInheritance} predict expected={recordInheritanceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False` und `Dog { Name = Rex }`.
+
+1. **Gleicher Typ:** Zwei `Animal` mit dem Namen `Rex` sind gleich.
+2. **Anderer Laufzeittyp:** `dog` hat denselben Namen, aber den Laufzeittyp `Dog`. Die Gleichheit schließt ihn ein: `False`.
+3. **ToString:** Der Text nennt den Laufzeittyp.
+
+Was passiert bei zwei `Dog` mit dem Namen `Rex`? Beide haben denselben Laufzeittyp und denselben Namen: `True`.
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die zwei Stellen aus den Kommentaren. Das Programm soll `True` und danach `alice: True` ausgeben, jeweils in eigener Zeile.
+
+<CSharpRunner id="m08-l10-gaps" code={recordGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Vergleichen:** `Console.WriteLine(first == second);` vergleicht die Werte der Records.
+2. **Zerlegen:** `var (who, ok) = first;` ersetzt die beiden Zeilen, die `who` und `ok` anlegen. `who` bekommt `User`, `ok` bekommt `Success`.
+3. **Ergebnis:** Die Ausgabe ist `True` und `alice: True`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog vergleicht `LogEvent`-Objekte nach ihren Werten, dafür stehen `Equals`, `GetHashCode` und `ToString` in der Klasse. Die Liste `logEvents` hält die geparsten Ereignisse der Beispieldatei. Die Funktion `ParseEventType` macht aus dem Text eines Ereignistyps einen Wert des Enums `EventType`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Funktionen `ParseEventType` und `SeverityOf`, die Stelle vor `return 0;` für den neuen Block und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model` kommt `sealed record SecurityEvent(DateTimeOffset Timestamp, EventType Type, string? User);`.
+2. Nach `SeverityOf` kommt die lokale Funktion `SecurityEvent ToSecurityEvent(LogEvent logEvent)`. Sie baut aus `Timestamp`, `ParseEventType(logEvent.EventType)` und `User` ein `SecurityEvent`.
+3. Vor `// End with exit code 0 …` kommt der Block `// Store events as records`. Er wandelt `logEvents[1]` zweimal in `recordA` und `recordB` um und gibt `$"As record: {recordA}"` und `$"Records equal with ==: {recordA == recordB}"` aus. Danach zerlegt er den Record mit `var (recordTime, recordType, who) = recordA;` und gibt `$"{who}: {recordType}"` aus.
+
+<CSharpRunner id="m08-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Record deklarieren:** Eine Zeile erzeugt Eigenschaften, Gleichheit, `ToString` und `Deconstruct`. `sealed` stoppt die Vererbung.
+2. **Umwandeln:** `ToSecurityEvent` wandelt den Text des Ereignistyps in das Enum um.
+3. **Ausgeben:** Der erzeugte Text zeigt Zeit, Typ und Benutzer. Die Zeit hat den Versatz `+00:00`, weil die Zeile mit `Z` endet. Die Ausgabe ist deshalb in jeder Zeitzone gleich.
+4. **Vergleichen:** Zwei Records aus demselben Ereignis sind gleich: `True`.
+5. **Zerlegen:** `Deconstruct` liefert Zeit, Typ und Benutzer in der Reihenfolge der Parameter.
+
+</details>
+
+**Neuer Stand:** SecLog hat mit `SecurityEvent` eine kompakte Form für Ereignisse. `LogEvent` bleibt für den vorhandenen Code, `SecurityEvent` ist die Form für neuen Code.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l10-record-always-immutable" />
+
+**„Ein Record ist immer unveränderlich.“** Das stimmt nicht. Die positionalen Eigenschaften eines `record class` sind `init`, ein einfaches `record struct` hat aber veränderbare positionale Eigenschaften. Jeder Record darf außerdem Eigenschaften mit `{ get; set; }` oder veränderbare Felder haben. Eine Eigenschaft mit einer `List<T>` bleibt lesbar, ihr Inhalt ändert sich trotzdem.
+:::
+
+## Zusammenfassung
+
+Ein Record ist eine Klasse (`record`, `record class`) oder ein Struct (`record struct`, `readonly record struct`), für die der Compiler wertbasierte Gleichheit, `GetHashCode` und `ToString` erzeugt. Bei einem positionalen Record kommen Konstruktor, Eigenschaften und `Deconstruct` dazu. Ein Record erbt nur von einem Record, und die Gleichheit schließt den Laufzeittyp ein. Veränderbar ist ein Record, wenn er veränderbare Eigenschaften hat.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l10-q1" />
+
+<Quiz id="m08-l10-q2" />
+
+<Quiz id="m08-l10-q3" />
+
+<Quiz id="m08-l10-q4" />
+
+<Quiz id="m08-l10-q5" />
+
+<Quiz id="m08-l10-q6" />
+
+<Quiz id="m08-l10-q7" />
+
+<Quiz id="m08-l10-q8" />
+
+<Quiz id="m08-l10-q9" />
+
+<Quiz id="m08-l10-q10" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l10-q11" />
+
+### Transferfrage
+
+<Quiz id="m08-l10-q12" />
+
+## Weiterlesen
+
+- C#-Sprachreferenz: [Records](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record)
+- Feature-Spezifikation: [Records (C# 9)](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-9.0/records) und [Record structs (C# 10)](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-10.0/record-structs)

@@ -1,0 +1,3 @@
+True
+False
+Dog { Name = Rex }

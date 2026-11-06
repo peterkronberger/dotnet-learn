@@ -1,0 +1,5 @@
+Point { X = 3, Y = 4 }
+True
+True
+7
+x=3, y=4

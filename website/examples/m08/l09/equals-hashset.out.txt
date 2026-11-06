@@ -1,0 +1,4 @@
+Without GetHashCode: 2
+False
+With GetHashCode: 1
+True
