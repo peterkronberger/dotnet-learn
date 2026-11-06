@@ -1117,6 +1117,322 @@
       "type": "explain",
       "question": "Transfer: Wofür würdest du in einem eigenen Programm ein Struct nehmen und wofür eine Klasse?",
       "modelAnswer": "Ein Struct nehme ich für einen kleinen Wert, der unveränderlich ist und nichts anderes als seine Daten bedeutet, in SecLog etwa den Zeitraum `TimeWindow` mit Start und Länge. Er wird oft kopiert, und das ist hier gewollt. Eine Klasse nehme ich für Dinge mit Identität und Zustand, der sich ändert, wie einen `Incident` mit seiner Liste von Ereignissen und seinem Status, denn alle Verweise sollen dasselbe Objekt sehen."
+    },
+    {
+      "id": "m08-l09-q1",
+      "lesson": "m08-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l09/equality-default.cs",
+      "explanation": "Die Klasse `Ticket` überschreibt `Equals` nicht. `first == second` und `first.Equals(second)` vergleichen deshalb die Verweise: Es sind zwei verschiedene Objekte, also `False`. `alias` zeigt auf dasselbe Objekt wie `first`: `True`. Ein Struct vergleicht dagegen standardmäßig Feld für Feld, darum ist `slotA.Equals(slotB)` `True`."
+    },
+    {
+      "id": "m08-l09-q2",
+      "lesson": "m08-l09",
+      "type": "single",
+      "question": "Die Klasse `Ticket` überschreibt weder `Equals` noch `==`. `a` und `b` sind zwei mit `new` erzeugte Objekte mit denselben Werten. Was ergibt `a == b`?",
+      "options": [
+        {
+          "text": "`False`, weil `==` bei Klassen die Verweise vergleicht.",
+          "correct": true
+        },
+        {
+          "text": "`True`, weil alle Eigenschaften gleich sind.",
+          "feedback": "`==` prüft bei einer Klasse ohne Überladung nur, ob beide Variablen auf dasselbe Objekt zeigen."
+        },
+        {
+          "text": "Der Compiler lehnt den Vergleich ab.",
+          "feedback": "Der Vergleich ist erlaubt: `==` gibt es für jeden Verweistyp."
+        }
+      ],
+      "explanation": "Für Klassen vergleicht `==` Verweise, solange die Klasse den Operator nicht überlädt. Zwei Objekte mit gleichen Werten sind darum nicht gleich."
+    },
+    {
+      "id": "m08-l09-q3",
+      "lesson": "m08-l09",
+      "type": "single",
+      "question": "Eine Klasse überschreibt `Equals`, aber nicht `GetHashCode`. Zwei Objekte mit gleichen Werten kommen in ein `HashSet`. Was passiert?",
+      "options": [
+        {
+          "text": "Das `HashSet` hält beide Objekte, obwohl `Equals` sie als gleich meldet.",
+          "correct": true
+        },
+        {
+          "text": "Nichts Besonderes: Das ist harmlos, denn das `HashSet` ruft `Equals` auf und erkennt das Duplikat.",
+          "feedback": "Das `HashSet` berechnet zuerst den Hash-Code. Unterscheiden sich die Codes, ruft es `Equals` gar nicht erst auf.",
+          "misconception": "m08-l09-equals-without-gethashcode"
+        },
+        {
+          "text": "Das `HashSet` wirft eine Exception beim zweiten `Add`.",
+          "feedback": "`Add` wirft nicht. Es meldet nur über den Rückgabewert, ob das Element neu war."
+        }
+      ],
+      "explanation": "Die Standardversion von `GetHashCode` liefert pro Objekt einen anderen Code. Das `HashSet` sucht deshalb in einer anderen Stelle und findet das gleiche Objekt nicht. Der Compiler warnt davor mit CS0659."
+    },
+    {
+      "id": "m08-l09-q4",
+      "lesson": "m08-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l09/equals-hashset.cs",
+      "explanation": "`HalfSeat` überschreibt nur `Equals`. Die beiden Objekte haben verschiedene Hash-Codes, das `HashSet` hält deshalb zwei und findet ein drittes gleiches Objekt nicht (`False`). `FullSeat` liefert mit `HashCode.Combine` aus gleichen Werten gleiche Codes: Ein Element, `Contains` ist `True`."
+    },
+    {
+      "id": "m08-l09-q5",
+      "lesson": "m08-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über `Equals` und `GetHashCode` stimmen?",
+      "options": [
+        {
+          "text": "Objekte, die `Equals` als gleich meldet, müssen denselben Hash-Code liefern.",
+          "correct": true
+        },
+        {
+          "text": "`x.Equals(null)` muss `false` ergeben.",
+          "correct": true
+        },
+        {
+          "text": "Haben zwei Objekte denselben Hash-Code, sind sie gleich.",
+          "feedback": "Verschiedene Objekte dürfen denselben Hash-Code haben. Erst `Equals` entscheidet."
+        },
+        {
+          "text": "Wer `GetHashCode` überschreibt, darf `Equals` bei der Standardversion lassen.",
+          "feedback": "Beide Methoden müssen zusammenpassen: Gleiche Objekte brauchen gleiche Hash-Codes, und das legt `Equals` fest."
+        }
+      ],
+      "explanation": "Der Gleichheitsvertrag verlangt: `Equals` ist reflexiv, symmetrisch und transitiv, `x.Equals(null)` ist `false`, und gleiche Objekte liefern denselben Hash-Code. Umgekehrt folgt aus gleichen Hash-Codes nichts."
+    },
+    {
+      "id": "m08-l09-q6",
+      "lesson": "m08-l09",
+      "type": "single",
+      "question": "Was ist der Vorteil von `IEquatable<T>` mit der Methode `Equals(T? other)` gegenüber `Equals(object? obj)` allein?",
+      "options": [
+        {
+          "text": "Der Parameter hat den passenden Typ. Ein Struct muss nicht geboxt werden, und es braucht keinen Cast.",
+          "correct": true
+        },
+        {
+          "text": "Damit wird `GetHashCode` automatisch passend erzeugt.",
+          "feedback": "`GetHashCode` musst du trotzdem selbst überschreiben."
+        },
+        {
+          "text": "Damit vergleicht `==` ab jetzt die Werte.",
+          "feedback": "`==` ändert sich nur durch eine Überladung des Operators."
+        }
+      ],
+      "explanation": "`IEquatable<T>` gibt `Equals` einen typisierten Parameter. Das spart bei Structs das Boxing und den Cast. `GetHashCode` und `==` bleiben Aufgabe der Klasse."
+    },
+    {
+      "id": "m08-l09-q7",
+      "lesson": "m08-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l09/hash-collision.cs",
+      "explanation": "`\"ab\"` und `\"cd\"` haben beide die Länge 2, also denselben Hash-Code: `True`. Die Tags sind aber nicht gleich: `False`. Das `HashSet` fragt bei gleichem Code `Equals`: `a` und `b` sind verschieden, das dritte Tag ist gleich `a`. Ergebnis: 2 Elemente."
+    },
+    {
+      "id": "m08-l09-q8",
+      "lesson": "m08-l09",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0216.",
+      "example": "m08/l09/operator-pair.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "explanation": "Wer `==` überlädt, muss auch `!=` deklarieren (CS0216). Der Compiler warnt außerdem, dass `Equals` und `GetHashCode` fehlen (CS0660 und CS0661)."
+    },
+    {
+      "id": "m08-l09-q9",
+      "lesson": "m08-l09",
+      "type": "single",
+      "question": "Die Klasse `Seat` vergleicht `Row` und `Number`. Welche Version von `GetHashCode` verletzt den Gleichheitsvertrag?",
+      "options": [
+        {
+          "text": "`return base.GetHashCode();`",
+          "correct": true
+        },
+        {
+          "text": "`return HashCode.Combine(Row, Number);`",
+          "feedback": "Gleiche Werte ergeben gleiche Codes. Das ist erlaubt."
+        },
+        {
+          "text": "`return 1;`",
+          "feedback": "Alle Objekte haben denselben Code. Das ist langsam, verletzt den Vertrag aber nicht."
+        }
+      ],
+      "explanation": "Gleiche Objekte müssen denselben Hash-Code liefern. `base.GetHashCode()` ist hier die Standardversion von `object`. Sie liefert pro Objekt einen eigenen Code, auch für zwei gleiche Objekte."
+    },
+    {
+      "id": "m08-l09-q10",
+      "lesson": "m08-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein `HashSet` und ein `Dictionary` sowohl `GetHashCode` als auch `Equals` brauchen.",
+      "modelAnswer": "Beide Sammlungen berechnen zuerst den Hash-Code eines Elements oder Schlüssels. Er sagt ihnen, an welcher Stelle sie suchen. Nur wenn dort ein Element mit demselben Hash-Code liegt, fragen sie `Equals`, ob es wirklich gleich ist. Ohne passendes `GetHashCode` suchen sie also an der falschen Stelle und finden gleiche Objekte nicht. Ohne `Equals` könnten sie Objekte mit gleichem Code nicht unterscheiden."
+    },
+    {
+      "id": "m08-l09-q11",
+      "lesson": "m08-l09",
+      "type": "explain",
+      "question": "Transfer: Für welchen Typ in einem eigenen Programm würdest du `Equals` und `GetHashCode` überschreiben, und für welchen nicht?",
+      "modelAnswer": "Ich überschreibe beide für einen Typ, der durch seine Werte bestimmt ist und als Schlüssel oder in einer Menge vorkommt, in SecLog etwa `LogEvent`: Dasselbe Ereignis aus der Datei soll nur einmal in einem `HashSet` stehen. Für einen Typ mit Identität, etwa einen `Incident` mit veränderlichem Status, lasse ich es: Zwei Vorfälle mit gleichen Daten sind trotzdem zwei verschiedene Vorfälle."
+    },
+    {
+      "id": "m08-l10-q1",
+      "lesson": "m08-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l10/record-basics.cs",
+      "explanation": "Der Compiler erzeugt für `Point` `ToString` (`Point { X = 3, Y = 4 }`), wertbasierte Gleichheit (`==` und `Equals` ergeben `True`), die Eigenschaften `X` und `Y` (Summe 7) und `Deconstruct`."
+    },
+    {
+      "id": "m08-l10-q2",
+      "lesson": "m08-l10",
+      "type": "multi",
+      "question": "Welche Member erzeugt der Compiler für `record Point(int X, int Y);`?",
+      "options": [
+        {
+          "text": "Die Eigenschaften `X` und `Y` mit `init`.",
+          "correct": true
+        },
+        {
+          "text": "Eine `Equals`-Methode, die die Werte vergleicht.",
+          "correct": true
+        },
+        {
+          "text": "Eine `Deconstruct`-Methode.",
+          "correct": true
+        },
+        {
+          "text": "Eine Methode `Sort`, die Records ordnet.",
+          "feedback": "Records haben keine eingebaute Ordnung. Sortieren braucht eigene Regeln (Lektion 11)."
+        }
+      ],
+      "explanation": "Ein positionaler Record bekommt einen Konstruktor, Eigenschaften, wertbasiertes `Equals`, `GetHashCode`, `==`, `!=`, `ToString` und `Deconstruct`."
+    },
+    {
+      "id": "m08-l10-q3",
+      "lesson": "m08-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l10/record-kinds.cs",
+      "explanation": "`c2 = c1` kopiert bei einem `record class` nur den Verweis: `True`. Ein `record struct` ist ein Werttyp: `s2` ist eine Kopie, `s2.X = 9` ändert `s1` nicht (`1 9`). `ToString` zeigt bei allen drei Arten den Typnamen und die Werte."
+    },
+    {
+      "id": "m08-l10-q4",
+      "lesson": "m08-l10",
+      "type": "single",
+      "question": "`StructPoint` ist mit `record struct StructPoint(int X, int Y);` deklariert. Was bewirkt `s.X = 9;` bei einer Variablen `s`?",
+      "options": [
+        {
+          "text": "Es funktioniert: Bei einem einfachen `record struct` haben die positionalen Eigenschaften `set`.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler lehnt es ab, denn ein Record ist immer unveränderlich.",
+          "feedback": "Nur bei `record class` und `readonly record struct` sind die positionalen Eigenschaften `init`. Ein einfaches `record struct` ist veränderbar.",
+          "misconception": "m08-l10-record-always-immutable"
+        },
+        {
+          "text": "Es ändert alle Variablen, die denselben Record enthalten.",
+          "feedback": "Ein `record struct` ist ein Werttyp. Jede Variable hat ihre eigene Kopie."
+        }
+      ],
+      "explanation": "Veränderlich oder nicht hängt von der Art ab: `record class` und `readonly record struct` haben `init`-Eigenschaften, ein einfaches `record struct` hat `set`. Eigene Eigenschaften mit `{ get; set; }` sind immer veränderbar."
+    },
+    {
+      "id": "m08-l10-q5",
+      "lesson": "m08-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l10/record-mutable.cs",
+      "explanation": "`Members` und `Status` stehen im Körper des Records und sind keine positionalen Eigenschaften: Die Liste lässt sich füllen, `Status` hat `set`. Das erzeugte `==` vergleicht auch sie. `team` und `same` haben verschiedene Listen (Verweisvergleich) und verschiedenen `Status`, also `False`."
+    },
+    {
+      "id": "m08-l10-q6",
+      "lesson": "m08-l10",
+      "type": "single",
+      "question": "Welche Aussage über Records stimmt?",
+      "options": [
+        {
+          "text": "Eine Eigenschaft im Körper eines Records kann `{ get; set; }` haben, der Record ist dann veränderbar.",
+          "correct": true
+        },
+        {
+          "text": "Kein Record hat eine `set`-Eigenschaft, denn Records sind immer unveränderlich.",
+          "feedback": "Das Schlüsselwort `record` erzwingt keine Unveränderlichkeit. Der Record bleibt nur dann unveränderlich, wenn alle Eigenschaften es sind.",
+          "misconception": "m08-l10-record-always-immutable"
+        },
+        {
+          "text": "Ein Record mit einer `List<string>`-Eigenschaft kann den Inhalt der Liste nicht ändern.",
+          "feedback": "Die Eigenschaft selbst ist nur lesbar. Die Liste dahinter ist ein normales Objekt, ihr Inhalt ändert sich.",
+          "misconception": "m08-l10-record-always-immutable"
+        }
+      ],
+      "explanation": "`record` bestimmt die erzeugten Member, nicht die Veränderbarkeit. Unveränderlich sind nur die positionalen Eigenschaften von `record class` und `readonly record struct`."
+    },
+    {
+      "id": "m08-l10-q7",
+      "lesson": "m08-l10",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS8864.",
+      "example": "m08/l10/record-inherit.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "explanation": "Ein Record erbt nur von `object` oder von einem anderen Record. `Shape` ist eine normale Klasse (CS8864)."
+    },
+    {
+      "id": "m08-l10-q8",
+      "lesson": "m08-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l10/record-inheritance.cs",
+      "explanation": "`animal == new Animal(\"Rex\")` vergleicht zwei `Animal`: `True`. `dog` hat denselben Namen, aber den Laufzeittyp `Dog`. Die erzeugte Gleichheit vergleicht auch den Laufzeittyp, also `False`. `ToString` nennt den Laufzeittyp: `Dog { Name = Rex }`."
+    },
+    {
+      "id": "m08-l10-q9",
+      "lesson": "m08-l10",
+      "type": "single",
+      "question": "Welche Deklaration ergibt einen Werttyp, dessen positionale Eigenschaften nur lesbar sind?",
+      "options": [
+        {
+          "text": "`readonly record struct P(int X);`",
+          "correct": true
+        },
+        {
+          "text": "`record struct P(int X);`",
+          "feedback": "Das ist ein Werttyp, aber `X` hat `set` und ist veränderbar.",
+          "misconception": "m08-l10-record-always-immutable"
+        },
+        {
+          "text": "`record P(int X);`",
+          "feedback": "Das ist ein `record class`, also ein Verweistyp."
+        }
+      ],
+      "explanation": "`record` allein ist ein `record class` (Verweistyp). `record struct` ist ein Werttyp mit veränderbaren Eigenschaften. Erst `readonly record struct` macht sie schreibgeschützt."
+    },
+    {
+      "id": "m08-l10-q10",
+      "lesson": "m08-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l10/record-set.cs",
+      "explanation": "Die Klasse `ClassSeat` vergleicht Verweise: zwei Objekte im `HashSet`. Der Record erzeugt `Equals` und `GetHashCode` aus den Werten: ein Element."
+    },
+    {
+      "id": "m08-l10-q11",
+      "lesson": "m08-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, welche Member der Compiler für einen positionalen Record erzeugt und wie sich `==` bei einem Record von `==` bei einer Klasse unterscheidet.",
+      "modelAnswer": "Aus den Parametern hinter dem Namen erzeugt der Compiler einen Konstruktor und Eigenschaften, dazu `Equals`, `GetHashCode`, `==`, `!=`, `ToString` und `Deconstruct`. Bei einer Klasse vergleicht `==` die Verweise: Zwei Objekte mit gleichen Werten sind verschieden. Bei einem Record vergleicht das erzeugte `==` die Werte und den Laufzeittyp, zwei Records mit gleichen Werten sind also gleich."
+    },
+    {
+      "id": "m08-l10-q12",
+      "lesson": "m08-l10",
+      "type": "explain",
+      "question": "Transfer: Wofür würdest du in einem eigenen Programm einen Record nehmen, und wofür eine Klasse?",
+      "modelAnswer": "Einen Record nehme ich für Daten, die durch ihre Werte bestimmt sind, etwa das Ereignis `SecurityEvent` mit Zeit, Typ und Benutzer: Zwei Ereignisse mit gleichen Werten sollen gleich sein. Eine Klasse nehme ich für Objekte mit Identität und veränderlichem Zustand, etwa einen `Incident`, dessen Status sich ändert."
     }
   ]
 }

@@ -1,0 +1,5 @@
+True
+1 9
+ClassPoint { X = 1, Y = 2 }
+StructPoint { X = 1, Y = 2 }
+ReadonlyPoint { X = 1, Y = 2 }
