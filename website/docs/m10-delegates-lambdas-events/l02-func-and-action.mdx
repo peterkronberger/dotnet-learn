@@ -1,0 +1,208 @@
+---
+title: "Func und Action: Verhalten als Parameter"
+sidebar_position: 2
+description: Func, Action und Predicate sind fertige Delegate-Typen. Mit ihnen übergibt der Aufrufer einer Methode das Verhalten, zum Beispiel an List<T>.Find, RemoveAll und Sort.
+lesson_id: m10-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import funcActionPredicate from '!!raw-loader!@site/examples/m10/l02/func-action-predicate.cs';
+import funcActionPredicateOutput from '!!raw-loader!@site/examples/m10/l02/func-action-predicate.out.txt';
+import behaviorAsParameter from '!!raw-loader!@site/examples/m10/l02/behavior-as-parameter.cs';
+import behaviorAsParameterOutput from '!!raw-loader!@site/examples/m10/l02/behavior-as-parameter.out.txt';
+import listMethods from '!!raw-loader!@site/examples/m10/l02/list-methods.cs';
+import listMethodsOutput from '!!raw-loader!@site/examples/m10/l02/list-methods.out.txt';
+import differentDelegateTypes from '!!raw-loader!@site/examples/m10/l02/different-delegate-types.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m10/l02/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l02/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l02/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l02/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l02/seclog-delegates-solution.cs';
+
+# Func und Action: Verhalten als Parameter
+
+:::note[Lernziele]
+- Du kannst `Func<…>`, `Action<…>` und `Predicate<T>` lesen und den passenden Typ für eine Methode wählen.
+- Du kannst eine Methode schreiben, die Verhalten als Parameter bekommt (Callback).
+- Du kannst erklären, warum `Func<…>` und `Action<…>` meist besser sind als ein eigener Delegate-Typ und wann ein eigener Typ hilft.
+- Du kannst Bibliotheksmethoden mit Delegate-Parametern nutzen (`List<T>.Find`, `FindAll`, `RemoveAll`, `ForEach`, `Sort(Comparison<T>)`) und ihnen Methodengruppen übergeben.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l01-q3" />
+
+<Quiz id="m09-l06-q5" />
+
+<Quiz id="m08-l11-q2" />
+
+## Fertige Delegate-Typen lesen
+
+Für jede Form von Methode einen eigenen Delegate-Typ zu deklarieren, wäre mühsam. Die Bibliothek bringt deshalb <Term id="generic-delegate">generische Delegates</Term> mit:
+
+- <Term id="func-delegate">`Func<T1, …, TResult>`</Term> steht für Methoden mit Rückgabewert. Die Typargumente vor dem letzten sind die Parametertypen, das **letzte** ist der Rückgabetyp. `Func<int, string>` nimmt einen `int` und gibt einen `string` zurück. `Func<string>` hat keinen Parameter.
+- <Term id="action-delegate">`Action<T1, …>`</Term> steht für Methoden ohne Rückgabewert (`void`). Alle Typargumente sind Parametertypen.
+- <Term id="predicate-delegate">`Predicate<T>`</Term> steht für Methoden mit einem Parameter `T`, die `bool` zurückgeben. Ältere Methoden von `List<T>` erwarten ihn.
+
+Alle drei werden wie eigene Delegate-Typen benutzt: Du weist eine Methodengruppe zu und rufst den Delegate auf.
+
+:::info[Vorhersage]
+Vier Delegate-Variablen verweisen auf vier Methoden. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l02-func-action-predicate" code={funcActionPredicate} predict expected={funcActionPredicateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `number 7`, `7`, `Log: finished` und `False`.
+
+1. **Func lesen:** `Func<int, string>` hat einen `int`-Parameter und den Rückgabetyp `string`. `describe(7)` gibt `number 7` zurück. `Func<int, int, int>` hat zwei `int`-Parameter und den Rückgabetyp `int`, `add(3, 4)` ergibt `7`.
+2. **Action lesen:** `Action<string>` gibt nichts zurück. `log("finished")` schreibt `Log: finished` selbst.
+3. **Predicate lesen:** `Predicate<int>` bekommt einen `int` und gibt `bool` zurück. `isEven(7)` ist `False`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Verschiedene Delegate-Typen sind nicht austauschbar (optional)</summary>
+
+Delegate-Typen sind über ihren Namen verschieden, nicht über ihre Form (§21.2 Delegate declarations). Ein eigener Typ `NumberCheck` und `Func<int, bool>` haben dieselbe Signatur, sind aber verschiedene Typen. Eine Methodengruppe passt zu beiden, ein fertiger Delegate-Wert lässt sich dem anderen Typ nicht zuweisen:
+
+<CodeBlock language="csharp" title="different-delegate-types.snippet.cs">{differentDelegateTypes}</CodeBlock>
+
+Der Compiler meldet `error CS0029: Cannot implicitly convert type 'NumberCheck' to 'System.Func<int, bool>'`.
+
+Ein eigener Delegate-Typ lohnt sich, wenn ein Name und eine Dokumentation helfen, zum Beispiel `IncidentCheck` in SecLog. In den meisten Fällen genügen `Func` und `Action`, weil jeder Aufrufer dieselben bekannten Typen benutzt.
+
+</details>
+
+## Verhalten als Parameter
+
+Eine Methode kann ein `Func` oder `Action` als Parameter nehmen. Sie ruft es auf, wenn sie das Verhalten braucht. Der Aufrufer entscheidet, was dann passiert. Ein solcher Parameter ist ein <Term id="callback">Callback</Term>.
+
+<Forward concepts={['Lambda-Ausdrücke']} module="10" />
+
+Für die Methoden, die du übergibst, brauchst du bisher eine benannte Methode. Kürzer geht es mit Lambda-Ausdrücken in der nächsten Lektion.
+
+:::info[Vorhersage]
+`Change` wendet eine übergebene Methode auf jede Zahl an. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l02-behavior" code={behaviorAsParameter} predict expected={behaviorAsParameterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2, 4, 6` und `-1, -2, -3`.
+
+1. **Parameter mit Func:** `Func<int, int> change` nimmt jede Methode mit einem `int`-Parameter und dem Rückgabetyp `int`.
+2. **Aufrufen:** `change(values[i])` ruft die übergebene Methode für jede Zahl auf. `Change` kennt die Methode nicht, nur ihre Form.
+3. **Aufrufer wählt:** `Double` verdoppelt, `Negate` wechselt das Vorzeichen. Die Schleife steht nur einmal im Code.
+
+</details>
+
+## Delegate-Parameter in der Bibliothek
+
+Viele Methoden von `List<T>` nehmen Delegates. `Find`, `FindAll` und `RemoveAll` erwarten ein `Predicate<T>`, `ForEach` ein `Action<T>` und `Sort` kann ein `Comparison<T>` nehmen: eine Methode `int Compare(T left, T right)`, die wie `CompareTo` eine negative Zahl, 0 oder eine positive Zahl liefert. Du übergibst Methodengruppen. `Console.WriteLine` ist eine Methodengruppe mit vielen Überladungen, die Umwandlung wählt die zum Delegate-Typ passende (`WriteLine(int)` für `Action<int>`).
+
+:::info[Vorhersage]
+Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l02-list-methods" code={listMethods} predict expected={listMethodsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `10`, `8, 10, 4`, `Removed 3, left: 2`, `5` und `3`.
+
+1. **Finden:** `Find(IsBig)` gibt das erste Element zurück, für das `IsBig` `true` liefert: `10`.
+2. **Filtern und entfernen:** `FindAll(IsEven)` liefert eine neue Liste mit `8, 10, 4`. `RemoveAll(IsEven)` entfernt diese drei Zahlen aus `numbers` und gibt ihre Anzahl zurück. Es bleiben `3` und `5`.
+3. **Sortieren:** `Sort(Descending)` benutzt `Descending` als Vergleich. `right.CompareTo(left)` kehrt die Reihenfolge um: `5`, dann `3`.
+4. **Ausführen:** `ForEach(Console.WriteLine)` ruft für jedes Element `WriteLine(int)` auf.
+
+**Was passiert, wenn …?** … `IsBig` keine Zahl trifft? `Find` gibt dann den Standardwert des Typs zurück, bei `int` also `0`.
+
+</details>
+
+## Lückenbeispiel
+
+`IsLong` ist fertig. Schreibe die Methode mit dem `Func`-Parameter und rufe sie auf.
+
+<CSharpRunner id="m10-l02-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Methode schreiben:** `static int CountWhere(string[] values, Func<string, bool> test)` zählt in einer `foreach`-Schleife jeden Wert, für den `test(value)` `true` ist, und gibt die Zahl zurück.
+2. **Aufrufen:** `Console.WriteLine(CountWhere(words, IsLong));` gibt `2` aus: `incident` und `rule` sind länger als 3 Zeichen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog kann Prüfungen als Methoden an `CountMatching` übergeben. Dafür gibt es den eigenen Delegate-Typ `IncidentCheck`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block, die Stelle für neue lokale Funktionen und die Stelle für den neuen Typ. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Im Namensraum `SecLog.Model` kommt am Ende die Klasse `sealed class FuncRule : IDetectionRule` mit dem Konstruktor `FuncRule(string name, Func<Incident, bool> check)`, der Eigenschaft `public string Name { get; }` und `public bool IsMatch(Incident incident)`, die `check` aufruft.
+2. Nach den ausgeblendeten lokalen Funktionen kommt `static void ReportMatches(IReadOnlyList<Incident> items, IDetectionRule rule, Action<string> report)`. Sie ruft `report` für jeden passenden Vorfall mit einer Zeile `"{rule.Name}: {item.Summary()}"` auf.
+3. Vor `// End with exit code 0 …` kommt der Block `// Plug in detection rules as Func values`. Er erzeugt `FuncRule("many failures", HasManyFailures)` und ruft `ReportMatches(incidents, rule, Console.WriteLine)` auf. Dann legt er einen `Detector` an, der zwei `FuncRule`-Objekte (`"many failures"` und `"under investigation"` mit `IsUnderInvestigation`) mit `new WatchListRule("dave")` und `new StatusRule()` mischt, und gibt für jeden Vorfall `{User}: {Anzahl} matches` mit `CountMatches` aus.
+
+<CSharpRunner id="m10-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Func speichern:** `FuncRule` hält das `Func<Incident, bool>` in einem Feld und ruft es in `IsMatch` auf. Die Regel ist so ein Objekt wie jede andere und lässt sich in einen `Detector` stecken.
+2. **Action als Callback:** `ReportMatches` weiß nicht, wohin die Zeilen gehen. `Console.WriteLine` als Methodengruppe passt zu `Action<string>`, die Umwandlung wählt `WriteLine(string)`.
+3. **Regeln mischen:** Die Liste enthält `FuncRule`-Objekte und die früheren Regelklassen. Alle sind `IDetectionRule`.
+
+</details>
+
+**Neuer Stand:** SecLog nimmt Regeln als Methoden an, ohne für jede eine eigene Klasse zu schreiben, und gibt Treffer über einen frei wählbaren Callback aus.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l02-func-last-type-is-parameter" />
+
+**„In `Func<int, string>` ist `string` ein Parameter.“** Das stimmt nicht. Das letzte Typargument von `Func` ist immer der Rückgabetyp. `Func<int, string>` nimmt einen `int` und gibt einen `string` zurück. Gibt es keinen Rückgabewert, nimmst du `Action`.
+:::
+
+## Zusammenfassung
+
+`Func<…>` steht für Methoden mit Rückgabewert, wobei das letzte Typargument der Rückgabetyp ist. `Action<…>` steht für Methoden ohne Rückgabewert, `Predicate<T>` für `bool`-Prüfungen mit einem Parameter. Verschiedene Delegate-Typen mit gleicher Signatur sind nicht austauschbar. Ein eigener Typ lohnt sich nur wegen seines Namens. Mit einem Delegate-Parameter legt der Aufrufer das Verhalten fest. Bibliotheksmethoden wie `Find`, `RemoveAll`, `ForEach` und `Sort` nehmen solche Callbacks, und Methodengruppen passen als Argumente.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l02-q1" />
+
+<Quiz id="m10-l02-q2" />
+
+<Quiz id="m10-l02-q3" />
+
+<Quiz id="m10-l02-q4" />
+
+<Quiz id="m10-l02-q5" />
+
+<Quiz id="m10-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m10-l02-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [`Func<TResult>` Delegate](https://learn.microsoft.com/dotnet/api/system.func-1)
+- Microsoft Learn: [`List<T>.RemoveAll`](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.removeall)
+- C#-Spezifikation: [§21.2 Delegate declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations)

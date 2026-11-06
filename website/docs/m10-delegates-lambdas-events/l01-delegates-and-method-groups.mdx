@@ -1,0 +1,254 @@
+---
+title: Delegates und Methodengruppen
+sidebar_position: 1
+description: Ein Delegate-Wert verweist auf eine Methode. Eine Methodengruppe ruft nichts auf, sie wird in einen Delegate umgewandelt, und die Methode läuft erst beim Aufruf.
+lesson_id: m10-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import delegateBasics from '!!raw-loader!@site/examples/m10/l01/delegate-basics.cs';
+import delegateBasicsOutput from '!!raw-loader!@site/examples/m10/l01/delegate-basics.out.txt';
+import methodGroupNotCall from '!!raw-loader!@site/examples/m10/l01/method-group-not-call.cs';
+import methodGroupNotCallOutput from '!!raw-loader!@site/examples/m10/l01/method-group-not-call.out.txt';
+import wrongSignature from '!!raw-loader!@site/examples/m10/l01/wrong-signature.snippet.cs';
+import nullDelegate from '!!raw-loader!@site/examples/m10/l01/null-delegate.cs';
+import nullDelegateOutput from '!!raw-loader!@site/examples/m10/l01/null-delegate.out.txt';
+import overloadedMethodGroup from '!!raw-loader!@site/examples/m10/l01/overloaded-method-group.cs';
+import overloadedMethodGroupOutput from '!!raw-loader!@site/examples/m10/l01/overloaded-method-group.out.txt';
+import callback from '!!raw-loader!@site/examples/m10/l01/callback.cs';
+import callbackOutput from '!!raw-loader!@site/examples/m10/l01/callback.out.txt';
+import gaps from '!!raw-loader!@site/examples/m10/l01/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l01/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l01/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l01/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l01/seclog-delegates-solution.cs';
+
+# Delegates und Methodengruppen
+
+:::note[Lernziele]
+- Du kannst erklären, was ein Delegate-Typ und ein Delegate-Wert sind.
+- Du kannst einen Delegate aus einer Methodengruppe erzeugen und aufrufen (auch mit `Invoke` und `?.Invoke`).
+- Du kannst vorhersagen, ob eine Methode zu einem Delegate-Typ passt (Parameter und Rückgabetyp).
+- Du kannst unterscheiden, wann eine Methode zugewiesen und wann sie aufgerufen wird.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog nimmt Erkennungsregeln als Methoden oder Lambda-Ausdrücke entgegen, ohne für jede Regel eine eigene Klasse zu brauchen.
+- SecLog löst ein Ereignis (Event) aus, sobald ein Vorfall gefunden wird, und mehrere Empfänger können darauf reagieren.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l06-q2" />
+
+<Quiz id="m03-l05-q1" />
+
+<Quiz id="m03-l04-q1" />
+
+## Ein Delegate verweist auf eine Methode
+
+In Modul 9 hast du einen Delegate aus einer statischen Methode erzeugt. Hier kommt das vollständige Bild. Zwei Prüfungen sollen sich zur Laufzeit austauschen lassen, ohne dass der Aufrufer eine `if`-Kette braucht: „ist gerade“ und „ist positiv“. Dafür gibt es <Term id="delegate">Delegates</Term>.
+
+Eine Delegate-Deklaration legt einen neuen Typ fest: `delegate bool NumberCheck(int number);` beschreibt jede Methode mit einem `int`-Parameter und dem Rückgabetyp `bool`. Dieser **Delegate-Typ** ist nur eine Beschreibung. Ein **Delegate-Wert** ist ein Objekt dieses Typs, das auf eine konkrete Methode verweist.
+
+Eine Methode passt zu einem Delegate-Typ, wenn Anzahl, Typen und Modifizierer der Parameter übereinstimmen und der Rückgabetyp passt. Die Namen der Parameter spielen keine Rolle. (Dass leicht abweichende Typen erlaubt sein können, folgt aus der Varianz aus Modul 9. Hier nutzt du nur exakt gleiche Typen.)
+
+Du erzeugst einen Delegate-Wert, indem du den Namen der Methode ohne Klammern einer Variablen des Delegate-Typs zuweist. Danach rufst du ihn wie eine Methode auf: `check(4)` oder gleichbedeutend `check.Invoke(4)`. Bei einer Instanzmethode merkt sich der Delegate auch das Objekt, auf dem er die Methode aufruft.
+
+:::info[Vorhersage]
+Das Programm erzeugt Delegates aus zwei statischen Methoden und aus einer Instanzmethode. Welche fünf Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m10-l01-delegate-basics" code={delegateBasics} predict expected={delegateBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `False`, `True` und `False`.
+
+1. **Typ deklarieren:** `NumberCheck` beschreibt Methoden `bool M(int)`. `IsEven` und `IsPositive` passen.
+2. **Wert erzeugen und aufrufen:** `check = IsEven` und `check(4)` ergeben `True`, `check.Invoke(7)` ergibt `False`. Beide Schreibweisen rufen dasselbe auf.
+3. **Wert austauschen:** Nach `check = IsPositive` ruft `check(-3)` die andere Methode auf: `False`.
+4. **Zielobjekt:** `belowLimit` verweist auf `IsBelow` des Objekts `limit`. `belowLimit(8)` ist zuerst `True` (8 < 10). Nach `limit.Value = 5` ist es `False` (8 < 5), weil der Delegate dasselbe Objekt benutzt.
+
+**Was passiert, wenn …?** … `check` eine Methode mit dem Rückgabetyp `string` bekäme? Das übersetzt nicht, weil die Methode nicht zum Delegate-Typ passt. Das siehst du weiter unten.
+
+</details>
+
+<details>
+<summary>Vertiefung: Delegates in der Spezifikation (optional)</summary>
+
+Eine Delegate-Deklaration definiert eine Klasse, die von `System.Delegate` abgeleitet ist. Zwei Delegate-Typen mit gleicher Signatur sind trotzdem verschiedene Typen (§21.2 Delegate declarations). Ob eine Methode zu einem Delegate-Typ passt, regelt §21.4 Delegate compatibility. Jeder Delegate-Typ hat eine Methode `Invoke`, und `check(x)` ist gleichbedeutend mit `check.Invoke(x)` (§21.3 Delegate members). Ein Delegate-Wert verweist auf eine Aufrufliste mit mindestens einem Eintrag. Bei einer Instanzmethode besteht ein Eintrag aus dem Objekt und der Methode (§21.1 General).
+
+</details>
+
+## Eine Methodengruppe ist kein Aufruf
+
+`IsEven` ohne Klammern ist eine <Term id="method-group">Methodengruppe</Term>: Der Name steht für alle Methoden mit diesem Namen. Eine Methodengruppe ruft nichts auf. Die <Term id="method-group-conversion">Umwandlung</Term> in einen Delegate-Typ macht daraus einen Delegate-Wert, der auf die passende Methode verweist. Sie funktioniert nur, wenn die Methode zum Delegate-Typ passt. Die Methode selbst läuft erst beim <Term id="delegate-invocation">Aufruf</Term> des Delegates.
+
+:::info[Vorhersage]
+`IsEven` schreibt eine Zeile, bevor es sein Ergebnis zurückgibt. In welcher Reihenfolge und wie oft erscheinen die Zeilen?
+:::
+
+<CSharpRunner id="m10-l01-method-group-not-call" code={methodGroupNotCall} predict expected={methodGroupNotCallOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Zuerst steht `Assigned the method group`, dann `IsEven runs with 6` und zuletzt `Invoked: True`.
+
+1. **Zuweisen:** `NumberCheck check = IsEven;` wandelt die Methodengruppe um. `IsEven` läuft dabei nicht, es erscheint keine Zeile aus der Methode.
+2. **Aufrufen:** Erst `check(6)` führt `IsEven` aus. Jetzt erscheint die Zeile aus der Methode.
+3. **Ergebnis:** `result` ist `True`, weil 6 gerade ist.
+
+**Was passiert, wenn …?** … du den Delegate zweimal aufrufst? Dann erscheint die Zeile aus der Methode zweimal. Der Delegate selbst wurde nur einmal erzeugt.
+
+</details>
+
+Passt die Methode nicht zum Delegate-Typ, meldet der Compiler einen Fehler. Hier gibt `Describe` einen `string` zurück, der Delegate-Typ verlangt `bool`:
+
+<CodeBlock language="csharp" title="wrong-signature.snippet.cs">{wrongSignature}</CodeBlock>
+
+Der Compiler meldet dazu `error CS0407: 'string Describe(int)' has the wrong return type`.
+
+## null-Delegates und Überladungen
+
+Eine Delegate-Variable kann `null` sein, wie jede Referenz. Ein Aufruf über `null` löst eine `NullReferenceException` aus. Mit `?.Invoke(…)` (bekannt aus Modul 4) wird der Aufruf übersprungen, wenn der Delegate `null` ist. Das Ergebnis ist dann `null`.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l01-null-delegate" code={nullDelegate} predict expected={nullDelegateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `NullReferenceException`, `True` und `True`.
+
+1. **Aufruf über null:** `check!(4)` ruft einen Delegate auf, der `null` ist. Das `!` unterdrückt nur die Warnung des Compilers. Die Ausnahme wird gefangen und mit dem Typnamen ausgegeben.
+2. **Sicherer Aufruf:** `check?.Invoke(4)` überspringt den Aufruf. Das Ergebnis ist `null`, `is null` ergibt `True`.
+3. **Mit Ziel:** Nach `check = IsEven` liefert `check?.Invoke(4)` den Wert `true`. Die Ausgabe ist `True`.
+
+</details>
+
+Eine Methodengruppe kann mehrere Überladungen enthalten. Die Umwandlung wählt die Überladung, die zu den Parametern des Delegate-Typs passt.
+
+:::info[Vorhersage]
+`Show` gibt es für `int` und für `string`. Welche zwei Zeilen erscheinen?
+:::
+
+<CSharpRunner id="m10-l01-overloads" code={overloadedMethodGroup} predict expected={overloadedMethodGroupOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `number 42` und `text done`.
+
+1. **Typ bestimmt die Überladung:** `Printer<int>` hat einen `int`-Parameter, also wird `Show(int)` gewählt. `Printer<string>` führt zu `Show(string)`.
+2. **Eine Überladung pro Delegate:** Jeder Delegate verweist auf genau eine Methode. Welche, steht beim Erzeugen fest.
+
+</details>
+
+## Ein Delegate als Parameter
+
+Weil ein Delegate-Wert ein normaler Wert ist, kannst du ihn an eine Methode übergeben. Die Methode ruft ihn auf, wenn sie das Verhalten braucht. Ein solcher Delegate heißt <Term id="callback">Callback</Term>. So legt der Aufrufer fest, was geprüft wird, und die Schleife steht nur einmal im Code.
+
+:::info[Vorhersage]
+`CountMatching` zählt, wie viele Zahlen eine Prüfung bestehen. Welche zwei Zahlen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l01-callback" code={callback} predict expected={callbackOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2` und `3`.
+
+1. **Methode übergeben:** `CountMatching(numbers, IsEven)` wandelt `IsEven` in einen `NumberCheck` um und übergibt ihn.
+2. **Aufrufen:** In der Schleife ruft `check(value)` für jede Zahl die übergebene Methode auf. Gerade sind 8 und 10, also `2`.
+3. **Anderes Verhalten:** Mit `IsBig` zählt dieselbe Methode die Zahlen ab 5: 8, 5 und 10, also `3`.
+
+</details>
+
+## Lückenbeispiel
+
+`TextCheck` und `IsShort` sind fertig. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m10-l01-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Delegate erzeugen:** `TextCheck check = IsShort;`
+2. **Aufrufen:** `Console.WriteLine(check("log"));` gibt `True` aus, `Console.WriteLine(check("authentication"));` gibt `False` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält Ereignisse und Vorfälle, prüft sie mit austauschbaren Regeln (`IDetectionRule`) und benutzt generische Helfer wie `Store<T>` und `Counter<TKey>`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block, die Stelle für neue lokale Funktionen und die Stelle für den neuen Typ. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Im Namensraum `SecLog.Model` kommt am Ende der Delegate-Typ `delegate bool IncidentCheck(Incident incident);`.
+2. Nach den ausgeblendeten lokalen Funktionen kommen drei statische lokale Funktionen: `static bool HasManyFailures(Incident incident)` (`FailureCount >= 5`), `static bool IsUnderInvestigation(Incident incident)` (`Status` ist `"investigating"`, ordinal verglichen) und `static int CountMatching(IReadOnlyList<Incident> items, IncidentCheck check)`, die zählt, wie viele Vorfälle die Prüfung bestehen.
+3. Vor `// End with exit code 0 …` kommt der Block `// Check incidents with methods stored in a delegate`. Er erzeugt einen `IncidentCheck` namens `manyFailures` aus `HasManyFailures` und gibt das Ergebnis für `bobIncident` und `daveIncident` aus (`bob has many failures: …`, `dave has many failures: …`). Dann gibt er `Many failures:` mit `CountMatching(incidents, HasManyFailures)` und `Under investigation:` mit `CountMatching(incidents, IsUnderInvestigation)` aus.
+
+<CSharpRunner id="m10-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Typ deklarieren:** `IncidentCheck` beschreibt jede Methode, die einen `Incident` prüft und `bool` zurückgibt. Die beiden Prüfmethoden passen dazu.
+2. **Delegate erzeugen und aufrufen:** `manyFailures = HasManyFailures` verweist auf die Methode. `manyFailures(bobIncident)` führt sie aus.
+3. **Als Callback übergeben:** `CountMatching(incidents, HasManyFailures)` schreibt den Namen ohne Klammern. Die Methodengruppe wird zum Delegate, und `CountMatching` ruft ihn für jeden Vorfall auf.
+
+</details>
+
+**Neuer Stand:** SecLog kann Prüfungen als Methoden an eine Zählfunktion übergeben. Die Schleife steht einmal, die Prüfung wählt der Aufrufer.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l01-method-group-calls-method" />
+
+**„`HasManyFailures` ohne Klammern ruft die Methode auf“ oder „beim Zuweisen an einen Delegate läuft die Methode.“** Das stimmt nicht. Ohne Klammern ist `HasManyFailures` eine Methodengruppe. Die Zuweisung erzeugt nur einen Delegate, der auf die Methode verweist. Die Methode läuft erst, wenn du den Delegate aufrufst, zum Beispiel mit `manyFailures(bobIncident)`.
+:::
+
+## Zusammenfassung
+
+Ein Delegate-Typ beschreibt Methoden mit bestimmten Parametern und Rückgabetyp. Ein Delegate-Wert verweist auf eine solche Methode, bei einer Instanzmethode auch auf das Objekt. Der Name einer Methode ohne Klammern ist eine Methodengruppe. Die Umwandlung erzeugt den Delegate, wählt bei Überladungen die passende Methode und ruft nichts auf. Die Methode läuft erst beim Aufruf mit `check(x)` oder `check.Invoke(x)`. Ein Delegate mit dem Wert `null` löst beim Aufruf eine Ausnahme aus, `?.Invoke(…)` überspringt ihn. Als Parameter ist ein Delegate ein Callback.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l01-q1" />
+
+<Quiz id="m10-l01-q2" />
+
+<Quiz id="m10-l01-q3" />
+
+<Quiz id="m10-l01-q4" />
+
+<Quiz id="m10-l01-q5" />
+
+<Quiz id="m10-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m10-l01-q8" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [§21.4 Delegate compatibility](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#214-delegate-compatibility)
+- C#-Spezifikation: [§10.8 Method group conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#108-method-group-conversions)
+- Microsoft Learn: [Delegates](https://learn.microsoft.com/dotnet/csharp/programming-guide/delegates/)
