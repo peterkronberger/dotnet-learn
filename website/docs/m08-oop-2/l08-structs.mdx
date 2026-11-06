@@ -1,0 +1,287 @@
+---
+title: Structs
+sidebar_position: 8
+description: Ein struct ist ein Werttyp. Zuweisen und Übergeben kopieren alle Felder, default setzt jedes Feld auf seinen Standardwert, und ein Struct erbt nicht von einem anderen Struct.
+lesson_id: m08-l08
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import structCopy from '!!raw-loader!@site/examples/m08/l08/struct-copy.cs';
+import structCopyOutput from '!!raw-loader!@site/examples/m08/l08/struct-copy.out.txt';
+import structList from '!!raw-loader!@site/examples/m08/l08/struct-list.cs';
+import structListOutput from '!!raw-loader!@site/examples/m08/l08/struct-list.out.txt';
+import structListModify from '!!raw-loader!@site/examples/m08/l08/struct-list-modify.snippet.cs';
+import structDefault from '!!raw-loader!@site/examples/m08/l08/struct-default.cs';
+import structDefaultOutput from '!!raw-loader!@site/examples/m08/l08/struct-default.out.txt';
+import structInherit from '!!raw-loader!@site/examples/m08/l08/struct-inherit.snippet.cs';
+import structReadonly from '!!raw-loader!@site/examples/m08/l08/struct-readonly.cs';
+import structReadonlyOutput from '!!raw-loader!@site/examples/m08/l08/struct-readonly.out.txt';
+import structReadonlyField from '!!raw-loader!@site/examples/m08/l08/struct-readonly-field.snippet.cs';
+import structBoxing from '!!raw-loader!@site/examples/m08/l08/struct-boxing.cs';
+import structBoxingOutput from '!!raw-loader!@site/examples/m08/l08/struct-boxing.out.txt';
+import structGap from '!!raw-loader!@site/examples/m08/l08/struct-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l08/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l08/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l08/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l08/seclog-oop-solution.cs';
+
+# Structs
+
+:::note[Lernziele]
+- Du kannst ein `struct` deklarieren und vorhersagen, was beim Zuweisen und Übergeben kopiert wird.
+- Du kannst `readonly struct` und `readonly`-Member einsetzen.
+- Du kannst entscheiden, ob ein Typ besser ein `struct` oder eine Klasse ist.
+- Du kannst erklären, wann ein Struct geboxt wird.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l01-q2" />
+
+<Quiz id="m04-l09-q3" />
+
+<Quiz id="m08-l07-q3" />
+
+## Ein Typ, der kopiert wird
+
+Eine Klasse ist ein Verweistyp: Eine Variable zeigt auf ein Objekt, und `b = a` kopiert nur den Verweis. Ein <Term id="struct">Struct</Term> (Struktur) ist dagegen ein <Term id="value-type">Werttyp</Term> (Modul 4). Du deklarierst ihn mit `struct`. Die Variable enthält den Wert selbst, also alle Felder. `int`, `DateTimeOffset` und `TimeSpan` aus Modul 5 sind Structs ([§16.2 Struct declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#162-struct-declarations)).
+
+Daraus folgt die wichtigste Regel: Zuweisen, Übergeben als Argument und Zurückgeben kopieren den ganzen Wert ([§16.8.4 Assignment](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1684-assignment)). Danach sind Original und Kopie zwei unabhängige Werte.
+
+:::info[Vorhersage]
+`Point` ist ein Struct mit den Eigenschaften `X` und `Y`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l08-struct-copy" code={structCopy} predict expected={structCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `10` und `1`.
+
+1. **Zuweisen kopiert:** `Point b = a;` legt eine Kopie an. `b.X = 10` ändert nur `b`.
+2. **Original prüfen:** `a.X` ist weiter 1.
+3. **Übergeben kopiert:** `Move(a)` bekommt eine Kopie. `p.X = 99` ändert diese Kopie, `a.X` bleibt 1.
+
+Was passiert, wenn `Point` eine Klasse wäre? Dann zeigen `a` und `b` auf dasselbe Objekt, und die Ausgabe wäre `10`, `10` und `99`.
+
+</details>
+
+## Structs in einer Liste
+
+Das Kopieren hat eine Folge, die oft überrascht. `points[0]` liest den Wert aus der Liste und liefert eine Kopie. Eine Eigenschaft dieser Kopie direkt zu ändern, lehnt der Compiler ab:
+
+<CodeBlock language="csharp" title="struct-list-modify.snippet.cs">{structListModify}</CodeBlock>
+
+```text
+error CS1612: Cannot modify the return value of 'List<Point>.this[int]' because it is not a variable
+```
+
+Du holst den Wert in eine Variable, änderst die Kopie und schreibst sie zurück.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l08-struct-list" code={structList} predict expected={structListOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `10` und `10`.
+
+1. **Kopie holen:** `Point copy = points[0];` kopiert den Wert aus der Liste.
+2. **Kopie ändern:** `copy.X = 10` ändert nur die Kopie. In der Liste steht weiter 1.
+3. **Zurückschreiben:** `points[0] = copy;` ersetzt den Wert in der Liste. Erst danach steht dort 10.
+
+Was passiert, wenn du die Zeile `points[0] = copy;` weglässt? Die Liste behält den Wert 1, die Änderung geht verloren.
+
+</details>
+
+## default und Vererbung
+
+Der Wert `default` eines Structs hat alle Felder auf ihrem Standardwert: Zahlen sind 0, Verweise sind `null`. Dasselbe gilt für die Elemente eines neuen Arrays von Structs. Ein Struct kann einen eigenen parameterlosen Konstruktor deklarieren. `new Counter()` ruft ihn auf, `default` aber nie: `default` erzeugt immer den Wert, in dem alle Felder ihren Standardwert haben ([§16.8.5 Default values](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1685-default-values)).
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l08-struct-default" code={structDefault} predict expected={structDefaultOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0 0`, `0 0`, `5` und `0`.
+
+1. **default:** Alle Felder von `origin` sind 0.
+2. **Array:** Auch `points[1]` hat nur Standardwerte.
+3. **Eigener Konstruktor:** `new()` ruft den parameterlosen Konstruktor von `Counter` auf: `5`.
+4. **default ruft ihn nicht auf:** `empty.Value` ist 0.
+</details>
+
+Structs haben außerdem keine Vererbung untereinander. Ein Struct ist implizit versiegelt, wie eine Klasse mit `sealed` aus Lektion 4: Ein anderer Typ kann nicht von ihm ableiten, und ein Struct kann nicht von einem anderen Struct ableiten. Interfaces kann ein Struct dagegen implementieren ([§16.8.3 Inheritance](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1683-inheritance)).
+
+<CodeBlock language="csharp" title="struct-inherit.snippet.cs">{structInherit}</CodeBlock>
+
+```text
+error CS0527: Type 'Point' in interface list is not an interface
+```
+
+Hinter dem Doppelpunkt eines Structs dürfen nur Interfaces stehen.
+
+## readonly struct und readonly-Member
+
+Ein `readonly struct` ist unveränderlich: Alle Instanzfelder müssen `readonly` sein. Eine Eigenschaft nur mit `get` erfüllt das. Das ist ein <Term id="readonly-struct">Readonly Struct</Term> ([§16.2.2 Struct modifiers](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1622-struct-modifiers)).
+
+<CodeBlock language="csharp" title="struct-readonly-field.snippet.cs">{structReadonlyField}</CodeBlock>
+
+```text
+error CS8340: Instance fields of readonly structs must be readonly.
+```
+
+Bei einem veränderlichen Struct kannst du einzelne Methoden und Eigenschaften mit `readonly` kennzeichnen. Ein <Term id="readonly-member">Readonly-Member</Term> darf die Felder des Structs nicht ändern ([§16.3.2 Readonly members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1632-readonly-members)).
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l08-struct-readonly" code={structReadonly} predict expected={structReadonlyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `25`, `(3, 4)` und `120 km/h`.
+
+1. **readonly-Member:** `Squared()` rechnet 3 · 3 + 4 · 4 = 25, ändert aber nichts.
+2. **Noch ein readonly-Member:** `Describe()` liest nur.
+3. **readonly struct:** `Speed` hat nur eine Eigenschaft mit `get`. Sein Wert ändert sich nach dem Konstruktor nie.
+
+Was passiert, wenn `Squared()` `X = 0;` ausführt? Der Compiler lehnt es ab, denn ein Readonly-Member darf das Struct nicht ändern.
+
+</details>
+
+## Boxing
+
+Ein Struct wird <Term id="boxing">geboxt</Term>, wenn du es einer Variablen vom Typ `object` oder eines Interface zuweist, das es implementiert (Boxing aus Modul 4). Dabei entsteht eine Kopie auf dem Heap. Änderst du das Original danach, oder die Kopie, bleibt die jeweils andere unverändert ([§16.8.6 Boxing and unboxing](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1686-boxing-and-unboxing)).
+
+:::info[Vorhersage]
+`Point` ist ein Struct, das `IMovable` implementiert. `MoveRight()` erhöht `X` um 1. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l08-struct-boxing" code={structBoxing} predict expected={structBoxingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `5` und `6`.
+
+1. **An object boxen:** `object boxed = point;` kopiert den Wert, in dem `X` noch 1 ist. Die spätere Änderung `point.X = 5` erreicht die Kopie nicht.
+2. **An ein Interface boxen:** `IMovable movable = point;` legt eine zweite Kopie an, in der `X` 5 ist.
+3. **Über das Interface ändern:** `movable.MoveRight()` ändert die Kopie auf 6. `point.X` bleibt 5.
+
+Was ist der Unterschied zu einer Klasse? Bei einer Klasse verweisen `point`, `boxed` und `movable` auf dasselbe Objekt, und jede Änderung wäre überall sichtbar.
+
+</details>
+
+## Struct oder Klasse?
+
+Die Richtlinie für Bibliotheken rät zu einem Struct nur für Typen, die einen einzelnen Wert darstellen, klein und unveränderlich sind und nicht oft geboxt werden. Als Größe nennt die Richtlinie weniger als 16 Bytes. Alles andere ist besser eine Klasse. Das ist eine Richtlinie, keine Regel der Sprache ([Choosing between class and struct](https://learn.microsoft.com/dotnet/standard/design-guidelines/choosing-between-class-and-struct)).
+
+Ein Zeitraum aus Start und Länge passt gut: klein, unveränderlich und ein einzelner Wert. Ein Vorfall mit einer Liste von Ereignissen und einem veränderlichen Status passt nicht. Alle, die ihn kennen, sollen denselben Vorfall sehen.
+
+<details>
+<summary>Vertiefung: Records und Structs (optional)</summary>
+
+<Forward concepts={['Record-Structs']} module="8" />
+
+Auch `ref struct` und `Span<T>` gehören zu den Structs. Sie sind in diesem Kurs nicht Thema. Mit `record struct` schreibst du ein Struct kürzer, das seinen Wert vergleicht und ausgibt. Das folgt in einer späteren Lektion dieses Moduls.
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die Stellen aus den Kommentaren. Das Programm soll `1 7` und danach `0 0` ausgeben, jeweils in eigener Zeile und in dieser Reihenfolge.
+
+<CSharpRunner id="m08-l08-gaps" code={structGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Kopie ändern:** `second.A = 7;` ändert nur `second`. `first.A` bleibt 1.
+2. **Standardwert setzen:** `third = default;` setzt alle Felder von `third` auf 0.
+3. **Hinweis:** Die Zeile mit `new Pair(9, 9)` steht schon da. Die Zuweisung `third = default;` kommt danach.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog beschreibt Ereignistyp und Schweregrad mit den Enums `EventType` und `Severity`. Der Block „Find 5 failed logins within 10 minutes“ aus Modul 5 hat die Liste `bobTimes` mit den Zeitpunkten der fünf Fehlversuche von bob und das Zeitfenster `window` von 10 Minuten.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block mit `bobTimes` und `window`, die Stelle vor `return 0;` für den neuen Block und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model` kommt `readonly struct TimeWindow`. Der Konstruktor `TimeWindow(DateTimeOffset start, TimeSpan length)` setzt die Eigenschaften `Start` und `Length`. `End` ist `Start + Length`, und `bool Contains(DateTimeOffset time)` gibt `time >= Start && time <= End` zurück.
+2. Vor `// End with exit code 0 …` kommt der Block `// Describe the detection window with a struct`. Er legt `TimeWindow bobWindow = new(bobTimes[0], window);` an, zählt, wie viele Zeitpunkte aus `bobTimes` im Fenster liegen, und gibt `$"In the window: {inWindow} of {bobTimes.Count}"` aus. Danach kopiert er `TimeWindow windowCopy = bobWindow;` und gibt `$"Copy has the same start: {windowCopy.Start == bobWindow.Start}"` aus.
+
+<CSharpRunner id="m08-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Struct deklarieren:** `TimeWindow` ist ein `readonly struct`. Seine Eigenschaften haben nur `get`, und `End` wird aus ihnen berechnet.
+2. **Fenster anlegen:** Das Fenster beginnt beim ersten Fehlversuch von bob und dauert `window`.
+3. **Zählen:** Alle fünf Zeitpunkte liegen zwischen `Start` und `End`: `5 of 5`.
+4. **Kopieren:** `windowCopy` ist eine Kopie. Ihr `Start` ist gleich dem des Originals.
+
+</details>
+
+**Neuer Stand:** SecLog beschreibt das Zeitfenster der Erkennung als kleinen, unveränderlichen Wert. Der Typ `TimeWindow` ersetzt später die losen Variablen `bobTimes[0]` und `window`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l08-struct-copy-changes-original" />
+
+**„Wenn ich ein Struct aus einer Variablen oder Liste hole und ändere, ändere ich auch das Original.“** Das stimmt nicht. Du änderst eine Kopie, das Original bleibt gleich. Das gilt für Zuweisungen, Argumente und den Indexer einer Liste. Willst du die Änderung behalten, schreibst du die Kopie zurück. Bei einer Klasse dagegen verweisen alle Variablen auf dasselbe Objekt (Modul 4).
+:::
+
+## Zusammenfassung
+
+Ein Struct ist ein Werttyp: Zuweisen, Übergeben und Zurückgeben kopieren alle Felder, und `default` setzt jedes Feld auf seinen Standardwert. Ein Struct ist implizit versiegelt und erbt nicht von einem anderen Struct, kann aber Interfaces implementieren. Dabei wird es geboxt, und die Kopie ist vom Original unabhängig. Ein `readonly struct` verlangt `readonly`-Felder, ein `readonly`-Member ändert den Wert nicht. Ein Struct passt für kleine, unveränderliche Einzelwerte, alles andere ist besser eine Klasse.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l08-q1" />
+
+<Quiz id="m08-l08-q2" />
+
+<Quiz id="m08-l08-q3" />
+
+<Quiz id="m08-l08-q4" />
+
+<Quiz id="m08-l08-q5" />
+
+<Quiz id="m08-l08-q6" />
+
+<Quiz id="m08-l08-q7" />
+
+<Quiz id="m08-l08-q8" />
+
+<Quiz id="m08-l08-q9" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l08-q10" />
+
+### Transferfrage
+
+<Quiz id="m08-l08-q11" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Structs](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs)
+- Microsoft Learn: [Choosing between class and struct](https://learn.microsoft.com/dotnet/standard/design-guidelines/choosing-between-class-and-struct)

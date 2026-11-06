@@ -5505,6 +5505,156 @@
         "title": "11.2.2 Declaration pattern",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern"
       }
+    },
+    {
+      "id": "enum",
+      "term": "Enum",
+      "german": "Aufzählungstyp",
+      "category": "language",
+      "definition": "Ein Werttyp mit `enum`, der einer Menge von Konstanten Namen gibt. Jeder Wert hat einen zugrunde liegenden ganzzahligen Wert.",
+      "aliases": [
+        "Enums",
+        "enumeration",
+        "Aufzählung"
+      ],
+      "related": [
+        "enum-member",
+        "underlying-type",
+        "flags-enum",
+        "value-type"
+      ],
+      "lesson": "m08-l07",
+      "source": {
+        "title": "Enums – Enum declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#202-enum-declarations"
+      }
+    },
+    {
+      "id": "enum-member",
+      "term": "Enum member",
+      "german": "Enum-Member",
+      "category": "language",
+      "definition": "Eine benannte Konstante eines Enums, etwa `High` in `enum Severity { None, Low, Medium, High }`. Ohne Angabe zählt der Wert ab 0 hoch.",
+      "aliases": [
+        "Enum-Member",
+        "Enum-Mitglied",
+        "enum members"
+      ],
+      "related": [
+        "enum",
+        "underlying-type"
+      ],
+      "lesson": "m08-l07",
+      "source": {
+        "title": "Enums – Enum members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#204-enum-members"
+      }
+    },
+    {
+      "id": "underlying-type",
+      "term": "Underlying type",
+      "german": "zugrunde liegender Typ",
+      "category": "language",
+      "definition": "Der ganzzahlige Typ, in dem ein Enum seine Werte speichert. Ohne Angabe ist es `int`, mit `enum Level : byte` ein anderer ganzzahliger Typ.",
+      "aliases": [
+        "zugrunde liegender Typ",
+        "underlying integral type"
+      ],
+      "related": [
+        "enum",
+        "explicit-conversion"
+      ],
+      "lesson": "m08-l07",
+      "source": {
+        "title": "Enums – Enum declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#202-enum-declarations"
+      }
+    },
+    {
+      "id": "flags-enum",
+      "term": "Flags enum",
+      "german": "Flags-Enum",
+      "category": "language",
+      "definition": "Ein Enum, dessen Member Zweierpotenzen sind und mit `|` kombiniert werden. Es trägt meist `[Flags]`. Mit `&` prüfst du, ob ein Bit gesetzt ist.",
+      "aliases": [
+        "Flags-Enum",
+        "Flags",
+        "FlagsAttribute",
+        "Bit-Flags"
+      ],
+      "related": [
+        "enum",
+        "enum-member"
+      ],
+      "lesson": "m08-l07",
+      "source": {
+        "title": "FlagsAttribute Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.flagsattribute"
+      }
+    },
+    {
+      "id": "struct",
+      "term": "Struct",
+      "german": "Struktur",
+      "category": "language",
+      "definition": "Ein Werttyp, den du mit `struct` deklarierst. Zuweisen und Übergeben kopieren den ganzen Wert. Ein Struct kann nicht von einem anderen Struct erben.",
+      "aliases": [
+        "Structs",
+        "Struktur",
+        "structs"
+      ],
+      "related": [
+        "value-type",
+        "readonly-struct",
+        "boxing",
+        "sealed-class",
+        "default-value"
+      ],
+      "lesson": "m08-l08",
+      "source": {
+        "title": "Structs – Struct declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#162-struct-declarations"
+      }
+    },
+    {
+      "id": "readonly-struct",
+      "term": "Readonly struct",
+      "german": "schreibgeschütztes Struct",
+      "category": "language",
+      "definition": "Ein Struct mit `readonly struct`. Alle seine Instanzfelder müssen `readonly` sein, seine Werte sind unveränderlich.",
+      "aliases": [
+        "readonly structs",
+        "unveränderliches Struct"
+      ],
+      "related": [
+        "struct",
+        "readonly-member"
+      ],
+      "lesson": "m08-l08",
+      "source": {
+        "title": "Structs – Struct modifiers",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1622-struct-modifiers"
+      }
+    },
+    {
+      "id": "readonly-member",
+      "term": "Readonly member",
+      "german": "schreibgeschützter Member",
+      "category": "language",
+      "definition": "Ein Member eines Structs mit `readonly`, etwa `public readonly int Squared()`. Er darf die Felder des Structs nicht ändern.",
+      "aliases": [
+        "readonly members",
+        "readonly-Member"
+      ],
+      "related": [
+        "struct",
+        "readonly-struct"
+      ],
+      "lesson": "m08-l08",
+      "source": {
+        "title": "Structs – Readonly members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs#1632-readonly-members"
+      }
     }
   ]
 }

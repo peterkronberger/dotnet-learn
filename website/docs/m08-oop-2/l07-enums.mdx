@@ -1,0 +1,260 @@
+---
+title: Enums
+sidebar_position: 7
+description: Ein Enum gibt Zahlenwerten Namen. Eine Variable vom Enum-Typ kann aber jeden Wert des Zahlentyps halten, deshalb braucht ein switch über ein Enum einen Standardfall.
+lesson_id: m08-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import enumBasics from '!!raw-loader!@site/examples/m08/l07/enum-basics.cs';
+import enumBasicsOutput from '!!raw-loader!@site/examples/m08/l07/enum-basics.out.txt';
+import enumUnnamed from '!!raw-loader!@site/examples/m08/l07/enum-unnamed.cs';
+import enumUnnamedOutput from '!!raw-loader!@site/examples/m08/l07/enum-unnamed.out.txt';
+import enumSwitchWarning from '!!raw-loader!@site/examples/m08/l07/enum-switch-warning.snippet.cs';
+import enumParse from '!!raw-loader!@site/examples/m08/l07/enum-parse.cs';
+import enumParseOutput from '!!raw-loader!@site/examples/m08/l07/enum-parse.out.txt';
+import enumFlags from '!!raw-loader!@site/examples/m08/l07/enum-flags.cs';
+import enumFlagsOutput from '!!raw-loader!@site/examples/m08/l07/enum-flags.out.txt';
+import enumGap from '!!raw-loader!@site/examples/m08/l07/enum-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l07/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l07/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l07/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l07/seclog-oop-solution.cs';
+
+# Enums
+
+:::note[Lernziele]
+- Du kannst ein Enum deklarieren und statt fester Texte oder Zahlen verwenden.
+- Du kannst zwischen einem Enum-Wert und seinem zugrunde liegenden Zahlenwert umwandeln und einen Text sicher in einen Enum-Wert umwandeln.
+- Du kannst erklären, warum ein `switch` über ein Enum einen Standardfall braucht.
+- Du kannst ein Flags-Enum lesen und mit `|` und `&` kombinieren.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l04-q3" />
+
+<Quiz id="m01-l07-q3" />
+
+<Quiz id="m08-l06-q6" />
+
+## Namen statt Texte und Zahlen
+
+In SecLog steht der Ereignistyp bisher als Text: `"login-failed"`. Ein Tippfehler wie `"login-faild"` fällt erst beim Ausführen auf, wenn überhaupt. Auch eine Zahl wie `3` für „hoch“ sagt nichts über ihre Bedeutung.
+
+Ein <Term id="enum">Enum</Term> (Aufzählungstyp) löst das. Es ist ein Werttyp, der einer festen Menge von Konstanten Namen gibt. Du deklarierst ihn mit `enum`, wie eine Klasse am Ende der Datei:
+
+`enum Severity { None, Low, Medium, High }`
+
+Jeder Name ist ein <Term id="enum-member">Enum-Member</Term>. Ohne Angabe bekommt der erste Member den Wert 0, jeder weitere den Wert des Vorgängers plus 1. Du kannst Werte auch selbst festlegen (`Low = 10`), und mehrere Member dürfen denselben Wert haben ([§20.4 Enum members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#204-enum-members)).
+
+Hinter jedem Enum steckt ein ganzzahliger Typ, der <Term id="underlying-type">zugrunde liegende Typ</Term> (Underlying Type). Ohne Angabe ist es `int`. Mit `enum Level : byte { … }` wählst du einen anderen ganzzahligen Typ ([§20.2 Enum declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#202-enum-declarations)).
+
+Zwischen dem Enum und seinem Zahlentyp wandelst du mit einem Cast um, einer <Term id="explicit-conversion">expliziten Umwandlung</Term> wie `(int)3.99` aus Modul 1. Enums lassen sich mit `==`, `<` und `>` vergleichen. Verglichen werden die Zahlenwerte.
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l07-enum-basics" code={enumBasics} predict expected={enumBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Medium`, `2`, `True` und `High`.
+
+1. **Name ausgeben:** `Console.WriteLine(level)` gibt den Namen des Members aus, nicht die Zahl.
+2. **In die Zahl umwandeln:** `(int)level` ist 2, denn `Medium` ist der dritte Member und der erste hat den Wert 0.
+3. **Vergleichen:** `Severity.Medium > Severity.Low` vergleicht 2 mit 1.
+4. **Aus der Zahl umwandeln:** `(Severity)3` ist `High`.
+
+Was passiert, wenn du `Severity.Critical` schreibst? Das ist ein Fehler beim Übersetzen: Der Compiler kennt nur die deklarierten Member. Genau das macht ein Enum sicherer als ein Text.
+
+</details>
+
+## Jeder Zahlenwert ist gültig
+
+Der Cast zwischen Zahl und Enum prüft nichts. Die Menge der Werte eines Enums ist die Menge der Werte seines zugrunde liegenden Typs, nicht nur die der benannten Member. `(Severity)42` ist ein gültiger Wert von `Severity` ([§20.6 Enum values and operations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#206-enum-values-and-operations)).
+
+Das hat drei Folgen:
+
+- `ToString()` gibt für einen unbenannten Wert die Zahl aus.
+- `Enum.IsDefined(wert)` prüft, ob der Wert einen Namen hat.
+- Ein `switch` muss unbenannte Werte behandeln. Eine `switch`-Anweisung braucht dafür `default`, ein switch-Ausdruck den Zweig `_`.
+
+:::info[Vorhersage]
+`odd` ist `(Severity)42`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l07-enum-unnamed" code={enumUnnamed} predict expected={enumUnnamedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `42`, `False`, `True` und `unknown value`.
+
+1. **Ausgeben:** Es gibt keinen Member mit dem Wert 42, deshalb steht die Zahl da.
+2. **Prüfen:** `Enum.IsDefined(odd)` ist `False`, `Enum.IsDefined(Severity.High)` ist `True`.
+3. **Fallunterscheidung:** Kein `case` passt, also läuft der `default`-Abschnitt.
+
+Was passiert, wenn du `default` weglässt? Dann läuft keiner der Abschnitte. Bei einem switch-Ausdruck ohne passenden Zweig wirft das Programm zur Laufzeit eine Ausnahme. Der Compiler warnt schon vorher:
+
+<CodeBlock language="csharp" title="enum-switch-warning.snippet.cs">{enumSwitchWarning}</CodeBlock>
+
+```text
+warning CS8524: The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value. For example, the pattern '(Severity)4' is not covered.
+```
+
+Der Ausdruck nennt alle vier Member und ist trotzdem nicht vollständig. Mit `_ => "unknown"` ist die Warnung weg.
+
+</details>
+
+## Text sicher in ein Enum umwandeln
+
+Eingaben kommen als Text, etwa aus einer Datei. Mit `Enum.TryParse` wandelst du den Text in einen Member um. Die Methode gibt `true` oder `false` zurück und schreibt den Wert in eine `out`-Variable, wie `int.TryParse` aus Modul 1. Den Enum-Typ erkennt der Compiler an der Variable.
+
+`Enum.Parse` macht dasselbe, wirft aber eine `ArgumentException`, wenn der Name unbekannt ist. Dort schreibst du den Typ als Typargument: `Enum.Parse<Severity>(text)`. Das Typargument kennst du von `List<string>`. Bevorzuge `TryParse`, wenn falsche Eingaben normal sind.
+
+Eine Zahl prüfst du vor dem Cast mit `Enum.IsDefined`.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l07-enum-parse" code={enumParse} predict expected={enumParseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True: Medium`, `False: None` und `ArgumentException`.
+
+1. **Bekannter Name:** `TryParse("Medium", …)` gibt `true` zurück, `found` ist `Medium`.
+2. **Unbekannter Name:** `TryParse("Critical", …)` gibt `false` zurück. Die Variable bekommt den Standardwert des Enums, also den Wert 0: `None`.
+3. **Ohne `Try`:** `Enum.Parse` wirft für `"Critical"`. Der `catch`-Block gibt den Namen der Ausnahme aus.
+
+Ob ein Wert, den du über einen Cast erhalten hast, einen Namen hat, prüfst du mit `Enum.IsDefined`.
+
+</details>
+
+## Flags: Werte kombinieren
+
+Manchmal sollen mehrere Eigenschaften zugleich gelten, etwa die Rechte `Read` und `Write`. Dafür gibt es ein <Term id="flags-enum">Flags-Enum</Term>. Seine Member sind Zweierpotenzen: 1, 2, 4, 8 … In der Binärdarstellung hat jeder Member dann genau ein eigenes Bit.
+
+- `|` kombiniert Member: `Read | Write` hat die Bits von beiden.
+- `&` mit einem Member prüft, ob dessen Bit gesetzt ist: `(granted & Access.Write) != Access.None`.
+
+Der Wert 0 heißt meist `None`. Vor dem Enum steht `[Flags]`. Das ist ein Attribut. Es sorgt dafür, dass `ToString()` kombinierte Werte als Liste der Namen ausgibt.
+
+<Forward concepts={['Attribute']} module="14" />
+
+<CSharpRunner id="m08-l07-enum-flags" code={enumFlags} predict expected={enumFlagsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Read, Write`, `3`, `True` und `False`.
+
+1. **Kombinieren:** `Read | Write` ist 1 + 2 = 3.
+2. **Ausgeben:** Wegen `[Flags]` zeigt `ToString()` die Namen der gesetzten Bits.
+3. **Prüfen:** `granted & Access.Write` ist 2, nicht `None`: `True`. `granted & Access.Delete` ist 0: `False`.
+
+Es gibt auch die Methode `HasFlag`, die für Flags-Enums gedacht ist und `(wert & flag) == flag` prüft ([`Enum.HasFlag`](https://learn.microsoft.com/dotnet/api/system.enum.hasflag)). Hier benutzen wir `&`, weil du dabei siehst, was passiert.
+
+</details>
+
+<details>
+<summary>Vertiefung: Gleiche Werte und andere Zahlentypen (optional)</summary>
+
+Mehrere Member dürfen denselben Wert haben. Der zugrunde liegende Typ muss alle Werte der Member aufnehmen können, und `char` ist als zugrunde liegender Typ nicht erlaubt ([§20.2 Enum declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#202-enum-declarations)).
+
+Jedes Enum ist ein Werttyp und erbt von `System.Enum`. Deshalb stehen auf Enum-Werten Methoden wie `ToString()` zur Verfügung ([§20.5 The System.Enum type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums#205-the-systemenum-type)).
+
+</details>
+
+## Lückenbeispiel
+
+Ergänze die Stellen aus den Kommentaren. Das Programm soll `1` und danach `Blue` ausgeben, jeweils in eigener Zeile und in dieser Reihenfolge.
+
+<CSharpRunner id="m08-l07-gaps" code={enumGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zahl ausgeben:** `Console.WriteLine((int)color);`
+2. **Text umwandeln:** `Enum.TryParse("Blue", out blue);` schreibt `Blue` in die Variable `blue`. Die Methode kennt den Typ von der Variable `blue`.
+3. **Hinweis:** Die Zeile mit `Console.WriteLine(blue)` steht schon da. Die Reihenfolge ist wichtig: erst die Zahl, dann der geparste Wert.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Regelklassen, einen `Detector` und Typprüfungen über die Regeln. Ereignistyp und Schweregrad sind weiter Texte: `EventTypeOf` liefert `"login-failed"`, `RateSeverity` liefert `"high"`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block, die Stelle hinter den lokalen Funktionen und die Stelle am Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Am Ende von `namespace SecLog.Model` kommen zwei Enums dazu: `EventType` mit `LoginSuccess`, `LoginFailed` und `Logout` sowie `Severity` mit `None`, `Low`, `Medium` und `High`.
+2. Nach den lokalen Funktionen schreibst du `EventType ParseEventType(string text)`: ein switch-Ausdruck über die Texte `"login-success"`, `"login-failed"` und `"logout"`. Jeder andere Text wirft im Zweig `_` eine `ArgumentException` (Throw-Ausdruck aus Modul 7). Danach schreibst du `Severity SeverityOf(int failures)` mit denselben Schwellen wie `RateSeverity`.
+3. Vor `// End with exit code 0 …` kommt der Block `// Use enums for the event type and the severity`. Er gibt aus: `Event type: …` mit `ParseEventType(EventTypeOf(sampleLog[1]))`, `Severity of bob: …` mit `SeverityOf(bobIncident.FailureCount)`, `Severity of dave: …` mit `SeverityOf(daveIncident.FailureCount)`, `Number of High: …` mit `(int)Severity.High`, und je eine Zeile `Medium parsed: …` und `Critical parsed: …` mit dem Ergebnis von `Enum.TryParse` und dem geparsten Wert in Klammern.
+
+<CSharpRunner id="m08-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Enums deklarieren:** Die Member stehen in der Reihenfolge, in der sie die Zahlen 0, 1, 2 (und 3) bekommen.
+2. **Text umwandeln:** `ParseEventType` bildet jeden bekannten Text auf einen Member ab. Der Zweig `_` fängt alles andere ab und wirft. So kann kein unbekannter Ereignistyp unbemerkt weiterwandern.
+3. **Schwellen übernehmen:** `SeverityOf` hat dieselben Zweige wie `RateSeverity`, liefert aber Enum-Member statt Texte.
+4. **Ausgeben:** Bob hat fünf Fehlversuche: `High`. Dave hat einen: `Low`. `(int)Severity.High` ist 3. `TryParse` gelingt für `"Medium"` und scheitert für `"Critical"`, dann bleibt `None`.
+
+</details>
+
+**Neuer Stand:** SecLog kennt Ereignistyp und Schweregrad als Enums. Ein Tippfehler im Namen ist jetzt ein Fehler beim Übersetzen, und Text von außen wird mit `TryParse` geprüft. Die Klasse `LogEvent` behält ihren Text als Ereignistyp, das ändert erst eine spätere Lektion.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l07-enum-only-named-values" />
+
+**„Eine Variable vom Typ eines Enums kann nur die benannten Werte enthalten.“** Das stimmt nicht. Jeder Wert des zugrunde liegenden Typs ist ein gültiger Wert des Enums, auch `(Severity)42`. Deshalb braucht ein `switch` über ein Enum einen Standardfall, und Eingaben prüfst du mit `Enum.TryParse` oder `Enum.IsDefined`.
+:::
+
+## Zusammenfassung
+
+Ein Enum gibt ganzzahligen Werten Namen. Ohne Angabe ist der zugrunde liegende Typ `int`, und die Member zählen ab 0. Mit einem Cast wandelst du zwischen Enum und Zahl um. Der Cast prüft nichts: Jeder Wert des Zahlentyps ist ein gültiger Wert des Enums. Darum braucht ein `switch` einen Standardfall, und `Enum.TryParse` oder `Enum.IsDefined` prüfen Eingaben. Ein Flags-Enum nutzt Zweierpotenzen, `|` kombiniert und `&` prüft.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l07-q1" />
+
+<Quiz id="m08-l07-q2" />
+
+<Quiz id="m08-l07-q3" />
+
+<Quiz id="m08-l07-q4" />
+
+<Quiz id="m08-l07-q5" />
+
+<Quiz id="m08-l07-q6" />
+
+<Quiz id="m08-l07-q7" />
+
+<Quiz id="m08-l07-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l07-q9" />
+
+### Transferfrage
+
+<Quiz id="m08-l07-q10" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Enums](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/enums)
+- Microsoft Learn: [Enum.TryParse](https://learn.microsoft.com/dotnet/api/system.enum.tryparse)
+- Microsoft Learn: [FlagsAttribute](https://learn.microsoft.com/dotnet/api/system.flagsattribute)
