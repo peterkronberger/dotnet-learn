@@ -1,3 +1,5 @@
+Console.WriteLine($"Direct call: IsShort(\"log\") is {IsShort("log")}");
+
 // Task 1: create a TextCheck from the method group IsShort
 // Task 2: invoke it for "log" and for "authentication" and print both results
 

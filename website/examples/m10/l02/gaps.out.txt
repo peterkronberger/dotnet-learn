@@ -1,1 +1,1 @@
-
+Direct call: IsLong("log") is False
