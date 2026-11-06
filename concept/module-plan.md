@@ -288,7 +288,15 @@ Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, po
     - guard clause (`throw` for a bad argument) vs. validation in a property `set` (`m07-l05`, `m06-l04`)
     - `File.WriteAllText` vs. `AppendAllText`; `IOException` vs. `UnauthorizedAccessException` (`m07-l09`)
   - Misconception ids: m07-l02-catch-order-irrelevant, m07-l04-finally-only-without-exception, m07-l05-throw-ex-keeps-stack-trace, m07-l07-catch-exception-everywhere-is-safe, m07-l08-dispose-frees-memory
-- **M8**: Filled by the module review of M8.
+- **M8**:
+  - Concepts:
+    - `override` vs. `new` (hiding): call through a base-class variable (`m08-l02`)
+    - abstract class vs. interface (`m08-l03`, `m08-l05`)
+    - `is` / `as` vs. cast: test, null result or exception (`m08-l06`)
+    - struct vs. class vs. record; `record struct` (`m08-l08`, `m08-l10`, `m06-l01`)
+    - record positional parameter vs. primary constructor parameter (`m08-l10`, `m06-l07`)
+    - `Equals` / `GetHashCode` vs. `==` (`m08-l09`, `m04-l08`)
+  - Misconception ids: m08-l02-new-overrides-method, m08-l06-cast-changes-object, m08-l08-struct-copy-changes-original, m08-l09-equals-without-gethashcode, m08-l10-record-always-immutable
 - ▶: all covered modules are runnable.
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
@@ -518,6 +526,8 @@ Primary sources:
 - Microsoft Learn, Validation in ASP.NET Core: https://learn.microsoft.com/aspnet/core/validation/overview – updated 2026-10-16.
 - .NET Blog, OpenAPI document generation in .NET 9 (2024-11-25): https://devblogs.microsoft.com/dotnet/dotnet9-openapi/
 - Microsoft Learn, sealed modifier (C# reference): https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/sealed – updated 2026-06-05.
+- Microsoft Learn, Framework design guidelines, Sealing: https://learn.microsoft.com/dotnet/standard/design-guidelines/sealing
+- Microsoft Learn, Code analysis rule CA1852 (seal internal types): https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1852
 - Microsoft Learn, Managed threading best practices: https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices – updated 2026-03-13.
 - Microsoft Learn, Parallel programming in .NET: https://learn.microsoft.com/dotnet/standard/parallel-programming/ – updated 2026-08-13.
 - Microsoft Learn, Channels: https://learn.microsoft.com/dotnet/core/extensions/channels
@@ -534,5 +544,4 @@ Open questions from the review:
 - With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
 - Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
 - M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
-- M8: current wording of the .NET design guidelines on sealing and the id of the analysis rule that suggests sealing internal types.
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.
