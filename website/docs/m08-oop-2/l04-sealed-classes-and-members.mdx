@@ -1,0 +1,226 @@
+---
+title: Versiegelte Klassen und Member
+sidebar_position: 4
+description: Mit sealed beendest du die Vererbung gezielt – bei einer Klasse oder bei einer Überschreibung. Der Zustand der Objekte bleibt davon unberührt.
+lesson_id: m08-l04
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import sealedClass from '!!raw-loader!@site/examples/m08/l04/sealed-class.snippet.cs';
+import sealedOverride from '!!raw-loader!@site/examples/m08/l04/sealed-override.cs';
+import sealedOverrideOutput from '!!raw-loader!@site/examples/m08/l04/sealed-override.out.txt';
+import sealedOverrideDerived from '!!raw-loader!@site/examples/m08/l04/sealed-override-derived.snippet.cs';
+import sealedWithoutOverride from '!!raw-loader!@site/examples/m08/l04/sealed-without-override.snippet.cs';
+import sealedAbstract from '!!raw-loader!@site/examples/m08/l04/sealed-abstract.snippet.cs';
+import sealedNotImmutable from '!!raw-loader!@site/examples/m08/l04/sealed-not-immutable.cs';
+import sealedNotImmutableOutput from '!!raw-loader!@site/examples/m08/l04/sealed-not-immutable.out.txt';
+import sealedGap from '!!raw-loader!@site/examples/m08/l04/sealed-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l04/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l04/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l04/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l04/seclog-oop-solution.cs';
+
+# Versiegelte Klassen und Member
+
+:::note[Lernziele]
+- Du kannst eine Klasse und eine Überschreibung mit `sealed` versiegeln und die Folgen vorhersagen.
+- Du kannst begründen, wann du eine Klasse versiegelst und wann nicht.
+- Du kannst erklären, dass `sealed` die Vererbung betrifft und nicht den Zustand eines Objekts.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l02-q4" />
+
+<Quiz id="m08-l03-q2" />
+
+<Quiz id="m06-l08-q6" />
+
+## Eine Klasse versiegeln
+
+Die Lektionen 1 bis 3 haben die Vererbung geöffnet. `sealed` schließt sie wieder, wo du es willst. Eine <Term id="sealed-class">versiegelte Klasse</Term> (Sealed Class) trägt `sealed` vor `class`. Von ihr kann keine andere Klasse ableiten. Wer es trotzdem versucht, bekommt einen Fehler beim Übersetzen:
+
+<CodeBlock language="csharp" title="sealed-class.snippet.cs">{sealedClass}</CodeBlock>
+
+```text
+error CS0509: 'LabelPrinter': cannot derive from sealed type 'Printer'
+```
+
+Eine Klasse kann nicht `sealed` und `abstract` zugleich sein. Das widerspricht sich: Eine abstrakte Klasse ist nur zum Ableiten da, `sealed` verbietet es.
+
+<CodeBlock language="csharp" title="sealed-abstract.snippet.cs">{sealedAbstract}</CodeBlock>
+
+```text
+error CS0418: 'Device': an abstract type cannot be sealed or static
+```
+
+Aus Modul 6 kennst du die `static class`. Sie darf weder `sealed` noch `abstract` tragen, verhält sich aber, als wäre sie beides: Von ihr gibt es kein Objekt, und man kann nicht von ihr ableiten.
+
+Structs sind implizit versiegelt, und Records lassen sich versiegeln. Beides kommt später.
+
+<Forward concepts={['Structs', 'Records']} module="8" />
+
+## Eine Überschreibung versiegeln
+
+Auch einzelne Member lassen sich versiegeln. Ein <Term id="sealed-member">versiegelter Member</Term> ist eine Überschreibung mit `sealed override`. Abgeleitete Klassen dürfen sie nicht erneut überschreiben. Die Klasse selbst bleibt ableitbar.
+
+:::info[Vorhersage]
+`Printer` versiegelt seine Überschreibung von `Describe()`, `Scanner` überschreibt sie normal. Die Schleife hat die Variable `device` vom Typ `Device`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l04-sealed-override" code={sealedOverride} predict expected={sealedOverrideOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Device: router`, `Printer: office printer` und `Scanner: archive scanner`.
+
+1. **Überschreiben:** `Printer` und `Scanner` überschreiben das virtuelle `Describe()` von `Device`.
+2. **Versiegeln:** `sealed override` in `Printer` beendet die Kette der Überschreibungen. Der Aufruf über `Device` ändert sich dadurch nicht: Der Laufzeittyp wählt weiter die Version.
+3. **Folge:** Eine Klasse, die von `Printer` ableitet, dürfte `Describe()` nicht mehr überschreiben:
+
+<CodeBlock language="csharp" title="sealed-override-derived.snippet.cs">{sealedOverrideDerived}</CodeBlock>
+
+```text
+error CS0239: 'LabelPrinter.Describe()': cannot override inherited member 'Printer.Describe()' because it is sealed
+```
+
+Was passiert, wenn du `sealed` bei einer Methode schreibst, die gar nichts überschreibt? Das ist ein Fehler: `sealed` ist bei einem Member nur zusammen mit `override` erlaubt. Ein Member ohne `virtual` braucht auch keine Versiegelung, denn man kann ihn ohnehin nicht überschreiben.
+
+<CodeBlock language="csharp" title="sealed-without-override.snippet.cs">{sealedWithoutOverride}</CodeBlock>
+
+```text
+error CS0238: 'Device.Describe()' cannot be sealed because it is not an override
+```
+
+</details>
+
+## sealed betrifft die Vererbung, nicht den Zustand
+
+`sealed` sagt nichts darüber, ob sich ein Objekt ändern darf. Es verbietet nur das Ableiten. Ob sich Eigenschaften ändern lassen, entscheiden `set`, `init` und `readonly` (Modul 4 und 6).
+
+Zum Prüfen gibt es `typeof(T).IsSealed`. Die Eigenschaft `Type.IsSealed` liefert `True`, wenn der Typ versiegelt ist. Sie gehört zur Bibliothek und ist das einzige Stück Reflection in diesem Modul, mehr dazu lernst du hier nicht.
+
+:::info[Vorhersage]
+`Printer` ist versiegelt und hat die Eigenschaft `Name` mit `set`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l04-immutable" code={sealedNotImmutable} predict expected={sealedNotImmutableOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `office printer`, `label printer`, `Device sealed: False` und `Printer sealed: True`.
+
+1. **Objekt ändern:** `Name` hat einen `set`-Accessor. Die Zuweisung ändert das Objekt, obwohl die Klasse versiegelt ist.
+2. **Typ prüfen:** `typeof(Device).IsSealed` ist `False`, `typeof(Printer).IsSealed` ist `True`.
+
+Was passiert, wenn du `sealed` entfernst? Die Zeile mit `label printer` gibt dasselbe aus. Nur `Printer sealed` zeigt dann `False`. Der Zustand hängt an `set`, nicht an `sealed`.
+
+</details>
+
+## Wann versiegeln?
+
+Es gibt keine feste Regel, sondern zwei Sichtweisen, die zu zwei Arten von Typen passen.
+
+Für wiederverwendbare Bibliotheken, die andere Entwickler benutzen, verlangen die Framework-Design-Richtlinien einen guten Grund, bevor man eine Klasse versiegelt. Nutzer leiten oft aus unerwarteten Gründen ab, zum Beispiel um bequeme Member zu ergänzen. Gute Gründe sind etwa eine statische Klasse oder sehr viele geerbte virtuelle Member. Überschreibungen soll man dagegen erwägen zu versiegeln. Die Richtlinien sind für Bibliotheken geschrieben ([Sealing](https://learn.microsoft.com/dotnet/standard/design-guidelines/sealing)). Sie stammen aus dem Jahr 2008, und die Seite weist darauf hin, dass manches veraltet sein kann.
+
+Für Typen, die nur im eigenen Programm vorkommen, gibt es die <Term id="code-analysis-rule">Code-Analyse-Regel</Term> (Code Analysis Rule) CA1852. Sie meldet einen Typ, der nur innerhalb seiner Assembly sichtbar ist und von dem nichts ableitet. Eine Assembly ist das fertig übersetzte Programm oder die Bibliothek. Versiegeln solcher Typen kann die Leistung verbessern. Die Regel gehört zur Kategorie Leistung, gibt es seit .NET 7 und ist in .NET 10 nicht standardmäßig eingeschaltet ([CA1852: Seal internal types](https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1852)). Wie man sie einschaltet, zeigt dieses Modul nicht.
+
+<Forward concepts={['Assemblies']} module="14" />
+
+Für SecLog heißt das: Die Regelklassen `FailedLoginRule` und `WatchListRule` benutzt nur das Programm selbst, und nichts leitet von ihnen ab. Sie sind gute Kandidaten zum Versiegeln. `DetectionRule` bleibt offen, denn sie ist die Basisklasse.
+
+## Lückenbeispiel
+
+Die Klasse `Scanner` soll versiegelt werden, und ihre Überschreibung ebenfalls. Ergänze die Stellen aus den Kommentaren. Das Programm soll weiter `Scanner: archive scanner` ausgeben.
+
+<CSharpRunner id="m08-l04-gaps" code={sealedGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Klasse versiegeln:** `sealed class Scanner : Device`.
+2. **Überschreibung versiegeln:** `public sealed override string Describe() => $"Scanner: {Name}";`.
+3. **Hinweis:** In einer versiegelten Klasse ist `sealed` bei der Überschreibung überflüssig, weil niemand ableiten kann. Es ist erlaubt und ändert die Ausgabe nicht.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die abstrakte Basisklasse `DetectionRule` mit `IsMatch` und zwei Regeln, `FailedLoginRule` und `WatchListRule`. Ein Block prüft jeden Vorfall mit jeder Regel.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Platz für den neuen Block mit `return 0;` und die Klassen `DetectionRule`, `FailedLoginRule` und `WatchListRule`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Versiegele `FailedLoginRule` und `WatchListRule` mit `sealed`. Nichts leitet von ihnen ab, deshalb würde CA1852 es vorschlagen.
+2. Schreibe vor `// End with exit code 0 …` den Block `// Check that the rule classes are sealed`. Er gibt für `FailedLoginRule`, `WatchListRule` und `DetectionRule` jeweils `{Name} sealed: {typeof(Name).IsSealed}` aus, etwa `$"FailedLoginRule sealed: {typeof(FailedLoginRule).IsSealed}"`. Für `DetectionRule` erscheint `False`.
+
+<CSharpRunner id="m08-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Versiegeln:** `sealed` steht vor `class` bei den beiden Regelklassen. Die Basisklasse `DetectionRule` bleibt unverändert.
+2. **Prüfen:** `typeof(…).IsSealed` liefert für die beiden Regeln `True` und für die Basisklasse `False`. Die Prüfung der Vorfälle aus Lektion 3 läuft unverändert weiter.
+
+</details>
+
+**Neuer Stand:** SecLog hat zwei versiegelte Regelklassen unter einer offenen abstrakten Basisklasse und prüft das mit `IsSealed`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l04-sealed-means-immutable" />
+
+**„Eine versiegelte Klasse macht ihre Objekte unveränderlich.“** Das stimmt nicht. `sealed` verbietet nur das Ableiten von der Klasse. Eigenschaften mit `set` lassen sich weiter ändern. Unveränderlich machen Eigenschaften ohne `set` oder mit `init` und `readonly`-Felder.
+:::
+
+<details>
+<summary>Vertiefung: Die Regeln im Detail (optional)</summary>
+
+Der Modifizierer `sealed` verhindert das Ableiten von einer Klasse: Ist eine versiegelte Klasse die Basisklasse einer anderen Klasse, ist das ein Fehler beim Übersetzen. Eine versiegelte Klasse kann nicht auch abstrakt sein ([§15.2.2.3 Sealed classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15223-sealed-classes)).
+
+Eine versiegelte Methode überschreibt eine geerbte virtuelle Methode mit gleicher Signatur und trägt zusätzlich `override`. Sie verhindert weiteres Überschreiben in abgeleiteten Klassen ([§15.6.6 Sealed methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1566-sealed-methods)).
+
+Eine statische Klasse darf weder `sealed` noch `abstract` tragen. Weil man sie weder erzeugen noch ableiten kann, verhält sie sich, als wäre sie beides ([§15.2.2.4 Static classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15224-static-classes)).
+
+</details>
+
+## Zusammenfassung
+
+`sealed` vor einer Klasse verbietet das Ableiten. `sealed override` verbietet, die Überschreibung in abgeleiteten Klassen zu wiederholen. Ein Member braucht `override`, um versiegelt zu werden, und eine Klasse kann nicht abstrakt und versiegelt zugleich sein. `sealed` betrifft nur die Vererbung und nicht den Zustand eines Objekts. Für Bibliothekstypen verlangt die Richtlinie einen guten Grund zum Versiegeln, für Typen nur im eigenen Programm schlägt CA1852 es vor, wenn nichts ableitet.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l04-q1" />
+
+<Quiz id="m08-l04-q2" />
+
+<Quiz id="m08-l04-q3" />
+
+<Quiz id="m08-l04-q4" />
+
+<Quiz id="m08-l04-q5" />
+
+<Quiz id="m08-l04-q6" />
+
+<Quiz id="m08-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m08-l04-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Sealed classes](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15223-sealed-classes)
+- Microsoft Learn: [Framework-Design-Richtlinien: Sealing](https://learn.microsoft.com/dotnet/standard/design-guidelines/sealing)
+- Microsoft Learn: [Type.IsSealed](https://learn.microsoft.com/dotnet/api/system.type.issealed)

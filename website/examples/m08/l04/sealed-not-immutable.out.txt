@@ -1,0 +1,4 @@
+office printer
+label printer
+Device sealed: False
+Printer sealed: True
