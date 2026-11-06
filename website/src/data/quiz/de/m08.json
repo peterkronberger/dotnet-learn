@@ -833,6 +833,290 @@
       "type": "explain",
       "question": "Transfer: Wo würdest du in einem eigenen Programm `is` mit einer Variable benutzen und wo `as`?",
       "modelAnswer": "In SecLog hält der `Detector` Regeln als `IDetectionRule`. Will ich nur bei der Regel mit Schwellenwert dessen `Threshold` lesen, schreibe ich `rule is FailedLoginRule thresholdRule` und benutze `thresholdRule` im Block. `as` benutze ich, wenn ich das Ergebnis weiterreichen oder zählen will, etwa `rule as DetectionRule` und danach auf `null` prüfen. Ein Cast passt nur, wenn ich sicher bin, dass der Typ stimmt."
+    },
+    {
+      "id": "m08-l07-q1",
+      "lesson": "m08-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l07/enum-basics.cs",
+      "explanation": "Ohne Angabe zählen die Member ab 0: `None` ist 0, `Low` 1, `Medium` 2, `High` 3. `Console.WriteLine` gibt den Namen aus, der Cast mit `(int)` den Zahlenwert. Der Vergleich `>` vergleicht die Zahlenwerte, und `(Severity)3` ist `High`."
+    },
+    {
+      "id": "m08-l07-q2",
+      "lesson": "m08-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l07/enum-unnamed.cs",
+      "explanation": "`(Severity)42` ist ein gültiger Wert des Enums, auch wenn kein Member 42 heißt. `ToString()` gibt dafür die Zahl aus, `Enum.IsDefined` ist `False`, und die `switch`-Anweisung landet im `default`-Abschnitt."
+    },
+    {
+      "id": "m08-l07-q3",
+      "lesson": "m08-l07",
+      "type": "single",
+      "question": "`Severity` hat die Member `None`, `Low`, `Medium` und `High` (Werte 0 bis 3). Was passiert bei `Severity odd = (Severity)42;`?",
+      "options": [
+        {
+          "text": "Das Programm läuft weiter: `odd` ist ein gültiger Wert des Enums, auch ohne Namen.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil 42 kein Member von `Severity` ist.",
+          "feedback": "Jeder Wert des zugrunde liegenden Typs `int` darf per Cast in das Enum. Der Compiler prüft die Namen nicht.",
+          "misconception": "m08-l07-enum-only-named-values"
+        },
+        {
+          "text": "Der Cast wirft zur Laufzeit eine `InvalidCastException`.",
+          "feedback": "Die Umwandlung zwischen einem Enum und seinem Zahlentyp prüft nicht, ob der Wert einen Namen hat.",
+          "misconception": "m08-l07-enum-only-named-values"
+        }
+      ],
+      "explanation": "Die Werte eines Enums sind alle Werte des zugrunde liegenden Typs, nicht nur die benannten. Deshalb prüfst du Eingaben mit `Enum.TryParse` oder `Enum.IsDefined`."
+    },
+    {
+      "id": "m08-l07-q4",
+      "lesson": "m08-l07",
+      "type": "single",
+      "question": "Ein switch-Ausdruck über `Severity` hat Zweige für alle vier Member, aber keinen `_`-Zweig. Was meldet der Compiler?",
+      "options": [
+        {
+          "text": "Eine Warnung (CS8524): Der Ausdruck deckt einen unbenannten Enum-Wert nicht ab.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, denn alle Member von `Severity` sind abgedeckt.",
+          "feedback": "Ein Enum kann auch unbenannte Werte wie `(Severity)42` enthalten. Die deckt kein Zweig ab.",
+          "misconception": "m08-l07-enum-only-named-values"
+        },
+        {
+          "text": "Einen Fehler: Das Programm lässt sich nicht übersetzen.",
+          "feedback": "Es ist eine Warnung. Das Programm läuft, wirft aber bei einem unbenannten Wert eine Ausnahme."
+        }
+      ],
+      "explanation": "Weil jeder Wert des zugrunde liegenden Typs gültig ist, ist ein switch über ein Enum nur mit Auffangzweig vollständig. Eine `switch`-Anweisung braucht dafür `default`."
+    },
+    {
+      "id": "m08-l07-q5",
+      "lesson": "m08-l07",
+      "type": "single",
+      "question": "Was ergibt `Enum.TryParse(\"Critical\", out Severity level)`, wenn `Severity` den Member `Critical` nicht hat?",
+      "options": [
+        {
+          "text": "`false`, und `level` hat den Standardwert `None`.",
+          "correct": true
+        },
+        {
+          "text": "Sie wirft eine `ArgumentException`.",
+          "feedback": "Das macht `Enum.Parse`. `TryParse` wirft nicht, sondern gibt `false` zurück."
+        },
+        {
+          "text": "`true`, und `level` ist `High`, der größte Wert.",
+          "feedback": "Ein unbekannter Name wird nie zu einem Member. `TryParse` gibt dann `false` zurück."
+        }
+      ],
+      "explanation": "`TryParse` meldet das Ergebnis über den Rückgabewert und schreibt bei einem Fehler den Standardwert in die `out`-Variable. Beim Enum ist das der Wert 0."
+    },
+    {
+      "id": "m08-l07-q6",
+      "lesson": "m08-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l07/enum-parse.cs",
+      "explanation": "`TryParse` mit `\"Medium\"` gelingt. Mit `\"Critical\"` gibt es `false` zurück und `unknown` bleibt `None`. `Enum.Parse` wirft für den unbekannten Namen eine `ArgumentException`, die der `catch`-Block abfängt."
+    },
+    {
+      "id": "m08-l07-q7",
+      "lesson": "m08-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über ein Flags-Enum stimmen?",
+      "options": [
+        {
+          "text": "Die Member sind Zweierpotenzen (1, 2, 4, …), damit jeder Member ein eigenes Bit hat.",
+          "correct": true
+        },
+        {
+          "text": "Mit `|` kombinierst du Member zu einem Wert.",
+          "correct": true
+        },
+        {
+          "text": "Mit `(wert & Member) != 0` prüfst du, ob ein Member im Wert steckt.",
+          "correct": true
+        },
+        {
+          "text": "`&` kombiniert Member, `|` prüft einen Member.",
+          "feedback": "Es ist umgekehrt: `|` kombiniert, `&` prüft."
+        },
+        {
+          "text": "Der Wert `Read | Write` ist kein gültiger Wert des Enums, weil er keinen Namen hat.",
+          "feedback": "Jeder Wert des zugrunde liegenden Typs ist gültig, auch eine Kombination ohne eigenen Namen.",
+          "misconception": "m08-l07-enum-only-named-values"
+        }
+      ],
+      "explanation": "Bei Zweierpotenzen überschneiden sich die Bits der Member nicht. So lassen sie sich mit `|` zusammensetzen und mit `&` einzeln prüfen."
+    },
+    {
+      "id": "m08-l07-q8",
+      "lesson": "m08-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l07/quiz-flags.cs",
+      "explanation": "`Read` ist 1 und `Delete` ist 4. `Read | Delete` ergibt 5. `granted & Delete` ist 4, also nicht `None`: `True`. `granted & Write` ist 0: `False`."
+    },
+    {
+      "id": "m08-l07-q9",
+      "lesson": "m08-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein `switch` über ein Enum einen Standardfall braucht, obwohl alle Member abgedeckt sind.",
+      "modelAnswer": "Ein Enum speichert einen Wert seines zugrunde liegenden Typs, meist `int`. Jeder dieser Werte ist ein gültiger Wert des Enums, auch einer ohne Namen wie `(Severity)42`. Er kommt zum Beispiel durch einen Cast oder eine Zahl aus einer Eingabe. Die Zweige eines `switch` nennen aber nur die benannten Member. Ohne Standardfall gäbe es für unbenannte Werte keinen Zweig: Der Compiler warnt (CS8524), und der switch-Ausdruck würde zur Laufzeit eine Ausnahme werfen."
+    },
+    {
+      "id": "m08-l07-q10",
+      "lesson": "m08-l07",
+      "type": "explain",
+      "question": "Transfer: Wo würdest du in einem eigenen Programm ein Enum statt eines Textes oder einer Zahl verwenden, und wie prüfst du Eingaben dafür?",
+      "modelAnswer": "In SecLog ersetzt ein Enum die Texte `login-success`, `login-failed` und `logout`. Ein Tippfehler wie `EventType.LoginFaild` ist dann ein Fehler beim Übersetzen, ein Text `\"login-faild\"` fiele erst zur Laufzeit auf. Ebenso passt ein Enum für den Schweregrad oder den Status eines Vorfalls. Text oder Zahl von außen wandle ich mit `Enum.TryParse` um und prüfe das Ergebnis. Für eine Zahl nutze ich `Enum.IsDefined`, bevor ich sie mit einem Cast als Enum verwende."
+    },
+    {
+      "id": "m08-l08-q1",
+      "lesson": "m08-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l08/struct-copy.cs",
+      "explanation": "`Point b = a;` kopiert den ganzen Wert, deshalb ändert `b.X = 10` nur `b`. Auch beim Aufruf von `Move(a)` bekommt die Methode eine Kopie, `a.X` bleibt 1."
+    },
+    {
+      "id": "m08-l08-q2",
+      "lesson": "m08-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l08/struct-list.cs",
+      "explanation": "`points[0]` zu lesen, liefert eine Kopie. `copy.X = 10` ändert nur die Kopie, in der Liste steht weiter 1. Erst `points[0] = copy;` schreibt den geänderten Wert zurück."
+    },
+    {
+      "id": "m08-l08-q3",
+      "lesson": "m08-l08",
+      "type": "single",
+      "question": "`points` ist eine `List<Point>` mit `Point` als Struct. Es gilt `Point p = points[0]; p.X = 10;`. Was steht danach in `points[0].X`?",
+      "options": [
+        {
+          "text": "Der alte Wert: `p` ist eine Kopie, die Liste enthält das Original.",
+          "correct": true
+        },
+        {
+          "text": "10: `p` und `points[0]` sind derselbe Wert.",
+          "feedback": "Bei einem Struct kopiert die Zuweisung den ganzen Wert. Bei einer Klasse würde `p` auf dasselbe Objekt zeigen.",
+          "misconception": "m08-l08-struct-copy-changes-original"
+        },
+        {
+          "text": "10, denn die Liste gibt Structs per Verweis heraus.",
+          "feedback": "Der Indexer gibt eine Kopie des Werts zurück. Dasselbe gilt für Variablen und Parameter.",
+          "misconception": "m08-l08-struct-copy-changes-original"
+        }
+      ],
+      "explanation": "Ein Struct ist ein Werttyp: Zuweisen, Übergeben und Zurückgeben kopieren den Wert. Eine Änderung an der Kopie lässt das Original unverändert."
+    },
+    {
+      "id": "m08-l08-q4",
+      "lesson": "m08-l08",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS1612.",
+      "example": "m08/l08/struct-list-modify.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "explanation": "`points[0]` ist eine Kopie, keine Variable. Eine Eigenschaft dieser Kopie zu ändern, wäre sinnlos, deshalb lehnt der Compiler es ab (CS1612). Lies den Wert in eine Variable, ändere sie und schreibe sie zurück."
+    },
+    {
+      "id": "m08-l08-q5",
+      "lesson": "m08-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l08/struct-boxing.cs",
+      "explanation": "`object boxed = point;` boxt eine Kopie. Die Änderung an `point` erreicht sie nicht: `1`. `IMovable movable = point;` boxt eine zweite Kopie (dort ist `X` 5). `MoveRight()` ändert diese Kopie, `point.X` bleibt `5`, und die Kopie hat `6`."
+    },
+    {
+      "id": "m08-l08-q6",
+      "lesson": "m08-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l08/struct-default.cs",
+      "explanation": "Bei `default` und bei einem Array von Structs sind alle Felder auf ihrem Standardwert. `new Counter()` ruft den selbst geschriebenen parameterlosen Konstruktor auf (`5`). `default` ruft ihn nicht auf: `0`."
+    },
+    {
+      "id": "m08-l08-q7",
+      "lesson": "m08-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über Structs stimmen?",
+      "options": [
+        {
+          "text": "Ein Struct ist ein Werttyp: Zuweisen und Übergeben kopieren alle Felder.",
+          "correct": true
+        },
+        {
+          "text": "Ein Struct ist implizit versiegelt und kann nicht von einem anderen Struct erben.",
+          "correct": true
+        },
+        {
+          "text": "Ein Struct kann Interfaces implementieren.",
+          "correct": true
+        },
+        {
+          "text": "Ein Struct kann von einem anderen Struct erben, wenn man `sealed` weglässt.",
+          "feedback": "Structs sind immer implizit versiegelt. Ableiten ist ein Fehler beim Übersetzen (CS0527)."
+        },
+        {
+          "text": "Der Wert von `default` ruft einen selbst geschriebenen parameterlosen Konstruktor auf.",
+          "feedback": "`default` setzt alle Felder auf ihren Standardwert und ruft keinen Konstruktor auf."
+        }
+      ],
+      "explanation": "Ein Struct unterscheidet sich von einer Klasse durch seine Wertsemantik und die fehlende Vererbung. Interfaces bleiben möglich, dabei wird der Wert aber geboxt."
+    },
+    {
+      "id": "m08-l08-q8",
+      "lesson": "m08-l08",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS8340.",
+      "example": "m08/l08/struct-readonly-field.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "explanation": "Ein `readonly struct` verlangt, dass alle Instanzfelder `readonly` sind. Das Feld `KmPerHour` ist es nicht (CS8340). Eine Eigenschaft nur mit `get` wäre erlaubt."
+    },
+    {
+      "id": "m08-l08-q9",
+      "lesson": "m08-l08",
+      "type": "single",
+      "question": "Du modellierst zwei Typen: eine Geschwindigkeit in km/h (ein Zahlenwert, klein, ändert sich nie) und einen Vorfall (hat eine Liste von Ereignissen und einen veränderlichen Status). Was passt?",
+      "options": [
+        {
+          "text": "Die Geschwindigkeit als `readonly struct`, den Vorfall als Klasse.",
+          "correct": true
+        },
+        {
+          "text": "Beide als Struct, denn Structs sind immer schneller.",
+          "feedback": "Das ist keine Regel. Ein Struct passt für kleine, unveränderliche Werte. Große oder veränderliche Typen kopierst du bei jeder Zuweisung."
+        },
+        {
+          "text": "Den Vorfall als Struct, damit Änderungen überall sichtbar sind.",
+          "feedback": "Beim Struct ändert eine Änderung nur die Kopie. Sichtbar für alle Verweise wäre sie nur bei einer Klasse.",
+          "misconception": "m08-l08-struct-copy-changes-original"
+        }
+      ],
+      "explanation": "Die Richtlinie empfiehlt ein Struct nur für Typen, die einen einzelnen Wert darstellen, klein und unveränderlich sind und selten geboxt werden. Alles andere ist besser eine Klasse."
+    },
+    {
+      "id": "m08-l08-q10",
+      "lesson": "m08-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was beim Zuweisen und beim Übergeben eines Structs passiert und was das für eine Änderung bedeutet.",
+      "modelAnswer": "Ein Struct ist ein Werttyp. Bei `b = a` und beim Übergeben als Argument wird der ganze Wert mit allen Feldern kopiert. Danach sind `a` und `b` zwei unabhängige Werte. Ändere ich `b`, bleibt `a` gleich, und eine Methode ändert nur ihre Kopie. Dasselbe gilt für einen Wert, den ich aus einer Liste hole: Ich ändere die Kopie und muss sie zurückschreiben, wenn die Liste sie enthalten soll."
+    },
+    {
+      "id": "m08-l08-q11",
+      "lesson": "m08-l08",
+      "type": "explain",
+      "question": "Transfer: Wofür würdest du in einem eigenen Programm ein Struct nehmen und wofür eine Klasse?",
+      "modelAnswer": "Ein Struct nehme ich für einen kleinen Wert, der unveränderlich ist und nichts anderes als seine Daten bedeutet, in SecLog etwa den Zeitraum `TimeWindow` mit Start und Länge. Er wird oft kopiert, und das ist hier gewollt. Eine Klasse nehme ich für Dinge mit Identität und Zustand, der sich ändert, wie einen `Incident` mit seiner Liste von Ereignissen und seinem Status, denn alle Verweise sollen dasselbe Objekt sehen."
     }
   ]
 }

@@ -1,0 +1,3 @@
+True: Medium
+False: None
+ArgumentException

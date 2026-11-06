@@ -1,0 +1,4 @@
+42
+False
+True
+unknown value
