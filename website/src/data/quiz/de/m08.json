@@ -1,4 +1,246 @@
 {
   "module": "m08",
-  "questions": []
+  "questions": [
+    {
+      "id": "m08-l01-q1",
+      "lesson": "m08-l01",
+      "type": "single",
+      "question": "Die Klasse `Device` hat die Eigenschaft `Name` und die Methode `Describe()`. `Printer` ist mit `class Printer : Device` abgeleitet und hat zusätzlich `PagesPerMinute`. Welche Member kann man an einem `Printer`-Objekt aufrufen?",
+      "options": [
+        {
+          "text": "`Name`, `Describe()` und `PagesPerMinute`.",
+          "correct": true
+        },
+        {
+          "text": "Nur `PagesPerMinute`, weil `Printer` die Member von `Device` nicht automatisch hat.",
+          "feedback": "Eine abgeleitete Klasse enthält die Member ihrer Basisklasse. `Name` und `Describe()` sind am `Printer`-Objekt aufrufbar."
+        },
+        {
+          "text": "Nur `Name` und `Describe()`, weil `Printer` nach dem Ableiten keine eigenen Member mehr hat.",
+          "feedback": "Eine abgeleitete Klasse kann eigene Member hinzufügen. `PagesPerMinute` gehört zu `Printer`."
+        }
+      ],
+      "explanation": "Die abgeleitete Klasse enthält die Member der Basisklasse und fügt ihre eigenen hinzu. Ein `Printer` hat also `Name`, `Describe()` und `PagesPerMinute`."
+    },
+    {
+      "id": "m08-l01-q2",
+      "lesson": "m08-l01",
+      "type": "single",
+      "question": "`Device` hat nur den Konstruktor `Device(string name)`. `Printer` ist mit `class Printer : Device` abgeleitet und deklariert keinen Konstruktor. Was passiert bei `new Printer(\"office printer\")`?",
+      "options": [
+        {
+          "text": "Der Code lässt sich nicht übersetzen: `Printer` hat keinen Konstruktor mit einem Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Es funktioniert, weil `Printer` den Konstruktor `Device(string name)` erbt.",
+          "feedback": "Konstruktoren werden nicht vererbt. `Printer` hat nur den Standardkonstruktor ohne Parameter, und der findet in `Device` keinen passenden Konstruktor ohne Parameter.",
+          "misconception": "m08-l01-constructors-are-inherited"
+        },
+        {
+          "text": "Es funktioniert, und `Name` bleibt `null`.",
+          "feedback": "Das Programm wird gar nicht erst übersetzt. Der Konstruktor von `Printer` ruft `base()` auf, und `Device` hat keinen Konstruktor ohne Parameter.",
+          "misconception": "m08-l01-constructors-are-inherited"
+        }
+      ],
+      "explanation": "Instanzkonstruktoren werden nicht vererbt. `Printer` bekommt nur einen Standardkonstruktor, der `base()` aufruft. `Device` hat keinen Konstruktor ohne Parameter, deshalb meldet der Compiler einen Fehler. `Printer` braucht einen eigenen Konstruktor mit `: base(name)`."
+    },
+    {
+      "id": "m08-l01-q3",
+      "lesson": "m08-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l01/constructor-order.cs",
+      "explanation": "`new Printer(...)` ruft zuerst den Basiskonstruktor auf, denn `: base(name)` läuft vor dem Rumpf. Danach läuft der Rumpf von `Printer`. Erst dann gibt `Console.WriteLine` die Zeile `Created` aus."
+    },
+    {
+      "id": "m08-l01-q4",
+      "lesson": "m08-l01",
+      "type": "single",
+      "question": "In `Device` steht `protected string Kind = \"device\";`. Wo kann man auf `Kind` zugreifen?",
+      "options": [
+        {
+          "text": "In `Device` und in Klassen, die von `Device` abgeleitet sind.",
+          "correct": true
+        },
+        {
+          "text": "Nur in `Device`.",
+          "feedback": "Das wäre `private`. `protected` erlaubt den Zugriff auch in abgeleiteten Klassen."
+        },
+        {
+          "text": "Überall, auch in Code außerhalb der Klassen.",
+          "feedback": "Das wäre `public`. Von außen, zum Beispiel im Hauptprogramm über `printer.Kind`, ist `protected` nicht zugreifbar."
+        }
+      ],
+      "explanation": "`protected` liegt zwischen `private` und `public`: Zugriff in der Klasse selbst und in ihren abgeleiteten Klassen, nicht von außen."
+    },
+    {
+      "id": "m08-l01-q5",
+      "lesson": "m08-l01",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0122.",
+      "example": "m08/l01/private-in-derived.snippet.cs",
+      "bugLines": [8],
+      "explanation": "Die abgeleitete Klasse enthält auch die privaten Member der Basisklasse, darf aber nicht auf sie zugreifen. Für den Zugriff in abgeleiteten Klassen braucht das Feld `protected`.",
+      "lineFeedback": {
+        "8": {
+          "feedback": "`secret` ist `private` in `Device`. `Printer` erbt das Feld, darf aber nicht darauf zugreifen. Mit `protected` wäre der Zugriff erlaubt."
+        }
+      }
+    },
+    {
+      "id": "m08-l01-q6",
+      "lesson": "m08-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l01/base-type-variable.cs",
+      "explanation": "Die Liste hat den Typ `List<Device>`. Ein `Printer` passt hinein, weil er von `Device` abgeleitet ist. Die Schleife ruft `Describe()` aus `Device` auf, und beide Objekte haben nur diese eine Version."
+    },
+    {
+      "id": "m08-l01-q7",
+      "lesson": "m08-l01",
+      "type": "single",
+      "question": "Es gilt `Device device = new Printer(\"office printer\", 40);`. Welche Zeile lässt sich übersetzen?",
+      "options": [
+        {
+          "text": "`Console.WriteLine(device.Name);`",
+          "correct": true
+        },
+        {
+          "text": "`Console.WriteLine(device.PagesPerMinute);`",
+          "feedback": "Über die Variable vom Typ `Device` sind nur die Member von `Device` erreichbar. `PagesPerMinute` gehört zu `Printer` (Fehler CS1061)."
+        },
+        {
+          "text": "`Printer printer = device;`",
+          "feedback": "Von der Basisklasse zur abgeleiteten Klasse gibt es keine automatische Umwandlung. Die Variable `device` hat den Typ `Device`, und nicht jedes `Device` ist ein `Printer`."
+        }
+      ],
+      "explanation": "Ein `Printer`-Objekt darf in einer `Device`-Variablen stehen. Über die Variable erreichst du aber nur die Member von `Device`, auch wenn das Objekt ein `Printer` ist."
+    },
+    {
+      "id": "m08-l01-q8",
+      "lesson": "m08-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was erbt eine abgeleitete Klasse von ihrer Basisklasse, und was nicht? Warum braucht ihr Konstruktor oft `: base(…)`?",
+      "modelAnswer": "Eine abgeleitete Klasse enthält die Member der Basisklasse, zum Beispiel Eigenschaften und Methoden, und kann eigene hinzufügen. Private Member sind enthalten, aber in der abgeleiteten Klasse nicht zugreifbar. Konstruktoren werden nicht vererbt. Die abgeleitete Klasse schreibt einen eigenen Konstruktor, und der ruft mit `: base(…)` einen Konstruktor der Basisklasse auf. Ohne Angabe ruft der Compiler `base()` auf. Hat die Basisklasse keinen Konstruktor ohne Parameter, ist `: base(…)` Pflicht."
+    },
+    {
+      "id": "m08-l01-q9",
+      "lesson": "m08-l01",
+      "type": "explain",
+      "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem mehrere Klassen dieselben Member haben und eine Basisklasse sinnvoll wäre.",
+      "modelAnswer": "In SecLog haben alle Erkennungsregeln einen Namen und eine Beschreibung. Eine Basisklasse `DetectionRule` hält `Name` und `Describe()` einmal. `FailedLoginRule` ist davon abgeleitet, ruft im Konstruktor `: base(\"failed logins\")` auf und fügt `Threshold` hinzu. So steht der gemeinsame Teil nur an einer Stelle."
+    },
+    {
+      "id": "m08-l02-q1",
+      "lesson": "m08-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l02/virtual-override.cs",
+      "explanation": "`Describe()` ist `virtual`. Beim Aufruf entscheidet der Laufzeittyp des Objekts: Das erste Objekt ist ein `Device`, das zweite ein `Printer` mit eigener Version (`override`). `Scanner` überschreibt nichts und benutzt die Version von `Device`."
+    },
+    {
+      "id": "m08-l02-q2",
+      "lesson": "m08-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l02/hiding.cs",
+      "explanation": "`Overridden()` ist mit `override` überschrieben, deshalb läuft über beide Variablen die Version von `Printer`. `Hidden()` ist nur mit `new` verdeckt: Über die `Printer`-Variable läuft die Version von `Printer`, über die `Device`-Variable die von `Device`. Beim Verdecken entscheidet der Typ der Variablen."
+    },
+    {
+      "id": "m08-l02-q3",
+      "lesson": "m08-l02",
+      "type": "single",
+      "question": "`A` deklariert `public virtual string Name()`. `B : A` deklariert `public new string Name()`. Es gilt `A x = new B();`. Welche Version läuft bei `x.Name()`?",
+      "options": [
+        {
+          "text": "Die Version von `A`, weil `new` nur verdeckt und der Typ der Variablen entscheidet.",
+          "correct": true
+        },
+        {
+          "text": "Die Version von `B`, weil `new` die Methode der Basisklasse überschreibt.",
+          "feedback": "`new` überschreibt nicht, es verdeckt nur. Überschreiben geht nur mit `override`. Über die Variable vom Typ `A` läuft die Version von `A`.",
+          "misconception": "m08-l02-new-overrides-method"
+        },
+        {
+          "text": "Die Version von `B`, weil das Objekt ein `B` ist.",
+          "feedback": "Der Objekttyp entscheidet nur bei `virtual` und `override`. Bei `new` entscheidet der Typ der Variablen.",
+          "misconception": "m08-l02-new-overrides-method"
+        }
+      ],
+      "explanation": "Eine Methode mit `new` verdeckt die geerbte Methode. Ein Aufruf über eine Variable vom Typ der Basisklasse führt die Version der Basisklasse aus. Nur `override` einer `virtual`-Methode lässt den Laufzeittyp entscheiden."
+    },
+    {
+      "id": "m08-l02-q4",
+      "lesson": "m08-l02",
+      "type": "single",
+      "question": "`Printer : Device` schreibt `public override string Describe()`. In `Device` steht `public string Describe()` ohne `virtual`. Was meldet der Compiler?",
+      "options": [
+        {
+          "text": "Einen Fehler (CS0506): Eine Methode ohne `virtual`, `abstract` oder `override` kann nicht überschrieben werden.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, `override` macht die Basismethode nachträglich überschreibbar.",
+          "feedback": "`override` allein reicht nicht. Die Methode der Basisklasse muss `virtual`, `abstract` oder selbst `override` sein."
+        },
+        {
+          "text": "Nur eine Warnung, und `override` wirkt wie `new`.",
+          "feedback": "Es ist ein Fehler, keine Warnung. Eine Warnung gibt es, wenn man ohne `new` verdeckt."
+        }
+      ],
+      "explanation": "Nur ein Member mit `virtual`, `abstract` oder `override` darf überschrieben werden. Ohne `virtual` meldet der Compiler den Fehler CS0506."
+    },
+    {
+      "id": "m08-l02-q5",
+      "lesson": "m08-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l02/base-call.cs",
+      "explanation": "Die Variable hat den Typ `Device`, das Objekt ist ein `Printer`. Wegen `virtual` und `override` läuft die Version von `Printer`. Sie ruft mit `base.Describe()` die Version von `Device` auf und hängt die Seitenzahl an."
+    },
+    {
+      "id": "m08-l02-q6",
+      "lesson": "m08-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l02/to-string.cs",
+      "explanation": "`Console.WriteLine(obj)` und die String-Interpolation rufen `ToString()` auf. `Printer` überschreibt die Methode, `Device` nicht. Dort liefert `object.ToString()` den Namen des Typs."
+    },
+    {
+      "id": "m08-l02-q7",
+      "lesson": "m08-l02",
+      "type": "single",
+      "question": "Warum muss eine Klasse `ToString()` mit `override` schreiben und nicht mit einer neuen Methode gleichen Namens?",
+      "options": [
+        {
+          "text": "`ToString()` ist in `object` `virtual`. Nur mit `override` benutzen `Console.WriteLine` und die Interpolation die eigene Version.",
+          "correct": true
+        },
+        {
+          "text": "Weil `ToString()` die einzige Methode ist, die man überschreiben darf.",
+          "feedback": "Man darf jede `virtual`-Methode überschreiben, nicht nur `ToString()`."
+        },
+        {
+          "text": "Weil eine Methode mit gleichem Namen nicht übersetzt wird.",
+          "feedback": "Sie wird übersetzt, mit einer Warnung (CS0108). Sie verdeckt nur, und `Console.WriteLine` ruft sie nicht auf."
+        }
+      ],
+      "explanation": "Jede Klasse erbt `ToString()` von `object`, und die Methode ist `virtual`. Mit `override` greift der Laufzeittyp, deshalb nutzen `Console.WriteLine` und die Interpolation die eigene Version."
+    },
+    {
+      "id": "m08-l02-q8",
+      "lesson": "m08-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `override` und `new` bei einer Methode, die eine abgeleitete Klasse neu schreibt.",
+      "modelAnswer": "Mit `override` ersetzt die abgeleitete Klasse eine `virtual`-Methode der Basisklasse. Beim Aufruf entscheidet der Laufzeittyp des Objekts, auch wenn die Variable den Typ der Basisklasse hat (Polymorphie). Mit `new` verdeckt die Methode die geerbte nur. Dann entscheidet der Typ der Variablen: Über eine Variable vom Typ der Basisklasse läuft die Version der Basisklasse."
+    },
+    {
+      "id": "m08-l02-q9",
+      "lesson": "m08-l02",
+      "type": "explain",
+      "question": "Transfer: Nenne ein Beispiel aus einem eigenen Programm, in dem ein Aufruf über die Basisklasse je nach Objekt etwas anderes tun soll.",
+      "modelAnswer": "SecLog hält Erkennungsregeln in Variablen vom Typ `DetectionRule`. `Describe()` ist `virtual`. `FailedLoginRule` überschreibt die Methode und hängt die Schwelle an. Ein Aufruf `rule.Describe()` liefert für jede Regel ihren eigenen Text, ohne dass der aufrufende Code die Art der Regel kennen muss."
+    }
+  ]
 }

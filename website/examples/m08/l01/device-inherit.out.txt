@@ -1,0 +1,3 @@
+office printer
+Device: office printer
+Pages per minute: 40

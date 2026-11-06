@@ -5018,6 +5018,208 @@
         "title": "IOException Class",
         "url": "https://learn.microsoft.com/dotnet/api/system.io.ioexception"
       }
+    },
+    {
+      "id": "inheritance",
+      "term": "Inheritance",
+      "german": "Vererbung",
+      "category": "language",
+      "definition": "Eine Klasse kann von einer anderen Klasse abgeleitet werden. Sie enthält dann die Member der Basisklasse (außer den Konstruktoren) und kann eigene hinzufügen.",
+      "aliases": [
+        "Vererbung"
+      ],
+      "related": [
+        "base-class",
+        "derived-class",
+        "class"
+      ],
+      "lesson": "m08-l01",
+      "source": {
+        "title": "Classes – Inheritance",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1534-inheritance"
+      }
+    },
+    {
+      "id": "base-class",
+      "term": "Base Class",
+      "german": "Basisklasse",
+      "category": "language",
+      "definition": "Die Klasse, von der eine andere Klasse abgeleitet ist. Sie steht hinter dem Doppelpunkt im Kopf der abgeleiteten Klasse. Ohne Angabe ist `object` die Basisklasse.",
+      "aliases": [
+        "Basisklasse",
+        "Oberklasse"
+      ],
+      "related": [
+        "derived-class",
+        "inheritance"
+      ],
+      "lesson": "m08-l01",
+      "source": {
+        "title": "Classes – Base classes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15242-base-classes"
+      }
+    },
+    {
+      "id": "derived-class",
+      "term": "Derived Class",
+      "german": "abgeleitete Klasse",
+      "category": "language",
+      "definition": "Eine Klasse, die mit `class D : B` von einer Basisklasse `B` abgeleitet ist. Sie erbt deren Member und kann eigene Member und Konstruktoren haben.",
+      "aliases": [
+        "abgeleitete Klasse",
+        "Unterklasse"
+      ],
+      "related": [
+        "base-class",
+        "inheritance"
+      ],
+      "lesson": "m08-l01",
+      "source": {
+        "title": "Classes – Base classes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15242-base-classes"
+      }
+    },
+    {
+      "id": "protected-access",
+      "term": "protected",
+      "german": "geschützter Zugriff",
+      "category": "language",
+      "definition": "Ein Member mit `protected` ist in seiner eigenen Klasse und in den abgeleiteten Klassen zugreifbar, aber nicht von außen.",
+      "aliases": [
+        "protected",
+        "geschützt"
+      ],
+      "related": [
+        "access-modifier",
+        "inheritance"
+      ],
+      "lesson": "m08-l01",
+      "source": {
+        "title": "Basic concepts – Declared accessibility",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/basic-concepts#742-declared-accessibility"
+      }
+    },
+    {
+      "id": "base-constructor-call",
+      "term": "Base Constructor Call",
+      "german": "Aufruf des Basiskonstruktors",
+      "category": "language",
+      "definition": "Mit `: base(…)` hinter dem Konstruktorkopf ruft ein Konstruktor einen Konstruktor der Basisklasse auf. Der Aufruf läuft vor dem Rumpf des eigenen Konstruktors.",
+      "aliases": [
+        "base(…)",
+        "Konstruktorinitialisierer"
+      ],
+      "related": [
+        "constructor-chaining",
+        "constructor",
+        "base-class"
+      ],
+      "lesson": "m08-l01",
+      "source": {
+        "title": "Classes – Constructor initializers",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15112-constructor-initializers"
+      }
+    },
+    {
+      "id": "virtual-member",
+      "term": "Virtual Member",
+      "german": "virtueller Member",
+      "category": "language",
+      "definition": "Ein Member mit `virtual`, den abgeleitete Klassen mit `override` ersetzen dürfen. Beim Aufruf entscheidet der Laufzeittyp des Objekts, welche Version läuft.",
+      "aliases": [
+        "virtual",
+        "virtuelle Methode"
+      ],
+      "related": [
+        "override",
+        "polymorphism"
+      ],
+      "lesson": "m08-l02",
+      "source": {
+        "title": "Classes – Virtual methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1564-virtual-methods"
+      }
+    },
+    {
+      "id": "override",
+      "term": "override",
+      "german": "überschreiben",
+      "category": "language",
+      "definition": "Mit `override` ersetzt eine abgeleitete Klasse die Version eines `virtual`-Members mit gleicher Signatur. Ohne `override` verdeckt ein gleichnamiger Member den geerbten nur.",
+      "aliases": [
+        "überschreiben",
+        "Override"
+      ],
+      "related": [
+        "virtual-member",
+        "member-hiding"
+      ],
+      "lesson": "m08-l02",
+      "source": {
+        "title": "Classes – Override methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1565-override-methods"
+      }
+    },
+    {
+      "id": "polymorphism",
+      "term": "Polymorphism",
+      "german": "Polymorphie",
+      "category": "language",
+      "definition": "Ein Aufruf über eine Variable vom Typ der Basisklasse führt die Version aus, die zum Laufzeittyp des Objekts gehört: ein Aufruf, das Objekt entscheidet.",
+      "aliases": [
+        "Polymorphie",
+        "Vielgestaltigkeit"
+      ],
+      "related": [
+        "virtual-member",
+        "override"
+      ],
+      "lesson": "m08-l02",
+      "source": {
+        "title": "Classes – Virtual methods",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1564-virtual-methods"
+      }
+    },
+    {
+      "id": "member-hiding",
+      "term": "Member Hiding",
+      "german": "Verdecken",
+      "category": "language",
+      "definition": "Ein Member mit demselben Namen wie ein geerbter verdeckt diesen. Mit `new` ist das gewollt. Beim Aufruf entscheidet dann der Typ der Variablen, nicht des Objekts.",
+      "aliases": [
+        "Verdecken",
+        "hiding",
+        "new-Modifizierer"
+      ],
+      "related": [
+        "override",
+        "virtual-member"
+      ],
+      "lesson": "m08-l02",
+      "source": {
+        "title": "Classes – The new modifier",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1535-the-new-modifier"
+      }
+    },
+    {
+      "id": "base-access",
+      "term": "Base Access",
+      "german": "Basiszugriff",
+      "category": "language",
+      "definition": "Mit `base.Name` greift eine abgeleitete Klasse auf einen Member der Basisklasse zu. Bei einer Methode läuft die Version der Basisklasse, auch wenn sie überschrieben ist.",
+      "aliases": [
+        "base.",
+        "Basiszugriff"
+      ],
+      "related": [
+        "override",
+        "base-class"
+      ],
+      "lesson": "m08-l02",
+      "source": {
+        "title": "Expressions – Base access",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12815-base-access"
+      }
     }
   ]
 }

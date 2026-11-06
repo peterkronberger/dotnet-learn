@@ -1,0 +1,257 @@
+---
+title: Virtuelle Methoden, override und Verdecken
+sidebar_position: 2
+description: Mit virtual und override entscheidet der Laufzeittyp des Objekts, welche Version läuft – mit new wird nur verdeckt.
+lesson_id: m08-l02
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import virtualOverride from '!!raw-loader!@site/examples/m08/l02/virtual-override.cs';
+import virtualOverrideOutput from '!!raw-loader!@site/examples/m08/l02/virtual-override.out.txt';
+import overrideNotVirtual from '!!raw-loader!@site/examples/m08/l02/override-not-virtual.snippet.cs';
+import baseCall from '!!raw-loader!@site/examples/m08/l02/base-call.cs';
+import baseCallOutput from '!!raw-loader!@site/examples/m08/l02/base-call.out.txt';
+import hiding from '!!raw-loader!@site/examples/m08/l02/hiding.cs';
+import hidingOutput from '!!raw-loader!@site/examples/m08/l02/hiding.out.txt';
+import hidingWithoutNew from '!!raw-loader!@site/examples/m08/l02/hiding-without-new.snippet.cs';
+import toStringExample from '!!raw-loader!@site/examples/m08/l02/to-string.cs';
+import toStringOutput from '!!raw-loader!@site/examples/m08/l02/to-string.out.txt';
+import overrideGap from '!!raw-loader!@site/examples/m08/l02/override-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l02/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l02/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l02/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l02/seclog-oop-solution.cs';
+
+# Virtuelle Methoden, override und Verdecken
+
+:::note[Lernziele]
+- Du kannst eine Methode mit `virtual` und `override` so schreiben, dass der Laufzeittyp des Objekts entscheidet, welche Version läuft.
+- Du kannst mit `base.Methode()` die Version der Basisklasse aufrufen.
+- Du kannst vorhersagen, welche Methode bei Verdecken mit `new` aufgerufen wird.
+- Du kannst `ToString()` überschreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l01-q6" />
+
+<Quiz id="m04-l01-q3" />
+
+<Quiz id="m03-l05-q1" />
+
+## Eine Methode überschreiben
+
+In Lektion 1 hat `Device` die Methode `Describe()`, und jedes abgeleitete Objekt benutzt dieselbe Version. Oft soll eine abgeleitete Klasse die Methode anders ausführen: Ein `Printer` soll sich anders beschreiben als ein `Device`.
+
+Dafür braucht es zwei Schlüsselwörter:
+
+1. In der Basisklasse steht `virtual` vor der Methode. Damit ist sie ein <Term id="virtual-member">virtueller Member</Term>: Abgeleitete Klassen dürfen sie ersetzen.
+2. In der abgeleiteten Klasse steht `override` vor der Methode mit derselben Signatur. Sie <Term id="override">überschreibt</Term> die Basisversion.
+
+Bei einem Aufruf entscheidet der Laufzeittyp, also der Typ des Objekts im Speicher, welche Version läuft. Der Typ der Variablen spielt keine Rolle. Man nennt das <Term id="polymorphism">Polymorphie</Term> (Polymorphism): ein Aufruf, das Objekt entscheidet. Hat eine abgeleitete Klasse die Methode nicht überschrieben, läuft die nächste Version weiter oben in der Klassenreihe.
+
+Auch Eigenschaften können `virtual` sein und mit `override` überschrieben werden. Die Regeln sind dieselben wie bei Methoden.
+
+:::info[Vorhersage]
+Die Liste hält ein `Device`, einen `Printer` und einen `Scanner`. Nur `Printer` überschreibt `Describe()`. Welche drei Zeilen gibt die Schleife aus?
+:::
+
+<CSharpRunner id="m08-l02-virtual" code={virtualOverride} predict expected={virtualOverrideOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Device: router`, `Printer: office printer` und `Device: archive scanner`.
+
+1. **Virtuell machen:** `Describe()` in `Device` ist `virtual`.
+2. **Überschreiben:** `Printer` schreibt `override` und liefert einen eigenen Text. `Scanner` überschreibt nichts.
+3. **Aufrufen:** Die Schleifenvariable hat immer den Typ `Device`. Bei jedem Objekt läuft aber die Version, die zu seinem Typ gehört. Beim `Scanner` ist das die Version von `Device`.
+
+Was passiert, wenn `Device` die Methode ohne `virtual` deklariert und `Printer` sie mit `override` schreibt? Der Compiler lehnt das ab, denn überschreiben darf man nur Member mit `virtual`, `abstract` oder `override`:
+
+<CodeBlock language="csharp" title="override-not-virtual.snippet.cs">{overrideNotVirtual}</CodeBlock>
+
+```text
+error CS0506: 'Printer.Describe()': cannot override inherited member
+'Device.Describe()' because it is not marked virtual, abstract, or override
+```
+
+</details>
+
+## Die Basisversion aufrufen: base
+
+Oft soll die Überschreibung die Basisversion nicht ersetzen, sondern ergänzen. Mit <Term id="base-access">`base.Describe()`</Term> ruft sie die Version der Basisklasse auf. Das ist ein Aufruf der konkreten Basisversion, auch wenn die Methode virtuell ist.
+
+:::info[Vorhersage]
+Die Variable hat den Typ `Device`, das Objekt ist ein `Printer`. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l02-base" code={baseCall} predict expected={baseCallOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Device: office printer, 40 pages per minute`.
+
+1. **Version wählen:** Das Objekt ist ein `Printer`, und `Describe()` ist überschrieben. Es läuft also die Version von `Printer`.
+2. **Basisversion aufrufen:** `base.Describe()` liefert `Device: office printer`.
+3. **Ergänzen:** Die Überschreibung hängt `, 40 pages per minute` an.
+
+Was passiert, wenn du in `Printer.Describe()` stattdessen `Describe()` ohne `base.` aufrufst? Die Methode ruft sich dann selbst auf, und die Rekursion endet nie. Die Basisversion erreichst du nur mit `base.`.
+
+</details>
+
+## Verdecken mit new
+
+Hat die abgeleitete Klasse eine Methode mit dem Namen einer geerbten Methode, aber ohne `override`, dann <Term id="member-hiding">verdeckt</Term> (Member Hiding) sie die geerbte. Ohne `new` gibt der Compiler eine Warnung aus:
+
+<CodeBlock language="csharp" title="hiding-without-new.snippet.cs">{hidingWithoutNew}</CodeBlock>
+
+```text
+warning CS0108: 'Printer.Describe()' hides inherited member 'Device.Describe()'.
+Use the new keyword if hiding was intended.
+```
+
+Mit `new` sagst du, dass das Verdecken Absicht ist, und die Warnung entfällt. An der Wirkung ändert `new` nichts. Beim Verdecken entscheidet der Typ der Variablen, nicht der Typ des Objekts.
+
+:::info[Vorhersage]
+Dasselbe `Printer`-Objekt steht in zwei Variablen: vom Typ `Printer` und vom Typ `Device`. `Overridden()` ist überschrieben, `Hidden()` ist mit `new` verdeckt. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l02-hiding" code={hiding} predict expected={hidingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe zeigt in den ersten drei Zeilen `Printer version` und in der letzten Zeile `Device version`.
+
+1. **Überschrieben:** `Overridden()` ist `virtual` und mit `override` ersetzt. Über beide Variablen läuft die Version von `Printer`, weil das Objekt ein `Printer` ist.
+2. **Verdeckt, Variable `Printer`:** Der Compiler sieht den Typ `Printer` und wählt die Methode von `Printer`.
+3. **Verdeckt, Variable `Device`:** Der Compiler sieht den Typ `Device` und wählt die Methode von `Device`. Das Objekt spielt keine Rolle.
+
+Was passiert, wenn du bei `Hidden()` in `Printer` `new` durch `override` ersetzt? Dann ist die Methode überschrieben, und die letzte Zeile zeigt `Printer version`.
+
+</details>
+
+## ToString() überschreiben
+
+Jede Klasse erbt von `object` die virtuelle Methode `ToString()`. Ihre Standardversion liefert den Namen des Typs. `Console.WriteLine(obj)` und die String-Interpolation `$"{obj}"` rufen `ToString()` auf. Mit `override` schreibst du eine eigene Version. `Equals` und `GetHashCode` sind weitere virtuelle Member von `object`.
+
+<Forward concepts={['`Equals` und `GetHashCode` eigener Typen']} module="8" />
+
+:::info[Vorhersage]
+`Printer` überschreibt `ToString()`, `Device` nicht. Was geben die drei Zeilen aus?
+:::
+
+<CSharpRunner id="m08-l02-tostring" code={toStringExample} predict expected={toStringOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Printer office printer`, `Text: Printer office printer` und `Device`.
+
+1. **Eigene Version:** `Printer` überschreibt `ToString()`. `Console.WriteLine(printer)` und die Interpolation benutzen sie.
+2. **Standardversion:** `Device` überschreibt nichts. `plain.ToString()` liefert den Namen des Typs, hier `Device`.
+
+Was passiert, wenn du `override` weglässt? Die Methode verdeckt dann nur `ToString()`, und `Console.WriteLine(printer)` zeigt `Printer` statt der eigenen Zeile.
+
+</details>
+
+## Lückenbeispiel
+
+`Describe()` in `Device` soll überschreibbar sein, und `Scanner` soll die Basisversion um die Auflösung ergänzen. Ergänze die beiden Stellen aus den Kommentaren. Danach soll das Programm `Device: archive scanner, 600 dpi` ausgeben.
+
+<CSharpRunner id="m08-l02-gaps" code={overrideGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Virtuell machen:** `public virtual string Describe() => $"Device: {Name}";`
+2. **Überschreiben:** In `Scanner` steht `public override string Describe()` mit dem Rumpf `return base.Describe() + $", {Dpi} dpi";`.
+3. **Ergebnis:** Die Variable hat den Typ `Device`, das Objekt ist ein `Scanner`. Es läuft die Version von `Scanner`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die Basisklasse `DetectionRule` mit `Name` und `Describe()` und die abgeleitete Regel `FailedLoginRule`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block aus Lektion 1 mit der Variablen `baseRule`, den Platz für den neuen Block mit `return 0;` und die Klassen `DetectionRule` und `FailedLoginRule`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Mache `Describe()` in `DetectionRule` `virtual`. Überschreibe die Methode in `FailedLoginRule`: Sie gibt `base.Describe() + $" (threshold {Threshold})"` zurück.
+2. Überschreibe in `DetectionRule` die Methode `ToString()`. Sie gibt `Describe()` zurück.
+3. Schreibe vor `// End with exit code 0 …` den Block `// Describe a rule through the base type`. Er gibt `baseRule.Describe()` und `As text: {baseRule}` aus.
+
+Die erste Ausgabezeile des Blocks aus Lektion 1 ändert sich dadurch: Sie ruft `Describe()` auf und zeigt jetzt die überschriebene Version. Genau das leistet `override`.
+
+<CSharpRunner id="m08-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Virtuell machen:** `virtual` in `DetectionRule` erlaubt die Überschreibung.
+2. **Überschreiben:** `FailedLoginRule` ergänzt die Basisversion mit `base.Describe()` um die Schwelle.
+3. **Text einer Regel:** `ToString()` gibt `Describe()` zurück. Weil `Describe()` virtuell ist, zeigt `$"{baseRule}"` die Beschreibung der abgeleiteten Regel.
+4. **Basisvariable:** `baseRule` hat den Typ `DetectionRule`, das Objekt ist eine `FailedLoginRule`. Der Laufzeittyp wählt die Version.
+
+</details>
+
+**Neuer Stand:** SecLog beschreibt jede Regel über ihre Basisklasse mit der Version, die zu ihrem Typ gehört, und gibt Regeln als Text aus.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l02-new-overrides-method" />
+
+**„Mit `new` (oder ganz ohne Modifizierer) überschreibt die Methode der abgeleiteten Klasse die Methode der Basisklasse.“** Das stimmt nicht. Das ist Verdecken: Ein Aufruf über eine Variable vom Typ der Basisklasse führt weiter die Version der Basisklasse aus. Nur `override` einer `virtual`-Methode lässt den Typ des Objekts entscheiden.
+:::
+
+<details>
+<summary>Vertiefung: Die Regeln im Detail (optional)</summary>
+
+Bei einem Aufruf einer virtuellen Methode bestimmt der Laufzeittyp der Instanz die Implementierung, die läuft: die am weitesten abgeleitete Implementierung ([§15.6.4 Virtual methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1564-virtual-methods)). Eine Überschreibung hat dieselbe Signatur und dieselbe Zugreifbarkeit wie die überschriebene Methode, und diese muss `virtual`, `abstract` oder `override` sein. Jede andere Methode mit derselben Signatur verdeckt die geerbte nur ([§15.6.5 Override methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1565-override-methods)).
+
+Das Verdecken ohne `new` ist kein Fehler, der Compiler gibt aber eine Warnung aus ([§15.3.5 The new modifier](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1535-the-new-modifier)). `base.Methode()` schaltet den virtuellen Aufruf ab und ruft die Basisversion auf ([§12.8.15 Base access](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12815-base-access)).
+
+Für Eigenschaften gilt dasselbe: Ein virtuelles Property macht seine Accessoren virtuell ([§15.7.6 Virtual, sealed, override and abstract accessors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1576-virtual-sealed-override-and-abstract-accessors)).
+
+</details>
+
+## Zusammenfassung
+
+Eine Methode mit `virtual` darf abgeleitete Klassen mit `override` ersetzen. Beim Aufruf entscheidet der Laufzeittyp des Objekts, welche Version läuft (Polymorphie). `base.Methode()` ruft die Basisversion auf. Eine Methode mit gleichem Namen ohne `override` verdeckt die geerbte nur. Mit `new` ist das gewollt, und dann entscheidet der Typ der Variablen. `ToString()` ist in `object` virtuell. Mit `override` bestimmst du, was `Console.WriteLine(obj)` und die Interpolation ausgeben.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l02-q1" />
+
+<Quiz id="m08-l02-q2" />
+
+<Quiz id="m08-l02-q3" />
+
+<Quiz id="m08-l02-q4" />
+
+<Quiz id="m08-l02-q5" />
+
+<Quiz id="m08-l02-q6" />
+
+<Quiz id="m08-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m08-l02-q9" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Virtual methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1564-virtual-methods)
+- C#-Spezifikation: [The new modifier](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1535-the-new-modifier)
+- Microsoft Learn: [Object.ToString](https://learn.microsoft.com/dotnet/api/system.object.tostring)
