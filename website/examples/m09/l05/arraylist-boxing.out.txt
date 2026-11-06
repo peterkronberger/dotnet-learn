@@ -1,0 +1,3 @@
+First: 42
+InvalidCastException
+First: 42

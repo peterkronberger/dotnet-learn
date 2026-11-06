@@ -1,0 +1,240 @@
+---
+title: Generische Interfaces, Delegates und Varianz
+sidebar_position: 6
+description: Eigene generische Interfaces und Delegates deklarieren, Func und Action lesen und verstehen, warum ein IEnumerable<string> ein IEnumerable<object> ist, eine List<string> aber keine List<object>.
+lesson_id: m09-l06
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import genericInterface from '!!raw-loader!@site/examples/m09/l06/generic-interface.cs';
+import genericInterfaceOutput from '!!raw-loader!@site/examples/m09/l06/generic-interface.out.txt';
+import genericDelegate from '!!raw-loader!@site/examples/m09/l06/generic-delegate.cs';
+import genericDelegateOutput from '!!raw-loader!@site/examples/m09/l06/generic-delegate.out.txt';
+import listObjectFromListString from '!!raw-loader!@site/examples/m09/l06/list-object-from-list-string.snippet.cs';
+import covarianceRead from '!!raw-loader!@site/examples/m09/l06/covariance-read.cs';
+import covarianceReadOutput from '!!raw-loader!@site/examples/m09/l06/covariance-read.out.txt';
+import pickerGap from '!!raw-loader!@site/examples/m09/l06/picker-gap.cs';
+import varianceDeclaration from '!!raw-loader!@site/examples/m09/l06/variance-declaration.cs';
+import varianceUnsafe from '!!raw-loader!@site/examples/m09/l06/variance-unsafe.snippet.cs';
+import valueTypeNotCovariant from '!!raw-loader!@site/examples/m09/l06/value-type-not-covariant.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m09/l06/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l06/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l06/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l06/seclog-generics-solution.cs';
+
+# Generische Interfaces, Delegates und Varianz
+
+:::note[Lernziele]
+- Du kannst ein eigenes generisches Interface deklarieren und in einer generischen und in einer nicht generischen Klasse implementieren.
+- Du kannst einen generischen Delegate-Typ deklarieren, einer Variablen eine passende Methode zuweisen und sie aufrufen.
+- Du kannst erklären, warum eine `List<string>` keine `List<object>` ist, ein `IEnumerable<string>` aber ein `IEnumerable<object>`.
+- Du kannst `Func<T, TResult>` und `Action<T>` als generische Delegates lesen.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l05-q2" />
+
+<Quiz id="m08-l05-q1" />
+
+<Quiz id="m08-l06-q1" />
+
+## Ein generisches Interface
+
+Ein <Term id="interface">Interface</Term> kann Typparameter haben, genau wie eine Klasse. Ein <Term id="generic-interface">generisches Interface</Term> wie `IConverter<TInput, TOutput>` beschreibt Methoden für beliebige Typen. Du kennst solche Interfaces schon: `IEquatable<T>` und `IComparable<T>` aus Modul 8 sind generisch.
+
+Eine Klasse kann ein generisches Interface auf zwei Arten <Term id="interface-implementation">implementieren</Term>:
+
+1. **Mit festen Typargumenten:** `class LengthConverter : IConverter<string, int>`. Die Klasse selbst ist nicht generisch. Sie legt die Typen fest.
+2. **Mit eigenem Typparameter:** `class Bracketer<T> : IConverter<T, string>`. Die Klasse ist generisch und gibt `T` an das Interface weiter.
+
+:::info[Vorhersage]
+Das Programm benutzt beide Klassen, einmal über das Interface und einmal direkt. Welche drei Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m09-l06-generic-interface" code={genericInterface} predict expected={genericInterfaceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5`, `[42]` und `[True]`.
+
+1. **Feste Typargumente:** `LengthConverter` implementiert `IConverter<string, int>`. `Convert("hello")` liefert die Länge, also `5`.
+2. **Eigener Typparameter:** `Bracketer<int>` ist ein `IConverter<int, string>`. `Convert(42)` liefert den Text `[42]`.
+3. **Anderes Typargument:** `Bracketer<bool>` ist ein eigener konstruierter Typ. Er liefert `[True]`.
+
+</details>
+
+## Ein generischer Delegate
+
+Ein <Term id="delegate">Delegate</Term> ist ein Typ für Methoden mit einer bestimmten Signatur. Ein Wert dieses Typs verweist auf eine Methode, die zur Signatur passt, und kann sie aufrufen. Wie bei Klassen und Interfaces kann ein Delegate-Typ Typparameter haben (<Term id="generic-delegate">generischer Delegate</Term>). `delegate TResult Transformer<TInput, TResult>(TInput input);` passt zu jeder Methode mit einem Parameter, die einen Wert zurückgibt.
+
+Du erzeugst einen Wert, indem du den Namen einer Methode zuweist. Danach rufst du die Variable wie eine Methode auf. Hier kommen nur benannte statische Methoden vor.
+
+<Forward concepts={['Methodengruppen im Detail', 'Lambda-Ausdrücke', 'Delegates mit mehreren Methoden']} module="10" />
+
+Die Bibliothek bringt fertige generische Delegates mit, damit du nicht für jede Signatur einen eigenen Typ brauchst. `Func<T, TResult>` steht für Methoden mit Rückgabewert (der letzte Typparameter ist der Rückgabetyp), `Action<T>` für Methoden ohne Rückgabewert und `Predicate<T>` für Methoden, die `bool` liefern.
+
+:::info[Vorhersage]
+Das Programm weist benannten Methoden vier Delegate-Variablen zu und ruft sie auf. Welche fünf Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m09-l06-generic-delegate" code={genericDelegate} predict expected={genericDelegateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `5`, `[7]`, `3`, `Show: done` und `True`.
+
+1. **Eigener Delegate:** `Transformer<string, int> measure = Length;` verweist auf `Length`. `measure("hello")` ruft `Length("hello")` auf: `5`. Mit `Transformer<int, string>` und `Bracket` entsteht `[7]`.
+2. **Bibliothek:** `Func<string, int>` hat dieselbe Form wie der eigene Delegate. `library("abc")` gibt `3`.
+3. **Ohne Rückgabewert:** `Action<string>` passt zu `Show`. Der Aufruf gibt `Show: done` aus.
+4. **Mit bool:** `Predicate<int>` passt zu `IsEven`. `IsEven(4)` ist `True`.
+
+</details>
+
+## Warum List\<string\> keine List\<object\> ist
+
+Jeder `string` ist ein `object`. Trotzdem lehnt der Compiler diese Zuweisung ab:
+
+<CodeBlock language="csharp" title="list-object-from-list-string.snippet.cs">{listObjectFromListString}</CodeBlock>
+
+```text
+error CS0029: Cannot implicitly convert type 'System.Collections.Generic.List<string>' to 'System.Collections.Generic.List<object>'
+```
+
+Der Grund: Eine `List<T>` ist <Term id="invariance">invariant</Term>. Zwei konstruierte Typen aus `List<T>` sind nur austauschbar, wenn die Typargumente gleich sind. Wäre `names` auch eine `List<object>`, könnte man über `things` mit `Add` eine Zahl in die Liste von Texten legen. Eine `List<string>` würde dann Zahlen enthalten, und der Compiler könnte nichts mehr garantieren.
+
+Bei einem Interface, das Elemente nur herausgibt, besteht diese Gefahr nicht. `IEnumerable<T>` und `IReadOnlyList<T>` haben keine Methode zum Hineinlegen. Deshalb sind sie <Term id="covariance">kovariant</Term>: Ein `IEnumerable<string>` ist ein `IEnumerable<object>`. Die Umwandlung ist eine implizite <Term id="reference-conversion">Referenzumwandlung</Term>, sie ändert das Objekt nicht.
+
+:::info[Vorhersage]
+Eine `List<string>` wird einem `IEnumerable<object>` und einem `IReadOnlyList<object>` zugewiesen. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m09-l06-covariance-read" code={covarianceRead} predict expected={covarianceReadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Item: alice`, `Item: bob`, `2` und `bob`.
+
+1. **Zuweisen:** Beide Zuweisungen übersetzen. `IEnumerable<out T>` und `IReadOnlyList<out T>` sind kovariant, und `string` ist ein Referenztyp.
+2. **Durchlaufen:** `PrintAll` bekommt ein `IEnumerable<object>` und läuft mit `foreach` durch die zwei Texte.
+3. **Lesen:** `readOnly.Count` ist `2`, `readOnly[1]` ist `bob`. Hineinlegen ginge über beide Sichten nicht.
+
+</details>
+
+Bei Werttypen gilt das nicht: Ein `IEnumerable<int>` ist kein `IEnumerable<object>`, denn dafür müsste jede Zahl verpackt werden.
+
+## Lückenbeispiel
+
+`IPicker<T>` und `FirstPicker<T>` sind fertig. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l06-gaps" code={pickerGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Implementieren:** `class LastPicker<T> : IPicker<T> { public T Pick(IReadOnlyList<T> items) { return items[items.Count - 1]; } }`.
+2. **Benutzen:** `IPicker<string> last = new LastPicker<string>(); Console.WriteLine(last.Pick(names));` gibt `carol` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog gibt mit `PrintEach<T>` jede Sammlung aus. `Store<T>` speichert Ereignisse, Vorfälle, Regeln und Zahlen, `SecurityEvent` ist ein Record.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block, die Stelle für das neue Interface und die Klasse `Store<T>`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Im Namensraum `SecLog.Model` kommt direkt vor `Store<T>` das Interface `IStore<T>` mit `void Add(T item)`, `int Count { get; }` und `IReadOnlyList<T> Items { get; }`. `Store<T>` implementiert es (`class Store<T> : IStore<T>`).
+2. Vor `// End with exit code 0 …` kommt der Block `// Use the store through its interface and read events as objects`. Er legt einen `IStore<SecurityEvent>` namens `securityEvents` an (`new Store<SecurityEvent>()`) und füllt ihn mit `ToSecurityEvent(logEvents[0])` und `ToSecurityEvent(logEvents[1])`.
+3. Dann gibt er `Interface count:` mit `securityEvents.Count` aus und ruft `PrintEach<object>("Events as objects", securityEvents.Items)` auf.
+
+<CSharpRunner id="m09-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Interface deklarieren:** `IStore<T>` beschreibt, was jeder Speicher kann. `Store<T>` implementiert es, die Member von `Store<T>` bleiben gleich.
+2. **Über das Interface benutzen:** Die Variable hat den Typ `IStore<SecurityEvent>`. Der Code kennt nur das Interface, nicht die Klasse.
+3. **Als Objekte lesen:** `Items` ist ein `IReadOnlyList<SecurityEvent>`. Er wird zu `IEnumerable<object>` umgewandelt, weil `IReadOnlyList<out T>` und `IEnumerable<out T>` kovariant sind und `SecurityEvent` eine Klasse ist. Deshalb ist `PrintEach<object>` erlaubt.
+
+</details>
+
+**Neuer Stand:** SecLog benutzt den Speicher über das Interface `IStore<T>` und liest die Ereignisse mit derselben Funktion als Objekte.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l06-list-object-accepts-list-string" />
+
+**„Weil jeder `string` ein `object` ist, kann ich eine `List<string>` überall übergeben, wo eine `List<object>` erwartet wird.“** Das stimmt nicht. `List<T>` ist invariant. Sonst könnte Code einen `int` in die Liste von Texten legen. Nur Interfaces, die Elemente herausgeben, wie `IEnumerable<object>` und `IReadOnlyList<object>`, nehmen eine `List<string>` an.
+:::
+
+<details>
+<summary>Vertiefung: out und in, Varianz-Sicherheit (optional)</summary>
+
+Ein Typparameter kann in einer Interface- oder Delegate-Deklaration mit `out` oder `in` markiert werden. Mit `out` ist er kovariant, mit `in` kontravariant, ohne Markierung invariant ([§19.2.3.1 Variant type parameter lists, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19231-general)). Varianz gibt es nur bei Interfaces und Delegates, nicht bei Klassen.
+
+Der Compiler prüft, ob `T` nur an erlaubten Stellen vorkommt: Ein kovarianter Parameter darf nicht als Eingabe benutzt werden, ein kontravarianter nicht als Ausgabe ([§19.2.3.2 Variance safety](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19232-variance-safety)). Deshalb könnte `IList<T>` nicht kovariant sein: Es hat `Add`.
+
+<CodeBlock language="csharp" title="variance-unsafe.snippet.cs">{varianceUnsafe}</CodeBlock>
+
+```text
+error CS1961: Invalid variance: The type parameter 'T' must be contravariantly valid on 'IBadSource<T>.Add(T)'. 'T' is covariant.
+```
+
+Eine Umwandlung nach Varianz verlangt eine implizite Referenzumwandlung oder eine Identitätsumwandlung zwischen den Typargumenten ([§19.2.3.3 Variance conversion](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19233-variance-conversion)). Eine Referenzumwandlung gibt es nur für Referenztypen ([§10.2.8 Implicit reference conversions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1028-implicit-reference-conversions)). Bei `int` ist keine vorhanden:
+
+<CodeBlock language="csharp" title="value-type-not-covariant.snippet.cs">{valueTypeNotCovariant}</CodeBlock>
+
+```text
+error CS0266: Cannot implicitly convert type 'System.Collections.Generic.List<int>' to 'System.Collections.Generic.IEnumerable<object>'. An explicit conversion exists (are you missing a cast?)
+```
+
+Kontravarianz läuft in die Gegenrichtung: Ein `IConsumer<object>` kann dort stehen, wo ein `IConsumer<string>` verlangt wird, denn wer jedes Objekt annimmt, nimmt auch Texte an.
+
+<CSharpRunner id="m09-l06-variance-declaration" code={varianceDeclaration} />
+
+In der Bibliothek ist `IEnumerable<out T>` kovariant, `IComparer<in T>` kontravariant. Bei `Func<in T, out TResult>` ist der Parametertyp kontravariant und der Rückgabetyp kovariant, bei `Action<in T>` ist der Parametertyp kontravariant ([Covariance and contravariance in generics, List of types](https://learn.microsoft.com/dotnet/standard/generics/covariance-and-contravariance#list-of-types)). Auch `IReadOnlyList<out T>` ist kovariant, wie das Beispiel `covariance-read.cs` zeigt ([IReadOnlyList\<T\>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ireadonlylist-1)). Delegates mit Typparametern deklariert [§21.2 Delegate declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations).
+
+</details>
+
+## Zusammenfassung
+
+Interfaces und Delegates können Typparameter haben. Eine Klasse implementiert ein generisches Interface mit festen Typargumenten oder gibt ihren eigenen Typparameter weiter. Ein Wert eines Delegate-Typs verweist auf eine Methode mit passender Signatur. `Func`, `Action` und `Predicate` sind fertige generische Delegates. Generische Klassen wie `List<T>` sind invariant. Interfaces mit `out T` wie `IEnumerable<T>` und `IReadOnlyList<T>` sind kovariant und nehmen bei Referenztypen auch eine Sammlung mit abgeleitetem Typargument an.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l06-q1" />
+
+<Quiz id="m09-l06-q2" />
+
+<Quiz id="m09-l06-q3" />
+
+<Quiz id="m09-l06-q4" />
+
+<Quiz id="m09-l06-q5" />
+
+<Quiz id="m09-l06-q6" />
+
+<Quiz id="m09-l06-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l06-q8" />
+
+### Transferfrage
+
+<Quiz id="m09-l06-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Covariance and contravariance in generics](https://learn.microsoft.com/dotnet/standard/generics/covariance-and-contravariance)
+- C#-Spezifikation: [§19.2.3 Variant type parameter lists](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists)
+- C#-Spezifikation: [§21.2 Delegate declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations)

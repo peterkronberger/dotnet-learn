@@ -665,6 +665,342 @@
         }
       ],
       "explanation": "Mit `default` und dem Rückgabetyp `T?` meldet die Methode „kein Element“, ohne Ausnahme und für jeden Elementtyp."
+    },
+    {
+      "id": "m09-l05-q1",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine `List<int>` enthält die Zahlen 1, 2 und 3. Wie liegen die Zahlen in der Liste?",
+      "options": [
+        {
+          "text": "Direkt als `int`. Das Typargument `int` bestimmt, wie die Liste ihre Elemente speichert.",
+          "correct": true
+        },
+        {
+          "text": "Jede Zahl ist in ein Objekt verpackt (Boxing), weil eine Liste Referenzen speichert.",
+          "misconception": "m09-l05-generics-box-value-types",
+          "feedback": "Boxing entsteht bei `object`-Sammlungen wie `ArrayList`. Eine `List<int>` speichert `int`-Werte direkt."
+        },
+        {
+          "text": "Als Text, damit die Liste jeden Typ aufnehmen kann.",
+          "feedback": "Die Liste ist an `int` gebunden. Ein Text hätte den Typ `string`."
+        }
+      ],
+      "explanation": "Bei einem Werttyp als Typargument erzeugt die Laufzeit Code, der genau für diesen Werttyp gemacht ist. Deshalb liegen die `int`-Werte direkt in der Liste."
+    },
+    {
+      "id": "m09-l05-q2",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `IReadOnlyList<int> numbers`. Welches Argument nimmt sie **nicht** an?",
+      "options": [
+        {
+          "text": "Ein `HashSet<int>`.",
+          "correct": true
+        },
+        {
+          "text": "Ein `int[]`.",
+          "feedback": "Ein Array implementiert `IReadOnlyList<int>` und wird angenommen."
+        },
+        {
+          "text": "Eine `List<int>`.",
+          "feedback": "`List<T>` implementiert `IReadOnlyList<T>` und wird angenommen."
+        }
+      ],
+      "explanation": "Ein `HashSet<T>` hat keine Plätze mit Index. Er implementiert `ICollection<T>` und `IEnumerable<T>`, aber nicht `IReadOnlyList<T>`."
+    },
+    {
+      "id": "m09-l05-q3",
+      "lesson": "m09-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l05/quiz-collection-sum.cs",
+      "explanation": "`TotalLength` nimmt `IEnumerable<string>` und läuft mit `foreach` durch alle Elemente. Die Liste und das Array passen beide. Die Längen sind 1 + 2 + 3 = 6 und 4."
+    },
+    {
+      "id": "m09-l05-q4",
+      "lesson": "m09-l05",
+      "type": "multi",
+      "question": "Welche dieser Schnittstellen implementiert `List<T>`?",
+      "options": [
+        {
+          "text": "`IList<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IReadOnlyList<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IEnumerable<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IReadOnlyDictionary<TKey, TValue>`",
+          "feedback": "Das ist eine Schnittstelle für Wörterbücher, nicht für Listen."
+        }
+      ],
+      "explanation": "`List<T>` implementiert `IList<T>`, `ICollection<T>`, `IEnumerable<T>`, `IReadOnlyList<T>` und `IReadOnlyCollection<T>`."
+    },
+    {
+      "id": "m09-l05-q5",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Ein `Dictionary<string, int>` wird als `IEnumerable<…>` durchlaufen. Welchen Typ hat dann ein Element?",
+      "options": [
+        {
+          "text": "`KeyValuePair<string, int>`",
+          "correct": true
+        },
+        {
+          "text": "`int`, der Wert des Eintrags.",
+          "feedback": "Ein Element enthält Schlüssel und Wert zusammen."
+        },
+        {
+          "text": "`string`, der Schlüssel des Eintrags.",
+          "feedback": "Ein Element enthält Schlüssel und Wert zusammen."
+        }
+      ],
+      "explanation": "`Dictionary<TKey, TValue>` ist ein `IEnumerable<KeyValuePair<TKey, TValue>>`. Jedes Element ist ein Paar aus Schlüssel und Wert."
+    },
+    {
+      "id": "m09-l05-q6",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Eine Methode soll nur einmal durch alle Elemente laufen, zum Beispiel um sie zu zählen. Welcher Parametertyp nimmt die meisten Sammlungen an?",
+      "options": [
+        {
+          "text": "`IEnumerable<T>`",
+          "correct": true
+        },
+        {
+          "text": "`IList<T>`",
+          "feedback": "`IList<T>` verlangt Indexzugriff und Änderungen. Ein `HashSet<T>` passt nicht."
+        },
+        {
+          "text": "`List<T>`",
+          "feedback": "Ein Array und ein `HashSet<T>` sind keine `List<T>`."
+        }
+      ],
+      "explanation": "Je weniger ein Parametertyp verlangt, desto mehr Sammlungen passen. `IEnumerable<T>` verlangt nur, dass man die Elemente nacheinander lesen kann."
+    },
+    {
+      "id": "m09-l05-q7",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Wann wird ein `int` in ein Objekt verpackt (Boxing)?",
+      "options": [
+        {
+          "text": "Wenn er in eine `ArrayList` eingefügt wird, deren Elemente den Typ `object` haben.",
+          "correct": true
+        },
+        {
+          "text": "Immer, wenn er in einer generischen Sammlung wie `List<int>` liegt.",
+          "misconception": "m09-l05-generics-box-value-types",
+          "feedback": "In einer `List<int>` liegt der `int` direkt. Es gibt kein Boxing."
+        },
+        {
+          "text": "Wenn er mit `+` zu einem anderen `int` addiert wird.",
+          "feedback": "Eine Addition von zwei `int` braucht kein Objekt."
+        }
+      ],
+      "explanation": "Boxing entsteht, wenn ein Wert in `object` oder in eine Schnittstelle umgewandelt wird. `ArrayList` speichert `object`, deshalb wird jeder eingefügte `int` verpackt."
+    },
+    {
+      "id": "m09-l05-q8",
+      "lesson": "m09-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum verpackt eine `List<int>` ihre Zahlen nicht, eine `ArrayList` aber schon, und was folgt daraus beim Lesen eines Elements?",
+      "modelAnswer": "Eine `List<int>` ist eine generische Klasse. Mit dem Typargument `int` speichert sie die Zahlen direkt als `int`. Eine `ArrayList` speichert nur `object`. Deshalb wird jede Zahl beim Einfügen verpackt, und beim Lesen braucht man einen Cast. Passt der Typ nicht, gibt es erst zur Laufzeit eine `InvalidCastException`. Bei `List<int>` meldet der Compiler einen falschen Typ schon beim Übersetzen."
+    },
+    {
+      "id": "m09-l05-q9",
+      "lesson": "m09-l05",
+      "type": "single",
+      "question": "Wo setzt du `IEnumerable<T>` ein? Eine Methode soll Zeilen ausgeben. Manche Aufrufer haben ein Array, andere eine `List<string>`. Was passt?",
+      "options": [
+        {
+          "text": "`static void PrintLines(IEnumerable<string> lines)`, denn Array und Liste passen beide.",
+          "correct": true
+        },
+        {
+          "text": "Zwei Überladungen: eine für `string[]` und eine für `List<string>`.",
+          "feedback": "Das funktioniert, ist aber doppelter Code. Ein `IEnumerable<string>` nimmt beide an."
+        },
+        {
+          "text": "`static void PrintLines(object lines)`, denn jede Sammlung ist ein `object`.",
+          "feedback": "Mit `object` kann die Methode nicht ohne Cast durch die Elemente laufen."
+        }
+      ],
+      "explanation": "Ein Parameter vom Typ `IEnumerable<string>` sagt: Die Methode braucht nur den Durchlauf. Array, Liste und Menge erfüllen das."
+    },
+    {
+      "id": "m09-l06-q1",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `List<object> things`. Kannst du eine `List<string>` übergeben, weil jeder `string` ein `object` ist?",
+      "options": [
+        {
+          "text": "Nein. `List<T>` ist invariant, eine `List<string>` ist keine `List<object>`.",
+          "correct": true
+        },
+        {
+          "text": "Ja, denn aus `string` nach `object` gibt es eine Umwandlung, also auch für die Liste.",
+          "misconception": "m09-l06-list-object-accepts-list-string",
+          "feedback": "Die Umwandlung gilt für einzelne Werte, nicht für die Liste. Sonst könnte man über `List<object>` einen `int` in eine Liste von Texten legen."
+        },
+        {
+          "text": "Ja, aber der Compiler gibt eine Warnung aus.",
+          "feedback": "Es gibt keine Warnung. Der Compiler lehnt die Zuweisung mit einem Fehler ab (CS0029)."
+        }
+      ],
+      "explanation": "Eine `List<string>` darf nur Texte enthalten. Wäre sie eine `List<object>`, könnte man mit `Add` ein beliebiges Objekt hineinlegen. Deshalb sind generische Klassen wie `List<T>` invariant."
+    },
+    {
+      "id": "m09-l06-q2",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Welche der drei Zuweisungen übersetzt?",
+      "options": [
+        {
+          "text": "`IEnumerable<object> a = new List<string>();`",
+          "correct": true
+        },
+        {
+          "text": "`List<object> b = new List<string>();`",
+          "misconception": "m09-l06-list-object-accepts-list-string",
+          "feedback": "`List<T>` ist invariant. Diese Zeile liefert den Fehler CS0029."
+        },
+        {
+          "text": "`IEnumerable<object> c = new List<int>();`",
+          "feedback": "Varianz gilt nur, wenn die Typargumente Referenztypen sind. Ein `int` müsste verpackt werden, dafür gibt es keine implizite Umwandlung der ganzen Liste."
+        }
+      ],
+      "explanation": "`IEnumerable<out T>` ist kovariant, und `string` ist ein Referenztyp. Deshalb ist ein `IEnumerable<string>` ein `IEnumerable<object>`."
+    },
+    {
+      "id": "m09-l06-q3",
+      "lesson": "m09-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m09/l06/quiz-variance.cs",
+      "explanation": "`IEnumerable<object>` und die Liste von Texten sind dasselbe Objekt. `foreach` zählt 2 Elemente. Der Test `things is IEnumerable<string>` ist `True`, denn das Objekt ist weiterhin eine `List<string>`."
+    },
+    {
+      "id": "m09-l06-q4",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Welche der beiden Klassen ist selbst generisch?\n\n`class EventStore : IStore<LogEvent>`\n\n`class Store<T> : IStore<T>`",
+      "options": [
+        {
+          "text": "Nur `Store<T>`. `EventStore` implementiert die konstruierte Schnittstelle `IStore<LogEvent>`.",
+          "correct": true
+        },
+        {
+          "text": "Beide, weil beide `IStore<…>` implementieren.",
+          "feedback": "Eine Klasse ist generisch, wenn sie selbst Typparameter hat. `EventStore` hat keine."
+        },
+        {
+          "text": "Nur `EventStore`, weil es ein festes Typargument hat.",
+          "feedback": "Ein festes Typargument macht eine Klasse nicht generisch. Das Gegenteil ist richtig."
+        }
+      ],
+      "explanation": "`EventStore` legt das Typargument der Schnittstelle fest. `Store<T>` reicht seinen Typparameter an die Schnittstelle weiter, deshalb gibt es `Store<int>`, `Store<string>` und so weiter."
+    },
+    {
+      "id": "m09-l06-q5",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Eine Schnittstelle ist als `interface IProducer<out T>` deklariert. Was bedeutet `out`?",
+      "options": [
+        {
+          "text": "`T` ist kovariant und darf nur an Ausgabestellen vorkommen, zum Beispiel als Rückgabetyp.",
+          "correct": true
+        },
+        {
+          "text": "`T` ist ein Ausgabeparameter wie bei `out int x`.",
+          "feedback": "Bei einem Typparameter hat `out` eine andere Bedeutung als bei einem Parameter einer Methode."
+        },
+        {
+          "text": "`T` darf nur für Werttypen eingesetzt werden.",
+          "feedback": "Es geht um die Richtung, in der `T` benutzt wird. Die Varianz wirkt sogar nur bei Referenztypen."
+        }
+      ],
+      "explanation": "Mit `out` ist `T` kovariant: Ein `IProducer<string>` ist ein `IProducer<object>`. Dafür darf `T` nur herauskommen, zum Beispiel als Rückgabetyp, und nicht als Parametertyp."
+    },
+    {
+      "id": "m09-l06-q6",
+      "lesson": "m09-l06",
+      "type": "multi",
+      "question": "Welche dieser Typen sind generische Delegates der Bibliothek?",
+      "options": [
+        {
+          "text": "`Func<T, TResult>`",
+          "correct": true
+        },
+        {
+          "text": "`Action<T>`",
+          "correct": true
+        },
+        {
+          "text": "`Predicate<T>`",
+          "correct": true
+        },
+        {
+          "text": "`List<T>`",
+          "feedback": "`List<T>` ist eine generische Klasse, kein Delegate."
+        }
+      ],
+      "explanation": "`Func<T, TResult>` steht für Methoden mit einem Rückgabewert, `Action<T>` für Methoden ohne Rückgabewert und `Predicate<T>` für Methoden, die `bool` liefern."
+    },
+    {
+      "id": "m09-l06-q7",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Gegeben sind `delegate TResult Transformer<TInput, TResult>(TInput input);` und `static int Length(string text)`. Was bewirkt `Transformer<string, int> t = Length;` und danach `t(\"hello\")`?",
+      "options": [
+        {
+          "text": "`t` verweist auf die Methode `Length`. Der Aufruf `t(\"hello\")` ruft sie auf und liefert 5.",
+          "correct": true
+        },
+        {
+          "text": "`t` ist ein `int`, der die Länge von `Length` enthält.",
+          "feedback": "Ohne Klammern wird `Length` nicht aufgerufen. Die Methode selbst wird der Variablen zugewiesen."
+        },
+        {
+          "text": "Das übersetzt nicht, weil einer Delegate-Variablen keine Methode zugewiesen werden kann.",
+          "feedback": "Ein Delegate nimmt jede Methode mit passender Signatur auf, auch eine benannte statische Methode."
+        }
+      ],
+      "explanation": "Ein Delegate-Typ beschreibt Methoden mit einer bestimmten Signatur. Ein Wert dieses Typs verweist auf eine passende Methode. Der Aufruf `t(\"hello\")` führt `Length(\"hello\")` aus."
+    },
+    {
+      "id": "m09-l06-q8",
+      "lesson": "m09-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum ist ein `IEnumerable<string>` ein `IEnumerable<object>`, eine `List<string>` aber keine `List<object>`?",
+      "modelAnswer": "Ein `IEnumerable<T>` gibt Elemente nur heraus. Deshalb ist `T` mit `out` als kovariant deklariert: Wer Texte herausgibt, gibt auch Objekte heraus. Bei einer `List<T>` kann man auch Elemente hineinlegen. Wäre eine `List<string>` eine `List<object>`, könnte man über diese Sicht einen `int` in die Liste von Texten legen. Deshalb ist `List<T>` invariant."
+    },
+    {
+      "id": "m09-l06-q9",
+      "lesson": "m09-l06",
+      "type": "single",
+      "question": "Wo setzt du eine eigene generische Schnittstelle ein? Der Code soll Ereignisse speichern, mal im Speicher und später in einer Datei. Was passt?",
+      "options": [
+        {
+          "text": "`interface IStore<T>` mit `Add`, `Count` und `Items`. Die Speicher implementieren sie, der übrige Code kennt nur die Schnittstelle.",
+          "correct": true
+        },
+        {
+          "text": "Eine Klasse `Store` mit Parametern vom Typ `object`.",
+          "feedback": "Mit `object` gehen Typsicherheit und die Vermeidung von Boxing verloren."
+        },
+        {
+          "text": "Eine eigene Klasse für jeden Elementtyp und jeden Speicherort.",
+          "feedback": "Das erzeugt viel doppelten Code. Eine generische Schnittstelle gilt für jeden Elementtyp."
+        }
+      ],
+      "explanation": "Eine generische Schnittstelle beschreibt, was ein Speicher kann, für jeden Elementtyp. So lässt sich der Speicher austauschen, ohne den übrigen Code zu ändern."
     }
   ]
 }

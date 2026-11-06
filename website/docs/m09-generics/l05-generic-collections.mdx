@@ -1,0 +1,213 @@
+---
+title: Generische Sammlungen verstehen
+sidebar_position: 5
+description: List<T> und Dictionary<TKey,TValue> sind normaler generischer Code. Sie speichern Werte ohne Boxing, und eine Methode mit IEnumerable<T> oder IReadOnlyList<T> arbeitet mit vielen Sammlungen.
+lesson_id: m09-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import arraylistBoxing from '!!raw-loader!@site/examples/m09/l05/arraylist-boxing.cs';
+import arraylistBoxingOutput from '!!raw-loader!@site/examples/m09/l05/arraylist-boxing.out.txt';
+import listDeclaration from '!!raw-loader!@site/examples/m09/l05/list-declaration.snippet.cs';
+import collectionInterfaces from '!!raw-loader!@site/examples/m09/l05/collection-interfaces.cs';
+import collectionInterfacesOutput from '!!raw-loader!@site/examples/m09/l05/collection-interfaces.out.txt';
+import setNotList from '!!raw-loader!@site/examples/m09/l05/set-not-list.snippet.cs';
+import countAllGap from '!!raw-loader!@site/examples/m09/l05/count-all-gap.cs';
+import containsEquality from '!!raw-loader!@site/examples/m09/l05/contains-equality.cs';
+import containsEqualityOutput from '!!raw-loader!@site/examples/m09/l05/contains-equality.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m09/l05/seclog-generics-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m09/l05/seclog-generics-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m09/l05/seclog-generics-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m09/l05/seclog-generics-solution.cs';
+
+# Generische Sammlungen verstehen
+
+:::note[Lernziele]
+- Du kannst die Deklaration von `List<T>` und `Dictionary<TKey,TValue>` auf Microsoft Learn lesen: Typparameter, Einschränkung und implementierte Schnittstellen.
+- Du kannst erklären, warum eine `List<int>` ihre Zahlen nicht verpackt, eine nicht generische Sammlung mit `object` aber schon.
+- Du kannst für einen Parameter die passende Sammlungs-Schnittstelle wählen (`IEnumerable<T>`, `IReadOnlyList<T>`, `IList<T>`).
+- Du kannst eine generische Methode schreiben, die jede Sammlung durchläuft.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l02-q1" />
+
+<Quiz id="m04-l09-q1" />
+
+<Quiz id="m05-l09-q1" />
+
+## Sammlungen sind generischer Code
+
+In Modul 5 hast du `List<string>` und `Dictionary<string, int>` schon benutzt. Seit Lektion 2 weißt du, was dahintersteckt: `List<T>` ist eine <Term id="generic-type">generische Klasse</Term> der Bibliothek, und `List<int>` ist ein konstruierter Typ daraus. Auch `Dictionary<TKey,TValue>` ist eine generische Klasse, mit zwei Typparametern. Du kannst ihre Deklaration deshalb wie eigenen Code lesen.
+
+<CodeBlock language="csharp" title="list-declaration.snippet.cs">{listDeclaration}</CodeBlock>
+
+Drei Dinge stehen in dieser Deklaration:
+
+1. **Typparameter:** `T` bei der Liste, `TKey` und `TValue` beim Wörterbuch.
+2. **Einschränkung:** `where TKey : notnull`. Ein Schlüssel darf nicht `null` sein. Einschränkungen kennst du aus Lektion 3.
+3. **Schnittstellen:** Hinter dem Doppelpunkt stehen die Schnittstellen, die die Klasse implementiert. Sie sagen, was man mit der Sammlung tun kann.
+
+## Kein Boxing mit List\<int\>
+
+Vor den generischen Sammlungen gab es Sammlungen, deren Elemente den Typ `object` haben, zum Beispiel `ArrayList` (<Term id="non-generic-collection">nicht generische Sammlung</Term>). Du siehst sie nur noch in altem Code. Sie zeigt gut, was Generics lösen: Ein `int` muss beim Einfügen in ein Objekt verpackt werden (<Term id="boxing">Boxing</Term>), und beim Lesen braucht man einen Cast. Passt der Typ nicht, scheitert der Cast erst zur Laufzeit.
+
+:::info[Vorhersage]
+Das Programm legt in eine `ArrayList` eine Zahl und einen Text und liest beide als `int`. Danach liest es eine `List<int>`. Welche drei Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m09-l05-arraylist-boxing" code={arraylistBoxing} predict expected={arraylistBoxingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `First: 42`, `InvalidCastException` und `First: 42`.
+
+1. **Einfügen:** `old.Add(42)` verpackt den `int` in ein Objekt. `old.Add("text")` ist ebenfalls erlaubt, denn beides ist ein `object`.
+2. **Lesen mit Cast:** `(int)old[0]!` packt die Zahl wieder aus. Bei `old[1]` ist das Element ein `string`. Der Cast scheitert mit einer `InvalidCastException`, und das Programm fängt sie.
+3. **Generisch:** `numbers[0]` braucht keinen Cast. In einer `List<int>` kann nur ein `int` liegen, ein Text würde schon beim Übersetzen abgelehnt.
+
+</details>
+
+Eine `List<int>` speichert die Zahlen dagegen direkt. Es gibt kein Boxing, solange du die Zahlen nicht selbst in `object` oder eine Schnittstelle umwandelst.
+
+## Die Sammlungs-Schnittstellen
+
+Die Schnittstellen hinter dem Doppelpunkt bilden eine Hierarchie. Je weiter oben, desto weniger verlangt die Schnittstelle:
+
+| Schnittstelle | Sie bietet | Beispiele |
+| --- | --- | --- |
+| `IEnumerable<T>` | Elemente nacheinander lesen (`foreach`) | `List<T>`, `T[]`, `HashSet<T>`, `Dictionary<TKey,TValue>` |
+| `IReadOnlyCollection<T>` | dazu `Count` | `List<T>`, `T[]`, `HashSet<T>` |
+| `IReadOnlyList<T>` | dazu Zugriff mit Index `[i]` | `List<T>`, `T[]` |
+| `ICollection<T>` | dazu `Add`, `Remove`, `Contains` | `List<T>`, `HashSet<T>` |
+| `IList<T>` | dazu Index und Einfügen an einem Platz | `List<T>`, `T[]` |
+
+<Term id="enumerable">`IEnumerable<T>`</Term> ist die Schnittstelle hinter `foreach` (<Term id="enumerator">Enumerator</Term> aus Modul 5): Sie liefert einen Enumerator über `GetEnumerator`. Ein `Dictionary<TKey,TValue>` ist ein `IEnumerable<KeyValuePair<TKey,TValue>>`, jedes Element ist also ein Paar aus Schlüssel und Wert. Wie man selbst eine solche Folge schreibt, kommt später im Kurs.
+
+<Forward concepts={['Iteratoren und `yield`']} module="11" />
+
+Die Regel für Parameter: Wähle die Schnittstelle, die gerade das verlangt, was die Methode braucht, und nicht mehr. Dann passen die meisten Sammlungen. Eine Methode, die nur durchläuft, nimmt `IEnumerable<T>`. Braucht sie den Index, nimmt sie `IReadOnlyList<T>` (aus Modul 5 bekannt). Nur wenn sie ändern muss, ist `IList<T>` oder `ICollection<T>` richtig.
+
+:::info[Vorhersage]
+`Sum` nimmt `IEnumerable<int>`, `FirstOf` nimmt `IReadOnlyList<int>`. Das Programm ruft sie mit einem Array, einer Liste und einer Menge auf. Welche fünf Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m09-l05-collection-interfaces" code={collectionInterfaces} predict expected={collectionInterfacesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `6`, `6`, `6`, `3` und `3`.
+
+1. **Summe:** Array, Liste und Menge sind alle ein `IEnumerable<int>`. Die Summe ist jedes Mal 3 + 1 + 2 = 6.
+2. **Erstes Element:** Array und Liste sind ein `IReadOnlyList<int>`. `numbers[0]` ist die `3`.
+3. **Was fehlt?** `FirstOf(set)` steht nicht im Programm, denn eine Menge hat keine Plätze mit Index. Mit `FirstOf(set)` meldet der Compiler einen Fehler.
+
+</details>
+
+<CodeBlock language="csharp" title="set-not-list.snippet.cs">{setNotList}</CodeBlock>
+
+```text
+error CS1503: Argument 1: cannot convert from 'System.Collections.Generic.HashSet<int>' to 'System.Collections.Generic.IReadOnlyList<int>'
+```
+
+Weil ein `HashSet<T>` die Reihenfolge nicht verspricht, hat er keinen Index. Er implementiert `ICollection<T>`, aber nicht `IList<T>`.
+
+## Lückenbeispiel
+
+`CountAll` nimmt ein `IEnumerable<T>` und zählt die Elemente. Ergänze die zwei Stellen aus den Kommentaren.
+
+<CSharpRunner id="m09-l05-gaps" code={countAllGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Aufrufen:** `Dictionary<string, int> ages = new() { ["a"] = 1, ["b"] = 2 };` und `Console.WriteLine($"Entries: {CountAll(ages)}");`. `T` ist hier `KeyValuePair<string, int>`, die Ausgabe ist `Entries: 2`.
+2. **Schreiben:** `static T LastOf<T>(IReadOnlyList<T> items) { return items[items.Count - 1]; }`. Aufruf: `Console.WriteLine(LastOf(numbers));` gibt `7` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest sicher aus dem generischen Speicher `Store<T>` und zählt mit `Counter<TKey>`. Es gibt die Speicher `eventStore` und `failureCounts`, die Liste `extendedWatchList` und die Menge `distinctIps`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Stelle vor `return 0;` für den neuen Block und die Stelle für eine neue lokale Funktion. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Eine generische lokale Funktion `static void PrintEach<T>(string title, IEnumerable<T> items)` kommt an die markierte Stelle zwischen den ausgeblendeten Teilen. Sie gibt den Titel aus und danach eine Zeile `- {item}` je Element.
+2. Vor `// End with exit code 0 …` kommt der Block `// Print any collection with one generic method`. Er ruft `PrintEach` viermal auf: mit `extendedWatchList` (Titel `Watch list`), mit einem `string[]` aus den ersten zwei Zeilen von `sampleLog` (Bereich `[..2]`, Titel `First lines`), mit einer sortierten `List<string>` aus `distinctIps` (Titel `Distinct IPs`) und mit `failureCounts.Items` (Titel `Failure counts`).
+3. Die Menge `distinctIps` kopierst du zuerst mit `[.. distinctIps]` in eine Liste und sortierst sie, denn ihre Reihenfolge ist nicht versprochen.
+
+<CSharpRunner id="m09-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-generics-solution.cs" />
+
+1. **Parameter wählen:** `IEnumerable<T>` verlangt nur den Durchlauf. Deshalb passen eine Liste, ein Array und der `Items`-Wert des Speichers (ein `IReadOnlyList<T>`).
+2. **Typargument ableiten:** `T` wird aus dem Argument abgeleitet: `string` bei der Liste und beim Array, `int` bei `failureCounts.Items`.
+3. **Menge vorbereiten:** `[.. distinctIps]` kopiert die Elemente in eine Liste, `Sort()` ordnet sie. So ist die Ausgabe immer gleich.
+
+</details>
+
+**Neuer Stand:** SecLog gibt mit einer einzigen generischen Funktion Listen, Arrays, Mengen und den Inhalt des Speichers aus.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m09-l05-generics-box-value-types" />
+
+**„Generics sind langsam, weil eine `List<int>` jede Zahl in ein Objekt verpackt (Boxing).“** Das stimmt nicht. Eine generische Sammlung mit einem Werttyp als Typargument speichert die Werte direkt. Boxing entsteht bei Sammlungen mit `object` wie `ArrayList`, oder wenn du einen Wert selbst in `object` oder eine Schnittstelle umwandelst.
+:::
+
+<details>
+<summary>Vertiefung: Gleichheit in Sammlungen (optional)</summary>
+
+`List<T>.Contains` vergleicht mit dem Standard-Vergleicher `EqualityComparer<T>.Default` für `T` ([List\<T\>.Contains, Remarks](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1.contains#remarks)). Implementiert der Typ `IEquatable<T>`, wie ein Record aus Modul 8, gilt dessen Gleichheit. Eine gewöhnliche Klasse ohne eigene Gleichheit vergleicht die Referenzen.
+
+<CSharpRunner id="m09-l05-contains" code={containsEquality} />
+
+Die Ausgabe ist `{containsEqualityOutput.trim().split('\n')[0]}` für den Record und `{containsEqualityOutput.trim().split('\n')[1]}` für die Klasse: Zwei verschiedene `Plain`-Objekte mit gleichen Werten sind nicht gleich.
+
+Dass `List<int>` ohne Boxing arbeitet, steht bei den Vorteilen generischer Sammlungen: Sie arbeiten mit Werttypen im Allgemeinen besser, weil kein Boxing nötig ist ([Generics in .NET, Advantages and disadvantages of generics](https://learn.microsoft.com/dotnet/standard/generics/#advantages-and-disadvantages-of-generics)). Ein konstruierter Typ wie `List<int>` ist ein eigener Typ ([§8.4 Constructed types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#84-constructed-types)).
+
+</details>
+
+## Zusammenfassung
+
+`List<T>` und `Dictionary<TKey,TValue>` sind generische Klassen, deren Deklaration du lesen kannst: Typparameter, Einschränkung `notnull` und implementierte Schnittstellen. Eine `List<int>` speichert ihre Zahlen direkt. Boxing und Casts gibt es bei `object`-Sammlungen wie `ArrayList`. Als Parametertyp passt die Schnittstelle, die genau das verlangt, was die Methode braucht: `IEnumerable<T>` zum Durchlaufen, `IReadOnlyList<T>` mit Index, `IList<T>` zum Ändern.
+
+## Prüfe dein Wissen
+
+<Quiz id="m09-l05-q1" />
+
+<Quiz id="m09-l05-q2" />
+
+<Quiz id="m09-l05-q3" />
+
+<Quiz id="m09-l05-q4" />
+
+<Quiz id="m09-l05-q5" />
+
+<Quiz id="m09-l05-q6" />
+
+<Quiz id="m09-l05-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m09-l05-q8" />
+
+### Transferfrage
+
+<Quiz id="m09-l05-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Generics in .NET](https://learn.microsoft.com/dotnet/standard/generics/)
+- Microsoft Learn: [Collections](https://learn.microsoft.com/dotnet/standard/collections/)
+- Microsoft Learn: [IEnumerable\<T\>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1)
