@@ -137,7 +137,6 @@ Each module section has these fields:
 - **Glossary terms:** collection (`m05-l04`); see the `"lesson": "m05-l…"` fields: array-initializer, bounds-check, rank, multi-dimensional-array, jagged-array, index-from-end, list, type-argument, enumerator, iteration-variable, dictionary, key, key-value-pair, hash-set, set-operation, collection-expression, spread-element, collection-initializer, target-typed, queue, stack-collection, collection-interface, ordinal-comparison, culture-sensitive-comparison, separator, utc, timestamp, time-span, date-time-offset
 - **Misconception ids:** m05-l01-index-starts-at-one, m05-l02-jagged-same-as-multidimensional, m05-l03-range-end-inclusive, m05-l04-insert-overwrites, m05-l05-change-list-in-foreach, m05-l06-missing-key-gives-default, m05-l07-add-duplicate-throws, m05-l08-collection-expression-is-array, m05-l09-contains-same-cost, m05-l10-replace-changes-string, m05-l11-now-for-log-timestamps
 - **Open forward references:**
-  - Generics (`List<T>` as a generic type) → M9
   - `Span<T>`, `ref struct` → named only, not taught
 - **SecLog end state:** `website/examples/m05/l11/seclog-collections-solution.cs` – the M4 end state plus: whole sample log in an array/list, failures per user in a `Dictionary`, distinct IPs in a `HashSet`, timestamps as `DateTimeOffset`, alert "5 failed attempts in 10 minutes". New local functions: `PrintAlerts`, `EventTypeOf`, `TimestampOf`. Chain: `m04/l08` → `m05/l01` → … → `m05/l11`. M5 milestone reached.
 - **Notes for later modules:**
@@ -219,6 +218,28 @@ Each module section has these fields:
   - `LogEvent` keeps its string `EventType`; `SecurityEvent` is the record form. `LogEvent` has value equality since `m08-l09`.
   - `IDetectionRule` and `Detector` are the place for new rules.
   - `Sort` is not stable: outputs must not depend on the order of equal elements.
+
+## M9 Generics
+
+- **Lessons:**
+  - `m09-l01` Generische Methoden – `Method<T>`, type parameter vs. type argument, type inference, explicit type arguments; no operators on an unconstrained `T`.
+  - `m09-l02` Generische Klassen und konstruierte Typen – `class`/`struct`/`record` with `<T>`, open vs. closed and constructed types, static fields per constructed type.
+  - `m09-l03` Einschränkungen für Typparameter – `where` with `class`, `struct`, `notnull`, base class, interface, `new()`; `unmanaged` named only.
+  - `m09-l04` Standardwerte und Nullable bei Typparametern – `default(T)`, `default`, `T?` with and without constraint, `out T?` in Try methods.
+  - `m09-l05` Generische Sammlungen verstehen – `List<T>`/`Dictionary<TKey,TValue>` as generic classes, `IEnumerable<T>` … `IList<T>`, no boxing in `List<int>`.
+  - `m09-l06` Generische Interfaces, Delegates und Varianz – generic interface, `delegate` declaration, `Func`/`Action`/`Predicate` (read only), invariance vs. covariance, `in`/`out` (deepening).
+- **Constructs taught:** `<T>` on methods and local functions, explicit type arguments (`m09-l01`), generic class/struct/record, constructed types (`m09-l02`), `where` with `class`/`struct`/`notnull`/base class/interface/`new()` (`m09-l03`), `default(T)`, `default`, `T?`, `out T?` (`m09-l04`), `IEnumerable<T>`, `ICollection<T>`, `IReadOnlyList<T>`, `IList<T>` (`m09-l05`), generic interface, `delegate` declaration, `Func`, `Action`, `Predicate`, `in`/`out` (`m09-l06`).
+- **Glossary terms:** see the `"lesson": "m09-l…"` fields: generics, type-parameter, generic-method, generic-type, constructed-type, open-type, closed-type, type-parameter-constraint, constructor-constraint, default-value-expression, default-literal, non-generic-collection, enumerable, generic-interface, delegate, generic-delegate, variance, covariance, contravariance, invariance
+- **Misconception ids:** m09-l01-type-inferred-from-return-type, m09-l02-constructed-types-share-statics, m09-l03-unconstrained-t-has-all-members, m09-l04-default-t-is-null, m09-l05-generics-box-value-types, m09-l06-list-object-accepts-list-string
+- **Open forward references:**
+  - Method groups in depth, lambdas, multicast delegates (`m09-l06`) → M10
+  - Iterators and `yield` (`m09-l05`) → M11
+  - Nullable analysis attributes (`m09-l04`) → M14
+- **SecLog end state:** `website/examples/m09/l06/seclog-generics-solution.cs` – the M8 end state plus: `Store<T> : IStore<T>` (`Add`, `Get`, `GetOrDefault`, `TryGet`, `Items`, `Count`), `Counter<TKey>` (`Add`, `CountOf`, `SortedKeys`), generic `PrintEach<T>(title, IEnumerable<T>)`. Stores for events, incidents and rules; counters for users and IPs. Chain: `m08/l11` → `m09/l01` → … → `m09/l06`. M9 milestone reached.
+- **Notes for later modules:**
+  - Delegates are introduced only minimally in `m09-l06` (created from named methods). M10 teaches them in full.
+  - `Counter<TKey>` and `Store<T>`/`IStore<T>` are the reusable helpers.
+  - Generic math and static abstract interface members are not covered.
 
 ## W1 Wiederholung M1–M4
 

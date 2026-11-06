@@ -34,6 +34,7 @@
       "id": "m09-l01-q3",
       "lesson": "m09-l01",
       "type": "single",
+      "placement": true,
       "question": "Welches Typargument leitet der Compiler bei `Pick(true, 1, 2.5)` für `static T Pick<T>(bool takeFirst, T a, T b)` ab?",
       "options": [
         {
@@ -198,6 +199,7 @@
       "id": "m09-l02-q3",
       "lesson": "m09-l02",
       "type": "single",
+      "placement": true,
       "question": "Die generische Klasse `Store<T>` hat ein statisches Feld `Created`. Das Programm benutzt `Store<int>` und `Store<string>`. Wie viele Exemplare von `Created` gibt es?",
       "options": [
         {
@@ -344,6 +346,7 @@
       "id": "m09-l03-q3",
       "lesson": "m09-l03",
       "type": "single",
+      "placement": true,
       "question": "Eine Methode `T Max<T>(T a, T b)` hat keine Einschränkung und wird mit `Max<int>(3, 8)` aufgerufen. Darf der Rumpf `a < b` schreiben?",
       "options": [
         {
@@ -411,6 +414,7 @@
       "id": "m09-l03-q6",
       "lesson": "m09-l03",
       "type": "single",
+      "placement": true,
       "question": "Welche `where`-Klausel ist gültig?",
       "options": [
         {
@@ -485,6 +489,7 @@
       "id": "m09-l04-q1",
       "lesson": "m09-l04",
       "type": "single",
+      "placement": true,
       "question": "Was ist `default(T)`, wenn `T` den Typ `int` hat, und was, wenn `T` den Typ `string` hat?",
       "options": [
         {
@@ -788,6 +793,7 @@
       "id": "m09-l05-q7",
       "lesson": "m09-l05",
       "type": "single",
+      "placement": true,
       "question": "Wann wird ein `int` in ein Objekt verpackt (Boxing)?",
       "options": [
         {
@@ -838,6 +844,7 @@
       "id": "m09-l06-q1",
       "lesson": "m09-l06",
       "type": "single",
+      "placement": true,
       "question": "Eine Methode hat den Parameter `List<object> things`. Kannst du eine `List<string>` übergeben, weil jeder `string` ein `object` ist?",
       "options": [
         {
@@ -911,6 +918,7 @@
       "id": "m09-l06-q5",
       "lesson": "m09-l06",
       "type": "single",
+      "placement": true,
       "question": "Eine Schnittstelle ist als `interface IProducer<out T>` deklariert. Was bedeutet `out`?",
       "options": [
         {

@@ -345,7 +345,15 @@ Misconception: the query already runs when it is defined.
 Mixes M9–M11. Folder `w03-review-generics-linq/`, quiz file `de/w03.json`, position 11.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
 - Lesson L1: mixed reading and tracing set (title chosen by the architect of W3).
 - Lesson L2: mixed writing set and final set (title chosen by the architect of W3).
-- **M9**: Filled by the module review of M9.
+- **M9** (from `module-digest.md` `## M9`):
+  - Concepts:
+    - type parameter vs. type argument (`m09-l01`)
+    - generic method vs. overloads (`m09-l01`, `m03-l05`)
+    - constraint vs. cast or type test (`m09-l03`, `m08-l06`)
+    - `default(T)` vs. `null` (`m09-l04`, `m04-l05`)
+    - `T?` without constraint vs. `int?` (`m09-l04`)
+    - invariance of `List<T>` vs. covariance of `IEnumerable<T>` (`m09-l06`)
+  - Misconception ids: m09-l01-type-inferred-from-return-type, m09-l03-unconstrained-t-has-all-members, m09-l04-default-t-is-null, m09-l05-generics-box-value-types, m09-l06-list-object-accepts-list-string
 - **M10**: Filled by the module review of M10.
 - **M11**: Filled by the module review of M11.
 - ▶: all covered modules are runnable.
@@ -490,7 +498,7 @@ Content of the specification or platform that the course leaves out, and why. "O
 | `goto` and labeled statements | §13 | Rarely used, makes control flow hard to read; the switch statement rules are enough. Only by name in M2. |
 | Dynamic binding (`dynamic`) | §8, §12 | Mainly for COM and dynamic languages interop; works against the static typing the course teaches. |
 | `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions | §16, feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
-| Generic math, static abstract interface members | feature spec (C# 11) | Mainly for library authors; high abstraction level. Deep dive at most in M9. |
+| Generic math, static abstract interface members | feature spec (C# 11) | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
 | Reflection, source generators, interceptors, partial events and partial constructors (C# 14) | library, feature specs | Infrastructure for frameworks and generators, not for beginners' application code. Attributes are taught (M14), reading them via reflection is not. |
 | Interop (P/Invoke, COM), `extern` members, extern alias | §15, §14 | Platform-specific; not needed for cross-platform web and console apps. |
 | Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, …) | §6 | Tool and editor concerns; no effect on program logic. |
