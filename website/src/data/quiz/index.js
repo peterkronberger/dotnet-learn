@@ -7,6 +7,7 @@ import deM05 from './de/m05.json';
 import deM06 from './de/m06.json';
 import deM07 from './de/m07.json';
 import deM08 from './de/m08.json';
+import deM09 from './de/m09.json';
 import deW01 from './de/w01.json';
 import deDev from './de/dev.json';
 import {getExample} from './examples';
@@ -18,7 +19,7 @@ export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons'
 const DEFAULT_LOCALE = 'de';
 
 const FILES = {
-  de: [deM00, deM01, deM02, deM03, deM04, deM05, deM06, deM07, deM08, deW01, deDev],
+  de: [deM00, deM01, deM02, deM03, deM04, deM05, deM06, deM07, deM08, deM09, deW01, deDev],
 };
 
 const LESSON_PATTERN = /^[a-z0-9]+-l\d+$/;
