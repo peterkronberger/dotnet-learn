@@ -289,6 +289,327 @@
         }
       ],
       "explanation": "Die Methode gibt dem Aufrufer eine Zeile und braucht nichts zurück. Das ist ein `Action<string>`. `Console.WriteLine` als Methodengruppe passt dazu."
+    },
+    {
+      "id": "m10-l03-q1",
+      "lesson": "m10-l03",
+      "type": "single",
+      "question": "Welches Lambda passt zu `Func<int, int, int>`?",
+      "options": [
+        {
+          "text": "`(a, b) => a + b`",
+          "correct": true
+        },
+        {
+          "text": "`a, b => a + b`",
+          "feedback": "Bei zwei Parametern gehört die Parameterliste in Klammern."
+        },
+        {
+          "text": "`a => a + 1`",
+          "feedback": "Das Lambda hat einen Parameter, der Delegate-Typ verlangt zwei."
+        },
+        {
+          "text": "`() => 42`",
+          "feedback": "Ohne Parameter passt das Lambda nicht zu einem Delegate mit zwei `int`-Parametern."
+        }
+      ],
+      "explanation": "Ein Lambda braucht genau so viele Parameter wie der Delegate-Typ. Bei mehr als einem Parameter und bei keinem stehen Klammern um die Liste. Der Rückgabetyp `int` passt zu `a + b`."
+    },
+    {
+      "id": "m10-l03-q2",
+      "lesson": "m10-l03",
+      "type": "single",
+      "question": "`Func<int, bool> check = n => { Console.WriteLine(\"run\"); return n > 0; };` steht in einem Programm. Wann erscheint `run` in der Ausgabe?",
+      "options": [
+        {
+          "text": "Sofort bei dieser Zeile, weil das Lambda dort geschrieben steht.",
+          "misconception": "m10-l03-lambda-runs-when-defined",
+          "feedback": "Die Zeile erzeugt nur einen Delegate, der auf den Lambda-Körper verweist. Der Körper läuft nicht."
+        },
+        {
+          "text": "Jedes Mal, wenn `check` aufgerufen wird.",
+          "correct": true
+        },
+        {
+          "text": "Genau einmal, beim ersten Aufruf von `check`.",
+          "feedback": "Der Körper läuft bei jedem Aufruf neu, nicht nur beim ersten."
+        },
+        {
+          "text": "Nie, weil ein Lambda keine Anweisungen wie `Console.WriteLine` enthalten darf.",
+          "feedback": "Ein Lambda mit Anweisungskörper darf beliebige Anweisungen enthalten."
+        }
+      ],
+      "explanation": "Ein Lambda erzeugt nur einen Delegate-Wert. Der Körper läuft erst beim Aufruf, und zwar bei jedem Aufruf. Ohne Aufruf (null Mal) läuft er nie."
+    },
+    {
+      "id": "m10-l03-q3",
+      "lesson": "m10-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, wie oft das Lambda läuft.",
+      "example": "m10/l03/quiz-lambda-runs.cs",
+      "explanation": "Vor den Aufrufen steht `calls` auf 0, denn das Lambda wurde nur erzeugt. `next(1)` und `next(2)` führen den Körper zweimal aus, danach ist `calls` 2."
+    },
+    {
+      "id": "m10-l03-q4",
+      "lesson": "m10-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l03/quiz-lambda-block.cs",
+      "explanation": "Das Lambda hat einen Anweisungskörper mit mehreren `return`-Anweisungen. `-3` ist kleiner als 0, `0` ergibt `zero`, `5` ergibt `positive`."
+    },
+    {
+      "id": "m10-l03-q5",
+      "lesson": "m10-l03",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0029.",
+      "example": "m10/l03/wrong-return-type.snippet.cs",
+      "bugLines": [
+        1
+      ],
+      "explanation": "Der Delegate-Typ `Func<int, bool>` verlangt den Rückgabetyp `bool`. Das Lambda gibt aber einen `string` zurück, und der lässt sich nicht in `bool` umwandeln."
+    },
+    {
+      "id": "m10-l03-q6",
+      "lesson": "m10-l03",
+      "type": "single",
+      "question": "In `List<string> words` steht `words.FindAll(w => w.Length > 3)`. Woher weiß der Compiler, dass `w` ein `string` ist?",
+      "options": [
+        {
+          "text": "Aus dem Zieltyp: `FindAll` erwartet ein `Predicate<string>`.",
+          "correct": true
+        },
+        {
+          "text": "Aus dem Namen `w`: ein Buchstabe steht immer für `string`.",
+          "feedback": "Der Name des Parameters sagt nichts über seinen Typ."
+        },
+        {
+          "text": "Aus dem Ausdruck `w.Length > 3`: nur `string` hat eine Eigenschaft `Length`.",
+          "feedback": "Der Compiler setzt zuerst den Parametertyp aus dem Zieltyp ein und prüft dann den Körper."
+        },
+        {
+          "text": "Gar nicht: Er behandelt `w` als `object` und prüft erst zur Laufzeit.",
+          "feedback": "Die Typen stehen beim Übersetzen fest. Es gibt keine Prüfung zur Laufzeit."
+        }
+      ],
+      "explanation": "Ein Lambda hat in diesen Beispielen keinen eigenen Typ. Der Delegate-Typ des Ziels (hier `Predicate<string>`) liefert die Parametertypen und den Rückgabetyp, und der Körper muss dazu passen."
+    },
+    {
+      "id": "m10-l03-q7",
+      "lesson": "m10-l03",
+      "type": "single",
+      "question": "Du brauchst einen `IComparer<Incident>` und hast nur eine kurze Vergleichsregel. Was passt?",
+      "options": [
+        {
+          "text": "`Comparer<Incident>.Create((a, b) => …)` mit der Regel als Lambda.",
+          "correct": true
+        },
+        {
+          "text": "`new Comparer<Incident>((a, b) => …)`, denn `Comparer<T>` hat einen Konstruktor für Lambdas.",
+          "feedback": "Das Objekt entsteht über die statische Methode `Create`, nicht über einen Konstruktor."
+        },
+        {
+          "text": "Du musst immer eine eigene Klasse schreiben, die `IComparer<Incident>` umsetzt.",
+          "feedback": "Eine Klasse ist möglich, aber für eine kurze Regel genügt `Comparer<T>.Create` mit einem Lambda."
+        },
+        {
+          "text": "`incidents.Sort(IComparer<Incident> => …)`.",
+          "feedback": "Das ist kein gültiger Lambda-Ausdruck. Ein Typname ersetzt keine Parameterliste."
+        }
+      ],
+      "explanation": "`Comparer<T>.Create` nimmt ein `Comparison<T>` und liefert einen `IComparer<T>`. Damit schreibst du die Ordnung als Lambda statt als eigene Klasse."
+    },
+    {
+      "id": "m10-l03-q8",
+      "lesson": "m10-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `n => n % 2 == 0` ist, woher `n` seinen Typ bekommt und wann der Ausdruck `n % 2 == 0` ausgerechnet wird.",
+      "modelAnswer": "Das Lambda ist eine Funktion ohne Namen, die dort steht, wo sie gebraucht wird. Es wird in einen Delegate-Typ umgewandelt, zum Beispiel `Predicate<int>`. Dieser Zieltyp legt fest, dass `n` ein `int` ist und dass das Ergebnis `bool` sein muss. Der Ausdruck `n % 2 == 0` wird erst ausgerechnet, wenn jemand den Delegate aufruft, und bei jedem Aufruf neu."
+    },
+    {
+      "id": "m10-l03-q9",
+      "lesson": "m10-l03",
+      "type": "single",
+      "question": "Eine Prüfung `IsUnderInvestigation` besteht aus mehreren Zeilen und wird an drei Stellen gebraucht. Eine andere Prüfung `i => i.FailureCount > 0` steht nur an einer Stelle. Was ist besser lesbar?",
+      "options": [
+        {
+          "text": "Die lange Prüfung als benannte Methode übergeben, die kurze einmalige als Lambda schreiben.",
+          "correct": true
+        },
+        {
+          "text": "Beide als Lambda schreiben, weil Lambdas immer kürzer und deshalb besser sind.",
+          "feedback": "Eine lange Prüfung, die dreimal vorkommt, würdest du dreimal kopieren. Ein Name hilft hier."
+        },
+        {
+          "text": "Beide als benannte Methode schreiben, weil ein Lambda langsamer läuft.",
+          "feedback": "Es geht um Lesbarkeit. Ein Lambda ist für eine kurze, einmalige Prüfung klarer."
+        },
+        {
+          "text": "Das ist egal, weil nur Lambdas als Argument erlaubt sind.",
+          "feedback": "Methodengruppen sind ebenfalls als Argument erlaubt, wie in Lektion 2."
+        }
+      ],
+      "explanation": "Eine benannte Methode gibt einer längeren, wiederverwendeten Prüfung einen Namen. Ein Lambda eignet sich für kurze Prüfungen, die nur an einer Stelle gebraucht werden."
+    },
+    {
+      "id": "m10-l04-q1",
+      "lesson": "m10-l04",
+      "type": "single",
+      "question": "Welche Zeile lässt sich übersetzen?",
+      "options": [
+        {
+          "text": "`var inc = (int x) => x + 1;`",
+          "correct": true
+        },
+        {
+          "text": "`var inc = x => x + 1;`",
+          "feedback": "Ohne Parametertyp findet der Compiler weder einen Delegate-Typ noch einen Zieltyp. Es gibt den Fehler CS8917."
+        },
+        {
+          "text": "`var inc = () => x + 1;` mit `x` als Parameter, der später kommt.",
+          "feedback": "Ein Parameter muss in der Parameterliste stehen. Eine leere Liste hat keinen."
+        },
+        {
+          "text": "`var inc = int => 1;`",
+          "feedback": "Ein Typname ersetzt keinen Parameternamen."
+        }
+      ],
+      "explanation": "Mit ausdrücklichem Parametertyp hat das Lambda einen natürlichen Typ, hier `Func<int, int>`. Deshalb funktioniert `var`."
+    },
+    {
+      "id": "m10-l04-q2",
+      "lesson": "m10-l04",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Ein Lambda kann man nie mit `var` speichern, weil es keinen eigenen Typ hat.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Sie hat recht: Ein Lambda braucht immer einen ausdrücklichen Delegate-Typ als Ziel.",
+          "misconception": "m10-l04-lambda-has-no-type",
+          "feedback": "Seit C# 10 hat ein Lambda mit ausdrücklich typisierten Parametern einen natürlichen Typ, und `var` ist erlaubt."
+        },
+        {
+          "text": "Es geht, wenn alle Parametertypen im Lambda stehen. Der Compiler wählt dann `Func` oder `Action`.",
+          "correct": true
+        },
+        {
+          "text": "Es geht immer, auch ohne Parametertypen, denn der Compiler errät sie aus dem Körper.",
+          "feedback": "Der Compiler leitet Parametertypen nicht aus dem Körper ab. Ohne Typen und ohne Zieltyp gibt es den Fehler CS8917."
+        },
+        {
+          "text": "Es geht nur für `Action`, nie für `Func`.",
+          "feedback": "Beide gehen: Ohne Rückgabewert entsteht `Action<…>`, mit Rückgabewert `Func<…>`."
+        }
+      ],
+      "explanation": "Ein Lambda mit ausdrücklichen Parametertypen hat einen natürlichen Typ. Nur wenn der Compiler keine Parametertypen findet, braucht er einen Zieltyp."
+    },
+    {
+      "id": "m10-l04-q3",
+      "lesson": "m10-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l04/quiz-natural-type.cs",
+      "explanation": "`half(5)` teilt `5` durch `2` als `double` und gibt `2.5` aus. Ohne zweites Argument gilt der Standardwert `1`, mit `3` das übergebene Argument."
+    },
+    {
+      "id": "m10-l04-q4",
+      "lesson": "m10-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l04/quiz-discard.cs",
+      "explanation": "`pick` ignoriert beide Argumente und gibt immer `7` zurück. Bei `second` ist nur ein `_` vorhanden, das Lambda hat einen normalen Parameter `b` und gibt `2` zurück."
+    },
+    {
+      "id": "m10-l04-q5",
+      "lesson": "m10-l04",
+      "type": "find-bug",
+      "question": "Welche Zeilen lassen sich nicht übersetzen? Der Compiler meldet zweimal CS8917.",
+      "example": "m10/l04/no-natural-type.snippet.cs",
+      "bugLines": [
+        1,
+        2
+      ],
+      "explanation": "Das Lambda in der ersten Zeile hat keinen Parametertyp. Die Methodengruppe `Console.WriteLine` in der zweiten Zeile hat viele Überladungen, deshalb kann der Compiler keinen Delegate-Typ wählen. Beide brauchen einen ausdrücklichen Typ."
+    },
+    {
+      "id": "m10-l04-q6",
+      "lesson": "m10-l04",
+      "type": "single",
+      "question": "Ein Lambda soll den Rückgabetyp `int?` ausdrücklich angeben. Welche Schreibweise stimmt?",
+      "options": [
+        {
+          "text": "`int? (string text) => …`",
+          "correct": true
+        },
+        {
+          "text": "`(string text) int? => …`",
+          "feedback": "Der Rückgabetyp steht vor der Parameterliste, nicht dahinter."
+        },
+        {
+          "text": "`int? text => …`",
+          "feedback": "Mit ausdrücklichem Rückgabetyp braucht die Parameterliste Klammern."
+        },
+        {
+          "text": "`(string text) => int? …`",
+          "feedback": "Rechts vom Pfeil steht der Körper, kein Typ."
+        }
+      ],
+      "explanation": "Der Rückgabetyp steht vor der Parameterliste, und die Parameterliste steht in Klammern: `int? (string text) => …`."
+    },
+    {
+      "id": "m10-l04-q7",
+      "lesson": "m10-l04",
+      "type": "single",
+      "question": "`var log = (string text, string level = \"INFO\") => …;` Was ist der Typ von `log`?",
+      "options": [
+        {
+          "text": "Ein Delegate-Typ, den der Compiler für dieses Lambda erzeugt.",
+          "correct": true
+        },
+        {
+          "text": "`Func<string, string, string>`",
+          "feedback": "`Func` kennt keine Standardwerte. Die Zuweisung `Func<string, string, string> same = log;` ergibt CS0029."
+        },
+        {
+          "text": "`Action<string, string>`",
+          "feedback": "Das Lambda gibt einen Wert zurück, also kann es kein `Action` sein."
+        },
+        {
+          "text": "`object`",
+          "feedback": "Ein Lambda ist keine `object`-Variable. Der Compiler wählt einen Delegate-Typ."
+        }
+      ],
+      "explanation": "Hat ein Lambda einen optionalen Parameter oder ein `params`-Array, passt kein `Func` oder `Action`. Der Compiler erzeugt dann einen eigenen Delegate-Typ, der den Standardwert kennt."
+    },
+    {
+      "id": "m10-l04-q8",
+      "lesson": "m10-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wann `var` mit einem Lambda funktioniert und wann der Compiler einen Zieltyp braucht.",
+      "modelAnswer": "Hat das Lambda für jeden Parameter einen ausdrücklichen Typ (oder gar keinen Parameter), hat es einen natürlichen Typ: der Compiler macht daraus ein `Func<…>` oder `Action<…>`, und `var` geht. Fehlt ein Parametertyp, wie bei `x => x`, kann der Compiler die Typen nicht erfinden. Dann braucht er einen Zieltyp, zum Beispiel `Func<int, int> f = x => x;`. Dasselbe gilt für eine Methodengruppe mit mehreren Überladungen."
+    },
+    {
+      "id": "m10-l04-q9",
+      "lesson": "m10-l04",
+      "type": "single",
+      "question": "Ein Delegate hat drei Parameter, du brauchst nur den dritten. Wie schreibst du das Lambda, ohne unbenutzte Namen zu erfinden?",
+      "options": [
+        {
+          "text": "`(_, _, last) => last`",
+          "correct": true
+        },
+        {
+          "text": "`(a, a, last) => last`",
+          "feedback": "Zwei Parameter dürfen nicht denselben Namen `a` haben. Nur `_` darf mehrfach stehen."
+        },
+        {
+          "text": "`(, , last) => last`",
+          "feedback": "Eine Parameterliste darf keine leeren Stellen haben."
+        },
+        {
+          "text": "`last => last`",
+          "feedback": "Das Lambda hat dann einen Parameter. Der Delegate-Typ verlangt drei."
+        }
+      ],
+      "explanation": "Mehrere Parameter namens `_` sind Discards: Ihre Werte werden ignoriert, und sie stören sich nicht. Die Parameteranzahl muss trotzdem zum Delegate-Typ passen."
     }
   ]
 }

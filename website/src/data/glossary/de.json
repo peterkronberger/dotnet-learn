@@ -6417,6 +6417,150 @@
         "title": "Predicate<T> Delegate",
         "url": "https://learn.microsoft.com/dotnet/api/system.predicate-1"
       }
+    },
+    {
+      "id": "lambda-expression",
+      "term": "Lambda Expression",
+      "german": "Lambda-Ausdruck",
+      "category": "language",
+      "definition": "Eine Funktion ohne Namen, geschrieben mit `=>`, zum Beispiel `x => x * 2`. Links vom Pfeil stehen die Parameter, rechts der Körper. Ein Lambda wird in einen Delegate umgewandelt und läuft erst, wenn dieser aufgerufen wird.",
+      "aliases": [
+        "Lambda",
+        "Lambdas",
+        "Lambda-Ausdrücke"
+      ],
+      "related": [
+        "anonymous-function",
+        "expression-lambda",
+        "statement-lambda",
+        "delegate"
+      ],
+      "lesson": "m10-l03",
+      "source": {
+        "title": "Expressions – Anonymous function expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1222-anonymous-function-expressions"
+      }
+    },
+    {
+      "id": "anonymous-function",
+      "term": "Anonymous Function",
+      "german": "anonyme Funktion",
+      "category": "language",
+      "definition": "Oberbegriff für Funktionen ohne Namen, die dort stehen, wo man sie braucht: Lambda-Ausdrücke und die ältere Form mit `delegate (…) { … }`. Eine anonyme Funktion wird in einen passenden Delegate umgewandelt.",
+      "aliases": [
+        "anonyme Funktionen",
+        "anonyme Methode"
+      ],
+      "related": [
+        "lambda-expression",
+        "anonymous-function-conversion"
+      ],
+      "lesson": "m10-l03",
+      "source": {
+        "title": "Expressions – Anonymous function expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1222-anonymous-function-expressions"
+      }
+    },
+    {
+      "id": "expression-lambda",
+      "term": "Expression Lambda",
+      "german": "Lambda mit Ausdruckskörper",
+      "category": "language",
+      "definition": "Ein Lambda, dessen Körper ein einzelner Ausdruck ist, zum Beispiel `x => x * 2`. Der Wert des Ausdrucks ist das Ergebnis. Es gibt weder Klammern `{ }` noch `return`.",
+      "aliases": [
+        "Ausdruckslambda",
+        "Expression-Lambda"
+      ],
+      "related": [
+        "lambda-expression",
+        "statement-lambda"
+      ],
+      "lesson": "m10-l03",
+      "source": {
+        "title": "Lambda expressions and anonymous functions – Expression lambdas",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/lambda-expressions#expression-lambdas"
+      }
+    },
+    {
+      "id": "statement-lambda",
+      "term": "Statement Lambda",
+      "german": "Lambda mit Anweisungskörper",
+      "category": "language",
+      "definition": "Ein Lambda, dessen Körper ein Block mit Anweisungen in `{ }` ist. Ein Ergebnis gibst du mit `return` zurück, wenn der Delegate-Typ einen Rückgabewert hat.",
+      "aliases": [
+        "Anweisungslambda",
+        "Statement-Lambda"
+      ],
+      "related": [
+        "lambda-expression",
+        "expression-lambda"
+      ],
+      "lesson": "m10-l03",
+      "source": {
+        "title": "Lambda expressions and anonymous functions – Statement lambdas",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/lambda-expressions#statement-lambdas"
+      }
+    },
+    {
+      "id": "anonymous-function-conversion",
+      "term": "Anonymous Function Conversion",
+      "german": "Umwandlung einer anonymen Funktion",
+      "category": "language",
+      "definition": "Die implizite Umwandlung eines Lambdas in einen passenden Delegate-Typ. Der Zieltyp liefert die Parametertypen und den Rückgabetyp, und der Körper muss dazu passen. Die Umwandlung erzeugt den Delegate, ruft den Körper aber nicht auf.",
+      "aliases": [
+        "Umwandlung eines Lambdas"
+      ],
+      "related": [
+        "anonymous-function",
+        "lambda-expression",
+        "method-group-conversion",
+        "delegate"
+      ],
+      "lesson": "m10-l03",
+      "source": {
+        "title": "Conversions – Anonymous function conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#107-anonymous-function-conversions"
+      }
+    },
+    {
+      "id": "natural-type",
+      "term": "Natural Type",
+      "german": "natürlicher Typ",
+      "category": "language",
+      "definition": "Der Typ, den der Compiler einem Lambda oder einer Methodengruppe ohne Zieltyp selbst gibt, zum Beispiel `Func<int, int>` für `(int x) => x * 2`. Ein Lambda hat ihn, wenn alle Parametertypen ausdrücklich dastehen. Mit ihm funktioniert `var`.",
+      "aliases": [
+        "natürlicher Typ eines Lambdas"
+      ],
+      "related": [
+        "lambda-expression",
+        "type-inference",
+        "func-delegate"
+      ],
+      "lesson": "m10-l04",
+      "source": {
+        "title": "Expressions – Anonymous function type",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1228-anonymous-function-type"
+      }
+    },
+    {
+      "id": "discard-parameter",
+      "term": "Discard Parameter",
+      "german": "Discard-Parameter",
+      "category": "language",
+      "definition": "Ein Lambda-Parameter mit dem Namen `_`, wenn mehr als einer so heißt. Der Wert wird ignoriert, und mehrere `_` stören sich nicht, zum Beispiel `(_, _, last) => last`.",
+      "aliases": [
+        "Discard-Parameter",
+        "Discard-Parameter im Lambda"
+      ],
+      "related": [
+        "discard",
+        "lambda-expression"
+      ],
+      "lesson": "m10-l04",
+      "source": {
+        "title": "Expressions – Anonymous function signatures",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1222-anonymous-function-signatures"
+      }
     }
   ]
 }

@@ -1,0 +1,5 @@
+42
+> natural type
+42
+True
+49

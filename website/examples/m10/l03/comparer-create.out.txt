@@ -1,0 +1,6 @@
+fig, pear, apple, banana
+pear, fig, banana, apple
+Removed 1
+- pear
+- banana
+- apple
