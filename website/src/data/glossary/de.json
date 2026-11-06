@@ -6131,6 +6131,152 @@
         "title": "IEnumerable<T> Interface",
         "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1"
       }
+    },
+    {
+      "id": "generic-interface",
+      "term": "Generic Interface",
+      "german": "Generische Schnittstelle",
+      "category": "language",
+      "definition": "Eine Schnittstelle mit Typparametern, zum Beispiel `interface IStore<T>`. Eine Klasse implementiert sie mit einem festen Typargument (`IStore<LogEvent>`) oder gibt ihren eigenen Typparameter weiter (`Store<T> : IStore<T>`).",
+      "aliases": [
+        "generische Schnittstellen"
+      ],
+      "related": [
+        "interface",
+        "interface-implementation",
+        "generic-type"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Interfaces – Interface declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#192-interface-declarations"
+      }
+    },
+    {
+      "id": "delegate",
+      "term": "Delegate",
+      "german": "Delegate-Typ",
+      "category": "language",
+      "definition": "Ein Typ für Methoden mit einer bestimmten Signatur. Ein Wert dieses Typs verweist auf eine passende Methode und ruft sie auf.",
+      "aliases": [
+        "Delegates",
+        "Delegate"
+      ],
+      "related": [
+        "generic-delegate",
+        "generic-type"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Delegates – Delegate declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations"
+      }
+    },
+    {
+      "id": "generic-delegate",
+      "term": "Generic Delegate",
+      "german": "Generischer Delegate",
+      "category": "language",
+      "definition": "Ein Delegate-Typ mit Typparametern, zum Beispiel `delegate TResult Transformer<TInput, TResult>(TInput input);`. Die Bibliothek enthält `Func<…>`, `Action<…>` und `Predicate<T>`.",
+      "aliases": [
+        "generische Delegates",
+        "Func",
+        "Action",
+        "Predicate"
+      ],
+      "related": [
+        "delegate",
+        "generic-type",
+        "type-parameter"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Delegates – Delegate declarations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations"
+      }
+    },
+    {
+      "id": "variance",
+      "term": "Variance",
+      "german": "Varianz",
+      "category": "language",
+      "definition": "Die Regel, wann ein konstruierter Typ wie `IEnumerable<string>` in einen anderen wie `IEnumerable<object>` umgewandelt werden darf. Sie gilt nur für Schnittstellen und Delegates, deren Typparameter mit `out` oder `in` markiert sind.",
+      "aliases": [
+        "Varianz"
+      ],
+      "related": [
+        "covariance",
+        "contravariance",
+        "invariance"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Interfaces – Variant type parameter lists",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists"
+      }
+    },
+    {
+      "id": "covariance",
+      "term": "Covariance",
+      "german": "Kovarianz",
+      "category": "language",
+      "definition": "Ein Typparameter mit `out` ist kovariant. Er darf nur an Ausgabestellen stehen, und ein `IEnumerable<string>` ist dann ein `IEnumerable<object>`.",
+      "aliases": [
+        "Kovarianz",
+        "kovariant"
+      ],
+      "related": [
+        "variance",
+        "contravariance",
+        "invariance"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Interfaces – Variant type parameter lists",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists"
+      }
+    },
+    {
+      "id": "contravariance",
+      "term": "Contravariance",
+      "german": "Kontravarianz",
+      "category": "language",
+      "definition": "Ein Typparameter mit `in` ist kontravariant. Er darf nur an Eingabestellen stehen, und ein `IComparer<object>` ist dann ein `IComparer<string>`.",
+      "aliases": [
+        "Kontravarianz",
+        "kontravariant"
+      ],
+      "related": [
+        "variance",
+        "covariance",
+        "invariance"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Interfaces – Variant type parameter lists",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists"
+      }
+    },
+    {
+      "id": "invariance",
+      "term": "Invariance",
+      "german": "Invarianz",
+      "category": "language",
+      "definition": "Ein Typparameter ohne `in` oder `out` ist invariant. Dann sind nur gleiche Typargumente austauschbar: Eine `List<string>` ist keine `List<object>`. Generische Klassen sind immer invariant.",
+      "aliases": [
+        "Invarianz",
+        "invariant"
+      ],
+      "related": [
+        "variance",
+        "covariance",
+        "contravariance"
+      ],
+      "lesson": "m09-l06",
+      "source": {
+        "title": "Interfaces – Variant type parameter lists",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists"
+      }
     }
   ]
 }
