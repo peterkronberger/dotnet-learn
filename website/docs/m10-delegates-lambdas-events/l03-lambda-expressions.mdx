@@ -1,0 +1,248 @@
+---
+title: Lambda-Ausdrücke
+sidebar_position: 3
+description: Ein Lambda-Ausdruck ist eine Funktion ohne Namen, die dort steht, wo man sie braucht. Er wird in einen Delegate umgewandelt und läuft erst, wenn dieser aufgerufen wird.
+lesson_id: m10-l03
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import helperToLambda from '!!raw-loader!@site/examples/m10/l03/helper-to-lambda.cs';
+import helperToLambdaOutput from '!!raw-loader!@site/examples/m10/l03/helper-to-lambda.out.txt';
+import lambdaForms from '!!raw-loader!@site/examples/m10/l03/lambda-forms.cs';
+import lambdaFormsOutput from '!!raw-loader!@site/examples/m10/l03/lambda-forms.out.txt';
+import lambdaRunsLater from '!!raw-loader!@site/examples/m10/l03/lambda-runs-later.cs';
+import lambdaRunsLaterOutput from '!!raw-loader!@site/examples/m10/l03/lambda-runs-later.out.txt';
+import comparerCreate from '!!raw-loader!@site/examples/m10/l03/comparer-create.cs';
+import comparerCreateOutput from '!!raw-loader!@site/examples/m10/l03/comparer-create.out.txt';
+import wrongReturnType from '!!raw-loader!@site/examples/m10/l03/wrong-return-type.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m10/l03/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m10/l03/seclog-delegates-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m10/l03/seclog-delegates-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m10/l03/seclog-delegates-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m10/l03/seclog-delegates-solution.cs';
+
+# Lambda-Ausdrücke
+
+:::note[Lernziele]
+- Du kannst einen Lambda-Ausdruck mit Ausdrucks- und Anweisungskörper schreiben.
+- Du kannst erklären, woher die Parametertypen eines Lambdas kommen (Zieltyp).
+- Du kannst vorhersagen, wann der Code eines Lambdas läuft.
+- Du kannst eine Methodengruppe durch ein Lambda ersetzen und begründen, welche Form besser lesbar ist.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l01-q1" />
+
+<Quiz id="m10-l02-q3" />
+
+<Quiz id="m08-l11-q6" />
+
+## Von der Hilfsmethode zum Lambda
+
+In Lektion 2 hast du `FindAll(IsEven)` geschrieben. Dafür brauchtest du eine eigene Methode `IsEven`, die nur an dieser einen Stelle gebraucht wird. Ein <Term id="lambda-expression">Lambda-Ausdruck</Term> schreibt dieselbe Prüfung direkt an die Stelle, wo sie gebraucht wird: `n => n % 2 == 0`. Links vom Pfeil `=>` stehen die Parameter, rechts der Körper.
+
+Ein Lambda ist eine <Term id="anonymous-function">anonyme Funktion</Term>: eine Funktion ohne Namen. Die ältere Form `delegate (int x) { … }` heißt anonyme Methode. Du triffst sie in altem Code, in diesem Kurs benutzen wir sie nicht.
+
+:::info[Vorhersage]
+Beide Aufrufe von `FindAll` prüfen dasselbe. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l03-helper-to-lambda" code={helperToLambda} predict expected={helperToLambdaOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Beide Zeilen lauten `8, 10, 4`.
+
+1. **Methodengruppe:** `IsEven` ist der Name einer Methode. `FindAll` ruft sie für jede Zahl auf.
+2. **Lambda:** `n => n % 2 == 0` ist dieselbe Prüfung ohne Namen. `n` ist der Parameter, `n % 2 == 0` der Körper.
+3. **Vergleich:** Das Lambda spart die Hilfsmethode. Dafür hat die Prüfung keinen Namen mehr, der sie erklärt.
+
+</details>
+
+## Formen von Lambdas
+
+Der Körper steht rechts von `=>` in zwei Formen:
+
+- Ein <Term id="expression-lambda">Lambda mit Ausdruckskörper</Term> hat einen einzelnen Ausdruck. Sein Wert ist das Ergebnis, ohne `return` und ohne `{ }`: `x => x * 2`.
+- Ein <Term id="statement-lambda">Lambda mit Anweisungskörper</Term> hat einen Block in `{ }` mit beliebig vielen Anweisungen. Das Ergebnis gibst du mit `return` zurück.
+
+Die Parameterliste hat vier Formen: `x` (ein Parameter ohne Klammern), `(x, y)` (mehrere Parameter), `()` (keiner) und `(int x)` (mit ausdrücklichem Typ). Bei einem `Action` hat der Körper kein Ergebnis.
+
+:::info[Vorhersage]
+Welche sechs Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l03-lambda-forms" code={lambdaForms} predict expected={lambdaFormsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `8`, `7`, `hello`, `False`, `7 is odd` und `> done`.
+
+1. **Ausdruckskörper:** `twice(4)` rechnet `4 * 2`. `add(3, 4)` rechnet `3 + 4`.
+2. **Keine Parameter:** `greeting()` hat leere Klammern und liefert `hello`.
+3. **Ausdrücklicher Typ:** `(int x) => x > 0` ist für `-2` gleich `False`.
+4. **Anweisungskörper:** `describe` berechnet in einer Variablen `kind` und gibt mit `return` einen Text zurück.
+5. **Action:** `show` gibt nichts zurück, es schreibt die Zeile selbst.
+
+</details>
+
+## Woher kommen die Typen?
+
+Ein Lambda hat in diesen Beispielen keinen eigenen Typ. Es wird in einen Delegate-Typ umgewandelt, der als Ziel dasteht: der Typ der Variablen oder des Parameters. Diese <Term id="anonymous-function-conversion">Umwandlung einer anonymen Funktion</Term> geht so:
+
+1. Der **Zieltyp** liefert die Parametertypen und den Rückgabetyp. Bei `Func<int, int> twice = x => x * 2;` ist `x` ein `int`, und das Ergebnis muss ein `int` sein.
+2. Der **Körper** muss dazu passen: Anzahl der Parameter, Rückgabetyp und alle `return`-Anweisungen.
+3. Die Umwandlung **erzeugt** den Delegate. Der Körper läuft dabei nicht.
+
+Passt der Körper nicht, meldet der Compiler einen Fehler:
+
+<CodeBlock language="csharp" title="wrong-return-type.snippet.cs">{wrongReturnType}</CodeBlock>
+
+`Func<int, bool>` verlangt `bool`, das Lambda liefert einen `string`. Der Compiler meldet `error CS0029: Cannot implicitly convert type 'string' to 'bool'`.
+
+## Wann läuft ein Lambda?
+
+Ein Lambda erzeugt nur einen Delegate. Der Körper läuft, wenn der Delegate aufgerufen wird, wie bei der Methodengruppe in Lektion 1: keinmal, einmal oder mehrmals.
+
+:::info[Vorhersage]
+Im Körper steht eine `Console.WriteLine`-Anweisung. Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l03-runs-later" code={lambdaRunsLater} predict expected={lambdaRunsLaterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Lambda created`, `Lambda runs with 4`, `True`, `Lambda runs with 7` und `False`.
+
+1. **Erzeugen:** Die Zuweisung an `isEven` erzeugt den Delegate. Es erscheint nur `Lambda created`.
+2. **Erster Aufruf:** `isEven(4)` führt den Körper aus. Erst läuft `WriteLine` im Körper, dann gibt der Aufruf `True` zurück, das `Console.WriteLine` außen ausgibt.
+3. **Zweiter Aufruf:** `isEven(7)` führt den Körper noch einmal aus.
+
+**Was passiert, wenn …?** … du `isEven` nie aufrufst? Dann läuft der Körper nie, und `Lambda runs with …` erscheint nicht.
+
+</details>
+
+## Lambdas in der Bibliothek
+
+Du übergibst Lambdas überall dort, wo ein Delegate-Parameter steht: `FindAll`, `RemoveAll`, `ForEach` und `Sort(Comparison<T>)`. Mit `Comparer<T>.Create` machst du aus einem Lambda einen `IComparer<T>`: Die Methode nimmt ein `Comparison<T>` und liefert einen Vergleicher. In Lektion 11 von Modul 8 war dafür noch eine eigene Klasse nötig.
+
+<Forward concepts={['LINQ (`Where`, `Select`)']} module="11" />
+
+Dieselben Lambdas benutzt später auch LINQ, zum Beispiel in `Where` und `Select`.
+
+:::info[Vorhersage]
+Die Wörter haben verschiedene Längen, `Sort` hat also keine Gleichstände. Welche sechs Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m10-l03-comparer-create" code={comparerCreate} predict expected={comparerCreateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `fig, pear, apple, banana`, `pear, fig, banana, apple`, `Removed 1`, `- pear`, `- banana` und `- apple`.
+
+1. **Sort mit Lambda:** `(a, b) => a.Length.CompareTo(b.Length)` ist ein `Comparison<string>`: negativ, wenn `a` kürzer ist.
+2. **Create:** `Comparer<string>.Create` macht aus dem Lambda einen `IComparer<string>`. Vertauschte Parameter (`b`, `a`) kehren die Reihenfolge um.
+3. **RemoveAll:** Das Lambda entscheidet pro Wort, ob es entfernt wird. Wörter mit weniger als 4 Buchstaben fallen weg.
+4. **ForEach:** Das Lambda läuft für jedes übrige Wort einmal.
+
+</details>
+
+<details>
+<summary>Vertiefung: Was die Umwandlung erzeugt (optional)</summary>
+
+Die Umwandlung einer anonymen Funktion in einen Delegate-Typ erzeugt eine Delegate-Instanz, die auf die anonyme Funktion verweist. Beim Aufruf des Delegates läuft ihr Körper ([§10.7.2 Evaluation of anonymous function conversions to delegate types](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1072-evaluation-of-anonymous-function-conversions-to-delegate-types)).
+
+Welche Delegate-Typen zu einem Lambda passen, legt [§10.7.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1071-general) fest: gleiche Parameterzahl, passende Parametertypen und ein Rückgabetyp, in den sich die Ergebnisse des Körpers umwandeln lassen.
+
+Der Compiler meldet für das Beispiel oben außer CS0029 auch `CS1662`, dass das Lambda nicht in den Delegate-Typ umgewandelt werden kann, weil Rückgabetypen nicht passen.
+
+</details>
+
+## Lückenbeispiel
+
+Ersetze die Hilfsmethode `IsShort` durch ein Lambda im Aufruf von `FindAll` und gib das Ergebnis aus.
+
+<CSharpRunner id="m10-l03-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Lambda schreiben:** `words.FindAll(word => word.Length <= 3)` ersetzt `IsShort`. Die Hilfsmethode kann entfallen.
+2. **Ausgeben:** `Console.WriteLine(string.Join(", ", shortWords));` gibt `log, ip` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog nimmt Regeln als Methoden an. `FuncRule` hält ein `Func<Incident, bool>`, und ein `Detector` zählt, wie viele Regeln auf einen Vorfall passen.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block mit den `FuncRule`-Regeln und die Stelle vor `return 0;` für den neuen Block. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Vor `// End with exit code 0 …` kommt der Block `// Write detection rules as lambdas`.
+
+1. Er erzeugt zwei `FuncRule`-Objekte mit Lambdas: `"many failures"` (`incident.FailureCount >= 5`) und `"user dave"` (der `User` ist `"dave"`, ordinal verglichen).
+2. Er legt einen `Detector` an, der diese zwei Regeln und `new StatusRule()` enthält, und gibt für jeden Vorfall `{User}: {Anzahl} lambda matches` mit `CountMatches` aus.
+3. Er sortiert eine Kopie von `incidents` mit `Comparer<Incident>.Create((a, b) => …)`: mehr Fehlversuche zuerst, bei Gleichstand der `User` ordinal. `Sort` ist nicht stabil, deshalb muss die Reihenfolge vollständig festgelegt sein. Dann gibt er den `Summary()` jedes Vorfalls aus.
+
+<CSharpRunner id="m10-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-delegates-solution.cs" />
+
+1. **Regeln als Lambdas:** Die zwei Prüfungen sind kurz und stehen nur hier. Eine Methode pro Regel wäre mehr Schreibarbeit. Der Zieltyp `Func<Incident, bool>` des Konstruktors liefert den Typ von `incident`.
+2. **Mischen:** `FuncRule`-Objekte und die Regelklasse `StatusRule` sind alle `IDetectionRule` und stehen im selben `Detector`.
+3. **Sortieren:** `Comparer<Incident>.Create` macht aus dem Lambda einen Vergleicher für `Sort`. Das Lambda vergleicht erst die Fehlversuche (absteigend), dann den Benutzernamen (ordinal).
+
+</details>
+
+**Neuer Stand:** SecLog schreibt Erkennungsregeln als Lambdas an der Stelle, wo es sie braucht, und sortiert Vorfälle mit einer Regel, die ohne eigene Klasse auskommt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m10-l03-lambda-runs-when-defined" />
+
+**„Der Code eines Lambdas läuft, wenn die Zeile mit dem Lambda ausgeführt wird.“** Das stimmt nicht. Die Zeile erzeugt nur einen Delegate. Der Körper läuft bei jedem Aufruf des Delegates: keinmal, einmal oder mehrmals.
+:::
+
+## Zusammenfassung
+
+Ein Lambda-Ausdruck ist eine Funktion ohne Namen, mit einem Ausdrucks- oder einem Anweisungskörper. Der Zieltyp, also der Delegate-Typ der Variablen oder des Parameters, liefert Parametertypen und Rückgabetyp, und der Körper muss dazu passen. Die Umwandlung erzeugt nur den Delegate. Der Körper läuft bei jedem Aufruf. Eine kurze, einmalige Prüfung ist als Lambda gut lesbar. Eine längere oder mehrfach gebrauchte Prüfung bekommt besser einen Methodennamen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m10-l03-q1" />
+
+<Quiz id="m10-l03-q2" />
+
+<Quiz id="m10-l03-q3" />
+
+<Quiz id="m10-l03-q4" />
+
+<Quiz id="m10-l03-q5" />
+
+<Quiz id="m10-l03-q6" />
+
+<Quiz id="m10-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m10-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m10-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Lambda-Ausdrücke und anonyme Funktionen](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/lambda-expressions)
+- Microsoft Learn: [`Comparer<T>.Create`](https://learn.microsoft.com/dotnet/api/system.collections.generic.comparer-1.create)
+- C#-Spezifikation: [§12.22 Anonymous function expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1222-anonymous-function-expressions)

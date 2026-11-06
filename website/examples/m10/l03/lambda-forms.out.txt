@@ -1,0 +1,6 @@
+8
+7
+hello
+False
+7 is odd
+> done
