@@ -5325,6 +5325,106 @@
         "title": "CA1852: Seal internal types",
         "url": "https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca1852"
       }
+    },
+    {
+      "id": "interface",
+      "term": "Interface",
+      "category": "language",
+      "definition": "Ein Typ, der Member ohne eigenen Zustand festlegt: Methoden und Eigenschaften mit Signatur. Er ist ein Vertrag, den Klassen umsetzen. Von einem Interface gibt es kein Objekt.",
+      "aliases": [
+        "Interfaces",
+        "interfaces"
+      ],
+      "related": [
+        "interface-implementation",
+        "abstract-class",
+        "collection-interface"
+      ],
+      "lesson": "m08-l05",
+      "source": {
+        "title": "Interfaces (C#-Spezifikation)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces"
+      }
+    },
+    {
+      "id": "interface-implementation",
+      "term": "Interface implementation",
+      "german": "Implementierung eines Interface",
+      "category": "language",
+      "definition": "Eine Klasse nennt das Interface in ihrer Basisliste (`class Printer : ILabeled`) und setzt jedes Member um. Passende Member ohne den Eintrag in der Basisliste genügen nicht.",
+      "aliases": [
+        "Interface implementieren",
+        "implement an interface"
+      ],
+      "related": [
+        "interface",
+        "explicit-interface-implementation"
+      ],
+      "lesson": "m08-l05",
+      "source": {
+        "title": "19.6.1 Interface implementations, General",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1961-general"
+      }
+    },
+    {
+      "id": "explicit-interface-implementation",
+      "term": "Explicit interface implementation",
+      "german": "explizite Interface-Implementierung",
+      "category": "language",
+      "definition": "Ein Member wird mit dem Namen des Interface vor dem Member-Namen umgesetzt (`string ILabeled.Describe()`), ohne Zugriffsmodifizierer. Es ist nur über eine Variable vom Typ des Interface erreichbar.",
+      "aliases": [
+        "explizite Implementierung",
+        "explicit implementation"
+      ],
+      "related": [
+        "interface",
+        "interface-implementation"
+      ],
+      "lesson": "m08-l05",
+      "source": {
+        "title": "19.6.2 Explicit interface member implementations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1962-explicit-interface-member-implementations"
+      }
+    },
+    {
+      "id": "default-interface-member",
+      "term": "Default interface member",
+      "german": "Standardimplementierung in einem Interface",
+      "category": "language",
+      "definition": "Ein Interface-Member mit Rumpf (seit C# 8). Eine Klasse muss es nicht umsetzen. Es ist nur über eine Variable vom Typ des Interface erreichbar.",
+      "aliases": [
+        "default interface method",
+        "Default Interface Method"
+      ],
+      "related": [
+        "interface",
+        "interface-implementation"
+      ],
+      "lesson": "m08-l05",
+      "source": {
+        "title": "19.4.1 Interface members, General",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1941-general"
+      }
+    },
+    {
+      "id": "composition",
+      "term": "Composition",
+      "german": "Komposition",
+      "category": "language",
+      "definition": "Ein Objekt hält andere Objekte und benutzt sie („hat ein“), statt von einer Klasse zu erben („ist ein“). Beispiel: Ein `Detector` hat eine Liste von Regeln.",
+      "aliases": [
+        "Objektkomposition",
+        "has-a"
+      ],
+      "related": [
+        "inheritance",
+        "interface"
+      ],
+      "lesson": "m08-l05",
+      "source": {
+        "title": "Tutorial: Introduction to Inheritance",
+        "url": "https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/inheritance"
+      }
     }
   ]
 }

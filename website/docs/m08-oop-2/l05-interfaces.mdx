@@ -1,0 +1,244 @@
+---
+title: Interfaces
+sidebar_position: 5
+description: Ein Interface beschreibt, was ein Typ können muss, ohne Zustand und ohne fertigen Code. Jede Klasse, die es benennt und umsetzt, lässt sich dann austauschen.
+lesson_id: m08-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import interfaceBasics from '!!raw-loader!@site/examples/m08/l05/interface-basics.cs';
+import interfaceBasicsOutput from '!!raw-loader!@site/examples/m08/l05/interface-basics.out.txt';
+import interfaceMissingMember from '!!raw-loader!@site/examples/m08/l05/interface-missing-member.snippet.cs';
+import interfaceNew from '!!raw-loader!@site/examples/m08/l05/interface-new.snippet.cs';
+import interfaceNominal from '!!raw-loader!@site/examples/m08/l05/interface-nominal.snippet.cs';
+import interfaceExplicit from '!!raw-loader!@site/examples/m08/l05/interface-explicit.cs';
+import interfaceExplicitOutput from '!!raw-loader!@site/examples/m08/l05/interface-explicit.out.txt';
+import interfaceExplicitCall from '!!raw-loader!@site/examples/m08/l05/interface-explicit-call.snippet.cs';
+import composition from '!!raw-loader!@site/examples/m08/l05/composition.cs';
+import defaultMember from '!!raw-loader!@site/examples/m08/l05/default-member.cs';
+import interfaceGap from '!!raw-loader!@site/examples/m08/l05/interface-gap.cs';
+import projectTask from '!!raw-loader!@site/examples/m08/l05/seclog-oop-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m08/l05/seclog-oop-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m08/l05/seclog-oop-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m08/l05/seclog-oop-solution.cs';
+
+# Interfaces
+
+:::note[Lernziele]
+- Du kannst ein Interface deklarieren und in einer Klasse implementieren.
+- Du kannst eine Variable, einen Parameter oder eine Liste vom Typ eines Interface verwenden.
+- Du kannst entscheiden, ob ein Interface oder eine Basisklasse besser passt.
+- Du kannst ein Interface-Member explizit implementieren.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l03-q2" />
+
+<Quiz id="m08-l04-q2" />
+
+<Quiz id="m07-l08-q2" />
+
+## Ein Vertrag ohne Zustand
+
+Eine Basisklasse gibt ihren abgeleiteten Klassen fertigen Code und Zustand mit. Manchmal willst du weniger: Du willst nur festlegen, was ein Typ können muss. Dafür gibt es das <Term id="interface">Interface</Term> (Schnittstelle). Es listet Member auf, ohne sie auszuprogrammieren: Methoden und Eigenschaften, jeweils nur mit ihrer Signatur. Ein Interface ist ein Vertrag, an den sich jede Klasse hält, die es umsetzt.
+
+Du kennst Interfaces schon, ohne sie geschrieben zu haben. `IReadOnlyList<T>` aus Modul 5 und `IDisposable` aus Modul 7 sind Interfaces. Die <Term id="collection-interface">Collection-Interfaces</Term> beschreiben, was eine Sammlung kann, und viele Klassen setzen sie um.
+
+Ein Interface beginnt mit dem Schlüsselwort `interface`. Die Member haben keinen Rumpf und sind automatisch `public`. Ein Interface darf keine Instanzfelder enthalten, denn es beschreibt nur das Verhalten und hat keinen eigenen Zustand ([§19.4.2 Interface fields](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1942-interface-fields)). Der Name beginnt üblicherweise mit `I`, zum Beispiel `ILabeled`. Das ist eine Namenskonvention und keine Pflicht des Compilers ([Namen von Klassen, Structs und Interfaces](https://learn.microsoft.com/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces)).
+
+## Ein Interface implementieren
+
+Eine Klasse <Term id="interface-implementation">implementiert</Term> ein Interface, indem sie es hinter dem Doppelpunkt in ihrer Basisliste nennt. Dann muss sie jedes Member des Interface umsetzen. Eine Klasse hat höchstens eine Basisklasse, darf aber beliebig viele Interfaces nennen. Schreibst du beides, steht die Basisklasse zuerst: `class Scanner : Device, ILabeled`.
+
+Ein Interface ist auch ein Typ. Du kannst eine Variable, einen Parameter oder die Elemente einer Liste mit dem Interface als Typ deklarieren. In ihnen liegt dann jedes Objekt, dessen Klasse das Interface implementiert.
+
+:::info[Vorhersage]
+`Printer` und `Ticket` sind zwei Klassen ohne gemeinsame Basisklasse. Beide implementieren `ILabeled`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l05-basics" code={interfaceBasics} predict expected={interfaceBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Printer: office printer` und `Ticket: ticket-7`.
+
+1. **Vertrag deklarieren:** `ILabeled` verlangt die Eigenschaft `Label` und die Methode `Describe()`. Beide haben keinen Rumpf.
+2. **Vertrag umsetzen:** `Printer` und `Ticket` nennen `: ILabeled` und liefern beide Member. `Printer` speichert das Label in einer Eigenschaft, `Ticket` berechnet es aus einem Feld.
+3. **Den Typ benutzen:** Die Liste hat den Elementtyp `ILabeled`, und die Schleife kennt nur diesen Typ. Der Aufruf `item.Describe()` wählt die Version des jeweiligen Objekts, wie bei einer virtuellen Methode.
+
+Was passiert, wenn eine Klasse eine Methode des Interface nicht hat, zum Beispiel `Describe()`? Das Programm lässt sich nicht übersetzen:
+
+<CodeBlock language="csharp" title="interface-missing-member.snippet.cs">{interfaceMissingMember}</CodeBlock>
+
+```text
+error CS0535: 'Scanner' does not implement interface member 'ILabeled.Describe()'
+```
+
+Von einem Interface gibt es kein Objekt. Es legt nur fest, was Objekte können, und hat keinen Code, den ein Objekt ausführen könnte:
+
+<CodeBlock language="csharp" title="interface-new.snippet.cs">{interfaceNew}</CodeBlock>
+
+```text
+error CS0144: Cannot create an instance of the abstract type or interface 'ILabeled'
+```
+
+</details>
+
+## Interface oder Basisklasse?
+
+Beide Mittel machen Typen austauschbar, aber sie drücken Verschiedenes aus. Eine Basisklasse beschreibt eine „ist ein“-Beziehung: Die abgeleitete Klasse ist eine spezialisierte Version der Basisklasse und erbt ihren Code. Ein Interface beschreibt eine „kann“-Beziehung: Der Typ kann, was der Vertrag verlangt ([Tutorial: Einführung in die Vererbung](https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/inheritance)).
+
+Daraus ergeben sich Fragen, die du dir beim Entwerfen stellst:
+
+- Teilen die Klassen Code oder Zustand? Dann passt eine Basisklasse. Ein Interface bringt beides nicht mit.
+- Sind die Klassen sonst nicht verwandt, sollen aber austauschbar sein? Dann passt ein Interface. `Printer` und `Ticket` haben außer `ILabeled` nichts gemeinsam.
+- Braucht eine Klasse mehrere solche Fähigkeiten? Eine Klasse hat nur eine Basisklasse, kann aber viele Interfaces nennen.
+
+In SecLog gibt die abstrakte Basisklasse `DetectionRule` ihren Regeln den Namen und die Beschreibung. Der Vertrag „hat einen Namen und prüft einen Vorfall“ ist dagegen ein Interface: Auch eine Regel, die nicht von `DetectionRule` erbt, soll sich einsetzen lassen.
+
+## Explizit implementieren
+
+Normalerweise ist ein umgesetztes Member `public` und über die Klasse und über das Interface erreichbar. Bei der <Term id="explicit-interface-implementation">expliziten Implementierung</Term> (Explicit Interface Implementation) schreibst du den Namen des Interface vor das Member, ohne Zugriffsmodifizierer: `string ILabeled.Describe()`. Das Member gehört dann zum Vertrag, ist aber nur über eine Variable vom Typ des Interface erreichbar. Das ist nützlich, wenn der Vertrag zur Klasse nicht in ihre öffentliche Schnittstelle passen soll.
+
+:::info[Vorhersage]
+`Printer` setzt `Describe()` explizit um. Die Variable `labeled` hat den Typ `ILabeled`, `printer` den Typ `Printer`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m08-l05-explicit" code={interfaceExplicit} predict expected={interfaceExplicitOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Printer: office printer` und `office printer`.
+
+1. **Umsetzen:** `string ILabeled.Describe()` ist die explizite Implementierung. `Label` ist normal `public`.
+2. **Über das Interface aufrufen:** `labeled.Describe()` funktioniert, denn die Variable hat den Typ `ILabeled`.
+3. **Über die Klasse aufrufen:** `printer.Label` funktioniert, aber `printer.Describe()` nicht ([§19.6.2 Explicit interface member implementations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1962-explicit-interface-member-implementations)):
+
+<CodeBlock language="csharp" title="interface-explicit-call.snippet.cs">{interfaceExplicitCall}</CodeBlock>
+
+```text
+error CS1061: 'Printer' does not contain a definition for 'Describe' and no accessible extension method 'Describe' accepting a first argument of type 'Printer' could be found (are you missing a using directive or an assembly reference?)
+```
+
+Was passiert, wenn du `Describe()` nicht explizit schreibst? Dann ist der Aufruf über beide Typen möglich.
+
+</details>
+
+## Komposition statt Vererbung?
+
+Neben „ist ein“ und „kann“ gibt es eine dritte Beziehung: „hat ein“. Ein Objekt hält andere Objekte und benutzt sie. Das nennt man <Term id="composition">Komposition</Term> (Composition). Ein `Folder` ist keine Art von `Printer` und keine Art von `Ticket`. Er hat eine Liste von Dingen mit Label.
+
+<CSharpRunner id="m08-l05-composition" code={composition} />
+
+`Folder` erbt von nichts. Er hält seine Elemente in einer privaten Liste und kennt sie nur über das Interface `ILabeled`. Dadurch passt jedes Objekt mit Label hinein, auch eines, das später dazukommt.
+
+Das Tutorial zur Vererbung beschreibt Vererbung als „ist ein“-Beziehung. Eine Regel „Komposition ist besser“ steht dort nicht. Die Frage zum Nachdenken ist deshalb: Sagst du in einem Satz „X ist ein Y“, oder sagst du „X hat Y“? Bei `Detector` und seinen Regeln trifft der zweite Satz zu.
+
+## Lückenbeispiel
+
+`Scanner` hat schon alle Member von `ILabeled`, nennt das Interface aber nicht. Ergänze die Stellen aus den Kommentaren. Das Programm soll weiter `Scanner: archive scanner` ausgeben, die Variable `item` soll aber den Typ `ILabeled` haben.
+
+<CSharpRunner id="m08-l05-gaps" code={interfaceGap} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Interface nennen:** `class Scanner : ILabeled`.
+2. **Variablentyp ändern:** `ILabeled item = new Scanner("archive scanner");`.
+3. **Hinweis:** Ohne den ersten Schritt lässt sich der zweite nicht übersetzen. Warum, zeigt der Kasten „Achtung“ weiter unten.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat die abstrakte Basisklasse `DetectionRule` und zwei versiegelte Regeln, `FailedLoginRule` und `WatchListRule`. Ein Block prüft jeden Vorfall mit jeder Regel.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block, der die Vorfälle mit den Regeln prüft, den Platz für den neuen Block mit `return 0;` und die Klassen `DetectionRule`, `FailedLoginRule` und `WatchListRule`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe vor `DetectionRule` das Interface `IDetectionRule` mit der Eigenschaft `string Name { get; }` und der Methode `bool IsMatch(Incident incident);`. `DetectionRule` nennt es mit `: IDetectionRule`. Ihre Member passen schon.
+2. Schreibe die versiegelte Klasse `StatusRule : IDetectionRule` (sie erbt nicht von `DetectionRule`). `Name` ist `"status investigating"`, und `IsMatch` ist wahr, wenn `incident.Status` gleich `"investigating"` ist (ordinal verglichen).
+3. Schreibe die versiegelte Klasse `Detector` mit dem Konstruktor `Detector(List<IDetectionRule> rules)`, der schreibgeschützten Eigenschaft `public IReadOnlyList<IDetectionRule> Rules` und der Methode `public int CountMatches(Incident incident)`. Sie zählt die Regeln, die zum Vorfall passen.
+4. Schreibe vor `// End with exit code 0 …` den Block `// Combine exchangeable rules in a detector`. Er erzeugt `Detector detector = new(…)` mit `failedRule`, `new WatchListRule("dave")` und `new StatusRule()`. Für jeden Vorfall aus `incidents` gibt er `$"{incident.User}: {matches} of {detector.Rules.Count} rules match"` aus.
+
+<CSharpRunner id="m08-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-oop-solution.cs" />
+
+1. **Vertrag deklarieren:** `IDetectionRule` verlangt `Name` und `IsMatch`. `DetectionRule` nennt das Interface, ohne dass sich ihr Code ändert, denn `Name` und die abstrakte Methode `IsMatch` erfüllen den Vertrag schon.
+2. **Zweite Umsetzung:** `StatusRule` hat keine Basisklasse und setzt den Vertrag selbst um. Für den Detector ist sie eine Regel wie jede andere.
+3. **Komposition:** `Detector` hat eine Liste von `IDetectionRule` und kennt keine konkrete Regelklasse. Nach außen gibt er sie als `IReadOnlyList<IDetectionRule>` heraus, die man nur lesen kann.
+4. **Prüfen:** Bei bob passen `FailedLoginRule` (fünf Fehlversuche) und `StatusRule`, bei dave passen `WatchListRule` und `StatusRule`. Deshalb zeigen beide Zeilen `2 of 3`. Beide Vorfälle haben den Status `investigating`.
+
+</details>
+
+**Neuer Stand:** SecLog prüft Vorfälle mit austauschbaren Regeln, die nur über das Interface `IDetectionRule` bekannt sind, und ein `Detector` hält sie als Liste.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m08-l05-matching-methods-implement-interface" />
+
+**„Eine Klasse, die alle Methoden eines Interface hat, implementiert es automatisch.“** Das stimmt nicht. C# verlangt, dass die Klasse das Interface in ihrer Basisliste nennt. Passende Member allein reichen nicht. Ohne `: ILabeled` lässt sich das Objekt nicht als `ILabeled` benutzen:
+
+<CodeBlock language="csharp" title="interface-nominal.snippet.cs">{interfaceNominal}</CodeBlock>
+
+```text
+error CS0266: Cannot implicitly convert type 'Scanner' to 'ILabeled'. An explicit conversion exists (are you missing a cast?)
+```
+:::
+
+<details>
+<summary>Vertiefung: Standardimplementierungen in Interfaces (optional)</summary>
+
+Seit C# 8 darf ein Interface-Member einen Rumpf haben. Das ist ein <Term id="default-interface-member">Default Interface Member</Term> (Standardimplementierung). Eine Klasse, die das Interface nennt, muss ein solches Member nicht umsetzen. Es ist implizit virtuell, und die Klasse darf es überschreiben, indem sie es selbst umsetzt.
+
+<CSharpRunner id="m08-l05-default" code={defaultMember} />
+
+`Ticket` setzt `Describe()` nicht um und nutzt die Version aus dem Interface. Sie ist nur über eine Variable vom Typ des Interface erreichbar. Eine Variable vom Typ `Ticket` findet das Member nicht ([§19.4.1 Interface members, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1941-general)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Interface legt Member ohne Zustand fest. Eine Klasse implementiert es, indem sie es in ihrer Basisliste nennt und alle Member umsetzt. Passende Member allein genügen nicht. Variablen, Parameter und Listen dürfen den Typ des Interface haben, ein Objekt des Interface selbst gibt es nicht. Eine Basisklasse passt, wenn Klassen Code und Zustand teilen, ein Interface, wenn sonst unverwandte Typen austauschbar sein sollen. Explizit implementierte Member sind nur über das Interface erreichbar. Komposition bedeutet: Ein Objekt hat andere Objekte, statt von ihnen zu erben.
+
+## Prüfe dein Wissen
+
+<Quiz id="m08-l05-q1" />
+
+<Quiz id="m08-l05-q2" />
+
+<Quiz id="m08-l05-q3" />
+
+<Quiz id="m08-l05-q4" />
+
+<Quiz id="m08-l05-q5" />
+
+<Quiz id="m08-l05-q6" />
+
+<Quiz id="m08-l05-q7" />
+
+<Quiz id="m08-l05-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m08-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m08-l05-q10" />
+
+## Weiterlesen
+
+- C#-Spezifikation: [Interfaces](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces)
+- Microsoft Learn: [Tutorial: Einführung in die Vererbung](https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/inheritance)
+- Microsoft Learn: [Namen von Klassen, Structs und Interfaces](https://learn.microsoft.com/dotnet/standard/design-guidelines/names-of-classes-structs-and-interfaces)
