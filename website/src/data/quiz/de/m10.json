@@ -1,4 +1,294 @@
 {
   "module": "m10",
-  "questions": []
+  "questions": [
+    {
+      "id": "m10-l01-q1",
+      "lesson": "m10-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Achte darauf, wann `IsEven` läuft.",
+      "example": "m10/l01/quiz-method-group.cs",
+      "explanation": "`NumberCheck first = IsEven;` erzeugt nur den Delegate. `IsEven` läuft erst beim Aufruf `first(2)`. Deshalb steht `C` zwischen `A` und `B`."
+    },
+    {
+      "id": "m10-l01-q2",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "Was passiert bei `NumberCheck check = IsEven;`, wenn `IsEven` zu `NumberCheck` passt?",
+      "options": [
+        {
+          "text": "Die Methode `IsEven` läuft einmal, und `check` bekommt ihr Ergebnis.",
+          "misconception": "m10-l01-method-group-calls-method",
+          "feedback": "Ohne Klammern ist `IsEven` eine Methodengruppe, kein Aufruf. Ein Aufruf bräuchte `IsEven(…)` mit Argument."
+        },
+        {
+          "text": "`check` verweist auf `IsEven`. Die Methode läuft noch nicht.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `IsEven` Klammern braucht.",
+          "feedback": "Eine Methodengruppe wird ohne Klammern in einen passenden Delegate umgewandelt."
+        },
+        {
+          "text": "`check` enthält eine Kopie des Quelltextes von `IsEven` als Text.",
+          "feedback": "Ein Delegate-Wert verweist auf die Methode. Er speichert keinen Text."
+        }
+      ],
+      "explanation": "Die Zuweisung erzeugt einen Delegate-Wert, der auf die Methode verweist. Die Methode läuft erst, wenn du den Delegate aufrufst."
+    },
+    {
+      "id": "m10-l01-q3",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "Der Delegate-Typ ist `delegate bool NumberCheck(int number);`. Welche Methode passt dazu?",
+      "options": [
+        { "text": "`static bool IsPositive(int value)`", "correct": true },
+        {
+          "text": "`static int Square(int value)`",
+          "feedback": "Der Rückgabetyp `int` passt nicht zu `bool`."
+        },
+        {
+          "text": "`static bool IsLong(string text)`",
+          "feedback": "Der Parametertyp `string` passt nicht zu `int`."
+        },
+        {
+          "text": "`static bool InRange(int value, int max)`",
+          "feedback": "Die Methode hat zwei Parameter, der Delegate-Typ hat einen."
+        }
+      ],
+      "explanation": "Anzahl und Typen der Parameter und der Rückgabetyp müssen passen. Die Namen der Parameter spielen keine Rolle."
+    },
+    {
+      "id": "m10-l01-q4",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "Was passiert, wenn du einen Delegate aufrufst, dessen Wert `null` ist, zum Beispiel `check(4)`?",
+      "options": [
+        { "text": "Es wird eine `NullReferenceException` ausgelöst.", "correct": true },
+        {
+          "text": "Der Aufruf tut nichts und gibt `false` zurück.",
+          "feedback": "Ein Aufruf über `null` läuft nie still durch. Nur `check?.Invoke(4)` überspringt den Aufruf."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler.",
+          "feedback": "Ob der Wert `null` ist, zeigt sich erst zur Laufzeit."
+        },
+        {
+          "text": "Der Aufruf liefert den Standardwert des Rückgabetyps.",
+          "feedback": "Ohne Ziel gibt es keinen Rückgabewert, nur die Ausnahme."
+        }
+      ],
+      "explanation": "Ein Aufruf über einen Delegate mit dem Wert `null` löst eine `NullReferenceException` aus. Mit `?.Invoke(…)` wird der Aufruf übersprungen, das Ergebnis ist dann `null`."
+    },
+    {
+      "id": "m10-l01-q5",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "Die Klasse hat zwei Methoden `Show(int)` und `Show(string)`. Welche läuft nach `Printer<string> printText = Output.Show; printText(\"done\");`?",
+      "options": [
+        { "text": "`Show(string)`, weil der Delegate-Typ `string` als Parameter hat.", "correct": true },
+        {
+          "text": "`Show(int)`, weil sie zuerst im Quelltext steht.",
+          "feedback": "Die Reihenfolge im Quelltext entscheidet nicht. Die Überladung wird nach dem Delegate-Typ gewählt."
+        },
+        {
+          "text": "Beide laufen nacheinander.",
+          "feedback": "Ein Delegate aus einer Methodengruppe verweist auf genau eine Überladung."
+        },
+        {
+          "text": "Keine, der Compiler meldet einen Fehler wegen Mehrdeutigkeit.",
+          "feedback": "Nur eine der Überladungen passt zum Delegate-Typ. Deshalb ist die Wahl eindeutig."
+        }
+      ],
+      "explanation": "Die Umwandlung der Methodengruppe wählt die Überladung, die zu den Parametern des Delegate-Typs passt."
+    },
+    {
+      "id": "m10-l01-q6",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "`Limit limit = new Limit(10); NumberCheck below = limit.IsBelow; limit.Value = 5; below(8);` Was liefert der letzte Aufruf, wenn `IsBelow(number)` den Vergleich `number < Value` zurückgibt?",
+      "options": [
+        { "text": "`False`, weil der Delegate dasselbe Objekt `limit` benutzt, dessen `Value` jetzt 5 ist.", "correct": true },
+        {
+          "text": "`True`, weil `Value` beim Zuweisen 10 war.",
+          "feedback": "Der Delegate merkt sich das Objekt, nicht den Wert seiner Eigenschaften."
+        },
+        {
+          "text": "`True`, weil der Delegate eine Kopie von `limit` enthält.",
+          "feedback": "Der Delegate verweist auf dasselbe Objekt. Es gibt keine Kopie."
+        },
+        {
+          "text": "Der Aufruf löst eine Ausnahme aus, weil `Value` geändert wurde.",
+          "feedback": "Das Ändern eines Werts ist für den Delegate kein Problem."
+        }
+      ],
+      "explanation": "Ein Delegate auf eine Instanzmethode hält das Zielobjekt fest. Ändert sich das Objekt, sieht der Aufruf den neuen Zustand."
+    },
+    {
+      "id": "m10-l01-q7",
+      "lesson": "m10-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `IsEven` und `IsEven(4)` in C#. Was bedeutet das für einen Delegate?",
+      "modelAnswer": "`IsEven(4)` ruft die Methode mit dem Argument 4 auf und liefert ein Ergebnis. `IsEven` ohne Klammern ist eine Methodengruppe: Sie ruft nichts auf. Wird sie einer Delegate-Variablen zugewiesen, verweist der Delegate auf die Methode. Die Methode läuft erst, wenn der Delegate aufgerufen wird, zum Beispiel mit `check(4)`."
+    },
+    {
+      "id": "m10-l01-q8",
+      "lesson": "m10-l01",
+      "type": "single",
+      "question": "Eine Methode soll eine Liste prüfen, aber jeder Aufrufer soll die Prüfung selbst festlegen. Wie löst du das mit dem, was du in dieser Lektion gelernt hast?",
+      "options": [
+        { "text": "Die Methode bekommt einen Parameter mit einem Delegate-Typ, und der Aufrufer übergibt eine passende Methode.", "correct": true },
+        {
+          "text": "Die Methode bekommt einen `bool`-Parameter pro möglicher Prüfung.",
+          "feedback": "Dann musst du die Methode bei jeder neuen Prüfung ändern."
+        },
+        {
+          "text": "Jede Prüfung bekommt eine eigene Kopie der Methode, die die Liste durchläuft.",
+          "feedback": "Der Code der Schleife würde mehrfach stehen."
+        },
+        {
+          "text": "Die Methode ruft jede mögliche Prüfung auf und gibt alle Ergebnisse als Text zurück.",
+          "feedback": "Der Aufrufer wollte nur eine bestimmte Prüfung."
+        }
+      ],
+      "explanation": "Ein Delegate-Parameter (Callback) trennt die Schleife von der Prüfung. Die Schleife steht einmal, der Aufrufer wählt die Prüfung."
+    },
+    {
+      "id": "m10-l02-q1",
+      "lesson": "m10-l02",
+      "type": "single",
+      "question": "`Func<int, string> f` ist deklariert. Was kann `f`?",
+      "options": [
+        { "text": "Es nimmt einen `int` entgegen und gibt einen `string` zurück.", "correct": true },
+        {
+          "text": "Es nimmt einen `int` und einen `string` entgegen und gibt nichts zurück.",
+          "misconception": "m10-l02-func-last-type-is-parameter",
+          "feedback": "Das letzte Typargument von `Func` ist der Rückgabetyp. Ein Delegate ohne Rückgabewert ist `Action`."
+        },
+        {
+          "text": "Es nimmt einen `string` entgegen und gibt einen `int` zurück.",
+          "misconception": "m10-l02-func-last-type-is-parameter",
+          "feedback": "Die Reihenfolge ist: erst die Parameter, zuletzt der Rückgabetyp."
+        },
+        {
+          "text": "Es nimmt nichts entgegen und gibt ein Paar aus `int` und `string` zurück.",
+          "misconception": "m10-l02-func-last-type-is-parameter",
+          "feedback": "Alle Typargumente außer dem letzten sind Parametertypen."
+        }
+      ],
+      "explanation": "Bei `Func<T1, …, TResult>` sind alle Typargumente außer dem letzten die Parametertypen. Das letzte ist der Rückgabetyp."
+    },
+    {
+      "id": "m10-l02-q2",
+      "lesson": "m10-l02",
+      "type": "single",
+      "question": "Welcher Typ passt zu einer Methode `static void Save(string path)`?",
+      "options": [
+        { "text": "`Action<string>`", "correct": true },
+        {
+          "text": "`Func<string>`",
+          "feedback": "`Func<string>` hat keinen Parameter und gibt einen `string` zurück."
+        },
+        {
+          "text": "`Func<string, void>`",
+          "feedback": "`void` ist als Typargument nicht erlaubt. Für Methoden ohne Rückgabewert gibt es `Action`."
+        },
+        {
+          "text": "`Predicate<string>`",
+          "feedback": "`Predicate<string>` verlangt einen Rückgabewert vom Typ `bool`."
+        }
+      ],
+      "explanation": "`Action<…>` steht für Methoden ohne Rückgabewert. Die Typargumente sind die Parametertypen."
+    },
+    {
+      "id": "m10-l02-q3",
+      "lesson": "m10-l02",
+      "type": "multi",
+      "question": "Die Methode `static bool IsEven(int number)` gibt es. Welche Zuweisungen sind erlaubt?",
+      "options": [
+        { "text": "`Func<int, bool> a = IsEven;`", "correct": true },
+        { "text": "`Predicate<int> b = IsEven;`", "correct": true },
+        {
+          "text": "`Action<int> c = IsEven;`",
+          "feedback": "`Action<int>` hat keinen Rückgabewert, `IsEven` gibt `bool` zurück."
+        },
+        {
+          "text": "`Func<bool, int> d = IsEven;`",
+          "misconception": "m10-l02-func-last-type-is-parameter",
+          "feedback": "Hier wäre `bool` der Parameter und `int` der Rückgabetyp. `IsEven` ist umgekehrt."
+        }
+      ],
+      "explanation": "`Func<int, bool>` und `Predicate<int>` haben dieselbe Form: ein `int` hinein, ein `bool` heraus."
+    },
+    {
+      "id": "m10-l02-q4",
+      "lesson": "m10-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l02/quiz-func-types.cs",
+      "explanation": "`label(3)` ist `item-3` mit der Länge 6. Die erste Zeile gibt `6` aus. `show` bekommt die 6 und schreibt `Length 6`."
+    },
+    {
+      "id": "m10-l02-q5",
+      "lesson": "m10-l02",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0029.",
+      "example": "m10/l02/different-delegate-types.snippet.cs",
+      "bugLines": [2],
+      "lineFeedback": {
+        "1": { "feedback": "Diese Zeile ist in Ordnung. `IsEven` passt zu `NumberCheck`." }
+      },
+      "explanation": "`NumberCheck` und `Func<int, bool>` haben dieselbe Form, sind aber verschiedene Typen. Ein Wert des einen Typs lässt sich nicht dem anderen zuweisen."
+    },
+    {
+      "id": "m10-l02-q6",
+      "lesson": "m10-l02",
+      "type": "single",
+      "question": "Welchen Delegate-Typ erwartet `List<int>.RemoveAll`?",
+      "options": [
+        { "text": "`Predicate<int>`", "correct": true },
+        {
+          "text": "`Action<int>`",
+          "feedback": "`RemoveAll` muss pro Element wissen, ob es entfernt wird. Dafür braucht es einen `bool`-Rückgabewert."
+        },
+        {
+          "text": "`Func<int, int>`",
+          "feedback": "Ein `int` als Ergebnis sagt nicht, ob das Element entfernt wird."
+        },
+        {
+          "text": "`Comparison<int>`",
+          "feedback": "`Comparison<int>` vergleicht zwei Elemente und gehört zu `Sort`."
+        }
+      ],
+      "explanation": "`RemoveAll`, `Find` und `FindAll` nehmen ein `Predicate<T>`: eine Methode, die für ein Element `true` oder `false` liefert."
+    },
+    {
+      "id": "m10-l02-q7",
+      "lesson": "m10-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Callback ist und warum eine Methode wie `Change(int[] values, Func<int, int> change)` flexibler ist als eine Methode, die immer verdoppelt.",
+      "modelAnswer": "Ein Callback ist ein Delegate, den der Aufrufer einer Methode übergibt. Die Methode ruft ihn auf, wenn sie das Verhalten braucht. `Change` enthält nur die Schleife. Was mit jeder Zahl passiert, legt der Aufrufer mit der übergebenen Methode fest. So brauchst du für verdoppeln, negieren oder andere Änderungen nur eine Schleife."
+    },
+    {
+      "id": "m10-l02-q8",
+      "lesson": "m10-l02",
+      "type": "single",
+      "question": "Du schreibst eine Methode, die alle Vorfälle durchgeht und für jeden eine Zeile über einen Parameter ausgibt, den der Aufrufer wählt (Konsole, Liste, Datei). Welcher Parametertyp passt?",
+      "options": [
+        { "text": "`Action<string>`", "correct": true },
+        {
+          "text": "`Func<string, bool>`",
+          "feedback": "Der Aufrufer soll nur etwas mit der Zeile tun. Ein Rückgabewert ist nicht nötig."
+        },
+        {
+          "text": "`Predicate<string>`",
+          "feedback": "`Predicate<string>` entscheidet über `true` oder `false`. Hier wird aber etwas ausgeführt."
+        },
+        {
+          "text": "`Func<string>`",
+          "feedback": "`Func<string>` bekommt keine Zeile übergeben."
+        }
+      ],
+      "explanation": "Die Methode gibt dem Aufrufer eine Zeile und braucht nichts zurück. Das ist ein `Action<string>`. `Console.WriteLine` als Methodengruppe passt dazu."
+    }
+  ]
 }

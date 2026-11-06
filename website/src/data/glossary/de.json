@@ -6277,6 +6277,146 @@
         "title": "Interfaces – Variant type parameter lists",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#1923-variant-type-parameter-lists"
       }
+    },
+    {
+      "id": "method-group",
+      "term": "Method Group",
+      "german": "Methodengruppe",
+      "category": "language",
+      "definition": "Der Name einer Methode ohne Klammern. Er steht für alle Überladungen mit diesem Namen und ruft nichts auf. Er lässt sich in einen passenden Delegate umwandeln.",
+      "aliases": [
+        "Methodengruppen",
+        "method group"
+      ],
+      "related": [
+        "method-group-conversion",
+        "delegate",
+        "overloading"
+      ],
+      "lesson": "m10-l01",
+      "source": {
+        "title": "Conversions – Method group conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#108-method-group-conversions"
+      }
+    },
+    {
+      "id": "method-group-conversion",
+      "term": "Method Group Conversion",
+      "german": "Methodengruppen-Umwandlung",
+      "category": "language",
+      "definition": "Die implizite Umwandlung einer Methodengruppe in einen Delegate-Typ. Der Compiler wählt die Überladung, die zu den Parametern des Delegate-Typs passt, und der Delegate verweist auf sie.",
+      "aliases": [
+        "Umwandlung einer Methodengruppe"
+      ],
+      "related": [
+        "method-group",
+        "delegate"
+      ],
+      "lesson": "m10-l01",
+      "source": {
+        "title": "Conversions – Method group conversions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#108-method-group-conversions"
+      }
+    },
+    {
+      "id": "delegate-invocation",
+      "term": "Delegate Invocation",
+      "german": "Delegate-Aufruf",
+      "category": "language",
+      "definition": "Der Aufruf einer Methode über einen Delegate: `check(x)` oder `check.Invoke(x)`. Erst dabei läuft die Methode. Ein Delegate mit dem Wert `null` löst beim Aufruf eine `NullReferenceException` aus.",
+      "aliases": [
+        "Aufruf eines Delegates",
+        "Invoke"
+      ],
+      "related": [
+        "delegate",
+        "method-group"
+      ],
+      "lesson": "m10-l01",
+      "source": {
+        "title": "Delegates – Delegate invocation",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#216-delegate-invocation"
+      }
+    },
+    {
+      "id": "callback",
+      "term": "Callback",
+      "german": "Rückruf",
+      "category": "language",
+      "definition": "Ein Delegate, den der Aufrufer einer Methode als Argument übergibt. Die Methode ruft ihn auf, wenn sie das Verhalten braucht, das der Aufrufer festlegt.",
+      "aliases": [
+        "Callbacks",
+        "Rückruf-Methode"
+      ],
+      "related": [
+        "delegate",
+        "func-delegate",
+        "action-delegate"
+      ],
+      "lesson": "m10-l01",
+      "source": {
+        "title": "Delegates (C# Programming Guide)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/delegates/"
+      }
+    },
+    {
+      "id": "func-delegate",
+      "term": "Func Delegate",
+      "german": "Func-Delegate",
+      "category": "language",
+      "definition": "`Func<T1, …, TResult>` ist ein generischer Delegate für Methoden mit Rückgabewert. Alle Typargumente außer dem letzten sind Parametertypen, das letzte ist der Rückgabetyp.",
+      "aliases": [
+        "Func-Delegates"
+      ],
+      "related": [
+        "generic-delegate",
+        "action-delegate",
+        "predicate-delegate"
+      ],
+      "lesson": "m10-l02",
+      "source": {
+        "title": "Func<TResult> Delegate",
+        "url": "https://learn.microsoft.com/dotnet/api/system.func-1"
+      }
+    },
+    {
+      "id": "action-delegate",
+      "term": "Action Delegate",
+      "german": "Action-Delegate",
+      "category": "language",
+      "definition": "`Action<T1, …>` ist ein generischer Delegate für Methoden ohne Rückgabewert (`void`). Alle Typargumente sind Parametertypen.",
+      "aliases": [
+        "Action-Delegates"
+      ],
+      "related": [
+        "generic-delegate",
+        "func-delegate",
+        "predicate-delegate"
+      ],
+      "lesson": "m10-l02",
+      "source": {
+        "title": "Action Delegate",
+        "url": "https://learn.microsoft.com/dotnet/api/system.action"
+      }
+    },
+    {
+      "id": "predicate-delegate",
+      "term": "Predicate Delegate",
+      "german": "Predicate-Delegate",
+      "category": "language",
+      "definition": "`Predicate<T>` ist ein Delegate für Methoden mit einem Parameter vom Typ `T`, die `bool` zurückgeben. Methoden wie `List<T>.Find`, `FindAll` und `RemoveAll` erwarten ihn.",
+      "aliases": [
+        "Predicate-Delegates"
+      ],
+      "related": [
+        "generic-delegate",
+        "func-delegate"
+      ],
+      "lesson": "m10-l02",
+      "source": {
+        "title": "Predicate<T> Delegate",
+        "url": "https://learn.microsoft.com/dotnet/api/system.predicate-1"
+      }
     }
   ]
 }
