@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-06. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-07. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -268,3 +268,9 @@ Each module section has these fields:
 - **Lessons:**
   - `w01-l01` Code lesen und vorhersagen – mixed reading and tracing set for M1–M4 (quiz ids `w01-l01-q1` … `w01-l01-q28`).
   - `w01-l02` Code ergänzen und schreiben – mixed writing set and final set for M1–M4 (quiz ids `w01-l02-q1` … `w01-l02-q24`).
+
+## W2 Wiederholung M5–M8
+
+- **Lessons:**
+  - `w02-l01` Sammlungen und Objekte: Code lesen – mixed reading and tracing set for M5–M8 (quiz ids `w02-l01-q1` … `w02-l01-q26`).
+  - `w02-l02` Sammlungen und Objekte: Code schreiben – mixed writing set and final set for M5–M8 (quiz ids `w02-l02-q1` … `w02-l02-q36`).
