@@ -1,4 +1,4 @@
-Action<string> notify = PrintPlain;
+Action<string>? notify = PrintPlain;
 notify += PrintUpper;
 notify += PrintPlain;
 
@@ -6,8 +6,8 @@ notify("disk");
 Console.WriteLine(notify.GetInvocationList().Length);
 
 notify -= PrintPlain;
-notify("cpu");
-Console.WriteLine(notify.GetInvocationList().Length);
+notify?.Invoke("cpu");
+Console.WriteLine(notify?.GetInvocationList().Length);
 
 notify -= PrintPlain;
 notify -= PrintUpper;
