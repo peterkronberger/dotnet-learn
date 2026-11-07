@@ -1,0 +1,6 @@
+parsed
+finally
+12
+bad text
+finally
+-1

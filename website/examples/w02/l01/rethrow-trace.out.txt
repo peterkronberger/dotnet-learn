@@ -1,0 +1,4 @@
+throw;
+at LogTools.Inner
+throw ex;
+at LogTools.Outer

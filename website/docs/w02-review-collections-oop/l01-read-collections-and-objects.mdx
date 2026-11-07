@@ -1,0 +1,180 @@
+---
+title: "Sammlungen und Objekte: Code lesen"
+sidebar_position: 1
+description: "Gemischte Leseaufgaben zu den Modulen 5–8: erst das Konzept erkennen, dann das Ergebnis vorhersagen oder den Fehler finden."
+lesson_id: w02-l01
+duration_min: 25
+---
+
+import overrideVsNew from '!!raw-loader!@site/examples/w02/l01/override-vs-new.cs';
+import overrideVsNewOutput from '!!raw-loader!@site/examples/w02/l01/override-vs-new.out.txt';
+import finallyFlow from '!!raw-loader!@site/examples/w02/l01/finally-flow.cs';
+import finallyFlowOutput from '!!raw-loader!@site/examples/w02/l01/finally-flow.out.txt';
+import structInList from '!!raw-loader!@site/examples/w02/l01/struct-in-list.cs';
+import structInListOutput from '!!raw-loader!@site/examples/w02/l01/struct-in-list.out.txt';
+import rethrowTrace from '!!raw-loader!@site/examples/w02/l01/rethrow-trace.cs';
+import rethrowTraceOutput from '!!raw-loader!@site/examples/w02/l01/rethrow-trace.out.txt';
+
+# Sammlungen und Objekte: Code lesen
+
+:::note[Lernziele]
+- Du erkennst bei kurzem Code, welches Konzept aus den Modulen 5–8 das Verhalten bestimmt.
+- Du sagst die Ausgabe von kurzem Code aus den Modulen 5–8 vorher oder findest die fehlerhafte Zeile, ohne den Code auszuführen.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+<OptionalReview modules={[5, 6, 7, 8]} />
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann sagst du das Ergebnis voraus oder findest den Fehler. Die Aufgaben mischen die Module 5–8. Notiere deinen Tipp, bevor du antwortest.
+
+### Aufgabe 1
+
+<Quiz id="w02-l01-q1" />
+
+<Quiz id="w02-l01-q2" />
+
+<Quiz id="w02-l01-q3" />
+
+### Aufgabe 2
+
+<Quiz id="w02-l01-q4" />
+
+<Quiz id="w02-l01-q5" />
+
+<Quiz id="w02-l01-q6" />
+
+### Aufgabe 3
+
+<Quiz id="w02-l01-q7" />
+
+<Quiz id="w02-l01-q8" />
+
+### Aufgabe 4
+
+<Quiz id="w02-l01-q9" />
+
+<Quiz id="w02-l01-q10" />
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="w02-l01-override-vs-new" code={overrideVsNew} predict expected={overrideVsNewOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `failed-login`, `base description`, `failed-login` und `failed login description`.
+
+1. **Über die Basisklasse:** `Name()` ist `virtual` und überschrieben, darum entscheidet der Typ des Objekts. `Describe()` ist nur verdeckt, darum zählt der Typ der Variable: `Rule`.
+2. **Über die abgeleitete Klasse:** Die Variable hat den Typ `FailedLoginRule`, also läuft jedes Mal deren Version.
+
+</details>
+
+### Aufgabe 5
+
+<Quiz id="w02-l01-q11" />
+
+<Quiz id="w02-l01-q12" />
+
+### Aufgabe 6
+
+<Quiz id="w02-l01-q13" />
+
+<Quiz id="w02-l01-q14" />
+
+<Quiz id="w02-l01-q15" />
+
+### Aufgabe 7
+
+<Quiz id="w02-l01-q16" />
+
+<Quiz id="w02-l01-q17" />
+
+:::info[Vorhersage]
+Der Code ruft `Load` zweimal auf, einmal mit `12` und einmal mit `x`. Welche Zeilen erscheinen in welcher Reihenfolge?
+:::
+
+<CSharpRunner id="w02-l01-finally-flow" code={finallyFlow} predict expected={finallyFlowOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `parsed`, `finally`, `12`, `bad text`, `finally` und `-1`.
+
+1. **Erster Aufruf:** `parsed` erscheint, dann läuft `finally`. Erst danach gibt `Console.WriteLine` den Rückgabewert `12` aus.
+2. **Zweiter Aufruf:** `int.Parse` wirft eine `FormatException`. Der `catch`-Block schreibt `bad text`, danach läuft `finally`, und `-1` wird zurückgegeben.
+
+</details>
+
+### Aufgabe 8
+
+<Quiz id="w02-l01-q18" />
+
+<Quiz id="w02-l01-q19" />
+
+:::info[Vorhersage]
+Welche drei Zahlen gibt das Programm aus? Achte darauf, ob `Point` und `Box` ein `struct` oder eine `class` sind.
+:::
+
+<CSharpRunner id="w02-l01-struct-in-list" code={structInList} predict expected={structInListOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `1`, `20` und `10`.
+
+1. **Struct:** `copy` ist eine Kopie, darum bleibt `points[0].X` gleich `1`.
+2. **Zurückschreiben:** `points[1] = new Point { X = 20 };` ersetzt das Element in der Liste, darum erscheint `20`.
+3. **Klasse:** `same` und `boxes[0]` verweisen auf dasselbe Objekt, darum erscheint `10`.
+
+</details>
+
+### Aufgabe 9
+
+<Quiz id="w02-l01-q20" />
+
+<Quiz id="w02-l01-q21" />
+
+:::info[Vorhersage]
+Das Programm löst dieselbe Exception zweimal aus, einmal mit `throw;` und einmal mit `throw ex;`. Welche eigene Methode steht jeweils zuerst im Stack Trace?
+:::
+
+<CSharpRunner id="w02-l01-rethrow-trace" code={rethrowTrace} predict expected={rethrowTraceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Bei `throw;` steht `at LogTools.Inner` zuerst, bei `throw ex;` steht `at LogTools.Outer` zuerst.
+
+1. **`throw;`:** Der Stack Trace behält den ursprünglichen Ort des Fehlers in `Inner`.
+2. **`throw ex;`:** Der Stack Trace beginnt neu an der Stelle des `throw` in `Outer`.
+
+</details>
+
+### Aufgabe 10
+
+<Quiz id="w02-l01-q22" />
+
+<Quiz id="w02-l01-q23" />
+
+<Quiz id="w02-l01-q24" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w02-l01-q25" />
+
+### Übertragen
+
+<Quiz id="w02-l01-q26" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- Microsoft Learn: [Ausnahmebehandlung mit try-catch-finally](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements)
+- C#-Spezifikation: [Structs](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs)

@@ -1,4 +1,375 @@
 {
   "module": "w02",
-  "questions": []
+  "questions": [
+    {
+      "id": "w02-l01-q1",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Aus dem Array `string[] users = [\"ana\", \"ben\", \"cem\", \"dia\", \"eli\"];` soll ein Teil als neues Array entstehen.",
+      "options": [
+        { "text": "Bereich mit `..` (Teil eines Arrays)", "correct": true },
+        { "text": "Spread-Element `..` in einem Collection-Ausdruck" },
+        { "text": "`Length` und `Count`" },
+        { "text": "`Dictionary` und `TryGetValue`" }
+      ],
+      "explanation": "Das Konzept ist der Bereich mit `..` in eckigen Klammern hinter einer Variable. Du kennst ihn aus Lektion „Index vom Ende und Bereiche“ (Modul 5). Das Spread-Element sieht gleich aus, steht aber innerhalb eines Collection-Ausdrucks."
+    },
+    {
+      "id": "w02-l01-q2",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welche Elemente enthält `users[1..3]` für `string[] users = [\"ana\", \"ben\", \"cem\", \"dia\", \"eli\"];`?",
+      "options": [
+        { "text": "`ben`, `cem`", "correct": true },
+        {
+          "text": "`ben`, `cem`, `dia`",
+          "misconception": "m05-l03-range-end-inclusive",
+          "feedback": "Das Ende eines Bereichs gehört nicht dazu. Die Länge ist Ende minus Anfang, hier also `3 - 1 = 2`."
+        },
+        {
+          "text": "`ana`, `ben`, `cem`",
+          "misconception": "m05-l01-index-starts-at-one",
+          "feedback": "Der Index beginnt bei `0`. Das Element mit dem Index `1` ist `ben`, nicht `ana`."
+        }
+      ],
+      "explanation": "Der Anfang `1` gehört dazu, das Ende `3` nicht. Es entstehen die Elemente mit den Indizes 1 und 2: `ben` und `cem`."
+    },
+    {
+      "id": "w02-l01-q3",
+      "lesson": "w02-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "w02/l01/range-slice.cs",
+      "explanation": "`users[1..3]` ist ein neues Array mit zwei Elementen, also `2` und `ben,cem`. `users[^1]` ist das letzte Element des Originals: `eli`."
+    },
+    {
+      "id": "w02-l01-q4",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Klasse hat ein Feld `public readonly List<string> Names = new();`, und außerhalb steht `roster.Names.Add(\"ana\");`.",
+      "options": [
+        { "text": "`readonly` bei einem Feld", "correct": true },
+        { "text": "`const`" },
+        { "text": "`init` bei einer Eigenschaft" },
+        { "text": "Primärkonstruktor" }
+      ],
+      "explanation": "Das Konzept ist `readonly` bei einem Feld. Du kennst es aus Lektion „Konstruktoren“ (Modul 6)."
+    },
+    {
+      "id": "w02-l01-q5",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Das Feld ist `public readonly List<string> Names = new();`. Was passiert bei `roster.Names.Add(\"ana\");` außerhalb der Klasse?",
+      "options": [
+        { "text": "Der Aufruf läuft, und die Liste hat danach ein Element.", "correct": true },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `readonly` auch die Liste unveränderlich macht.",
+          "misconception": "m06-l02-readonly-object-immutable",
+          "feedback": "`readonly` schützt nur das Feld. Es kann nach dem Konstruktor keinen neuen Wert bekommen. Das Objekt dahinter bleibt veränderbar."
+        },
+        {
+          "text": "Der Aufruf läuft, ändert aber nur eine Kopie der Liste.",
+          "feedback": "Das Feld enthält einen Verweis auf eine Liste (Modul 4). `Add` ändert diese eine Liste."
+        }
+      ],
+      "explanation": "`readonly` verbietet nur, dem Feld `Names` eine neue Liste zuzuweisen. `Add` ändert die Liste selbst, und das ist erlaubt."
+    },
+    {
+      "id": "w02-l01-q6",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Eine Klasse hat `public static int Created;`, und ihr Konstruktor ruft `Created++;` auf. Wie groß ist `Created` nach `new Roster(); new Roster();`?",
+      "options": [
+        { "text": "`2`", "correct": true },
+        {
+          "text": "`0`, weil sich ein `static`-Wert nicht ändern kann",
+          "misconception": "m06-l08-static-means-unchangeable",
+          "feedback": "`static` bedeutet nur, dass das Feld zum Typ gehört. Es kann neue Werte bekommen. Unveränderlich wird ein Wert erst durch `const` oder `readonly`."
+        },
+        {
+          "text": "`1`, weil jedes Objekt seinen eigenen Zähler hat",
+          "feedback": "Ein statisches Feld gibt es nur einmal pro Typ. Beide Objekte zählen am selben Feld."
+        }
+      ],
+      "explanation": "Das statische Feld gehört zum Typ `Roster` und wird von beiden Konstruktoraufrufen erhöht: erst auf `1`, dann auf `2`."
+    },
+    {
+      "id": "w02-l01-q7",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein `try`-Block hat zwei `catch`-Klauseln, eine für `Exception` und eine für `FormatException`.",
+      "options": [
+        { "text": "Reihenfolge mehrerer `catch`-Klauseln", "correct": true },
+        { "text": "`finally`" },
+        { "text": "`throw;` im `catch`-Block" },
+        { "text": "Die Try-Methode mit `out`" }
+      ],
+      "explanation": "Das Konzept ist die Reihenfolge der `catch`-Klauseln. Du kennst es aus Lektion „Mehrere catch-Klauseln und Ausnahmefilter“ (Modul 7)."
+    },
+    {
+      "id": "w02-l01-q8",
+      "lesson": "w02-l01",
+      "type": "find-bug",
+      "question": "Der Compiler meldet für diesen Code einen Fehler. Welche Zeile ist die Ursache?",
+      "example": "w02/l01/catch-order.snippet.cs",
+      "bugLines": [5],
+      "lineFeedback": {
+        "9": {
+          "feedback": "Die Meldung nennt diese Zeile, aber die Ursache liegt davor: Die allgemeine Klausel steht zu früh und fängt schon alles.",
+          "misconception": "m07-l02-catch-order-irrelevant"
+        }
+      },
+      "explanation": "C# nimmt die erste Klausel, die passt. `catch (Exception)` passt auf jede Exception und steht vor `catch (FormatException)`. Spezielle Typen stehen vor allgemeinen."
+    },
+    {
+      "id": "w02-l01-q9",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Variable vom Typ der Basisklasse verweist auf ein Objekt der abgeleiteten Klasse, und eine Methode wird darüber aufgerufen.",
+      "options": [
+        { "text": "`override` und Verdecken mit `new`", "correct": true },
+        { "text": "Abstrakte Klasse und Interface" },
+        { "text": "`is` und `as`" },
+        { "text": "Struct und Klasse" }
+      ],
+      "explanation": "Das Konzept ist `override` gegen Verdecken mit `new`. Du kennst es aus Lektion „Virtuelle Methoden, override und Verdecken“ (Modul 8)."
+    },
+    {
+      "id": "w02-l01-q10",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "`Rule rule = new FailedLoginRule();` und `FailedLoginRule` deklariert `public new string Describe()`. Welche Version führt `rule.Describe()` aus?",
+      "options": [
+        { "text": "Die Version von `Rule`, weil nur der Typ der Variable zählt", "correct": true },
+        {
+          "text": "Die Version von `FailedLoginRule`, weil `new` die Methode überschreibt",
+          "misconception": "m08-l02-new-overrides-method",
+          "feedback": "`new` verdeckt nur. Ein Aufruf über eine Variable vom Typ der Basisklasse führt weiter die Version der Basisklasse aus. Nur `override` einer `virtual`-Methode lässt den Typ des Objekts entscheiden."
+        },
+        {
+          "text": "Beide nacheinander",
+          "feedback": "Es läuft genau eine Version. Ohne `base.Describe()` wird die andere nicht aufgerufen."
+        }
+      ],
+      "explanation": "Verdecken wählt die Methode nach dem Typ der Variable. Bei einer `virtual`-Methode mit `override` entscheidet dagegen der Typ des Objekts."
+    },
+    {
+      "id": "w02-l01-q11",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Aus einer Zeile Text soll die IP-Adresse durch `x.x.x.x` ersetzt und danach die Zeile ausgegeben werden.",
+      "options": [
+        { "text": "`string` ist unveränderlich: `Replace` liefert einen neuen Text", "correct": true },
+        { "text": "Vergleich mit `StringComparison`" },
+        { "text": "`Split` und `Join`" },
+        { "text": "`DateTimeOffset`" }
+      ],
+      "explanation": "Das Konzept ist, dass Methoden von `string` einen neuen Text liefern. Du kennst es aus Lektion „Mit Strings arbeiten“ (Modul 5)."
+    },
+    {
+      "id": "w02-l01-q12",
+      "lesson": "w02-l01",
+      "type": "find-bug",
+      "question": "Das Programm soll `user=ana ip=x.x.x.x` ausgeben, gibt aber die alte Zeile aus. Welche Zeile ist die Ursache?",
+      "example": "w02/l01/replace-discarded.snippet.cs",
+      "bugLines": [2],
+      "lineFeedback": {
+        "3": {
+          "feedback": "`Console.WriteLine` gibt aus, was in `line` steht. Die Ursache liegt davor: `line` wurde nie geändert.",
+          "misconception": "m05-l10-replace-changes-string"
+        }
+      },
+      "explanation": "Der Text ist unveränderlich. `Replace` liefert einen neuen Text, den die Zeile verwirft. Richtig ist `line = line.Replace(…);`."
+    },
+    {
+      "id": "w02-l01-q13",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Klasse soll negative Werte beim Schreiben ablehnen und mitzählen, wie oft das passiert ist.",
+      "options": [
+        { "text": "Eigenschaft mit Prüfung im `set`", "correct": true },
+        { "text": "`readonly`-Feld" },
+        { "text": "Objektinitialisierer" },
+        { "text": "Statische Klasse" }
+      ],
+      "explanation": "Das Konzept ist die Eigenschaft mit Code im `set`. Du kennst es aus Lektion „Eigenschaften“ (Modul 6)."
+    },
+    {
+      "id": "w02-l01-q14",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Eine Eigenschaft `Failures` prüft im `set`, ob der Wert negativ ist, und ignoriert ihn dann. Was bewirkt `incident.Failures = -2;`?",
+      "options": [
+        { "text": "Der Code im `set` läuft, und der Wert wird nicht gespeichert.", "correct": true },
+        {
+          "text": "Der Wert `-2` steht danach im Objekt, wie bei einem öffentlichen Feld.",
+          "misconception": "m06-l04-property-is-field",
+          "feedback": "Eine Eigenschaft hat Accessoren mit Code. Dieser Code läuft bei jedem Schreiben. Er kann einen Wert prüfen oder ablehnen."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `-2` negativ ist.",
+          "feedback": "Der Compiler prüft nur den Typ. Der Wert wird erst zur Laufzeit im `set` geprüft."
+        }
+      ],
+      "explanation": "Jeder Schreibzugriff läuft durch den `set`-Code. Er lehnt `-2` ab, und der alte Wert bleibt."
+    },
+    {
+      "id": "w02-l01-q15",
+      "lesson": "w02-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "w02/l01/property-guard.cs",
+      "explanation": "`3` wird gespeichert, `-2` wird abgelehnt und gezählt, danach wird `5` gespeichert. Ausgabe: `5` für `Failures` und `1` für `Rejected`."
+    },
+    {
+      "id": "w02-l01-q16",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Methode hat `try`, `catch` und `finally`, und `try` und `catch` enthalten je ein `return`.",
+      "options": [
+        { "text": "`finally` läuft immer", "correct": true },
+        { "text": "`using` und `Dispose`" },
+        { "text": "Reihenfolge der `catch`-Klauseln" },
+        { "text": "Eigene Exception-Klasse" }
+      ],
+      "explanation": "Das Konzept ist der `finally`-Block. Du kennst ihn aus Lektion „Aufräumen mit finally“ (Modul 7)."
+    },
+    {
+      "id": "w02-l01-q17",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "In welchen Fällen läuft der `finally`-Block?",
+      "options": [
+        { "text": "Nach dem normalen Ende, nach `return` und bei einer Exception", "correct": true },
+        {
+          "text": "Nur, wenn keine Exception ausgelöst wurde",
+          "misconception": "m07-l04-finally-only-without-exception",
+          "feedback": "Der `finally`-Block läuft in beiden Fällen: nach dem normalen Ende, nach `return` und bei einer Exception, ob sie gefangen wird oder nicht."
+        },
+        {
+          "text": "Nur, wenn eine Exception gefangen wurde",
+          "feedback": "Auch ohne Exception läuft `finally`."
+        }
+      ],
+      "explanation": "`finally` läuft immer, wenn der `try`-Block verlassen wird. Das gilt auch, wenn vorher ein `return` steht."
+    },
+    {
+      "id": "w02-l01-q18",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Element wird aus einer `List<Point>` geholt, verändert, und danach wird die Liste ausgegeben. `Point` ist ein `struct`.",
+      "options": [
+        { "text": "Wertsemantik von Structs", "correct": true },
+        { "text": "Gleichheit mit `Equals` und `GetHashCode`" },
+        { "text": "Positionale Records" },
+        { "text": "`sealed` bei einer Klasse" }
+      ],
+      "explanation": "Das Konzept ist die Wertsemantik: Zuweisen kopiert. Du kennst sie aus Lektion „Structs“ (Modul 8)."
+    },
+    {
+      "id": "w02-l01-q19",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "`Point copy = points[0]; copy.X = 10;` mit `Point` als `struct` und `points` als `List<Point>`. Was ist `points[0].X` danach?",
+      "options": [
+        { "text": "Unverändert, denn `copy` ist eine Kopie", "correct": true },
+        {
+          "text": "`10`, denn `copy` und das Listenelement sind dasselbe Objekt",
+          "misconception": "m08-l08-struct-copy-changes-original",
+          "feedback": "Du änderst eine Kopie, das Original bleibt gleich. Das gilt auch für den Indexer einer Liste. Bei einer Klasse dagegen verweisen alle Variablen auf dasselbe Objekt."
+        },
+        {
+          "text": "`0`, weil die Liste leer wird",
+          "feedback": "Die Liste bleibt unverändert."
+        }
+      ],
+      "explanation": "Ein Struct wird beim Zuweisen kopiert. Willst du die Änderung behalten, schreibst du die Kopie zurück: `points[0] = copy;`."
+    },
+    {
+      "id": "w02-l01-q20",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein `catch`-Block soll den Fehler melden und dieselbe Exception an den Aufrufer weitergeben.",
+      "options": [
+        { "text": "`throw;` gegen `throw ex;`", "correct": true },
+        { "text": "Ausnahmefilter mit `when`" },
+        { "text": "Guard Clause mit `ArgumentNullException.ThrowIfNull`" },
+        { "text": "Try-Muster mit `out`" }
+      ],
+      "explanation": "Das Konzept ist das erneute Auslösen mit `throw;`. Du kennst es aus Lektion „Exceptions auslösen mit throw“ (Modul 7)."
+    },
+    {
+      "id": "w02-l01-q21",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Im `catch (FormatException ex)`-Block steht `throw ex;`. Was passiert mit dem Stack Trace?",
+      "options": [
+        { "text": "Er beginnt neu an dieser Stelle, der ursprüngliche Ort geht verloren.", "correct": true },
+        {
+          "text": "Er bleibt unverändert, genau wie bei `throw;`.",
+          "misconception": "m07-l05-throw-ex-keeps-stack-trace",
+          "feedback": "`throw ex;` setzt den Stack Trace an der aktuellen Stelle zurück. `throw;` behält ihn."
+        },
+        {
+          "text": "Es entsteht gar kein Stack Trace.",
+          "feedback": "Jede ausgelöste Exception hat einen Stack Trace. Bei `throw ex;` beginnt er nur an der Stelle des `throw`."
+        }
+      ],
+      "explanation": "Schreibe in einem `catch`-Block `throw;`, wenn du dieselbe Exception weitergeben willst."
+    },
+    {
+      "id": "w02-l01-q22",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Variable vom Typ `Shape` enthält ein `Square`, und der Code prüft sie auf `Circle`: mit `is`, mit `as` und mit einem Cast.",
+      "options": [
+        { "text": "Typprüfung: `is`, `as` und Cast", "correct": true },
+        { "text": "`override` und Verdecken" },
+        { "text": "Abstrakte Klasse" },
+        { "text": "Enum mit `Enum.TryParse`" }
+      ],
+      "explanation": "Das Konzept sind die Typprüfungen. Du kennst sie aus Lektion „Typprüfungen und Casts“ (Modul 8)."
+    },
+    {
+      "id": "w02-l01-q23",
+      "lesson": "w02-l01",
+      "type": "single",
+      "question": "Eine Variable `Shape shape` enthält ein `Square`. Was bewirkt `(Circle)shape`?",
+      "options": [
+        { "text": "Es wirft eine `InvalidCastException`, denn das Objekt ist kein `Circle`.", "correct": true },
+        {
+          "text": "Es verwandelt das `Square` in ein `Circle`.",
+          "misconception": "m08-l06-cast-changes-object",
+          "feedback": "Eine Verweisumwandlung behält dasselbe Objekt. Der Cast prüft zur Laufzeit den Typ. Ist das Objekt kein `Circle`, entsteht keines, und der Cast wirft eine `InvalidCastException`."
+        },
+        {
+          "text": "Es liefert `null`.",
+          "feedback": "`null` liefert `as`. Ein Cast wirft stattdessen eine Exception."
+        }
+      ],
+      "explanation": "Der Cast prüft den Typ des Objekts. `as` liefert bei einem Fehlschlag `null`, `is` liefert `false`, der Cast wirft eine Exception."
+    },
+    {
+      "id": "w02-l01-q24",
+      "lesson": "w02-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "w02/l01/cast-checks.cs",
+      "explanation": "`shape is Circle` ist `False`. `as` liefert `null`, also ist `asCircle is null` wahr: `True`. Der Cast wirft, daher `cast failed`. Das Objekt bleibt ein `Square`."
+    },
+    {
+      "id": "w02-l01-q25",
+      "lesson": "w02-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du bei einem Stück Code, welches Konzept dein Ergebnis bestimmt?",
+      "modelAnswer": "Ich suche zuerst die Stelle, an der sich entscheidet, was passiert: eine Methode wird aufgerufen, ein Wert wird zugewiesen oder kopiert, eine Exception wird ausgelöst. Dann frage ich, welcher Typ und welches Schlüsselwort dort im Spiel sind, zum Beispiel `struct` oder `class`, `override` oder `new`, `throw;` oder `throw ex;`.\n\nErst danach sage ich die Ausgabe vorher und gehe den Code Zeile für Zeile durch."
+    },
+    {
+      "id": "w02-l01-q26",
+      "lesson": "w02-l01",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm eine Eigenschaft mit Prüfung im `set` einsetzen, und welches andere Konzept aus dieser Lektion würde dort ebenfalls helfen?",
+      "modelAnswer": "Zum Beispiel bei einem Zähler für fehlgeschlagene Anmeldungen, der nie negativ sein darf: Der `set`-Code lehnt falsche Werte ab.\n\nDazu passt eine `catch`-Klausel mit `finally`, wenn der Wert aus einer Eingabe geparst wird und danach etwas aufgeräumt werden muss."
+    }
+  ]
 }
