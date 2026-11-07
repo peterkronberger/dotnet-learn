@@ -852,14 +852,14 @@ foreach (Incident incident in incidents)
 Console.WriteLine($"Checked incidents: {checkedCount}");
 // Send one incident to several alert methods
 int alertCount = 0;
-Action<Incident> alerts = PrintAlert;
+Action<Incident>? alerts = PrintAlert;
 alerts += PrintSeverity;
 alerts += incident => alertCount++;
 alerts(bobIncident);
 Console.WriteLine($"Targets: {alerts.GetInvocationList().Length}");
 alerts -= PrintSeverity;
-alerts(daveIncident);
-Console.WriteLine($"Targets: {alerts.GetInvocationList().Length}");
+alerts?.Invoke(daveIncident);
+Console.WriteLine($"Targets: {alerts?.GetInvocationList().Length}");
 Console.WriteLine($"Alerts counted: {alertCount}");
 // @fold-end
 // End with exit code 0 (success); later steps add their blocks before this line
