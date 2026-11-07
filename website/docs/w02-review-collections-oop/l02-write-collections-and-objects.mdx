@@ -1,0 +1,180 @@
+---
+title: "Sammlungen und Objekte: Code schreiben"
+sidebar_position: 2
+description: "Gemischte Schreibaufgaben zu den Modulen 5–8: erst das Konzept erkennen, dann Code ergänzen oder schreiben."
+lesson_id: w02-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import primaryTask from '!!raw-loader!@site/examples/w02/l02/primary-property-task.cs';
+import primaryTests from '!!raw-loader!@site/examples/w02/l02/primary-property-task.tests.snippet.cs';
+import primarySolution from '!!raw-loader!@site/examples/w02/l02/primary-property-solution.cs';
+import equalsTask from '!!raw-loader!@site/examples/w02/l02/equals-hash-task.cs';
+import equalsTests from '!!raw-loader!@site/examples/w02/l02/equals-hash-task.tests.snippet.cs';
+import equalsSolution from '!!raw-loader!@site/examples/w02/l02/equals-hash-solution.cs';
+
+# Sammlungen und Objekte: Code schreiben
+
+:::note[Lernziele]
+- Du erkennst bei einer Schreibaufgabe, welches Konzept aus den Modulen 5–8 gebraucht wird.
+- Du ergänzt und schreibst kurzen Code zu den Modulen 5–8 so, dass er das verlangte Ergebnis liefert.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann ergänzt oder schreibst du den Code. Bei den Programmieraufgaben überlegst du vorher, was der Startcode ausgibt, und führst ihn dann aus.
+
+### Aufgabe 1
+
+<Quiz id="w02-l02-q1" />
+
+<Quiz id="w02-l02-q2" />
+
+<Quiz id="w02-l02-q3" />
+
+### Aufgabe 2
+
+<Quiz id="w02-l02-q4" />
+
+:::info[Vorhersage]
+Der Startcode gibt eine Zeile aus. Welche? Und welche zweite Zeile soll nach deiner Änderung erscheinen?
+:::
+
+Aufgabe: Mach den Namen von außen lesbar. Deklariere in `Incident` die Eigenschaft `User` und gib sie im Hauptprogramm aus.
+
+<CSharpRunner id="w02-l02-primary-property" code={primaryTask} tests={primaryTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `incident for ana` aus. Mit der Lösung folgt eine zweite Zeile, `ana`.
+
+<CodeBlock language="csharp" title="primary-property-solution.cs">{primarySolution}</CodeBlock>
+
+1. **Ursache:** Der Parameter `user` gilt nur im Klassenrumpf. Von außen gibt es kein Member mit diesem Namen.
+2. **Eigenschaft:** `public string User => user;` gibt den Wert des Parameters weiter.
+
+</details>
+
+<Quiz id="w02-l02-q5" />
+
+### Aufgabe 3
+
+<Quiz id="w02-l02-q6" />
+
+<Quiz id="w02-l02-q7" />
+
+<Quiz id="w02-l02-q8" />
+
+<Quiz id="w02-l02-q9" />
+
+### Aufgabe 4
+
+<Quiz id="w02-l02-q10" />
+
+:::info[Vorhersage]
+Der Startcode legt zwei gleiche `Seat`-Objekte in ein `HashSet<Seat>`. Welche Zahl gibt er aus, und welche soll er ausgeben?
+:::
+
+Aufgabe: Ergänze `GetHashCode` in `Seat`, sodass gleiche Sitze nur einmal in der Menge stehen.
+
+<CSharpRunner id="w02-l02-equals-hash" code={equalsTask} tests={equalsTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `2` aus. Mit der Lösung gibt das Programm `1` aus.
+
+<CodeBlock language="csharp" title="equals-hash-solution.cs">{equalsSolution}</CodeBlock>
+
+1. **Ursache:** Ohne `GetHashCode` haben zwei gleiche Sitze verschiedene Hash-Codes. Die Menge hält sie darum für verschieden.
+2. **Hash-Code:** `HashCode.Combine(Row, Number)` nimmt dieselben Werte, die `Equals` vergleicht.
+
+</details>
+
+<Quiz id="w02-l02-q11" />
+
+### Aufgabe 5
+
+<Quiz id="w02-l02-q12" />
+
+<Quiz id="w02-l02-q13" />
+
+<Quiz id="w02-l02-q14" />
+
+<Quiz id="w02-l02-q15" />
+
+### Aufgabe 6
+
+<Quiz id="w02-l02-q16" />
+
+<Quiz id="w02-l02-q17" />
+
+<Quiz id="w02-l02-q18" />
+
+### Aufgabe 7
+
+<Quiz id="w02-l02-q19" />
+
+<Quiz id="w02-l02-q20" />
+
+<Quiz id="w02-l02-q21" />
+
+### Aufgabe 8
+
+<Quiz id="w02-l02-q22" />
+
+<Quiz id="w02-l02-q23" />
+
+<Quiz id="w02-l02-q24" />
+
+<Quiz id="w02-l02-q25" />
+
+## Abschlussrunde
+
+Vier kurze gemischte Aufgaben, jeweils mit einem anderen Modul als die Aufgabe davor.
+
+### Aufgabe 9
+
+<Quiz id="w02-l02-q26" />
+
+<Quiz id="w02-l02-q27" />
+
+<Quiz id="w02-l02-q28" />
+
+### Aufgabe 10
+
+<Quiz id="w02-l02-q29" />
+
+<Quiz id="w02-l02-q30" />
+
+### Aufgabe 11
+
+<Quiz id="w02-l02-q31" />
+
+<Quiz id="w02-l02-q32" />
+
+### Aufgabe 12
+
+<Quiz id="w02-l02-q33" />
+
+<Quiz id="w02-l02-q34" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w02-l02-q35" />
+
+### Übertragen
+
+<Quiz id="w02-l02-q36" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- Microsoft Learn: [Ausnahmebehandlung mit try-catch-finally](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/exception-handling-statements)
+- C#-Spezifikation: [Structs](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/structs)

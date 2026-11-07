@@ -370,6 +370,756 @@
       "type": "explain",
       "question": "Wo würdest du in einem eigenen Programm eine Eigenschaft mit Prüfung im `set` einsetzen, und welches andere Konzept aus dieser Lektion würde dort ebenfalls helfen?",
       "modelAnswer": "Zum Beispiel bei einem Zähler für fehlgeschlagene Anmeldungen, der nie negativ sein darf: Der `set`-Code lehnt falsche Werte ab.\n\nDazu passt eine `catch`-Klausel mit `finally`, wenn der Wert aus einer Eingabe geparst wird und danach etwas aufgeräumt werden muss."
+    },
+    {
+      "id": "w02-l02-q1",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei Arrays sollen in einer neuen Liste landen, danach kommt ein Element dazu, und du zählst die Elemente.",
+      "options": [
+        {
+          "text": "Spread-Element `..` in einem Collection-Ausdruck, `Add` und `Count` einer `List<T>`",
+          "correct": true
+        },
+        {
+          "text": "Bereich `..` mit zwei Grenzen"
+        },
+        {
+          "text": "`Dictionary` und `TryGetValue`"
+        },
+        {
+          "text": "`HashSet<T>` und `Add`"
+        }
+      ],
+      "explanation": "Ein Spread-Element fügt die Elemente einer Sammlung in einen Collection-Ausdruck ein, und eine `List<T>` wächst mit `Add` und meldet ihre Größe mit `Count`. Das stammt aus den Lektionen über Listen und Collection-Ausdrücke in Modul 5."
+    },
+    {
+      "id": "w02-l02-q2",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücken: Die Liste `all` soll zuerst alle Elemente von `morning`, dann alle von `evening` enthalten. Danach soll das Programm die Anzahl der Elemente der Liste ausgeben.",
+      "example": "w02/l02/list-merge.cs",
+      "blanks": [
+        {
+          "text": "..",
+          "hint": "Dieselben zwei Zeichen stehen vor jeder Quelle, deren Elemente einzeln eingefügt werden."
+        },
+        {
+          "text": "..",
+          "hint": "Auch vor `evening` fügt das Spread-Element die Elemente einzeln ein."
+        },
+        {
+          "text": "Count",
+          "hint": "Eine Liste meldet ihre Größe anders als ein Array.",
+          "wrongAnswers": [
+            {
+              "text": "Length",
+              "feedback": "`Length` gehört zu Arrays. Eine `List<T>` wächst und meldet ihre Größe mit `Count`."
+            }
+          ]
+        }
+      ],
+      "explanation": "`..morning` fügt die Elemente von `morning` einzeln in die Liste ein, ohne Spread-Element läge das ganze Array als ein Element darin. Die Liste hat danach fünf Elemente, gezählt mit `Count`. Das Array `morning` hat eine feste Länge von `Length` 2."
+    },
+    {
+      "id": "w02-l02-q3",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Im Programm steht `foreach (string name in all) { if (name == \"ben\") { all.Remove(name); } }`. Was passiert?",
+      "options": [
+        {
+          "text": "Das Programm bricht mit einer Exception ab, weil die Liste sich während des Durchlaufs ändert. Sicher entfernst du rückwärts mit `for` und `RemoveAt`.",
+          "correct": true
+        },
+        {
+          "text": "`ben` wird entfernt, und die Schleife läuft normal weiter.",
+          "feedback": "Eine Änderung macht den Enumerator ungültig, und das Programm bricht ab.",
+          "misconception": "m05-l05-change-list-in-foreach"
+        },
+        {
+          "text": "`ben` wird nicht entfernt, weil `foreach` die Liste nur liest.",
+          "feedback": "Der Aufruf ist erlaubt, aber danach bricht der Durchlauf mit einer Exception ab.",
+          "misconception": "m05-l05-change-list-in-foreach"
+        }
+      ],
+      "explanation": "Eine Änderung der Liste macht den Enumerator ungültig, das Programm bricht ab. Entferne rückwärts mit `for` und `RemoveAt` oder sammle die Elemente zuerst in einer zweiten Liste."
+    },
+    {
+      "id": "w02-l02-q4",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Von außen soll `incident.User` den Namen liefern. Die Klasse hat nur den Primärkonstruktor `class Incident(string user)`.",
+      "options": [
+        {
+          "text": "Primärkonstruktor-Parameter und eine selbst deklarierte Eigenschaft, die ihn weitergibt",
+          "correct": true
+        },
+        {
+          "text": "`static`-Member der Klasse"
+        },
+        {
+          "text": "`readonly`-Feld mit Konstruktor"
+        },
+        {
+          "text": "`init`-Eigenschaft im Objektinitialisierer"
+        }
+      ],
+      "explanation": "Der Parameter eines Primärkonstruktors gilt nur im Klassenrumpf und ist kein Member. Eine Eigenschaft wie `public string User => user;` gibt ihn weiter (Lektion über Primärkonstruktoren, Modul 6)."
+    },
+    {
+      "id": "w02-l02-q5",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Die Klasse ist `class Incident(string user)`. Was bewirkt `Console.WriteLine(incident.user);` im Hauptprogramm?",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `user` kein Member von `Incident` ist.",
+          "correct": true
+        },
+        {
+          "text": "Die Zeile gibt den Namen aus, weil jeder Parameter des Primärkonstruktors eine Eigenschaft ist.",
+          "feedback": "Der Parameter gilt nur im Klassenrumpf. Von außen gibt es kein Member mit diesem Namen.",
+          "misconception": "m06-l07-primary-parameter-is-property"
+        }
+      ],
+      "explanation": "Ein Parameter des Primärkonstruktors ist keine Eigenschaft. Von außen musst du eine Eigenschaft deklarieren, zum Beispiel `public string User => user;`."
+    },
+    {
+      "id": "w02-l02-q6",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Text soll in eine Zahl umgewandelt werden. Ist er keine Zahl, soll das Programm das melden und mit dem nächsten Text weitermachen.",
+      "options": [
+        {
+          "text": "`try` mit einer `catch`-Klausel für einen konkreten Exception-Typ",
+          "correct": true
+        },
+        {
+          "text": "`finally` ohne `catch`"
+        },
+        {
+          "text": "`throw;` im `catch`-Block"
+        },
+        {
+          "text": "`using` mit `IDisposable`"
+        }
+      ],
+      "explanation": "`int.Parse` wirft bei falschem Text eine `FormatException`. Du fängst sie dort, wo du reagieren kannst (Lektionen über `try`/`catch`, Modul 7)."
+    },
+    {
+      "id": "w02-l02-q7",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücke: Nur ein Text, der keine Zahl ist, soll die Meldung auslösen. Andere Fehler sollen das Programm nicht verstecken.",
+      "example": "w02/l02/catch-specific.cs",
+      "blanks": [
+        {
+          "text": "FormatException",
+          "hint": "`int.Parse` wirft diesen konkreten Typ, wenn der Text keine Zahl ist.",
+          "wrongAnswers": [
+            {
+              "text": "Exception",
+              "feedback": "`Exception` fängt jeden Fehler und versteckt auch Fehler im Code. Fange den konkreten Typ.",
+              "misconception": "m07-l07-catch-exception-everywhere-is-safe"
+            }
+          ]
+        }
+      ],
+      "explanation": "`int.Parse(\"x\")` wirft eine `FormatException`. Die `catch`-Klausel für diesen Typ meldet den Fehler. Ein `catch (Exception)` würde auch Fehler wie eine `NullReferenceException` verstecken."
+    },
+    {
+      "id": "w02-l02-q8",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Ein Team schreibt um jeden Methodenaufruf `catch (Exception) { }`. Was ist die Folge?",
+      "options": [
+        {
+          "text": "Das Programm stürzt seltener ab, aber Fehler im Code bleiben versteckt, und es arbeitet mit einem falschen Zustand weiter.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm wird sicher, weil kein Fehler mehr durchkommt.",
+          "feedback": "Das Programm stürzt zwar seltener ab, versteckt aber Fehler und arbeitet danach mit einem falschen Zustand weiter.",
+          "misconception": "m07-l07-catch-exception-everywhere-is-safe"
+        },
+        {
+          "text": "Der Compiler lehnt einen leeren `catch`-Block ab.",
+          "feedback": "Der Compiler lässt das zu. Das ist das Problem: Fehler verschwinden unbemerkt."
+        }
+      ],
+      "explanation": "Fange konkrete Typen dort, wo du reagieren kannst, und lass den Rest zu einer Stelle laufen, die ihn meldet."
+    },
+    {
+      "id": "w02-l02-q9",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Eine Eingabe des Nutzers ist oft falsch, und das Programm soll danach ohne Exception weitermachen. Was passt am besten?",
+      "options": [
+        {
+          "text": "Ein Try-Muster wie `int.TryParse(text, out int number)`, das `false` liefert",
+          "correct": true
+        },
+        {
+          "text": "`int.Parse` und ein `catch (Exception)` um das ganze Programm"
+        },
+        {
+          "text": "`throw new FormatException()` bei jedem falschen Text"
+        },
+        {
+          "text": "Ein `finally`-Block nach `int.Parse`"
+        }
+      ],
+      "explanation": "Fällt ein Fehler häufig an, ist das Try-Muster besser als eine Exception: Es meldet den Fehlschlag mit `false` (Lektion „Exception oder nicht?“, Modul 7)."
+    },
+    {
+      "id": "w02-l02-q10",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei `Seat`-Objekte mit gleicher Reihe und Nummer sollen in einem `HashSet<Seat>` nur einmal vorkommen.",
+      "options": [
+        {
+          "text": "`Equals` überschreiben und `GetHashCode` aus denselben Werten bilden",
+          "correct": true
+        },
+        {
+          "text": "`is` und `as` zum Prüfen des Typs"
+        },
+        {
+          "text": "`override` gegen `new` bei einer Methode"
+        },
+        {
+          "text": "Eine `abstract` Basisklasse"
+        }
+      ],
+      "explanation": "Ein `HashSet` nutzt Hash-Code und `Equals`. Beide müssen zusammenpassen (Lektion „Gleichheit von Objekten“, Modul 8)."
+    },
+    {
+      "id": "w02-l02-q11",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "`Seat` überschreibt `Equals`, aber nicht `GetHashCode`. Was ist die Folge für ein `HashSet<Seat>`?",
+      "options": [
+        {
+          "text": "Gleiche Sitze können als verschieden gelten, weil sie verschiedene Hash-Codes haben. Der Compiler warnt mit CS0659.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, `GetHashCode` ist nur für Dictionary-Schlüssel nötig.",
+          "feedback": "Auch ein `HashSet` braucht den Hash-Code, um Elemente zu finden.",
+          "misconception": "m08-l09-equals-without-gethashcode"
+        },
+        {
+          "text": "Nichts, `Equals` allein reicht für Sammlungen.",
+          "feedback": "Sammlungen mit Hash-Tabelle prüfen zuerst den Hash-Code. Ohne passenden Wert wird `Equals` oft nie aufgerufen.",
+          "misconception": "m08-l09-equals-without-gethashcode"
+        }
+      ],
+      "explanation": "Überschreibe immer beide Methoden und baue den Hash-Code aus denselben Werten, die `Equals` vergleicht."
+    },
+    {
+      "id": "w02-l02-q12",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Aus einer Liste von IP-Adressen sollst du die verschiedenen zählen. Jede Adresse darf mehrfach vorkommen.",
+      "options": [
+        {
+          "text": "`HashSet<T>` mit `Add`, das `bool` liefert",
+          "correct": true
+        },
+        {
+          "text": "Array mit `Length`"
+        },
+        {
+          "text": "`Queue<T>` mit `Enqueue`"
+        },
+        {
+          "text": "Bereich `..` auf einem Array"
+        }
+      ],
+      "explanation": "Eine Menge behält jeden Wert nur einmal, und `Add` meldet mit `true` oder `false`, ob der Wert neu war (Lektion über Mengen, Modul 5)."
+    },
+    {
+      "id": "w02-l02-q13",
+      "lesson": "w02-l02",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Das Programm zählt die verschiedenen IP-Adressen und gibt die Zahl aus.",
+      "example": "w02/l02/hashset-distinct.cs",
+      "explanation": "Zuerst brauchen die Daten, die Menge und der Zähler einen Wert. In der Schleife zählt der Zähler nur, wenn `Add` den Wert `true` liefert, also bei einer neuen Adresse. Die Ausgabe steht nach der Schleife."
+    },
+    {
+      "id": "w02-l02-q14",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "`seen.Add(\"192.0.2.7\");` steht zweimal hintereinander, `seen` ist ein `HashSet<string>`. Was passiert beim zweiten Aufruf?",
+      "options": [
+        {
+          "text": "`Add` liefert `false`, und die Menge bleibt unverändert.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm bricht mit einer Exception ab.",
+          "feedback": "Das gilt für `Dictionary.Add` mit vorhandenem Schlüssel, nicht für `HashSet<T>.Add`.",
+          "misconception": "m05-l07-add-duplicate-throws"
+        },
+        {
+          "text": "Der Wert steht danach zweimal in der Menge.",
+          "feedback": "Eine Menge behält jeden Wert nur einmal."
+        }
+      ],
+      "explanation": "`HashSet<T>.Add` liefert bei einem vorhandenen Wert `false`. Bei `Dictionary.Add` mit vorhandenem Schlüssel bricht das Programm ab."
+    },
+    {
+      "id": "w02-l02-q15",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "`counts` ist ein `Dictionary<string, int>`. Welche Zeile ändert den Wert zu `\"ana\"` auch dann ohne Exception, wenn der Schlüssel schon existiert?",
+      "options": [
+        {
+          "text": "`counts[\"ana\"] = 2;`",
+          "correct": true
+        },
+        {
+          "text": "`counts.Add(\"ana\", 2);`"
+        },
+        {
+          "text": "`counts.TryGetValue(\"ana\", out int value);` allein"
+        },
+        {
+          "text": "`counts.ContainsKey(\"ana\");` allein"
+        }
+      ],
+      "explanation": "Der Indexer setzt einen Wert, auch wenn der Schlüssel schon da ist. `Add` bricht bei einem vorhandenen Schlüssel ab, `TryGetValue` und `ContainsKey` lesen nur."
+    },
+    {
+      "id": "w02-l02-q16",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Eigenschaft `Source` muss beim Erzeugen gesetzt werden und danach unveränderlich sein. `Count` darf später steigen.",
+      "options": [
+        {
+          "text": "`required` und `init` für `Source`, `set` für `Count`",
+          "correct": true
+        },
+        {
+          "text": "`static` für beide Eigenschaften"
+        },
+        {
+          "text": "`readonly` vor einer Eigenschaft"
+        },
+        {
+          "text": "Ein Primärkonstruktor-Parameter für `Count`"
+        }
+      ],
+      "explanation": "`required` verlangt die Zuweisung, `init` erlaubt sie nur beim Erzeugen, `set` erlaubt sie jederzeit (Lektion „Eigenschaften im Detail“, Modul 6)."
+    },
+    {
+      "id": "w02-l02-q17",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücken: `Source` muss beim Erzeugen gesetzt werden und danach unveränderlich sein.",
+      "example": "w02/l02/required-init.cs",
+      "blanks": [
+        {
+          "text": "required",
+          "hint": "Dieses Schlüsselwort verlangt die Zuweisung im Objektinitialisierer."
+        },
+        {
+          "text": "init",
+          "hint": "Dieser Accessor erlaubt die Zuweisung nur, solange das Objekt erzeugt wird.",
+          "wrongAnswers": [
+            {
+              "text": "set",
+              "feedback": "`set` erlaubt die Zuweisung auch später, `Source` wäre dann nicht unveränderlich."
+            }
+          ]
+        }
+      ],
+      "explanation": "`required` zwingt den Aufrufer, `Source` im Initialisierer zu setzen. `init` erlaubt die Zuweisung nur dabei. `Count` mit `set` darf sich später ändern, darum läuft `incident.Count = 2;`."
+    },
+    {
+      "id": "w02-l02-q18",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Nach `Incident incident = new() { Source = \"vpn\", Count = 1 };` steht `incident.Source = \"mail\";`. `Source` hat `{ get; init; }`. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler lehnt die Zuweisung ab, weil das Objekt schon erzeugt ist.",
+          "correct": true
+        },
+        {
+          "text": "Die Zuweisung klappt, `init` verhält sich dann wie `set`.",
+          "feedback": "`init` erlaubt die Zuweisung nur beim Erzeugen, zum Beispiel im Objektinitialisierer.",
+          "misconception": "m06-l06-init-settable-later"
+        },
+        {
+          "text": "Die Zuweisung klappt, aber nur einmal.",
+          "feedback": "Nach der Erzeugung gibt es keine erlaubte Zuweisung mehr.",
+          "misconception": "m06-l06-init-settable-later"
+        }
+      ],
+      "explanation": "Willst du den Wert später ändern, nimmst du `set` statt `init`."
+    },
+    {
+      "id": "w02-l02-q19",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Klasse `Session` hält eine Ressource. Sie soll am Ende des Blocks geschlossen sein, auch wenn eine Exception auftritt.",
+      "options": [
+        {
+          "text": "`using` mit einem Typ, der `IDisposable` und `Dispose()` hat",
+          "correct": true
+        },
+        {
+          "text": "`throw ex;` im `catch`-Block"
+        },
+        {
+          "text": "`catch` mit `when`-Filter"
+        },
+        {
+          "text": "`File.AppendAllText`"
+        }
+      ],
+      "explanation": "`using` ruft am Ende des Gültigkeitsbereichs `Dispose()` auf, auch bei einer Exception (Lektion „Ressourcen freigeben“, Modul 7)."
+    },
+    {
+      "id": "w02-l02-q20",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücken: `Session` soll am Ende des Programms automatisch schließen.",
+      "example": "w02/l02/using-session.cs",
+      "blanks": [
+        {
+          "text": "using",
+          "hint": "Dieses Schlüsselwort ruft am Ende des Gültigkeitsbereichs die Aufräummethode auf."
+        },
+        {
+          "text": "IDisposable",
+          "hint": "Dieses Interface verlangt die Methode zum Freigeben."
+        },
+        {
+          "text": "Dispose",
+          "hint": "So heißt die Methode, die das Interface verlangt."
+        }
+      ],
+      "explanation": "Die `using`-Deklaration ruft am Ende `Dispose()` auf. Dafür muss die Klasse `IDisposable` implementieren. Darum erscheint `closed audit` nach der ersten Zeile."
+    },
+    {
+      "id": "w02-l02-q21",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "`Dispose()` wird am Ende eines `using` aufgerufen. Was gibt es dabei frei?",
+      "options": [
+        {
+          "text": "Andere Ressourcen wie Dateien oder Verbindungen. Den Speicher gibt später der Garbage Collector frei.",
+          "correct": true
+        },
+        {
+          "text": "Den Speicher des Objekts, sofort nach dem Aufruf.",
+          "feedback": "Den Speicher gibt der Garbage Collector frei, wenn das Objekt nicht mehr erreichbar ist.",
+          "misconception": "m07-l08-dispose-frees-memory"
+        },
+        {
+          "text": "Nichts, `Dispose` ist nur ein Name ohne Wirkung.",
+          "feedback": "Der Code in `Dispose` läuft wirklich und gibt Ressourcen frei."
+        }
+      ],
+      "explanation": "`Dispose` gibt andere Ressourcen frei, nicht den Speicher des Objekts."
+    },
+    {
+      "id": "w02-l02-q22",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein kleiner Typ `Alert(User, Level)` soll Gleichheit nach Werten, eine lesbare `ToString`-Ausgabe und `Deconstruct` bekommen, ohne dass du das selbst schreibst.",
+      "options": [
+        {
+          "text": "`record` mit positionalen Parametern",
+          "correct": true
+        },
+        {
+          "text": "`abstract` class"
+        },
+        {
+          "text": "`interface`"
+        },
+        {
+          "text": "`sealed` class"
+        }
+      ],
+      "explanation": "Ein Record erzeugt Konstruktor, Eigenschaften, wertbasierte Gleichheit und `ToString` (Lektion „Records“, Modul 8)."
+    },
+    {
+      "id": "w02-l02-q23",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücke: `Alert` soll ein positionaler Record mit wertbasierter Gleichheit sein.",
+      "example": "w02/l02/record-point.cs",
+      "blanks": [
+        {
+          "text": "record",
+          "hint": "Dieses Schlüsselwort lässt den Compiler Gleichheit und `ToString` erzeugen.",
+          "wrongAnswers": [
+            {
+              "text": "class",
+              "feedback": "Eine normale Klasse vergleicht mit `==` die Verweise und gibt nur den Typnamen aus."
+            }
+          ]
+        }
+      ],
+      "explanation": "`record Alert(string User, int Level);` erzeugt Eigenschaften, wertbasierte Gleichheit, `ToString` und `Deconstruct`. Darum ist `first == second` wahr."
+    },
+    {
+      "id": "w02-l02-q24",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Ein `record struct Counter(int Value);` und ein `record Alert(string User)`. Was stimmt über ihre Veränderbarkeit?",
+      "options": [
+        {
+          "text": "Die positionalen Eigenschaften eines `record class` sind `init`. Bei einem einfachen `record struct` sind sie veränderbar.",
+          "correct": true
+        },
+        {
+          "text": "Jeder Record ist unveränderlich.",
+          "feedback": "Ein einfaches `record struct` hat veränderbare Eigenschaften, und jeder Record darf zusätzliche `set`-Eigenschaften haben.",
+          "misconception": "m08-l10-record-always-immutable"
+        },
+        {
+          "text": "Ein Record mit einer `List<T>`-Eigenschaft ist deshalb auch im Inhalt unveränderlich.",
+          "feedback": "Die Eigenschaft bleibt lesbar, der Inhalt der Liste ändert sich trotzdem.",
+          "misconception": "m08-l10-record-always-immutable"
+        }
+      ],
+      "explanation": "Veränderbar ist ein Record, wenn er veränderbare Eigenschaften hat."
+    },
+    {
+      "id": "w02-l02-q25",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Mehrere Klassen ohne gemeinsame Basis sollen alle eine Methode `Describe()` anbieten, und ein Aufrufer soll sie gleich behandeln. Was passt?",
+      "options": [
+        {
+          "text": "Ein `interface`",
+          "correct": true
+        },
+        {
+          "text": "Eine `abstract` Basisklasse, von der alle erben"
+        },
+        {
+          "text": "Eine `static class`"
+        },
+        {
+          "text": "Ein `record struct`"
+        }
+      ],
+      "explanation": "Ein Interface legt Fähigkeiten fest, ohne dass die Typen eine gemeinsame Basisklasse haben müssen. Eine abstrakte Klasse passt, wenn Typen Zustand und Code teilen (Lektionen über abstrakte Klassen und Interfaces, Modul 8)."
+    },
+    {
+      "id": "w02-l02-q26",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Logeintrag soll auf `login-failed` geprüft werden, egal ob groß oder klein geschrieben.",
+      "options": [
+        {
+          "text": "Vergleich mit `StringComparison.OrdinalIgnoreCase`",
+          "correct": true
+        },
+        {
+          "text": "`DateTimeOffset.Parse`"
+        },
+        {
+          "text": "`Split` mit Trennzeichen"
+        },
+        {
+          "text": "`HashSet<T>.Add`"
+        }
+      ],
+      "explanation": "Texte vergleichst du mit einem ausdrücklichen `StringComparison`. Für Logs passt der Ordinal-Vergleich (Lektion „Mit Strings arbeiten“, Modul 5)."
+    },
+    {
+      "id": "w02-l02-q27",
+      "lesson": "w02-l02",
+      "type": "cloze",
+      "question": "Ergänze die Lücke: Der erste Vergleich soll Groß- und Kleinschreibung ignorieren, aber nicht von der Kultur abhängen.",
+      "example": "w02/l02/compare-ordinal.cs",
+      "blanks": [
+        {
+          "text": "OrdinalIgnoreCase",
+          "hint": "Der Vergleich ist ordinal, und Groß- und Kleinschreibung zählen nicht.",
+          "wrongAnswers": [
+            {
+              "text": "CurrentCultureIgnoreCase",
+              "feedback": "Dieser Vergleich hängt von der Kultur ab. Für Logs nimmst du einen ordinalen Vergleich."
+            }
+          ]
+        }
+      ],
+      "explanation": "`OrdinalIgnoreCase` vergleicht Zeichen ohne Kulturregeln und ignoriert die Schreibweise. `Ordinal` unterscheidet Groß- und Kleinschreibung, darum ist der zweite Vergleich `False`."
+    },
+    {
+      "id": "w02-l02-q28",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Ein Zeitstempel aus einem Log enthält einen Offset wie `+02:00`. Welcher Typ behält ihn?",
+      "options": [
+        {
+          "text": "`DateTimeOffset`",
+          "correct": true
+        },
+        {
+          "text": "`DateTime`"
+        },
+        {
+          "text": "`TimeOnly`"
+        },
+        {
+          "text": "`DateOnly`"
+        }
+      ],
+      "explanation": "`DateTimeOffset` speichert Datum, Uhrzeit und den Offset zu UTC (Lektion „Datum und Uhrzeit“, Modul 5)."
+    },
+    {
+      "id": "w02-l02-q29",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei Objekte derselben Klasse sollen eine gemeinsame Zahl `Created` teilen, die bei jedem `new` steigt.",
+      "options": [
+        {
+          "text": "`static`-Feld",
+          "correct": true
+        },
+        {
+          "text": "Eine `init`-Eigenschaft"
+        },
+        {
+          "text": "Ein Primärkonstruktor-Parameter"
+        },
+        {
+          "text": "Ein `required`-Member"
+        }
+      ],
+      "explanation": "Ein `static`-Member gehört zur Klasse und nicht zu einer Instanz (Lektion über statische Member, Modul 6)."
+    },
+    {
+      "id": "w02-l02-q30",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Eine Klasse soll einen Wert nur prüfen und dann speichern, wenn er nicht negativ ist. Was nimmst du?",
+      "options": [
+        {
+          "text": "Eine Eigenschaft mit Prüfung im `set` und einem privaten Feld",
+          "correct": true
+        },
+        {
+          "text": "Ein öffentliches Feld"
+        },
+        {
+          "text": "Ein `static`-Feld"
+        },
+        {
+          "text": "Eine `readonly`-Konstante"
+        }
+      ],
+      "explanation": "Ein Feld hat keinen Code beim Schreiben. Eine Eigenschaft kann im `set` prüfen (Lektion über Eigenschaften, Modul 6)."
+    },
+    {
+      "id": "w02-l02-q31",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei Objekte einer eigenen Klasse ohne überschriebenes `Equals` werden mit `==` verglichen.",
+      "options": [
+        {
+          "text": "`==` bei Klassen vergleicht Verweise, `Equals` und `operator ==` ändern das",
+          "correct": true
+        },
+        {
+          "text": "`record struct` kopiert die Werte"
+        },
+        {
+          "text": "`override` gegen `new`"
+        },
+        {
+          "text": "`is` gegen `as`"
+        }
+      ],
+      "explanation": "Ohne Überschreibung vergleicht `==` bei einer Klasse die Verweise (Lektion „Gleichheit von Objekten“, Modul 8)."
+    },
+    {
+      "id": "w02-l02-q32",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "`Seat a = new(2, 5); Seat b = new(2, 5);` mit einer Klasse `Seat` ohne eigenes `Equals` und ohne `operator ==`. Was ergibt `a == b`?",
+      "options": [
+        {
+          "text": "`false`, weil es zwei verschiedene Objekte sind",
+          "correct": true
+        },
+        {
+          "text": "`true`, weil beide dieselben Werte haben"
+        },
+        {
+          "text": "Ein Compilerfehler"
+        },
+        {
+          "text": "`true`, weil beide denselben Typ haben"
+        }
+      ],
+      "explanation": "Bei einer Klasse vergleicht `==` ohne Überschreibung die Verweise."
+    },
+    {
+      "id": "w02-l02-q33",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Zeile soll an eine vorhandene Logdatei angehängt werden, ohne den alten Inhalt zu löschen.",
+      "options": [
+        {
+          "text": "`File.AppendAllText`",
+          "correct": true
+        },
+        {
+          "text": "`File.WriteAllText`"
+        },
+        {
+          "text": "`File.ReadAllText`"
+        },
+        {
+          "text": "`File.Delete`"
+        }
+      ],
+      "explanation": "`AppendAllText` hängt Text an, `WriteAllText` ersetzt den Inhalt (Lektion „Dateien lesen und schreiben“, Modul 7)."
+    },
+    {
+      "id": "w02-l02-q34",
+      "lesson": "w02-l02",
+      "type": "single",
+      "question": "Eine Datei enthält schon drei Zeilen. Du rufst `File.WriteAllText(path, \"neu\")` auf. Was steht danach in der Datei?",
+      "options": [
+        {
+          "text": "Nur `neu`, der alte Inhalt ist ersetzt.",
+          "correct": true
+        },
+        {
+          "text": "Die drei Zeilen und `neu`.",
+          "feedback": "`WriteAllText` hängt nichts an, sondern ersetzt den Inhalt.",
+          "misconception": "m07-l09-writealltext-appends"
+        },
+        {
+          "text": "Gar nichts, `WriteAllText` löscht die Datei."
+        }
+      ],
+      "explanation": "`AppendAllText` hängt an, `WriteAllText` schreibt den Inhalt neu."
+    },
+    {
+      "id": "w02-l02-q35",
+      "lesson": "w02-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du bei einer Aufgabe, welches Konzept sie braucht, und was prüfst du, bevor du Code schreibst?",
+      "modelAnswer": "Zuerst lese ich, was das Programm tun soll und was verlangt wird: eine Sammlung, ein Wert, der nur beim Erzeugen gesetzt wird, ein Fehler, ein Typ mit Gleichheit. Dann suche ich das Schlüsselwort, das dazu passt, zum Beispiel `HashSet` für „jeder Wert nur einmal“ oder `using` für „am Ende aufräumen“. Danach schreibe ich den Code und prüfe ihn gegen das erwartete Ergebnis.\n\nBei Unsicherheit vergleiche ich zwei ähnliche Konzepte, etwa `init` und `set`, und prüfe, welches das gewünschte Verhalten liefert."
+    },
+    {
+      "id": "w02-l02-q36",
+      "lesson": "w02-l02",
+      "type": "explain",
+      "question": "Wo würdest du in einem eigenen Programm eine Menge statt einer Liste einsetzen, und warum?",
+      "modelAnswer": "Zum Beispiel bei einem Programm, das aus einem Log die verschiedenen IP-Adressen zählt: Eine `HashSet<string>` behält jede Adresse nur einmal, und `Add` meldet mit `true` oder `false`, ob die Adresse neu war.\n\nBei einer Liste müsste ich vorher mit `Contains` prüfen, und die Liste würde doppelte Werte behalten."
     }
   ]
 }
