@@ -5,7 +5,8 @@
       "id": "m02-l01-q1",
       "lesson": "m02-l01",
       "type": "single",
-      "question": "Was gibt `int x = 5; Console.WriteLine(x > 5);` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m02/l01/quiz-greater.cs",
       "options": [
         {
           "text": "`False`",
@@ -56,7 +57,8 @@
       "lesson": "m02-l01",
       "placement": true,
       "type": "single",
-      "question": "In `if (a > 0) if (b > 10) F(); else G();` steht das `else` direkt unter dem äußeren `if`. Zu welchem `if` gehört es?",
+      "question": "Das `else` im Code steht direkt unter dem äußeren `if`. Zu welchem `if` gehört es?",
+      "example": "m02/l01/quiz-dangling-else.snippet.cs",
       "options": [
         {
           "text": "Zum inneren `if (b > 10)`, dem nächsten `if` davor, das noch kein `else` hat.",
@@ -112,7 +114,8 @@
       "id": "m02-l01-q6",
       "lesson": "m02-l01",
       "type": "single",
-      "question": "`int failed = 0; if (failed > 0) Console.WriteLine(\"A\"); Console.WriteLine(\"B\");` – was passiert?",
+      "question": "Was passiert beim Ausführen des Programms?",
+      "example": "m02/l01/quiz-if-without-block.cs",
       "options": [
         {
           "text": "Es erscheint nur `B`. Zum `if` gehört nur die eine Anweisung direkt dahinter.",
@@ -290,7 +293,8 @@
       "id": "m02-l03-q1",
       "lesson": "m02-l03",
       "type": "single",
-      "question": "Was steht nach `int x = 7; string s = x % 2 == 0 ? \"even\" : \"odd\";` in `s`?",
+      "question": "Was steht am Ende des Programms in `s`?",
+      "example": "m02/l03/quiz-parity.cs",
       "options": [
         {
           "text": "`\"odd\"`, weil `7 % 2` den Rest 1 ergibt und die Bedingung falsch ist.",
@@ -347,7 +351,8 @@
       "id": "m02-l03-q4",
       "lesson": "m02-l03",
       "type": "single",
-      "question": "Welchen Typ hat der Wert von `flag ? 1 : 2.5` mit `bool flag = true;`?",
+      "question": "Welchen Typ hat der Wert von `result` im Code?",
+      "example": "m02/l03/quiz-mixed-branches.snippet.cs",
       "options": [
         {
           "text": "`double`: Die `1` wird in einen `double` umgewandelt.",
@@ -425,7 +430,8 @@
       "id": "m02-l04-q1",
       "lesson": "m02-l04",
       "type": "single",
-      "question": "Welchen Wert hat `text` nach `int n = 3; string text = n switch { 1 => \"one\", 3 => \"three\", _ => \"other\" };`?",
+      "question": "Welchen Wert hat `text` am Ende des Programms?",
+      "example": "m02/l04/quiz-switch-value.cs",
       "options": [
         {
           "text": "`\"three\"`, weil das konstante Muster `3` zum Wert passt.",
@@ -454,7 +460,8 @@
       "id": "m02-l04-q3",
       "lesson": "m02-l04",
       "type": "single",
-      "question": "Ein switch-Ausdruck auf einen `int` hat die Zweige `0`, `< 3` und `< 5`, aber keinen Auffangzweig. Was passiert für den Wert `7`?",
+      "question": "Was passiert im Code für den Wert `7`, wenn der switch-Ausdruck keinen Auffangzweig hat?",
+      "example": "m02/l04/quiz-switch-no-default.snippet.cs",
       "options": [
         {
           "text": "Zur Laufzeit wird eine Ausnahme ausgelöst, und der Compiler hat vorher gewarnt.",
@@ -504,7 +511,8 @@
       "lesson": "m02-l04",
       "placement": true,
       "type": "single",
-      "question": "`failed` ist `4`. Welches Ergebnis liefert `failed switch { < 5 => \"medium\", < 3 => \"low\", _ => \"high\" }`?",
+      "question": "Welches Ergebnis liefert der switch-Ausdruck im Code?",
+      "example": "m02/l04/quiz-switch-order.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, weil der Zweig `< 3` nie erreicht wird.",
@@ -619,7 +627,8 @@
       "id": "m02-l05-q4",
       "lesson": "m02-l05",
       "type": "single",
-      "question": "`switch (level)` hat nur die Labels `case 1:` und `case 2:` (mit `break;`) und kein `default`. `level` ist `9`. Was passiert?",
+      "question": "Was passiert im Programm, wenn kein Label passt und es kein `default` gibt?",
+      "example": "m02/l05/quiz-switch-no-match.cs",
       "options": [
         {
           "text": "Kein Abschnitt wird ausgeführt, und das Programm läuft hinter der switch-Anweisung weiter.",
@@ -705,7 +714,8 @@
       "id": "m02-l06-q2",
       "lesson": "m02-l06",
       "type": "single",
-      "question": "`int n = 0; while (n < 3) { n += 2; }` Welchen Wert hat `n` nach der Schleife?",
+      "question": "Welchen Wert hat `n` nach der Schleife?",
+      "example": "m02/l06/quiz-while-step.cs",
       "options": [
         {
           "text": "`4`, weil die Bedingung vor jedem Durchlauf geprüft wird: nach `2` ist sie noch wahr.",
@@ -733,7 +743,8 @@
       "lesson": "m02-l06",
       "placement": true,
       "type": "single",
-      "question": "Wie oft läuft der Block von `int n = 5; do { n++; } while (n < 3);`?",
+      "question": "Wie oft läuft der Block der Schleife?",
+      "example": "m02/l06/quiz-do-once.cs",
       "options": [
         {
           "text": "Genau einmal, weil die Bedingung erst nach dem Block geprüft wird.",
@@ -754,7 +765,8 @@
       "id": "m02-l06-q4",
       "lesson": "m02-l06",
       "type": "single",
-      "question": "Ein Programm liest Zeilen mit `while (line != \"stop\")` und die Eingabe endet, ohne dass `stop` vorkommt. Was passiert?",
+      "question": "Die Eingabe endet, ohne dass `stop` vorkommt. Was passiert im Code?",
+      "example": "m02/l06/quiz-until-stop.snippet.cs",
       "options": [
         {
           "text": "Am Ende der Eingabe liefert `ReadLine()` keinen Text mehr. Das ist nicht gleich `\"stop\"`, die Bedingung bleibt wahr, und die Schleife endet nie.",
@@ -999,7 +1011,8 @@
       "id": "m02-l08-q3",
       "lesson": "m02-l08",
       "type": "single",
-      "question": "`foreach (char c in \"12x45\")` zählt mit `n++` jedes Zeichen. Im Block steht davor `if (c == 'x') { continue; }`. Welchen Wert hat `n` danach?",
+      "question": "Welchen Wert hat `n` am Ende des Programms?",
+      "example": "m02/l08/quiz-continue-count.cs",
       "options": [
         {
           "text": "`4`, weil nur das Zeichen `x` übersprungen wird und die Schleife weiterläuft.",
@@ -1043,7 +1056,8 @@
       "id": "m02-l08-q5",
       "lesson": "m02-l08",
       "type": "single",
-      "question": "In einer `for`-Schleife steht eine `switch`-Anweisung. In einem Abschnitt steht `break;`. Was beendet dieses `break`?",
+      "question": "Was beendet das `break;` im Code?",
+      "example": "m02/l08/quiz-break-in-switch.cs",
       "options": [
         {
           "text": "Nur die `switch`-Anweisung. Die `for`-Schleife läuft mit dem nächsten Durchlauf weiter.",
@@ -1129,7 +1143,8 @@
       "id": "m02-l09-q3",
       "lesson": "m02-l09",
       "type": "single",
-      "question": "In der inneren von zwei verschachtelten `for`-Schleifen steht `break;`. Was passiert?",
+      "question": "Was bewirkt das `break;` im Code?",
+      "example": "m02/l09/quiz-break-inner.cs",
       "options": [
         {
           "text": "Nur die innere Schleife endet. Die äußere macht mit ihrem nächsten Durchlauf weiter.",
@@ -1200,7 +1215,8 @@
       "id": "m02-l09-q6",
       "lesson": "m02-l09",
       "type": "single",
-      "question": "Welche Ausgabe erzeugt `for (int r = 1; r <= 3; r++) { for (int c = 1; c <= r; c++) { Console.Write(\"#\"); } Console.WriteLine(); }`?",
+      "question": "Welche Ausgabe erzeugt das Programm?",
+      "example": "m02/l09/quiz-triangle.cs",
       "options": [
         {
           "text": "Drei Zeilen mit `#`, `##` und `###`.",
