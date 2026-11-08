@@ -38,7 +38,8 @@
       "lesson": "m00-l01",
       "type": "single",
       "placement": true,
-      "question": "Du vertauschst die beiden Zeilen `Console.WriteLine(\"A\");` und `Console.WriteLine(\"B\");`. Was ändert sich?",
+      "question": "Du vertauschst die beiden Zeilen im Code. Was ändert sich?",
+      "example": "m00/l01/quiz-swap-lines.cs",
       "options": [
         {
           "text": "Nichts, die Reihenfolge der Anweisungen ist egal.",

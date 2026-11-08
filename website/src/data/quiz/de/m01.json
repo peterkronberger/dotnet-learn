@@ -160,7 +160,8 @@
       "lesson": "m01-l02",
       "type": "single",
       "placement": true,
-      "question": "Ein Programm hat diese vier Zeilen:\n\n`int level = 1;`\n`level = 4;`\n`level = 2;`\n`Console.WriteLine(level);`\n\nWas wird ausgegeben?",
+      "question": "Was wird ausgegeben?",
+      "example": "m01/l02/quiz-overwrite.cs",
       "options": [
         {
           "text": "`2`, der zuletzt zugewiesene Wert.",
@@ -242,7 +243,8 @@
       "id": "m01-l02-q6",
       "lesson": "m01-l02",
       "type": "single",
-      "question": "In einem Programm stehen nur diese zwei Zeilen:\n\n`int attempts;`\n`Console.WriteLine(attempts);`\n\nWas passiert?",
+      "question": "Was passiert mit dem Code?",
+      "example": "m01/l02/quiz-unassigned-read.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, weil `attempts` vor dem Lesen keinen Wert bekommen hat.",
@@ -507,7 +509,8 @@
       "id": "m01-l04-q3",
       "lesson": "m01-l04",
       "type": "single",
-      "question": "Nach `int x = 5; int y = x++;` – welche Werte haben `y` und `x`?",
+      "question": "Welche Werte haben `y` und `x` am Ende des Programms?",
+      "example": "m01/l04/quiz-postfix.cs",
       "options": [
         {
           "text": "`y` ist `5`, `x` ist `6`.",
@@ -533,7 +536,8 @@
       "id": "m01-l04-q4",
       "lesson": "m01-l04",
       "type": "single",
-      "question": "Welchen Wert hat `count` nach `int count = 10; count -= 3; count *= 2;`?",
+      "question": "Welchen Wert hat `count` am Ende des Programms?",
+      "example": "m01/l04/quiz-compound.cs",
       "options": [
         {
           "text": "`14`",
@@ -646,7 +650,8 @@
       "id": "m01-l05-q1",
       "lesson": "m01-l05",
       "type": "single",
-      "question": "Was passiert mit diesem Code?\n\n`const int maxAttempts = 3;`\n`maxAttempts = 5;`",
+      "question": "Was passiert mit diesem Code?",
+      "example": "m01/l05/quiz-const-assign.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, das Programm startet nicht.",
@@ -692,7 +697,8 @@
       "lesson": "m01-l05",
       "type": "single",
       "placement": true,
-      "question": "Was passiert mit diesem Code?\n\n`var x = 5;`\n`x = \"Text\";`",
+      "question": "Was passiert mit diesem Code?",
+      "example": "m01/l05/quiz-var-reassign.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, weil `x` ein `int` ist und kein `string` aufnehmen kann.",
@@ -726,7 +732,8 @@
       "id": "m01-l05-q5",
       "lesson": "m01-l05",
       "type": "multi",
-      "question": "Gegeben sind `int n = 4;` und `const int k = 10;`. Welche Deklarationen lassen sich übersetzen?",
+      "question": "Welche Deklarationen lassen sich direkt nach dem Code übersetzen?",
+      "example": "m01/l05/quiz-const-declarations.snippet.cs",
       "options": [
         {
           "text": "`const int a = k * 2;`",
@@ -882,7 +889,8 @@
       "lesson": "m01-l06",
       "type": "single",
       "placement": true,
-      "question": "`double rate = 71.4286;` – was gibt `Console.WriteLine($\"{rate:F1} %\");` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m01/l06/quiz-format-fixed.cs",
       "options": [
         {
           "text": "`71.4 %`",
@@ -907,7 +915,8 @@
       "id": "m01-l06-q4",
       "lesson": "m01-l06",
       "type": "single",
-      "question": "Was gibt `Console.WriteLine($\"[{count,5}]\");` bei `int count = 42;` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m01/l06/quiz-format-width.cs",
       "options": [
         {
           "text": "`[   42]`",
@@ -957,7 +966,8 @@
       "id": "m01-l06-q6",
       "lesson": "m01-l06",
       "type": "single",
-      "question": "Nach `string name = \"bob\"; name.ToUpper();` – welchen Wert hat `name`?",
+      "question": "Welchen Wert hat `name` am Ende des Programms?",
+      "example": "m01/l06/quiz-string-immutable.cs",
       "options": [
         {
           "text": "`\"bob\"` – die Methode liefert einen neuen Text zurück, `name` bleibt gleich.",
@@ -1107,7 +1117,8 @@
       "id": "m01-l07-q4",
       "lesson": "m01-l07",
       "type": "single",
-      "question": "Ein Programm enthält `int max = int.MaxValue;` und danach `int next = max + 1;`. Es gibt keine `checked`-Angabe und keine besonderen Compileroptionen. Was passiert?",
+      "question": "Was passiert beim Ausführen des Programms? Es gibt keine `checked`-Angabe und keine besonderen Compileroptionen.",
+      "example": "m01/l07/quiz-overflow.cs",
       "options": [
         {
           "text": "Das Programm läuft weiter, `next` ist `-2147483648`.",
@@ -1209,7 +1220,8 @@
       "id": "m01-l07-q8",
       "lesson": "m01-l07",
       "type": "multi",
-      "question": "Welche Aussagen über `long big = 3000000000;` und `int small = (int)big;` ohne `checked` sind richtig?",
+      "question": "Welche Aussagen über den Code stimmen, wenn er ohne `checked` läuft?",
+      "example": "m01/l07/quiz-long-to-int.cs",
       "options": [
         {
           "text": "Der Cast ist nötig, weil ein `long` nicht implizit nach `int` umgewandelt wird.",
@@ -1455,7 +1467,8 @@
       "id": "m01-l09-q2",
       "lesson": "m01-l09",
       "type": "single",
-      "question": "Die Eingabe besteht aus den zwei Zeilen `bob` und `5`. Das Programm ruft zweimal `var a = Console.ReadLine();` und `var b = Console.ReadLine();` auf, in dieser Reihenfolge. Welche Werte haben `a` und `b`?",
+      "question": "Die Eingabe besteht aus den zwei Zeilen `bob` und `5`. Welche Werte haben `a` und `b`?",
+      "example": "m01/l09/quiz-two-lines.cs",
       "options": [
         {
           "text": "`a` ist `\"bob\"`, `b` ist `\"5\"`.",
@@ -1482,7 +1495,8 @@
       "id": "m01-l09-q3",
       "lesson": "m01-l09",
       "type": "single",
-      "question": "Die Eingabe ist `7`. Was gibt `var t = Console.ReadLine(); Console.WriteLine(t + 1);` aus?",
+      "question": "Die Eingabe ist `7`. Was gibt das Programm aus?",
+      "example": "m01/l09/quiz-text-plus-number.cs",
       "options": [
         {
           "text": "`71`",
@@ -1553,7 +1567,8 @@
       "id": "m01-l09-q6",
       "lesson": "m01-l09",
       "type": "single",
-      "question": "Die Eingabe ist `5`. Was gibt `var t = Console.ReadLine(); bool ok = int.TryParse(t, out int n); Console.WriteLine(n * 2);` aus?",
+      "question": "Die Eingabe ist `5`. Was gibt das Programm aus?",
+      "example": "m01/l09/quiz-tryparse-input.cs",
       "options": [
         {
           "text": "`10`",
