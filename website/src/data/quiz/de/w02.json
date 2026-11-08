@@ -46,7 +46,8 @@
       "id": "w02-l01-q4",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "Welches Konzept brauchst du hier? Eine Klasse hat ein Feld `public readonly List<string> Names = new();`, und außerhalb steht `roster.Names.Add(\"ana\");`.",
+      "question": "Welches Konzept brauchst du hier? Achte auf das Feld `Names` im Code.",
+      "example": "w02/l01/quiz-readonly-list.cs",
       "options": [
         { "text": "`readonly` bei einem Feld", "correct": true },
         { "text": "`const`" },
@@ -59,7 +60,8 @@
       "id": "w02-l01-q5",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "Das Feld ist `public readonly List<string> Names = new();`. Was passiert bei `roster.Names.Add(\"ana\");` außerhalb der Klasse?",
+      "question": "Was passiert im Code beim Aufruf von `Add` außerhalb der Klasse?",
+      "example": "w02/l01/quiz-readonly-list.cs",
       "options": [
         { "text": "Der Aufruf läuft, und die Liste hat danach ein Element.", "correct": true },
         {
@@ -78,7 +80,8 @@
       "id": "w02-l01-q6",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "Eine Klasse hat `public static int Created;`, und ihr Konstruktor ruft `Created++;` auf. Wie groß ist `Created` nach `new Roster(); new Roster();`?",
+      "question": "Wie groß ist `Created` am Ende des Programms?",
+      "example": "w02/l01/quiz-static-counter.cs",
       "options": [
         { "text": "`2`", "correct": true },
         {
@@ -138,7 +141,8 @@
       "id": "w02-l01-q10",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "`Rule rule = new FailedLoginRule();` und `FailedLoginRule` deklariert `public new string Describe()`. Welche Version führt `rule.Describe()` aus?",
+      "question": "Welche Version von `Describe` führt `rule.Describe()` im Code aus?",
+      "example": "w02/l01/quiz-new-hiding.cs",
       "options": [
         { "text": "Die Version von `Rule`, weil nur der Typ der Variable zählt", "correct": true },
         {
@@ -198,7 +202,8 @@
       "id": "w02-l01-q14",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "Eine Eigenschaft `Failures` prüft im `set`, ob der Wert negativ ist, und ignoriert ihn dann. Was bewirkt `incident.Failures = -2;`?",
+      "question": "Was bewirkt die Zuweisung `incident.Failures = -2;` im Code?",
+      "example": "w02/l01/quiz-guarded-setter.cs",
       "options": [
         { "text": "Der Code im `set` läuft, und der Wert wird nicht gespeichert.", "correct": true },
         {
@@ -270,7 +275,8 @@
       "id": "w02-l01-q19",
       "lesson": "w02-l01",
       "type": "single",
-      "question": "`Point copy = points[0]; copy.X = 10;` mit `Point` als `struct` und `points` als `List<Point>`. Was ist `points[0].X` danach?",
+      "question": "Was ist `points[0].X` am Ende des Programms?",
+      "example": "w02/l01/quiz-struct-copy.cs",
       "options": [
         { "text": "Unverändert, denn `copy` ist eine Kopie", "correct": true },
         {
@@ -425,7 +431,8 @@
       "id": "w02-l02-q3",
       "lesson": "w02-l02",
       "type": "single",
-      "question": "Im Programm steht `foreach (string name in all) { if (name == \"ben\") { all.Remove(name); } }`. Was passiert?",
+      "question": "Was passiert im Code?",
+      "example": "w02/l02/quiz-remove-in-foreach.snippet.cs",
       "options": [
         {
           "text": "Das Programm bricht mit einer Exception ab, weil die Liste sich während des Durchlaufs ändert. Sicher entfernst du rückwärts mit `for` und `RemoveAt`.",
@@ -650,7 +657,8 @@
       "id": "w02-l02-q14",
       "lesson": "w02-l02",
       "type": "single",
-      "question": "`seen.Add(\"192.0.2.7\");` steht zweimal hintereinander, `seen` ist ein `HashSet<string>`. Was passiert beim zweiten Aufruf?",
+      "question": "Was passiert beim zweiten Aufruf von `Add` im Code?",
+      "example": "w02/l02/quiz-hashset-add-twice.cs",
       "options": [
         {
           "text": "`Add` liefert `false`, und die Menge bleibt unverändert.",
@@ -740,7 +748,8 @@
       "id": "w02-l02-q18",
       "lesson": "w02-l02",
       "type": "single",
-      "question": "Nach `Incident incident = new() { Source = \"vpn\", Count = 1 };` steht `incident.Source = \"mail\";`. `Source` hat `{ get; init; }`. Was passiert?",
+      "question": "Was passiert bei der zweiten Zuweisung an `Source` im Code?",
+      "example": "w02/l02/quiz-init-assign.snippet.cs",
       "options": [
         {
           "text": "Der Compiler lehnt die Zuweisung ab, weil das Objekt schon erzeugt ist.",
@@ -1046,7 +1055,8 @@
       "id": "w02-l02-q32",
       "lesson": "w02-l02",
       "type": "single",
-      "question": "`Seat a = new(2, 5); Seat b = new(2, 5);` mit einer Klasse `Seat` ohne eigenes `Equals` und ohne `operator ==`. Was ergibt `a == b`?",
+      "question": "Was ergibt `a == b` im Code?",
+      "example": "w02/l02/quiz-seat-equality.cs",
       "options": [
         {
           "text": "`false`, weil es zwei verschiedene Objekte sind",

@@ -115,7 +115,8 @@
       "id": "w01-l01-q6",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "Eine Methode `int Square(int x)` gibt `x * x` mit `return` zurück. Was gibt das Programm aus: `Square(4); Console.WriteLine(\"Done\");`?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-square-unused.cs",
       "options": [
         {
           "text": "Nur `Done`",
@@ -159,7 +160,8 @@
       "id": "w01-l01-q8",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "Die Methode `void AddOne(int n)` enthält nur `n = n + 1;`. Was gibt `int a = 5; AddOne(a); Console.WriteLine(a);` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-add-one.cs",
       "options": [
         {
           "text": "`5`",
@@ -203,7 +205,8 @@
       "id": "w01-l01-q10",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "Was gibt `var a = new StringBuilder(\"x\"); var b = a; b.Append(\"y\"); Console.WriteLine(a);` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-shared-builder.cs",
       "options": [
         {
           "text": "`xy`",
@@ -335,7 +338,8 @@
       "id": "w01-l01-q16",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "Was geben die Schleifen aus? `for (int i = 1; i <= 2; i++) { for (int j = 1; j <= 3; j++) { if (j == 2) { break; } Console.WriteLine($\"{i}{j}\"); } }`",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-nested-break.cs",
       "options": [
         {
           "text": "`11` und `21`",
@@ -379,7 +383,8 @@
       "id": "w01-l01-q18",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "`void Reset(StringBuilder text)` enthält nur `text = new StringBuilder(\"new\");`. Was gibt `var log = new StringBuilder(\"old\"); Reset(log); Console.WriteLine(log);` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-reset-builder.cs",
       "options": [
         {
           "text": "`old`",
@@ -423,7 +428,8 @@
       "id": "w01-l01-q20",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "Die Methode `int Count(int n)` enthält nur `return Count(n - 1) + 1;`. Was passiert bei `Count(3)`?",
+      "question": "Was passiert im Code bei `Count(3)`?",
+      "example": "w01/l01/quiz-count-recursion.snippet.cs",
       "options": [
         {
           "text": "Die Aufrufe hören nicht auf, es entsteht ein Stapelüberlauf",
@@ -468,7 +474,8 @@
       "id": "w01-l01-q22",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "`Check()` erhöht `calls` um eins und gibt `true` zurück. `calls` ist am Anfang `0`. Welchen Wert hat `calls` nach `bool ok = false & Check();`?",
+      "question": "Welchen Wert hat `calls` am Ende des Programms?",
+      "example": "w01/l01/quiz-and-check.cs",
       "options": [
         {
           "text": "`1`",
@@ -534,7 +541,8 @@
       "id": "w01-l01-q25",
       "lesson": "w01-l01",
       "type": "single",
-      "question": "`Fallback()` gibt `Fallback called` aus und liefert `\"none\"`. Was gibt `string? name = \"ann\"; Console.WriteLine(name ?? Fallback());` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l01/quiz-coalesce-fallback.cs",
       "options": [
         {
           "text": "Nur `ann`",
@@ -872,7 +880,8 @@
       "id": "w01-l02-q14",
       "lesson": "w01-l02",
       "type": "single",
-      "question": "`int n = 5;` und danach `int.TryParse(\"abc\", out n);`. Welchen Wert hat `n` danach?",
+      "question": "Welchen Wert hat `n` am Ende des Programms?",
+      "example": "w01/l02/quiz-tryparse-out.cs",
       "options": [
         {
           "text": "`0`",
@@ -996,7 +1005,8 @@
       "id": "w01-l02-q19",
       "lesson": "w01-l02",
       "type": "single",
-      "question": "Zwei Strings `a` und `b` haben denselben Text `ab`, sind aber zwei getrennte Objekte (zum Beispiel aus zwei `StringBuilder.ToString()`-Aufrufen). Was liefern `a == b` und `object.ReferenceEquals(a, b)`?",
+      "question": "Was gibt das Programm aus?",
+      "example": "w01/l02/quiz-string-equality.cs",
       "options": [
         {
           "text": "`True` und `False`",
