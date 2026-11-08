@@ -5,7 +5,8 @@
       "id": "m03-l01-q1",
       "lesson": "m03-l01",
       "type": "single",
-      "question": "Ein Programm gibt zuerst `A` aus, dann `B`. Am Ende der Datei steht die Deklaration `void Hello() { Console.WriteLine(\"Hi\"); }`, aber nirgends ein Aufruf `Hello()`. Was erscheint in der Konsole?",
+      "question": "Was erscheint in der Konsole, wenn das Programm läuft?",
+      "example": "m03/l01/quiz-unused-method.snippet.cs",
       "options": [
         {
           "text": "`A` und `B`",
@@ -40,7 +41,8 @@
       "id": "m03-l01-q3",
       "lesson": "m03-l01",
       "type": "single",
-      "question": "Gegeben ist `int Add(int first, int second) { return first + second; }` und der Aufruf `Add(3, 4)`. Was ist ein Argument?",
+      "question": "Was ist im Code ein Argument?",
+      "example": "m03/l01/quiz-argument.cs",
       "options": [
         {
           "text": "`3`",
@@ -65,7 +67,8 @@
       "id": "m03-l01-q4",
       "lesson": "m03-l01",
       "type": "single",
-      "question": "Es gilt `int i = 1;`, und die Methode `void Show(int a, int b)` gibt `a` und `b` nacheinander aus. Was gibt der Aufruf `Show(i++, i++)` aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m03/l01/quiz-argument-order.cs",
       "options": [
         {
           "text": "`1 2`",
@@ -155,7 +158,8 @@
         "m03-l01"
       ],
       "type": "single",
-      "question": "Die Methode `int Square(int n) { return n * n; }` ist deklariert. Das Programm enthält nur die Anweisung `Square(4);`. Was erscheint in der Konsole?",
+      "question": "Was erscheint in der Konsole, wenn das Programm läuft?",
+      "example": "m03/l02/quiz-unused-result.cs",
       "options": [
         {
           "text": "Nichts",
@@ -222,7 +226,8 @@
       "id": "m03-l02-q5",
       "lesson": "m03-l02",
       "type": "single",
-      "question": "Eine Methode mit Rückgabetyp `string` hat ein `if` mit `return \"none\";` und danach kein weiteres `return`. Was meldet der Compiler?",
+      "question": "Was meldet der Compiler zu dem Code?",
+      "example": "m03/l02/quiz-missing-return.snippet.cs",
       "options": [
         {
           "text": "Einen Fehler: Auf dem Weg, auf dem das `if` nicht zutrifft, wird nichts zurückgegeben.",
@@ -308,7 +313,8 @@
       "lesson": "m03-l03",
       "placement": true,
       "type": "single",
-      "question": "Es gilt `int attempts = 5;`, dann folgt der Aufruf `Reset(attempts);`. Die Methode ist `void Reset(int value) { value = 0; }`. Welchen Wert hat `attempts` danach?",
+      "question": "Welchen Wert hat `attempts` am Ende des Programms?",
+      "example": "m03/l03/quiz-value-copy.cs",
       "options": [
         {
           "text": "`5`",
@@ -426,7 +432,8 @@
       "lesson": "m03-l04",
       "placement": true,
       "type": "single",
-      "question": "Die lokale Funktion `Word` steht im Rumpf von `Label`, und zwar unter der Zeile, die `Word(count)` aufruft. Was passiert?",
+      "question": "Was passiert beim Ausführen des Programms?",
+      "example": "m03/l04/quiz-local-order.cs",
       "options": [
         {
           "text": "Das Programm läuft. Eine lokale Funktion gilt im ganzen Block, in dem sie steht.",
@@ -557,7 +564,8 @@
       "id": "m03-l05-q1",
       "lesson": "m03-l05",
       "type": "single",
-      "question": "Eine Klasse soll `int Value(string text)` und `double Value(string text)` enthalten. Was sagt der Compiler?",
+      "question": "Was sagt der Compiler zu dem Code?",
+      "example": "m03/l05/quiz-same-signature.snippet.cs",
       "options": [
         {
           "text": "Das ist ein Fehler. Beide Methoden haben dieselbe Signatur, nur der Rückgabetyp unterscheidet sich.",
@@ -635,7 +643,8 @@
       "id": "m03-l05-q5",
       "lesson": "m03-l05",
       "type": "single",
-      "question": "Die Klasse `Display` hat `Show(int value)` und `Show(double value)`. `long total = 40;` ist deklariert. Welche Überladung ruft `Display.Show(total)` auf?",
+      "question": "Welche Überladung ruft `Display.Show(total)` im Programm auf?",
+      "example": "m03/l05/quiz-long-overload.cs",
       "options": [
         {
           "text": "Die mit `double`, weil sich `long` implizit in `double` umwandeln lässt.",
@@ -702,7 +711,8 @@
       "lesson": "m03-l06",
       "placement": true,
       "type": "single",
-      "question": "Die lokale Variable `fallback` hat den Wert `3`. Ein Parameter wird als `int max = fallback` deklariert. Was sagt der Compiler?",
+      "question": "Was sagt der Compiler zu dem Code?",
+      "example": "m03/l06/quiz-default-variable.snippet.cs",
       "options": [
         {
           "text": "Das ist ein Fehler. Der Standardwert muss ein konstanter Ausdruck sein.",
@@ -1030,7 +1040,8 @@
       "id": "m03-l08-q4",
       "lesson": "m03-l08",
       "type": "single",
-      "question": "Eine Methode hat den Parameter `out int result` und weist ihn auf einem Weg nicht zu. Was gilt?",
+      "question": "Was gilt für den Code?",
+      "example": "m03/l08/quiz-out-unassigned.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler.",
@@ -1057,7 +1068,8 @@
       "id": "m03-l08-q5",
       "lesson": "m03-l08",
       "type": "single",
-      "question": "Gegeben ist `void Reset(ref int number) { number = 0; }`. Es gilt `int x = 5;` und danach der Aufruf `Reset(ref x);`. Welchen Wert hat `x`?",
+      "question": "Welchen Wert hat `x` am Ende des Programms?",
+      "example": "m03/l08/quiz-ref-reset.cs",
       "options": [
         {
           "text": "`0`",
@@ -1125,7 +1137,8 @@
       "id": "m03-l09-q2",
       "lesson": "m03-l09",
       "type": "single",
-      "question": "Es gilt `var a = (Count: 1, Name: \"x\"); var b = a; b.Count = 2;`. Welchen Wert hat danach `a.Count`?",
+      "question": "Welchen Wert hat `a.Count` am Ende des Programms?",
+      "example": "m03/l09/quiz-tuple-copy.cs",
       "options": [
         {
           "text": "`1`, denn `b` ist eine eigene Kopie.",
@@ -1177,7 +1190,8 @@
       "id": "m03-l09-q4",
       "lesson": "m03-l09",
       "type": "single",
-      "question": "Die Methode `(int, string) Pair()` gibt ein Tupel zurück. Welche Typen haben `a` und `b` nach `var (a, b) = Pair();`?",
+      "question": "Welche Typen haben `a` und `b` im Programm?",
+      "example": "m03/l09/quiz-deconstruct.cs",
       "options": [
         {
           "text": "`a` ist ein `int`, `b` ein `string`.",
@@ -1198,7 +1212,8 @@
       "id": "m03-l09-q5",
       "lesson": "m03-l09",
       "type": "single",
-      "question": "Es gilt `(string User, int Failures) x = (\"bob\", 5);`. Ist `(string Name, int Count) y = x;` erlaubt?",
+      "question": "Ist die Zuweisung an `y` im Programm erlaubt?",
+      "example": "m03/l09/quiz-tuple-rename.cs",
       "options": [
         {
           "text": "Ja. Die Typen der Elemente passen, die Namen sind nicht Teil des Laufzeittyps.",
@@ -1267,7 +1282,8 @@
       "id": "m03-l10-q2",
       "lesson": "m03-l10",
       "type": "single",
-      "question": "Die Methode `Countdown(int number)` gibt `number` aus und ruft dann `Countdown(number - 1)` auf. Sie hat keinen Basisfall. Was passiert bei `Countdown(3)`?",
+      "question": "Was passiert beim Ausführen des Codes?",
+      "example": "m03/l10/quiz-no-base-case.snippet.cs",
       "options": [
         {
           "text": "Die Aufrufe hören nicht auf, der Aufrufstapel läuft über, und das Programm wird beendet.",
@@ -1295,7 +1311,8 @@
       "lesson": "m03-l10",
       "placement": true,
       "type": "single",
-      "question": "`Show(3)` gibt `enter 3` aus, ruft `Show(2)` auf und gibt danach `leave 3` aus. `Show(2)` verhält sich ebenso mit `Show(1)`. Warum erscheint `leave 1` vor `leave 2`?",
+      "question": "Warum erscheint `leave 1` im Programm vor `leave 2`?",
+      "example": "m03/l10/quiz-leave-order.cs",
       "options": [
         {
           "text": "Der Frame von `Show(1)` liegt oben auf dem Aufrufstapel. Der Aufruf muss enden, bevor `Show(2)` weiterläuft.",

@@ -460,7 +460,8 @@
       "placement": true,
       "placementLessons": ["m05-l04"],
       "type": "single",
-      "question": "Ein `foreach` geht durch eine Liste und ruft in einem Durchlauf `list.Remove(...)` für ein Element in der Mitte auf. Was passiert?",
+      "question": "Was passiert beim Ausführen des Codes?",
+      "example": "m05/l05/quiz-remove-in-foreach.snippet.cs",
       "options": [
         {
           "text": "Beim nächsten Schritt der Schleife bricht das Programm zur Laufzeit ab.",
@@ -483,7 +484,8 @@
       "id": "m05-l05-q3",
       "lesson": "m05-l05",
       "type": "single",
-      "question": "Was geschieht bei `foreach (string user in users) { user = \"carol\"; }`?",
+      "question": "Was geschieht bei der Schleife im Code?",
+      "example": "m05/l05/quiz-assign-iteration-variable.snippet.cs",
       "options": [
         {
           "text": "Der Compiler lehnt die Zuweisung ab, weil die Iterationsvariable nur gelesen werden kann.",
@@ -905,7 +907,8 @@
       "id": "m05-l09-q2",
       "lesson": "m05-l09",
       "type": "single",
-      "question": "Nacheinander wurden `Push(1)`, `Push(2)` und `Push(3)` aufgerufen. Was liefert `Pop()`?",
+      "question": "Was liefert `Pop()` im Programm?",
+      "example": "m05/l09/quiz-stack-pop.cs",
       "options": [
         {
           "text": "3, das zuletzt abgelegte Element.",
@@ -1016,7 +1019,8 @@
       "lesson": "m05-l10",
       "placement": true,
       "type": "single",
-      "question": "Es gilt `string text = \"alice\";`. Danach steht die Zeile `text.Replace(\"a\", \"A\");` allein. Was steht danach in `text`?",
+      "question": "Was steht am Ende des Programms in `text`?",
+      "example": "m05/l10/quiz-discarded-replace.cs",
       "options": [
         {
           "text": "`alice`",
