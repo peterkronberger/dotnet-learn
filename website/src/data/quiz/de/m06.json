@@ -61,7 +61,8 @@
       "lesson": "m06-l01",
       "placement": true,
       "type": "single",
-      "question": "Es gilt `Counter x = new Counter(); Counter y = x;`. Wie viele Objekte gibt es danach, und worauf zeigen `x` und `y`?",
+      "question": "Wie viele Objekte gibt es nach dem Code, und worauf zeigen `x` und `y`?",
+      "example": "m06/l01/quiz-two-variables.cs",
       "options": [
         {
           "text": "Zwei Objekte: `y` bekommt eine Kopie des Objekts von `x`.",
@@ -217,7 +218,8 @@
       "lesson": "m06-l03",
       "placement": true,
       "type": "single",
-      "question": "In der Klasse `Counter` mit `private int value;` steht die Methode `public bool SameValueAs(Counter other) { return value == other.value; }`. Warum übersetzt `other.value`?",
+      "question": "Warum übersetzt der Zugriff `other.value` in `SameValueAs`, obwohl `value` privat ist?",
+      "example": "m06/l03/quiz-same-value.cs",
       "options": [
         {
           "text": "`private` beschränkt den Zugriff auf den Programmtext der Klasse. Die Methode steht in `Counter` und darf `value` jedes `Counter`-Objekts lesen.",
@@ -524,7 +526,8 @@
       "placement": true,
       "placementLessons": ["m06-l05"],
       "type": "single",
-      "question": "`Title` ist eine Eigenschaft mit `{ get; init; }`, und `alert` wurde mit `new() { Title = \"Disk full\" }` erzeugt. Was passiert bei `alert.Title = \"Other\";` in der nächsten Zeile?",
+      "question": "Was passiert bei der Zuweisung `alert.Title = \"Other\";` im Code?",
+      "example": "m06/l06/quiz-init-assign.snippet.cs",
       "options": [
         {
           "text": "Der Compiler lehnt die Zuweisung ab, weil `init` nur beim Erzeugen des Objekts erlaubt.",
@@ -917,7 +920,8 @@
       "id": "m06-l09-q4",
       "lesson": "m06-l09",
       "type": "single",
-      "question": "Das Programm hat `using Alerts.Mail;` und `using Alerts.Sms;`. Beide Namespaces enthalten eine Klasse `Notice`. Was passiert bei `Notice notice = …;`?",
+      "question": "Beide Namespaces enthalten eine Klasse `Notice`. Was passiert im Code bei `Notice notice = …;`?",
+      "example": "m06/l09/quiz-ambiguous-type.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, weil `Notice` mehrdeutig ist. Ein `using`-Alias oder der vollqualifizierte Name löst das.",
