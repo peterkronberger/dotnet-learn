@@ -1,10 +1,12 @@
 import React, {useId, useState} from 'react';
 import clsx from 'clsx';
 import Translate from '@docusaurus/Translate';
+import CodeBlock from '@theme/CodeBlock';
 import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
 import DeferredActions, {useEditFocus} from './DeferredActions';
 import {renderInline} from './QuizText';
+import {getExample} from '../../data/quiz/examples';
 import styles from './styles.module.css';
 
 // Shared implementation of `single` (radio group) and `multi` (checkboxes).
@@ -16,6 +18,11 @@ export default function Choice({question, multi, onResult, deferred = false}) {
   const reveal = checked && !deferred;
   const {formRef, requestFocus} = useEditFocus();
   const options = question.options;
+  // Optional stimulus: code shown above the question text.
+  const example = question.example === undefined ? null : getExample(question.example);
+  if (question.example !== undefined && !example) {
+    throw new Error(`Quiz "${question.id}": example "${question.example}" not found`);
+  }
   const pinnedLast = options.flatMap((o, i) => (o.pin === 'last' ? [i] : []));
   const {order, ready, reshuffle} = useShuffledOrder(options.length, {pinnedLast});
 
@@ -59,6 +66,7 @@ export default function Choice({question, multi, onResult, deferred = false}) {
 
   return (
     <form className={styles.quiz} onSubmit={check} ref={formRef}>
+      {example && <CodeBlock language="csharp">{example.code.replace(/\n+$/, '')}</CodeBlock>}
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
         <div className={clsx(!ready && styles.shuffling)}>

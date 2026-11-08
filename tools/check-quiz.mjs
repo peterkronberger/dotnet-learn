@@ -94,6 +94,14 @@ function validate(q) {
       if (q.type === 'multi' && correct < 1) errors.push(`${w}: multi needs at least one correct option`);
     }
   }
+  if ((q.type === 'single' || q.type === 'multi') && q.example !== undefined) {
+    if (typeof q.example !== 'string' || !q.example) errors.push(`${w}: example must be a non-empty string`);
+    else {
+      const cs = join(website, 'examples', q.example);
+      if (!existsSync(cs)) errors.push(`${w}: example ${q.example} not found`);
+      else if (!q.example.endsWith('.snippet.cs') && !existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
+    }
+  }
   if (q.type === 'output') {
     if (!q.example) errors.push(`${w}: output needs example`);
     else {

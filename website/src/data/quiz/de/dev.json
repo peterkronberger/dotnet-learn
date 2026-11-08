@@ -92,6 +92,19 @@
         { "left": "`double`", "right": "Lizenzkosten in Euro", "misconception": "dev-l01-demo", "feedback": "`double` rechnet binär und kann Dezimalbrüche wie `0.1` nicht exakt darstellen; für Geldbeträge ist `decimal` gedacht." }
       ],
       "explanation": "`int` zählt ganze Dinge, `decimal` rechnet Dezimalwerte exakt (Geld), `double` passt zu Messwerten, bei denen kleine Rundungsfehler keine Rolle spielen."
+    },
+    {
+      "id": "dev-l01-q9",
+      "lesson": "dev-l01",
+      "type": "single",
+      "example": "dev/quiz-recognition.cs",
+      "question": "Welches Konzept brauchst du für diesen Code?",
+      "options": [
+        { "text": "Ganzzahldivision und Rest", "correct": true },
+        { "text": "Schleife mit Zähler" },
+        { "text": "Zeichenketten zusammenfügen" }
+      ],
+      "explanation": "Der Code teilt zwei `int`-Werte mit `/` und holt den Rest mit `%`."
     }
   ]
 }

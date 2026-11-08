@@ -40,6 +40,7 @@ Rule: option texts, option `feedback`, `explanation` and `wrongMatches[].feedbac
 
 - `single`: `options` (at least 2) with exactly one option `correct: true`.
 - `multi`: `options` (at least 2) with at least one correct option.
+- `single`/`multi`, optional `example` (path as for `find-bug`): the code is shown above the question text. Use it for the recognition step of review lessons.
 - Option: `text` (required), `correct`, `feedback` (why it is wrong or right), `misconception` (ID of an "Achtung" box, `<lesson_id>-<kebab-slug>`), `pin` (`"last"`, optional, only on `single`/`multi` options: the option is always shown after all shuffled options; several pinned options keep their data order). Use it for options that only make sense at the end, e.g. "Keine der genannten" or "Alle genannten". Such summary options must have `"pin": "last"`.
 - `output`: `example` = path relative to `website/examples/`. The code comes from `<example>.cs`, the expected output from `<example>.out.txt` (CI snapshot).
 - `explain`: `modelAnswer` (required). The learner's answer is not stored; self-rating `correct`/`partial`/`wrong`.

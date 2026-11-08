@@ -53,6 +53,13 @@ export function validateQuestion(q) {
       if (q.type === 'single' && correct !== 1) errors.push(`${where}: single needs exactly one correct option`);
       if (q.type === 'multi' && correct < 1) errors.push(`${where}: multi needs at least one correct option`);
     }
+    if (q.example !== undefined) {
+      if (typeof q.example !== 'string' || !q.example) {
+        errors.push(`${where}: example must be a non-empty string`);
+      } else if (!getExample(q.example)) {
+        errors.push(`${where}: example ${q.example} not found`);
+      }
+    }
   }
   if (q.type === 'output' && (typeof q.example !== 'string' || !q.example)) {
     errors.push(`${where}: output needs example`);

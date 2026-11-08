@@ -175,8 +175,11 @@ Coverage: W1 = M1–M4, W2 = M5–M8, W3 = M9–M11, W4 = M12–M14. The concept
 
 Every task is a block with a neutral heading `### Aufgabe <n>`. Never use the topic name, because the name would give away the recognition step.
 
-1. Recognition step: a `single` question "Welches Konzept brauchst du hier?" with 3–4 concept names from the covered modules as options. The `explanation` names the concept and the original lesson.
-2. The task itself: a quiz question, or a runner task with the pattern prediction → runner → solution and explanation (see "Practice-example pattern").
+1. Recognition step: one `single` question. It **first shows the stimulus** of the task, **then** asks "Welches Konzept brauchst du hier?" (or "… für diesen Code?") with 3–4 concept names from the covered modules as options.
+   - The stimulus is the code of the task (field `example`, or inline code in `question` for one line) or, for a writing task, the task statement and its start code (field `example`). The stimulus must not name the correct concept.
+   - The `explanation` names the concept and the original lesson.
+   - Reason: a learner can only choose a concept when the problem is visible; and every question can be shown alone in the review session, so it must be self-contained.
+2. The task itself: a quiz question, or a runner task with the pattern prediction → runner → solution and explanation (see "Practice-example pattern"). The task question may show the same code again.
 
 Two neighbouring task blocks never come from the same covered module.
 
