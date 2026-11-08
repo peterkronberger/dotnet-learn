@@ -102,7 +102,8 @@
       "id": "m09-l01-q7",
       "lesson": "m09-l01",
       "type": "multi",
-      "question": "Gegeben sind `static void Swap<T>(ref T x, ref T y)` sowie `int a = 1; int b = 2; string s = \"s\";`. Welche Aufrufe lassen sich übersetzen?",
+      "question": "Welche Aufrufe von `Swap` lassen sich im Code übersetzen?",
+      "example": "m09/l01/quiz-swap-calls.snippet.cs",
       "options": [
         { "text": "`Swap(ref a, ref b);`", "correct": true },
         { "text": "`Swap<int>(ref a, ref b);`", "correct": true },
@@ -200,7 +201,8 @@
       "lesson": "m09-l02",
       "type": "single",
       "placement": true,
-      "question": "Die generische Klasse `Store<T>` hat ein statisches Feld `Created`. Das Programm benutzt `Store<int>` und `Store<string>`. Wie viele Exemplare von `Created` gibt es?",
+      "question": "Wie viele Exemplare des statischen Felds `Created` gibt es im Programm?",
+      "example": "m09/l02/quiz-static-per-type.cs",
       "options": [
         {
           "text": "Zwei: eins für `Store<int>` und eins für `Store<string>`.",
@@ -897,7 +899,8 @@
       "id": "m09-l06-q4",
       "lesson": "m09-l06",
       "type": "single",
-      "question": "Welche der beiden Klassen ist selbst generisch?\n\n`class EventStore : IStore<LogEvent>`\n\n`class Store<T> : IStore<T>`",
+      "question": "Welche der beiden Klassen `EventStore` und `Store<T>` ist selbst generisch?",
+      "example": "m09/l06/quiz-generic-classes.snippet.cs",
       "options": [
         {
           "text": "Nur `Store<T>`. `EventStore` implementiert die konstruierte Schnittstelle `IStore<LogEvent>`.",
@@ -965,7 +968,8 @@
       "id": "m09-l06-q7",
       "lesson": "m09-l06",
       "type": "single",
-      "question": "Gegeben sind `delegate TResult Transformer<TInput, TResult>(TInput input);` und `static int Length(string text)`. Was bewirkt `Transformer<string, int> t = Length;` und danach `t(\"hello\")`?",
+      "question": "Was bewirkt die Zuweisung an `t`, und was geschieht beim Aufruf `t(\"hello\")`?",
+      "example": "m09/l06/quiz-transformer-call.cs",
       "options": [
         {
           "text": "`t` verweist auf die Methode `Length`. Der Aufruf `t(\"hello\")` ruft sie auf und liefert 5.",

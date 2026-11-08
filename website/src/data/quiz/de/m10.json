@@ -84,7 +84,8 @@
       "id": "m10-l01-q5",
       "lesson": "m10-l01",
       "type": "single",
-      "question": "Die Klasse hat zwei Methoden `Show(int)` und `Show(string)`. Welche läuft nach `Printer<string> printText = Output.Show; printText(\"done\");`?",
+      "question": "Welche Überladung von `Show` läuft im Programm?",
+      "example": "m10/l01/quiz-overload-pick.cs",
       "options": [
         { "text": "`Show(string)`, weil der Delegate-Typ `string` als Parameter hat.", "correct": true },
         {
@@ -106,7 +107,8 @@
       "id": "m10-l01-q6",
       "lesson": "m10-l01",
       "type": "single",
-      "question": "`Limit limit = new Limit(10); NumberCheck below = limit.IsBelow; limit.Value = 5; below(8);` Was liefert der letzte Aufruf, wenn `IsBelow(number)` den Vergleich `number < Value` zurückgibt?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l01/quiz-limit-target.cs",
       "options": [
         { "text": "`False`, weil der Delegate dasselbe Objekt `limit` benutzt, dessen `Value` jetzt 5 ist.", "correct": true },
         {
@@ -322,7 +324,8 @@
       "id": "m10-l03-q2",
       "lesson": "m10-l03",
       "type": "single",
-      "question": "`Func<int, bool> check = n => { Console.WriteLine(\"run\"); return n > 0; };` steht in einem Programm. Wann erscheint `run` in der Ausgabe?",
+      "question": "Wann erscheint `run` in der Ausgabe?",
+      "example": "m10/l03/quiz-block-lambda-body.cs",
       "options": [
         {
           "text": "Sofort bei dieser Zeile, weil das Lambda dort geschrieben steht.",
@@ -628,7 +631,8 @@
       "lesson": "m10-l05",
       "type": "single",
       "placement": true,
-      "question": "`int x = 1; Func<int> read = () => x; x = 5; Console.WriteLine(read());` Was gibt das Programm aus?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m10/l05/quiz-read-after-change.cs",
       "options": [
         {
           "text": "`5`",
@@ -662,7 +666,8 @@
       "id": "m10-l05-q4",
       "lesson": "m10-l05",
       "type": "single",
-      "question": "Eine `for`-Schleife `for (int i = 0; i < 3; i++)` fügt einer Liste in jeder Runde das Lambda `() => i` hinzu. Eine `foreach`-Schleife tut dasselbe mit ihrer Schleifenvariablen. Was stimmt, wenn die Lambdas danach laufen?",
+      "question": "Was stimmt für die Variablen, die die Lambdas im Programm erfassen?",
+      "example": "m10/l05/quiz-loop-variables.cs",
       "options": [
         {
           "text": "Die drei Lambdas der `for`-Schleife teilen sich eine Variable `i`, die der `foreach`-Schleife haben je eine eigene Variable.",
@@ -688,7 +693,8 @@
       "id": "m10-l05-q5",
       "lesson": "m10-l05",
       "type": "single",
-      "question": "`const int Factor = 2; int offset = 10;` Welches Lambda lässt sich übersetzen?",
+      "question": "Welches Lambda lässt sich mit diesen Variablen übersetzen?",
+      "example": "m10/l05/quiz-static-locals.snippet.cs",
       "options": [
         {
           "text": "`static number => number * Factor`",
@@ -713,7 +719,8 @@
       "id": "m10-l05-q6",
       "lesson": "m10-l05",
       "type": "single",
-      "question": "`static Func<int, bool> AtLeast(int threshold) => value => value >= threshold;` Du rufst `AtLeast(2)` und danach `AtLeast(5)` auf. Was stimmt?",
+      "question": "Was stimmt für die beiden Lambdas im Programm?",
+      "example": "m10/l05/quiz-at-least.cs",
       "options": [
         {
           "text": "Jeder Aufruf legt sein eigenes `threshold` an. Das erste Lambda prüft weiter gegen `2`.",
@@ -739,7 +746,8 @@
       "id": "m10-l05-q7",
       "lesson": "m10-l05",
       "type": "single",
-      "question": "Eine Methode erzeugt eine lokale Variable `counter`, gibt ein Lambda zurück, das `counter` erfasst, und endet. Was passiert mit `counter`?",
+      "question": "Was passiert mit `counter`, nachdem `MakeCounter` beendet ist?",
+      "example": "m10/l05/quiz-counter-lifetime.cs",
       "options": [
         {
           "text": "Die Variable lebt mindestens so lange weiter, bis der Delegate nicht mehr erreichbar ist.",
@@ -795,7 +803,8 @@
       "id": "m10-l06-q3",
       "lesson": "m10-l06",
       "type": "single",
-      "question": "`Func<int> read = First; read += Second; read += Third;` Die Methoden geben `1`, `2` und `3` zurück. Was liefert `int result = read();`?",
+      "question": "Was liefert `int result = read();` im Programm?",
+      "example": "m10/l06/quiz-return-values.cs",
       "options": [
         {
           "text": "`3`, den Wert des letzten Ziels. Alle drei Methoden laufen.",
@@ -822,7 +831,8 @@
       "id": "m10-l06-q4",
       "lesson": "m10-l06",
       "type": "single",
-      "question": "`Action log = A; log += B;` Was passiert bei `log -= C;`, wenn `C` nicht in der Aufrufliste steht?",
+      "question": "Was passiert im Programm bei `log -= C;`, wenn `C` nicht in der Aufrufliste steht?",
+      "example": "m10/l06/quiz-remove-missing.cs",
       "options": [
         {
           "text": "Nichts. Die Aufrufliste bleibt `A`, `B`.",
@@ -847,7 +857,8 @@
       "id": "m10-l06-q5",
       "lesson": "m10-l06",
       "type": "single",
-      "question": "`Action log = Print; log -= Print; log();` Was passiert?",
+      "question": "Was passiert beim Aufruf von `log` im Programm?",
+      "example": "m10/l06/quiz-remove-last.cs",
       "options": [
         {
           "text": "Eine `NullReferenceException`, weil `log` nach dem Entfernen des letzten Ziels `null` ist.",
@@ -898,7 +909,8 @@
       "id": "m10-l06-q7",
       "lesson": "m10-l06",
       "type": "single",
-      "question": "`Action log = () => Console.WriteLine(\"a\"); log += () => Console.WriteLine(\"b\"); log -= () => Console.WriteLine(\"b\");` Wie viele Ziele hat `log` danach?",
+      "question": "Wie viele Ziele hat `log` am Ende des Programms?",
+      "example": "m10/l06/quiz-remove-lambda-count.cs",
       "options": [
         {
           "text": "Zwei. Das zweite Lambda ist ein anderer Delegate, `-=` findet es nicht.",
@@ -971,7 +983,8 @@
       "lesson": "m10-l07",
       "type": "single",
       "placement": true,
-      "question": "`Scanner` deklariert `public event Action<string>? Found;`. Außerhalb der Klasse steht `scanner.Found?.Invoke(\"x\");`. Was passiert?",
+      "question": "Was passiert bei der Zeile `scanner.Found?.Invoke(\"x\");`?",
+      "example": "m10/l07/quiz-raise-outside.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler: Ein Event kann von außen nur mit `+=` und `-=` benutzt werden.",
@@ -998,7 +1011,8 @@
       "id": "m10-l07-q4",
       "lesson": "m10-l07",
       "type": "multi",
-      "question": "`Found` ist ein Event der Klasse `Scanner` vom Typ `Action<string>?`. Welche Zeilen übersetzen außerhalb von `Scanner`?",
+      "question": "Welche Zeilen übersetzen außerhalb von `Scanner`?",
+      "example": "m10/l07/quiz-event-outside-lines.snippet.cs",
       "options": [
         {
           "text": "`scanner.Found += Print;`",
