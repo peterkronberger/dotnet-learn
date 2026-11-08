@@ -92,6 +92,19 @@
         { "left": "`double`", "right": "Lizenzkosten in Euro", "misconception": "dev-l01-demo", "feedback": "`double` rechnet binär und kann Dezimalbrüche wie `0.1` nicht exakt darstellen; für Geldbeträge ist `decimal` gedacht." }
       ],
       "explanation": "`int` zählt ganze Dinge, `decimal` rechnet Dezimalwerte exakt (Geld), `double` passt zu Messwerten, bei denen kleine Rundungsfehler keine Rolle spielen."
+    },
+    {
+      "id": "dev-l01-q9",
+      "lesson": "dev-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "dev/quiz-choice-code.cs",
+      "options": [
+        { "text": "`3.5`", "feedback": "Beide Operanden sind `int`, daher gibt es keinen Nachkommateil.", "misconception": "dev-l01-demo" },
+        { "text": "`3`", "correct": true },
+        { "text": "`4`", "feedback": "Der Nachkommateil wird abgeschnitten, nicht gerundet." }
+      ],
+      "explanation": "`7 / 2` ist eine Ganzzahldivision, der Nachkommateil wird abgeschnitten. Das Programm gibt `3` aus."
     }
   ]
 }

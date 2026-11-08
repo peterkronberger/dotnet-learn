@@ -20,6 +20,10 @@
   padding: 0;
 }
 
+.choiceCode {
+  margin-bottom: 0.75rem;
+}
+
 .option {
   display: flex;
   align-items: flex-start;

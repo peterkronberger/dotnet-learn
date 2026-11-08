@@ -81,6 +81,15 @@ function validate(q) {
   else if (!String(q.id).startsWith(`${q.lesson}-q`)) errors.push(`${w}: id must start with "${q.lesson}-q"`);
   if (!TYPES.includes(q.type)) errors.push(`${w}: unknown type "${q.type}"`);
   if (!q.question) errors.push(`${w}: missing question`);
+  if ((q.type === 'single' || q.type === 'multi') && q.example !== undefined) {
+    if (typeof q.example !== 'string' || !q.example || !q.example.endsWith('.cs')) {
+      errors.push(`${w}: example must be a non-empty string`);
+    } else {
+      const cs = join(website, 'examples', q.example);
+      if (!existsSync(cs)) errors.push(`${w}: example ${q.example} not found`);
+      else if (!q.example.endsWith('.snippet.cs') && !existsSync(cs.replace(/\.cs$/, '.out.txt'))) errors.push(`${w}: snapshot .out.txt missing`);
+    }
+  }
   if (q.type === 'single' || q.type === 'multi') {
     if (!Array.isArray(q.options) || q.options.length < 2) errors.push(`${w}: needs at least 2 options`);
     else {

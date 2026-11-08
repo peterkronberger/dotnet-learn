@@ -1,6 +1,8 @@
 import React, {useId, useState} from 'react';
 import clsx from 'clsx';
 import Translate from '@docusaurus/Translate';
+import CodeBlock from '@theme/CodeBlock';
+import {getExample} from '../../data/quiz/examples';
 import {useShuffledOrder} from './shuffle';
 import Feedback from './Feedback';
 import DeferredActions, {useEditFocus} from './DeferredActions';
@@ -9,6 +11,10 @@ import styles from './styles.module.css';
 
 // Shared implementation of `single` (radio group) and `multi` (checkboxes).
 export default function Choice({question, multi, onResult, deferred = false}) {
+  const example = question.example ? getExample(question.example) : undefined;
+  if (question.example && !example) {
+    throw new Error(`Quiz "${question.id}": example "${question.example}" not found`);
+  }
   const groupName = useId();
   const [selected, setSelected] = useState([]);
   const [result, setResult] = useState(null);
@@ -61,6 +67,11 @@ export default function Choice({question, multi, onResult, deferred = false}) {
     <form className={styles.quiz} onSubmit={check} ref={formRef}>
       <fieldset className={styles.fieldset} disabled={checked}>
         <legend className={styles.question}>{renderInline(question.question)}</legend>
+        {example && (
+          <div className={styles.choiceCode}>
+            <CodeBlock language="csharp">{example.code.replace(/\n+$/, '')}</CodeBlock>
+          </div>
+        )}
         <div className={clsx(!ready && styles.shuffling)}>
         {order.map((index) => {
           const option = options[index];
