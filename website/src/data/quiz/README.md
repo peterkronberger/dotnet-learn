@@ -38,8 +38,8 @@ Rule: option texts, option `feedback`, `explanation` and `wrongMatches[].feedbac
 
 ## Types
 
-- `single`: `options` (at least 2) with exactly one option `correct: true`.
-- `multi`: `options` (at least 2) with at least one correct option.
+- `single`: `options` (at least 2) with exactly one option `correct: true`. Optional `example` = path as for `find-bug` (`.cs` with `.out.txt`, or `.snippet.cs`). The code is shown as a code block between the question and the options. The output snapshot is not shown.
+- `multi`: `options` (at least 2) with at least one correct option. Optional `example` as for `single`.
 - Option: `text` (required), `correct`, `feedback` (why it is wrong or right), `misconception` (ID of an "Achtung" box, `<lesson_id>-<kebab-slug>`), `pin` (`"last"`, optional, only on `single`/`multi` options: the option is always shown after all shuffled options; several pinned options keep their data order). Use it for options that only make sense at the end, e.g. "Keine der genannten" or "Alle genannten". Such summary options must have `"pin": "last"`.
 - `output`: `example` = path relative to `website/examples/`. The code comes from `<example>.cs`, the expected output from `<example>.out.txt` (CI snapshot).
 - `explain`: `modelAnswer` (required). The learner's answer is not stored; self-rating `correct`/`partial`/`wrong`.
@@ -47,6 +47,10 @@ Rule: option texts, option `feedback`, `explanation` and `wrongMatches[].feedbac
 - `cloze`: code with blanks. `example` = path as for `output` (complete, runnable code). `blanks` = the blanks in code order (at least one). Each blank is the first unused occurrence of `text`, searched from the end of the previous blank; if `text` is not found, the build and `check-quiz.mjs` fail. Per blank: `text` (solution), optional `accept` (accepted inputs, default `[text]`, compared with all whitespace removed), `hint` (shown when the blank is wrong), `wrongAnswers` (list of `text` plus `feedback` and/or `misconception`). Each blank has the label "Lücke N von M" (blank N of M); the result is shown per blank as text (✓/✗) next to the field.
 - `find-bug`: select the faulty line(s). `example` = path as for `output`; for code that does not compile, a `*.snippet.cs` file (without `.out.txt`). `bugLines` = line numbers (1-based, at least one, inside the file, no duplicates). Exactly one line: radio buttons, otherwise checkboxes. The answer is correct when the selected set is exactly `bugLines`. Optional `lineFeedback`: object `line number` → `{feedback, misconception}`, shown for selected lines. Each line has the label "Zeile N: <code>" (line N: <code>); the result is shown as text (✓/✗) next to the line.
 - `match`: match terms. `pairs` = 2 to 8 objects `{left, right}`; every `left` and every `right` is unique. One `<select>` per left term (label = the left term) with the right entries in random order (new on every view and every retry) and the empty option "Bitte wählen" (please choose). The answer is correct when all matches are right. The result is shown as text (✓/✗) per row, with the correct answer on errors. Optional `wrongMatches`: list of `{left, right, feedback, misconception}` for typical wrong matches (`left`/`right` must appear in `pairs`, and the pair must not be a correct one).
+
+## Code in single/multi questions
+
+Code that the learner must read goes into `example`, not into the question text. Inline backticks in `question` are only for names, types, keywords and one short expression or one short statement. Prefer a runnable `.cs` file (CI checks it, and the correct option can be checked against the `.out.txt`). Use `.snippet.cs` only for code that does not compile on its own. The question text refers to the code as „das Programm“ or „der Code“, never by position words like „oben“.
 
 ## Examples
 
@@ -56,6 +60,8 @@ Rule: option texts, option `feedback`, `explanation` and `wrongMatches[].feedbac
   "explanation": "…" }
 { "id": "m01-l03-q2", "lesson": "m01-l03", "type": "multi", "question": "…",
   "options": [ { "text": "…", "correct": true }, { "text": "…", "correct": true }, { "text": "…" } ], "explanation": "…" }
+{ "id": "m01-l03-q5", "lesson": "m01-l03", "type": "single", "question": "Was gibt das Programm aus?", "example": "m01/l03/quiz-remainder.cs",
+  "options": [ { "text": "…", "correct": true }, { "text": "…" } ], "explanation": "…" }
 { "id": "m01-l03-q3", "lesson": "m01-l03", "type": "output", "question": "…", "example": "m01/l03/quiz-remainder.cs", "explanation": "…" }
 { "id": "m01-l03-q4", "lesson": "m01-l03", "type": "explain", "question": "…", "modelAnswer": "…\n\n…" }
 ```

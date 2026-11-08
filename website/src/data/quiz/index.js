@@ -40,6 +40,13 @@ export function validateQuestion(q) {
   if (!QUESTION_TYPES.includes(q.type)) errors.push(`${where}: unknown type "${q.type}"`);
   if (typeof q.question !== 'string' || !q.question) errors.push(`${where}: missing question`);
 
+  if ((q.type === 'single' || q.type === 'multi') && q.example !== undefined) {
+    if (typeof q.example !== 'string' || !q.example || !q.example.endsWith('.cs')) {
+      errors.push(`${where}: example must be a non-empty string`);
+    } else if (!getExample(q.example)) {
+      errors.push(`${where}: example ${q.example} or its .out.txt not found`);
+    }
+  }
   if (q.type === 'single' || q.type === 'multi') {
     if (!Array.isArray(q.options) || q.options.length < 2) {
       errors.push(`${where}: needs at least 2 options`);
