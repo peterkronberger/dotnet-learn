@@ -72,7 +72,7 @@ public sealed class CSharpRunner
     /// <param name="testsCode">
     /// Optional test code (spike S7). It declares <c>public static class TaskTests</c> with
     /// <c>public static (string Name, bool Visible, bool Passed, string Feedback)[] Run()</c>.
-    /// If given, the tests run instead of the program's entry point.
+    /// If given, the program runs first (its output is shown), then the tests run.
     /// </param>
     /// <param name="trace">
     /// Record every step (spike S5). Ignored when tests run. If the instrumented code does not
@@ -161,11 +161,9 @@ public sealed class CSharpRunner
                 hook?.SetValue(null, (Action<int, string[], object?[]>)recorder.Record);
             }
 
-            if (testsTree is not null)
-            {
-                tests = RunTests(loaded);
-            }
-            else
+            // The program always runs first, so its output is shown (also when tests follow).
+            // The tests run the program again with their own captured output.
+            try
             {
                 var entryPoint = ResolveEntryPoint(loaded)
                     ?? throw new InvalidOperationException("Es wurde kein Einstiegspunkt gefunden.");
@@ -178,6 +176,16 @@ public sealed class CSharpRunner
                 {
                     await task;
                 }
+            }
+            catch (Exception) when (testsTree is not null)
+            {
+                // The tests report a failing program themselves.
+            }
+
+            if (testsTree is not null)
+            {
+                Console.SetIn(new StringReader(stdin ?? string.Empty));
+                tests = RunTests(loaded);
             }
         }
         catch (TargetInvocationException ex)
