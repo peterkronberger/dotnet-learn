@@ -5,7 +5,8 @@
       "id": "m08-l01-q1",
       "lesson": "m08-l01",
       "type": "single",
-      "question": "Die Klasse `Device` hat die Eigenschaft `Name` und die Methode `Describe()`. `Printer` ist mit `class Printer : Device` abgeleitet und hat zusätzlich `PagesPerMinute`. Welche Member kann man an einem `Printer`-Objekt aufrufen?",
+      "question": "Welche Member kann man an einem `Printer`-Objekt aufrufen?",
+      "example": "m08/l01/quiz-printer-members.cs",
       "options": [
         {
           "text": "`Name`, `Describe()` und `PagesPerMinute`.",
@@ -26,7 +27,8 @@
       "id": "m08-l01-q2",
       "lesson": "m08-l01",
       "type": "single",
-      "question": "`Device` hat nur den Konstruktor `Device(string name)`. `Printer` ist mit `class Printer : Device` abgeleitet und deklariert keinen Konstruktor. Was passiert bei `new Printer(\"office printer\")`?",
+      "question": "Was passiert bei `new Printer(\"office printer\")` im Code?",
+      "example": "m08/l01/quiz-no-printer-constructor.snippet.cs",
       "options": [
         {
           "text": "Der Code lässt sich nicht übersetzen: `Printer` hat keinen Konstruktor mit einem Parameter.",
@@ -154,7 +156,8 @@
       "lesson": "m08-l02",
       "type": "single",
       "placement": true,
-      "question": "`A` deklariert `public virtual string Name()`. `B : A` deklariert `public new string Name()`. Es gilt `A x = new B();`. Welche Version läuft bei `x.Name()`?",
+      "question": "Welche Version läuft bei `x.Name()`?",
+      "example": "m08/l02/quiz-hiding-call.cs",
       "options": [
         {
           "text": "Die Version von `A`, weil `new` nur verdeckt und der Typ der Variablen entscheidet.",
@@ -177,7 +180,8 @@
       "id": "m08-l02-q4",
       "lesson": "m08-l02",
       "type": "single",
-      "question": "`Printer : Device` schreibt `public override string Describe()`. In `Device` steht `public string Describe()` ohne `virtual`. Was meldet der Compiler?",
+      "question": "Was meldet der Compiler für diesen Code?",
+      "example": "m08/l02/quiz-override-without-virtual.snippet.cs",
       "options": [
         {
           "text": "Einen Fehler (CS0506): Eine Methode ohne `virtual`, `abstract` oder `override` kann nicht überschrieben werden.",
@@ -702,7 +706,8 @@
       "id": "m08-l06-q3",
       "lesson": "m08-l06",
       "type": "single",
-      "question": "`Device device = new Scanner(\"archive scanner\");` Was passiert bei `Printer p = (Printer)device;`, wenn `Printer` und `Scanner` von `Device` ableiten?",
+      "question": "Was passiert bei `Printer p = (Printer)device;` im Code?",
+      "example": "m08/l06/quiz-wrong-cast.snippet.cs",
       "options": [
         {
           "text": "Das Programm wirft zur Laufzeit eine `InvalidCastException`.",
@@ -724,7 +729,8 @@
       "id": "m08-l06-q4",
       "lesson": "m08-l06",
       "type": "single",
-      "question": "`Printer printer = new(\"office printer\", 40); Device device = printer; Printer again = (Printer)device;` Was ergibt `object.ReferenceEquals(printer, again)`?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l06/quiz-reference-equals.cs",
       "options": [
         {
           "text": "`True`: Alle drei Variablen verweisen auf dasselbe Objekt.",
@@ -1007,7 +1013,8 @@
       "id": "m08-l08-q3",
       "lesson": "m08-l08",
       "type": "single",
-      "question": "`points` ist eine `List<Point>` mit `Point` als Struct. Es gilt `Point p = points[0]; p.X = 10;`. Was steht danach in `points[0].X`?",
+      "question": "Welchen Wert hat `points[0].X` am Ende des Programms?",
+      "example": "m08/l08/quiz-struct-in-list.cs",
       "options": [
         {
           "text": "Der alte Wert: `p` ist eine Kopie, die Liste enthält das Original.",
@@ -1141,7 +1148,8 @@
       "id": "m08-l09-q2",
       "lesson": "m08-l09",
       "type": "single",
-      "question": "Die Klasse `Ticket` überschreibt weder `Equals` noch `==`. `a` und `b` sind zwei mit `new` erzeugte Objekte mit denselben Werten. Was ergibt `a == b`?",
+      "question": "Was gibt das Programm aus?",
+      "example": "m08/l09/quiz-class-equality.cs",
       "options": [
         {
           "text": "`False`, weil `==` bei Klassen die Verweise vergleicht.",
@@ -1503,7 +1511,8 @@
       "id": "m08-l11-q5",
       "lesson": "m08-l11",
       "type": "single",
-      "question": "`Plain` hat die Eigenschaften `Name` und `Number` und setzt kein Interface um. Was passiert bei `items.Sort();` für eine `List<Plain>` mit zwei Objekten?",
+      "question": "Was passiert bei `items.Sort();` im Code?",
+      "example": "m08/l11/quiz-sort-plain.snippet.cs",
       "options": [
         {
           "text": "`Sort` sortiert nach `Name`, der ersten Eigenschaft.",

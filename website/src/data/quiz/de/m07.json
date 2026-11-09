@@ -135,7 +135,8 @@
       "lesson": "m07-l02",
       "placement": true,
       "type": "single",
-      "question": "Ein `try` hat zuerst `catch (Exception ex)` und danach `catch (FormatException)`. Was passiert?",
+      "question": "Was passiert mit diesem Code?",
+      "example": "m07/l02/quiz-catch-order.snippet.cs",
       "options": [
         {
           "text": "Der Compiler meldet einen Fehler, weil die allgemeine Klausel die zweite nie erreichen lässt.",
@@ -456,7 +457,8 @@
       "id": "m07-l04-q5",
       "lesson": "m07-l04",
       "type": "single",
-      "question": "Eine Methode hat `try { … } finally { … }` ohne `catch`. Im `try`-Block wird eine Exception ausgelöst, die keine andere Stelle fängt. Was passiert mit dem `finally`-Block?",
+      "question": "Im `try`-Block wird eine Exception ausgelöst, die keine andere Stelle fängt. Was passiert mit dem `finally`-Block?",
+      "example": "m07/l04/quiz-finally-unhandled.snippet.cs",
       "options": [
         {
           "text": "Er läuft, bevor die Exception nach außen weitergegeben wird.",
