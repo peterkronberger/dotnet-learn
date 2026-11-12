@@ -1,0 +1,3 @@
+instance method
+extension method
+extension method, place lab
