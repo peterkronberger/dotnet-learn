@@ -1,0 +1,6 @@
+iterator created
+start of the body
+got one
+after the first yield return
+got two
+end of the body

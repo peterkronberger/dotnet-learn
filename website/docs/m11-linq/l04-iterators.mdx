@@ -1,0 +1,197 @@
+---
+title: "Iteratoren: eigene Folgen mit yield"
+sidebar_position: 4
+description: Eine Methode mit yield return liefert eine Folge Element für Element, und ihr Rumpf läuft nur, solange jemand das nächste Element abruft.
+lesson_id: m11-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import listVsIterator from '!!raw-loader!@site/examples/m11/l04/list-vs-iterator.cs';
+import pause from '!!raw-loader!@site/examples/m11/l04/pause.cs';
+import pauseOutput from '!!raw-loader!@site/examples/m11/l04/pause.out.txt';
+import yieldBreak from '!!raw-loader!@site/examples/m11/l04/yield-break.cs';
+import endless from '!!raw-loader!@site/examples/m11/l04/endless.cs';
+import restriction from '!!raw-loader!@site/examples/m11/l04/restriction.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l04/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l04/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l04/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l04/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l04/seclog-linq-solution.cs';
+
+# Iteratoren: eigene Folgen mit yield
+
+:::note[Lernziele]
+- Du kannst eine Methode mit `yield return` und `yield break` schreiben, die eine Folge liefert.
+- Du kannst vorhersagen, in welcher Reihenfolge Ausgaben aus einem Iterator und aus der `foreach`-Schleife erscheinen.
+- Du kannst erklären, dass der Rumpf eines Iterators erst beim Durchlaufen läuft und nach jedem `yield return` pausiert.
+- Du kannst die wichtigsten Einschränkungen von `yield` nennen.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l05-q2" />
+
+<Quiz id="m09-l05-q2" />
+
+<Quiz id="m11-l03-q1" />
+
+## Eine Folge Element für Element
+
+In Lektion `m09-l05` hast du `IEnumerable<T>` kennengelernt und gelesen, dass es Iteratoren gibt. Hier lernst du sie. Eine Methode, die eine `List<T>` zurückgibt, muss die ganze Liste aufbauen, bevor der Aufrufer das erste Element sieht. Ein <Term id="iterator">Iterator</Term> gibt die Elemente dagegen einzeln her.
+
+Die Methode `SquaresIterator` unten hat den Rückgabetyp `IEnumerable<int>` und enthält `yield return`. Der Aufrufer fragt mit `foreach` nach dem nächsten Element, und die Methode liefert es.
+
+<CSharpRunner id="m11-l04-list-vs-iterator" code={listVsIterator} />
+
+Bei der Liste erscheinen zuerst alle `compute`-Zeilen, dann alle `use`-Zeilen. Beim Iterator wechseln sie sich ab: Jedes Element wird erst berechnet, wenn die Schleife es holt.
+
+## yield return und der Iteratorblock
+
+Ein Block mit `yield return` oder `yield break` heißt <Term id="iterator-block">Iteratorblock</Term>. `yield return wert;` gibt ein Element der Folge zurück und pausiert die Methode an dieser Stelle. Die <Term id="yield-statement">`yield`-Anweisung</Term> gibt es in zwei Formen: `yield return` liefert ein Element, `yield break` beendet die Folge.
+
+Der Rückgabetyp der Methode ist `IEnumerable<T>` oder `IEnumerator<T>` (und die nicht generischen Formen `IEnumerable` und `IEnumerator`). Das `T` ist der Typ der Elemente. Ein normales `return wert;` ist in einem Iteratorblock nicht erlaubt.
+
+Der Compiler baut aus dem Block ein Objekt. Wer die Methode aufruft, bekommt ein <Term id="enumerable">Enumerable</Term>-Objekt. Dessen `GetEnumerator` erzeugt einen <Term id="enumerator">Enumerator</Term> mit `MoveNext` und `Current`, wie du ihn aus Modul 5 kennst. Beim ersten `MoveNext` läuft der Rumpf bis zum ersten `yield return`. Jedes weitere `MoveNext` setzt ihn an der pausierten Stelle fort.
+
+:::info[Vorhersage]
+Der Rumpf von `Steps` enthält Ausgaben. In welcher Reihenfolge erscheinen die sechs Zeilen?
+:::
+
+<CSharpRunner id="m11-l04-pause" code={pause} predict expected={pauseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe beginnt mit `iterator created` und endet mit `end of the body`. Dazwischen wechseln sich die Zeilen des Rumpfes und der Schleife ab.
+
+1. **Aufruf:** `Steps()` führt den Rumpf noch nicht aus. Es entsteht nur das Enumerable-Objekt. Deshalb steht `iterator created` vorn.
+2. **Erstes Element:** Die `foreach`-Schleife ruft `MoveNext` auf. Jetzt läuft der Rumpf bis `yield return "one"`, und `start of the body` erscheint. Die Schleife gibt `got one` aus.
+3. **Fortsetzen:** Das nächste `MoveNext` setzt den Rumpf nach dem ersten `yield return` fort: `after the first yield return`, dann `yield return "two"` und `got two`.
+4. **Ende:** Das dritte `MoveNext` läuft bis zum Ende des Blocks. Dort steht `end of the body`, und die Folge ist zu Ende. Die Schleife läuft nicht mehr.
+
+**Was passiert, wenn …?** … die Schleife nach dem ersten Element mit `break` endet? Dann kommt das zweite `MoveNext` nie, und `after the first yield return` erscheint nicht.
+
+</details>
+
+## yield break, mehrere Läufe und endlose Folgen
+
+`yield break` beendet die Folge, auch mitten im Rumpf. Das Ende des Blocks beendet sie ebenfalls. `yield return` beendet die Methode dagegen nicht: Sie macht beim nächsten `MoveNext` an derselben Stelle weiter.
+
+Jeder Aufruf von `GetEnumerator` beginnt einen neuen Lauf des Rumpfes. Wer dieselbe Folge zweimal mit `foreach` durchläuft, startet den Rumpf also zweimal von vorn.
+
+<CSharpRunner id="m11-l04-yield-break" code={yieldBreak} />
+
+Die erste Zeile zeigt, dass `12` übersprungen wird (größer als das Limit) und die Folge bei `-1` endet. Die zwei weiteren Zeilen zeigen, dass jeder Durchlauf dasselbe Ergebnis liefert.
+
+Weil der Rumpf nur Schritt für Schritt läuft, darf ein Iterator sogar nie enden. Mit `Take` aus Lektion 3 holst du nur so viele Elemente, wie du brauchst. Nur diese Elemente werden berechnet.
+
+<CSharpRunner id="m11-l04-endless" code={endless} />
+
+Ohne `Take` oder ein `break` in der Schleife würde ein Durchlauf der endlosen Folge nie enden.
+
+## Einschränkungen
+
+Der Iteratorblock hat Regeln, die der Compiler prüft:
+
+- `yield` darf nicht in einem `finally`-Block stehen.
+- `yield return` darf nicht in einem `try`-Block stehen, der einen `catch`-Teil hat. `yield break` ist dort erlaubt.
+- `yield` darf nicht in einer anonymen Funktion (zum Beispiel einem Lambda) stehen.
+- Die Parameter der Methode dürfen nicht `ref`, `out` oder `in` sein.
+
+Die folgende Methode verstößt gegen die zweite Regel. Der Compiler meldet: `error CS1626: Cannot yield a value in the body of a try block with a catch clause`.
+
+<CodeBlock language="csharp" title="restriction.snippet.cs">{restriction}</CodeBlock>
+
+## Lückenbeispiel
+
+`EvenNumbers` soll die ersten `count` geraden Zahlen ab `start` liefern. Das Beispiel ist vollständig. Ändere den Aufruf in `EvenNumbers(3, 3)` und danach in `EvenNumbers(3, 0)` und sage jeweils vorher, was herauskommt. Die Teilschritte: 1. zählen, wie viele Zahlen schon geliefert wurden, 2. mit `yield break` enden, 3. gerade Zahlen mit `yield return` liefern.
+
+<CSharpRunner id="m11-l04-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zählen:** `given` zählt die gelieferten Zahlen.
+2. **Beenden:** Sobald `given == count` gilt, endet die Folge mit `yield break`. Bei `count` 0 ist die Folge leer.
+3. **Liefern:** Für jede gerade Zahl `n` gibt `yield return n` ein Element her. Danach wird `given` erhöht.
+
+Für `EvenNumbers(3, 3)` liefert der Iterator 4, 6 und 8.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog wertet das Log mit LINQ-Ketten aus. Die lokale Funktion `ReadUserAndIp` liest Benutzer und IP-Adresse aus einer Zeile, und `sampleLog` enthält die 14 Zeilen des Logs.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Funktion `ReportMatches` mit der Stelle dahinter und die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe nach der lokalen Funktion `ReportMatches` die lokale Funktion `IEnumerable<string> LinesOfUser(IEnumerable<string> lines, string user, int maxCount)`. Sie ist ein Iterator und nicht `static`, weil sie die lokale Funktion `ReadUserAndIp` aufruft. Sie liefert jede Zeile, deren Benutzer `user` ist (Vergleich mit `StringComparison.Ordinal`), und endet mit `yield break`, sobald `maxCount` Zeilen geliefert sind. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Read the lines of one user with an iterator`: Gib `LinesOfUser(sampleLog, "bob", 3)` mit einer `foreach`-Schleife aus (die Zeilen 2, 3 und 5 des Beispiel-Logs). Gib danach `LinesOfUser(sampleLog, "alice", 10)` mit `PrintEach("Lines of alice", …)` aus.
+
+<CSharpRunner id="m11-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Iterator schreiben:** `LinesOfUser` hat den Rückgabetyp `IEnumerable<string>` und enthält `yield return`. Sie ist nicht `static`, weil sie `ReadUserAndIp` aufruft.
+2. **Filtern und zählen:** Für jede Zeile liest `ReadUserAndIp(line).User` den Benutzer. Passt er, liefert `yield return line` die Zeile, und `given` wird erhöht.
+3. **Beenden:** Bei `given == maxCount` endet die Folge mit `yield break`. bob hat 5 Zeilen, es kommen aber nur drei.
+4. **Ausgeben:** Die `foreach`-Schleife holt die Zeilen einzeln. `PrintEach` nimmt ein `IEnumerable<string>` und durchläuft es ebenfalls.
+
+Die Zeilen werden erst bei der Ausgabe gelesen und geprüft. Die Methode `Count()` kommt erst in Lektion 5.
+
+</details>
+
+**Neuer Stand:** SecLog hat einen eigenen Iterator für die Log-Zeilen eines Benutzers.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l04-yield-return-ends-method" />
+
+**„`yield return` beendet die Methode wie `return`.“** Das stimmt nicht. `yield return` gibt ein Element her und pausiert. Beim nächsten `MoveNext` läuft die Methode an derselben Stelle weiter. Nur `yield break` oder das Ende des Blocks beendet die Folge.
+:::
+
+<details>
+<summary>Vertiefung: Was die Spezifikation für Iteratoren festlegt (optional)</summary>
+
+Ein Block mit `yield` ist ein Iteratorblock. Die Regeln für Rückgabetypen, den Typ der Elemente und die Parameter stehen in [Synchronous and asynchronous iterators (§15.15)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1515-synchronous-and-asynchronous-iterators): Der Aufruf der Methode führt den Rumpf nicht aus, sondern erzeugt ein Enumerator-Objekt. Der Rumpf läuft bei `MoveNext`. Ein Enumerable-Objekt liefert bei jedem `GetEnumerator` einen neuen Enumerator.
+
+Wo `yield` stehen darf, legt [The yield statement (§13.15)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement) fest: nicht in einer anonymen Funktion, nicht in einem `finally`-Teil und `yield return` nicht in einem `try` mit `catch`.
+
+</details>
+
+## Zusammenfassung
+
+Eine Methode mit `yield return` ist ein Iterator. Der Compiler baut daraus ein Enumerable-Objekt, und der Rumpf läuft erst beim Durchlaufen. Nach jedem `yield return` pausiert er und macht beim nächsten `MoveNext` an derselben Stelle weiter. Nur `yield break` oder das Ende des Blocks beendet die Folge. Jeder `GetEnumerator`-Aufruf startet einen neuen Lauf. Endlose Iteratoren sind zusammen mit `Take` sicher. Es gibt Einschränkungen: kein `yield` in `finally` und in anonymen Funktionen, kein `yield return` in `try` mit `catch`, keine `ref`-, `out`- oder `in`-Parameter.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l04-q1" />
+
+<Quiz id="m11-l04-q2" />
+
+<Quiz id="m11-l04-q3" />
+
+<Quiz id="m11-l04-q4" />
+
+<Quiz id="m11-l04-q5" />
+
+<Quiz id="m11-l04-q6" />
+
+<Quiz id="m11-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l04-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Iteratoren (C#)](https://learn.microsoft.com/dotnet/csharp/iterators)
+- Microsoft Learn: [Die yield-Anweisung (C#-Spezifikation)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement)
