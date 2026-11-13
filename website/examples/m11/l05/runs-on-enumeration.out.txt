@@ -1,0 +1,17 @@
+Define the query
+First loop
+  checks pear
+use pear
+  checks fig
+  checks plum
+use plum
+Second loop
+  checks pear
+use pear
+  checks fig
+  checks plum
+use plum
+  checks pear
+  checks fig
+  checks plum
+Count: 2

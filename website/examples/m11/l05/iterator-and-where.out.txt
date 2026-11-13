@@ -1,0 +1,15 @@
+Call the iterator
+Loop over the iterator
+  iterator: gives 1
+use 1
+  iterator: gives 2
+use 2
+  iterator: gives 3
+use 3
+Define the query
+Loop over the query
+  lambda: checks 1
+  lambda: checks 2
+use 2
+  lambda: checks 3
+use 3

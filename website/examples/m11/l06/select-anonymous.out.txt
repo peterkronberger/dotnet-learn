@@ -1,0 +1,6 @@
+pear 4 PEAR
+plum 4 PLUM
+kiwi 4 KIWI
+{ Word = pear, Length = 4, Upper = PEAR }
+{ Word = plum, Length = 4, Upper = PLUM }
+{ Word = kiwi, Length = 4, Upper = KIWI }

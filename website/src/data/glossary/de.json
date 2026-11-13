@@ -7054,6 +7054,114 @@
         "title": "The yield statement (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement"
       }
+    },
+    {
+      "id": "deferred-execution",
+      "term": "Deferred execution",
+      "german": "verzögerte Ausführung",
+      "category": "language",
+      "definition": "Eine LINQ-Abfrage läuft nicht dort, wo sie definiert wird, sondern erst beim Durchlaufen, zum Beispiel in einer `foreach`-Schleife. Sie sieht den Stand der Quelle zu diesem Zeitpunkt.",
+      "aliases": [
+        "deferred",
+        "verzögerte Auswertung",
+        "lazy evaluation"
+      ],
+      "related": [
+        "immediate-execution",
+        "multiple-enumeration",
+        "query-operator",
+        "iterator"
+      ],
+      "lesson": "m11-l05",
+      "source": {
+        "title": "Introduction to LINQ queries (Classification of standard query operators by manner of execution)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries#classification-of-standard-query-operators-by-manner-of-execution"
+      }
+    },
+    {
+      "id": "immediate-execution",
+      "term": "Immediate execution",
+      "german": "sofortige Ausführung",
+      "category": "language",
+      "definition": "Ein Operator wie `Count`, `ToList` oder `ToArray` liest die Quelle sofort und liefert einen Wert oder eine Sammlung. `ToList` und `ToArray` erzwingen die Ausführung jeder Abfrage und speichern das Ergebnis.",
+      "aliases": [
+        "immediate",
+        "sofortige Auswertung"
+      ],
+      "related": [
+        "deferred-execution",
+        "multiple-enumeration",
+        "query-operator"
+      ],
+      "lesson": "m11-l05",
+      "source": {
+        "title": "Introduction to LINQ queries (Classification of standard query operators by manner of execution)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries#classification-of-standard-query-operators-by-manner-of-execution"
+      }
+    },
+    {
+      "id": "multiple-enumeration",
+      "term": "Multiple enumeration",
+      "german": "mehrfache Aufzählung",
+      "category": "language",
+      "definition": "Dieselbe Abfrage wird mehrmals durchlaufen, zum Beispiel mit zwei `foreach`-Schleifen oder mit `Count()` nach einer Schleife. Jeder Durchlauf führt die Abfrage erneut aus, mit allen Nebenwirkungen und Kosten.",
+      "aliases": [
+        "mehrfaches Aufzählen",
+        "multiple enumerations"
+      ],
+      "related": [
+        "deferred-execution",
+        "immediate-execution"
+      ],
+      "lesson": "m11-l05",
+      "source": {
+        "title": "Introduction to LINQ queries (Classification of standard query operators by manner of execution)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries#classification-of-standard-query-operators-by-manner-of-execution"
+      }
+    },
+    {
+      "id": "anonymous-type",
+      "term": "Anonymous type",
+      "german": "anonymer Typ",
+      "category": "language",
+      "definition": "Ein Typ ohne Namen, den der Compiler aus `new { Name = …, Count = … }` erzeugt. Er hat nur schreibgeschützte Eigenschaften und wertbasierte Gleichheit. Die Variable braucht `var`.",
+      "aliases": [
+        "anonyme Typen",
+        "anonymous types",
+        "anonymes Objekt"
+      ],
+      "related": [
+        "projection",
+        "tuple",
+        "record",
+        "type-inference"
+      ],
+      "lesson": "m11-l06",
+      "source": {
+        "title": "Anonymous types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/anonymous-types"
+      }
+    },
+    {
+      "id": "projection",
+      "term": "Projection",
+      "german": "Projektion",
+      "category": "language",
+      "definition": "Der Schritt einer Abfrage, der aus jedem Element einen neuen Wert macht, zum Beispiel mit `Select`. Das Ergebnis kann ein einzelner Wert, ein Tupel oder ein anonymes Objekt sein.",
+      "aliases": [
+        "Projektionen",
+        "projecting"
+      ],
+      "related": [
+        "anonymous-type",
+        "query-operator",
+        "tuple"
+      ],
+      "lesson": "m11-l06",
+      "source": {
+        "title": "Enumerable.Select",
+        "url": "https://learn.microsoft.com/dotnet/api/system.linq.enumerable.select"
+      }
     }
   ]
 }
