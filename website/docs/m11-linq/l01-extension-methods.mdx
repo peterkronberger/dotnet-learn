@@ -1,0 +1,212 @@
+---
+title: Erweiterungsmethoden
+sidebar_position: 1
+description: Eine statische Methode mit this vor dem ersten Parameter lässt sich aufrufen wie eine Instanzmethode. Eine Instanzmethode mit gleicher Signatur gewinnt immer.
+lesson_id: m11-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import textExtension from '!!raw-loader!@site/examples/m11/l01/text-extension.cs';
+import textExtensionOutput from '!!raw-loader!@site/examples/m11/l01/text-extension.out.txt';
+import nonStaticClass from '!!raw-loader!@site/examples/m11/l01/non-static-class.snippet.cs';
+import instanceWins from '!!raw-loader!@site/examples/m11/l01/instance-wins.cs';
+import instanceWinsOutput from '!!raw-loader!@site/examples/m11/l01/instance-wins.out.txt';
+import missingUsing from '!!raw-loader!@site/examples/m11/l01/missing-using.snippet.cs';
+import privateMember from '!!raw-loader!@site/examples/m11/l01/private-member.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l01/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l01/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l01/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l01/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l01/seclog-linq-solution.cs';
+
+# Erweiterungsmethoden
+
+:::note[Lernziele]
+- Du kannst eine Erweiterungsmethode schreiben (statische Klasse, erster Parameter mit `this`) und aufrufen.
+- Du kannst erklären, dass ein Aufruf `x.M()` nur eine andere Schreibweise für `Klasse.M(x)` ist.
+- Du kannst vorhersagen, welche Methode der Compiler wählt, wenn eine Instanzmethode und eine Erweiterungsmethode gleich heißen.
+- Du kannst erklären, warum eine Erweiterungsmethode nur mit dem passenden `using` (Namespace) sichtbar ist.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog wertet das Log mit LINQ aus: die häufigsten IP-Adressen und die Fehlversuche pro Stunde.
+- SecLog bewertet gemeldete Nachrichten als „möglicherweise Phishing“ oder „harmlos“ (Nachrichtenbewertung).
+- SecLog bekommt eigene Erweiterungsmethoden und einen eigenen Iterator für die Log-Zeilen.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l08-q3" />
+
+<Quiz id="m10-l03-q3" />
+
+<Quiz id="m09-l05-q1" />
+
+## Eine Methode, die sich schlecht liest
+
+Du schreibst eine Hilfsmethode, die ein `LogEvent` prüft, etwa `IsFailure`. Mit den Mitteln aus Modul 6 landet sie in einer statischen Klasse, und du rufst sie so auf: `Helpers.IsFailure(logEvent)`. Das liest sich anders als die Methoden, die `LogEvent` selbst hat, zum Beispiel `logEvent.Describe()`. Bei einem Typ der Bibliothek wie `string` kannst du die Methode gar nicht in den Typ schreiben, weil du seinen Code nicht ändern kannst.
+
+Eine <Term id="extension-method">Erweiterungsmethode</Term> löst das: Du schreibst die Methode weiter in einer eigenen Klasse, aber rufst sie auf, als gehöre sie zum Typ: `logEvent.IsFailure()`. Der Typ selbst bleibt unverändert.
+
+## Eine Erweiterungsmethode schreiben
+
+Eine Erweiterungsmethode hat drei Merkmale:
+
+1. **Statische Klasse:** Sie steht in einer <Term id="static-class">statischen Klasse</Term>, die nicht generisch und nicht in einer anderen Klasse verschachtelt ist.
+2. **Statische Methode:** Sie ist selbst `static`.
+3. **`this` vor dem ersten Parameter:** Der Typ dieses Parameters ist der Typ, den die Methode erweitert. Das Objekt vor dem Punkt wird beim Aufruf dieser erste Parameter.
+
+:::info[Vorhersage]
+`Shout` und `Wrap` erweitern `string`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m11-l01-text" code={textExtension} predict expected={textExtensionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `HELLO!`, `HELLO!` und `*hello*`.
+
+1. **Methode schreiben:** `Shout(this string text)` steht in der statischen Klasse `TextExtensions`. Das `this` macht die Methode zur Erweiterungsmethode von `string`.
+2. **Als Erweiterung aufrufen:** `"hello".Shout()` sieht aus wie eine Methode von `string`. Der Text vor dem Punkt wird zum Parameter `text`.
+3. **Als statische Methode aufrufen:** `TextExtensions.Shout("hello")` ergibt dasselbe. Der Aufruf `x.M()` ist nur eine andere Schreibweise für `Klasse.M(x)`.
+4. **Weitere Parameter:** `"hello".Wrap("*")` übergibt `"*"` als zweites Argument, also als `mark`.
+
+**Was passiert, wenn …?** … die Klasse `TextExtensions` nicht `static` ist? Dann lehnt der Compiler die Methode ab:
+
+<CodeBlock language="csharp" title="non-static-class.snippet.cs">{nonStaticClass}</CodeBlock>
+
+Der Compiler meldet für Zeile 1 `error CS1106: Extension method must be defined in a non-generic static class`.
+
+</details>
+
+## Instanzmethode oder Erweiterungsmethode?
+
+Was passiert, wenn der Typ schon eine Methode mit demselben Namen hat? Der Compiler sucht bei `x.M()` zuerst unter den Instanzmethoden des Typs. Findet er eine passende, nimmt er sie. Erst wenn keine Instanzmethode passt, sucht er nach einer Erweiterungsmethode.
+
+:::info[Vorhersage]
+Die Klasse `Sensor` hat `Describe()`. Zwei Erweiterungsmethoden heißen ebenfalls `Describe`. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m11-l01-instance" code={instanceWins} predict expected={instanceWinsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `instance method`, `extension method` und `extension method, place lab`.
+
+1. **Instanzmethode zuerst:** `sensor.Describe()` findet die Instanzmethode `Describe()` von `Sensor`. Die Erweiterungsmethode mit gleicher Signatur wird übersprungen, ohne Warnung.
+2. **Statische Form:** `SensorExtensions.Describe(sensor)` nennt die Klasse der Erweiterungsmethode. Hier gibt es keine Suche, also läuft genau sie.
+3. **Andere Signatur:** `sensor.Describe("lab")` passt zu keiner Instanzmethode. Deshalb kommt die Erweiterungsmethode mit dem zweiten Parameter zum Zug.
+
+**Was passiert, wenn …?** … die Instanzmethode `Describe(string)` heißt und du `sensor.Describe("lab")` aufrufst? Dann passt sie, und die Erweiterungsmethode läuft nicht mehr.
+
+</details>
+
+## Wann der Compiler die Methode findet
+
+Zwei Bedingungen gelten für jede Erweiterungsmethode.
+
+**Der Namespace muss sichtbar sein.** Die Methode ist nur verfügbar, wenn ihr <Term id="namespace">Namespace</Term> mit einer <Term id="using-directive">`using`-Direktive</Term> eingebunden ist. Ohne `using` meldet der Compiler, dass der Typ die Methode nicht hat:
+
+<CodeBlock language="csharp" title="missing-using.snippet.cs">{missingUsing}</CodeBlock>
+
+Der Compiler meldet für Zeile 18 `error CS1061: 'string' does not contain a definition for 'Shout' and no accessible extension method 'Shout' accepting a first argument of type 'string' could be found (are you missing a using directive or an assembly reference?)`. Mit `using Tools;` vor `namespace App` ist die Methode sichtbar.
+
+**Private Member bleiben unsichtbar.** Die Methode steht außerhalb des Typs. Sie sieht nur, was jeder andere Code auch sieht:
+
+<CodeBlock language="csharp" title="private-member.snippet.cs">{privateMember}</CodeBlock>
+
+Der Compiler meldet für Zeile 10 `error CS0122: 'Sensor.secret' is inaccessible due to its protection level`.
+
+## Lückenbeispiel
+
+`IsLong` soll eine Erweiterungsmethode von `string` werden. Sie gibt `true` zurück, wenn der Text mehr als `limit` Zeichen hat. Rufe sie danach wie eine Instanzmethode auf. Die Zeichenzahl liefert `text.Length`.
+
+<CSharpRunner id="m11-l01-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Methode erweitern:** `public static bool IsLong(this string text, int limit)`.
+2. **Ergebnis:** `return text.Length > limit;`
+3. **Aufruf:** `Console.WriteLine(text.IsLong(5));` gibt `True` aus, denn `extension` hat 9 Zeichen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest das Log in `LogEvent`-Objekte, findet Vorfälle mit austauschbaren Regeln und meldet sie über ein Event.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den letzten Block `// Raise an event when an incident is found` und das Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe am Ende des Namensraums `SecLog.Model`, nach `IncidentMonitor`, die statische Klasse `LogEventExtensions`. Sie hat zwei Erweiterungsmethoden für `LogEvent`: `public static bool IsFailure(this LogEvent logEvent)` ist `true`, wenn `EventType` gleich `"login-failed"` ist. `public static bool IsFrom(this LogEvent logEvent, string user)` ist `true`, wenn `User` gleich `user` ist. Schreibe danach, vor der Zeile `// End with exit code 0 …`, den Block `// Ask log events with extension methods`: Er zählt mit einer `foreach`-Schleife und `IsFailure()` die Fehlversuche in `logEvents` und gibt `Failed events: <Anzahl>` aus. Dann gibt er `Event 2 is from bob: ` mit `logEvents[1].IsFrom("bob")` aus und `Static form: ` mit demselben Aufruf in der statischen Form `LogEventExtensions.IsFrom(logEvents[1], "bob")`.
+
+<CSharpRunner id="m11-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Klasse anlegen:** `LogEventExtensions` ist `static`. Sie steht im Namensraum `SecLog.Model`, den das Programm oben mit `using SecLog.Model;` einbindet. Deshalb sind die Methoden im Programm sichtbar.
+2. **Methoden schreiben:** `IsFailure` vergleicht `EventType` mit `"login-failed"`, `IsFrom` vergleicht `User` mit dem Parameter. Beide `this`-Parameter haben den Typ `LogEvent`.
+3. **Zählen:** Die Schleife erhöht `failedEvents` für jedes Ereignis, bei dem `logEvent.IsFailure()` wahr ist. Das sind 7 von 14 Zeilen.
+4. **Zwei Schreibweisen:** `logEvents[1].IsFrom("bob")` und `LogEventExtensions.IsFrom(logEvents[1], "bob")` sind derselbe Aufruf.
+
+</details>
+
+**Neuer Stand:** SecLog stellt Fragen an ein `LogEvent` mit `logEvent.IsFailure()` und `logEvent.IsFrom("bob")`. Die Hilfsmethoden stehen in einer eigenen Klasse, `LogEvent` selbst ist unverändert.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l01-extension-beats-instance-method" />
+
+**„Eine Erweiterungsmethode ersetzt eine Instanzmethode mit gleichem Namen.“** Das stimmt nicht. Hat der Typ eine passende Instanzmethode, nimmt der Compiler immer diese. Die Erweiterungsmethode wird ohne Warnung ignoriert und lässt sich nur noch in der statischen Form aufrufen.
+:::
+
+<details>
+<summary>Vertiefung: Wie der Compiler die Methode sucht (optional)</summary>
+
+Eine Erweiterungsmethode wird in einer nicht generischen, nicht verschachtelten statischen Klasse deklariert, und der erste Parameter trägt `this` ([§15.6.10 Extension methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15610-extension-methods)). Beim Aufruf `x.M(…)` sucht der Compiler zuerst normal nach einer Instanzmethode. Nur wenn er keine anwendbare findet, behandelt er den Aufruf als Aufruf einer Erweiterungsmethode und schreibt ihn in einen statischen Aufruf um ([§12.8.10.3 Extension method invocations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128103-extension-method-invocations)).
+
+Weil eine Erweiterungsmethode außerhalb des Typs steht, gelten für sie dieselben Zugriffsregeln wie für jeden anderen Code: `private` Member des erweiterten Typs sind nicht erreichbar.
+
+</details>
+
+## Zusammenfassung
+
+Eine Erweiterungsmethode ist eine statische Methode in einer statischen Klasse, deren erster Parameter `this` trägt. Der Aufruf `x.M()` ist eine andere Schreibweise für `Klasse.M(x)`. Der Compiler wählt eine Instanzmethode immer vor einer Erweiterungsmethode. Die Erweiterungsmethode ist nur mit dem passenden `using` sichtbar und kommt nicht an `private` Member heran.
+
+Die Operatoren von LINQ sind Erweiterungsmethoden auf `IEnumerable<T>`. Das lernst du in Lektion 3.
+
+<Forward concepts={['LINQ']} module="11" />
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l01-q1" />
+
+<Quiz id="m11-l01-q2" />
+
+<Quiz id="m11-l01-q3" />
+
+<Quiz id="m11-l01-q4" />
+
+<Quiz id="m11-l01-q5" />
+
+<Quiz id="m11-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m11-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Extension members](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods)
+- C#-Spezifikation: [§15.6.10 Extension methods](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15610-extension-methods)

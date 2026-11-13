@@ -1,0 +1,198 @@
+---
+title: "Erweiterungsmember: Eigenschaften und statische Member"
+sidebar_position: 2
+description: Mit C# 14 fügen Erweiterungsblöcke einem Typ Eigenschaften und statische Member hinzu, ohne Daten im Objekt zu speichern.
+lesson_id: m11-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import oldForm from '!!raw-loader!@site/examples/m11/l02/old-form.cs';
+import extensionBlock from '!!raw-loader!@site/examples/m11/l02/extension-block.cs';
+import extensionBlockOutput from '!!raw-loader!@site/examples/m11/l02/extension-block.out.txt';
+import computedEachTime from '!!raw-loader!@site/examples/m11/l02/computed-each-time.cs';
+import computedEachTimeOutput from '!!raw-loader!@site/examples/m11/l02/computed-each-time.out.txt';
+import storesData from '!!raw-loader!@site/examples/m11/l02/stores-data.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l02/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l02/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l02/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l02/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l02/seclog-linq-solution.cs';
+
+# Erweiterungsmember: Eigenschaften und statische Member
+
+<Since csharp="14" dotnet="10" />
+
+:::note[Lernziele]
+- Du kannst einen Erweiterungsblock `extension(Typ name) { … }` lesen und schreiben.
+- Du kannst eine Erweiterungseigenschaft und einen statischen Erweiterungsmember für einen bestehenden Typ schreiben und aufrufen.
+- Du kannst erklären, warum eine Erweiterungseigenschaft keine neuen Daten im Objekt speichern kann.
+- Du kannst eine Erweiterungsmethode der alten Form (Lektion 1) in die Blockform umschreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l01-q3" />
+
+<Quiz id="m06-l06-q1" />
+
+<Quiz id="m06-l08-q1" />
+
+## Mehr als Methoden
+
+Mit einer Erweiterungsmethode aus Lektion 1 kannst du einem Typ nur Methoden hinzufügen. Soll ein Wert wie eine Eigenschaft wirken, schreibst du bis C# 13 eine Methode mit Namen wie `GetFahrenheit()`, und der Aufruf trägt Klammern. Auch ein Wert, der zum Typ gehört statt zu einem Objekt, ließ sich nicht erweitern.
+
+C# 14 bringt dafür <Term id="extension-block">Erweiterungsblöcke</Term>. Sie liefern <Term id="extension-member">Erweiterungsmember</Term>: Erweiterungsmethoden, Erweiterungseigenschaften und statische Erweiterungsmember. Der Block steht wie die alten Methoden in einer statischen Klasse.
+
+**So schrieb man es vorher:** Die Methoden tragen `this` vor dem ersten Parameter, und eine Eigenschaft gibt es nicht.
+
+<CodeBlock language="csharp" title="old-form.cs">{oldForm}</CodeBlock>
+
+## Der Erweiterungsblock
+
+Ein Block hat die Form `extension(Typ name) { … }`. Der Teil in den Klammern ist der **Empfänger**:
+
+1. **Mit Parametername** (`extension(Reading reading)`): Die Member im Block sind Instanzmember, also Eigenschaften und Methoden, die du an einem Objekt aufrufst. Im Code liest du das Objekt über den Namen `reading`. Der Name entspricht dem ersten Parameter mit `this` der alten Form.
+2. **Nur mit Typ** (`extension(Reading)`): Die Member im Block sind statisch. Du rufst sie über den Typnamen auf, zum Beispiel `Reading.Unit`.
+
+Der Block ändert den Typ `Reading` nicht, und der Aufruf sieht aus wie bei einem echten Member.
+
+:::info[Vorhersage]
+`Reading` hat nur die Eigenschaft `Celsius`. Die Klasse `ReadingExtensions` bringt `Fahrenheit` (Eigenschaft), `IsWarm()` (Methode) und `Unit` (statisch). Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m11-l02-block" code={extensionBlock} predict expected={extensionBlockOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `77`, `True` und `Celsius`.
+
+1. **Empfänger festlegen:** `extension(Reading reading)` macht alle Member dieses Blocks zu Membern von Objekten der Klasse `Reading`. Der Name `reading` ist das Objekt.
+2. **Eigenschaft:** `Fahrenheit` rechnet `25 * 9 / 5 + 32 = 77`. Du liest sie ohne Klammern.
+3. **Methode:** `IsWarm()` steht im Block wie in einer Klasse, ohne `static` und ohne `this`. Der Aufruf ist derselbe wie in Lektion 1.
+4. **Statischer Member:** `extension(Reading)` hat keinen Namen, also ist `Unit` statisch. Du liest `Reading.Unit` über den Typnamen.
+
+**Was passiert, wenn …?** … `Unit` im Block mit `extension(Reading reading)` stünde und nicht `static` wäre? Dann wäre es ein Instanzmember, und du müsstest `reading.Unit` schreiben.
+
+</details>
+
+Beide Formen sind verträglich. Alte Erweiterungsmethoden und neue Blöcke dürfen in derselben statischen Klasse stehen, und der Aufrufer sieht keinen Unterschied. Der Block ist wie die alte Form nur in einer statischen Klasse erlaubt, die nicht generisch und nicht verschachtelt ist.
+
+## Keine neuen Daten im Objekt
+
+Eine Erweiterungseigenschaft ist eine <Term id="computed-property">berechnete Eigenschaft</Term>: Ihr Code liest den Empfänger und liefert ein Ergebnis. Sie hat kein Feld, in dem sie einen Wert ablegen könnte, denn das Objekt hat nur die Felder, die seine Klasse deklariert.
+
+:::info[Vorhersage]
+`Celsius` lässt sich hier ändern. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m11-l02-computed" code={computedEachTime} predict expected={computedEachTimeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `50` und `86`.
+
+1. **Erster Zugriff:** `Fahrenheit` rechnet `10 * 9 / 5 + 32 = 50`.
+2. **Quelle ändern:** `reading.Celsius = 30` ändert das Objekt. Die Erweiterungseigenschaft speichert nichts.
+3. **Zweiter Zugriff:** `Fahrenheit` rechnet neu: `30 * 9 / 5 + 32 = 86`. Es gibt keinen alten Wert, der noch im Objekt stünde.
+
+**Was passiert, wenn …?** … die Eigenschaft einen Wert speichern soll? Das geht im Erweiterungsblock nicht:
+
+<CodeBlock language="csharp" title="stores-data.snippet.cs">{storesData}</CodeBlock>
+
+Der Compiler meldet für Zeile 10 `error CS9282: This member is not allowed in an extension block`. Eine Auto-Eigenschaft bräuchte ein verstecktes Feld im Objekt.
+
+</details>
+
+## Lückenbeispiel
+
+`IsHot` steht noch in der alten Form. Schreibe es als Member eines Erweiterungsblocks um und füge die Erweiterungseigenschaft `Kelvin` hinzu (`Celsius + 273.15`). Gib beide Werte aus. Die Aufrufe sehen aus wie vorher.
+
+<CSharpRunner id="m11-l02-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Block anlegen:** `extension(Reading reading)` in `ReadingExtensions`.
+2. **Methode verschieben:** `public bool IsHot() { return reading.Celsius > 30; }` verliert `static` und `this`.
+3. **Eigenschaft:** `public double Kelvin => reading.Celsius + 273.15;`
+4. **Prüfen:** `reading.IsHot()` gibt `False` aus, `reading.Kelvin` gibt `298.15` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog stellt Fragen an ein `LogEvent` mit den Erweiterungsmethoden `IsFailure()` und `IsFrom(…)`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Block `// Ask log events with extension methods` und die Klasse `LogEventExtensions`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe am Ende des Namensraums `SecLog.Model`, nach `LogEventExtensions`, die statische Klasse `IncidentExtensions`. Sie hat zwei Erweiterungsblöcke: `extension(Incident incident)` mit der Eigenschaft `public bool IsSevere => incident.FailureCount >= 5;` und `extension(Incident)` mit dem statischen Member `public static string TableHeader => "Number | User | Failures | Severe";`. Schreibe danach, vor der Zeile `// End with exit code 0 …`, den Block `// Read incident facts through extension members`: Er gibt `Incident.TableHeader` aus und dann für jeden Vorfall in `incidents` eine Zeile der Form `<Number> | <User> | <FailureCount> | <IsSevere>`.
+
+<CSharpRunner id="m11-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Eigenschaft:** Der Block mit dem Empfänger `incident` enthält `IsSevere`. Sie rechnet bei jedem Zugriff aus `FailureCount` und speichert nichts.
+2. **Statischer Member:** Der Block ohne Namen enthält `TableHeader`. Du liest ihn über den Typnamen: `Incident.TableHeader`.
+3. **Ausgeben:** Die Schleife schreibt pro Vorfall `Number`, `User`, `FailureCount` und `IsSevere`. bob hat 5 Fehlversuche und ist `True`, dave hat einen und ist `False`.
+
+Die Grenze von 5 Fehlversuchen ist eine Vereinfachung für das Lernbeispiel.
+
+</details>
+
+**Neuer Stand:** SecLog liest Tatsachen über einen `Incident` als Eigenschaft (`IsSevere`) und als statischen Member (`TableHeader`), ohne die Klasse `Incident` zu ändern.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l02-extension-property-stores-data" />
+
+**„Eine Erweiterungseigenschaft kann neue Daten im Objekt speichern.“** Das stimmt nicht. Ein Erweiterungsblock fügt dem Typ keine Felder hinzu. Die Eigenschaft rechnet bei jedem Zugriff aus dem Empfänger, und eine Auto-Eigenschaft im Block lehnt der Compiler ab.
+:::
+
+<details>
+<summary>Vertiefung: Was die Spezifikation für Erweiterungsblöcke festlegt (optional)</summary>
+
+Erweiterungsblöcke sind in der [Feature-Spezifikation zu Extension members](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/extensions) beschrieben. Sie stehen nicht im Entwurf des C#-Standards. Ein Block steht in einer nicht generischen, nicht verschachtelten statischen Klasse. Der Empfänger darf ein Parametername oder nur ein Typ sein. Ein Instanzmember ohne Empfängerparameter ist ein Fehler. Instanzmember brauchen also einen benannten Empfänger.
+
+Die Member eines Blocks werden als statische Methoden in der umgebenden Klasse erzeugt. Daran sieht man, warum es keinen Platz für Daten gibt: Der Compiler ändert den erweiterten Typ nicht.
+
+</details>
+
+## Zusammenfassung
+
+Ein Erweiterungsblock `extension(Typ name) { … }` fügt einem bestehenden Typ Member hinzu. Mit Parametername sind es Instanzmember wie Eigenschaften und Methoden, nur mit Typ sind es statische Member. Eine Erweiterungseigenschaft wird bei jedem Zugriff aus dem Empfänger berechnet, denn ein Erweiterungsblock speichert keine Daten im Objekt. Alte Erweiterungsmethoden mit `this` und neue Blöcke dürfen nebeneinander stehen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l02-q1" />
+
+<Quiz id="m11-l02-q2" />
+
+<Quiz id="m11-l02-q3" />
+
+<Quiz id="m11-l02-q4" />
+
+<Quiz id="m11-l02-q5" />
+
+<Quiz id="m11-l02-q6" />
+
+<Quiz id="m11-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Extension members](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods)
+- Microsoft Learn: [Feature-Spezifikation Extension members (C# 14)](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/extensions)

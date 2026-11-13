@@ -1,4 +1,259 @@
 {
   "module": "m11",
-  "questions": []
+  "questions": [
+    {
+      "id": "m11-l01-q1",
+      "lesson": "m11-l01",
+      "type": "single",
+      "question": "Was macht eine Methode zu einer Erweiterungsmethode?",
+      "options": [
+        {
+          "text": "Sie ist `static`, steht in einer statischen Klasse, und ihr erster Parameter trägt den Modifizierer `this`.",
+          "correct": true
+        },
+        {
+          "text": "Sie steht in der Klasse, die erweitert werden soll, und trägt den Modifizierer `extension`.",
+          "feedback": "Der erweiterte Typ bleibt unverändert. Die Methode steht in einer eigenen statischen Klasse."
+        },
+        {
+          "text": "Sie ist eine Instanzmethode mit `override`.",
+          "feedback": "`override` ersetzt eine geerbte Methode. Eine Erweiterungsmethode ist eine statische Methode außerhalb des Typs."
+        }
+      ],
+      "explanation": "Eine Erweiterungsmethode ist eine gewöhnliche statische Methode in einer statischen Klasse. Nur das `this` vor dem ersten Parameter erlaubt den Aufruf in der Form `x.M()`."
+    },
+    {
+      "id": "m11-l01-q2",
+      "lesson": "m11-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l01/quiz-which-method.cs",
+      "explanation": "`counter.Next()` findet die Instanzmethode `Next()` der Klasse `Counter` und gibt 1 zurück. Die Erweiterungsmethode mit gleicher Signatur wird nie aufgerufen. `counter.Next(5)` hat keine passende Instanzmethode, deshalb gilt die Erweiterungsmethode `Next(this Counter, int)` und gibt 50 zurück. Die Ausgabe ist `1` und `50`."
+    },
+    {
+      "id": "m11-l01-q3",
+      "lesson": "m11-l01",
+      "type": "single",
+      "question": "Die Klasse `Sensor` hat die Instanzmethode `Describe()`. Eine Erweiterungsmethode `Describe(this Sensor sensor)` hat die gleiche Signatur. Was passiert bei `sensor.Describe()`?",
+      "options": [
+        {
+          "text": "Die Instanzmethode läuft. Die Erweiterungsmethode wird ignoriert, ohne Warnung.",
+          "correct": true
+        },
+        {
+          "text": "Die Erweiterungsmethode läuft und ersetzt die Instanzmethode.",
+          "feedback": "Eine Erweiterungsmethode ersetzt nichts. Der Compiler sucht zuerst Instanzmethoden und nimmt eine Erweiterungsmethode nur, wenn keine passt.",
+          "misconception": "m11-l01-extension-beats-instance-method"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler wegen zwei gleicher Methoden.",
+          "feedback": "Beide Methoden liegen in verschiedenen Klassen. Es gibt keinen Fehler und keine Warnung."
+        },
+        {
+          "text": "Beide Methoden laufen nacheinander.",
+          "feedback": "Ein Aufruf führt genau eine Methode aus."
+        }
+      ],
+      "explanation": "Der Compiler sucht beim Aufruf `x.M()` zuerst unter den Instanzmethoden. Findet er eine passende, nimmt er sie. Erweiterungsmethoden kommen nur dran, wenn keine Instanzmethode passt. Die Erweiterungsmethode lässt sich nur in der statischen Form `SensorExtensions.Describe(sensor)` erreichen."
+    },
+    {
+      "id": "m11-l01-q4",
+      "lesson": "m11-l01",
+      "type": "single",
+      "question": "Welcher Aufruf ist gleichbedeutend mit `\"hello\".Wrap(\"*\")`, wenn `Wrap` eine Erweiterungsmethode der statischen Klasse `TextExtensions` ist?",
+      "options": [
+        {
+          "text": "`TextExtensions.Wrap(\"hello\", \"*\")`",
+          "correct": true
+        },
+        {
+          "text": "`string.Wrap(\"hello\", \"*\")`",
+          "feedback": "`Wrap` gehört nicht zu `string`, sondern zur Klasse `TextExtensions`. Der Typ `string` bleibt unverändert."
+        },
+        {
+          "text": "`TextExtensions.Wrap(\"*\")`",
+          "feedback": "Das Objekt vor dem Punkt wird zum ersten Argument. Es darf im statischen Aufruf nicht fehlen."
+        }
+      ],
+      "explanation": "Der Compiler schreibt `x.M(a)` um in `Klasse.M(x, a)`. Der Ausdruck vor dem Punkt wird das erste Argument, das dem Parameter mit `this` entspricht."
+    },
+    {
+      "id": "m11-l01-q5",
+      "lesson": "m11-l01",
+      "type": "single",
+      "question": "Der Code kompiliert nicht. Welche Ursache passt zur Fehlermeldung `CS1061: 'string' does not contain a definition for 'Shout' …`?",
+      "example": "m11/l01/missing-using.snippet.cs",
+      "options": [
+        {
+          "text": "Der Namespace `Tools` mit der Erweiterungsmethode ist nicht mit `using Tools;` eingebunden.",
+          "correct": true
+        },
+        {
+          "text": "`string` ist ein Typ der Bibliothek, und Typen der Bibliothek lassen sich nicht erweitern.",
+          "feedback": "Erweiterungsmethoden gibt es gerade für Typen, die du nicht ändern kannst, zum Beispiel `string`."
+        },
+        {
+          "text": "`Shout` muss `private` sein, damit sie sich wie eine Instanzmethode aufrufen lässt.",
+          "feedback": "Eine Erweiterungsmethode muss für den Aufrufer sichtbar sein. Mit `private` wäre sie es noch weniger."
+        }
+      ],
+      "explanation": "Erweiterungsmethoden sind nur sichtbar, wenn ihr Namespace mit einer `using`-Direktive eingebunden ist. Ohne `using Tools;` findet der Compiler `Shout` nicht. Die statische Form `Tools.TextExtensions.Shout(\"hello\")` ginge auch ohne `using`."
+    },
+    {
+      "id": "m11-l01-q6",
+      "lesson": "m11-l01",
+      "type": "find-bug",
+      "question": "Der Code kompiliert nicht. Welche Zeile ist der Fehler?",
+      "example": "m11/l01/private-member.snippet.cs",
+      "bugLines": [
+        10
+      ],
+      "lineFeedback": {
+        "10": {
+          "feedback": "Die Erweiterungsmethode steht außerhalb von `Sensor`. Sie sieht nur, was jeder Aufrufer sieht, also keine `private`-Member (CS0122)."
+        }
+      },
+      "explanation": "Eine Erweiterungsmethode ist eine statische Methode einer anderen Klasse. Sie hat keinen Zugriff auf `private` Member des erweiterten Typs. Das Feld `secret` ist von dort nicht erreichbar."
+    },
+    {
+      "id": "m11-l01-q7",
+      "lesson": "m11-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum ist `x.M()` bei einer Erweiterungsmethode nur eine andere Schreibweise, und welche Methode läuft, wenn der Typ von `x` schon eine Instanzmethode `M()` hat?",
+      "modelAnswer": "Eine Erweiterungsmethode ist eine statische Methode in einer statischen Klasse. Der Compiler schreibt `x.M()` zu `Klasse.M(x)` um, `x` wird das erste Argument. Hat der Typ von `x` selbst eine passende Instanzmethode `M()`, nimmt der Compiler diese. Die Erweiterungsmethode wird dann nie aufgerufen, ohne Warnung. Man erreicht sie nur noch in der statischen Form."
+    },
+    {
+      "id": "m11-l01-q8",
+      "lesson": "m11-l01",
+      "type": "explain",
+      "question": "Transferfrage: Du möchtest, dass `text.Shout()` für jeden `string` in deinem Programm funktioniert. Warum eignet sich dafür eine Erweiterungsmethode, und was musst du in jeder Datei tun, die sie benutzt?",
+      "modelAnswer": "Den Typ `string` kann ich nicht ändern, deshalb schreibe ich die Methode als Erweiterungsmethode in eine eigene statische Klasse mit `this string text` als erstem Parameter. Der Aufruf liest sich dann wie bei einer eigenen Methode von `string`. Jede Datei, die sie benutzt, muss den Namespace der statischen Klasse mit `using` einbinden, sonst findet der Compiler die Methode nicht."
+    },
+    {
+      "id": "m11-l02-q1",
+      "lesson": "m11-l02",
+      "type": "single",
+      "question": "Ein Erweiterungsblock `extension(Incident incident)` enthält die Eigenschaft `public bool IsSevere => incident.FailureCount >= 5;`. Was passiert bei jedem Zugriff auf `incident.IsSevere`?",
+      "options": [
+        {
+          "text": "Der Wert wird aus dem Empfänger `incident` neu berechnet.",
+          "correct": true
+        },
+        {
+          "text": "Der Wert wird beim ersten Zugriff im Objekt `incident` gespeichert und danach gelesen.",
+          "feedback": "Eine Erweiterungseigenschaft hat keinen Speicherplatz im Objekt. Sie ist ein Ausdruck, der bei jedem Zugriff läuft.",
+          "misconception": "m11-l02-extension-property-stores-data"
+        },
+        {
+          "text": "Der Compiler fügt der Klasse `Incident` ein neues Feld `IsSevere` hinzu.",
+          "feedback": "Die Klasse `Incident` bleibt unverändert. Es entsteht kein Feld.",
+          "misconception": "m11-l02-extension-property-stores-data"
+        }
+      ],
+      "explanation": "Eine Erweiterungseigenschaft ist eine berechnete Eigenschaft: Ihr Code liest den Empfänger und liefert ein Ergebnis. Neue Daten kann sie nicht im Objekt ablegen."
+    },
+    {
+      "id": "m11-l02-q2",
+      "lesson": "m11-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l02/quiz-extension-property.cs",
+      "explanation": "`Area` ist eine Erweiterungseigenschaft und rechnet bei jedem Zugriff `Width * Height`. Zuerst ist das 3 * 4 = 12. Nach `box.Width = 10` ergibt der nächste Zugriff 10 * 4 = 40, weil nichts gespeichert wurde. Die Ausgabe ist `12` und `40`."
+    },
+    {
+      "id": "m11-l02-q3",
+      "lesson": "m11-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l02/quiz-static-member.cs",
+      "explanation": "`Box.Corners` ist ein statischer Erweiterungsmember. Du liest ihn über den Typnamen: `4`. Die Methode `Describe` kommt aus dem zweiten Block, dessen Empfänger `box` heißt. Sie benutzt `Box.Corners` und gibt `box with 4 corners` zurück."
+    },
+    {
+      "id": "m11-l02-q4",
+      "lesson": "m11-l02",
+      "type": "single",
+      "question": "Der Code kompiliert nicht (`CS9282`). Warum?",
+      "example": "m11/l02/stores-data.snippet.cs",
+      "options": [
+        {
+          "text": "Ein Erweiterungsblock kann keine Daten speichern. Eine Eigenschaft mit `{ get; set; }` bräuchte ein verstecktes Feld im Objekt.",
+          "correct": true
+        },
+        {
+          "text": "Der Eigenschaft fehlt ein Startwert. Mit `= \"\"` würde sie den Wert im Objekt speichern.",
+          "feedback": "Ein Startwert ändert nichts. Der Erweiterungsblock hat keinen Platz für Daten, weder mit noch ohne Startwert.",
+          "misconception": "m11-l02-extension-property-stores-data"
+        },
+        {
+          "text": "Die Klasse `Reading` muss `sealed` sein, damit sie erweitert werden darf.",
+          "feedback": "Auch Klassen ohne `sealed` lassen sich erweitern. Der Fehler liegt an der Eigenschaft."
+        }
+      ],
+      "explanation": "Auto-Eigenschaften brauchen ein Hintergrundfeld. Ein Erweiterungsblock fügt dem Typ keine Felder hinzu, deshalb sind nur Member erlaubt, die aus dem Empfänger berechnen."
+    },
+    {
+      "id": "m11-l02-q5",
+      "lesson": "m11-l02",
+      "type": "single",
+      "question": "Ein Erweiterungsblock soll die Instanzeigenschaft `IsSevere` für `Incident` enthalten. Wie schreibst du den Kopf des Blocks?",
+      "options": [
+        {
+          "text": "`extension(Incident incident)`: Der Parametername gibt dem Code den Empfänger.",
+          "correct": true
+        },
+        {
+          "text": "`extension(Incident)`: Der Typ reicht für jede Eigenschaft.",
+          "feedback": "Ohne Parametername gibt es keinen Empfänger, den die Eigenschaft lesen könnte. Dann sind nur statische Member erlaubt."
+        },
+        {
+          "text": "`extension(this Incident incident)`: `this` gehört wie bei Erweiterungsmethoden davor.",
+          "feedback": "Das `this` steht nur in der alten Schreibweise vor dem ersten Parameter einer Methode. Der Block kennt es nicht."
+        }
+      ],
+      "explanation": "Der Parametername des Blocks ist der Empfänger. Instanzmember brauchen ihn, um das Objekt zu lesen. Steht nur der Typ in den Klammern, enthält der Block statische Erweiterungsmember."
+    },
+    {
+      "id": "m11-l02-q6",
+      "lesson": "m11-l02",
+      "type": "single",
+      "question": "Welcher Erweiterungsblock ist gleichwertig zu `public static bool IsHot(this Reading reading)` in der alten Form?",
+      "options": [
+        {
+          "text": "`extension(Reading reading) { public bool IsHot() { … } }`",
+          "correct": true
+        },
+        {
+          "text": "`extension(Reading) { public bool IsHot() { … } }`",
+          "feedback": "Ohne Parametername ist `IsHot` keine Instanzmethode. Der Compiler meldet einen Fehler."
+        },
+        {
+          "text": "`extension(Reading reading) { public static bool IsHot() { … } }`",
+          "feedback": "Eine statische Methode im Block hängt am Typ, nicht am Objekt. `reading.IsHot()` würde nicht funktionieren."
+        }
+      ],
+      "explanation": "Die Methode verliert im Block das `static` und das `this`. Der erste Parameter wandert in den Kopf des Blocks. Der Aufruf `reading.IsHot()` bleibt gleich."
+    },
+    {
+      "id": "m11-l02-q7",
+      "lesson": "m11-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l02/mixed-forms.cs",
+      "explanation": "Beide Formen dürfen in derselben statischen Klasse stehen. `IsWarm` ist eine Erweiterungsmethode der alten Form (25 > 20: `True`). `IsHot` steht im Erweiterungsblock (25 > 30: `False`). Der Aufruf `ReadingExtensions.IsHot(reading)` in der statischen Form ergibt dasselbe: `False`. Die Ausgabe ist `True`, `False` und `False`."
+    },
+    {
+      "id": "m11-l02-q8",
+      "lesson": "m11-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum kann eine Erweiterungseigenschaft keine neuen Daten im Objekt speichern?",
+      "modelAnswer": "Ein Erweiterungsblock ändert den Typ nicht. Das Objekt hat nur die Felder, die seine Klasse deklariert. Eine Erweiterungseigenschaft ist deshalb nur Code, der den Empfänger liest und bei jedem Zugriff einen Wert berechnet. Eine Auto-Eigenschaft bräuchte ein Hintergrundfeld im Objekt, und der Compiler lehnt sie im Erweiterungsblock ab."
+    },
+    {
+      "id": "m11-l02-q9",
+      "lesson": "m11-l02",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm würdest du eine Erweiterungseigenschaft oder einen statischen Erweiterungsmember einsetzen? Nenne ein Beispiel und sage, warum du dort nicht die Klasse selbst änderst.",
+      "modelAnswer": "Beispiel: Ein Typ aus einer Bibliothek hat `Count`, und ich möchte `IsEmpty` als Eigenschaft lesen. Ich kann die Bibliothek nicht ändern, deshalb schreibe ich `IsEmpty` als Erweiterungseigenschaft, die `Count == 0` prüft. Ein statischer Erweiterungsmember passt für eine Konstante oder Fabrikmethode, die zum Typ gehört, wie `Incident.TableHeader`. Beides lese ich wie einen echten Member, ohne neue Daten im Objekt."
+    }
+  ]
 }

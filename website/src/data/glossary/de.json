@@ -6852,6 +6852,67 @@
         "title": "Standard .NET event patterns",
         "url": "https://learn.microsoft.com/dotnet/csharp/event-pattern"
       }
+    },
+    {
+      "id": "extension-method",
+      "term": "Extension method",
+      "german": "Erweiterungsmethode",
+      "category": "language",
+      "definition": "Eine statische Methode in einer statischen Klasse, deren erster Parameter `this` trägt. Du rufst sie auf wie eine Instanzmethode dieses Typs, ohne den Typ zu ändern. Eine Instanzmethode mit gleicher Signatur hat immer Vorrang.",
+      "aliases": [
+        "extension methods",
+        "Erweiterungsmethoden"
+      ],
+      "related": [
+        "static-class",
+        "extension-member"
+      ],
+      "lesson": "m11-l01",
+      "source": {
+        "title": "Extension members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods"
+      }
+    },
+    {
+      "id": "extension-member",
+      "term": "Extension member",
+      "german": "Erweiterungsmember",
+      "category": "language",
+      "definition": "Ein Member, das du einem bestehenden Typ von außen hinzufügst: eine Erweiterungsmethode, seit C# 14 auch eine Erweiterungseigenschaft oder ein statischer Erweiterungsmember. Der Typ selbst bleibt unverändert, und ein Erweiterungsmember speichert keine neuen Daten im Objekt.",
+      "aliases": [
+        "extension members",
+        "Erweiterungsmember",
+        "Erweiterungseigenschaft"
+      ],
+      "related": [
+        "extension-method",
+        "extension-block"
+      ],
+      "lesson": "m11-l02",
+      "source": {
+        "title": "Extension members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods"
+      }
+    },
+    {
+      "id": "extension-block",
+      "term": "Extension block",
+      "german": "Erweiterungsblock",
+      "category": "language",
+      "definition": "Ein Block `extension(Typ name) { … }` in einer statischen Klasse (C# 14). Der Parameter ist der Empfänger; steht nur der Typ in den Klammern, enthält der Block statische Erweiterungsmember.",
+      "aliases": [
+        "extension blocks",
+        "Erweiterungsblöcke"
+      ],
+      "related": [
+        "extension-member",
+        "extension-method"
+      ],
+      "lesson": "m11-l02",
+      "source": {
+        "title": "Extension members",
+        "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods"
+      }
     }
   ]
 }
