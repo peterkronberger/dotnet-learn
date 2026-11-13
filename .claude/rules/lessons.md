@@ -29,6 +29,7 @@ paths:
 - The first lesson of a module starts with the box "Projekt: Was SecLog nach diesem Modul kann" (text from the milestone table).
 - SecLog is the only example project. Do not invent other projects or unrelated SecLog snippets.
 - Features from C# 12 / .NET 8 on: `<Since csharp="…" dotnet="…" />`.
+- Target is always the latest officially released (GA) .NET / C# version, never a fixed older one. Before writing, look up the current version on Microsoft Learn ("What's new in C#", "What's new in .NET", the newest `csharp-<version>` feature specifications) and check every technical statement against it first. Highlight every feature introduced after .NET 8 / C# 12 with a version badge. Mention an older-version behavior only if it still holds in the latest version or has a badge.
 - Sources (`concept/sources.md`):
   - No attribution phrases such as "laut Microsoft Learn", "die Quelle sagt" or "Microsoft beschreibt". State the fact directly. The forbidden list is in `concept/sources.md`, "Automatic check".
   - No English quotes in German text. Paraphrase in German.
