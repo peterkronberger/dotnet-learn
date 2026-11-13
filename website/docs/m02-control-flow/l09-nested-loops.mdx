@@ -12,6 +12,8 @@ import nestedCount from '!!raw-loader!@site/examples/m02/l09/nested-count.cs';
 import nestedCountOutput from '!!raw-loader!@site/examples/m02/l09/nested-count.out.txt';
 import breakInner from '!!raw-loader!@site/examples/m02/l09/break-inner.cs';
 import breakInnerOutput from '!!raw-loader!@site/examples/m02/l09/break-inner.out.txt';
+import labeledBreak from '!!raw-loader!@site/examples/m02/l09/labeled-break.cs';
+import labeledBreakOutput from '!!raw-loader!@site/examples/m02/l09/labeled-break.out.txt';
 import triangleGaps from '!!raw-loader!@site/examples/m02/l09/triangle-gaps.cs';
 import projectTask from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-task.cs';
 import projectInput from '!!raw-loader!@site/examples/m02/l09/seclog-analysis-solution.in.txt';
@@ -24,6 +26,7 @@ import projectSolution from '!!raw-loader!@site/examples/m02/l09/seclog-analysis
 - Du schreibst eine Schleife in eine andere und sagst voraus, wie oft der innere Block insgesamt läuft.
 - Du erklärst, dass die innere Schleife bei jedem Durchlauf der äußeren neu startet.
 - Du sagst voraus, dass `break` und `continue` in der inneren Schleife nur die innere betreffen.
+- Du beendest mit einer Schleifenmarke und `break outer;` beide Schleifen.
 - Du gibst mit zwei Schleifen ein Zeichenmuster aus.
 :::
 
@@ -104,8 +107,31 @@ Die Ausgabe ist `row 1, column 1`, `row 2, column 1`, `row 3, column 1` und `don
 :::warning[Achtung]
 <Misconception id="m02-l09-break-leaves-all-loops" />
 
-**„Ein `break` in der inneren Schleife beendet auch die äußere.“** Es verlässt nur die innere Schleife. Die äußere läuft weiter. Willst du auch die äußere beenden, brauchst du dort eine eigene Prüfung mit `break`.
+**„Ein `break` in der inneren Schleife beendet auch die äußere.“** Es verlässt nur die innere Schleife. Die äußere läuft weiter. Willst du auch die äußere beenden, brauchst du dort eine eigene Prüfung mit `break` oder eine Schleifenmarke (siehe unten).
 :::
+
+## Die äußere Schleife benennen
+
+<Since csharp="15" dotnet="11" />
+
+Mit einer <Term id="loop-label">Schleifenmarke (Loop Label)</Term> gibst du einer Schleife einen Namen. Sie steht vor der Schleife: `outer:`. In der inneren Schleife wirkt `break outer;` dann auf die äußere Schleife und beendet beide. `continue outer;` macht mit dem nächsten Durchlauf der äußeren Schleife weiter. Ohne Marke wirken `break` und `continue` weiterhin auf die innerste Schleife. Auch `goto` nutzt Marken, gehört aber nicht zu diesem Kurs.
+
+:::info[Vorhersage]
+Die äußere Schleife trägt die Marke `outer`. Bei `row == 2` und `column == 2` steht ein `break outer;`. Welche Zeilen erscheinen?
+:::
+
+<CSharpRunner id="m02-l09-labeled-break" code={labeledBreak} predict expected={labeledBreakOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `row 1, column 1` bis `row 1, column 3`, dann `row 2, column 1` und `done`.
+
+1. **Zeile 1:** Die innere Schleife läuft komplett durch, drei Ausgaben.
+2. **Zeile 2:** Bei `column` gleich `2` springt `break outer;` aus beiden Schleifen. Es gibt keine weiteren Durchläufe, auch nicht für Zeile 3.
+3. **Danach:** Das Programm gibt `done` aus.
+
+</details>
 
 ## Lückenbeispiel
 
@@ -157,7 +183,7 @@ Verschachtelte Schleifen sind außerdem die Grundlage für zweidimensionale Arra
 
 ## Zusammenfassung
 
-Eine verschachtelte Schleife steht im Block einer anderen Schleife. Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett von vorn durch, die Zahl der Durchläufe des inneren Blocks ist das Produkt beider Anzahlen. Die beiden Schleifenvariablen haben verschiedene Namen. `break` und `continue` betreffen nur die innerste Schleife, in der sie stehen.
+Eine verschachtelte Schleife steht im Block einer anderen Schleife. Die innere Schleife läuft bei jedem Durchlauf der äußeren komplett von vorn durch, die Zahl der Durchläufe des inneren Blocks ist das Produkt beider Anzahlen. Die beiden Schleifenvariablen haben verschiedene Namen. `break` und `continue` betreffen nur die innerste Schleife, in der sie stehen. Mit einer Marke vor der äußeren Schleife wirken `break outer;` und `continue outer;` auf diese.
 
 ## Prüfe dein Wissen
 
@@ -172,6 +198,8 @@ Eine verschachtelte Schleife steht im Block einer anderen Schleife. Die innere S
 <Quiz id="m02-l09-q5" />
 
 <Quiz id="m02-l09-q6" />
+
+<Quiz id="m02-l09-q9" />
 
 ### In eigenen Worten erklären
 

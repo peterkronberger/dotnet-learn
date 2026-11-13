@@ -67,7 +67,7 @@ Each module section has these fields:
   - `m02-l06` Schleifen mit while und do – `while` checks before, `do` after the body.
   - `m02-l07` Zählschleifen mit for und Durchlaufen mit foreach – `for` header parts, off-by-one, `foreach` over a `string`.
   - `m02-l08` Schleifen steuern: break und continue – leave a loop or skip one iteration.
-  - `m02-l09` Verschachtelte Schleifen – inner block runs outer x inner times; `break` leaves only the inner loop.
+  - `m02-l09` Verschachtelte Schleifen – inner block runs outer x inner times; `break` leaves only the inner loop; labeled `break`/`continue` (`outer:`, `break outer;`, C# 15).
 - **Constructs taught:** `==` `!=` `<` `>` `<=` `>=` (`m02-l01`), `if`/`else`/`else if` and `{ }` blocks (`m02-l01`), `&&` `||` `!` and short-circuit (`m02-l02`), `&` `|` on `bool` (`m02-l02`), `?:` (`m02-l03`), `switch` expression with constant, `<`-relational and `_` patterns (`m02-l04`), `switch` statement with `case`, `default`, several labels, `when` (`m02-l05`), `while` (`m02-l06`), `do … while` (`m02-l06`), `for` (`m02-l07`), `foreach` over a `string` (`m02-l07`), `break` (`m02-l05`, `m02-l08`), `continue` (`m02-l08`), nested loops (`m02-l09`).
 - **Glossary terms:** selection-statement, boolean-expression, comparison-operator (`m02-l01`), logical-operator, short-circuit-evaluation (`m02-l02`), conditional-operator (`m02-l03`), switch-expression, pattern, discard, relational-pattern, constant-pattern, exhaustive (`m02-l04`), switch-statement, case-guard, fall-through (`m02-l05`), loop, iteration (`m02-l06`), loop-variable, off-by-one-error (`m02-l07`), jump-statement (`m02-l08`), nested-loop (`m02-l09`). `collection` has `lesson` `m05-l04`.
 - **Misconception ids:** m02-l01-else-wrong-if, m02-l02-and-same-as-ampersand, m02-l03-both-branches-evaluated, m02-l04-missing-arm-gives-default, m02-l05-case-falls-through, m02-l06-condition-checked-once, m02-l07-off-by-one, m02-l08-continue-ends-loop, m02-l09-break-leaves-all-loops
@@ -131,7 +131,7 @@ Each module section has these fields:
   - `m05-l05` Sammlungen durchlaufen und ändern – enumerator, no change during `foreach`, remove backwards.
   - `m05-l06` Wörterbücher: Dictionary<TKey,TValue> – key to value, `Add`, indexer, `TryGetValue`, `ContainsKey`; key equality (→ M8).
   - `m05-l07` Mengen: HashSet<T> – no duplicates, `Add` returns `bool`, set operations.
-  - `m05-l08` Collection-Ausdrücke und Initialisierer – `[1, 2, 3]`, spread `..`, object/collection initializers (C# 12).
+  - `m05-l08` Collection-Ausdrücke und Initialisierer – `[1, 2, 3]`, spread `..`, object/collection initializers (C# 12), collection expression arguments `with(capacity: n)` (C# 15), `List<T>.Capacity` vs `Count`.
   - `m05-l09` Welche Sammlung wann? – `Queue<T>`, `Stack<T>`, `IReadOnlyList<T>`, cost of `Contains`.
   - `m05-l10` Mit Strings arbeiten – `Split`, `Join`, `IndexOf`, `Replace`, `StringComparison`, ordinal vs. culture.
   - `m05-l11` Datum und Uhrzeit – `DateTimeOffset`, `TimeSpan`, `DateOnly`, `TimeOnly`, UTC; time zones as a warning.
@@ -266,14 +266,14 @@ Each module section has these fields:
 
 - **Lessons:**
   - `m11-l01` Erweiterungsmethoden – `static` method with `this` first parameter in a static class, instance method wins, namespace must be visible.
-  - `m11-l02` Erweiterungsmember: Eigenschaften und statische Member – `extension(…)` blocks, extension properties and static members (C# 14), no new data in the object.
+  - `m11-l02` Erweiterungsmember: Eigenschaften und statische Member – `extension(…)` blocks, extension properties and static members (C# 14), no new data in the object; deep dive: extension indexer (C# 15, needs a named receiver).
   - `m11-l03` LINQ-Grundlagen: filtern, projizieren, sortieren – `Where`, `Select`, `OrderBy`/`ThenBy`, `Take`/`Skip`, operator families, source stays unchanged.
   - `m11-l04` Iteratoren: eigene Folgen mit yield – `yield return`, `yield break`, iterator block, lazy run, endless sequences, restrictions.
   - `m11-l05` Verzögerte Ausführung – deferred vs. immediate operators, each pass restarts the query, multiple enumeration.
   - `m11-l06` Anonyme Typen in Projektionen – `new { … }`, value equality, read-only, vs. tuple and record.
   - `m11-l07` Gruppieren und Aggregieren – `GroupBy`, `Sum`/`Min`/`Max`/`Average`, `MinBy`/`MaxBy`, `Aggregate`, empty sequences, top N, `CountBy`/`AggregateBy` (.NET 9).
   - `m11-l08` Element-Operatoren und Quantoren – `First`/`Single`/`Last`/`ElementAt` and `…OrDefault`, `Any`/`All`/`Contains`.
-  - `m11-l09` Joins und Mengenoperationen – `Join`, `GroupJoin`, `Distinct`/`DistinctBy`, `Union`, `Intersect`, `Except`, `Concat`.
+  - `m11-l09` Joins und Mengenoperationen – `Join`, `GroupJoin`, `Distinct`/`DistinctBy`, `Union`, `Intersect`, `Except`, `Concat`; deep dive: `FullJoin`, tuple `Join` (.NET 11), `LeftJoin`/`RightJoin` (.NET 10).
   - `m11-l10` Abfragesyntax – query expressions (`from`, `where`, `orderby`, `select`, `group … by`, `join`, `let`, `into`), translation into method calls, `SequenceEqual`.
 - **Constructs taught:** extension method with `this` (`m11-l01`), `extension(…)` block, extension property, static extension member (`m11-l02`), `Where`, `Select`, `OrderBy`, `OrderByDescending`, `ThenBy`, `Take`, `Skip`, `ToList`, `ToArray` (`m11-l03`), `yield return`, `yield break`, iterator method (`m11-l04`), `Count()`, `ToDictionary`, deferred vs. immediate (`m11-l05`), `new { … }` anonymous object (`m11-l06`), `GroupBy`, `IGrouping<TKey, TElement>`, `Sum`, `Min`, `Max`, `Average`, `MinBy`, `MaxBy`, `Aggregate`, `CountBy`, `AggregateBy` (`m11-l07`), `First`, `Single`, `Last`, `ElementAt`, `…OrDefault`, `Any`, `All`, `Contains` (`m11-l08`), `Join`, `GroupJoin`, `Distinct`, `DistinctBy`, `Union`, `Intersect`, `Except`, `Concat` (`m11-l09`), query expression clauses, `SequenceEqual` (`m11-l10`).
 - **Glossary terms:** see the `"lesson": "m11-l…"` fields: extension-method, extension-member, extension-block, linq, method-syntax, query-operator, key-selector, iterator, iterator-block, yield-statement, deferred-execution, immediate-execution, multiple-enumeration, anonymous-type, projection, grouping, aggregate-operator, element-operator, quantifier, join, query-expression, query-syntax

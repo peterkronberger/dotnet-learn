@@ -13,6 +13,7 @@ import extensionBlockOutput from '!!raw-loader!@site/examples/m11/l02/extension-
 import computedEachTime from '!!raw-loader!@site/examples/m11/l02/computed-each-time.cs';
 import computedEachTimeOutput from '!!raw-loader!@site/examples/m11/l02/computed-each-time.out.txt';
 import storesData from '!!raw-loader!@site/examples/m11/l02/stores-data.snippet.cs';
+import extensionIndexer from '!!raw-loader!@site/examples/m11/l02/extension-indexer.cs';
 import gaps from '!!raw-loader!@site/examples/m11/l02/gaps.cs';
 import projectTask from '!!raw-loader!@site/examples/m11/l02/seclog-linq-task.cs';
 import projectInput from '!!raw-loader!@site/examples/m11/l02/seclog-linq-solution.in.txt';
@@ -161,6 +162,19 @@ Die Grenze von 5 Fehlversuchen ist eine Vereinfachung für das Lernbeispiel.
 Erweiterungsblöcke sind in der [Feature-Spezifikation zu Extension members](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-14.0/extensions) beschrieben. Sie stehen nicht im Entwurf des C#-Standards. Ein Block steht in einer nicht generischen, nicht verschachtelten statischen Klasse. Der Empfänger darf ein Parametername oder nur ein Typ sein. Ein Instanzmember ohne Empfängerparameter ist ein Fehler. Instanzmember brauchen also einen benannten Empfänger.
 
 Die Member eines Blocks werden als statische Methoden in der umgebenden Klasse erzeugt. Daran sieht man, warum es keinen Platz für Daten gibt: Der Compiler ändert den erweiterten Typ nicht.
+
+</details>
+
+<details>
+<summary>Vertiefung: Erweiterungsindexer (optional)</summary>
+
+<Since csharp="15" dotnet="11" />
+
+Ein Erweiterungsblock darf auch einen Indexer enthalten. Ein Indexer ist immer ein Instanzmember, deshalb braucht der Block einen benannten Empfänger: `extension(FailureCounts counts)`. Was ein Indexer ist, zeigt die Vertiefung zu Indexern in Lektion 9 von Modul 8. Hier liefert `counts[1]` den zweiten Wert des Arrays im Objekt.
+
+<CSharpRunner id="m11-l02-indexer" code={extensionIndexer} />
+
+Die Ausgabe ist `5` und `1`. Für Strings und Arrays gelten Erweiterungsindexer nicht: Dort bleibt der eingebaute Zugriff. Ein Indexer des Typs selbst hat Vorrang vor einem Erweiterungsindexer. Die Regeln stehen auf der Seite [Extension member declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/extension#extension-indexers).
 
 </details>
 

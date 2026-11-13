@@ -896,6 +896,28 @@
       "explanation": "Soll der Inhalt einer Sammlung eingefügt werden, braucht es das Spread-Element `..`. Der Zieltyp steht links."
     },
     {
+      "id": "m05-l08-q7",
+      "lesson": "m05-l08",
+      "type": "single",
+      "question": "Was gilt für `List<string> users = [with(capacity: 10), \"alice\", \"bob\"];`?",
+      "options": [
+        {
+          "text": "`Count` ist 2 und `Capacity` ist 10.",
+          "correct": true,
+          "feedback": "`with(capacity: 10)` reserviert Platz für zehn Elemente. `Count` zählt nur die zwei Namen."
+        },
+        {
+          "text": "`Count` ist 10, weil die Liste zehn Plätze hat.",
+          "feedback": "`Count` zählt die Elemente, die in der Liste stehen. Die Kapazität ist nur reservierter Platz."
+        },
+        {
+          "text": "Der Code kompiliert nicht, weil `with(...)` kein Element der Liste ist.",
+          "feedback": "`with(...)` ist als erstes Element erlaubt. Es reicht Argumente an die Zielsammlung weiter und wird nicht in die Liste eingefügt."
+        }
+      ],
+      "explanation": "`with(...)` steht als erstes Element und übergibt Argumente beim Anlegen der Zielsammlung. Hier setzt es die Kapazität, während `Count` die zwei Elemente zählt."
+    },
+    {
       "id": "m05-l09-q1",
       "lesson": "m05-l09",
       "type": "output",

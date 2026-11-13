@@ -1246,6 +1246,28 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du verschachtelte Schleifen nutzen?",
       "modelAnswer": "Zum Beispiel für ein Balkendiagramm: Die äußere Schleife geht über die Nutzer, die innere gibt pro Fehlversuch ein Zeichen aus. Auch für Tabellen mit Zeilen und Spalten oder für alle Paare aus zwei Folgen. In Modul 5 bilden sie die Grundlage für zweidimensionale Arrays."
+    },
+    {
+      "id": "m02-l09-q9",
+      "lesson": "m02-l09",
+      "type": "single",
+      "question": "Was bewirkt `break outer;` in der inneren Schleife, wenn die äußere Schleife die Schleifenmarke `outer:` trägt?",
+      "options": [
+        {
+          "text": "Beide Schleifen enden, das Programm macht hinter der äußeren Schleife weiter.",
+          "correct": true
+        },
+        {
+          "text": "Nur die innere Schleife endet, die Marke ändert nichts.",
+          "misconception": "m02-l09-break-leaves-all-loops",
+          "feedback": "Ohne Marke endet nur die innere Schleife. Mit der Marke `outer` benennt `break` die äußere Schleife als Ziel."
+        },
+        {
+          "text": "Die äußere Schleife startet von vorn.",
+          "feedback": "Neu starten kann eine Schleife nicht. `continue outer;` würde mit dem nächsten Durchlauf der äußeren Schleife weitermachen."
+        }
+      ],
+      "explanation": "Die Marke benennt die Schleife, auf die `break` wirkt. Ohne Marke wirkt `break` immer auf die innerste Schleife."
     }
   ]
 }

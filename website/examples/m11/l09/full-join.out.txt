@@ -1,0 +1,4 @@
+bob | login-failed
+dave | login-failed
+erin | -
+- | login-success

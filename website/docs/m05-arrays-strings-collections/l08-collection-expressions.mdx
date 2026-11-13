@@ -11,6 +11,8 @@ import collectionExpressionsOutput from '!!raw-loader!@site/examples/m05/l08/col
 import noTargetType from '!!raw-loader!@site/examples/m05/l08/no-target-type.snippet.cs';
 import spread from '!!raw-loader!@site/examples/m05/l08/spread.cs';
 import spreadOutput from '!!raw-loader!@site/examples/m05/l08/spread.out.txt';
+import collectionExpressionArguments from '!!raw-loader!@site/examples/m05/l08/collection-expression-arguments.cs';
+import collectionExpressionArgumentsOutput from '!!raw-loader!@site/examples/m05/l08/collection-expression-arguments.out.txt';
 import initializers from '!!raw-loader!@site/examples/m05/l08/initializers.cs';
 import spreadGap from '!!raw-loader!@site/examples/m05/l08/spread-gap.cs';
 import projectTask from '!!raw-loader!@site/examples/m05/l08/seclog-collections-task.cs';
@@ -25,6 +27,7 @@ import CodeBlock from '@theme/CodeBlock';
 - Du kannst mit einem Collection-Ausdruck ein Array und eine Liste anlegen.
 - Du kannst mit dem Spread-Element `..` mehrere Sammlungen zu einer neuen zusammenfügen und das Ergebnis vorhersagen.
 - Du kannst erklären, warum `var x = [1, 2];` nicht kompiliert.
+- Du kannst mit `with(capacity: …)` die Kapazität einer Liste beim Anlegen festlegen und sie von `Count` unterscheiden.
 - Du kannst eine Liste und ein Dictionary mit einem Initialisierer füllen.
 :::
 
@@ -109,6 +112,35 @@ Die Ausgabe ist `4`, `alice`, `bob`, `dave`, `carol`, `4`, `5`.
 
 </details>
 
+## Argumente mit `with(...)`
+
+<Since csharp="15" dotnet="11" />
+
+Ein <Term id="collection-expression-argument">Collection-Ausdruck-Argument</Term> gibt dem Konstruktor der Zielsammlung Werte mit. Es steht als allererstes Element zwischen den Klammern: `with(...)`. Danach folgen die Elemente wie sonst.
+
+<Forward concepts={['Konstruktor']} lesson="m06-l02" />
+
+Du musst den Konstruktor hier nicht kennen: `with(...)` legt fest, wie die neue Sammlung angelegt wird.
+
+Ein Beispiel ist die Kapazität einer `List<T>`. Die Kapazität (`Capacity`) ist der Platz, den die Liste im Voraus reserviert. Sie ist nicht die Zahl der Elemente: `Count` zählt die Elemente, `Capacity` sagt, wie viele ohne neuen Speicher hineinpassen. Mit `with(capacity: 10)` reservierst du Platz für zehn Elemente.
+
+:::info[Vorhersage]
+Die Liste bekommt zwei Namen und `with(capacity: 10)`. Welche Werte haben `Count` und `Capacity`?
+:::
+
+<CSharpRunner id="m05-l08-arguments" code={collectionExpressionArguments} predict expected={collectionExpressionArgumentsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Count: 2` und `Capacity: 10`.
+
+1. **Argument:** `with(capacity: 10)` steht an erster Stelle und ruft den Konstruktor von `List<string>` mit der Kapazität 10 auf.
+2. **Elemente:** `"alice"` und `"bob"` füllen die Liste. `Count` ist 2.
+3. **Platz:** `Capacity` bleibt bei 10, weil die Liste im Voraus Platz für zehn Elemente hat.
+
+</details>
+
 ## Initialisierer
 
 Ein <Term id="collection-initializer">Collection-Initialisierer</Term> füllt eine Sammlung gleich beim Anlegen: `new List<string> { "alice", "bob" }`. Der Compiler ruft dafür `Add` für jedes Element auf.
@@ -172,7 +204,7 @@ Ein Collection-Ausdruck legt immer eine Sammlung an, die alle Elemente enthält,
 
 ## Zusammenfassung
 
-Ein Collection-Ausdruck `[a, b]` legt eine Sammlung an, deren Typ der Zieltyp bestimmt: ein Array, eine Liste oder eine der erlaubten Schnittstellen. Ohne Zieltyp, etwa bei `var`, kompiliert er nicht. Das Spread-Element `..x` fügt alle Elemente von `x` ein. Initialisierer füllen eine Sammlung beim Anlegen: `{ … }` ruft `Add` auf, `["k"] = v` schreibt über den Index.
+Ein Collection-Ausdruck `[a, b]` legt eine Sammlung an, deren Typ der Zieltyp bestimmt: ein Array, eine Liste oder eine der erlaubten Schnittstellen. Ohne Zieltyp, etwa bei `var`, kompiliert er nicht. Das Spread-Element `..x` fügt alle Elemente von `x` ein. Ein erstes Element `with(...)` reicht Argumente an den Konstruktor der Zielsammlung weiter, etwa die Kapazität einer Liste. Initialisierer füllen eine Sammlung beim Anlegen: `{ … }` ruft `Add` auf, `["k"] = v` schreibt über den Index.
 
 ## Prüfe dein Wissen
 
@@ -183,6 +215,8 @@ Ein Collection-Ausdruck `[a, b]` legt eine Sammlung an, deren Typ der Zieltyp be
 <Quiz id="m05-l08-q3" />
 
 <Quiz id="m05-l08-q4" />
+
+<Quiz id="m05-l08-q7" />
 
 ### In eigenen Worten erklären
 
