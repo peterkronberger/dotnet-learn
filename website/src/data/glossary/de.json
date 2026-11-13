@@ -21,6 +21,66 @@
       }
     },
     {
+      "id": "iterator",
+      "term": "Iterator",
+      "category": "language",
+      "definition": "Eine Methode mit `yield return`, die eine Folge liefert. Der Compiler baut daraus ein Enumerable-Objekt, und der Rumpf läuft erst beim Durchlaufen.",
+      "aliases": [
+        "Iteratoren",
+        "iterators"
+      ],
+      "related": [
+        "iterator-block",
+        "yield-statement",
+        "enumerable",
+        "enumerator"
+      ],
+      "lesson": "m11-l04",
+      "source": {
+        "title": "Iterators",
+        "url": "https://learn.microsoft.com/dotnet/csharp/iterators"
+      }
+    },
+    {
+      "id": "iterator-block",
+      "term": "Iterator block",
+      "german": "Iteratorblock",
+      "category": "language",
+      "definition": "Ein Block mit `yield return` oder `yield break`. Er darf als Rumpf einer Methode stehen, die `IEnumerable<T>` oder `IEnumerator<T>` zurückgibt.",
+      "aliases": [
+        "Iteratorblöcke"
+      ],
+      "related": [
+        "iterator",
+        "yield-statement"
+      ],
+      "lesson": "m11-l04",
+      "source": {
+        "title": "The yield statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement"
+      }
+    },
+    {
+      "id": "key-selector",
+      "term": "Key selector",
+      "german": "Schlüsselwähler",
+      "category": "language",
+      "definition": "Ein Lambda, das aus einem Element den Wert holt, nach dem sortiert wird, zum Beispiel `w => w.Length` in `OrderBy`.",
+      "aliases": [
+        "keySelector"
+      ],
+      "related": [
+        "query-operator",
+        "lambda-expression",
+        "func-delegate"
+      ],
+      "lesson": "m11-l03",
+      "source": {
+        "title": "Enumerable.OrderBy",
+        "url": "https://learn.microsoft.com/dotnet/api/system.linq.enumerable.orderby"
+      }
+    },
+    {
       "id": "keyword",
       "term": "Keyword",
       "german": "Schlüsselwort",
@@ -96,6 +156,67 @@
       "source": {
         "title": "Definite assignment (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/variables#94-definite-assignment"
+      }
+    },
+    {
+      "id": "linq",
+      "term": "LINQ",
+      "german": "sprachintegrierte Abfrage",
+      "category": "language",
+      "definition": "Language Integrated Query: Abfragen auf Folgen, zum Beispiel mit `Where`, `Select` und `OrderBy`. Die Operatoren sind Erweiterungsmethoden auf `IEnumerable<T>` und liefern eine neue Folge.",
+      "aliases": [
+        "Language Integrated Query"
+      ],
+      "related": [
+        "query-operator",
+        "method-syntax",
+        "extension-method",
+        "enumerable"
+      ],
+      "lesson": "m11-l03",
+      "source": {
+        "title": "Language Integrated Query (LINQ)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/"
+      }
+    },
+    {
+      "id": "method-syntax",
+      "term": "Method syntax",
+      "german": "Methodensyntax",
+      "category": "language",
+      "definition": "Die Schreibweise von LINQ mit Methodenaufrufen und Lambdas, zum Beispiel `list.Where(x => x > 2).OrderBy(x => x)`.",
+      "aliases": [
+        "method-based query syntax"
+      ],
+      "related": [
+        "linq",
+        "query-operator"
+      ],
+      "lesson": "m11-l03",
+      "source": {
+        "title": "Standard query operators overview",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/"
+      }
+    },
+    {
+      "id": "query-operator",
+      "term": "Query operator",
+      "german": "Abfrageoperator",
+      "category": "language",
+      "definition": "Eine Methode von LINQ wie `Where`, `Select` oder `OrderBy`. Sie bekommt eine Folge und liefert eine neue Folge oder einen einzelnen Wert.",
+      "aliases": [
+        "Abfrageoperatoren",
+        "standard query operators"
+      ],
+      "related": [
+        "linq",
+        "method-syntax",
+        "lambda-expression"
+      ],
+      "lesson": "m11-l03",
+      "source": {
+        "title": "Standard query operators overview",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/"
       }
     },
     {
@@ -6912,6 +7033,26 @@
       "source": {
         "title": "Extension members",
         "url": "https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/extension-methods"
+      }
+    },
+    {
+      "id": "yield-statement",
+      "term": "yield statement",
+      "german": "yield-Anweisung",
+      "category": "language",
+      "definition": "`yield return wert;` gibt ein Element der Folge zurück und pausiert den Iterator. `yield break;` beendet die Folge.",
+      "aliases": [
+        "yield return",
+        "yield break"
+      ],
+      "related": [
+        "iterator",
+        "iterator-block"
+      ],
+      "lesson": "m11-l04",
+      "source": {
+        "title": "The yield statement (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1315-the-yield-statement"
       }
     }
   ]

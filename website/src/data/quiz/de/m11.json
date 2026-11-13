@@ -254,6 +254,286 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Programm würdest du eine Erweiterungseigenschaft oder einen statischen Erweiterungsmember einsetzen? Nenne ein Beispiel und sage, warum du dort nicht die Klasse selbst änderst.",
       "modelAnswer": "Beispiel: Ein Typ aus einer Bibliothek hat `Count`, und ich möchte `IsEmpty` als Eigenschaft lesen. Ich kann die Bibliothek nicht ändern, deshalb schreibe ich `IsEmpty` als Erweiterungseigenschaft, die `Count == 0` prüft. Ein statischer Erweiterungsmember passt für eine Konstante oder Fabrikmethode, die zum Typ gehört, wie `Incident.TableHeader`. Beides lese ich wie einen echten Member, ohne neue Daten im Objekt."
+    },
+    {
+      "id": "m11-l03-q1",
+      "lesson": "m11-l03",
+      "type": "single",
+      "question": "Was ist `Where` in C#?",
+      "options": [
+        {
+          "text": "Eine Erweiterungsmethode auf `IEnumerable<T>`, die eine neue Folge liefert.",
+          "correct": true
+        },
+        {
+          "text": "Eine Instanzmethode von `List<T>`, die Elemente aus der Liste entfernt.",
+          "feedback": "`Where` gehört nicht zu `List<T>` und entfernt nichts. Es steht in `System.Linq.Enumerable` und liefert eine neue Folge.",
+          "misconception": "m11-l03-where-changes-source"
+        },
+        {
+          "text": "Ein Schlüsselwort der Sprache, so wie `foreach`.",
+          "feedback": "`Where` ist eine gewöhnliche Methode. Die Sprache kennt dafür nur in der Abfragesyntax ein Schlüsselwort `where`."
+        }
+      ],
+      "explanation": "Die LINQ-Operatoren sind Erweiterungsmethoden aus Lektion 1. Sie erweitern `IEnumerable<T>` und geben eine neue Folge zurück, die Quelle bleibt unverändert."
+    },
+    {
+      "id": "m11-l03-q2",
+      "lesson": "m11-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l03/quiz-chain.cs",
+      "explanation": "Die Kette arbeitet von oben nach unten. `Where(n => n > 2)` behält 3, 8, 6 und 4. `OrderByDescending` ergibt 8, 6, 4, 3. `Select(n => n * 10)` ergibt 80, 60, 40, 30. `Take(2)` behält die ersten zwei. Die Ausgabe ist `80, 60`."
+    },
+    {
+      "id": "m11-l03-q3",
+      "lesson": "m11-l03",
+      "type": "single",
+      "question": "Was geben die zwei `WriteLine`-Aufrufe des Programms aus?",
+      "example": "m11/l03/quiz-source.cs",
+      "options": [
+        {
+          "text": "`2` und `3`",
+          "correct": true
+        },
+        {
+          "text": "`2` und `2`",
+          "feedback": "`Where` entfernt keine Elemente aus `names`. Die Liste hat weiter drei Elemente.",
+          "misconception": "m11-l03-where-changes-source"
+        },
+        {
+          "text": "`3` und `3`",
+          "feedback": "Der Filter `n.Length <= 3` behält `bob` und `eve`, also zwei Elemente in `shortNames`."
+        }
+      ],
+      "explanation": "`shortNames` ist eine neue Liste mit `bob` und `eve`. Die Liste `names` bleibt unverändert und hat weiter drei Elemente."
+    },
+    {
+      "id": "m11-l03-q4",
+      "lesson": "m11-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Wort)?",
+      "example": "m11/l03/quiz-thenby.cs",
+      "explanation": "`OrderBy` sortiert nach der Länge: `a` und `b` (1), `bb` und `aa` (2), `ccc` (3). `ThenBy` ordnet gleich lange Wörter nach dem Text. Die Ausgabe ist `a`, `b`, `aa`, `bb`, `ccc`."
+    },
+    {
+      "id": "m11-l03-q5",
+      "lesson": "m11-l03",
+      "type": "single",
+      "question": "Du willst aus einer LINQ-Kette eine eigene `List<string>` machen. Was schreibst du ans Ende der Kette?",
+      "options": [
+        {
+          "text": "`.ToList()`",
+          "correct": true
+        },
+        {
+          "text": "`.Select(x => x)`",
+          "feedback": "`Select` liefert wieder nur eine Folge und keine Liste."
+        },
+        {
+          "text": "`.Take(1)`",
+          "feedback": "`Take` begrenzt die Anzahl der Elemente. Das Ergebnis ist weiter eine Folge."
+        }
+      ],
+      "explanation": "`ToList()` legt die Elemente der Folge in eine neue `List<T>`, `ToArray()` in ein Array."
+    },
+    {
+      "id": "m11-l03-q6",
+      "lesson": "m11-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über LINQ-Operatoren stimmen?",
+      "options": [
+        {
+          "text": "`Select` liefert für jedes Element der Quelle ein Element.",
+          "correct": true
+        },
+        {
+          "text": "`OrderBy` ist stabil: Elemente mit gleichem Schlüssel behalten ihre Reihenfolge.",
+          "correct": true
+        },
+        {
+          "text": "`Where` entfernt die nicht passenden Elemente aus der Quelle.",
+          "feedback": "`Where` lässt sie nur in der neuen Folge weg. Die Quelle bleibt gleich.",
+          "misconception": "m11-l03-where-changes-source"
+        },
+        {
+          "text": "`Take(5)` wirft einen Fehler, wenn die Folge nur drei Elemente hat.",
+          "feedback": "`Take` liefert dann einfach die drei vorhandenen Elemente."
+        }
+      ],
+      "explanation": "`Select` projiziert jedes Element, `OrderBy` sortiert stabil. `Where` ändert die Quelle nicht, und `Take` liefert höchstens so viele Elemente, wie da sind."
+    },
+    {
+      "id": "m11-l03-q7",
+      "lesson": "m11-l03",
+      "type": "single",
+      "question": "Die Liste `numbers` enthält 10, 20, 30, 40 und 50. Welcher Aufruf liefert 30 und 40?",
+      "options": [
+        {
+          "text": "`numbers.Skip(2).Take(2)`",
+          "correct": true
+        },
+        {
+          "text": "`numbers.Take(2).Skip(2)`",
+          "feedback": "`Take(2)` behält 10 und 20. `Skip(2)` lässt dann beide weg, und die Folge ist leer."
+        },
+        {
+          "text": "`numbers.Skip(3).Take(2)`",
+          "feedback": "`Skip(3)` lässt 10, 20 und 30 weg. Es bleiben 40 und 50."
+        }
+      ],
+      "explanation": "Die Reihenfolge der Operatoren zählt: `Skip(2)` lässt 10 und 20 weg, `Take(2)` behält dann 30 und 40."
+    },
+    {
+      "id": "m11-l03-q8",
+      "lesson": "m11-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Warum kannst du LINQ-Operatoren wie `Where` und `Select` mit einem Punkt hintereinander schreiben, und was passiert mit der Quelle?",
+      "modelAnswer": "Die Operatoren sind Erweiterungsmethoden auf `IEnumerable<T>`. Jeder Operator bekommt eine Folge und liefert eine neue Folge zurück, deshalb kann der nächste Operator direkt auf dem Ergebnis aufrufen. Die Quelle wird dabei nicht verändert: `Where` lässt nicht passende Elemente nur in der neuen Folge weg, und die Liste behält alle Elemente."
+    },
+    {
+      "id": "m11-l03-q9",
+      "lesson": "m11-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm würdest du eine Kette aus `Where`, `OrderBy` und `Select` statt einer Schleife einsetzen? Nenne ein Beispiel.",
+      "modelAnswer": "Beispiel: Aus einer Liste von Bestellungen will ich die offenen Bestellungen, das neueste zuerst, als Textzeilen ausgeben. Eine Kette mit `Where` (offen), `OrderByDescending` (Datum) und `Select` (Text) sagt in drei Zeilen, was ich will. Eine Schleife bräuchte eine Hilfsliste, ein `if` und eine Sortierung. Die Originalliste bleibt dabei unverändert."
+    },
+    {
+      "id": "m11-l04-q1",
+      "lesson": "m11-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l04/quiz-order.cs",
+      "explanation": "Der Aufruf von `Letters()` führt den Rumpf noch nicht aus. Die erste `MoveNext`-Runde der Schleife gibt `a` aus und liefert `x`, die Schleife schreibt `x`. Die zweite Runde gibt `b` aus und liefert `y`. Die Ausgabe ist `a`, `x`, `b`, `y`."
+    },
+    {
+      "id": "m11-l04-q2",
+      "lesson": "m11-l04",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l04/quiz-continue.cs",
+      "options": [
+        {
+          "text": "`1, 2, 3`",
+          "correct": true
+        },
+        {
+          "text": "`1`",
+          "feedback": "`yield return` beendet die Methode nicht. Sie pausiert und macht beim nächsten Element an derselben Stelle weiter.",
+          "misconception": "m11-l04-yield-return-ends-method"
+        },
+        {
+          "text": "Nichts, weil eine Methode ohne `return` keinen Wert liefert.",
+          "feedback": "Ein Iterator braucht kein `return`. Jedes `yield return` liefert ein Element."
+        }
+      ],
+      "explanation": "Jedes `yield return` gibt ein Element her und pausiert. Der Aufruf von `string.Join` holt alle drei Elemente nacheinander. Die Folge endet am Ende des Blocks."
+    },
+    {
+      "id": "m11-l04-q3",
+      "lesson": "m11-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l04/quiz-break.cs",
+      "explanation": "Die Schleife liefert 1 und 2. Bei `i == 3` endet die Folge mit `yield break`. Die Werte 4 und 5 kommen nicht mehr. Die Ausgabe ist `1, 2`."
+    },
+    {
+      "id": "m11-l04-q4",
+      "lesson": "m11-l04",
+      "type": "single",
+      "question": "Eine Methode mit `yield return` wird aufgerufen, und das Ergebnis liegt in einer Variablen. Wann läuft der Rumpf der Methode?",
+      "options": [
+        {
+          "text": "Erst wenn ein Element abgerufen wird, zum Beispiel von `foreach` (erstes `MoveNext`).",
+          "correct": true
+        },
+        {
+          "text": "Sofort beim Aufruf der Methode, bis alle Elemente berechnet sind.",
+          "feedback": "Der Aufruf erzeugt nur das Enumerable-Objekt. Der Rumpf läuft noch nicht."
+        },
+        {
+          "text": "Sobald die Variable deklariert ist, aber nur bis zum ersten `yield return`.",
+          "feedback": "Die Deklaration löst nichts aus. Erst `MoveNext` startet den Rumpf."
+        }
+      ],
+      "explanation": "Der Rumpf eines Iterators läuft Schritt für Schritt: beim ersten `MoveNext` bis zum ersten `yield return`, danach pausiert er, bis das nächste Element angefordert wird."
+    },
+    {
+      "id": "m11-l04-q5",
+      "lesson": "m11-l04",
+      "type": "single",
+      "question": "Welche dieser Methoden lehnt der Compiler ab?",
+      "options": [
+        {
+          "text": "Ein Iterator mit dem Parameter `ref int count`.",
+          "correct": true
+        },
+        {
+          "text": "Ein Iterator mit `yield return` in einem `try` mit nur einem `finally`-Teil.",
+          "feedback": "Das ist erlaubt. Nur `yield` im `finally`-Teil und `yield return` in einem `try` mit `catch` sind Fehler."
+        },
+        {
+          "text": "Ein Iterator mit `yield break` in einem `try` mit `catch`-Teil.",
+          "feedback": "`yield break` ist dort erlaubt. Nur `yield return` ist in einem `try` mit `catch` verboten."
+        }
+      ],
+      "explanation": "Eine Methode mit Iteratorblock darf keine `ref`-, `out`- oder `in`-Parameter haben. Die anderen beiden Formen sind erlaubt."
+    },
+    {
+      "id": "m11-l04-q6",
+      "lesson": "m11-l04",
+      "type": "single",
+      "question": "Welchen Rückgabetyp kann eine Iterator-Methode für ganze Zahlen haben?",
+      "options": [
+        {
+          "text": "`IEnumerable<int>`",
+          "correct": true
+        },
+        {
+          "text": "`List<int>`",
+          "feedback": "Der Compiler baut ein Enumerable-Objekt. Eine `List<int>` kann er nicht zurückgeben."
+        },
+        {
+          "text": "`int[]`",
+          "feedback": "Ein Array ist als Rückgabetyp eines Iterators nicht erlaubt."
+        }
+      ],
+      "explanation": "Erlaubt sind `IEnumerable<T>`, `IEnumerator<T>` und die nicht generischen Formen."
+    },
+    {
+      "id": "m11-l04-q7",
+      "lesson": "m11-l04",
+      "type": "single",
+      "question": "Ein Iterator liefert mit `while (true)` endlos Zahlen. Der Aufruf `Zahlen().Take(5)` wird mit `foreach` durchlaufen. Warum endet das Programm?",
+      "options": [
+        {
+          "text": "Es werden nur die fünf geholten Elemente berechnet. Danach fragt niemand mehr nach dem nächsten.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler erkennt die Endlosschleife und baut sie um.",
+          "feedback": "Der Compiler ändert die Schleife nicht. Der Rumpf läuft nur, wenn jemand ein Element anfordert."
+        },
+        {
+          "text": "`Take` berechnet zuerst die ganze Folge und schneidet dann fünf Elemente ab.",
+          "feedback": "Dann würde das Programm nie enden. `Take` holt nur so viele Elemente, wie es braucht."
+        }
+      ],
+      "explanation": "Der Iterator pausiert nach jedem `yield return`. `Take(5)` fordert fünf Elemente an und hört dann auf zu fragen."
+    },
+    {
+      "id": "m11-l04-q8",
+      "lesson": "m11-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was macht `yield return`, und wann läuft der Rumpf eines Iterators?",
+      "modelAnswer": "`yield return` gibt ein Element der Folge zurück und pausiert die Methode an dieser Stelle. Beim nächsten Abruf (`MoveNext`) läuft sie an derselben Stelle weiter. Der Rumpf läuft nicht beim Aufruf der Methode, sondern erst beim Durchlaufen, zum Beispiel in einer `foreach`-Schleife. Nur `yield break` oder das Ende des Blocks beendet die Folge."
+    },
+    {
+      "id": "m11-l04-q9",
+      "lesson": "m11-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm würdest du einen Iterator statt einer Methode einsetzen, die eine `List<T>` zurückgibt?",
+      "modelAnswer": "Beispiel: Eine Methode liest die Zeilen einer großen Datei und gibt nur die Zeilen mit einem bestimmten Wort her. Als Iterator muss sie nicht alle Treffer sammeln. Der Aufrufer kann nach den ersten drei Treffern aufhören, und der Rest der Datei wird nicht mehr gelesen."
     }
   ]
 }
