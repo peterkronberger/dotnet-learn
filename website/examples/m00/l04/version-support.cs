@@ -1,10 +1,10 @@
-Console.Write(".NET 10");
-Console.WriteLine(" (LTS)");
+Console.Write(".NET 11");
+Console.WriteLine(" (STS)");
 Console.Write("Released: ");
-Console.WriteLine("2025-11-11");
+Console.WriteLine("2026-11-10");
 Console.Write("End of support: ");
 Console.Write("2028-11-14");
 Console.WriteLine();
-Console.Write(".NET 9 (STS)");
+Console.Write(".NET 10 (LTS)");
 Console.Write(" ends ");
-Console.WriteLine("2026-11-10");
+Console.WriteLine("2028-11-14");

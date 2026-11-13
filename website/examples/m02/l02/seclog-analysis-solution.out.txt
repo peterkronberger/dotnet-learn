@@ -3,7 +3,7 @@ Purpose: find suspicious logins in made-up login logs
 Language: C#
 Platform: .NET
 Variant: .NET (Linux server and Windows laptops)
-Version: .NET 10 (LTS)
+Version: .NET 11 (STS)
 End of support: 2028-11-14
 Execution model: Native AOT
 
