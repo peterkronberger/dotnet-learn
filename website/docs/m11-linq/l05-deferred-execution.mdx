@@ -1,0 +1,211 @@
+---
+title: Verzögerte Ausführung
+sidebar_position: 5
+description: Eine LINQ-Abfrage beschreibt nur, was geschehen soll, und läuft erst beim Durchlaufen. Jeder Durchlauf startet sie neu und sieht den aktuellen Stand der Quelle.
+lesson_id: m11-l05
+duration_min: 24
+---
+
+import iteratorAndWhere from '!!raw-loader!@site/examples/m11/l05/iterator-and-where.cs';
+import runsOnEnumeration from '!!raw-loader!@site/examples/m11/l05/runs-on-enumeration.cs';
+import runsOnEnumerationOutput from '!!raw-loader!@site/examples/m11/l05/runs-on-enumeration.out.txt';
+import sourceChanges from '!!raw-loader!@site/examples/m11/l05/source-changes.cs';
+import immediate from '!!raw-loader!@site/examples/m11/l05/immediate.cs';
+import streaming from '!!raw-loader!@site/examples/m11/l05/streaming.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l05/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l05/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l05/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l05/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l05/seclog-linq-solution.cs';
+
+# Verzögerte Ausführung
+
+:::note[Lernziele]
+- Du kannst vorhersagen, wann eine LINQ-Abfrage tatsächlich läuft.
+- Du kannst verzögerte (deferred) und sofortige (immediate) Operatoren unterscheiden und Beispiele nennen.
+- Du kannst erklären, warum eine Abfrage eine Änderung der Quelle sieht und eine Liste aus `ToList()` nicht.
+- Du kannst das Problem der mehrfachen Aufzählung erkennen und mit `ToList()` vermeiden.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l04-q4" />
+
+<Quiz id="m10-l05-q2" />
+
+<Quiz id="m10-l03-q2" />
+
+## Eine Abfrage ist eine Beschreibung
+
+Der Iterator aus Lektion 4 führt seinen Rumpf erst aus, wenn jemand die Folge durchläuft. Eine LINQ-Abfrage verhält sich genauso. Im Beispiel unten steht in beiden Fällen eine Ausgabe, die zeigt, wann der Code läuft: im Rumpf des Iterators und im Lambda von `Where`.
+
+<CSharpRunner id="m11-l05-iterator-and-where" code={iteratorAndWhere} />
+
+Beim Iterator erscheint `Call the iterator` ohne eine Zeile vom Iterator. Bei der Abfrage steht nach `Define the query` ebenfalls nichts vom Lambda. Erst in der Schleife wechseln sich die Zeilen von Iterator beziehungsweise Lambda und die Zeilen `use …` ab. Das Lambda prüft jedes Element erst, wenn die Schleife es holt.
+
+Eine LINQ-Abfrage ist also eine Beschreibung der Arbeit. Die Variable `query` hält diese Beschreibung, keine Ergebnisse. Die Arbeit läuft erst beim Durchlaufen. Das heißt <Term id="deferred-execution">verzögerte Ausführung</Term> (deferred execution). Ein Operator, der so arbeitet, ist ein verzögerter Operator.
+
+## Jeder Durchlauf startet die Abfrage neu
+
+Weil die Variable nur die Beschreibung hält, beginnt jeder Durchlauf von vorn. Das gilt für jede `foreach`-Schleife und für jeden Aufruf wie `Count()`. Der Rumpf eines Iterators verhält sich ebenso (Lektion 4: jeder `GetEnumerator`-Aufruf startet einen neuen Lauf).
+
+:::info[Vorhersage]
+Die Abfrage `longWords` wird zweimal mit `foreach` durchlaufen und danach mit `Count()` gezählt. Wie oft erscheint die Zeile `checks pear`? Tippe die ganze Ausgabe.
+:::
+
+<CSharpRunner id="m11-l05-runs-on-enumeration" code={runsOnEnumeration} predict expected={runsOnEnumerationOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Zeile `checks pear` erscheint dreimal: in der ersten Schleife, in der zweiten Schleife und bei `Count()`.
+
+1. **Definieren:** `Where` läuft nicht. Nach `Define the query` steht deshalb keine Zeile `checks …`.
+2. **Erster Durchlauf:** Die Schleife holt ein Element nach dem anderen. Das Lambda prüft `pear`, dann `fig` (kein Treffer, keine Zeile `use`), dann `plum`.
+3. **Zweiter Durchlauf:** Die Abfrage beginnt von vorn. Alle drei Prüfungen laufen noch einmal.
+4. **Zählen:** `Count()` durchläuft die Folge ein drittes Mal. Es zählt zwei Treffer, gibt aber selbst nichts weiter aus. Darum stehen vor `Count: 2` nur die drei Zeilen `checks …`.
+
+**Was passiert, wenn …?** … das Lambda eine teure Prüfung macht oder etwas schreibt? Dann passiert das bei jedem Durchlauf erneut. Diese <Term id="multiple-enumeration">mehrfache Aufzählung</Term> (multiple enumeration) kostet Zeit und wiederholt Nebenwirkungen.
+
+</details>
+
+## Die Abfrage sieht die Quelle von heute
+
+Die Abfrage liest die Quelle erst beim Durchlaufen. Sie sieht deshalb den Stand der Quelle zu diesem Zeitpunkt, nicht den bei der Definition. Das gilt auch für eine Variable, die das Lambda erfasst (<Term id="captured-variable">Captured Variable</Term>, Lektion `m10-l05`): Das Lambda liest den Wert, den die Variable beim Durchlaufen hat.
+
+`ToList()` ist anders. Es durchläuft die Abfrage sofort und legt das Ergebnis in eine eigene Liste. Diese Liste ist eine Kopie: Sie ändert sich nicht mehr, wenn sich die Quelle ändert.
+
+<CSharpRunner id="m11-l05-source-changes" code={sourceChanges} />
+
+Zuerst finden Abfrage und Liste beide 2 Zahlen größer als 4. Nach `Add(9)` zählt die Abfrage 3, die Liste bleibt bei 2. Nach `limit = 7` sieht die Abfrage nur noch 8 und 9. Die Liste hat sich nie geändert.
+
+## Sofortige und verzögerte Operatoren
+
+Ein Operator, der einen einzelnen Wert oder eine Sammlung liefert, liest die Quelle sofort: <Term id="immediate-execution">sofortige Ausführung</Term> (immediate execution). Dazu gehören `Count`, `ToList`, `ToArray`, `ToDictionary` und `ToHashSet`. Ein Operator, der wieder eine Folge liefert, ist verzögert. Bei den verzögerten Operatoren gibt es zwei Arten:
+
+- **Streaming:** Der Operator prüft ein Element und gibt es gleich weiter. Er liest nicht die ganze Quelle, bevor das erste Element herauskommt. Beispiele: `Where`, `Select`, `Take`, `Skip`.
+- **Non-streaming:** Der Operator muss zuerst die ganze Quelle lesen, bevor er das erste Element liefert. Beispiele: `OrderBy`, `OrderByDescending`, `ThenBy`, `ThenByDescending`.
+
+| Operator | Lektion | Ausführung |
+| --- | --- | --- |
+| `Where`, `Select`, `Take`, `Skip` | 3 | verzögert, streaming |
+| `OrderBy`, `OrderByDescending`, `ThenBy`, `ThenByDescending` | 3 | verzögert, non-streaming |
+| `ToList`, `ToArray` | 3 | sofort |
+| `Count`, `ToDictionary`, `ToHashSet` | 5 | sofort |
+
+`ToDictionary` baut ein `Dictionary<TKey, TValue>`: Das erste Lambda wählt den Schlüssel, das zweite den Wert. `ToHashSet` baut ein `HashSet<T>` (Modul 5). `Count()` liefert die Anzahl der Elemente der Folge.
+
+Im folgenden Beispiel zählt eine Variable `calls`, wie oft das Lambda läuft. Nach der Definition steht sie auf 0. Jeder sofortige Operator durchläuft die Abfrage einmal und erhöht den Zähler um 4 (vier Wörter).
+
+<CSharpRunner id="m11-l05-immediate" code={immediate} />
+
+Das Array `array` ist ein Ergebnis von `ToArray()`. Es benutzen heißt nicht, die Abfrage noch einmal zu starten: Der letzte Aufruf ändert den Zähler nicht.
+
+Der Unterschied zwischen Streaming und Non-streaming zeigt sich an der Reihenfolge der Ausgaben:
+
+<CSharpRunner id="m11-l05-streaming" code={streaming} />
+
+`Where` prüft ein Element und gibt es sofort weiter: `checks` und `use` wechseln sich ab. `OrderBy` ruft den Schlüsselwähler für alle Elemente auf, bevor das erste `use` erscheint, weil es zum Sortieren alle Elemente kennen muss.
+
+## Mehrfache Aufzählung vermeiden
+
+Wer das Ergebnis einer Abfrage mehrmals braucht, speichert es mit `ToList()` (oder `ToArray()`). Die Abfrage läuft dann einmal, und alle weiteren Schritte benutzen die Liste. Das lohnt sich besonders, wenn die Abfrage teuer ist oder Nebenwirkungen hat. Soll eine Abfrage dagegen immer den aktuellen Stand sehen, lässt du sie unverändert.
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. Abfrage definieren, 2. die Quelle ändern, 3. die Abfrage ausführen und eine Kopie behalten, 4. die Quelle noch einmal ändern und vergleichen. Das Beispiel ist vollständig. Sage vorher, was herauskommt. Verschiebe dann `hosts.Add("web-2");` hinter die Zeile mit `ToList()` und sage erneut vorher, was die beiden Zeilen ausgeben.
+
+<CSharpRunner id="m11-l05-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Definieren:** `webHosts` beschreibt nur den Filter. Es läuft nichts.
+2. **Ändern:** `web-2` kommt vor dem Ausführen in die Liste.
+3. **Ausführen und kopieren:** `ToList()` findet `web-1` und `web-2`. Die Kopie hat 2 Elemente.
+4. **Vergleichen:** Nach `web-3` zählt die Abfrage 3 Treffer, die Kopie bleibt bei 2.
+
+Steht `Add("web-2")` hinter `ToList()`, hat die Kopie nur 1 Element. Die Abfrage zählt dann trotzdem 3.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest Zeilen mit einem eigenen Iterator. `sampleLog` enthält die 14 Zeilen des Logs, und die lokale Funktion `EventTypeOf` liest die Ereignisart einer Zeile.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// See when a LINQ query runs`. Lege `List<string> liveLog = [.. sampleLog[..4]];` an. Definiere `failedQuery` als `liveLog.Where(…)` mit den Zeilen, deren `EventTypeOf(line)` mit `string.Equals(…, StringComparison.Ordinal)` gleich `"login-failed"` ist. Gib `failedQuery.Count()` aus (2). Füge `sampleLog[4]` zu `liveLog` hinzu und gib `failedQuery.Count()` noch einmal aus (3). Speichere `List<string> snapshot = failedQuery.ToList();`, füge `sampleLog[5]` hinzu und gib `snapshot.Count` (3) und `failedQuery.Count()` (4) aus.
+
+<CSharpRunner id="m11-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Quelle wählen:** `[.. sampleLog[..4]]` kopiert die ersten vier Zeilen in eine neue Liste. Nur diese Liste wird später geändert.
+2. **Abfrage definieren:** `failedQuery` beschreibt den Filter. Beim Definieren läuft nichts.
+3. **Ausführen:** `Count()` durchläuft die Abfrage. Unter den ersten vier Zeilen sind 2 Fehlversuche von bob.
+4. **Quelle ändern:** Nach `Add(sampleLog[4])` sieht die Abfrage beim nächsten `Count()` 3 Fehlversuche.
+5. **Kopieren:** `ToList()` hält diesen Stand in `snapshot` fest. Nach dem nächsten `Add` bleibt `snapshot.Count` bei 3, während die Abfrage 4 zählt.
+
+</details>
+
+**Neuer Stand:** SecLog zeigt, dass eine Abfrage erst beim Durchlaufen läuft und dass `ToList()` einen Stand festhält.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l05-query-runs-when-defined" />
+
+**„Eine Abfrage läuft, sobald ich sie definiere.“** Das stimmt nicht. Die Definition beschreibt nur die Arbeit. Die Abfrage läuft, wenn jemand sie durchläuft (`foreach`, `Count()`, `ToList()`).
+:::
+
+:::warning[Achtung]
+<Misconception id="m11-l05-query-result-is-copy" />
+
+**„Eine Abfragevariable enthält die Ergebnisse und ändert sich nicht, wenn die Quelle sich ändert.“** Das stimmt nicht. Die Variable hält die Abfrage, nicht ihre Ergebnisse, und sie sieht spätere Änderungen der Quelle. Nur `ToList()` oder `ToArray()` machen eine Kopie.
+:::
+
+<details>
+<summary>Vertiefung: Warum jeder Durchlauf neu beginnt (optional)</summary>
+
+Ein Enumerable-Objekt liefert bei jedem `GetEnumerator` einen neuen Enumerator, und der Rumpf eines Iterators beginnt dabei von vorn. Das legt [Synchronous and asynchronous iterators (§15.15)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1515-synchronous-and-asynchronous-iterators) fest. `Where` und `Select` verhalten sich bei diesem Punkt wie ein Iterator: Sie lesen die Quelle beim Durchlaufen und beginnen bei jedem Durchlauf neu. Wie sie geschrieben sind, ist hier nicht wichtig.
+
+Die Einteilung der Operatoren in sofort, verzögert streaming und verzögert non-streaming steht in [Classification of standard query operators by manner of execution](https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries#classification-of-standard-query-operators-by-manner-of-execution).
+
+</details>
+
+## Zusammenfassung
+
+Eine LINQ-Abfrage beschreibt die Arbeit und läuft erst beim Durchlaufen (verzögerte Ausführung). Jeder Durchlauf startet sie neu und sieht den aktuellen Stand der Quelle und der erfassten Variablen. Operatoren, die einen Wert oder eine Sammlung liefern (`Count`, `ToList`, `ToArray`, `ToDictionary`, `ToHashSet`), laufen sofort. `Where`, `Select`, `Take` und `Skip` sind verzögert und streamen, `OrderBy` ist verzögert und liest zuerst die ganze Quelle. Wer das Ergebnis mehrmals braucht, speichert es mit `ToList()` und vermeidet die mehrfache Aufzählung.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l05-q1" />
+
+<Quiz id="m11-l05-q2" />
+
+<Quiz id="m11-l05-q3" />
+
+<Quiz id="m11-l05-q4" />
+
+<Quiz id="m11-l05-q5" />
+
+<Quiz id="m11-l05-q6" />
+
+<Quiz id="m11-l05-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l05-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l05-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Einführung in LINQ-Abfragen (Einteilung nach Art der Ausführung)](https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries#classification-of-standard-query-operators-by-manner-of-execution)
+- Microsoft Learn: [Enumerable.ToList](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.tolist)

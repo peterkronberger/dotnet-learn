@@ -1,0 +1,7 @@
+{ Word = fig, Length = 3 }
+(fig, 3)
+WordInfo { Word = fig, Length = 3 }
+True
+True
+True
+(fig, 4)

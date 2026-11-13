@@ -1,0 +1,6 @@
+After the definition: 0 calls
+Count() gives 3: 4 calls
+ToArray() gives 3 items: 8 calls
+ToDictionary() gives 3 entries: 12 calls
+ToHashSet() gives 3 items: 16 calls
+Length of the array again: 3: 16 calls

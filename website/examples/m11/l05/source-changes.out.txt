@@ -1,0 +1,3 @@
+At first: query 2, list 2
+After Add(9): query 3, list 2
+After limit = 7: query 2, list 2

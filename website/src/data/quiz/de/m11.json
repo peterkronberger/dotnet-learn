@@ -534,6 +534,325 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Programm würdest du einen Iterator statt einer Methode einsetzen, die eine `List<T>` zurückgibt?",
       "modelAnswer": "Beispiel: Eine Methode liest die Zeilen einer großen Datei und gibt nur die Zeilen mit einem bestimmten Wort her. Als Iterator muss sie nicht alle Treffer sammeln. Der Aufrufer kann nach den ersten drei Treffern aufhören, und der Rest der Datei wird nicht mehr gelesen."
+    },
+    {
+      "id": "m11-l05-q1",
+      "lesson": "m11-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l05/quiz-defined.cs",
+      "explanation": "Die Definition von `doubled` führt das Lambda nicht aus. Deshalb steht `defined` zuerst. Erst die `foreach`-Schleife startet die Abfrage. Sie holt das erste Element: `select` erscheint einmal, dann `2`. Danach endet die Schleife mit `break`, und die Elemente 2 und 3 werden nie verarbeitet."
+    },
+    {
+      "id": "m11-l05-q2",
+      "lesson": "m11-l05",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l05/quiz-snapshot.cs",
+      "options": [
+        {
+          "text": "`3 2`",
+          "correct": true
+        },
+        {
+          "text": "`2 2`",
+          "misconception": "m11-l05-query-result-is-copy",
+          "feedback": "Die Abfrage ist keine Kopie. `query.Count()` läuft erneut und sieht die 4, die nach `ToList()` hinzukam."
+        },
+        {
+          "text": "`3 3`",
+          "feedback": "`ToList()` hat das Ergebnis zum Zeitpunkt des Aufrufs kopiert. Die Liste `copy` enthält nur 2 und 3 und wächst nicht mit."
+        },
+        {
+          "text": "`2 3`",
+          "feedback": "Es ist umgekehrt: Die Abfrage sieht die neue Zahl, die Kopie nicht."
+        }
+      ],
+      "explanation": "`ToList()` führt die Abfrage sofort aus und legt 2 und 3 in `copy`. Die Abfrage selbst bleibt eine Beschreibung. `query.Count()` läuft nach `Add(4)` noch einmal und findet 2, 3 und 4. Die Ausgabe ist `3 2`."
+    },
+    {
+      "id": "m11-l05-q3",
+      "lesson": "m11-l05",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l05/quiz-captured.cs",
+      "options": [
+        {
+          "text": "`1`",
+          "correct": true
+        },
+        {
+          "text": "`2`",
+          "misconception": "m11-l05-query-runs-when-defined",
+          "feedback": "Das wäre das Ergebnis, wenn die Abfrage schon bei der Definition gelaufen wäre (mit `limit` 4: 5 und 9). Sie läuft aber erst bei `Count()`."
+        },
+        {
+          "text": "`3`",
+          "feedback": "Bei `limit` 8 zählen 1 und 5 nicht. Nur 9 ist größer."
+        },
+        {
+          "text": "`0`",
+          "feedback": "Die Zahl 9 ist größer als 8, also zählt sie."
+        }
+      ],
+      "explanation": "Das Lambda erfasst die Variable `limit`, nicht ihren Wert. Die Abfrage läuft erst bei `Count()`, und dann hat `limit` den Wert 8. Nur 9 ist größer als 8. Die Ausgabe ist `1`."
+    },
+    {
+      "id": "m11-l05-q4",
+      "lesson": "m11-l05",
+      "type": "single",
+      "question": "Welcher dieser Operatoren führt die Abfrage sofort aus?",
+      "options": [
+        {
+          "text": "`Count`",
+          "correct": true
+        },
+        {
+          "text": "`Where`",
+          "misconception": "m11-l05-query-runs-when-defined",
+          "feedback": "`Where` beschreibt nur den Filter. Die Elemente werden erst beim Durchlaufen geprüft."
+        },
+        {
+          "text": "`Select`",
+          "feedback": "`Select` ist verzögert. Das Lambda läuft erst, wenn jemand die Folge durchläuft."
+        },
+        {
+          "text": "`Take`",
+          "feedback": "`Take` liefert wieder eine Folge, und die Folge wird erst beim Durchlaufen gebildet."
+        }
+      ],
+      "explanation": "`Count` liefert einen einzelnen Wert (eine Zahl). Dafür muss die Folge sofort durchlaufen werden. `Where`, `Select` und `Take` liefern dagegen wieder eine Folge und sind verzögert."
+    },
+    {
+      "id": "m11-l05-q5",
+      "lesson": "m11-l05",
+      "type": "multi",
+      "question": "Welche Aufrufe führen die Abfrage sofort aus?",
+      "options": [
+        {
+          "text": "`ToList()`",
+          "correct": true
+        },
+        {
+          "text": "`ToArray()`",
+          "correct": true
+        },
+        {
+          "text": "`Count()`",
+          "correct": true
+        },
+        {
+          "text": "`Where(…)`",
+          "misconception": "m11-l05-query-runs-when-defined",
+          "feedback": "`Where` definiert nur den Filter und führt ihn nicht aus."
+        },
+        {
+          "text": "`OrderBy(…)`",
+          "feedback": "`OrderBy` ist verzögert. Es liest die Quelle erst beim Durchlaufen, dann aber ganz."
+        }
+      ],
+      "explanation": "`ToList()`, `ToArray()` und `Count()` lesen die Quelle sofort. `Where` und `OrderBy` sind verzögert: Sie beschreiben nur, was beim Durchlaufen passieren soll."
+    },
+    {
+      "id": "m11-l05-q6",
+      "lesson": "m11-l05",
+      "type": "single",
+      "question": "Eine Abfrage `kosten.Where(…)` ist in der Variablen `abfrage` gespeichert. Der Code durchläuft sie erst mit einer `foreach`-Schleife und ruft danach `abfrage.Count()` auf. Wie oft läuft die Abfrage?",
+      "options": [
+        {
+          "text": "Zweimal: einmal für die Schleife und einmal für `Count()`.",
+          "correct": true
+        },
+        {
+          "text": "Einmal, weil die Abfrage ihr Ergebnis nach dem ersten Durchlauf speichert.",
+          "misconception": "m11-l05-query-result-is-copy",
+          "feedback": "Eine Abfrage speichert kein Ergebnis. Jeder Durchlauf beginnt von vorn. Nur `ToList()` oder `ToArray()` speichern."
+        },
+        {
+          "text": "Gar nicht, weil sie schon bei der Definition gelaufen ist.",
+          "misconception": "m11-l05-query-runs-when-defined",
+          "feedback": "Die Definition führt nichts aus. Die Abfrage läuft bei jedem Durchlauf."
+        }
+      ],
+      "explanation": "Jedes `foreach` und jedes `Count()` startet die Abfrage neu. Das ist die mehrfache Aufzählung. Mit `ToList()` läuft die Abfrage nur einmal, und die Liste kann beliebig oft benutzt werden."
+    },
+    {
+      "id": "m11-l05-q7",
+      "lesson": "m11-l05",
+      "type": "single",
+      "question": "Was gilt für `OrderBy`?",
+      "options": [
+        {
+          "text": "Es ist verzögert und liest beim Durchlaufen zuerst die ganze Quelle, bevor das erste Element herauskommt.",
+          "correct": true
+        },
+        {
+          "text": "Es sortiert die Quelle sofort, sobald der Aufruf im Code steht.",
+          "misconception": "m11-l05-query-runs-when-defined",
+          "feedback": "`OrderBy` führt nichts beim Aufruf aus. Das Sortieren geschieht erst beim Durchlaufen."
+        },
+        {
+          "text": "Es gibt jedes Element sofort weiter, genau wie `Where`.",
+          "feedback": "Zum Sortieren muss `OrderBy` alle Elemente kennen. Es liefert deshalb nicht Element für Element."
+        }
+      ],
+      "explanation": "`OrderBy` gehört zu den verzögerten Operatoren, die nicht streamen: Beim Durchlaufen liest es die ganze Quelle, ordnet sie und gibt dann die Elemente her. `Where` streamt dagegen Element für Element."
+    },
+    {
+      "id": "m11-l05-q8",
+      "lesson": "m11-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wann läuft eine LINQ-Abfrage wie `liste.Where(…)`, und warum sieht sie Änderungen der Quelle, eine Liste aus `ToList()` aber nicht?",
+      "modelAnswer": "Die Definition einer Abfrage führt nichts aus. Sie beschreibt nur, was geschehen soll. Die Abfrage läuft, wenn jemand sie durchläuft, zum Beispiel mit `foreach` oder `Count()`, und sie liest dabei den aktuellen Stand der Quelle. Jeder Durchlauf beginnt von vorn. `ToList()` führt die Abfrage sofort aus und legt das Ergebnis in eine eigene Liste. Diese Liste ist eine Kopie und ändert sich nicht, wenn die Quelle später geändert wird."
+    },
+    {
+      "id": "m11-l05-q9",
+      "lesson": "m11-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm würdest du das Ergebnis einer Abfrage mit `ToList()` festhalten, und wo würdest du die Abfrage lieber unverändert lassen?",
+      "modelAnswer": "Beispiel: Ein Programm zählt die Fehlversuche und gibt danach jede Zeile aus. Mit `ToList()` läuft die Abfrage nur einmal, und beide Schritte benutzen dieselbe Liste. Das ist auch gut, wenn die Abfrage teuer ist oder Nebenwirkungen hat. Die Abfrage ohne `ToList()` passt, wenn sie bei jedem Durchlauf den aktuellen Stand sehen soll, zum Beispiel bei einer Liste, die ständig neue Ereignisse bekommt."
+    },
+    {
+      "id": "m11-l06-q1",
+      "lesson": "m11-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l06/quiz-equals.cs",
+      "explanation": "Beide Objekte haben dieselben Namen und Typen in derselben Reihenfolge, also denselben Typ. `Equals` vergleicht alle Eigenschaften und ergibt `True`. `ReferenceEquals` prüft dagegen, ob es dasselbe Objekt ist. Es sind zwei Objekte, also `False`."
+    },
+    {
+      "id": "m11-l06-q2",
+      "lesson": "m11-l06",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l06/quiz-names.cs",
+      "options": [
+        {
+          "text": "`bob 3`",
+          "correct": true
+        },
+        {
+          "text": "Nichts, der Compiler meldet einen Fehler, weil die Eigenschaften keine Namen haben.",
+          "feedback": "Bei einer Variablen und einem Memberzugriff leitet der Compiler den Namen ab: `user` und `Length`."
+        },
+        {
+          "text": "`bob bob`",
+          "feedback": "`row.Length` ist die Länge des Strings `user`, also 3."
+        }
+      ],
+      "explanation": "In `new { user, user.Length }` geben der einfache Name `user` und der Memberzugriff `user.Length` ihre eigenen Namen weiter. Das Objekt hat also die Eigenschaften `user` und `Length`. Die Ausgabe ist `bob 3`."
+    },
+    {
+      "id": "m11-l06-q3",
+      "lesson": "m11-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l06/quiz-select.cs",
+      "explanation": "`Select` macht aus jeder Zahl ein anonymes Objekt mit den Eigenschaften `n` und `Square`. Die Schleife liest beide. Die Ausgabe ist `1:1`, `2:4` und `3:9`."
+    },
+    {
+      "id": "m11-l06-q4",
+      "lesson": "m11-l06",
+      "type": "find-bug",
+      "question": "In welcher Zeile steht der Fehler? Der Compiler meldet CS0200.",
+      "example": "m11/l06/read-only.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "Die Eigenschaften eines anonymen Objekts sind schreibgeschützt. Eine Zuweisung ist ein Fehler.",
+          "misconception": "m11-l06-anonymous-type-is-writable"
+        }
+      },
+      "explanation": "Ein anonymer Typ hat nur Eigenschaften mit `get`. Zeile 2 weist `Hour` einen neuen Wert zu, und der Compiler meldet CS0200. Für einen neuen Wert erzeugst du ein neues Objekt."
+    },
+    {
+      "id": "m11-l06-q5",
+      "lesson": "m11-l06",
+      "type": "single",
+      "question": "Warum brauchst du für ein anonymes Objekt `var`?",
+      "options": [
+        {
+          "text": "Der Typ hat keinen Namen, den man hinschreiben könnte.",
+          "correct": true
+        },
+        {
+          "text": "Anonyme Objekte sind immer `dynamic`, und `var` gibt ihnen einen festen Typ.",
+          "feedback": "Der Typ steht beim Übersetzen fest. `var` schreibt ihn nur nicht hin."
+        },
+        {
+          "text": "Ohne `var` wären die Eigenschaften änderbar.",
+          "misconception": "m11-l06-anonymous-type-is-writable",
+          "feedback": "Die Eigenschaften sind immer schreibgeschützt. Das hat mit `var` nichts zu tun."
+        }
+      ],
+      "explanation": "Der Compiler erzeugt den Typ und vergibt einen Namen, den du im Code nicht schreiben kannst. Mit `var` bestimmt der Compiler den Typ aus dem Wert rechts vom `=`."
+    },
+    {
+      "id": "m11-l06-q6",
+      "lesson": "m11-l06",
+      "type": "single",
+      "question": "Eine Methode soll zwei Werte (Benutzer und Stunde) an ihren Aufrufer zurückgeben. Was passt?",
+      "options": [
+        {
+          "text": "Ein Tupel oder ein Record, weil der Rückgabetyp einen Namen haben muss.",
+          "correct": true
+        },
+        {
+          "text": "Ein anonymes Objekt, weil es die kürzeste Schreibweise hat.",
+          "feedback": "Der Rückgabetyp einer Methode muss benannt werden, und ein anonymer Typ hat keinen Namen."
+        },
+        {
+          "text": "Ein anonymes Objekt mit `var` als Rückgabetyp.",
+          "feedback": "Eine Methode darf `var` nicht als Rückgabetyp haben."
+        }
+      ],
+      "explanation": "Die Signatur einer Methode braucht einen Typ mit Namen. Ein Tupel hat die Schreibweise `(string User, int Hour)`, ein Record hat einen eigenen Namen. Anonyme Objekte bleiben innerhalb einer Methode."
+    },
+    {
+      "id": "m11-l06-q7",
+      "lesson": "m11-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über anonyme Objekte stimmen?",
+      "options": [
+        {
+          "text": "Zwei Objekte mit denselben Namen und Typen in derselben Reihenfolge haben denselben Typ.",
+          "correct": true
+        },
+        {
+          "text": "`Equals` vergleicht alle Eigenschaften.",
+          "correct": true
+        },
+        {
+          "text": "Die Eigenschaften sind nach dem Erzeugen nicht mehr zuweisbar.",
+          "correct": true
+        },
+        {
+          "text": "Man kann einer Eigenschaft später einen neuen Wert zuweisen.",
+          "misconception": "m11-l06-anonymous-type-is-writable",
+          "feedback": "Anonyme Objekte haben nur Eigenschaften mit `get`."
+        },
+        {
+          "text": "Die Reihenfolge der Eigenschaften spielt für den Typ keine Rolle.",
+          "feedback": "Eine andere Reihenfolge ergibt einen anderen Typ, und `Equals` ergibt dann `False`."
+        }
+      ],
+      "explanation": "Gleiche Namen, Typen und Reihenfolge ergeben denselben Typ, und `Equals` vergleicht alle Eigenschaften. Die Eigenschaften sind schreibgeschützt, und die Reihenfolge gehört zur Form des Typs."
+    },
+    {
+      "id": "m11-l06-q8",
+      "lesson": "m11-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Was ist ein anonymes Objekt, und worin unterscheidet es sich von einem Tupel und einem Record?",
+      "modelAnswer": "Ein anonymes Objekt entsteht mit `new { Name = …, Count = … }`. Der Compiler erzeugt dafür einen Typ ohne Namen mit schreibgeschützten Eigenschaften und wertbasierter Gleichheit. Weil der Typ keinen Namen hat, braucht die Variable `var`, und das Objekt bleibt innerhalb der Methode. Ein Tupel hat die Form `(a, b)`, ist ein Werttyp mit änderbaren Elementen und kann zurückgegeben werden. Ein Record hat einen eigenen Namen, ist unveränderlich (bei positionalen Eigenschaften) und passt für Werte, die durch das Programm wandern."
+    },
+    {
+      "id": "m11-l06-q9",
+      "lesson": "m11-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem Programm würdest du `Select` mit einem anonymen Objekt benutzen, und wann würdest du einen Record nehmen?",
+      "modelAnswer": "Beispiel: Ein Programm will aus einer Liste von Ereignissen für eine Tabelle nur Benutzer und Stunde ausgeben. Ein anonymes Objekt reicht, weil das Ergebnis nur in dieser einen Methode benutzt wird. Wenn das Ergebnis an andere Methoden weitergegeben oder gespeichert werden soll, nehme ich einen Record, weil er einen Namen hat."
     }
   ]
 }

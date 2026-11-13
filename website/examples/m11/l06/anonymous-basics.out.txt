@@ -1,0 +1,4 @@
+bob at 8
+fig has 3 letters
+{ Name = bob, Hour = 8 }
+{ word = fig, Length = 3 }

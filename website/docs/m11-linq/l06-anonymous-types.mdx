@@ -1,0 +1,201 @@
+---
+title: Anonyme Typen in Projektionen
+sidebar_position: 6
+description: Mit new { … } entsteht ein Objekt eines namenlosen Typs mit schreibgeschützten Eigenschaften und wertbasierter Gleichheit. Das ist die übliche Form für das Ergebnis von Select innerhalb einer Methode.
+lesson_id: m11-l06
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import anonymousBasics from '!!raw-loader!@site/examples/m11/l06/anonymous-basics.cs';
+import equality from '!!raw-loader!@site/examples/m11/l06/equality.cs';
+import equalityOutput from '!!raw-loader!@site/examples/m11/l06/equality.out.txt';
+import selectAnonymous from '!!raw-loader!@site/examples/m11/l06/select-anonymous.cs';
+import compareShapes from '!!raw-loader!@site/examples/m11/l06/compare-shapes.cs';
+import readOnly from '!!raw-loader!@site/examples/m11/l06/read-only.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l06/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l06/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l06/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l06/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l06/seclog-linq-solution.cs';
+
+# Anonyme Typen in Projektionen
+
+:::note[Lernziele]
+- Du kannst mit `new { … }` ein anonymes Objekt erzeugen, auch mit abgeleiteten Namen (`new { e.User }`).
+- Du kannst vorhersagen, wann zwei anonyme Objekte gleich sind und was `ToString()` ausgibt.
+- Du kannst entscheiden, ob für ein Ergebnis ein anonymer Typ, ein Tupel oder ein Record passt.
+- Du kannst erklären, warum man für ein anonymes Objekt `var` braucht.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l10-q6" />
+
+<Quiz id="m03-l09-q6" />
+
+<Quiz id="m11-l03-q3" />
+
+## Zwei Werte pro Element
+
+`Select` macht aus jedem Element einen neuen Wert. Oft brauchst du dabei zwei Werte pro Element, zum Beispiel Benutzer und Stunde eines Ereignisses. Ein einzelner String wie die Ausgabe von `Describe()` verliert diese Struktur: Du müsstest ihn später wieder zerlegen. Eine eigene Klasse nur für eine einzige Abfrage ist viel Code.
+
+Dafür gibt es das <Term id="anonymous-type">anonyme Objekt</Term>: Du schreibst `new { … }` mit den Werten, und der Compiler erzeugt den Typ selbst. Der Typ hat keinen Namen, den du schreiben könntest. Für jeden Wert gibt es eine Eigenschaft.
+
+## Ein anonymes Objekt erzeugen
+
+Jeder Teil in den Klammern heißt Memberdeklarator. Die Form `Name = ausdruck` legt den Namen der Eigenschaft fest. Besteht der Teil nur aus einem einfachen Namen (`word`) oder einem Memberzugriff (`word.Length`), übernimmt die Eigenschaft diesen Namen. Der Compiler leitet den Namen ab. Der Typ jeder Eigenschaft ist der Typ des Ausdrucks.
+
+Weil der Typ keinen Namen hat, deklarierst du die Variable mit `var` (Lektion `m01-l05`): Der Compiler bestimmt den Typ aus dem Wert rechts vom `=`. Das ist hier kein Komfort, sondern Pflicht.
+
+<CSharpRunner id="m11-l06-anonymous-basics" code={anonymousBasics} />
+
+Die Ausgabe von `Console.WriteLine(row)` ist ein Aufruf von `ToString()`. Der Compiler erzeugt diese Methode mit: Sie schreibt die Namen und Werte in geschweiften Klammern.
+
+## Gleichheit
+
+Der Compiler überschreibt `Equals` und `GetHashCode`: Zwei anonyme Objekte sind gleich, wenn alle Eigenschaften gleich sind. Das gilt nur für Objekte vom selben Typ. Zwei anonyme Objekte haben denselben Typ, wenn ihre Eigenschaften dieselben Namen und Typen in derselben Reihenfolge haben.
+
+:::info[Vorhersage]
+Welche sechs Zeilen gibt das Programm aus? Achte auf `d`: Die Eigenschaften stehen in anderer Reihenfolge.
+:::
+
+<CSharpRunner id="m11-l06-equality" code={equality} predict expected={equalityOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, `False`, `False`, `False`, `True` und `{ User = bob, Hour = 8 }`.
+
+1. **Gleiche Form:** `a` und `b` haben dieselben Namen, Typen und Reihenfolge, also denselben Typ. Alle Eigenschaften sind gleich, daher ergibt `a.Equals(b)` `True`.
+2. **Anderer Wert:** `c` hat `Hour = 9`, also ergibt `a.Equals(c)` `False`.
+3. **Andere Reihenfolge:** `d` hat die Eigenschaften in der Reihenfolge `Hour`, `User`. Das ist ein anderer Typ, und `Equals` ergibt `False`.
+4. **Zwei Objekte:** `ReferenceEquals` fragt, ob es dasselbe Objekt ist. `a` und `b` sind zwei Objekte, also `False`. Ihre Hashcodes sind gleich (`True`), weil sie aus denselben Werten entstehen.
+5. **Zuweisung:** Weil `a` und `b` denselben Typ haben, darf `a = b` stehen.
+
+**Was passiert, wenn …?** … du `a = d;` schreibst? Der Compiler lehnt es ab, weil `d` einen anderen Typ hat.
+
+</details>
+
+## Projektion mit Select
+
+In einer Abfrage ist das anonyme Objekt die übliche Form für das Ergebnis einer <Term id="projection">Projektion</Term>: `Select` erzeugt pro Element ein Objekt mit den Werten, die du brauchst. Die `foreach`-Schleife liest die Eigenschaften mit `row.Word`. Die Abfrage selbst ist wie in Lektion 5 verzögert.
+
+<CSharpRunner id="m11-l06-select-anonymous" code={selectAnonymous} />
+
+Mit `var` in der Schleife kennt der Compiler den Typ, und die Eingabehilfe des Editors zeigt dir die Eigenschaften.
+
+## Schreibgeschützt
+
+Die Eigenschaften eines anonymen Objekts haben nur `get`. Du kannst sie nach dem Erzeugen nicht ändern. Für einen neuen Wert erzeugst du ein neues Objekt.
+
+Der folgende Code ändert `Hour`. Der Compiler meldet: `error CS0200: Property or indexer '<anonymous type: string Name, int Hour>.Hour' cannot be assigned to -- it is read only`.
+
+<CodeBlock language="csharp" title="read-only.snippet.cs">{readOnly}</CodeBlock>
+
+## Anonymer Typ, Tupel oder Record?
+
+Alle drei fassen mehrere Werte zusammen. Sie unterscheiden sich im Namen, im Geltungsbereich, in der Gleichheit und in der Änderbarkeit:
+
+| | Anonymer Typ | Tupel (Lektion `m03-l09`) | Record (Lektion `m08-l10`) |
+| --- | --- | --- | --- |
+| Name des Typs | keiner | keiner, aber eine Schreibweise `(string, int)` | eigener Name |
+| Geltungsbereich | innerhalb einer Methode, denn der Typ lässt sich nicht als Rückgabetyp oder Parameter schreiben | überall, auch als Rückgabetyp | überall |
+| Gleichheit | wertbasiert (`Equals`) | wertbasiert | wertbasiert |
+| Änderbarkeit | Eigenschaften schreibgeschützt | Elemente änderbar | positionale Eigenschaften nur beim Erzeugen setzbar |
+
+<CSharpRunner id="m11-l06-compare-shapes" code={compareShapes} />
+
+Alle drei geben die Werte aus und sind gleich, wenn die Werte gleich sind. Nur beim Tupel lässt sich ein Element ändern (`tuple.Length = 4`). Die Ausgabe der Typen unterscheidet sich: Das Tupel nennt nur die Werte, der Record seinen Namen.
+
+Daraus folgt eine Faustregel: Ein anonymer Typ passt für das Zwischenergebnis einer Abfrage innerhalb einer Methode. Soll das Ergebnis eine Methode verlassen, nimmst du ein Tupel oder einen Record.
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. die Web-Hosts filtern, 2. jeden Host in ein anonymes Objekt projizieren, 3. die Zeilen ausgeben. Das Beispiel ist vollständig. Ändere `Select` so, dass es `Name = h.ToUpper()` statt `Host = h` liefert, und passe die Ausgabe an. Sage vorher, was herauskommt.
+
+<CSharpRunner id="m11-l06-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Filtern:** `StartsWith("web")` behält `web-1` und `web-22`.
+2. **Projizieren:** `new { Host = h, h.Length }` hat die Eigenschaften `Host` und `Length`. Die Länge übernimmt ihren Namen vom Memberzugriff.
+3. **Ausgeben:** `row.Host` und `row.Length` lesen die Eigenschaften. Mit `Name = h.ToUpper()` heißt die Eigenschaft `Name`, und die Schleife muss `row.Name` lesen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zeigt, dass eine Abfrage erst beim Durchlaufen läuft. `logEvents` ist die Liste der Log-Ereignisse, und `IsFailure()` aus Lektion 1 erkennt einen Fehlversuch.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Project log events into anonymous objects`. Definiere `var failureRows = logEvents.Where(e => e.IsFailure()).Select(e => new { e.User, e.Timestamp.Hour });` und gib jede Zeile mit `foreach` aus (die `ToString()`-Ausgabe des anonymen Objekts). Erzeuge danach von Hand zwei Objekte `new { User = "bob", Hour = 8 }`, vergleiche sie mit `Equals` und gib das Ergebnis aus (`True`).
+
+<CSharpRunner id="m11-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Filtern:** `Where(e => e.IsFailure())` behält die 7 Fehlversuche.
+2. **Projizieren:** `new { e.User, e.Timestamp.Hour }` leitet die Namen `User` und `Hour` ab. Der Zeitstempel bleibt dabei unverändert, nur die Stunde wird übernommen.
+3. **Ausgeben:** Die Schleife gibt jede Zeile als `{ User = …, Hour = … }` aus.
+4. **Vergleichen:** Zwei von Hand gebaute Objekte mit denselben Namen und Werten haben denselben Typ, und `Equals` ergibt `True`.
+
+</details>
+
+**Neuer Stand:** SecLog projiziert Log-Ereignisse in anonyme Objekte mit Benutzer und Stunde.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l06-anonymous-type-is-writable" />
+
+**„Die Eigenschaften eines anonymen Objekts kann man später ändern.“** Das stimmt nicht. Die Eigenschaften sind schreibgeschützt (nur `get`). Eine Zuweisung ist ein Compilerfehler (CS0200). Für einen neuen Wert erzeugst du ein neues Objekt.
+:::
+
+<details>
+<summary>Vertiefung: Was die Spezifikation für anonyme Objekte festlegt (optional)</summary>
+
+Die Memberdeklaratoren, die abgeleiteten Namen und die Regel für denselben Typ stehen in [Anonymous object creation expressions (§12.8.17.3)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128173-anonymous-object-creation-expressions): Der Typ ist eine namenlose Klasse, die direkt von `object` erbt. Seine Member sind schreibgeschützte Eigenschaften. `Equals` und `GetHashCode` sind über die Eigenschaften definiert. Im selben Programm erzeugen zwei Initialisierer mit denselben Namen und Typen in derselben Reihenfolge Objekte desselben Typs.
+
+Ein Memberausdruck muss einen Typ haben. `null` oder ein Lambda sind deshalb als Wert ohne Typangabe nicht erlaubt. Dass der Compiler auch `ToString()` erzeugt, steht im C#-Leitfaden [Anonymous types](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/anonymous-types), nicht in der Spezifikation. Der Vergleich mit Tupeln steht in [Choosing between anonymous and tuple types](https://learn.microsoft.com/dotnet/standard/base-types/choosing-between-anonymous-and-tuple).
+
+</details>
+
+## Zusammenfassung
+
+Mit `new { … }` erzeugst du ein Objekt eines Typs, den der Compiler baut und der keinen Namen hat. Deshalb braucht die Variable `var`. Namen kommen aus `Name = …` oder aus einem einfachen Namen oder Memberzugriff. Die Eigenschaften sind schreibgeschützt, `Equals` vergleicht alle Eigenschaften, und gleiche Namen, Typen und Reihenfolge ergeben denselben Typ. Anonyme Objekte sind die übliche Form für das Ergebnis von `Select` innerhalb einer Methode. Für Ergebnisse, die eine Methode verlassen, nimmst du ein Tupel oder einen Record.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l06-q1" />
+
+<Quiz id="m11-l06-q2" />
+
+<Quiz id="m11-l06-q3" />
+
+<Quiz id="m11-l06-q4" />
+
+<Quiz id="m11-l06-q5" />
+
+<Quiz id="m11-l06-q6" />
+
+<Quiz id="m11-l06-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l06-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l06-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Anonyme Typen (C#)](https://learn.microsoft.com/dotnet/csharp/programming-guide/classes-and-structs/anonymous-types)
+- Microsoft Learn: [Wahl zwischen anonymen Typen und Tupeln](https://learn.microsoft.com/dotnet/standard/base-types/choosing-between-anonymous-and-tuple)
+- Microsoft Learn: [Ausdrücke zur Erzeugung anonymer Objekte (C#-Spezifikation)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128173-anonymous-object-creation-expressions)
