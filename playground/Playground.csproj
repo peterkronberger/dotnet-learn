@@ -37,8 +37,14 @@
     The DLLs are embedded as resources in Playground.dll and read on first start.
   -->
   <Target Name="EmbedReferenceAssemblies" BeforeTargets="AssignTargetPaths">
+    <!-- Take the directory from the resolved reference pack of $(TargetFramework). The SDK's
+         BundledNETCoreAppPackageVersion can point to a newer major version (e.g. 11.0.0 when
+         a newer SDK is installed), whose pack does not contain net10.0. -->
+    <ItemGroup>
+      <SystemRuntimeRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'System.Runtime'" />
+    </ItemGroup>
     <PropertyGroup>
-      <RefPackDir>$(NetCoreTargetingPackRoot)/Microsoft.NETCore.App.Ref/$(BundledNETCoreAppPackageVersion)/ref/$(TargetFramework)/</RefPackDir>
+      <RefPackDir>@(SystemRuntimeRef->'%(RootDir)%(Directory)')</RefPackDir>
     </PropertyGroup>
 
     <ItemGroup>
