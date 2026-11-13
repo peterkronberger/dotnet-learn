@@ -363,7 +363,15 @@ Mixes M9–M11. Folder `w03-review-generics-linq/`, quiz file `de/w03.json`, pos
     - `for` vs. `foreach` capture (`m10-l05`)
     - event vs. public delegate field (`m10-l07`)
   - Misconception ids: m10-l01-method-group-calls-method, m10-l03-lambda-runs-when-defined, m10-l05-lambda-captures-value, m10-l06-multicast-returns-all-results, m10-l07-event-raised-from-outside
-- **M11**: Filled by the module review of M11.
+- **M11** (from `module-digest.md` `## M11`):
+  - Concepts:
+    - extension method vs. instance method (`m11-l01`, `m06`)
+    - deferred vs. immediate operator (`m11-l05`)
+    - iterator `yield return` vs. `return` (`m11-l04`, `m03`)
+    - anonymous type vs. tuple vs. record (`m11-l06`, `m03`, `m08-l10`)
+    - `First` vs. `FirstOrDefault` vs. `Single` (`m11-l08`)
+    - `Union` vs. `Concat` (`m11-l09`)
+  - Misconception ids: m11-l01-extension-beats-instance-method, m11-l04-yield-return-ends-method, m11-l05-query-runs-when-defined, m11-l05-query-result-is-copy, m11-l08-first-returns-null
 - ▶: all covered modules are runnable.
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
