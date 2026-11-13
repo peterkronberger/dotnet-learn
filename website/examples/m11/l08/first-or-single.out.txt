@@ -1,0 +1,3 @@
+First b2: b2
+Single a1: a1
+Single b2: InvalidOperationException

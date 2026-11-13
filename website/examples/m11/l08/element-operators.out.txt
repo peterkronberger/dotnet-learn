@@ -1,0 +1,6 @@
+First: 4
+First above 10: 15
+Last: 42
+Last below 20: 16
+Single above 40: 42
+Element at 2: 15

@@ -1,0 +1,4 @@
+{ Letter = a, Count = 3 }
+{ Letter = b, Count = 2 }
+{ Letter = c, Count = 1 }
+3

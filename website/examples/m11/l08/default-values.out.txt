@@ -1,0 +1,6 @@
+int: 0
+string is null: True
+own default: -1
+Single: 0
+Last: 0
+ElementAt: 0

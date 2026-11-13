@@ -1,0 +1,208 @@
+---
+title: Element-Operatoren und Quantoren
+sidebar_position: 8
+description: First, Last, Single und ElementAt wählen ein Element aus und verhalten sich bei keinem oder mehreren Treffern verschieden. Any, All und Contains beantworten Ja-Nein-Fragen über eine Folge.
+lesson_id: m11-l08
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import loopVsOperator from '!!raw-loader!@site/examples/m11/l08/loop-vs-operator.cs';
+import elementOperators from '!!raw-loader!@site/examples/m11/l08/element-operators.cs';
+import noMatch from '!!raw-loader!@site/examples/m11/l08/no-match.cs';
+import noMatchOutput from '!!raw-loader!@site/examples/m11/l08/no-match.out.txt';
+import defaultValues from '!!raw-loader!@site/examples/m11/l08/default-values.cs';
+import nullSafe from '!!raw-loader!@site/examples/m11/l08/null-safe.cs';
+import firstOrSingle from '!!raw-loader!@site/examples/m11/l08/first-or-single.cs';
+import quantifiers from '!!raw-loader!@site/examples/m11/l08/quantifiers.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l08/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l08/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l08/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l08/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l08/seclog-linq-solution.cs';
+
+# Element-Operatoren und Quantoren
+
+:::note[Lernziele]
+- Du kannst `First`, `FirstOrDefault`, `Last`, `Single`, `SingleOrDefault` und `ElementAt` einsetzen und vorhersagen, was sie bei keinem oder mehreren passenden Elementen tun.
+- Du kannst erklären, was `FirstOrDefault` bei einem Werttyp und bei einem Verweistyp liefert, und den Standardwert selbst angeben.
+- Du kannst `Any`, `All` und `Contains` einsetzen und ihr Ergebnis bei einer leeren Folge vorhersagen.
+- Du kannst entscheiden, ob `First` oder `Single` die Absicht besser ausdrückt.
+:::
+
+## Rückblick
+
+<Quiz id="m09-l04-q1" />
+
+<Quiz id="m04-l06-q1" />
+
+<Quiz id="m11-l07-q5" />
+
+## Gibt es einen Fehlversuch? Welcher war der erste?
+
+Zwei Fragen stellst du an Daten ständig: „Gibt es überhaupt ein Element mit dieser Eigenschaft?“ und „Welches ist das erste?“ In Modul 2 hast du beides mit einer Schleife und `break` gelöst: eine Hilfsvariable, die Schleife, die Bedingung, das Abbrechen. Mit LINQ ist es ein Aufruf.
+
+<CSharpRunner id="m11-l08-loop-vs-operator" code={loopVsOperator} />
+
+`Any` ist ein <Term id="quantifier">Quantor</Term>: Er beantwortet eine Ja-Nein-Frage über die Folge. `First` ist ein <Term id="element-operator">Element-Operator</Term>: Er wählt genau ein Element aus. Beide gehören zu den <Term id="query-operator">Abfrageoperatoren</Term>, und beide sind **sofort** (Lektion `m11-l05`): Sie laufen beim Aufruf. Sie hören auf, sobald die Antwort feststeht, und lesen den Rest der Folge nicht mehr.
+
+## Ein Element auswählen
+
+`First()` gibt das erste Element zurück, `Last()` das letzte. Mit einer Bedingung als Parameter liefern sie das erste beziehungsweise letzte Element, das die Bedingung erfüllt. `Single` erwartet genau ein passendes Element. `ElementAt(n)` gibt das Element an Position `n` zurück (gezählt ab 0).
+
+<CSharpRunner id="m11-l08-element-operators" code={elementOperators} />
+
+## Wenn nichts passt: First wirft, FirstOrDefault nicht
+
+Was geschieht, wenn kein Element passt? Die Operatoren ohne Namenszusatz haben darauf keine Antwort und werfen eine Ausnahme. `Single` wirft auch, wenn **mehr als ein** Element passt, denn dann ist „das eine Element“ nicht eindeutig.
+
+:::info[Vorhersage]
+Welche Ausnahme steckt hinter jeder Zeile? Die Namen sind `InvalidOperationException` und `ArgumentOutOfRangeException`. Beachte die beiden `Single`-Zeilen: Sie scheitern aus verschiedenen Gründen.
+:::
+
+<CSharpRunner id="m11-l08-no-match" code={noMatch} predict expected={noMatchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`First` und `Last` ohne Treffer:** `InvalidOperationException`, weil kein Element die Bedingung erfüllt.
+2. **`Single` ohne Treffer:** ebenfalls `InvalidOperationException`.
+3. **`Single` mit mehreren Treffern:** `15`, `16`, `23` und `42` sind größer als 10. Es gibt vier Treffer statt einem, und `Single` wirft dieselbe Ausnahme.
+4. **`ElementAt(10)`:** Die Folge hat nur 6 Elemente. Der Index liegt außerhalb, und es kommt eine `ArgumentOutOfRangeException`.
+5. **`First` einer leeren Folge:** `InvalidOperationException`.
+
+**Was passiert, wenn …?** … `Single` ein einziges Element mit passender Bedingung findet? Dann gibt es dieses Element zurück, ohne Ausnahme.
+
+</details>
+
+## Die OrDefault-Formen
+
+Wenn „kein Treffer“ ein normaler Fall ist, nimmst du die Form mit `OrDefault`: `FirstOrDefault`, `LastOrDefault`, `SingleOrDefault` und `ElementAtOrDefault`. Sie werfen bei keinem Treffer nicht, sondern geben den Standardwert des Elementtyps zurück, wie bei <Term id="default-value-expression">`default(T)`</Term> (Lektion `m09-l04`): `0` für `int`, `false` für `bool` und `null` für Verweistypen wie `string`. `SingleOrDefault` wirft bei **mehreren** Treffern weiterhin.
+
+Einen eigenen Standardwert gibst du als zweiten Parameter an: `FirstOrDefault(Bedingung, -1)`.
+
+<CSharpRunner id="m11-l08-default-values" code={defaultValues} />
+
+Ein Standardwert von `0` ist bei Zahlen nicht von einem echten Treffer `0` zu unterscheiden. Ein eigener Wert wie `-1` macht „nichts gefunden“ erkennbar.
+
+Bei Verweistypen ist das Ergebnis von `FirstOrDefault` ein `string?`: Es kann `null` sein. Wie in Lektion `m04-l06` gehst du damit mit `?.` und `??` um.
+
+<CSharpRunner id="m11-l08-null-safe" code={nullSafe} />
+
+## First oder Single?
+
+Beide geben ein Element zurück, drücken aber verschiedene Absichten aus. `First` sagt: „Gib mir das erste, mehrere dürfen existieren.“ `Single` sagt: „Es gibt genau eines. Wenn nicht, ist etwas falsch.“ Bei einer eindeutigen Kennung wie einer ID passt `Single`, weil ein Duplikat ein Fehler in den Daten ist, den du sehen willst. `First` würde ihn verschweigen.
+
+<CSharpRunner id="m11-l08-first-or-single" code={firstOrSingle} />
+
+## Quantoren: Ja-Nein-Fragen
+
+| Quantor | Frage | Bei einer leeren Folge |
+| --- | --- | --- |
+| `Any()` | Gibt es mindestens ein Element? | `false` |
+| `Any(Bedingung)` | Erfüllt mindestens ein Element die Bedingung? | `false` |
+| `All(Bedingung)` | Erfüllen alle Elemente die Bedingung? | `true` |
+| `Contains(Wert)` | Kommt der Wert vor? | `false` |
+
+Dass `All` bei einer leeren Folge `true` ergibt, überrascht. Der Grund: `All` sucht ein Gegenbeispiel, ein Element, das die Bedingung **nicht** erfüllt. Ohne Elemente gibt es keines, also gilt die Aussage.
+
+<CSharpRunner id="m11-l08-quantifiers" code={quantifiers} />
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. fragen, ob ein Benutzername kurz ist, 2. fragen, ob alle klein geschrieben sind, 3. den ersten langen Namen suchen. Das Beispiel ist vollständig. Ändere die Bedingung von `firstLong` auf `u.Length > 10`. Sage vorher, was die letzte Zeile ausgibt und welchen Typ `firstLong` hat.
+
+<CSharpRunner id="m11-l08-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **`Any`:** `bob` hat drei Buchstaben, also `True`.
+2. **`All`:** Alle Namen sind klein geschrieben, also `True`.
+3. **`FirstOrDefault`:** Mit `u.Length > 10` passt kein Name. Das Ergebnis ist `null` (`string?`), und die Interpolation gibt einen leeren Text aus. Mit `First` würde das Programm abbrechen.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlversuche pro Stunde und nennt die häufigsten IP-Adressen. Die Liste `logEvents` und die Erweiterungsmethoden `IsFailure()` und `IsFrom(…)` aus Lektion 1 sind verfügbar.
+
+Im Runner siehst du die Stelle vor `// End with exit code 0 …` und die Stelle für die neue lokale Funktion zwischen den ausgeblendeten Teilen (Zeilen mit ⋯). Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Rate reported messages as possible phishing`:
+
+1. Lege `string[] reportedMessages` mit den sechs gemeldeten Nachrichten und `string[] signalWords = ["password", "login", "urgent", "locked", "prize", "click", "verify"];` an. Die sechs Texte stehen in `concept/project-seclog.md` („Reported messages“). Du schreibst sie dort ab, genau wie sie dort stehen.
+2. Schreibe eine lokale Funktion `bool IsPossiblePhishing(string message, string[] signalWords)` vor dem Kommentar `// Format a report line …`. Sie ergibt `true`, wenn die Nachricht `http://` enthält (`StringComparison.Ordinal`) **und** `signalWords.Any(word => message.Contains(word, StringComparison.OrdinalIgnoreCase))` gilt.
+3. Gib pro Nachricht eine Zeile `Message 1: possible phishing` oder `Message 4: harmless` aus. Gib danach `reportedMessages.All(m => m.Length > 0)` aus, die Nummer der ersten harmlosen Nachricht (`First` mit Bedingung und `Array.IndexOf`) und `logEvents.FirstOrDefault(e => e.IsFrom("bob") && e.EventType == "logout")?.Describe() ?? "no logout of bob"`.
+
+Die Bewertung ist eine Vereinfachung für den Unterricht: Eine echte Phishing-Erkennung braucht viel mehr Kontext als einen Link und ein paar Signalwörter.
+
+<CSharpRunner id="m11-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Funktion:** `IsPossiblePhishing` prüft zuerst den Link und dann mit `Any`, ob irgendein Signalwort vorkommt. Die Groß- und Kleinschreibung spielt bei den Signalwörtern keine Rolle, deshalb `OrdinalIgnoreCase`.
+2. **Bewertung:** Die Nachrichten 1 bis 3 haben einen `http://`-Link und Signalwörter („password“, „login“, „prize“). Die Nachrichten 4 bis 6 haben keinen Link.
+3. **`All`:** Keine Nachricht ist leer, also `True`.
+4. **`First` und `Array.IndexOf`:** `First` findet die erste harmlose Nachricht, `Array.IndexOf` gibt ihren Index 3, und plus 1 ergibt die Nummer 4.
+5. **`FirstOrDefault`:** bob hat kein Logout. `FirstOrDefault` gibt `null` zurück, `?.` überspringt `Describe()`, und `??` liefert den Ersatztext.
+
+</details>
+
+**Neuer Stand:** SecLog bewertet die gemeldeten Nachrichten als „möglicherweise Phishing“ oder „harmlos“.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l08-first-returns-null" />
+
+**„`First` gibt `null` zurück, wenn nichts passt.“** Das stimmt nicht. `First` wirft eine `InvalidOperationException`. Nur `FirstOrDefault` gibt den Standardwert zurück, und der ist bei einer `int`-Folge `0`, nicht `null`. `null` bekommst du nur bei Verweistypen.
+:::
+
+<details>
+<summary>Vertiefung: Bibliotheksdetails zu Element-Operatoren und Quantoren (optional)</summary>
+
+Dieser Abschnitt beschreibt Bibliotheksverhalten, nicht die Sprache. Die Operatoren stehen in `System.Linq.Enumerable`.
+
+`First`, `Last` und `Single` werfen eine `InvalidOperationException`, wenn die Folge leer ist oder kein Element die Bedingung erfüllt. `Single` wirft sie außerdem, wenn mehr als ein Element passt ([Enumerable.Single](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.single)). `FirstOrDefault` hat seit .NET 6 Überladungen mit einem selbst gewählten Standardwert ([Enumerable.FirstOrDefault](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.firstordefault)).
+
+`Any`, `All` und `Contains` sind Quantoren der Standardabfrageoperatoren. Bei einer leeren Folge ergibt `All` `true`, `Any` und `Contains` ergeben `false` ([Enumerable.All](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.all)).
+
+</details>
+
+## Zusammenfassung
+
+Element-Operatoren (`First`, `Last`, `Single`, `ElementAt`) wählen ein Element aus. Ohne Treffer werfen sie eine `InvalidOperationException` (`ElementAt` bei einem zu großen Index eine `ArgumentOutOfRangeException`), `Single` auch bei mehreren Treffern. Die `OrDefault`-Formen geben stattdessen den Standardwert zurück: `0` bei `int`, `null` bei Verweistypen, oder einen selbst angegebenen Wert. Quantoren beantworten Ja-Nein-Fragen: `Any` ergibt bei einer leeren Folge `false`, `All` `true`. `First` drückt „das erste von vielen“ aus, `Single` „genau eines“.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l08-q1" />
+
+<Quiz id="m11-l08-q2" />
+
+<Quiz id="m11-l08-q3" />
+
+<Quiz id="m11-l08-q4" />
+
+<Quiz id="m11-l08-q5" />
+
+<Quiz id="m11-l08-q6" />
+
+<Quiz id="m11-l08-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l08-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l08-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Element-Operationen (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/element-operations)
+- Microsoft Learn: [Quantifizierer-Operationen (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/quantifier-operations)
+- Microsoft Learn: [Enumerable.FirstOrDefault](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.firstordefault)

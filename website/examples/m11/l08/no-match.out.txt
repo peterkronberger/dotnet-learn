@@ -1,0 +1,6 @@
+First above 100: InvalidOperationException
+Last above 100: InvalidOperationException
+Single above 100: InvalidOperationException
+Single above 10: InvalidOperationException
+ElementAt 10: ArgumentOutOfRangeException
+First of empty: InvalidOperationException
