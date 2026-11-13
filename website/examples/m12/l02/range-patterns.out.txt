@@ -1,0 +1,5 @@
+0: False False
+1: True True
+2: True True
+3: False False
+5: False False

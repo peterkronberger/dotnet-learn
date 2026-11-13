@@ -7347,6 +7347,84 @@
         "title": "Query expression basics",
         "url": "https://learn.microsoft.com/dotnet/csharp/linq/get-started/query-expression-basics"
       }
+    },
+    {
+      "id": "type-pattern",
+      "term": "Type pattern",
+      "german": "Typmuster",
+      "category": "language",
+      "definition": "Ein Pattern, das nur den Laufzeittyp prüft, zum Beispiel `x is string` oder `string => …` in einem switch-Ausdruck. Es legt keine Variable an und passt nie auf `null`.",
+      "aliases": [
+        "Typpattern"
+      ],
+      "related": [
+        "pattern",
+        "declaration-pattern"
+      ],
+      "lesson": "m12-l01",
+      "source": {
+        "title": "11.2.8 Type pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1128-type-pattern"
+      }
+    },
+    {
+      "id": "is-pattern-expression",
+      "term": "Is-pattern expression",
+      "german": "Ist-Muster-Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck der Form `wert is Muster`. Er ergibt `true`, wenn der Wert zum Pattern passt, und sonst `false`.",
+      "aliases": [
+        "is-Ausdruck",
+        "is-Pattern"
+      ],
+      "related": [
+        "pattern",
+        "type-test"
+      ],
+      "lesson": "m12-l01",
+      "source": {
+        "title": "12.15.12 The is operator",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#121512-the-is-operator"
+      }
+    },
+    {
+      "id": "logical-pattern",
+      "term": "Logical pattern",
+      "german": "Logisches Muster",
+      "category": "language",
+      "definition": "Ein Pattern, das andere Patterns mit `not`, `and` oder `or` verbindet. `not` bindet stärker als `and`, `and` stärker als `or`.",
+      "aliases": [
+        "Logisches Pattern",
+        "Pattern-Kombinator"
+      ],
+      "related": [
+        "pattern",
+        "relational-pattern"
+      ],
+      "lesson": "m12-l02",
+      "source": {
+        "title": "11.2.10 Logical pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern"
+      }
+    },
+    {
+      "id": "parenthesized-pattern",
+      "term": "Parenthesized pattern",
+      "german": "Geklammertes Muster",
+      "category": "language",
+      "definition": "Ein Pattern in runden Klammern. Die Klammern legen fest, welche Teile eines logischen Patterns zusammengehören.",
+      "aliases": [
+        "Geklammertes Pattern"
+      ],
+      "related": [
+        "pattern",
+        "logical-pattern"
+      ],
+      "lesson": "m12-l02",
+      "source": {
+        "title": "11.2.1 Pattern forms (General)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1121-general"
+      }
     }
   ]
 }

@@ -1,0 +1,4 @@
+0: none
+2: low
+4: medium
+9: high

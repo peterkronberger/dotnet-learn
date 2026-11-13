@@ -1,0 +1,4 @@
+string with 5 characters
+int, doubled: 84
+something else
+null

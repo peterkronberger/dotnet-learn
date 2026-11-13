@@ -1,0 +1,4 @@
+text of length 3
+number 7
+nothing
+other
