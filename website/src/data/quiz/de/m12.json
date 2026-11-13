@@ -1,4 +1,289 @@
 {
   "module": "m12",
-  "questions": []
+  "questions": [
+    {
+      "id": "m12-l01-q1",
+      "lesson": "m12-l01",
+      "type": "single",
+      "question": "`string? text = null;` – was ergibt `text is string`?",
+      "options": [
+        {
+          "text": "`False`",
+          "correct": true,
+          "feedback": "Das Typmuster passt nie auf `null`."
+        },
+        {
+          "text": "`True`, weil `text` als `string?` deklariert ist",
+          "feedback": "Der deklarierte Typ spielt keine Rolle. Ein Nullverweis hat keinen Laufzeittyp, den das Typmuster prüfen könnte.",
+          "misconception": "m12-l01-type-pattern-matches-null"
+        },
+        {
+          "text": "Eine `NullReferenceException`",
+          "feedback": "`is` löst bei `null` keine Ausnahme aus, es ergibt einfach `False`."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler",
+          "feedback": "Der Ausdruck ist gültig, `text` darf `null` sein."
+        }
+      ],
+      "explanation": "Ein Typmuster und ein Deklarationsmuster passen nie auf `null`, auch nicht, wenn der deklarierte Typ derselbe ist. Für `null` brauchst du `is null`."
+    },
+    {
+      "id": "m12-l01-q2",
+      "lesson": "m12-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l01/quiz-switch-null.cs",
+      "explanation": "`\"a\"` passt zum Typmuster `string`. `missing` enthält `null`, und kein Typmuster passt auf `null`, also greift `_` und es steht `other`. `1` passt zu `int`."
+    },
+    {
+      "id": "m12-l01-q3",
+      "lesson": "m12-l01",
+      "type": "cloze",
+      "question": "Ergänze die Muster der Arme.",
+      "example": "m12/l01/gap-describe.cs",
+      "blanks": [
+        {
+          "text": "null",
+          "hint": "Ein Konstantenmuster für den fehlenden Wert."
+        },
+        {
+          "text": "string",
+          "hint": "Der Typ, dessen Wert in `text` steht."
+        },
+        {
+          "text": "int",
+          "hint": "Der Typ, dessen Wert in `number` steht."
+        }
+      ],
+      "explanation": "`null` ist ein Konstantenmuster, `string text` und `int number` sind Deklarationsmuster. Der Arm `_` fängt alles andere ab."
+    },
+    {
+      "id": "m12-l01-q4",
+      "lesson": "m12-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über `is` und Muster stimmen?",
+      "options": [
+        {
+          "text": "`value is string text` gibt den Wert nur dann in `text` heraus, wenn er ein `string` ist.",
+          "correct": true
+        },
+        {
+          "text": "`value is null` prüft auf den Nullverweis.",
+          "correct": true
+        },
+        {
+          "text": "`value is string` kann `true` sein, obwohl `value` den Wert `null` hat.",
+          "feedback": "Typmuster passen nie auf `null`.",
+          "misconception": "m12-l01-type-pattern-matches-null"
+        },
+        {
+          "text": "`value is not null` ist das Gegenteil von `value is null`.",
+          "correct": true
+        }
+      ],
+      "explanation": "Das Deklarationsmuster bindet die Variable nur bei Erfolg. `is null` und `is not null` testen auf den Nullverweis. Ein Typmuster passt nie auf `null`."
+    },
+    {
+      "id": "m12-l01-q5",
+      "lesson": "m12-l01",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS0165, Variable nicht zugewiesen). Welche?",
+      "example": "m12/l01/quiz-scope.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "lineFeedback": {
+        "6": {
+          "feedback": "Außerhalb des `if` hat `name` keinen sicher zugewiesenen Wert, denn das Muster passt vielleicht nicht."
+        }
+      },
+      "explanation": "Die Variable eines Deklarationsmusters ist nur dort zugewiesen, wo das Muster gepasst hat."
+    },
+    {
+      "id": "m12-l01-q6",
+      "lesson": "m12-l01",
+      "type": "single",
+      "question": "`DescribeItem` hat die Arme `string line => …` und `_ => \"unknown item\"`, aber keinen Arm `null`. Was liefert `DescribeItem(null)`?",
+      "options": [
+        {
+          "text": "`\"unknown item\"`",
+          "correct": true,
+          "feedback": "`null` passt nicht zu `string line`, aber `_` passt auf alles."
+        },
+        {
+          "text": "`\"raw line: \"`",
+          "feedback": "Das Deklarationsmuster `string line` passt nie auf `null`.",
+          "misconception": "m12-l01-type-pattern-matches-null"
+        },
+        {
+          "text": "Eine `NullReferenceException`",
+          "feedback": "Ein Muster löst bei `null` keine Ausnahme aus."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler",
+          "feedback": "Der `switch`-Ausdruck ist gültig."
+        }
+      ],
+      "explanation": "Das Verwerfen `_` passt auf jeden Wert, auch auf `null`. Das Deklarationsmuster übergeht `null`."
+    },
+    {
+      "id": "m12-l01-q7",
+      "lesson": "m12-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Typmuster und ein Deklarationsmuster prüfen und warum beide bei `null` nie passen.",
+      "modelAnswer": "Beide prüfen den Laufzeittyp eines Werts. Das Deklarationsmuster gibt den Wert zusätzlich in einer Variablen dieses Typs heraus, aber nur wenn es passt.\n\nEin Nullverweis zeigt auf kein Objekt und hat deshalb keinen Laufzeittyp. Darum passt kein Typmuster auf `null`, auch nicht, wenn die Variable als `string?` deklariert ist. Auf `null` prüfst du mit `is null`."
+    },
+    {
+      "id": "m12-l01-q8",
+      "lesson": "m12-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm `is` mit einem Typmuster oder Deklarationsmuster und wo `is null` verwenden?",
+      "modelAnswer": "Ein Typmuster oder Deklarationsmuster passt, wenn eine Liste Werte verschiedener Typen enthält und jeder Typ anders behandelt wird, zum Beispiel Ereignisse und rohe Textzeilen in einem Log-Werkzeug. `is null` passt, wenn ein Wert fehlen darf, zum Beispiel ein Benutzername ohne Eintrag, und du den fehlenden Fall getrennt behandelst."
+    },
+    {
+      "id": "m12-l02-q1",
+      "lesson": "m12-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l02/quiz-and-or.cs",
+      "explanation": "`and` bindet stärker als `or`: `< 2 or (> 6 and < 9)`. `1` ist kleiner als 2: `True`. `4` passt nicht: `False`. `8` liegt zwischen 6 und 9: `True`."
+    },
+    {
+      "id": "m12-l02-q2",
+      "lesson": "m12-l02",
+      "type": "single",
+      "question": "`type` enthält `\"logout\"`. Was ergibt `type is not \"login-success\" or \"logout\"`?",
+      "options": [
+        {
+          "text": "`True`",
+          "correct": true,
+          "feedback": "Das Muster ist `(not \"login-success\") or \"logout\"`. Schon der erste Teil passt."
+        },
+        {
+          "text": "`False`, weil `not` für beide Texte gilt",
+          "feedback": "`not` gilt nur für das Muster direkt dahinter. Für beide Texte bräuchtest du Klammern.",
+          "misconception": "m12-l02-not-applies-to-whole-pattern"
+        },
+        {
+          "text": "`False`, weil `\"logout\"` ein erlaubter Wert ist",
+          "feedback": "Ein Wert wird nicht erlaubt oder verboten, er wird gegen das Muster geprüft.",
+          "misconception": "m12-l02-not-applies-to-whole-pattern"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler",
+          "feedback": "Der Ausdruck ist gültig."
+        }
+      ],
+      "explanation": "`not` bindet stärker als `or`. Mit Klammern `not (\"login-success\" or \"logout\")` wäre das Ergebnis für `\"logout\"` `False`."
+    },
+    {
+      "id": "m12-l02-q3",
+      "lesson": "m12-l02",
+      "type": "cloze",
+      "question": "Ergänze die Muster.",
+      "example": "m12/l02/gap-severity.cs",
+      "blanks": [
+        {
+          "text": "< 3",
+          "accept": [
+            "<3"
+          ],
+          "hint": "Die obere Grenze von „low“ (2 gehört dazu)."
+        },
+        {
+          "text": "<= 5",
+          "accept": [
+            "<=5"
+          ],
+          "hint": "Die obere Grenze von „medium“ (5 gehört dazu)."
+        },
+        {
+          "text": "_",
+          "hint": "Das Muster, das alle übrigen Werte fängt."
+        }
+      ],
+      "explanation": "`>= 1 and < 3` umfasst 1 und 2, `>= 3 and <= 5` die Werte 3 bis 5. `_` fängt alles andere ab."
+    },
+    {
+      "id": "m12-l02-q4",
+      "lesson": "m12-l02",
+      "type": "single",
+      "question": "Welches Muster ist gleichwertig zu `failures == 0 || failures >= 5`?",
+      "options": [
+        {
+          "text": "`failures is 0 or >= 5`",
+          "correct": true
+        },
+        {
+          "text": "`failures is 0 and >= 5`",
+          "feedback": "`and` verlangt, dass beide Muster passen. Kein Wert ist gleich 0 und zugleich mindestens 5."
+        },
+        {
+          "text": "`failures is not (0 or >= 5)`",
+          "feedback": "Das ist das Gegenteil: es passt, wenn weder 0 noch mindestens 5 zutrifft."
+        },
+        {
+          "text": "`failures is 0 || >= 5`",
+          "feedback": "Im Muster stehen `or` und `and`. Die Operatoren `||` und `&&` verbinden ganze Ausdrücke."
+        }
+      ],
+      "explanation": "`||` zwischen zwei Vergleichen derselben Variable wird zu `or` zwischen zwei Mustern. Die Variable steht nur einmal."
+    },
+    {
+      "id": "m12-l02-q5",
+      "lesson": "m12-l02",
+      "type": "find-bug",
+      "question": "Eine Zeile erzeugt den Fehler CS8780 (Variable in einem `not`- oder `or`-Muster). Welche?",
+      "example": "m12/l02/pattern-variable-in-or.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "Ein Zweig von `or` kann passen, ohne dass `name` einen Wert bekommt. Darum darf dort keine Variable stehen."
+        }
+      },
+      "explanation": "In einem `or`- oder `not`-Muster ist keine Variable erlaubt, weil sie nicht sicher zugewiesen wäre."
+    },
+    {
+      "id": "m12-l02-q6",
+      "lesson": "m12-l02",
+      "type": "single",
+      "question": "Warum meldet der Compiler bei `value is > 5 and < 3` für ein `int` einen Fehler?",
+      "options": [
+        {
+          "text": "Kein `int` ist größer als 5 und kleiner als 3 zugleich, das Muster kann nie passen.",
+          "correct": true
+        },
+        {
+          "text": "`and` darf nicht mit relationalen Mustern verwendet werden.",
+          "feedback": "`and` verbindet relationale Muster, zum Beispiel für Bereiche."
+        },
+        {
+          "text": "Die Zahlen müssen in aufsteigender Reihenfolge stehen.",
+          "feedback": "Die Reihenfolge der Zahlen ist nicht vorgeschrieben, aber der Bereich muss Werte enthalten."
+        },
+        {
+          "text": "Ein relationales Muster darf nur einmal pro `is` vorkommen.",
+          "feedback": "Beliebig viele Muster lassen sich verbinden."
+        }
+      ],
+      "explanation": "`and` verlangt, dass beide Muster passen. Die Menge der Werte, die größer als 5 und kleiner als 3 sind, ist leer. Der Compiler erkennt das als Fehler (CS8518)."
+    },
+    {
+      "id": "m12-l02-q7",
+      "lesson": "m12-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `not`, `and` und `or` ohne Klammern gruppiert werden und wann du Klammern setzt.",
+      "modelAnswer": "`not` bindet am stärksten, dann `and`, dann `or`. `x is not A or B` ist also `(not A) or B`, und `x is A or B and C` ist `A or (B and C)`.\n\nKlammern setzt du, wenn die Gruppierung anders sein soll, zum Beispiel `x is not (A or B)`, oder wenn das Muster dadurch leichter lesbar wird."
+    },
+    {
+      "id": "m12-l02-q8",
+      "lesson": "m12-l02",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Log-Werkzeug ein Muster mit `and` und wo eines mit `or` oder `not` einsetzen?",
+      "modelAnswer": "Mit `and` prüfst du einen Bereich, zum Beispiel Fehlversuche von mindestens 3 und höchstens 5 oder Ereignisse zwischen 08:00 und 09:00 Uhr. Mit `or` fasst du mehrere erlaubte Werte zusammen, zum Beispiel zwei Ereignistypen. Mit `not` schließt du Werte aus, zum Beispiel alle Ereignisse, die weder Anmeldung noch Abmeldung sind."
+    }
+  ]
 }

@@ -1,0 +1,185 @@
+---
+title: Relationale und logische Muster
+sidebar_position: 2
+description: Relationale Muster vergleichen mit einer Konstante, and, or und not verbinden Muster. not bindet stärker als and, and stärker als or, und Klammern ändern die Gruppierung.
+lesson_id: m12-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import rangePatterns from '!!raw-loader!@site/examples/m12/l02/range-patterns.cs';
+import rangePatternsOutput from '!!raw-loader!@site/examples/m12/l02/range-patterns.out.txt';
+import notPrecedence from '!!raw-loader!@site/examples/m12/l02/not-precedence.cs';
+import notPrecedenceOutput from '!!raw-loader!@site/examples/m12/l02/not-precedence.out.txt';
+import variableInOr from '!!raw-loader!@site/examples/m12/l02/pattern-variable-in-or.snippet.cs';
+import impossibleRange from '!!raw-loader!@site/examples/m12/l02/impossible-range.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l02/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l02/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l02/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l02/seclog-patterns-solution.cs';
+
+# Relationale und logische Muster
+
+:::note[Lernziele]
+- Du kannst relationale Muster mit `and`, `or` und `not` zu einem Muster verbinden (zum Beispiel einen Bereich prüfen).
+- Du kannst Klammern in Mustern setzen und vorhersagen, wie `not`, `and` und `or` ohne Klammern gruppiert werden.
+- Du kannst eine Kette von `||`/`&&`-Vergleichen in ein Muster umschreiben und umgekehrt.
+- Du kannst erklären, warum `x is > 5 and < 3` nie wahr ist.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l02-q1" />
+
+<Quiz id="m02-l02-q4" />
+
+<Quiz id="m12-l01-q2" />
+
+## Ein Wert, mehrere Bedingungen
+
+In Modul 2 hast du in `switch`-Ausdrücken <Term id="relational-pattern">relationale Muster</Term> (Relational Patterns) gesehen: `< 3`, `>= 1`. Ein relationales Muster vergleicht den Wert mit einer Konstante. Mit `<`, `<=`, `>` und `>=` und `is` steht es auch in einer Bedingung: `count is >= 1`. Die Konstante muss ein konstanter Ausdruck sein, zum Beispiel ein Literal ([§11.2.9 Relational pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1129-relational-pattern)).
+
+Mehrere Muster verbindest du mit den Schlüsselwörtern `and`, `or` und `not`. Das Ergebnis ist ein <Term id="logical-pattern">logisches Muster</Term> (Logical Pattern):
+
+- `A and B` passt, wenn beide Muster passen.
+- `A or B` passt, wenn mindestens eines passt.
+- `not A` passt, wenn `A` nicht passt.
+
+Der Vorteil: Die Variable steht nur einmal im Ausdruck. Aus `count >= 1 && count < 3` wird `count is >= 1 and < 3`. Ein Muster prüft immer **einen** Wert. Die Operatoren `&&` und `||` verbinden dagegen zwei ganze boolesche Ausdrücke.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Notiere für jeden Wert die beiden Ergebnisse und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m12-l02-range" code={rangePatterns} predict expected={rangePatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Gruppe prüfen:** Beide Schreibweisen prüfen `1 <= count < 3`.
+2. **Treffer:** Nur `1` und `2` liegen im Bereich, in beiden Spalten steht `True`.
+3. **Kein Treffer:** Bei `0`, `3` und `5` steht in beiden Spalten `False`.
+
+Was passiert, wenn du `and` durch `or` ersetzt? Jede Zahl ist entweder `>= 1` oder `< 3`, also gibt es nur noch `True`.
+
+</details>
+
+## Gruppierung und Klammern
+
+Ohne Klammern gilt: `not` bindet am stärksten, dann `and`, dann `or`. Das entspricht der Rangfolge von `!`, `&&` und `||`, die du aus Modul 2 kennst ([§11.2.10 Logical pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)). Zusätzlich gilt: Die Muster-Schlüsselwörter binden fester als die Operatoren `&&` und `||` außerhalb des Musters.
+
+Mit Klammern änderst du die Gruppierung. Ein Muster in Klammern heißt <Term id="parenthesized-pattern">geklammertes Muster</Term> (Parenthesized Pattern).
+
+| Geschrieben | Gelesen als |
+| --- | --- |
+| `x is not A or B` | `x is (not A) or B` |
+| `x is not (A or B)` | `x is not (A or B)` |
+| `x is A or B and C` | `x is A or (B and C)` |
+
+:::info[Vorhersage]
+Das Programm prüft die drei Ereignistypen mit zwei Mustern, die fast gleich aussehen. Was geben die drei Zeilen aus?
+:::
+
+<CSharpRunner id="m12-l02-not" code={notPrecedence} predict expected={notPrecedenceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erstes Muster lesen:** `not "login-success" or "logout"` ist `(not "login-success") or "logout"`.
+2. **`login-success`:** Es ist nicht „nicht `login-success`“ und nicht `"logout"`. Das erste Muster ist `False`. Das zweite, `not ("login-success" or "logout")`, ist ebenfalls `False`.
+3. **`login-failed`:** Beide Muster sind `True`.
+4. **`logout`:** Das erste Muster ist `True`, weil der Teil `or "logout"` passt. Das zweite ist `False`, weil `logout` in der Klammer steht.
+
+</details>
+
+## Was nicht geht
+
+Die beiden folgenden Fälle erkennt der Compiler als Fehler.
+
+Ein Bereich, der nie passt, ist ein Fehler. Kein `int` ist größer als 5 und kleiner als 3 zugleich:
+
+<CodeBlock language="csharp" title="impossible-range.snippet.cs">{impossibleRange}</CodeBlock>
+
+Der Compiler meldet `error CS8518: An expression of type 'int' can never match the provided pattern.` für Zeile 4.
+
+In einem `or`- oder `not`-Muster darf keine Variable stehen, denn ein Zweig von `or` kann passen, ohne dass die Variable einen Wert bekommt ([§11.2.10 Logical pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)):
+
+<CodeBlock language="csharp" title="pattern-variable-in-or.snippet.cs">{variableInOr}</CodeBlock>
+
+Der Compiler meldet `error CS8780: A variable may not be declared within a 'not' or 'or' pattern.` für Zeile 2 und `error CS0165: Use of unassigned local variable 'name'` für Zeile 4.
+
+In der folgenden Aufgabe ergänzt du ein `switch` mit relationalen und logischen Mustern:
+
+<Quiz id="m12-l02-q3" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog beschreibt gemischte Werte mit Typmustern. `EventTypeOf(line)` liefert den Ereignistyp einer Zeile, `TimestampOf(line)` den Zeitpunkt als `DateTimeOffset`, und `sampleLog` enthält die 14 Zeilen.
+
+Im Runner siehst du nur den Block `// Describe mixed items with type patterns`, die Stelle vor `// End with exit code 0 …` und die Funktion `DescribeItem`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe direkt nach der Funktion `DescribeItem` die lokale Funktion `bool IsMorningFailure(string line)`. Sie gibt `true` zurück, wenn der Ereignistyp der Zeile `"login-failed"` ist **und** die Stunde des Zeitpunkts im Bereich von 8 bis unter 9 liegt: `EventTypeOf(line) is "login-failed" && TimestampOf(line).Hour is >= 8 and < 9`.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Check log lines with logical patterns`. Er geht durch `sampleLog` und zählt zwei Dinge: die Zeilen, für die `IsMorningFailure` wahr ist, und die Zeilen, deren Ereignistyp `is not ("login-success" or "logout")` ist.
+3. Gib die Zahlen als `Failures between 08:00 and 08:59: …` und `Lines that are neither success nor logout: …` aus.
+
+<CSharpRunner id="m12-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Bereich als Muster:** `Hour is >= 8 and < 9` nennt die Stunde nur einmal. Die Zeitstempel sind in UTC.
+2. **Zwei Ebenen:** `&&` verbindet den Typtest und den Stundentest, weil das zwei getrennte Ausdrücke sind. Innerhalb des Stundentests verbindet `and` zwei Muster für denselben Wert.
+3. **Klammern:** `not ("login-success" or "logout")` zählt nur die Fehlversuche. Ohne Klammern wären auch die Abmeldungen dabei.
+
+</details>
+
+**Neuer Stand:** SecLog prüft Log-Zeilen mit Bereichs- und Kombinationsmustern, ohne den Wert mehrfach zu nennen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l02-not-applies-to-whole-pattern" />
+
+**„`x is not A or B` bedeutet `x is not (A or B)`.“** Das stimmt nicht. `not` bindet stärker als `or` und gilt nur für das Muster direkt dahinter. `x is not "login-success" or "logout"` ist also `(not "login-success") or "logout"` und ist auch für `"logout"` wahr. Setze Klammern: `x is not ("login-success" or "logout")`.
+:::
+
+<details>
+<summary>Vertiefung: `and` und `or` werten nicht verkürzt aus (optional)</summary>
+
+Anders als `&&` und `||` sind `and` und `or` keine Kurzschlussoperatoren, und die Reihenfolge, in der gleichrangige Teile geprüft werden, ist nicht festgelegt ([§11.2.10 Logical pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)). Verlasse dich deshalb nicht auf eine Reihenfolge der Prüfung.
+
+</details>
+
+## Zusammenfassung
+
+Relationale Muster vergleichen einen Wert mit einer Konstante. Mit `and`, `or` und `not` entstehen daraus logische Muster, zum Beispiel `count is >= 1 and < 3`. `not` bindet stärker als `and`, und `and` stärker als `or`. Klammern ändern die Gruppierung. Ein Bereich, der nie passt wie `> 5 and < 3`, ist ein Compilerfehler, und in `or` oder `not` darf keine Variable stehen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l02-q1" />
+
+<Quiz id="m12-l02-q2" />
+
+<Quiz id="m12-l02-q4" />
+
+<Quiz id="m12-l02-q5" />
+
+<Quiz id="m12-l02-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l02-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l02-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Logische Muster und Rangfolge](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#logical-patterns)
+- Microsoft Learn: [§11.2.9 Relational pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1129-relational-pattern)
+- Microsoft Learn: [§11.2.10 Logical pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)

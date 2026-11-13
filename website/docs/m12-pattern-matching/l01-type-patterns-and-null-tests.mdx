@@ -1,0 +1,181 @@
+---
+title: Typmuster, Deklarationsmuster und Nulltests
+sidebar_position: 1
+description: Mit is prüfst du den Laufzeittyp eines Werts und testest auf null. Typ- und Deklarationsmuster passen nie auf null, und switch-Ausdrücke nutzen dieselben Muster.
+lesson_id: m12-l01
+duration_min: 22
+---
+
+import typePatterns from '!!raw-loader!@site/examples/m12/l01/type-patterns.cs';
+import typePatternsOutput from '!!raw-loader!@site/examples/m12/l01/type-patterns.out.txt';
+import nullTest from '!!raw-loader!@site/examples/m12/l01/null-test.cs';
+import nullTestOutput from '!!raw-loader!@site/examples/m12/l01/null-test.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m12/l01/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l01/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l01/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l01/seclog-patterns-solution.cs';
+
+# Typmuster, Deklarationsmuster und Nulltests
+
+:::note[Lernziele]
+- Du kannst mit `is` und einem Typmuster oder Deklarationsmuster den Laufzeittyp eines Werts prüfen und das Ergebnis in einer Variablen verwenden.
+- Du kannst mit `is null` und `is not null` auf `null` prüfen.
+- Du kannst vorhersagen, dass ein Typmuster bei `null` nie passt.
+- Du kannst Typmuster in den Armen eines `switch`-Ausdrucks einsetzen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog zerlegt Log-Zeilen mit Mustern und erkennt ungültige Zeilen.
+- SecLog aktualisiert Vorfälle mit `with`, ohne den alten Stand zu verlieren.
+- SecLog beschreibt das Ergebnis des Einlesens und den Status eines Vorfalls so, dass der Compiler prüft, ob jeder Fall behandelt ist.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l06-q7" />
+
+<Quiz id="m02-l04-q4" />
+
+<Quiz id="m04-l04-q1" />
+
+## Ein Wert wird gegen ein Muster geprüft
+
+In Modul 8 hast du `device is Printer printer` kennengelernt. Das ist ein <Term id="declaration-pattern">Deklarationsmuster</Term> (Declaration Pattern), eine Form des <Term id="pattern">Patterns</Term> (Muster). Ein Pattern beschreibt, wie ein Wert aussehen soll. Der Ausdruck `wert is Muster` heißt <Term id="is-pattern-expression">Is-Pattern-Ausdruck</Term> und ergibt `true`, wenn der Wert zum Muster passt, sonst `false`.
+
+Zwei Formen prüfen den Laufzeittyp:
+
+- Das <Term id="type-pattern">Typmuster</Term> (Type Pattern) nennt nur den Typ: `value is string`. Es liefert nur `true` oder `false`.
+- Das Deklarationsmuster nennt zusätzlich einen Namen: `value is string text`. Passt der Wert, steht er danach in der Variablen `text` mit dem Typ `string`.
+
+Die Variable `text` hat nur dort einen Wert, wo das Muster gepasst hat, zum Beispiel im Block des `if`. Außerhalb ist sie zwar sichtbar, aber nicht zugewiesen, und der Compiler lässt keinen Zugriff zu ([§11.2.2 Declaration pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern)).
+
+Auf `null` testest du mit einem <Term id="constant-pattern">Konstantenmuster</Term> (Constant Pattern): `value is null`. Das Gegenteil ist `value is not null`.
+
+<Forward concepts={['`not`']} lesson="m12-l02" />
+
+:::info[Vorhersage]
+Was gibt das Programm für die vier Werte aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m12-l01-type-patterns" code={typePatterns} predict expected={typePatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Text:** `"hello"` passt zum Deklarationsmuster `string text`. `text` hat 5 Zeichen.
+2. **Zahl:** `42` passt nicht zu `string`, aber zu `int number`. Die Variable `number` hat den Wert 42, verdoppelt ergibt das 84.
+3. **Anderer Typ:** `3.5` ist ein `double`. Weder `string` noch `int` noch `null` passen, also läuft der `else`-Zweig.
+4. **`null`:** Kein Typmuster passt auf `null`. Erst `value is null` trifft zu.
+
+Was passiert, wenn du den `null`-Zweig an den Anfang stellst? Das Ergebnis bleibt gleich, weil nur `null` auf `null` passt.
+
+</details>
+
+<details>
+<summary>Vertiefung: `is null` und überladenes `==` (optional)</summary>
+
+Der Compiler garantiert, dass `x is null` keinen vom Typ selbst überladenen Operator `==` oder `!=` aufruft ([Konstantenmuster](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#constant-pattern)). Mit `x == null` kann ein Typ mit eigenem `==` anders antworten. Der Test mit `is null` ist also immer ein echter Test auf den Nullverweis.
+
+</details>
+
+## Typmuster und `null`
+
+Ein Typmuster und ein Deklarationsmuster passen nie auf `null`. Das gilt auch dann, wenn der deklarierte Typ der Variablen derselbe Typ ist ([§11.2.8 Type pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1128-type-pattern)). Ein Nullverweis hat keinen Laufzeittyp, den man prüfen könnte.
+
+:::info[Vorhersage]
+`text` ist als `string?` deklariert und enthält `null`. Welche der vier Zeilen geben `True` aus?
+:::
+
+<CSharpRunner id="m12-l01-null-test" code={nullTest} predict expected={nullTestOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`text is string`:** `False`. Das Typmuster passt nie auf `null`, obwohl `text` den Typ `string?` hat.
+2. **`boxed is string`:** `False`. Dasselbe gilt, wenn die Variable den Typ `object?` hat.
+3. **`text is null`:** `True`. Nur das Konstantenmuster `null` passt auf `null`.
+4. **`text is not null`:** `False`. Es ist das Gegenteil von `is null`.
+
+</details>
+
+Diese Eigenschaft ist nützlich: `if (value is string text)` prüft in einem Schritt auf `null` und auf den Typ. In `text` steht danach nie `null`.
+
+## Muster in `switch`-Ausdrücken
+
+Die Arme eines <Term id="switch-expression">switch-Ausdrucks</Term> aus Modul 2 nehmen dieselben Muster. Ein Typmuster prüft den Typ, ein Deklarationsmuster gibt den Wert in einer Variablen heraus, `null` ist ein Konstantenmuster, `_` passt auf alles. Die Arme werden von oben nach unten geprüft, der erste passende gewinnt. Das Verwerfen `_` passt auch auf `null`.
+
+In der folgenden Aufgabe fehlen im Code drei Muster. Ergänze sie:
+
+<Quiz id="m12-l01-q3" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest und analysiert das Log mit Schleifen, Klassen, Records, Schnittstellen, Lambdas und LINQ. Die Objekte `logEvents` (Liste von `LogEvent`) und `sampleLog` (die 14 Zeilen) sowie die Funktion `ToSecurityEvent` sind verfügbar.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und die Funktion `IsPossiblePhishing`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe direkt nach der Funktion `IsPossiblePhishing` die lokale Funktion `string DescribeItem(object? item)`. Sie liefert mit einem `switch`-Ausdruck einen kurzen Text: `null` → `"missing"`, `LogEvent e` → `$"log event: {e.Describe()}"`, `SecurityEvent s` → `$"security event of {s.User ?? "unknown"}"`, `string line` → `$"raw line: {line}"`, alles andere (`_`) → `"unknown item"`.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Describe mixed items with type patterns`: ein Feld `object?[] mixedItems` mit `logEvents[0]`, `ToSecurityEvent(logEvents[1])`, `sampleLog[2]`, `null` und `42`. Gib für jedes Element `DescribeItem` aus.
+3. Gib danach `mixedItems[2] is string: ` mit dem Ergebnis von `mixedItems[2] is string` aus und ebenso für `mixedItems[3]`.
+
+<CSharpRunner id="m12-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Typmuster in den Armen:** Jeder Arm prüft einen Typ. `LogEvent e`, `SecurityEvent s` und `string line` geben den Wert in einer Variablen heraus.
+2. **Nulltest zuerst:** Der Arm `null` steht oben. `_` am Ende fängt `42` und alles andere ab.
+3. **Ausgabe:** Für `sampleLog[2]` steht `raw line: ` und danach die ganze Zeile. `mixedItems[2] is string` ergibt `True`, `mixedItems[3] is string` ergibt `False`, weil `null` auf kein Typmuster passt.
+
+</details>
+
+**Neuer Stand:** SecLog beschreibt Werte unterschiedlichen Typs mit Mustern und erkennt fehlende Werte.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l01-type-pattern-matches-null" />
+
+**„`x is string s` ist auch wahr, wenn `x` `null` ist.“** Das stimmt nicht. Ein Typmuster und ein Deklarationsmuster passen nie auf `null`, auch wenn `x` als `string?` deklariert ist. Willst du `null` erkennen, brauchst du `is null` oder einen Arm `null`.
+:::
+
+<details>
+<summary>Vertiefung: Wo die Variable gilt (optional)</summary>
+
+Die Variable eines Deklarationsmusters ist nach dem `if` weiterhin im Gültigkeitsbereich, aber nicht sicher zugewiesen. Der Compiler lässt den Zugriff nur dort zu, wo das Muster sicher gepasst hat ([§11.2.2 Declaration pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1122-declaration-pattern)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Pattern beschreibt einen Wert, und `is` prüft einen Wert gegen ein Pattern. Das Typmuster `x is T` prüft den Laufzeittyp, das Deklarationsmuster `x is T name` gibt den Wert zusätzlich in einer Variablen heraus. Beide passen nie auf `null`. Auf `null` testest du mit `is null`, das Gegenteil ist `is not null`. In `switch`-Ausdrücken stehen dieselben Muster in den Armen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l01-q1" />
+
+<Quiz id="m12-l01-q2" />
+
+<Quiz id="m12-l01-q4" />
+
+<Quiz id="m12-l01-q5" />
+
+<Quiz id="m12-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Deklarations- und Typmuster](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#declaration-and-type-patterns)
+- Microsoft Learn: [Der is-Operator](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/is)
+- Microsoft Learn: [§11 Patterns and pattern matching](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns)
