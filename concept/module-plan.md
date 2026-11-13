@@ -392,7 +392,7 @@ Type, property, relational and list patterns · `switch` expressions · `record`
 - *(C# 15)* Closed hierarchies: lesson proposal, together with unions or right after; the `closed` modifier fixes the direct descendants in the declaring assembly, so a `switch` over them is exhaustive; link to sealing in `m08-l04`.
 - **Spec:**
   - §11: all pattern kinds – declaration, type, constant, relational, logical, property (incl. extended property patterns, C# 10), positional, var, discard, list and slice patterns (C# 11); the null test with patterns; subsumption (an unreachable arm is an error) and exhaustiveness (warning, runtime exception).
-  - §12: switch expression typing, the is-pattern expression, with expressions – for records, and since C# 10 also for structs and anonymous types (check in the feature spec).
+  - §12: switch expression typing, the is-pattern expression, with expressions – for records, and since C# 10 also for structs (spec §12.10 "With expressions": receiver is a record class, record struct or non-record struct; feature spec `csharp-10.0/record-structs`, section "Allow `with` expression on structs") and for anonymous types (language reference "with expression", which also lists tuples; the spec clause and the feature spec do not name anonymous types; compiled with .NET 11 SDK 11.0.100). Checked 2026-11-13.
   - Deconstruction: user-defined deconstruct methods and how positional patterns use them.
   - C# 15 feature specifications `csharp-15.0/unions` and `csharp-15.0/closed-hierarchies` (https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/); language reference "Union types", "closed modifier" and "Closed hierarchy patterns" (in "Patterns").
 - **Badge:** union types (C# 15 / .NET 11); closed hierarchies, `closed` modifier (C# 15 / .NET 11). Library scaffolding (`UnionAttribute`, `IUnion` in `System.Runtime.CompilerServices`, .NET 11): check when writing.
@@ -582,7 +582,6 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 
 Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
-- With expressions for structs and anonymous types since C# 10: check in the feature specification before writing M12.
 - Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
 - M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.
