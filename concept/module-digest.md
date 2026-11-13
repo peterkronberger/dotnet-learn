@@ -1,5 +1,7 @@
 # Module digest – what earlier modules taught
 
+Base since #450: C# 15 / .NET 11.
+
 As of 2026-11-13. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format

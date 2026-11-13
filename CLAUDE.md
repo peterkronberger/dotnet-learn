@@ -1,6 +1,6 @@
 # CLAUDE.md – dotnet-learn
 
-Learning site for C# and .NET: Docusaurus 3 (learning path, quizzes) + a Blazor WebAssembly playground with Roslyn (.NET 10), hosted on GitHub Pages. Audience: programming beginners **and** people with prior programming experience. Teaching style: example-driven, scientifically grounded, fundamentals are explained.
+Learning site for C# and .NET: Docusaurus 3 (learning path, quizzes) + a Blazor WebAssembly playground with Roslyn (.NET 11), hosted on GitHub Pages. Audience: programming beginners **and** people with prior programming experience. Teaching style: example-driven, scientifically grounded, fundamentals are explained.
 
 This document is binding for all work in the repo – for humans and for Claude (also in the workflows `claude-architect.yml` / `claude-implement.yml`).
 
@@ -55,7 +55,7 @@ Before every commit: run both build checks. If one fails, do not commit.
 ## Non-negotiable rules
 
 1. **Language.** The text of the lessons (`website/docs/**/*.mdx`, quiz texts) and the learner-facing UI texts are German (more languages later via Docusaurus i18n). **Everything else is English**: code, identifiers, code comments (also in CSS, Razor, JS, config files), program output of the examples, documentation (`CLAUDE.md`, `concept/`, `README.md`, `.claude/`), commit messages, and **pull requests (title and description)**. Use simple English. Technical terms are English; at first use in a lesson they get a German explanation: "Value Type (Werttyp)".
-2. **Base: C# 14 / .NET 10 (LTS).** Top-level statements at the start, `Main` is explained later. Nullable reference types on. New features beginning from C# 12 / .NET 8 get a version badge (`<Since csharp="…" dotnet="…" />`).
+2. **Base: C# 15 / .NET 11 (STS, support until 2028-11-14).** Top-level statements at the start, `Main` is explained later. Nullable reference types on. New features beginning from C# 12 / .NET 8 get a version badge (`<Since csharp="…" dotnet="…" />`).
 3. **Code lives in `.cs` files** under `website/examples/mXX/lYY/` and is included into code blocks and `<CSharpRunner>` by `raw-loader`. No new inline code in MDX.
 4. **Every shown output is real**: it must match the actual run (CI comparison, S2). No outputs invented by hand.
 5. **Not runnable ≠ marked**: code examples that the playground cannot run (ASP.NET Core, EF Core, unit tests) are normal ` ```csharp title="…" ` blocks without a note.

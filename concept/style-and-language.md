@@ -20,7 +20,7 @@
 
 ## Code style
 
-- C# 14 / .NET 10, top-level statements (type declarations at the end of the file), nullable enabled, `var` where the type is obvious.
+- C# 15 / .NET 11, top-level statements (type declarations at the end of the file), nullable enabled, `var` where the type is obvious.
 - Prefer modern idioms. Show older styles only where people often meet them in other people's code. Then add the `<Since>` badge and "So schrieb man es vorher" (how it used to be written).
 - Naming conventions follow Microsoft Learn (PascalCase for types/members, camelCase for local variables).
 - Every example runs on its own or is clearly marked as a fragment (file ending `.snippet.cs`, skipped by CI).
