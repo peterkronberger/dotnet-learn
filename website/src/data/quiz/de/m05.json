@@ -177,7 +177,7 @@
       "id": "m05-l02-q4",
       "lesson": "m05-l02",
       "type": "single",
-      "question": "Wie greifst du auf Zeile 1 und Spalte 2 von `int[,] table` zu?",
+      "question": "Wie greifst du auf Zeile 2 und Spalte 3 von `int[,] table` zu?",
       "options": [
         {
           "text": "`table[1, 2]`",
