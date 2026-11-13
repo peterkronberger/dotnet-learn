@@ -1,0 +1,5 @@
+Join: 0 pairs
+GroupJoin: 0, 0, 0
+Except: 3, 1
+Intersect: 0 elements
+Union: 3, 1

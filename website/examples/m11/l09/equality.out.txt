@@ -1,0 +1,4 @@
+Records: 3
+Default: 3
+Ignore case: 2
+DistinctBy: bob, amy
