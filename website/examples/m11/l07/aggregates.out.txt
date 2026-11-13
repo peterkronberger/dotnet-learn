@@ -1,0 +1,8 @@
+Count: 6
+Count above 10: 4
+Sum: 108
+Min: 4
+Max: 42
+Average: 18
+Shortest: fig
+Longest: banana

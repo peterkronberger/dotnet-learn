@@ -853,6 +853,261 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem Programm würdest du `Select` mit einem anonymen Objekt benutzen, und wann würdest du einen Record nehmen?",
       "modelAnswer": "Beispiel: Ein Programm will aus einer Liste von Ereignissen für eine Tabelle nur Benutzer und Stunde ausgeben. Ein anonymes Objekt reicht, weil das Ergebnis nur in dieser einen Methode benutzt wird. Wenn das Ergebnis an andere Methoden weitergegeben oder gespeichert werden soll, nehme ich einen Record, weil er einen Namen hat."
+    },
+    {
+      "id": "m11-l07-q1",
+      "lesson": "m11-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l07/quiz-group-key.cs",
+      "explanation": "Der Schlüssel `n % 2` ist bei 1, 3 und 5 gleich `1` und bei 2 und 4 gleich `0`. Die Gruppe `1` entsteht zuerst, weil `1` als erstes Element vorkommt. Ihre Summe ist 9, die der Gruppe `0` ist 6."
+    },
+    {
+      "id": "m11-l07-q2",
+      "lesson": "m11-l07",
+      "type": "single",
+      "question": "Was ist ein Element der Folge, die `GroupBy` zurückgibt?",
+      "options": [
+        {
+          "text": "Eine Gruppe mit der Eigenschaft `Key`, die selbst eine Folge ihrer Elemente ist.",
+          "correct": true
+        },
+        {
+          "text": "Ein einzelnes Element der Quelle, das als erstes zu einem Schlüssel passt.",
+          "feedback": "`GroupBy` wirft keine Elemente weg. Alle Elemente landen in einer Gruppe."
+        },
+        {
+          "text": "Eine Zahl: die Anzahl der Elemente pro Schlüssel.",
+          "feedback": "Die Anzahl bekommst du erst mit `Count()` auf der Gruppe."
+        }
+      ],
+      "explanation": "Das Ergebnis von `GroupBy` ist eine Folge von Gruppen. Jede Gruppe ist ein `IGrouping<TKey, TElement>` mit der Eigenschaft `Key` und den Elementen, die zu diesem Schlüssel gehören."
+    },
+    {
+      "id": "m11-l07-q3",
+      "lesson": "m11-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l07/quiz-top.cs",
+      "explanation": "bob kommt dreimal vor, alice zweimal, dave einmal. Nach `OrderByDescending` steht bob vorn, und `Take(1)` behält nur diese Gruppe. Die Ausgabe ist `bob 3`."
+    },
+    {
+      "id": "m11-l07-q4",
+      "lesson": "m11-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l07/quiz-aggregate.cs",
+      "explanation": "`Aggregate` startet bei 10 und zieht nacheinander 2, 3 und 4 ab: 10 − 2 = 8, 8 − 3 = 5, 5 − 4 = 1. Die Ausgabe ist `1`."
+    },
+    {
+      "id": "m11-l07-q5",
+      "lesson": "m11-l07",
+      "type": "single",
+      "question": "Was ergibt `new int[0].Average()`, also der Durchschnitt einer leeren `int`-Folge?",
+      "options": [
+        {
+          "text": "Eine `InvalidOperationException`.",
+          "correct": true
+        },
+        {
+          "text": "`0`, so wie bei `Sum`.",
+          "feedback": "`Sum` ergibt `0`, aber ein Durchschnitt von nichts ist nicht `0`. `Average` wirft.",
+          "misconception": "m11-l07-average-of-empty-is-zero"
+        },
+        {
+          "text": "`null`.",
+          "feedback": "`null` gibt es nur bei nullbaren Elementtypen wie `int?`. Ein `int` kann nicht `null` sein."
+        }
+      ],
+      "explanation": "Es gibt keinen Durchschnitt von nichts. `Average` wirft bei einer leeren `int`-Folge eine `InvalidOperationException`. `Sum` ergibt dagegen `0`."
+    },
+    {
+      "id": "m11-l07-q6",
+      "lesson": "m11-l07",
+      "type": "multi",
+      "question": "Welche Aufrufe werfen bei einem leeren `int[]` eine `InvalidOperationException`?",
+      "options": [
+        {
+          "text": "`Min()`",
+          "correct": true
+        },
+        {
+          "text": "`Max()`",
+          "correct": true
+        },
+        {
+          "text": "`Average()`",
+          "correct": true
+        },
+        {
+          "text": "`Sum()`",
+          "feedback": "`Sum` ergibt bei einer leeren Folge `0`.",
+          "misconception": "m11-l07-average-of-empty-is-zero"
+        },
+        {
+          "text": "`Count()`",
+          "feedback": "`Count` ergibt `0`."
+        }
+      ],
+      "explanation": "`Min`, `Max` und `Average` haben bei einer leeren `int`-Folge kein Ergebnis und werfen. `Count` und `Sum` ergeben `0`."
+    },
+    {
+      "id": "m11-l07-q7",
+      "lesson": "m11-l07",
+      "type": "single",
+      "question": "Was gibt `words.MaxBy(w => w.Length)` für eine nicht leere `string[]` zurück?",
+      "options": [
+        {
+          "text": "Das längste Wort.",
+          "correct": true
+        },
+        {
+          "text": "Die größte Länge als `int`.",
+          "feedback": "Das macht `Max(w => w.Length)`. `MaxBy` gibt das Element zurück, nicht den Schlüssel."
+        },
+        {
+          "text": "Eine Gruppe mit allen Wörtern der größten Länge.",
+          "feedback": "`MaxBy` gruppiert nicht. Es gibt genau ein Element zurück."
+        }
+      ],
+      "explanation": "`MaxBy` gibt das Element zurück, dessen Schlüssel am größten ist, hier das längste Wort. Die größte Länge als Zahl liefert `words.Max(w => w.Length)`."
+    },
+    {
+      "id": "m11-l07-q8",
+      "lesson": "m11-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `GroupBy` und ein Aggregatoperator zusammenarbeiten, und was bei einer leeren Folge passiert.",
+      "modelAnswer": "`GroupBy` teilt die Elemente anhand eines Schlüssels in Gruppen. Jede Gruppe hat einen `Key` und ist eine Folge ihrer Elemente. Ein Aggregatoperator wie `Count()` oder `Sum()` fasst eine Gruppe zu einem Wert zusammen. Dann habe ich pro Schlüssel eine Zahl, zum Beispiel die Anzahl der Fehlversuche pro Stunde. Bei einer leeren Folge ergeben `Count` und `Sum` `0`. `Average`, `Min` und `Max` auf `int` werfen eine `InvalidOperationException`, weil es keinen Wert gibt, den sie zurückgeben könnten."
+    },
+    {
+      "id": "m11-l07-q9",
+      "lesson": "m11-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem Programm `GroupBy` mit `OrderByDescending` und `Take` benutzen?",
+      "modelAnswer": "Beispiel: Ein Programm will die drei Seiten mit den meisten Zugriffen anzeigen. Ich gruppiere die Zugriffe nach Seite, sortiere die Gruppen nach `Count()` absteigend und nehme mit `Take(3)` die ersten drei. Bei gleicher Anzahl lege ich mit `ThenBy` eine feste Reihenfolge fest."
+    },
+    {
+      "id": "m11-l08-q1",
+      "lesson": "m11-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m11/l08/quiz-first.cs",
+      "explanation": "Kein Element ist größer als 10. `FirstOrDefault` gibt deshalb den Standardwert von `int` zurück, `0`. Mit dem Standardwert `99` als zweitem Parameter gibt es `99` zurück."
+    },
+    {
+      "id": "m11-l08-q2",
+      "lesson": "m11-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l08/quiz-all.cs",
+      "explanation": "Bei einer leeren Folge gibt es kein Element, das `Any` finden könnte: `False`. `All` sucht ein Gegenbeispiel und findet keines: `True`."
+    },
+    {
+      "id": "m11-l08-q3",
+      "lesson": "m11-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l08/quiz-single.cs",
+      "explanation": "`Single` findet für `amy` genau ein Element und gibt es aus. Für `bob` gibt es zwei Treffer, `Single` wirft eine `InvalidOperationException`, und das Programm gibt `error` aus."
+    },
+    {
+      "id": "m11-l08-q4",
+      "lesson": "m11-l08",
+      "type": "single",
+      "question": "Was ergibt `new int[] { 1, 2, 3 }.First(n => n > 100)`?",
+      "options": [
+        {
+          "text": "Eine `InvalidOperationException`.",
+          "correct": true
+        },
+        {
+          "text": "`null`.",
+          "feedback": "Ein `int` kann nicht `null` sein, und `First` gibt auch bei Verweistypen nie einen Standardwert zurück.",
+          "misconception": "m11-l08-first-returns-null"
+        },
+        {
+          "text": "`0`.",
+          "feedback": "`0` ist das Ergebnis von `FirstOrDefault`, nicht von `First`."
+        }
+      ],
+      "explanation": "`First` wirft eine `InvalidOperationException`, wenn kein Element passt. Nur `FirstOrDefault` gibt einen Standardwert zurück."
+    },
+    {
+      "id": "m11-l08-q5",
+      "lesson": "m11-l08",
+      "type": "single",
+      "question": "Du suchst in einer Liste den Benutzer mit einer eindeutigen ID. Duplikate wären ein Fehler in den Daten. Welcher Operator drückt das aus?",
+      "options": [
+        {
+          "text": "`Single`",
+          "correct": true
+        },
+        {
+          "text": "`First`",
+          "feedback": "`First` nimmt das erste Element und übersieht ein Duplikat."
+        },
+        {
+          "text": "`Last`",
+          "feedback": "`Last` nimmt das letzte Element und übersieht ein Duplikat ebenfalls."
+        }
+      ],
+      "explanation": "`Single` sagt: Es gibt genau ein Element. Bei einem Duplikat wirft es und macht den Fehler sichtbar. `First` würde das Duplikat verschweigen."
+    },
+    {
+      "id": "m11-l08-q6",
+      "lesson": "m11-l08",
+      "type": "single",
+      "question": "Welche Aussage über eine leere Folge stimmt?",
+      "options": [
+        {
+          "text": "`Any(…)` ergibt `false` und `All(…)` ergibt `true`.",
+          "correct": true
+        },
+        {
+          "text": "`Any(…)` und `All(…)` ergeben beide `false`.",
+          "feedback": "`All` ergibt `true`, weil es kein Element gibt, das die Bedingung verletzt."
+        },
+        {
+          "text": "`Any(…)` und `All(…)` werfen beide eine Ausnahme.",
+          "feedback": "Die Quantoren werfen bei einer leeren Folge nicht."
+        }
+      ],
+      "explanation": "`Any` sucht ein Element und findet keines (`false`). `All` sucht ein Gegenbeispiel und findet keines (`true`)."
+    },
+    {
+      "id": "m11-l08-q7",
+      "lesson": "m11-l08",
+      "type": "single",
+      "question": "Was gibt `FirstOrDefault(w => w.Length > 10)` für eine `string[]` zurück, in der kein Wort so lang ist?",
+      "options": [
+        {
+          "text": "`null`",
+          "correct": true
+        },
+        {
+          "text": "Einen leeren String.",
+          "feedback": "Der Standardwert von `string` ist `null`, nicht `\"\"`."
+        },
+        {
+          "text": "Eine `InvalidOperationException`.",
+          "feedback": "Das wäre bei `First` so. `FirstOrDefault` wirft bei keinem Treffer nicht."
+        }
+      ],
+      "explanation": "Der Standardwert eines Verweistyps ist `null`. Das Ergebnis ist ein `string?`."
+    },
+    {
+      "id": "m11-l08-q8",
+      "lesson": "m11-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `First`, `FirstOrDefault` und `Single`.",
+      "modelAnswer": "`First` gibt das erste passende Element zurück und wirft eine `InvalidOperationException`, wenn keines passt. `FirstOrDefault` wirft dann nicht, sondern gibt den Standardwert zurück: `0` bei `int`, `null` bei Verweistypen, oder einen Wert, den ich angebe. `Single` erwartet genau ein passendes Element und wirft bei keinem und bei mehreren. Ich nehme `First`, wenn mehrere Treffer erlaubt sind, und `Single`, wenn es genau einen geben muss."
+    },
+    {
+      "id": "m11-l08-q9",
+      "lesson": "m11-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du `Any` oder `All` benutzen, und wo `FirstOrDefault`?",
+      "modelAnswer": "Beispiel: Eine Anwendung soll warnen, wenn ein Benutzer in der Liste der Ereignisse einen Fehlversuch hat. Dafür reicht `Any`, denn ich brauche nur ein Ja oder Nein. Will ich außerdem wissen, welches Ereignis es war, nehme ich `FirstOrDefault` und prüfe das Ergebnis auf `null`. `All` benutze ich, wenn jede Zeile einer Datei eine Regel erfüllen muss."
     }
   ]
 }

@@ -1,0 +1,8 @@
+Count: 0
+Sum: 0
+Average: InvalidOperationException
+Min: InvalidOperationException
+Max: InvalidOperationException
+MaxBy of ints: InvalidOperationException
+MaxBy of strings: 
+Average of int?: True

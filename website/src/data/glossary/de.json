@@ -7162,6 +7162,92 @@
         "title": "Enumerable.Select",
         "url": "https://learn.microsoft.com/dotnet/api/system.linq.enumerable.select"
       }
+    },
+    {
+      "id": "grouping",
+      "term": "Grouping",
+      "german": "Gruppe",
+      "category": "language",
+      "definition": "Das Ergebnis von `GroupBy` für einen Schlüssel: ein `IGrouping<TKey, TElement>` mit der Eigenschaft `Key`, das selbst eine Folge der Elemente mit diesem Schlüssel ist.",
+      "aliases": [
+        "Gruppen",
+        "groupings",
+        "IGrouping"
+      ],
+      "related": [
+        "query-operator",
+        "key-selector",
+        "aggregate-operator"
+      ],
+      "lesson": "m11-l07",
+      "source": {
+        "title": "Grouping data",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/grouping-data"
+      }
+    },
+    {
+      "id": "aggregate-operator",
+      "term": "Aggregate operator",
+      "german": "Aggregatoperator",
+      "category": "language",
+      "definition": "Ein Abfrageoperator, der eine ganze Folge zu einem einzelnen Wert zusammenfasst, zum Beispiel `Count`, `Sum`, `Min`, `Max`, `Average` oder `Aggregate`. Er läuft sofort.",
+      "aliases": [
+        "Aggregatoperatoren",
+        "aggregate operators",
+        "aggregation"
+      ],
+      "related": [
+        "query-operator",
+        "grouping"
+      ],
+      "lesson": "m11-l07",
+      "source": {
+        "title": "Aggregation operations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/aggregation-operations"
+      }
+    },
+    {
+      "id": "element-operator",
+      "term": "Element operator",
+      "german": "Element-Operator",
+      "category": "language",
+      "definition": "Ein Abfrageoperator, der genau ein Element aus einer Folge auswählt, zum Beispiel `First`, `Last`, `Single` oder `ElementAt`. Die `OrDefault`-Formen geben bei keinem Treffer den Standardwert zurück.",
+      "aliases": [
+        "Element-Operatoren",
+        "element operators",
+        "Elementoperator"
+      ],
+      "related": [
+        "query-operator",
+        "default-value-expression",
+        "quantifier"
+      ],
+      "lesson": "m11-l08",
+      "source": {
+        "title": "Element operations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/element-operations"
+      }
+    },
+    {
+      "id": "quantifier",
+      "term": "Quantifier",
+      "german": "Quantor",
+      "category": "language",
+      "definition": "Ein Abfrageoperator, der eine Ja-Nein-Frage über eine Folge beantwortet: `Any` (mindestens eines), `All` (alle) und `Contains` (kommt vor). Er liefert einen `bool`.",
+      "aliases": [
+        "Quantoren",
+        "quantifiers",
+        "Quantifizierer"
+      ],
+      "related": [
+        "query-operator",
+        "element-operator"
+      ],
+      "lesson": "m11-l08",
+      "source": {
+        "title": "Quantifier operations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/quantifier-operations"
+      }
     }
   ]
 }

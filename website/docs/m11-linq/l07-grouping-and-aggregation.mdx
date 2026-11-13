@@ -1,0 +1,209 @@
+---
+title: Gruppieren und Aggregieren
+sidebar_position: 7
+description: GroupBy sortiert Elemente anhand eines Schlüssels in Gruppen, und Aggregatoperatoren wie Count, Sum, Min, Max, Average, MinBy, MaxBy und Aggregate fassen eine Folge oder eine Gruppe zu einem Wert zusammen.
+lesson_id: m11-l07
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import groupBy from '!!raw-loader!@site/examples/m11/l07/group-by.cs';
+import groupProjection from '!!raw-loader!@site/examples/m11/l07/group-projection.cs';
+import aggregates from '!!raw-loader!@site/examples/m11/l07/aggregates.cs';
+import emptySequence from '!!raw-loader!@site/examples/m11/l07/empty-sequence.cs';
+import emptySequenceOutput from '!!raw-loader!@site/examples/m11/l07/empty-sequence.out.txt';
+import topN from '!!raw-loader!@site/examples/m11/l07/top-n.cs';
+import aggregateSeed from '!!raw-loader!@site/examples/m11/l07/aggregate-seed.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l07/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l07/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l07/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l07/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l07/seclog-linq-solution.cs';
+
+# Gruppieren und Aggregieren
+
+:::note[Lernziele]
+- Du kannst mit `GroupBy` Elemente nach einem Schlüssel gruppieren und jede Gruppe mit `Key` und ihren Elementen auswerten.
+- Du kannst `Count`, `Sum`, `Min`, `Max`, `Average`, `MinBy`/`MaxBy` und `Aggregate` einsetzen und ihr Ergebnis vorhersagen.
+- Du kannst vorhersagen, was diese Operatoren bei einer leeren Folge tun.
+- Du kannst eine „Top-N“-Auswertung mit `GroupBy`, `OrderByDescending` und `Take` schreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l06-q1" />
+
+<Quiz id="m05-l06-q3" />
+
+<Quiz id="m11-l06-q2" />
+
+## Zählen mit einer einzigen Kette
+
+In Modul 5 hast du Vorkommen mit einem Dictionary gezählt: Schlüssel suchen, Zähler erhöhen, wieder speichern. In Modul 9 hat `Counter<TKey>` diese Arbeit in eine eigene Klasse gepackt. Beides löst dieselbe Aufgabe: Elemente nach einem Schlüssel einsortieren und dann pro Schlüssel etwas ausrechnen.
+
+Mit LINQ schreibst du das als eine Kette. Dafür brauchst du zwei Bausteine: `GroupBy` sortiert die Elemente in Gruppen, und die <Term id="aggregate-operator">Aggregatoperatoren</Term> rechnen aus vielen Werten einen einzigen aus.
+
+## GroupBy: Gruppen mit einem Schlüssel
+
+<Term id="grouping">`GroupBy`</Term> bekommt wie `OrderBy` einen <Term id="key-selector">Schlüsselauswähler</Term>. Elemente mit demselben Schlüssel kommen in dieselbe Gruppe. Das Ergebnis ist eine Folge von Gruppen. Jede Gruppe ist ein `IGrouping<TKey, TElement>`: Sie hat die Eigenschaft `Key` und ist selbst eine Folge ihrer Elemente. Deshalb kannst du über eine Gruppe mit `foreach` laufen und auf ihr `Count()` oder `string.Join` aufrufen.
+
+<CSharpRunner id="m11-l07-group-by" code={groupBy} />
+
+Die Gruppen erscheinen in der Reihenfolge, in der ihr Schlüssel zum ersten Mal vorkommt, und die Elemente einer Gruppe behalten ihre Reihenfolge. Wie `Where` und `Select` ist `GroupBy` verzögert (Lektion `m11-l05`): Die Gruppierung passiert erst beim Durchlaufen.
+
+Eine Gruppe ist eine ganze Folge, oft willst du aber nur einen Wert pro Gruppe. Dafür projizierst du jede Gruppe mit `Select` in ein <Term id="anonymous-type">anonymes Objekt</Term> (Lektion `m11-l06`). Mit `ToDictionary` machst du aus den Gruppen ein Dictionary: Der erste Lambda-Ausdruck liefert den Schlüssel, der zweite den Wert.
+
+<CSharpRunner id="m11-l07-group-projection" code={groupProjection} />
+
+## Aggregatoperatoren: eine Folge, ein Wert
+
+Ein Aggregatoperator liest die ganze Folge und gibt einen einzelnen Wert zurück. Er ist **sofort** (immediate): Anders als `Where` läuft er beim Aufruf, nicht erst später. Die wichtigsten:
+
+| Operator | Ergebnis |
+| --- | --- |
+| `Count()` / `Count(Bedingung)` | Anzahl der Elemente (die der Bedingung entsprechen) |
+| `Sum()` | Summe der Zahlen |
+| `Min()` / `Max()` | kleinster / größter Wert |
+| `Average()` | Durchschnitt, immer mit Nachkommastellen (`double` bei `int`-Werten) |
+| `MinBy(Schlüssel)` / `MaxBy(Schlüssel)` | das **Element** mit dem kleinsten / größten Schlüssel (nicht der Schlüssel selbst) |
+| `Aggregate(Start, Regel)` | wendet eine eigene Regel Element für Element an |
+
+<CSharpRunner id="m11-l07-aggregates" code={aggregates} />
+
+`Max()` gibt den größten Wert zurück. `MaxBy(w => w.Length)` gibt dagegen das Wort zurück, dessen Länge am größten ist. Merke den Unterschied: Der Schlüsselauswähler bestimmt nur, wonach verglichen wird.
+
+## Aggregate: eine eigene Regel
+
+`Aggregate` ist der allgemeine Fall. Du gibst einen Startwert (die Summe vor dem ersten Element, im Englischen _seed_) und eine Regel mit zwei Parametern an: dem bisherigen Ergebnis und dem nächsten Element. Die Regel liefert das neue Ergebnis. Am Ende gibt `Aggregate` das letzte Ergebnis zurück.
+
+<CSharpRunner id="m11-l07-aggregate-seed" code={aggregateSeed} />
+
+Die Ausgabe zeigt jeden Schritt. Bei einer leeren Folge läuft die Regel nie, und das Ergebnis ist der Startwert (`1`). Das ist der Grund, warum `Aggregate` mit Startwert bei einer leeren Folge nicht abbricht.
+
+## Was passiert bei einer leeren Folge?
+
+Ein Durchschnitt oder ein Minimum von nichts ist nicht definiert. `Count` und `Sum` haben dagegen ein sinnvolles Ergebnis, nämlich `0`.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Entscheide für jede Zeile: ein Wert oder ein Ausnahmetyp? `Try` fängt die Ausnahme und gibt ihren Typnamen aus. Achte auch auf die vorletzte Zeile: Eine leere Ausgabe nach dem Doppelpunkt bedeutet `null`.
+:::
+
+<CSharpRunner id="m11-l07-empty-sequence" code={emptySequence} predict expected={emptySequenceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`Count` und `Sum`:** Beide ergeben `0`. Es gibt nichts zu zählen und nichts zu addieren.
+2. **`Average`, `Min`, `Max` bei `int`:** Es gibt keinen Wert, den die Methode zurückgeben könnte. Sie wirft eine `InvalidOperationException`.
+3. **`MaxBy` bei `int`:** Auch hier wirft die Methode, weil der Elementtyp `int` keinen Wert „kein Element“ hat.
+4. **`MaxBy` bei `string`:** Ein Verweistyp hat `null` als Ergebnis. Die Ausgabe nach dem Doppelpunkt ist leer.
+5. **`Average` bei `int?`:** Für Zahlen, die `null` sein dürfen (Lektion `m04-l05`), ergibt `Average` bei einer leeren Folge `null` statt einer Ausnahme.
+
+**Was passiert, wenn …?** … die Folge nicht leer ist, aber alle Werte `null` sind? Bei `int?` ergibt `Average` dann ebenfalls `null`.
+
+</details>
+
+## Top-N: häufigste Werte finden
+
+Gruppieren, nach Anzahl absteigend sortieren, die ersten N nehmen: Das ist die „Top-N“-Auswertung. `ThenBy` legt fest, wie bei gleicher Anzahl sortiert wird. Ohne diese zweite Regel bliebe die Reihenfolge der Gruppen bei Gleichstand die des ersten Auftretens.
+
+<CSharpRunner id="m11-l07-top-n" code={topN} />
+
+Die Kette gleicht dem Zähler aus Modul 5 und 9, ist aber kürzer. Sie sortiert, wählt aus und gibt nur das Ergebnis aus.
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. die Wörter nach Länge gruppieren, 2. die Gruppen nach Länge sortieren, 3. pro Gruppe eine Zeile ausgeben. Das Beispiel ist vollständig. Ändere die Ausgabe so, dass sie statt der Anzahl die Summe aller Buchstaben der Gruppe zeigt (`lengthGroup.Sum(w => w.Length)`). Sage vorher, was herauskommt.
+
+<CSharpRunner id="m11-l07-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Gruppieren:** `GroupBy(w => w.Length)` bildet die Gruppen 3, 4 und 5.
+2. **Sortieren:** `OrderBy(g => g.Key)` sortiert die Gruppen nach dem Schlüssel.
+3. **Ausgeben:** Mit `Sum(w => w.Length)` ergibt sich 3, 12 und 10 Buchstaben, weil `Sum` mit einem Auswähler die Werte der Elemente addiert.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog projiziert Log-Ereignisse in anonyme Objekte. `logEvents` ist die Liste der Ereignisse, `incidents` enthält die Vorfälle von bob und dave, und `ReadUserAndIp` liefert Benutzer und IP-Adresse einer Log-Zeile.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Count failures per hour and find the top IP addresses`:
+
+1. Gruppiere die Fehlversuche von `logEvents` (`Where(e => e.IsFailure())`) mit `GroupBy(e => e.Timestamp.Hour)`, sortiere die Gruppen mit `OrderBy(g => g.Key)` und gib pro Gruppe eine Zeile wie `08:00 6 failures` aus.
+2. Bestimme die drei häufigsten IP-Adressen: `sampleLog.Select(line => ReadUserAndIp(line).Ip)`, gruppieren, nach `Count()` absteigend und bei Gleichstand nach `Key` (mit `StringComparer.Ordinal`) sortieren, `Take(3)`. Gib pro Zeile die Adresse und die Anzahl aus, zum Beispiel `203.0.113.7 5`.
+3. Gib den Vorfall mit den meisten Fehlversuchen aus: `incidents.MaxBy(i => i.FailureCount)?.Summary()`.
+
+<CSharpRunner id="m11-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Fehlversuche pro Stunde:** Die Zeitstempel haben den Offset 0, `Hour` ist also die UTC-Stunde. 6 Fehlversuche liegen in der Stunde 8 (5 von bob, 1 von alice), 1 in der Stunde 9. `{hourGroup.Key:D2}` füllt die Stunde auf zwei Stellen auf.
+2. **Häufigste IP-Adressen:** `203.0.113.7` kommt in 5 Zeilen vor, `192.0.2.10` in 4 und `198.51.100.8` in 3. Die Adresse `198.51.100.23` hat nur 2 Zeilen und fällt durch `Take(3)` heraus.
+3. **Größter Vorfall:** `MaxBy` gibt das Element mit dem größten `FailureCount` zurück, also den Vorfall von bob. Das `?.` fängt den Fall einer leeren Liste ab (Lektion `m04-l06`).
+
+</details>
+
+**Neuer Stand:** SecLog zählt die Fehlversuche pro Stunde, nennt die drei häufigsten IP-Adressen und findet den größten Vorfall.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l07-average-of-empty-is-zero" />
+
+**„`Average` einer leeren Folge ergibt 0.“** Das stimmt nicht. `Sum` ergibt bei einer leeren Folge `0`, aber `Average` einer leeren `int`-Folge wirft eine `InvalidOperationException`, weil es keinen Durchschnitt von nichts gibt. Prüfe vorher mit `Any()`, ob die Folge Elemente hat, oder nutze `int?`-Werte, bei denen das Ergebnis `null` ist.
+:::
+
+<details>
+<summary>Vertiefung: Bibliotheksdetails zu Gruppen und Aggregaten (optional)</summary>
+
+Dieser Abschnitt beschreibt Bibliotheksverhalten, nicht die Sprache. Die Sprachspezifikation enthält die LINQ-Operatoren nicht, sie stehen in `System.Linq.Enumerable`.
+
+`GroupBy` hat Überladungen mit einem Elementauswähler (er bestimmt, was in der Gruppe steht) und einem Ergebnisauswähler (er macht aus Schlüssel und Gruppe direkt ein Ergebnis). Die Seite [Enumerable.GroupBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.groupby) beschreibt sie. `IGrouping<TKey, TElement>` hat die Eigenschaft `Key` und ist eine `IEnumerable<TElement>` ([IGrouping](https://learn.microsoft.com/dotnet/api/system.linq.igrouping-2)).
+
+`MinBy` und `MaxBy` gibt es seit .NET 6. Bei einer leeren Folge geben sie `null` zurück, wenn der Elementtyp ein Verweistyp ist, und werfen eine `InvalidOperationException`, wenn er ein nicht nullbarer Werttyp ist ([Enumerable.MaxBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.maxby)).
+
+<Since dotnet="9" /> `CountBy` und `AggregateBy` fassen Gruppieren und Aggregieren in einem Schritt zusammen: `CountBy` liefert pro Schlüssel die Anzahl als `KeyValuePair<TKey, int>` ([Enumerable.CountBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.countby)). Der Runner dieser Lektion zeigt sie nicht, die Kette mit `GroupBy` und `Count()` liefert dieselbe Zahl.
+
+</details>
+
+## Zusammenfassung
+
+`GroupBy` teilt eine Folge anhand eines Schlüssels in Gruppen. Jede Gruppe ist ein `IGrouping<TKey, TElement>` mit `Key` und ihren Elementen. Aggregatoperatoren (`Count`, `Sum`, `Min`, `Max`, `Average`, `MinBy`, `MaxBy`, `Aggregate`) sind sofort und liefern einen Wert. Bei einer leeren Folge ergeben `Count` und `Sum` `0`, `Average`, `Min` und `Max` auf `int` werfen eine `InvalidOperationException`, und bei Verweistypen und nullbaren Zahlen ist das Ergebnis `null`. Für „Top-N“ gruppierst du, sortierst absteigend nach `Count()` und nimmst mit `Take` die ersten Gruppen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l07-q1" />
+
+<Quiz id="m11-l07-q2" />
+
+<Quiz id="m11-l07-q3" />
+
+<Quiz id="m11-l07-q4" />
+
+<Quiz id="m11-l07-q5" />
+
+<Quiz id="m11-l07-q6" />
+
+<Quiz id="m11-l07-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l07-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l07-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Daten gruppieren (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/grouping-data)
+- Microsoft Learn: [Aggregatoperationen (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/aggregation-operations)
+- Microsoft Learn: [Enumerable.GroupBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.groupby)

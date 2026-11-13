@@ -1,0 +1,8 @@
+Any: True
+Any above 10: True
+All above 3: True
+All above 10: False
+Contains 15: True
+Empty Any: False
+Empty All: True
+Empty Contains: False

@@ -1,0 +1,3 @@
+3 letters: 1 words
+4 letters: 3 words
+5 letters: 2 words
