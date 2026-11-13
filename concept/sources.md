@@ -21,6 +21,7 @@ Format of the table in the PR:
 | --- | --- | --- |
 | A statement list runs in order | https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements – §13.3.2 Statement lists | 2026-10-27 |
 | .NET 10 is an LTS release | https://dotnet.microsoft.com/platform/support/policy/dotnet-core – table of supported versions | 2026-10-27 |
+| .NET 11 is an STS release, end of support 2028-11-14 | https://dotnet.microsoft.com/platform/support/policy/dotnet-core – table of supported versions | 2026-11-13 |
 ```
 
 ## Level 1 – No visible source (default)

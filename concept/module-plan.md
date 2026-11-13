@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-10-25 (second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-11-13 (third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -72,12 +72,12 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
 4. History and versions: timeline, yearly release rhythm (November), LTS (even versions, 3 years) vs. STS (odd versions, **24 months since .NET 9**, before 18 months), support length. With an "as of" date; review twice a year.
 5. From code to running program: compiler → IL → JIT → CLR (medium depth, no machine code). Plus the overview of execution models: JIT at run time (default), ReadyToRun (IL plus precompiled native code, less JIT work at startup), Native AOT (native code only, no JIT, limits on compatibility). Only the idea here; the build and publish commands come in M14.
 - Page "Wie dieser Kurs funktioniert": methods, limits, how to use it (Leitner, export/import), **one** paragraph on AI use while learning.
-- Facts already verified for L4: C#/.NET mapping C# 9/.NET 5, 10/.NET 6, 11/.NET 7, 12/.NET 8, 13/.NET 9, 14/.NET 10 (Roslyn wiki); .NET 10 = LTS, released 2025-11-11, support until November 2028. Check everything else (older years, .NET Framework versions) against Microsoft Learn when writing.
+- Facts already verified for L4: C#/.NET mapping C# 9/.NET 5, 10/.NET 6, 11/.NET 7, 12/.NET 8, 13/.NET 9, 14/.NET 10 (Roslyn wiki), 15/.NET 11 (What's new in C# 15: "C# 15 is the default language version for projects that target `net11.0`", checked 2026-11-13); .NET 10 = LTS, released 2025-11-11, support until November 2028. Check everything else (older years, .NET Framework versions) against Microsoft Learn when writing.
 - **Spec:** language vs. implementation: the standard describes the language, not the runtime or the library (draft: Scope, Conformance, Annex "Standard library"); the three source layers from "Reference" above, in learner words.
 - Facts checked 2026-10-25 (support policy page, .NET Blog):
   - STS support is 24 months, starting with .NET 9 (announced 2025-09-16). LTS stays 3 years.
-  - .NET 8 (LTS) and .NET 9 (STS) both reach end of support on **2026-11-10**. L4 must reflect this at the first review after that date.
-  - .NET 11 is planned for 2026-11-10 together with C# 15 (primary source: dotnet/core `releases.md` lists .NET 11 as STS with release date 2026-11-10, status Go-Live, checked 2026-10-28). By the odd/even rule it is an STS release. The course base stays C# 14 / .NET 10 (LTS) – see `CLAUDE.md`.
+  - .NET 8 (LTS) and .NET 9 (STS) both reached end of support on **2026-11-10** (support policy page, checked 2026-11-13). L4 must reflect this.
+  - .NET 11 (STS) was released on **2026-11-10** together with C# 15; end of support is **2028-11-14**, the same date as .NET 10 LTS (support policy page; "What's new in .NET 11", `ms.date` 2026-11-10; checked 2026-11-13). The course base is C# 15 / .NET 11 – see `CLAUDE.md` and #450.
   - End of support for .NET 10 is **2028-11-14** (checked 2026-10-25, .NET support policy page, primary source). The EF Core 10 "What's new" page says 2028-11-10; that is not used.
 
 - **Placement test:** marked in `website/src/data/quiz/de/m00.json` (`"placement": true`).
@@ -108,10 +108,13 @@ Misconceptions: off-by-one; the loop condition is checked only once; `else` belo
 - *(new)* The switch **statement** next to the switch expression (people meet both).
 - *(new)* The conditional operator (inline choice of a value).
 - *(new)* Nested loops (base for 2D arrays in M5).
+- *(C# 15)* Labeled `break`/`continue` in nested loops (`m02-l09`): a label on a loop becomes part of M2; `goto` stays not covered.
 - **Spec:**
   - §12: relational and equality operators, conditional logical operators with short-circuit evaluation vs. the non-short-circuit logical operators, the conditional operator (both branches need a common type), boolean expressions.
   - §13: selection statements; switch statement rules: no implicit fall-through between sections, case guards, the default section, a switch section must not reach its end; the four iteration statements and when each one evaluates its condition (before vs. after the body); jump statements that leave or restart a loop; scope of loop variables.
   - §11 (simple part): constant patterns, relational patterns and the discard pattern in switch expressions; non-exhaustive switch expressions give a compiler warning and a runtime exception.
+  - Feature specification "Labeled break and continue" (C# 15): https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/labeled-break-continue; language reference "Jump statements".
+- **Badge:** labeled `break`/`continue` (C# 15 / .NET 11).
 - More misconceptions: `&&` and `&` are the same; a `case` continues into the next `case` without `break`.
 
 ### M3 Methoden (methods) ▶
@@ -199,7 +202,9 @@ Misconceptions: the index starts at 1; changing a list during `foreach`.
   - §10/§12: collection expressions and the spread element (target-typed; which target types are allowed).
   - §8/§12: object and collection initializers.
 - **Library (not spec):** generic collection interfaces (`IEnumerable<T>`, `ICollection<T>`, `IList<T>`, the read-only variants, `IDictionary<TKey,TValue>`); the enumerator invalidation rule when a collection changes during enumeration; dictionary keys need consistent equality and hash code (forward reference M8); `StringBuilder`; `DateTime` vs. `DateTimeOffset`, `TimeSpan`, `DateOnly`/`TimeOnly`, time zones only as a warning (UTC for logs).
-- **Badge:** collection expressions (C# 12 / .NET 8).
+- *(C# 15)* Collection expression arguments `with(...)` in the lesson "Collection expressions" (`m05-l08`): capacity or comparer passed to the collection.
+  - **Spec (C# 15):** feature specification `csharp-15.0/collection-expression-arguments` (https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/collection-expression-arguments); language reference "Collection expressions", section "Collection expression arguments".
+- **Badge:** collection expressions (C# 12 / .NET 8); collection expression arguments (C# 15 / .NET 11).
 - More misconceptions: `string.Replace` changes the string; `DateTime.Now` is fine for log timestamps across time zones.
 
 ### M6 OOP I ▶
@@ -332,13 +337,16 @@ Misconception: the query already runs when it is defined.
 - *(new)* Lesson "Iterators": writing your own sequence with an iterator block; this explains deferred execution.
 - *(new)* Joins, set operations, quantifiers, element operators and what they do when no element exists.
 - *(new)* Anonymous types in projections (vs. tuples and records).
+- *(C# 15)* Extension indexers: deep dive in `m11-l02` (indexers are a deep dive in `m08-l09`).
+- *(.NET 11)* LINQ `FullJoin` and the tuple-returning `Join` / `GroupJoin` overloads: deep dive in `m11-l09`.
 - **Spec:**
   - §15: extension methods (static class, first parameter with `this`, lookup rules: instance methods win); iterators: iterator blocks, enumerable and enumerator objects, lazy execution, yield return and yield break.
   - C# 14 extension members (feature specification): extension blocks with properties and static members.
+  - C# 15 extension indexers (feature specification `csharp-15.0/extension-indexers`; language reference "Extension declaration", section "Extension indexers").
   - §12: anonymous object creation expressions; query expressions and their syntactic translation into method calls (this is why query syntax and method syntax are the same).
   - §13: the yield statement and its restrictions.
-- **Library (not spec):** `IEnumerable<T>` contract, deferred vs. immediate operators, multiple enumeration, `Enumerable` operator families; newer operators from .NET 9/10 only with a badge (check the exact list when writing).
-- **Badge:** extension members (C# 14 / .NET 10).
+- **Library (not spec):** `IEnumerable<T>` contract, deferred vs. immediate operators, multiple enumeration, `Enumerable` operator families; newer operators from .NET 9/10/11 only with a badge (check the exact list when writing); .NET 11: `FullJoin` and tuple-returning `Join` / `GroupJoin` overloads ("What's new in .NET 11", libraries).
+- **Badge:** extension members (C# 14 / .NET 10); extension indexers (C# 15 / .NET 11); `FullJoin` and tuple join overloads (.NET 11).
 - More misconceptions: `First` returns `null` when nothing matches; a query result is a copy that does not change when the source changes.
 
 ### W3 Wiederholung M9–M11 ▶
@@ -380,11 +388,15 @@ Type, property, relational and list patterns · `switch` expressions · `record`
 - *(new)* Logical patterns (combinators) and parenthesized patterns.
 - *(new)* Positional patterns and deconstruction.
 - *(new)* "Patterns or polymorphism?" (design choice, not spec).
+- *(C# 15)* Union types: lesson proposal; `union` declaration, case types, implicit conversions, exhaustive `switch` over the case types.
+- *(C# 15)* Closed hierarchies: lesson proposal, together with unions or right after; the `closed` modifier fixes the direct descendants in the declaring assembly, so a `switch` over them is exhaustive; link to sealing in `m08-l04`.
 - **Spec:**
   - §11: all pattern kinds – declaration, type, constant, relational, logical, property (incl. extended property patterns, C# 10), positional, var, discard, list and slice patterns (C# 11); the null test with patterns; subsumption (an unreachable arm is an error) and exhaustiveness (warning, runtime exception).
   - §12: switch expression typing, the is-pattern expression, with expressions – for records, and since C# 10 also for structs and anonymous types (check in the feature spec).
   - Deconstruction: user-defined deconstruct methods and how positional patterns use them.
-- More misconceptions: `with` changes the original; the order of switch arms does not matter.
+  - C# 15 feature specifications `csharp-15.0/unions` and `csharp-15.0/closed-hierarchies` (https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/); language reference "Union types", "closed modifier" and "Closed hierarchy patterns" (in "Patterns").
+- **Badge:** union types (C# 15 / .NET 11); closed hierarchies, `closed` modifier (C# 15 / .NET 11). Library scaffolding (`UnionAttribute`, `IUnion` in `System.Runtime.CompilerServices`, .NET 11): check when writing.
+- More misconceptions: `with` changes the original; the order of switch arms does not matter; `closed` is the same as `sealed` (a closed class is implicitly abstract and can still have descendants in its assembly).
 
 ### M13 async/await und Nebenläufigkeit (async/await and concurrency) ▶ (part A) · ◻ (part B)
 `Task` · `async`/`await` · exceptions in asynchronous code · cancellation (`CancellationToken`).
@@ -396,6 +408,7 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
 - *(new)* Lesson "Waiting for several tasks" (all, any; timeouts).
 - *(new)* Lesson "Async streams" (asynchronous iteration).
 - *(new)* Async disposal.
+- *(.NET 11)* Runtime Async (the runtime runs async methods natively; cleaner stack traces, lower overhead): only by name in a deep dive; no code change for learners.
 - *(new)* Part "Pitfalls": async void (only for event handlers), blocking on a task (deadlock risk, ◻), I/O-bound vs. CPU-bound work.
 - **Spec (part A):**
   - §15: async functions, the allowed return types (task types, void, async iterators), evaluation of an async function (runs synchronously until the first await of an incomplete task).
@@ -430,7 +443,7 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
 
 ### M14 Testen (testing) ◻
 xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. The test runner output is produced in CI (S2).
-- *(new)* Lesson "From the playground to a project" (first lessons of the module): the SDK and the `dotnet` CLI, file-based apps (one `.cs` file, .NET 10) as the bridge from the playground, SDK-style project file (target framework, nullable, implicit usings, warnings as errors), solutions and project references, NuGet package references, build configurations, assemblies (link `internal` from M6).
+- *(new)* Lesson "From the playground to a project" (first lessons of the module): the SDK and the `dotnet` CLI, file-based apps (one `.cs` file, .NET 10; since the .NET 11 SDK also `#:include` to split an app across files) as the bridge from the playground, SDK-style project file (target framework, nullable, implicit usings, warnings as errors), solutions and project references, NuGet package references, build configurations, assemblies (link `internal` from M6).
 - *(new)* Lesson "Build and run": the difference between build and publish; build configurations (Debug vs. Release, what changes); the ways to start a program – `dotnet run` (project or single file), the apphost executable, `dotnet <app>.dll`; runtime version roll-forward to the newest installed patch (framework-dependent only).
 - *(new)* Lesson "Publishing options" (decision table): framework-dependent (needs an installed runtime, small) incl. the cross-platform DLL without apphost; self-contained (runtime included, platform-specific, patches only through a new build); runtime identifiers (target OS and architecture); single-file; ReadyToRun (faster startup, larger files); Native AOT (no JIT, no installed runtime, but limited library compatibility, longer builds, one build per platform; must be set in the project file); trimming (smaller self-contained output, risk of removed code); container images directly from the SDK (.NET 8 SDK and newer, no Dockerfile needed; a container runtime is needed to run them). For each option: how the result is started.
 - *(new)* Lesson "Using a debugger" (breakpoints, stepping, watching variables; tool-neutral, ◻).
@@ -444,7 +457,8 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
   - §7: assemblies as the unit of deployment and accessibility (`internal`).
 - **Tooling (not spec), build and publish:** `dotnet build`/`run`/`publish`, publish properties for self-contained, single-file, ReadyToRun, Native AOT and trimming, the RID catalog, SDK container publishing; Microsoft Learn ".NET application publishing overview" and "Containerize a .NET app with dotnet publish" as main references. Shown publish outputs (file lists, sizes) only from CI runs, and sizes with units (MB) and the date of the run, because they change between SDK versions.
 - **Library / tooling (not spec):** xUnit.net (check current major version, v3 at the time of writing), test platforms VSTest vs. Microsoft.Testing.Platform (MTP); MSTest, NUnit and TUnit only by name; data-driven tests; `TimeProvider` (.NET 8) and `FakeTimeProvider` (package `Microsoft.Extensions.TimeProvider.Testing`).
-- **Badge:** `TimeProvider` (.NET 8); file-based apps (.NET 10 SDK).
+- **.NET 11 SDK (check when writing):** built-in test templates support xUnit v3 (defaulting to Microsoft.Testing.Platform) and NUnit; `dotnet test` improvements ("What's new in .NET 11", SDK).
+- **Badge:** `TimeProvider` (.NET 8); file-based apps (.NET 10 SDK); `#:include` in file-based apps (.NET 11 SDK).
 - More misconceptions: a test that never fails is a good test; 100 % coverage means no bugs; a Debug build is fine for production; self-contained apps get runtime security patches automatically; Native AOT works with every library.
 
 ### W4 Wiederholung M12–M14 ▶
@@ -480,7 +494,7 @@ Dependencies through interfaces · `ServiceCollection` · lifetimes · logging �
 - **Spec:**
   - §8/§10: expression tree types – a lambda converted to an expression tree is data, not code (this is the language basis of LINQ to SQL).
   - §12: query expressions again (translated to `Queryable` calls).
-- **Library (not spec):** EF Core 10 (LTS, released November 2025, needs .NET 10), provider in CI: SQLite (check the CI project `website/examples/_ci/ef-core`), migrations tooling.
+- **Library (not spec):** EF Core 11 (released with .NET 11; check "What's new in EF Core 11" when writing), provider in CI: SQLite (check the CI project `website/examples/_ci/ef-core`), migrations tooling.
 - More misconceptions: `ToList()` at the end changes nothing; EF Core sends every LINQ method to the database.
 
 ### M17 ASP.NET Core Minimal APIs ◻
@@ -494,7 +508,7 @@ Routing, handlers · binding and validation · status codes · middleware pipeli
 - *(new)* Cancellation in request handlers (link M13).
 - *(new)* Lesson "Running an ASP.NET Core app" ◻: an ASP.NET Core app is a console app with the built-in web server Kestrel; publish to a folder and start it; a process manager starts and restarts it; optional reverse proxy in front of Kestrel (Nginx or IIS only by name) and the forwarded headers it needs; environments (development vs. production); container image from the SDK (link M14). Concepts only, no provider-specific steps.
 - **Spec:** no new language content; uses lambdas (M10), attributes (M14), records (M8), async (M13).
-- **Library (not spec):** ASP.NET Core 10 Minimal APIs; built-in validation (`AddValidation`, data annotations, `IValidatableObject`; some validation attributes are experimental in .NET 10); typed results; middleware order; configuration and environments (link M15); `Microsoft.AspNetCore.OpenApi`.
+- **Library (not spec):** ASP.NET Core 11 Minimal APIs (check "What's new in ASP.NET Core for .NET 11" when writing); built-in validation (`AddValidation`, data annotations, `IValidatableObject`; some validation attributes are experimental in .NET 10); typed results; middleware order; configuration and environments (link M15); `Microsoft.AspNetCore.OpenApi`.
 - More misconceptions: validation runs automatically without registration; middleware order does not matter.
 
 ### M18 Abschlussprojekt (final project)
@@ -510,8 +524,8 @@ Content of the specification or platform that the course leaves out, and why. "O
 
 | Content | Spec / area | Reason |
 | --- | --- | --- |
-| Unsafe code, pointers, fixed buffers, stack allocation into pointers | §23 | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
-| `goto` and labeled statements | §13 | Rarely used, makes control flow hard to read; the switch statement rules are enough. Only by name in M2. |
+| Unsafe code, pointers, fixed buffers, stack allocation into pointers, memory safety (preview, C# 15) | §23, feature specs | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
+| `goto` | §13 | Rarely used, makes control flow hard to read; the switch statement rules are enough. Only by name in M2. Labels are taught only as targets of labeled `break`/`continue` (C# 15, M2). |
 | Dynamic binding (`dynamic`) | §8, §12 | Mainly for COM and dynamic languages interop; works against the static typing the course teaches. |
 | `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions | §16, feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
 | Generic math, static abstract interface members | feature spec (C# 11) | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
@@ -526,7 +540,8 @@ Content of the specification or platform that the course leaves out, and why. "O
 | Provider-specific deployment (cloud services, IIS configuration details), CI/CD pipelines, container orchestration | tooling | Step-by-step guides depend on one provider and change often. The build options, publishing options and ways to run a program (framework-dependent, self-contained, single-file, ReadyToRun, Native AOT, trimming, containers, hosting an ASP.NET Core app) **are** covered in M0 L5 (idea), M14 and M17. |
 | Blazor, MAUI, WPF, WinForms, Unity, gRPC, SignalR | frameworks | Outside the end goal (see top of file). |
 | .NET Framework-only technology (AppDomains, remoting, WCF server) | platform | Not available in modern .NET; only mentioned as history in M0. |
-| C# 15 / .NET 11 features | – | .NET 11 is an STS release (planned 2026-11-10). The course base is C# 14 / .NET 10 LTS. Review at the next half-yearly review (2027-04). |
+| Non-virtual static interface members on older runtimes (C# 15) | feature specs | The course targets `net11.0`, so the runtime restriction never applies. |
+| Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
 
 ## Practice project SecLog
 
@@ -538,6 +553,8 @@ Primary sources:
 - Microsoft Learn, C# language specification (draft, overview and table of contents): https://learn.microsoft.com/dotnet/csharp/specification – updated 2026-05-01.
 - Microsoft Learn, C# standard foreword (features added compared with the previous edition): https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/foreword
 - Ecma International, ECMA-334 (latest published edition: 7th, December 2023): https://ecma-international.org/publications-and-standards/standards/ecma-334
+- Microsoft Learn, What's new in C# 15: https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-15 – `ms.date` 2026-11-10.
+- Microsoft Learn, What's new in .NET 11: https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/overview – `ms.date` 2026-11-10.
 - Microsoft Learn, What's new in C# 14: https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-14 – updated 2026-09-03.
 - Microsoft Learn, The history of C# (features per version): https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-version-history
 - Microsoft Learn, C# language versioning: https://learn.microsoft.com/dotnet/csharp/language-reference/configure-language-version – updated 2026-01-20.
