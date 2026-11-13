@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
 
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net11.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>Playground</AssemblyName>
@@ -21,13 +21,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="10.0.*" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="11.0.*" PrivateAssets="all" />
+    <!-- Pre-release from the dotnet-tools feed (see nuget.config): the first Roslyn version that
+         knows C# 15. Switch to the stable nuget.org package when it exists. -->
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.12.0-1.26430.105" />
     <!-- Fixed package set for user code (S6). Blazor ships the runtime DLLs anyway;
          the references for the compiler are embedded below. -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.*" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="11.0.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="11.0.*" />
   </ItemGroup>
 
   <!--
@@ -38,8 +40,8 @@
   -->
   <Target Name="EmbedReferenceAssemblies" BeforeTargets="AssignTargetPaths">
     <!-- Take the directory from the resolved reference pack of $(TargetFramework). The SDK's
-         BundledNETCoreAppPackageVersion can point to a newer major version (e.g. 11.0.0 when
-         a newer SDK is installed), whose pack does not contain net10.0. -->
+         BundledNETCoreAppPackageVersion can point to a newer major version than the target
+         framework (e.g. 12.0.0 when a newer SDK is installed), whose pack does not contain net11.0. -->
     <ItemGroup>
       <SystemRuntimeRef Include="@(ReferencePath)" Condition="'%(Filename)' == 'System.Runtime'" />
     </ItemGroup>
