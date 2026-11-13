@@ -1,0 +1,221 @@
+---
+title: Joins und Mengenoperationen
+sidebar_position: 9
+description: Join und GroupJoin verbinden zwei Folgen über einen gemeinsamen Schlüssel. Distinct, Union, Intersect und Except behandeln Folgen als Mengen, Concat hängt nur an.
+lesson_id: m11-l09
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import loopVsJoin from '!!raw-loader!@site/examples/m11/l09/loop-vs-join.cs';
+import joinInner from '!!raw-loader!@site/examples/m11/l09/join-inner.cs';
+import joinInnerOutput from '!!raw-loader!@site/examples/m11/l09/join-inner.out.txt';
+import groupJoin from '!!raw-loader!@site/examples/m11/l09/group-join.cs';
+import setOperators from '!!raw-loader!@site/examples/m11/l09/set-operators.cs';
+import setOperatorsOutput from '!!raw-loader!@site/examples/m11/l09/set-operators.out.txt';
+import equality from '!!raw-loader!@site/examples/m11/l09/equality.cs';
+import emptySequences from '!!raw-loader!@site/examples/m11/l09/empty-sequences.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l09/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l09/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l09/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l09/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l09/seclog-linq-solution.cs';
+
+# Joins und Mengenoperationen
+
+:::note[Lernziele]
+- Du kannst zwei Folgen mit `Join` über einen gemeinsamen Schlüssel verbinden und das Ergebnis vorhersagen (nur passende Paare).
+- Du kannst mit `GroupJoin` zu jedem Element der ersten Folge alle passenden Elemente der zweiten finden, auch wenn es keine gibt.
+- Du kannst `Distinct`, `Union`, `Intersect`, `Except` und `Concat` unterscheiden und ihr Ergebnis vorhersagen.
+- Du kannst erklären, wie die Gleichheit der Elemente bestimmt wird (Standardvergleich, Records, `…By`-Formen, eigener Vergleicher).
+:::
+
+## Rückblick
+
+<Quiz id="m05-l07-q1" />
+
+<Quiz id="m08-l09-q1" />
+
+<Quiz id="m11-l07-q1" />
+
+## Welche Ereignisse gehören zu welchem Vorfall?
+
+SecLog hat eine Liste von Vorfällen und eine Liste von Log-Ereignissen. Beide haben einen Benutzernamen, sonst nichts gemeinsam. Die Frage „welche Ereignisse gehören zu welchem Vorfall?“ löst du mit zwei verschachtelten Schleifen: für jeden Vorfall alle Ereignisse durchsehen und die mit gleichem Benutzer ausgeben. Mit LINQ ist es ein Aufruf: `Join`.
+
+<CSharpRunner id="m11-l09-loop-vs-join" code={loopVsJoin} />
+
+`Join` bekommt vier Angaben: die zweite Folge, einen <Term id="key-selector">Schlüsselauswahl</Term>-Lambda für die erste Folge, einen für die zweite und ein Lambda, das aus einem passenden Paar das Ergebnis baut. Beide Schlüssel werden mit der Gleichheit verglichen. Ein <Term id="join">Join</Term> verbindet also zwei Folgen über einen gemeinsamen Schlüssel. Er gehört zu den <Term id="query-operator">Abfrageoperatoren</Term>.
+
+## Join: nur passende Paare
+
+`Join` liefert ein Ergebnis für jedes **Paar** aus einem Element der ersten und einem der zweiten Folge, dessen Schlüssel gleich sind. Hat ein Element keinen Partner, kommt es im Ergebnis nicht vor. Hat es mehrere Partner, kommt es mehrfach vor.
+
+:::info[Vorhersage]
+Wie viele Zeilen gibt das Programm aus, und welche? Beachte den Vorfall von `erin` und das Ereignis von `alice`.
+:::
+
+<CSharpRunner id="m11-l09-join-inner" code={joinInner} predict expected={joinInnerOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Schlüssel vergleichen:** Der Vorfall von `bob` passt zu den zwei Ereignissen von `bob`, der von `dave` zu einem Ereignis.
+2. **Paare bilden:** Das ergibt drei Paare. `bob` erscheint zweimal, weil er zwei Partner hat.
+3. **Ohne Partner entfällt:** `erin` hat kein Ereignis, `alice` keinen Vorfall. Beide kommen nicht im Ergebnis vor.
+
+**Was passiert, wenn …?** … die zweite Folge leer ist? Dann gibt es keine Paare, und das Ergebnis ist leer.
+
+</details>
+
+## GroupJoin: jedes Element der ersten Folge bleibt
+
+Manchmal willst du **zu jedem** Vorfall wissen, wie viele Ereignisse es gibt, auch wenn die Antwort 0 ist. Dafür gibt es `GroupJoin`. Das Ergebnis-Lambda bekommt das Element der ersten Folge und die **Gruppe** aller passenden Elemente der zweiten Folge. Die Gruppe kann leer sein.
+
+<CSharpRunner id="m11-l09-group-join" code={groupJoin} />
+
+`erin` bleibt im Ergebnis, mit der Anzahl 0. Der Name `matches` im Lambda steht für eine Folge, die du wie jede andere Folge mit `Count()` oder `Any()` befragst. Das Ergebnis ist ein anonymes Objekt (Lektion `m11-l06`).
+
+## Mengenoperationen
+
+Zwei Folgen kannst du auch als **Mengen** lesen: Es zählt nur, ob ein Wert vorkommt, nicht wie oft. In Lektion `m05-l07` hast du das mit `HashSet<T>` gemacht. LINQ bietet dieselben <Term id="set-operation">Mengenoperationen</Term> für **jede** Folge:
+
+| Operator | Ergebnis |
+| --- | --- |
+| `Distinct()` | jeder Wert einmal |
+| `Union(b)` | jeder Wert aus `a` oder `b`, einmal |
+| `Intersect(b)` | Werte, die in `a` **und** `b` vorkommen |
+| `Except(b)` | Werte aus `a`, die **nicht** in `b` vorkommen |
+| `Concat(b)` | alle Elemente von `a`, dann alle von `b`, **mit** Duplikaten |
+
+Die Operatoren entfernen Duplikate und geben die Werte in der Reihenfolge des ersten Auftretens zurück. `Concat` ist keine Mengenoperation: Es hängt nur an.
+
+:::info[Vorhersage]
+Schreibe für jede der fünf Zeilen die Werte auf. Prüfe dann mit dem Lauf.
+:::
+
+<CSharpRunner id="m11-l09-set-operators" code={setOperators} predict expected={setOperatorsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`Concat`:** Alle 5 Elemente von `a`, dann alle 4 von `b`. Duplikate bleiben: `2, 2` und `4, 4`.
+2. **`Distinct`:** `a` ohne die doppelte 2.
+3. **`Union`:** Die Werte aus `a` und `b`, jeder einmal, in der Reihenfolge des ersten Auftretens.
+4. **`Intersect`:** `3` und `4` stehen in beiden Folgen.
+5. **`Except`:** `1` und `2` stehen in `a`, aber nicht in `b`. Die zweite 2 fällt als Duplikat weg.
+
+</details>
+
+Alle diese Operatoren sind **verzögert** (Lektion `m11-l05`): Sie laufen erst, wenn du die Folge durchläufst.
+
+## Wann sind zwei Elemente gleich?
+
+Join und Mengenoperatoren vergleichen Elemente mit der Gleichheit. Standardmäßig ist das die Gleichheit des Typs, also `Equals` und `GetHashCode`. Bei `int` und `string` ist das der Inhalt. Bei einem Record vergleicht sie die Werte der Eigenschaften (Lektion `m08-l09`), bei einer normalen Klasse die Verweise.
+
+Du kannst das ändern:
+
+- **Eigener Vergleicher:** Ein `IEqualityComparer<T>` ist ein Objekt, das entscheidet, wann zwei Elemente gleich sind. Fertig bekommst du ihn für Text, zum Beispiel `StringComparer.OrdinalIgnoreCase`, der Groß- und Kleinschreibung ignoriert. Du gibst ihn als letzten Parameter mit.
+- **`…By`-Formen:** `DistinctBy`, `UnionBy`, `IntersectBy` und `ExceptBy` nehmen ein Schlüssel-Lambda und vergleichen nur den Schlüssel. Bei `DistinctBy` bleibt von jedem Schlüssel das erste Element.
+
+<CSharpRunner id="m11-l09-equality" code={equality} />
+
+## Leere Folgen
+
+Was die Operatoren tun, wenn es keine Elemente gibt, ist wohldefiniert: `Join` mit einer leeren zweiten Folge liefert nichts, `GroupJoin` liefert für jedes Element eine leere Gruppe, `Except` mit einer leeren zweiten Folge liefert die Werte der ersten ohne Duplikate.
+
+<CSharpRunner id="m11-l09-empty-sequences" code={emptySequences} />
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. Duplikate aus der ersten Folge entfernen, 2. die Werte suchen, die in beiden Folgen vorkommen, 3. die suchen, die nur in der ersten vorkommen. Das Beispiel ist vollständig. Ändere `Intersect` in `Union` und sage vorher, wie viele Namen die erste Ausgabe zeigt.
+
+<CSharpRunner id="m11-l09-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **`Distinct`:** `failed` ergibt `bob`, `alice`, `dave`.
+2. **`Union`:** Mit `success` zusammen kommen `bob`, `alice`, `dave` und `carol` heraus, also vier Namen. Mit `Intersect` waren es zwei.
+3. **`Except`:** Die zweite Zeile ändert sich nicht: `bob`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlversuche pro Stunde, nennt die häufigsten IP-Adressen und bewertet gemeldete Nachrichten. Die Listen `incidents` und `logEvents`, die Erweiterungsmethode `IsFailure()` und die Funktion `PrintEach` sind verfügbar.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Join incidents with log events and compare user sets`:
+
+1. Verbinde mit `GroupJoin` die `incidents` (erste Folge) mit den `logEvents` (zweite Folge) über den Benutzer. Gib mit `PrintEach` unter dem Titel `Log events per incident` pro Vorfall eine Zeile aus, zum Beispiel `bob 5`: Benutzer und Anzahl der Ereignisse. Der Schlüssel eines Vorfalls ist `string`, der eines Ereignisses `string?`. Beide Lambdas geben den Benutzer zurück, ohne `!`.
+2. Lege `failedUsers` an: die Benutzer der Fehlversuche, ohne `null`, ohne Duplikate (`Where`, `Select`, `Distinct`). Lege `successUsers` genauso an für die Ereignisse mit `EventType == "login-success"`.
+3. Gib mit `PrintEach` aus: `Intersect` unter `Failed and logged in`, `Except` unter `Failed, never logged in` und `Union` unter `All users with a login`.
+
+<CSharpRunner id="m11-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Verbinden:** `GroupJoin` hält jeden Vorfall fest und gibt die Ereignisse seines Benutzers als Gruppe weiter. `events.Count()` zählt sie: bob hat 5, dave 3.
+2. **Benutzermengen:** `Where` behält Fehlversuche (beziehungsweise Anmeldungen) mit Benutzer, `Select` nimmt den Namen, `Distinct` entfernt Duplikate.
+3. **Vergleichen:** alice und dave sind in beiden Mengen (`Intersect`). bob ist nur bei den Fehlversuchen (`Except`). `Union` listet alle vier Benutzer einmal in der Reihenfolge des ersten Auftretens.
+
+</details>
+
+**Neuer Stand:** SecLog verbindet Vorfälle mit Ereignissen und vergleicht Benutzermengen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l09-union-keeps-duplicates" />
+
+**„`Union` hängt die zweite Folge einfach an, wie `Concat`.“** Das stimmt nicht. `Union` gibt jeden Wert nur einmal zurück, auch wenn er in einer Folge mehrfach vorkommt. `Concat` behält alle Elemente und damit auch alle Duplikate.
+:::
+
+<details>
+<summary>Vertiefung: Bibliotheksdetails zu Joins und Mengenoperatoren (optional)</summary>
+
+Dieser Abschnitt beschreibt Bibliotheksverhalten, nicht die Sprache. Die Operatoren stehen in `System.Linq.Enumerable`.
+
+`Join` ist ein Inner Join: Elemente ohne Partner erscheinen nicht im Ergebnis. `GroupJoin` nimmt jedes Element der ersten Folge ins Ergebnis auf, auch mit leerer Gruppe ([Join Operations](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/join-operations)).
+
+`Union` schließt Duplikate aus, `Concat` behält alle Elemente. Ohne Vergleicher gilt der Standardvergleich des Typs, und `Union` liefert jedes Element beim Durchlaufen genau dann, wenn es nicht schon geliefert wurde ([Enumerable.Union](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.union)).
+
+</details>
+
+## Zusammenfassung
+
+`Join` verbindet zwei Folgen über einen Schlüssel und liefert nur passende Paare. `GroupJoin` behält jedes Element der ersten Folge und gibt dazu die möglicherweise leere Gruppe der passenden Elemente der zweiten. `Distinct`, `Union`, `Intersect` und `Except` behandeln Folgen als Mengen: Jeder Wert kommt einmal vor, in der Reihenfolge des ersten Auftretens. `Concat` hängt dagegen nur an und behält Duplikate. Gleichheit bestimmt der Standardvergleich des Typs (bei Records die Werte), ein eigener Vergleicher oder bei den `…By`-Formen ein Schlüssel.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l09-q1" />
+
+<Quiz id="m11-l09-q2" />
+
+<Quiz id="m11-l09-q3" />
+
+<Quiz id="m11-l09-q4" />
+
+<Quiz id="m11-l09-q5" />
+
+<Quiz id="m11-l09-q6" />
+
+<Quiz id="m11-l09-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l09-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l09-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Join-Operationen (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/join-operations)
+- Microsoft Learn: [Mengenoperationen (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/set-operations)
+- Microsoft Learn: [Enumerable.Union](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.union)

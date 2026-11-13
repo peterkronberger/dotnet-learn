@@ -1,0 +1,5 @@
+Concat:    1, 2, 2, 3, 4, 3, 4, 4, 5
+Distinct:  1, 2, 3, 4
+Union:     1, 2, 3, 4, 5
+Intersect: 3, 4
+Except:    1, 2

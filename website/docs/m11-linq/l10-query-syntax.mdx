@@ -1,0 +1,212 @@
+---
+title: Abfragesyntax
+sidebar_position: 10
+description: Ein Abfrageausdruck mit from, where und select wird vom Compiler in Aufrufe derselben LINQ-Methoden übersetzt. Abfragesyntax und Methodensyntax liefern dasselbe Ergebnis.
+lesson_id: m11-l10
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import sideBySide from '!!raw-loader!@site/examples/m11/l10/side-by-side.cs';
+import clauses from '!!raw-loader!@site/examples/m11/l10/clauses.cs';
+import clausesOutput from '!!raw-loader!@site/examples/m11/l10/clauses.out.txt';
+import groupInto from '!!raw-loader!@site/examples/m11/l10/group-into.cs';
+import translationPairs from '!!raw-loader!@site/examples/m11/l10/translation-pairs.snippet.cs';
+import translation from '!!raw-loader!@site/examples/m11/l10/translation.cs';
+import deferredQuery from '!!raw-loader!@site/examples/m11/l10/deferred-query.cs';
+import noKeyword from '!!raw-loader!@site/examples/m11/l10/no-keyword.cs';
+import joinQuery from '!!raw-loader!@site/examples/m11/l10/join-query.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l10/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l10/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l10/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l10/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l10/seclog-linq-solution.cs';
+
+# Abfragesyntax
+
+:::note[Lernziele]
+- Du kannst einen Abfrageausdruck mit `from`, `where`, `orderby`, `select`, `group … by … into` und `let` lesen und schreiben.
+- Du kannst einen einfachen Abfrageausdruck in Methodensyntax übersetzen und umgekehrt.
+- Du kannst erklären, dass der Compiler Abfragesyntax in Methodenaufrufe übersetzt und beide gleich ausgeführt werden (auch verzögert).
+- Du kannst begründen, wann welche Schreibweise besser lesbar ist.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l03-q1" />
+
+<Quiz id="m11-l05-q1" />
+
+<Quiz id="m11-l07-q1" />
+
+## Dieselbe Abfrage, zwei Schreibweisen
+
+Bisher hast du Abfragen als Kette von Methodenaufrufen geschrieben: `Where`, `OrderBy`, `Select`. Das ist die <Term id="method-syntax">Methodensyntax</Term>. C# kennt für dieselben Abfragen eine zweite Schreibweise, die an eine Frage in Textform erinnert: die <Term id="query-syntax">Abfragesyntax</Term>. Ein Ausdruck in dieser Schreibweise heißt <Term id="query-expression">Abfrageausdruck</Term>.
+
+<CSharpRunner id="m11-l10-side-by-side" code={sideBySide} />
+
+Beide Abfragen liefern dieselben Namen. Der Abfrageausdruck beginnt immer mit `from` und endet mit `select` oder `group`. Die Variable nach `from` (hier `user`) steht für ein Element der Folge und heißt Laufvariable. Dazwischen stehen optionale Klauseln.
+
+## Die Klauseln
+
+| Klausel | Bedeutung | Methode |
+| --- | --- | --- |
+| `from x in e` | Quelle und Laufvariable | |
+| `where Bedingung` | filtern | `Where` |
+| `orderby k` / `orderby k descending` | sortieren (`ascending` ist Standard) | `OrderBy`, `OrderByDescending`, `ThenBy` |
+| `select v` | Ergebnis bilden | `Select` |
+| `let name = Ausdruck` | einen Zwischenwert in einer neuen Laufvariable merken | `Select` |
+| `group v by k` | nach Schlüssel gruppieren | `GroupBy` |
+| `… into name` | Ergebnis weiterverwenden (Fortsetzung) | |
+| `join y in e2 on a equals b` | zwei Folgen verbinden | `Join` |
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus, und in welcher Reihenfolge? Beachte `where`, `orderby … descending` und den Wert aus `let`.
+:::
+
+<CSharpRunner id="m11-l10-clauses" code={clauses} predict expected={clausesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`let`:** Für jedes Wort wird `length` berechnet und in der Abfrage weiterverwendet.
+2. **`where`:** Es bleiben die Wörter mit Länge 4: `pear`, `kiwi`, `plum`.
+3. **`orderby … descending`:** Absteigend nach Text sortiert: `plum`, `pear`, `kiwi`.
+4. **`select`:** Pro Wort entsteht ein Text aus Wort und Länge.
+
+**Was passiert, wenn …?** … du `descending` weglässt? Dann wird aufsteigend sortiert: `kiwi`, `pear`, `plum`.
+
+</details>
+
+### Gruppieren mit into
+
+`group … by …` endet die Abfrage. Willst du mit den Gruppen weiterarbeiten, hängst du `into name` an. Danach geht die Abfrage mit dem neuen Namen weiter, hier mit `orderby` und `select`.
+
+<CSharpRunner id="m11-l10-group-into" code={groupInto} />
+
+### Join in Abfragesyntax
+
+Die Klausel `join … in … on … equals …` entspricht `Join` aus Lektion `m11-l09`. Die beiden Schlüssel stehen links und rechts von `equals`.
+
+<CSharpRunner id="m11-l10-join-query" code={joinQuery} />
+
+## Der Compiler übersetzt in Methodenaufrufe
+
+Abfragesyntax ist keine eigene Technik. Die Sprachspezifikation beschreibt, dass der Compiler einen Abfrageausdruck in Aufrufe von Methoden mit den Namen `Where`, `Select`, `SelectMany`, `Join`, `GroupJoin`, `OrderBy`, `OrderByDescending`, `ThenBy`, `ThenByDescending`, `GroupBy` und `Cast` übersetzt ([§12.23.3 Query expression translation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12233-query-expression-translation)). Danach laufen diese Aufrufe wie jeder andere Methodenaufruf. Drei Paare zeigen die Übersetzung:
+
+<CodeBlock language="csharp" title="translation-pairs.snippet.cs">{translationPairs}</CodeBlock>
+
+- **Paar 1:** `where` wird zu `Where`, `select` zu `Select`.
+- **Paar 2:** `orderby … descending` wird zu `OrderByDescending`. Hat die Abfrage nur `select n`, entfällt das `Select`, weil es nichts ändern würde ([§12.23.3.6 Select clauses](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122336-select-clauses)).
+- **Paar 3:** `group … by … into` wird zu `GroupBy`, und was nach `into` kommt, arbeitet mit dem Ergebnis weiter, hier `Select` ([§12.23.3.2 Query expressions with continuations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122332-query-expressions-with-continuations)).
+
+Weil beide Schreibweisen dieselben Methoden aufrufen, sind Ergebnis, verzögerte Ausführung (Lektion `m11-l05`) und Geschwindigkeit gleich. Das Programm vergleicht die Zeilen beider Formen mit `SequenceEqual`: Der Operator prüft, ob zwei Folgen gleich lang sind und die Elemente an den gleichen Stellen gleich sind.
+
+<CSharpRunner id="m11-l10-translation" code={translation} />
+
+Anonyme Objekte mit gleichen Werten sind gleich (Lektion `m11-l06`). Deshalb gibt `SequenceEqual` hier `True` zurück.
+
+Auch die verzögerte Ausführung bleibt: Der Abfrageausdruck läuft erst bei der Aufzählung, und jede Aufzählung sieht die aktuellen Daten.
+
+<CSharpRunner id="m11-l10-deferred-query" code={deferredQuery} />
+
+## Operatoren ohne Schlüsselwort
+
+Nicht jeder Operator hat eine Klausel. Für `Count`, `First`, `Take`, `Distinct` und viele andere gibt es nur die Methode. Du rufst sie auf dem eingeklammerten Abfrageausdruck auf oder mischt die Schreibweisen.
+
+<CSharpRunner id="m11-l10-no-keyword" code={noKeyword} />
+
+## Welche Schreibweise?
+
+Die Wahl ist eine Frage der Lesbarkeit. Abfragesyntax liest sich besser bei mehreren Klauseln, bei `let` und bei `join`, weil die Laufvariablen in einem Namensbereich stehen und du keine verschachtelten Lambdas schreibst. Methodensyntax ist kürzer bei einem oder zwei Operatoren und die einzige Wahl bei Operatoren ohne Klausel. Beides zu mischen ist erlaubt. Dein Team einigt sich meist auf eine Hauptschreibweise.
+
+## Lückenbeispiel
+
+Die Teilschritte: 1. Quelle wählen, 2. filtern, 3. sortieren, 4. projizieren. Das Beispiel ist vollständig, beide Formen stehen untereinander. Ändere `where n > 3` in beiden Abfragen auf `where n > 5`. Sage vorher, was die beiden Zeilen ausgeben.
+
+<CSharpRunner id="m11-l10-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Filtern:** Mit `n > 5` bleiben `9` und `7`.
+2. **Sortieren und projizieren:** Aufsteigend `7`, `9`, dann quadriert: `49, 81`.
+3. **Beide Formen:** Beide Zeilen geben dasselbe aus, weil der Compiler die erste in die zweite übersetzt.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlversuche pro Stunde und nennt die häufigsten IP-Adressen (`GroupBy` in Methodensyntax), bewertet Nachrichten und verbindet Vorfälle mit Ereignissen. Die Liste `logEvents` und `IsFailure()` sind verfügbar.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Count failures per hour with query syntax`:
+
+1. Schreibe die Abfrage der Fehlversuche pro Stunde (Lektion `m11-l07`) als Abfrageausdruck in die Variable `queryRows`: `from e in logEvents`, `where e.IsFailure()`, `group e by e.Timestamp.Hour into hourGroup`, `orderby hourGroup.Key` und `select new { Hour = hourGroup.Key, Count = hourGroup.Count() }`.
+2. Gib jede Zeile im Format von Lektion 7 aus, zum Beispiel `08:00 6 failures` (`{row.Hour:D2}:00 {row.Count} failures`).
+3. Schreibe dieselbe Abfrage in Methodensyntax in `methodRows` (`Where`, `GroupBy`, `OrderBy`, `Select` mit demselben anonymen Objekt). Gib `Same rows as method syntax: ` und das Ergebnis von `queryRows.SequenceEqual(methodRows)` aus. [`SequenceEqual`](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.sequenceequal) liefert `true`, wenn beide Folgen gleich lang sind und ihre Elemente nacheinander gleich sind.
+
+<CSharpRunner id="m11-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Abfrageausdruck:** `from` wählt die Quelle, `where` behält Fehlversuche, `group … by … into` bildet Gruppen pro Stunde, `orderby` sortiert nach der Stunde, `select` bildet das anonyme Objekt.
+2. **Ausgabe:** Eine Zeile pro Stunde: `08:00 6 failures` und `09:00 1 failures`.
+3. **Vergleich:** Die Methodenform ergibt dieselben Zeilen. `SequenceEqual` vergleicht die anonymen Objekte nach Werten und gibt `True` zurück.
+
+</details>
+
+**Neuer Stand:** SecLog erreicht damit den Meilenstein von Modul 11: Es nennt die häufigsten IP-Adressen, zählt Fehlversuche pro Stunde und bewertet gemeldete Nachrichten.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l10-query-syntax-differs" />
+
+**„Abfragesyntax ist etwas anderes (oder langsamer) als Methodensyntax.“** Das stimmt nicht. Der Compiler übersetzt den Abfrageausdruck in dieselben Methodenaufrufe. Ergebnis, verzögerte Ausführung und Geschwindigkeit sind gleich. Nur die Schreibweise unterscheidet sich.
+:::
+
+<details>
+<summary>Vertiefung: Die Übersetzung ist rein syntaktisch (optional)</summary>
+
+Die Übersetzung von Abfrageausdrücken in Methodenaufrufe ist eine syntaktische Abbildung, die vor Typbindung und Überladungsauflösung stattfindet ([§12.23.3.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#122331-general)). Die Sprache legt die Ausführung nicht fest. Jeder Typ mit passenden Methoden `Where`, `Select` und so weiter, als Instanzmethode oder Erweiterungsmethode, kann also in einem Abfrageausdruck stehen. Diese Anforderungen heißen Abfrageausdrucksmuster ([§12.23.4 The query-expression pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12234-the-query-expression-pattern)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Abfrageausdruck beginnt mit `from` und endet mit `select` oder `group`, dazwischen stehen Klauseln wie `where`, `orderby`, `let` und `join`. `group … by … into` setzt die Abfrage mit den Gruppen fort. Der Compiler übersetzt jeden Abfrageausdruck in Aufrufe von `Where`, `Select`, `OrderBy`, `GroupBy`, `Join` und weiteren Methoden. Deshalb sind Ergebnis, verzögerte Ausführung und Geschwindigkeit wie bei der Methodensyntax. Operatoren ohne Klausel, zum Beispiel `Count` oder `First`, rufst du auf dem eingeklammerten Ausdruck auf. Welche Schreibweise besser ist, entscheidet die Lesbarkeit.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l10-q1" />
+
+<Quiz id="m11-l10-q2" />
+
+<Quiz id="m11-l10-q3" />
+
+<Quiz id="m11-l10-q4" />
+
+<Quiz id="m11-l10-q5" />
+
+<Quiz id="m11-l10-q6" />
+
+<Quiz id="m11-l10-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l10-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l10-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Grundlagen von Abfrageausdrücken (LINQ)](https://learn.microsoft.com/dotnet/csharp/linq/get-started/query-expression-basics)
+- Microsoft Learn: [Abfrageausdrücke in der C#-Sprachspezifikation (§12.23)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1223-query-expressions)
+- Microsoft Learn: [Enumerable.SequenceEqual](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.sequenceequal)

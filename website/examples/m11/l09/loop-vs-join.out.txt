@@ -1,0 +1,8 @@
+With two loops:
+#1 login-failed
+#1 login-failed
+#2 login-failed
+With Join:
+#1 login-failed
+#1 login-failed
+#2 login-failed

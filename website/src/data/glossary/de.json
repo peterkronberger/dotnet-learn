@@ -7248,6 +7248,67 @@
         "title": "Quantifier operations",
         "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/quantifier-operations"
       }
+    },
+    {
+      "id": "join",
+      "term": "LINQ Join",
+      "german": "Verbund",
+      "category": "language",
+      "definition": "Ein Abfrageoperator, der zwei Folgen über einen gemeinsamen Schlüssel verbindet. `Join` liefert nur passende Paare, `GroupJoin` zu jedem Element der ersten Folge die Gruppe aller passenden Elemente der zweiten.",
+      "aliases": [
+        "GroupJoin",
+        "Verknüpfung"
+      ],
+      "related": [
+        "query-operator",
+        "key-selector"
+      ],
+      "lesson": "m11-l09",
+      "source": {
+        "title": "Join operations",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/join-operations"
+      }
+    },
+    {
+      "id": "query-expression",
+      "term": "Query Expression",
+      "german": "Abfrageausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck mit `from`, `where`, `select` und weiteren Klauseln, der eine Abfrage schreibt. Der Compiler übersetzt ihn in Aufrufe der LINQ-Methoden.",
+      "aliases": [
+        "Abfrageausdrücke",
+        "query expressions"
+      ],
+      "related": [
+        "query-syntax",
+        "method-syntax",
+        "query-operator"
+      ],
+      "lesson": "m11-l10",
+      "source": {
+        "title": "Query expressions (C# language specification, §12.23)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1223-query-expressions"
+      }
+    },
+    {
+      "id": "query-syntax",
+      "term": "Query Syntax",
+      "german": "Abfragesyntax",
+      "category": "language",
+      "definition": "Die Schreibweise von LINQ-Abfragen mit Schlüsselwörtern wie `from`, `where` und `select`. Sie ergibt dieselbe Abfrage wie die Methodensyntax.",
+      "aliases": [
+        "Abfragesyntax",
+        "query syntax"
+      ],
+      "related": [
+        "query-expression",
+        "method-syntax"
+      ],
+      "lesson": "m11-l10",
+      "source": {
+        "title": "Query expression basics",
+        "url": "https://learn.microsoft.com/dotnet/csharp/linq/get-started/query-expression-basics"
+      }
     }
   ]
 }
