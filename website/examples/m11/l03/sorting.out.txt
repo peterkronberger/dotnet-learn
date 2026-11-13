@@ -1,0 +1,8 @@
+by length: fig
+by length: pear
+by length: kiwi
+by length: date
+by length: plum
+by length: apple
+fig, date, kiwi, pear, plum, apple
+apple, pear, kiwi, date, plum, fig

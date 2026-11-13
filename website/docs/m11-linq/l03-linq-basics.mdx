@@ -1,0 +1,230 @@
+---
+title: "LINQ-Grundlagen: filtern, projizieren, sortieren"
+sidebar_position: 3
+description: Mit Where, Select, OrderBy, Take und Skip baust du aus einer Folge in einer Kette eine neue Folge, ohne die Quelle zu ändern.
+lesson_id: m11-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import loopVsLinq from '!!raw-loader!@site/examples/m11/l03/loop-vs-linq.cs';
+import whereSelect from '!!raw-loader!@site/examples/m11/l03/where-select.cs';
+import whereSelectOutput from '!!raw-loader!@site/examples/m11/l03/where-select.out.txt';
+import sourceUnchanged from '!!raw-loader!@site/examples/m11/l03/source-unchanged.cs';
+import sourceUnchangedOutput from '!!raw-loader!@site/examples/m11/l03/source-unchanged.out.txt';
+import sorting from '!!raw-loader!@site/examples/m11/l03/sorting.cs';
+import takeSkip from '!!raw-loader!@site/examples/m11/l03/take-skip.cs';
+import gaps from '!!raw-loader!@site/examples/m11/l03/gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m11/l03/seclog-linq-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m11/l03/seclog-linq-solution.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m11/l03/seclog-linq-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m11/l03/seclog-linq-solution.cs';
+
+# LINQ-Grundlagen: filtern, projizieren, sortieren
+
+:::note[Lernziele]
+- Du kannst eine LINQ-Kette mit `Where`, `Select`, `OrderBy`/`OrderByDescending`/`ThenBy` und `Take`/`Skip` lesen und schreiben.
+- Du kannst erklären, dass LINQ-Operatoren Erweiterungsmethoden auf `IEnumerable<T>` sind und eine neue Folge liefern.
+- Du kannst vorhersagen, dass die Quelle durch `Where` nicht verändert wird.
+- Du kannst mit `ToList()`/`ToArray()` eine Liste oder ein Array aus einer Folge machen.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l03-q1" />
+
+<Quiz id="m10-l02-q1" />
+
+<Quiz id="m08-l11-q2" />
+
+## Von der Schleife zur Kette
+
+Eine Schleife mit `if` und `Add` kennst du: Sie wählt Elemente aus und sammelt sie in einer neuen Liste. Danach folgt oft noch das Sortieren. Das ist viel Code für eine einfache Absicht.
+
+<Term id="linq">LINQ</Term> (Language Integrated Query) schreibt dieselbe Absicht als eine Kette von Aufrufen. Jeder Aufruf ist ein <Term id="query-operator">Abfrageoperator</Term>. In dieser Lektion nutzt du die <Term id="method-syntax">Methodensyntax</Term>: Du schreibst die Operatoren als Methodenaufrufe mit Punkt.
+
+<Forward concepts={['Abfragesyntax']} module="11" />
+
+<CSharpRunner id="m11-l03-loop" code={loopVsLinq} />
+
+Beide Teile liefern dieselbe Liste. Die Kette liest sich von oben nach unten: erst filtern (`Where`), dann sortieren (`OrderBy`), dann in eine Liste umwandeln (`ToList`).
+
+## Operatoren sind Erweiterungsmethoden
+
+Die Operatoren sind <Term id="extension-method">Erweiterungsmethoden</Term> aus Lektion 1. Sie stehen in der statischen Klasse `System.Linq.Enumerable` und erweitern <Term id="enumerable">`IEnumerable<T>`</Term>. Jeder Typ, der `IEnumerable<T>` ist, hat sie also: `List<T>`, Arrays und jede Folge, die ein anderer Operator liefert. Das `using System.Linq;` ist in den Beispielen dieses Kurses schon gesetzt.
+
+Daraus folgt: `numbers.Where(…)` ist nur eine andere Schreibweise für `Enumerable.Where(numbers, …)`. Jeder Operator gibt eine **neue Folge** zurück, und der nächste Operator der Kette arbeitet auf ihr. Deshalb lassen sich die Aufrufe verketten.
+
+Die Argumente sind Lambdas aus Modul 10. `Where` erwartet eine `Func<T, bool>`: Für jedes Element gibt das Lambda `true` (behalten) oder `false` (weglassen) zurück. `Select` erwartet eine `Func<T, TResult>`: Das Lambda macht aus jedem Element einen neuen Wert. `Select` heißt **Projektion**.
+
+Wo es zu den Beispielen passt, sagen die Texte nichts zur Ausführungszeit. Die Beispiele geben ihre Ergebnisse sofort mit `foreach` oder `string.Join` aus.
+
+<Forward concepts={['verzögerte Ausführung']} module="11" />
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Tippe alle Zeilen, auch die letzte (die statische Schreibweise).
+:::
+
+<CSharpRunner id="m11-l03-where-select" code={whereSelect} predict expected={whereSelectOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Zuerst vier Zeilen `big: …` für 5, 8, 9 und 7, dann `10, 16, 4, 18, 8, 14` und zuletzt `5, 8, 9, 7`.
+
+1. **Quelle wählen:** `numbers` ist eine `List<int>`, also eine `IEnumerable<int>`.
+2. **Filtern:** `Where(n => n > 4)` behält 5, 8, 9 und 7. Die Reihenfolge bleibt wie in der Quelle.
+3. **Projizieren:** `Select(n => n * 2)` verdoppelt jedes Element der Quelle. Es gibt weiterhin sechs Werte.
+4. **Statische Form:** `Enumerable.Where(numbers, …)` ist derselbe Aufruf wie `numbers.Where(…)`, daher dieselben Werte.
+
+**Was passiert, wenn …?** … du `Select(n => n > 4)` schreibst? Dann entsteht eine Folge von `bool`-Werten, denn `Select` übernimmt das Ergebnis des Lambdas, ohne Elemente wegzulassen.
+
+</details>
+
+## Quelle bleibt unverändert
+
+Ein Abfrageoperator verändert die Quelle nicht. `Where` entfernt nichts aus der Liste, sondern liefert eine neue Folge mit den passenden Elementen. Mit `ToList()` wird aus der Folge eine eigene `List<T>`, mit `ToArray()` ein Array.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m11-l03-source" code={sourceUnchanged} predict expected={sourceUnchangedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `4`, `6` und `5, 8, 2, 9, 4, 7`.
+
+1. **Filtern:** `Where(n => n > 4)` wählt 5, 8, 9 und 7 aus, also vier Elemente.
+2. **Materialisieren:** `ToList()` legt sie in die neue Liste `big`. Die Liste `numbers` ist ein anderes Objekt.
+3. **Quelle prüfen:** `numbers.Count` ist weiter 6, und alle sechs Zahlen stehen noch an ihrem Platz.
+
+**Was passiert, wenn …?** … du `big.Add(100)` aufrufst? Dann wächst nur `big`. Die Liste `numbers` bleibt gleich, weil `ToList()` eine eigene Liste erzeugt.
+
+</details>
+
+## Sortieren
+
+`OrderBy` sortiert aufsteigend nach einem **Schlüssel**. Der <Term id="key-selector">Schlüsselwähler</Term> ist ein Lambda, das aus einem Element den Wert holt, nach dem sortiert wird: `w => w.Length`. `OrderByDescending` sortiert absteigend. Haben zwei Elemente denselben Schlüssel, bleibt ihre ursprüngliche Reihenfolge erhalten (stabile Sortierung). Mit `ThenBy` und `ThenByDescending` legst du einen zweiten Schlüssel für gleiche Werte fest.
+
+Für Zeichenketten gibst du als zweites Argument einen Vergleicher an, hier `StringComparer.Ordinal` (Lektion `m08-l11`). Ohne Vergleicher gilt der Standardvergleich des Typs.
+
+<CSharpRunner id="m11-l03-sorting" code={sorting} />
+
+In der ersten Ausgabe stehen `fig` (3 Buchstaben) vor den vier Wörtern mit 4 Buchstaben. Diese Wörter erscheinen in der Reihenfolge des Arrays: `pear`, `kiwi`, `date`, `plum`. Erst `ThenBy` sortiert sie nach dem Namen. Das ist die stabile Sortierung in Aktion.
+
+## Teilen mit Take und Skip
+
+`Take(n)` behält die ersten `n` Elemente, `Skip(n)` lässt die ersten `n` weg. Zusammen ergeben `Skip` und `Take` einen Ausschnitt. Hat die Folge weniger Elemente, gibt es keinen Fehler: Du bekommst, was da ist. `Select` hat außerdem eine Form, bei der das Lambda zusätzlich den Index des Elements bekommt.
+
+<CSharpRunner id="m11-l03-take-skip" code={takeSkip} />
+
+## Die Operatorfamilien
+
+LINQ hat viele Operatoren. Sie lassen sich in Familien ordnen. Diese Lektion zeigt die ersten vier, die anderen folgen in den nächsten Lektionen.
+
+| Familie | Beispiele | Lektion |
+| --- | --- | --- |
+| Filtern | `Where` | diese Lektion |
+| Projizieren | `Select` | diese Lektion |
+| Sortieren | `OrderBy`, `OrderByDescending`, `ThenBy` | diese Lektion |
+| Teilen | `Take`, `Skip` | diese Lektion |
+| Gruppieren | `GroupBy` | Lektion 7 |
+| Aggregieren | `Sum`, `Average`, `Max` | Lektion 7 |
+| Elemente | `First`, `Single` | Lektion 8 |
+| Quantoren | `Any`, `All` | Lektion 8 |
+| Verbinden | `Join` | Lektion 9 |
+| Mengen | `Distinct`, `Union` | Lektion 9 |
+
+<Forward concepts={['Gruppieren und Aggregieren', 'Element-Operatoren und Quantoren', 'Joins und Mengenoperationen']} module="11" />
+
+## Lückenbeispiel
+
+Die Aufgabe hat vier Schritte: 1. Quelle wählen, 2. filtern, 3. sortieren, 4. materialisieren. Im Code steht schon eine Lösung. Ändere sie so, dass sie die Hosts sortiert nach **absteigendem** Namen liefert, und gib die ersten zwei in Großbuchstaben aus.
+
+<CSharpRunner id="m11-l03-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Quelle:** das Array `hosts`.
+2. **Filtern:** `Where(h => h.StartsWith("web", StringComparison.Ordinal))` behält die drei Web-Hosts.
+3. **Sortieren:** `OrderByDescending(h => h, StringComparer.Ordinal)` ergibt `web-03`, `web-02`, `web-01`.
+4. **Materialisieren:** `ToList()`. `Take(2)` und `Select(h => h.ToUpper())` liefern `WEB-03, WEB-02`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat `logEvents` und stellt mit Erweiterungsmethoden Fragen an ein `LogEvent`. Die Funktion `PrintEach` gibt einen Titel und eine Zeile pro Element aus.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: die Funktion `PrintEach` und die Stelle vor `// End with exit code 0 …`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Analyze the log with Where, Select and OrderBy`. Baue `List<string> failedSummaries` aus `logEvents`: `Where(e => e.IsFailure())`, `OrderByDescending(e => e.Timestamp)`, `Select(e => e.Describe())`, `ToList()`. Gib sie mit `PrintEach("Failed logins, newest first", failedSummaries)` aus. Gib danach mit `PrintEach("First 3 events by user", …)` die ersten drei Ereignisse aus, deren `User` nicht `null` ist, sortiert nach `User` (`OrderBy` mit `StringComparer.Ordinal`) und danach nach `Timestamp` (`ThenBy`), als `Describe()`-Text (`Take(3)`, `Select`). Gib zuletzt `Events in the log: ` mit `logEvents.Count` aus. Es sind weiter 14 Ereignisse.
+
+<CSharpRunner id="m11-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-linq-solution.cs" />
+
+1. **Quelle wählen:** `logEvents` ist eine `List<LogEvent>`.
+2. **Filtern:** `IsFailure()` aus Lektion 1 behält die 7 Fehlversuche. Für die zweite Kette behält `e.User is not null` nur Ereignisse mit Benutzer.
+3. **Sortieren:** `OrderByDescending` auf `Timestamp` stellt das neueste Ereignis nach vorn. In der zweiten Kette sortiert `OrderBy` nach dem Benutzer und `ThenBy` nach der Zeit.
+4. **Projizieren und materialisieren:** `Select(e => e.Describe())` macht aus jedem Ereignis einen Text, `ToList()` legt sie in eine Liste. `Take(3)` begrenzt die zweite Kette auf drei Elemente.
+
+Alle drei Ereignisse der zweiten Kette gehören zu alice, weil sie die meisten Ereignisse hat und `Distinct` erst in Lektion 9 kommt. Die Zeile `Events in the log: 14` zeigt, dass die Ketten `logEvents` nicht verändern.
+
+</details>
+
+**Neuer Stand:** SecLog wertet das Log mit einer LINQ-Kette aus, ohne `logEvents` zu verändern.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m11-l03-where-changes-source" />
+
+**„`Where` entfernt Elemente aus der Liste.“** Das stimmt nicht. `Where` liefert eine neue Folge mit den passenden Elementen. Die Liste behält alle Elemente, und `Count` bleibt gleich.
+:::
+
+<details>
+<summary>Vertiefung: Wo Erweiterungsmethodenaufrufe in der Spezifikation stehen (optional)</summary>
+
+Der Aufruf `list.Where(…)` wird nach den Regeln für [Extension method invocations (§12.8.10.3)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128103-extension-method-invocations) in einen statischen Aufruf `Enumerable.Where(list, …)` umgeschrieben. Die Sortierung von `OrderBy` ist stabil: Elemente mit gleichem Schlüssel behalten ihre Reihenfolge, wie die API-Seite von [Enumerable.OrderBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.orderby) festlegt.
+
+</details>
+
+## Zusammenfassung
+
+LINQ-Operatoren sind Erweiterungsmethoden auf `IEnumerable<T>`. Jeder Operator liefert eine neue Folge, deshalb lassen sich `Where` (filtern), `Select` (projizieren), `OrderBy`/`ThenBy` (sortieren) und `Take`/`Skip` (teilen) verketten. Die Quelle bleibt dabei unverändert. Mit `ToList()` oder `ToArray()` machst du aus der Folge eine eigene Liste oder ein Array. `OrderBy` sortiert stabil.
+
+## Prüfe dein Wissen
+
+<Quiz id="m11-l03-q1" />
+
+<Quiz id="m11-l03-q2" />
+
+<Quiz id="m11-l03-q3" />
+
+<Quiz id="m11-l03-q4" />
+
+<Quiz id="m11-l03-q5" />
+
+<Quiz id="m11-l03-q6" />
+
+<Quiz id="m11-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m11-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m11-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Standard query operators overview](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/)
+- Microsoft Learn: [Enumerable.OrderBy](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.orderby)
