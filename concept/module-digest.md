@@ -22,7 +22,7 @@ Each module section has these fields:
   - `m00-l01` Dein erstes Programm – a program is a list of statements that run top to bottom.
   - `m00-l02` C# und .NET: Sprache und Plattform – C# is the language, .NET the platform with runtime and libraries.
   - `m00-l03` Die .NET-Familie – .NET Framework, .NET Core, .NET (5+), Mono and what they are for.
-  - `m00-l04` Geschichte und Versionen – LTS and STS releases and their support dates.
+  - `m00-l04` Geschichte und Versionen – LTS and STS releases and their support dates; course base C# 15 / .NET 11 (STS); SecLog prints `Version: .NET 11 (STS)`.
   - `m00-l05` Vom Code zum laufenden Programm – compile to IL, JIT, compile errors vs. run-time errors.
 - **Constructs taught:** top-level statements (`m00-l01`), statement end `;` (`m00-l01`), string literal `"…"` (`m00-l01`), `Console.WriteLine(…)` and `Console.Write(…)` (`m00-l01`), empty `Console.WriteLine()` (`m00-l03`), method call with arguments such as `Math.Max(3, 5)` and `"…".ToUpper()` as examples of library calls (`m00-l02`).
 - **Glossary terms:** top-level-statements, literal, compiler, seclog, statement, console-output, keyword, csharp, method, dotnet, roslyn, clr, bcl, sdk, language-specification, dotnet-framework, dotnet-core, dotnet-standard, mono, ef-core, lts, sts, end-of-support, il, jit, ready-to-run, native-aot, compile-error, runtime-error

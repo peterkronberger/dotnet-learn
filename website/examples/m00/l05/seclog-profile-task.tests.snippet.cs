@@ -10,7 +10,7 @@ public static class TaskTests
             ("Earlier lines stay unchanged: title and purpose", true, lines.Length > 0 && lines[0] == "SecLog project profile" && lines.Length > 1 && lines[1] == "Purpose: find suspicious logins in made-up login logs", "The first two lines must be: SecLog project profile / Purpose: find suspicious logins in made-up login logs"),
             ("Earlier lines stay unchanged: language and platform", true, lines.Length > 2 && lines[2] == "Language: C#" && lines.Length > 3 && lines[3] == "Platform: .NET", "Lines 3 and 4 must be: Language: C# / Platform: .NET"),
             ("Earlier lines stay unchanged: variant", true, lines.Length > 4 && lines[4] == "Variant: .NET (Linux server and Windows laptops)", "Line 5 must be: Variant: .NET (Linux server and Windows laptops)"),
-            ("Earlier lines stay unchanged: version and end of support", true, lines.Length > 5 && lines[5] == "Version: .NET 10 (LTS)" && lines.Length > 6 && lines[6] == "End of support: 2028-11-14", "Lines 6 and 7 must be: Version: .NET 10 (LTS) / End of support: 2028-11-14"),
+            ("Earlier lines stay unchanged: version and end of support", true, lines.Length > 5 && lines[5] == "Version: .NET 11 (STS)" && lines.Length > 6 && lines[6] == "End of support: 2028-11-14", "Lines 6 and 7 must be: Version: .NET 11 (STS) / End of support: 2028-11-14"),
             ("New lines: execution model", true, lines.Length > 7 && lines[7] == "Execution model: Native AOT", "Line 8 must be: Execution model: Native AOT"),
         ];
     }

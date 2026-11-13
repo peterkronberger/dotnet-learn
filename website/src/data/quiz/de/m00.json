@@ -454,6 +454,10 @@
         {
           "left": "C# 14",
           "right": ".NET 10"
+        },
+        {
+          "left": "C# 15",
+          "right": ".NET 11"
         }
       ],
       "explanation": "Seit C# 9 / .NET 5 erscheint jedes Jahr im November eine neue .NET-Version mit einer neuen C#-Version. Das Projekt nutzt standardmäßig die C#-Version, die zur .NET-Version passt, auf die es zielt."
@@ -466,7 +470,7 @@
       "question": "Ein älterer Server läuft auf .NET 8. Das Support-Ende ist der 10. November 2026. Wie ist der Stand am 1. Dezember 2026?",
       "options": [
         {
-          "text": "Support-Ende ist überschritten: .NET 8 bekommt keine Sicherheitsupdates mehr. Der Server sollte auf .NET 10 wechseln.",
+          "text": "Support-Ende ist überschritten: .NET 8 bekommt keine Sicherheitsupdates mehr. Der Server sollte auf .NET 10 oder .NET 11 wechseln.",
           "correct": true
         },
         {
@@ -478,30 +482,30 @@
           "feedback": "Der Support hängt von der Version und dem Datum ab, nicht davon, welche Features dein Programm nutzt."
         }
       ],
-      "explanation": "Nach dem Support-Ende gibt es keine Sicherheitsupdates mehr. .NET 10 (LTS) wird bis zum 14. November 2028 unterstützt."
+      "explanation": "Nach dem Support-Ende gibt es keine Sicherheitsupdates mehr. .NET 10 (LTS) und .NET 11 (STS) werden bis zum 14. November 2028 unterstützt."
     },
     {
       "id": "m00-l04-q5",
       "lesson": "m00-l04",
       "type": "single",
-      "question": "Warum nutzt dieser Kurs C# 14 und .NET 10?",
+      "question": "Warum nutzt dieser Kurs C# 15 und .NET 11?",
       "options": [
         {
-          "text": "Weil .NET 10 eine LTS-Version ist: aktuell, mit Support bis zum 14. November 2028.",
+          "text": "Weil .NET 11 die neueste Version ist, wie .NET 10 (LTS) bis zum 14. November 2028 unterstützt wird und C# 15 mitbringt.",
           "correct": true
         },
         {
-          "text": "Weil STS-Versionen wie .NET 9 Vorabversionen sind.",
-          "feedback": "STS-Versionen sind normale Releases, nur mit kürzerem Support.",
+          "text": "Weil .NET 11 eine STS-Version ist und STS-Versionen Vorabversionen sind.",
+          "feedback": "STS-Versionen sind normale Releases. .NET 11 ist seit dem 10. November 2026 veröffentlicht.",
           "misconception": "m00-l04-sts-is-preview"
         },
         {
           "text": "Weil die neueste Version immer den längsten Support hat.",
-          "feedback": "Das stimmt nicht allgemein: Eine STS-Version nach einer LTS-Version kann gleichzeitig enden.",
+          "feedback": "Das stimmt nicht allgemein: .NET 8 (LTS) und das neuere .NET 9 (STS) enden am selben Tag.",
           "misconception": "m00-l04-newest-has-longest-support"
         }
       ],
-      "explanation": "Für einen Kurs zählt ein stabiler Rahmen: Mit LTS ändert sich die Basis während des Lernens nicht, und der Support läuft lange."
+      "explanation": "Der Kurs nutzt die neueste Version. Ihr Support-Ende (14. November 2028) ist dasselbe wie bei .NET 10 (LTS), und sie bringt C# 15 mit."
     },
     {
       "id": "m00-l04-q6",

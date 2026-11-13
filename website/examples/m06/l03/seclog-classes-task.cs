@@ -6,7 +6,7 @@ Console.WriteLine("Purpose: find suspicious logins in made-up login logs");
 Console.WriteLine("Language: C#");
 Console.WriteLine("Platform: .NET");
 Console.WriteLine("Variant: .NET (Linux server and Windows laptops)");
-Console.WriteLine("Version: .NET 10 (LTS)");
+Console.WriteLine("Version: .NET 11 (STS)");
 Console.WriteLine("End of support: 2028-11-14");
 Console.WriteLine("Execution model: Native AOT");
 Console.WriteLine();
