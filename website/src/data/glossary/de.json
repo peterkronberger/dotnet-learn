@@ -1928,6 +1928,25 @@
       }
     },
     {
+      "id": "loop-label",
+      "term": "Loop Label",
+      "german": "Schleifenmarke",
+      "category": "language",
+      "definition": "Ein Name vor einer Schleife, zum Beispiel `outer:`. `break outer;` und `continue outer;` wirken dann auf diese benannte Schleife.",
+      "aliases": [
+        "Schleifenmarken",
+        "Schleifen-Label"
+      ],
+      "related": [
+        "nested-loop"
+      ],
+      "lesson": "m02-l09",
+      "source": {
+        "title": "Jump statements",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/jump-statements"
+      }
+    },
+    {
       "id": "nested-loop",
       "term": "Nested Loop",
       "german": "Verschachtelte Schleife",
@@ -3477,6 +3496,25 @@
       "source": {
         "title": "HashSet<T> Class",
         "url": "https://learn.microsoft.com/dotnet/api/system.collections.generic.hashset-1"
+      }
+    },
+    {
+      "id": "collection-expression-argument",
+      "term": "Collection Expression Argument",
+      "german": "Argument eines Collection-Ausdrucks",
+      "category": "language",
+      "definition": "Das erste Element `with(...)` in einem Collection-Ausdruck. Es übergibt Argumente an den Konstruktor der Zielsammlung, zum Beispiel `with(capacity: 10)` bei einer Liste.",
+      "aliases": [
+        "Collection-Ausdruck-Argument",
+        "with(...)"
+      ],
+      "related": [
+        "collection-expression"
+      ],
+      "lesson": "m05-l08",
+      "source": {
+        "title": "Collection expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/collection-expressions"
       }
     },
     {
