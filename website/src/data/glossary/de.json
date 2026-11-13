@@ -7286,8 +7286,8 @@
       ],
       "lesson": "m11-l10",
       "source": {
-        "title": "Query expressions (C# language specification)",
-        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#128-query-expressions"
+        "title": "Query expressions (C# language specification, §12.23)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1223-query-expressions"
       }
     },
     {

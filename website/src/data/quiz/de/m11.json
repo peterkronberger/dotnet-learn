@@ -272,7 +272,7 @@
         },
         {
           "text": "Ein Schlüsselwort der Sprache, so wie `foreach`.",
-          "feedback": "`Where` ist eine gewöhnliche Methode. Die Sprache kennt dafür nur in der Abfragesyntax ein Schlüsselwort `where`."
+          "feedback": "`Where` ist eine gewöhnliche Methode. Die Sprache kennt ein Schlüsselwort `where` nur in einer eigenen Schreibweise für Abfragen (Lektion `m11-l10`)."
         }
       ],
       "explanation": "Die LINQ-Operatoren sind Erweiterungsmethoden aus Lektion 1. Sie erweitern `IEnumerable<T>` und geben eine neue Folge zurück, die Quelle bleibt unverändert."
@@ -1218,6 +1218,130 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du eine Mengenoperation und wo einen Join einsetzen?",
       "modelAnswer": "Beispiel: Zwei Listen mit E-Mail-Adressen, die alte und die neue Newsletter-Liste. Wer auf beiden steht, finde ich mit `Intersect`, wer nur neu ist, mit `Except`, und alle ohne Duplikate mit `Union`. Einen Join nehme ich, wenn zwei Listen verschiedene Daten über dieselbe Sache haben, zum Beispiel Bestellungen und Kunden, die über die Kundennummer zusammengehören."
+    },
+    {
+      "id": "m11-l10-q1",
+      "lesson": "m11-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l10/quiz-translate.cs",
+      "explanation": "`where n > 2` behält 3, 8 und 6. `orderby n descending` sortiert absteigend: 8, 6, 3. `select n + 1` ergibt 9, 7 und 4."
+    },
+    {
+      "id": "m11-l10-q2",
+      "lesson": "m11-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l10/quiz-let.cs",
+      "explanation": "`let` merkt sich die Länge jedes Worts in `size`. `where size > 3` behält `coffee` (6) und `milk` (4). `select size` gibt die Längen aus."
+    },
+    {
+      "id": "m11-l10-q3",
+      "lesson": "m11-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m11/l10/quiz-same.cs",
+      "explanation": "Der Compiler übersetzt den Abfrageausdruck in `numbers.Where(n => n % 2 == 0)`. Beide Folgen enthalten 2 und 4, also gibt `SequenceEqual` `True` zurück."
+    },
+    {
+      "id": "m11-l10-q4",
+      "lesson": "m11-l10",
+      "type": "single",
+      "question": "Was stimmt über Abfragesyntax und Methodensyntax?",
+      "options": [
+        {
+          "text": "Der Compiler übersetzt Abfragesyntax in Methodenaufrufe. Ergebnis und Ausführung sind gleich.",
+          "correct": true
+        },
+        {
+          "text": "Abfragesyntax ist langsamer, weil sie erst zur Laufzeit in Methodenaufrufe übersetzt wird.",
+          "feedback": "Die Übersetzung geschieht beim Kompilieren. Zur Laufzeit gibt es keinen Unterschied.",
+          "misconception": "m11-l10-query-syntax-differs"
+        },
+        {
+          "text": "Abfragesyntax führt die Abfrage sofort aus, Methodensyntax verzögert.",
+          "feedback": "Beide Formen sind verzögert, weil es dieselben Methodenaufrufe sind.",
+          "misconception": "m11-l10-query-syntax-differs"
+        }
+      ],
+      "explanation": "Die Übersetzung ist eine syntaktische Abbildung beim Kompilieren. Danach sind es normale Methodenaufrufe."
+    },
+    {
+      "id": "m11-l10-q5",
+      "lesson": "m11-l10",
+      "type": "single",
+      "question": "In welchen Methodenaufruf übersetzt der Compiler `from n in numbers orderby n descending select n`?",
+      "options": [
+        {
+          "text": "`numbers.OrderByDescending(n => n)`",
+          "correct": true
+        },
+        {
+          "text": "`numbers.OrderBy(n => n).Select(n => n)`",
+          "feedback": "`descending` wird zu `OrderByDescending`. Ein `select n` mit der unveränderten Laufvariable entfällt."
+        },
+        {
+          "text": "`numbers.Where(n => n > 0).OrderBy(n => n)`",
+          "feedback": "Die Abfrage hat keine `where`-Klausel, also kommt kein `Where` vor."
+        }
+      ],
+      "explanation": "`orderby … descending` wird zu `OrderByDescending`. Weil `select n` das Element nicht verändert, entfällt das `Select`."
+    },
+    {
+      "id": "m11-l10-q6",
+      "lesson": "m11-l10",
+      "type": "single",
+      "question": "Du willst die Anzahl der Elemente zählen, die eine Abfrage mit `from … where … select …` liefert. Wie machst du das?",
+      "options": [
+        {
+          "text": "Du klammerst den Abfrageausdruck ein und rufst `.Count()` auf.",
+          "correct": true
+        },
+        {
+          "text": "Du schreibst eine Klausel `count` ans Ende des Abfrageausdrucks.",
+          "feedback": "Es gibt keine Klausel `count`. Operatoren wie `Count` gibt es nur als Methode."
+        },
+        {
+          "text": "Das geht nur in Methodensyntax.",
+          "feedback": "Du kannst beide Schreibweisen mischen: `(from … select …).Count()`."
+        }
+      ],
+      "explanation": "Für `Count`, `First`, `Take` und andere gibt es keine Klausel. Du rufst sie auf dem eingeklammerten Abfrageausdruck auf."
+    },
+    {
+      "id": "m11-l10-q7",
+      "lesson": "m11-l10",
+      "type": "single",
+      "question": "Wann hängt ein Abfrageausdruck später hinzugefügte Elemente der Quelle in sein Ergebnis ein?",
+      "options": [
+        {
+          "text": "Wenn man ihn nach dem Hinzufügen durchläuft. Er läuft erst bei der Aufzählung.",
+          "correct": true
+        },
+        {
+          "text": "Nie, denn ein Abfrageausdruck kopiert die Quelle bei der Definition.",
+          "feedback": "Ein Abfrageausdruck kopiert nichts. Er merkt sich die Quelle und die Abfrage."
+        },
+        {
+          "text": "Immer sofort, sobald ein Element hinzugefügt wird.",
+          "feedback": "Die Abfrage läuft nicht von selbst. Sie läuft bei der Aufzählung."
+        }
+      ],
+      "explanation": "Abfragesyntax wird zu denselben verzögerten Methodenaufrufen. Jede Aufzählung liest die aktuellen Daten der Quelle."
+    },
+    {
+      "id": "m11-l10-q8",
+      "lesson": "m11-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie Abfragesyntax und Methodensyntax zusammenhängen.",
+      "modelAnswer": "Ein Abfrageausdruck mit `from`, `where` und `select` ist nur eine andere Schreibweise. Der Compiler übersetzt ihn beim Kompilieren in Aufrufe von `Where`, `Select`, `OrderBy`, `GroupBy` und so weiter. Danach ist es dieselbe Abfrage wie in Methodensyntax: gleiches Ergebnis, gleiche verzögerte Ausführung, gleiche Geschwindigkeit. Welche Form ich nehme, entscheide ich nach der Lesbarkeit: Abfragesyntax bei mehreren Klauseln, `let` und `join`, Methodensyntax bei kurzen Ketten und bei Operatoren wie `Count` oder `First`."
+    },
+    {
+      "id": "m11-l10-q9",
+      "lesson": "m11-l10",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du Abfragesyntax einsetzen und wo Methodensyntax?",
+      "modelAnswer": "Beispiel: Ein Bericht verbindet Bestellungen und Kunden, filtert nach Datum, berechnet mit `let` einen Zwischenwert und sortiert. Dafür ist die Abfragesyntax lesbarer, weil kein verschachteltes Lambda nötig ist. Um nur zu prüfen, ob es eine Bestellung gibt, schreibe ich `orders.Any()` in Methodensyntax. Das ist kürzer."
     }
   ]
 }
