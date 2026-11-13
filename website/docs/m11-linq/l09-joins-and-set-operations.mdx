@@ -183,7 +183,7 @@ Dieser Abschnitt beschreibt Bibliotheksverhalten, nicht die Sprache. Die Operato
 
 `Join` ist ein Inner Join: Elemente ohne Partner erscheinen nicht im Ergebnis. `GroupJoin` nimmt jedes Element der ersten Folge ins Ergebnis auf, auch mit leerer Gruppe ([Join Operations](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/join-operations)).
 
-`FullJoin` behält die Elemente beider Folgen, auch ohne Partner. Fehlt der Partner, ist der Wert in der Ergebnisfunktion der Standardwert des Typs, bei Tupeln mit Text also ein Tupel mit `null` ([Enumerable.FullJoin](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.fulljoin)). Es gibt `FullJoin` und `Join` auch ohne Ergebnisfunktion: Sie liefern dann Tupel aus beiden Elementen. <Since dotnet="11" /> `LeftJoin` und `RightJoin` behalten alle Elemente der ersten beziehungsweise der zweiten Folge. <Since dotnet="10" />
+<Since dotnet="11" /> `FullJoin` behält die Elemente beider Folgen, auch ohne Partner. Fehlt der Partner, ist der Wert in der Ergebnisfunktion der Standardwert des Typs, bei Tupeln mit Text also ein Tupel mit `null` ([Enumerable.FullJoin](https://learn.microsoft.com/dotnet/api/system.linq.enumerable.fulljoin)). Es gibt `FullJoin` und `Join` auch ohne Ergebnisfunktion: Sie liefern dann Tupel aus beiden Elementen. <Since dotnet="10" /> `LeftJoin` und `RightJoin` behalten alle Elemente der ersten beziehungsweise der zweiten Folge.
 
 <CSharpRunner id="m11-l09-full-join" code={fullJoin} />
 
