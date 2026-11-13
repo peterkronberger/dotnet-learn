@@ -1,6 +1,6 @@
 # Module digest – what earlier modules taught
 
-As of 2026-11-07. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-13. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -210,7 +210,6 @@ Each module section has these fields:
 - **Misconception ids:** m08-l01-constructors-are-inherited, m08-l02-new-overrides-method, m08-l03-abstract-class-only-abstract-members, m08-l04-sealed-means-immutable, m08-l05-matching-methods-implement-interface, m08-l06-cast-changes-object, m08-l07-enum-only-named-values, m08-l08-struct-copy-changes-original, m08-l09-equals-without-gethashcode, m08-l10-record-always-immutable, m08-l11-sort-knows-order
 - **Open forward references:**
   - More patterns (`m08-l06`), `with` expressions (`m08-l10`) → M12
-  - LINQ, `OrderBy` (`m08-l11`) → M11
   - Attributes (`m08-l07`), assemblies (`m08-l04`) → M14
 - **SecLog end state:** `website/examples/m08/l11/seclog-oop-solution.cs` – the M7 end state plus: `IDetectionRule`, abstract `DetectionRule`, sealed `FailedLoginRule`/`WatchListRule`/`StatusRule`, `Detector`, enums `EventType`/`Severity`, `readonly struct TimeWindow`, `sealed record SecurityEvent`, `LogEvent` with value equality, `IncidentComparer : IComparer<Incident>`. Chain: `m07/l09` → `m08/l01` → … → `m08/l11`. M8 milestone reached.
 - **Notes for later modules:**
@@ -231,7 +230,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m09-l…"` fields: generics, type-parameter, generic-method, generic-type, constructed-type, open-type, closed-type, type-parameter-constraint, constructor-constraint, default-value-expression, default-literal, non-generic-collection, enumerable, generic-interface, delegate, generic-delegate, variance, covariance, contravariance, invariance
 - **Misconception ids:** m09-l01-type-inferred-from-return-type, m09-l02-constructed-types-share-statics, m09-l03-unconstrained-t-has-all-members, m09-l04-default-t-is-null, m09-l05-generics-box-value-types, m09-l06-list-object-accepts-list-string
 - **Open forward references:**
-  - Iterators and `yield` (`m09-l05`) → M11
   - Nullable analysis attributes (`m09-l04`) → M14
 - **SecLog end state:** `website/examples/m09/l06/seclog-generics-solution.cs` – the M8 end state plus: `Store<T> : IStore<T>` (`Add`, `Get`, `GetOrDefault`, `TryGet`, `Items`, `Count`), `Counter<TKey>` (`Add`, `CountOf`, `SortedKeys`), generic `PrintEach<T>(title, IEnumerable<T>)`. Stores for events, incidents and rules; counters for users and IPs. Chain: `m08/l11` → `m09/l01` → … → `m09/l06`. M9 milestone reached.
 - **Notes for later modules:**
@@ -254,14 +252,36 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m10-l…"` fields: method-group, method-group-conversion, delegate-invocation, callback, func-delegate, action-delegate, predicate-delegate, lambda-expression, anonymous-function, expression-lambda, statement-lambda, anonymous-function-conversion, natural-type, discard-parameter, closure, captured-variable, static-anonymous-function, multicast-delegate, invocation-list, delegate-combination, event, field-like-event, event-accessor, publisher, subscriber, event-args, event-handler, standard-event-pattern
 - **Misconception ids:** m10-l01-method-group-calls-method, m10-l02-func-last-type-is-parameter, m10-l03-lambda-runs-when-defined, m10-l04-lambda-has-no-type, m10-l05-lambda-captures-value, m10-l06-multicast-returns-all-results, m10-l07-event-raised-from-outside, m10-l08-subscribers-removed-automatically
 - **Open forward references:**
-  - LINQ (`Where`, `Select`) (`m10-l03`) → M11
   - Asynchronous event handlers (`m10-l08`) → M13
   - Attributes on lambdas → M14, expression trees → M16 (not marked in a lesson; not taught)
 - **SecLog end state:** `website/examples/m10/l08/seclog-delegates-solution.cs` – the M9 end state plus: `delegate bool IncidentCheck(Incident)`, `FuncRule : IDetectionRule` (name plus `Func<Incident, bool>`), rules written as lambdas, `FailuresAtLeast(int)` returning a lambda (closure), alert chain with a multicast `Action`, `IncidentMonitor` with `event EventHandler<IncidentFoundEventArgs>? IncidentFound`, `IncidentFoundEventArgs : EventArgs`. Chain: `m09/l06` → `m10/l01` → … → `m10/l08`. M10 milestone reached.
 - **Notes for later modules:**
   - `FuncRule` is the place for rules written as lambdas.
   - `IncidentMonitor.IncidentFound` follows the standard event pattern; observers must unsubscribe with `-=`.
-  - Lambda results are used with `List<T>` methods only; LINQ starts in M11.
+  - Lambdas are used with `List<T>` methods and, since M11, with LINQ operators.
+
+## M11 LINQ
+
+- **Lessons:**
+  - `m11-l01` Erweiterungsmethoden – `static` method with `this` first parameter in a static class, instance method wins, namespace must be visible.
+  - `m11-l02` Erweiterungsmember: Eigenschaften und statische Member – `extension(…)` blocks, extension properties and static members (C# 14), no new data in the object.
+  - `m11-l03` LINQ-Grundlagen: filtern, projizieren, sortieren – `Where`, `Select`, `OrderBy`/`ThenBy`, `Take`/`Skip`, operator families, source stays unchanged.
+  - `m11-l04` Iteratoren: eigene Folgen mit yield – `yield return`, `yield break`, iterator block, lazy run, endless sequences, restrictions.
+  - `m11-l05` Verzögerte Ausführung – deferred vs. immediate operators, each pass restarts the query, multiple enumeration.
+  - `m11-l06` Anonyme Typen in Projektionen – `new { … }`, value equality, read-only, vs. tuple and record.
+  - `m11-l07` Gruppieren und Aggregieren – `GroupBy`, `Sum`/`Min`/`Max`/`Average`, `MinBy`/`MaxBy`, `Aggregate`, empty sequences, top N, `CountBy`/`AggregateBy` (.NET 9).
+  - `m11-l08` Element-Operatoren und Quantoren – `First`/`Single`/`Last`/`ElementAt` and `…OrDefault`, `Any`/`All`/`Contains`.
+  - `m11-l09` Joins und Mengenoperationen – `Join`, `GroupJoin`, `Distinct`/`DistinctBy`, `Union`, `Intersect`, `Except`, `Concat`.
+  - `m11-l10` Abfragesyntax – query expressions (`from`, `where`, `orderby`, `select`, `group … by`, `join`, `let`, `into`), translation into method calls, `SequenceEqual`.
+- **Constructs taught:** extension method with `this` (`m11-l01`), `extension(…)` block, extension property, static extension member (`m11-l02`), `Where`, `Select`, `OrderBy`, `OrderByDescending`, `ThenBy`, `Take`, `Skip`, `ToList`, `ToArray` (`m11-l03`), `yield return`, `yield break`, iterator method (`m11-l04`), `Count()`, `ToDictionary`, deferred vs. immediate (`m11-l05`), `new { … }` anonymous object (`m11-l06`), `GroupBy`, `IGrouping<TKey, TElement>`, `Sum`, `Min`, `Max`, `Average`, `MinBy`, `MaxBy`, `Aggregate`, `CountBy`, `AggregateBy` (`m11-l07`), `First`, `Single`, `Last`, `ElementAt`, `…OrDefault`, `Any`, `All`, `Contains` (`m11-l08`), `Join`, `GroupJoin`, `Distinct`, `DistinctBy`, `Union`, `Intersect`, `Except`, `Concat` (`m11-l09`), query expression clauses, `SequenceEqual` (`m11-l10`).
+- **Glossary terms:** see the `"lesson": "m11-l…"` fields: extension-method, extension-member, extension-block, linq, method-syntax, query-operator, key-selector, iterator, iterator-block, yield-statement, deferred-execution, immediate-execution, multiple-enumeration, anonymous-type, projection, grouping, aggregate-operator, element-operator, quantifier, join, query-expression, query-syntax
+- **Misconception ids:** m11-l01-extension-beats-instance-method, m11-l02-extension-property-stores-data, m11-l03-where-changes-source, m11-l04-yield-return-ends-method, m11-l05-query-runs-when-defined, m11-l05-query-result-is-copy, m11-l06-anonymous-type-is-writable, m11-l07-average-of-empty-is-zero, m11-l08-first-returns-null, m11-l09-union-keeps-duplicates, m11-l10-query-syntax-differs
+- **Open forward references:** none. All `<Forward>` notes of M11 point to lessons inside M11. `IAsyncEnumerable<T>`, PLINQ, `IQueryable<T>` and expression trees are not marked in a lesson and not taught.
+- **SecLog end state:** `website/examples/m11/l10/seclog-linq-solution.cs` – the M10 end state plus: `LogEventExtensions` (`IsFailure()`, `IsFrom(user)`), `IncidentExtensions` (extension blocks with properties and a static member), `LinesOfUser` (iterator), failures per hour, top IP addresses, `IsPossiblePhishing` message rating (`reportedMessages`, `signalWords`), user set comparison, query and method syntax side by side. Chain: `m10/l08` → `m11/l01` → … → `m11/l10`. M11 milestone reached.
+- **Notes for later modules:**
+  - `IsFailure()` and `IsFrom(user)` are the extension methods for log events; new log-event helpers belong in `LogEventExtensions`.
+  - `reportedMessages` and `signalWords` hold the message rating data.
+  - `with` on anonymous types is not covered.
 
 ## W1 Wiederholung M1–M4
 

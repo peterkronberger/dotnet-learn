@@ -133,6 +133,10 @@
       "id": "m11-l02-q1",
       "lesson": "m11-l02",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m11-l01"
+      ],
       "question": "Ein Erweiterungsblock `extension(Incident incident)` enthält die Eigenschaft `public bool IsSevere => incident.FailureCount >= 5;`. Was passiert bei jedem Zugriff auf `incident.IsSevere`?",
       "options": [
         {
@@ -410,6 +414,7 @@
       "id": "m11-l04-q2",
       "lesson": "m11-l04",
       "type": "single",
+      "placement": true,
       "question": "Was gibt das Programm aus?",
       "example": "m11/l04/quiz-continue.cs",
       "options": [
@@ -547,6 +552,7 @@
       "id": "m11-l05-q2",
       "lesson": "m11-l05",
       "type": "single",
+      "placement": true,
       "question": "Was gibt das Programm aus?",
       "example": "m11/l05/quiz-snapshot.cs",
       "options": [
@@ -724,6 +730,7 @@
       "id": "m11-l06-q2",
       "lesson": "m11-l06",
       "type": "single",
+      "placement": true,
       "question": "Was gibt das Programm aus?",
       "example": "m11/l06/quiz-names.cs",
       "options": [
@@ -866,6 +873,7 @@
       "id": "m11-l07-q2",
       "lesson": "m11-l07",
       "type": "single",
+      "placement": true,
       "question": "Was ist ein Element der Folge, die `GroupBy` zurückgibt?",
       "options": [
         {
@@ -1014,6 +1022,7 @@
       "id": "m11-l08-q4",
       "lesson": "m11-l08",
       "type": "single",
+      "placement": true,
       "question": "Was ergibt `new int[] { 1, 2, 3 }.First(n => n > 100)`?",
       "options": [
         {
@@ -1137,6 +1146,7 @@
       "id": "m11-l09-q4",
       "lesson": "m11-l09",
       "type": "single",
+      "placement": true,
       "question": "Welche Aussage über `Union` stimmt?",
       "options": [
         {
@@ -1270,6 +1280,10 @@
       "id": "m11-l10-q5",
       "lesson": "m11-l10",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m11-l03"
+      ],
       "question": "In welchen Methodenaufruf übersetzt der Compiler `from n in numbers orderby n descending select n`?",
       "options": [
         {
