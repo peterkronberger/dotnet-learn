@@ -284,6 +284,153 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Log-Werkzeug ein Muster mit `and` und wo eines mit `or` oder `not` einsetzen?",
       "modelAnswer": "Mit `and` prüfst du einen Bereich, zum Beispiel Fehlversuche von mindestens 3 und höchstens 5 oder Ereignisse zwischen 08:00 und 09:00 Uhr. Mit `or` fasst du mehrere erlaubte Werte zusammen, zum Beispiel zwei Ereignistypen. Mit `not` schließt du Werte aus, zum Beispiel alle Ereignisse, die weder Anmeldung noch Abmeldung sind."
+    },
+    {
+      "id": "m12-l03-q1",
+      "lesson": "m12-l03",
+      "type": "single",
+      "question": "`object? value = null;` – was ergibt `value is { }`?",
+      "options": [
+        {
+          "text": "`False`",
+          "correct": true,
+          "feedback": "Jedes Eigenschaftsmuster prüft zuerst, dass der Wert nicht `null` ist. Das leere Muster prüft nur das."
+        },
+        {
+          "text": "`True`, weil das Muster keine Bedingung nennt",
+          "feedback": "Das leere Muster ist kein Muster, das alles annimmt. Es verlangt einen Wert, der nicht `null` ist.",
+          "misconception": "m12-l03-empty-property-pattern-matches-anything"
+        },
+        {
+          "text": "Eine `NullReferenceException`",
+          "feedback": "Ein Muster löst bei `null` keine Ausnahme aus."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler",
+          "feedback": "`{ }` ist ein gültiges Muster."
+        }
+      ],
+      "explanation": "`x is { }` ist ein Test auf \"nicht `null`\". Bei `null` ist das Ergebnis `False`, bei jedem anderen Wert `True`."
+    },
+    {
+      "id": "m12-l03-q2",
+      "lesson": "m12-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l03/quiz-property.cs",
+      "explanation": "Der erste Eintrag hat den Ereignistyp `login-failed` und einen Benutzer, der nicht `null` ist: `True`. Beim zweiten ist `User` gleich `null`, also passt `{ }` nicht: `False`. Der dritte Eintrag ist `null`, und schon die Prüfung auf `null` schlägt fehl: `False`."
+    },
+    {
+      "id": "m12-l03-q3",
+      "lesson": "m12-l03",
+      "type": "cloze",
+      "question": "Ergänze die Namen und das relationale Muster.",
+      "example": "m12/l03/gap-property.cs",
+      "blanks": [
+        {
+          "text": "EventType",
+          "hint": "Der Name der Eigenschaft, die `login-failed` enthält."
+        },
+        {
+          "text": "User",
+          "hint": "Der Name der Eigenschaft, die `bob` enthält."
+        },
+        {
+          "text": ">= 2",
+          "hint": "Ein relationales Muster: mindestens 2 Versuche."
+        }
+      ],
+      "explanation": "Links vom Doppelpunkt steht der Name einer Eigenschaft, rechts ein beliebiges Muster: eine Konstante oder ein relationales Muster. Alle Teile müssen passen."
+    },
+    {
+      "id": "m12-l03-q4",
+      "lesson": "m12-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Eigenschaftsmuster stimmen?",
+      "options": [
+        {
+          "text": "Links vom Doppelpunkt steht der Name einer lesbaren Eigenschaft oder eines Felds.",
+          "correct": true
+        },
+        {
+          "text": "Rechts vom Doppelpunkt darf wieder ein Eigenschaftsmuster stehen.",
+          "correct": true
+        },
+        {
+          "text": "`entry is { User: \"bob\" }` ist für `entry == null` wahr, weil kein anderer Benutzer gefunden wurde.",
+          "feedback": "Ein Eigenschaftsmuster passt nie auf `null`, auch wenn es kein Teilmuster hat.",
+          "misconception": "m12-l03-empty-property-pattern-matches-anything"
+        },
+        {
+          "text": "Mehrere Teile, die durch Kommas getrennt sind, müssen alle passen.",
+          "correct": true
+        }
+      ],
+      "explanation": "Ein Eigenschaftsmuster prüft erst auf `null`, liest dann die genannten Eigenschaften und verlangt, dass jedes Teilmuster passt."
+    },
+    {
+      "id": "m12-l03-q5",
+      "lesson": "m12-l03",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS0165, Variable nicht zugewiesen). Welche?",
+      "example": "m12/l03/quiz-scope.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "lineFeedback": {
+        "6": {
+          "feedback": "Außerhalb des `if` hat `name` keinen sicher zugewiesenen Wert, denn das Muster passt vielleicht nicht."
+        }
+      },
+      "explanation": "Die Variable am Ende eines Eigenschaftsmusters ist nur dort zugewiesen, wo das Muster gepasst hat."
+    },
+    {
+      "id": "m12-l03-q6",
+      "lesson": "m12-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l03/quiz-or-pattern.cs",
+      "explanation": "Der erste Eintrag passt: `login-failed` und 4 ist größer als 0. Der zweite hat zwar den Ereignistyp `logout`, aber 0 Versuche. Der dritte passt: `login-failed` und 1 ist größer als 0. Die Zahl ist 2."
+    },
+    {
+      "id": "m12-l03-q7",
+      "lesson": "m12-l03",
+      "type": "single",
+      "question": "Welches Muster bedeutet dasselbe wie `{ Profile: { Failures: >= 5 } }`?",
+      "options": [
+        {
+          "text": "`{ Profile.Failures: >= 5 }`",
+          "correct": true,
+          "feedback": "Der Punkt ist die Kurzform für das verschachtelte Muster. Auch hier wird `Profile` zuerst auf `null` geprüft."
+        },
+        {
+          "text": "`{ Profile: >= 5 }`",
+          "feedback": "Das vergleicht das Profil-Objekt selbst mit 5, nicht seine Eigenschaft `Failures`."
+        },
+        {
+          "text": "`{ Failures: >= 5 }`",
+          "feedback": "Das sucht `Failures` direkt am Konto. Die Eigenschaft liegt aber in `Profile`."
+        },
+        {
+          "text": "`{ Profile, Failures: >= 5 }`",
+          "feedback": "Jeder Teil braucht einen Namen, einen Doppelpunkt und ein Muster."
+        }
+      ],
+      "explanation": "Das erweiterte Eigenschaftsmuster `{ A.B: Muster }` ist gleichwertig mit `{ A: { B: Muster } }`."
+    },
+    {
+      "id": "m12-l03-q8",
+      "lesson": "m12-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Eigenschaftsmuster prüft und warum `x is { }` bei `null` falsch ist.",
+      "modelAnswer": "Ein Eigenschaftsmuster prüft zuerst, dass der Wert nicht `null` ist. Danach liest es die genannten Eigenschaften oder Felder und vergleicht jede mit dem Teilmuster, das daneben steht. Nur wenn alle Teile passen, passt das ganze Muster.\n\nBeim leeren Muster `{ }` gibt es keine Teile. Es bleibt nur die Prüfung auf `null`. Deshalb ist `x is { }` bei `null` falsch und sonst wahr."
+    },
+    {
+      "id": "m12-l03-q9",
+      "lesson": "m12-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Eigenschaftsmuster statt einer Kette aus `!= null`, `&&` und `==` einsetzen?",
+      "modelAnswer": "Ein Eigenschaftsmuster passt, wenn ein Objekt fehlen darf und du gleichzeitig mehrere Eigenschaften prüfst, zum Beispiel Log-Ereignisse mit einem bestimmten Typ und Benutzer oder Vorfälle mit mindestens fünf Fehlversuchen. Der Test steht in einem Ausdruck, und die Prüfung auf `null` ist schon dabei."
     }
   ]
 }

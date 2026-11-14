@@ -7425,6 +7425,110 @@
         "title": "11.2.1 Pattern forms (General)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1121-general"
       }
+    },
+    {
+      "id": "property-pattern",
+      "term": "Property pattern",
+      "german": "Eigenschaftsmuster",
+      "category": "language",
+      "definition": "Ein Pattern der Form `{ Name: Muster, … }`. Es prüft zuerst, dass der Wert nicht `null` ist, und vergleicht dann Eigenschaften und Felder mit je einem eigenen Muster. `{ }` prüft nur auf `null`.",
+      "aliases": [
+        "Eigenschaftspattern",
+        "Property Pattern"
+      ],
+      "related": [
+        "pattern",
+        "type-pattern",
+        "extended-property-pattern"
+      ],
+      "lesson": "m12-l03",
+      "source": {
+        "title": "11.2.6 Property pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern"
+      }
+    },
+    {
+      "id": "extended-property-pattern",
+      "term": "Extended property pattern",
+      "german": "Erweitertes Eigenschaftsmuster",
+      "category": "language",
+      "definition": "Die Kurzform `{ A.B: Muster }` eines Eigenschaftsmusters. Sie bedeutet dasselbe wie `{ A: { B: Muster } }` und prüft unterwegs jeden Wert auf `null`.",
+      "aliases": [
+        "Erweitertes Eigenschaftspattern"
+      ],
+      "related": [
+        "property-pattern",
+        "pattern"
+      ],
+      "lesson": "m12-l03",
+      "source": {
+        "title": "11.2.6 Property pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern"
+      }
+    },
+    {
+      "id": "positional-pattern",
+      "term": "Positional pattern",
+      "german": "Positionsmuster",
+      "category": "language",
+      "definition": "Ein Pattern der Form `(p1, p2, …)`. Es zerlegt den Wert in Teile (bei einem Tupel in seine Elemente, sonst mit einer `Deconstruct`-Methode) und vergleicht jeden Teil nach seiner Position mit einem Muster.",
+      "aliases": [
+        "Positionspattern",
+        "Positional Pattern"
+      ],
+      "related": [
+        "pattern",
+        "deconstruct-method",
+        "deconstruction",
+        "var-pattern"
+      ],
+      "lesson": "m12-l04",
+      "source": {
+        "title": "11.2.5 Positional pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1125-positional-pattern"
+      }
+    },
+    {
+      "id": "deconstruct-method",
+      "term": "Deconstruct method",
+      "german": "Deconstruct-Methode",
+      "category": "language",
+      "definition": "Eine Methode namens `Deconstruct` mit `out`-Parametern und Rückgabetyp `void`. Sie legt fest, in welche Teile ein Objekt zerlegt wird, sowohl bei `var (a, b) = obj;` als auch in einem Positionsmuster.",
+      "aliases": [
+        "Deconstruct",
+        "Dekonstruktionsmethode"
+      ],
+      "related": [
+        "deconstruction",
+        "positional-pattern",
+        "positional-record"
+      ],
+      "lesson": "m12-l04",
+      "source": {
+        "title": "12.7 Deconstruction",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#127-deconstruction"
+      }
+    },
+    {
+      "id": "var-pattern",
+      "term": "Var pattern",
+      "german": "var-Muster",
+      "category": "language",
+      "definition": "Ein Pattern `var name`, das jeden Wert annimmt und in einer neuen Variablen ablegt (auch `null`). `var (a, b)` ist die Kurzform für ein Positionsmuster `(var a, var b)`.",
+      "aliases": [
+        "var-Pattern",
+        "Var Pattern"
+      ],
+      "related": [
+        "pattern",
+        "positional-pattern",
+        "discard"
+      ],
+      "lesson": "m12-l04",
+      "source": {
+        "title": "11.2.4 Var pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1124-var-pattern"
+      }
     }
   ]
 }
