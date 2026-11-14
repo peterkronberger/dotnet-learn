@@ -1,4 +1,3 @@
-/home/runner/work/dotnet-learn/dotnet-learn/website/examples/m13/l15/seclog-async-task.cs(1805,32): warning CS8425: Async-iterator 'ReadSourceLinesAsync(string, CancellationToken)' has one or more parameters of type 'CancellationToken' but none of them is decorated with the 'EnumeratorCancellation' attribute, so the cancellation token parameter from the generated 'IAsyncEnumerable<>.GetAsyncEnumerator' will be unconsumed
 SecLog project profile
 Purpose: find suspicious logins in made-up login logs
 Language: C#

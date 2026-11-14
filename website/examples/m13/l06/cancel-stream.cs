@@ -1,4 +1,6 @@
-// The token is a normal parameter of the stream
+// The attribute marks the parameter that receives the stream's token
+using System.Runtime.CompilerServices;
+
 using CancellationTokenSource source = new();
 try
 {
@@ -16,7 +18,8 @@ catch (OperationCanceledException ex)
     Console.WriteLine($"Stream ended with {ex.GetType().Name}");
 }
 
-async IAsyncEnumerable<int> CountAsync(CancellationToken token)
+async IAsyncEnumerable<int> CountAsync(
+    [EnumeratorCancellation] CancellationToken token)
 {
     for (int number = 1; number <= 5; number++)
     {
