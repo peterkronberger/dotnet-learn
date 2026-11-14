@@ -296,6 +296,241 @@
       "type": "explain",
       "question": "Transferfrage: Du rufst eine `async`-Methode auf und gibst direkt danach eine Zeile aus. Wo in einem eigenen Programm kann die Reihenfolge der Ausgaben überraschen, und wie machst du sie sichtbar?",
       "modelAnswer": "Zum Beispiel beim Laden von Daten: Eine Zeile am Anfang der Methode erscheint vor der Zeile des Aufrufers, eine Zeile nach dem `await` erst danach. Ich mache die Reihenfolge sichtbar, indem ich vor und nach dem Aufruf und vor und nach dem `await` je eine Zeile ausgebe und das Ergebnis vorher vorhersage."
+    },
+    {
+      "id": "m13-l03-q1",
+      "lesson": "m13-l03",
+      "type": "single",
+      "question": "Eine `async`-Methode löst nach ihrem ersten `await` eine Exception aus. Die Methode hat keine `catch`-Klausel. Wo kommt die Exception beim Aufrufer an?",
+      "options": [
+        {
+          "text": "Beim `await` auf den zurückgegebenen Task. Dort wird sie erneut ausgelöst.",
+          "correct": true,
+          "feedback": "So ist es: Der Task speichert die Exception, und `await` löst sie wieder aus."
+        },
+        {
+          "text": "Schon beim Aufruf der Methode, bevor der Task zurückgegeben wird.",
+          "feedback": "Die Methode gibt zuerst einen Task zurück. Der Aufruf selbst löst nichts aus."
+        },
+        {
+          "text": "Gar nicht. Die Exception geht verloren, weil die Methode schon zurückgekehrt ist.",
+          "feedback": "Die Exception bleibt im Task gespeichert. Nur wenn niemand auf den Task wartet, merkt keiner etwas davon.",
+          "misconception": "m13-l03-async-exception-lost"
+        },
+        {
+          "text": "In der Methode selbst, die sie sofort im Hintergrund abfängt.",
+          "feedback": "Eine Methode fängt nichts von selbst ab. Ohne `catch` bleibt die Exception im Task.",
+          "misconception": "m13-l03-async-exception-lost"
+        }
+      ],
+      "explanation": "Ein Fehler in einer `async`-Methode, die einen Task zurückgibt, versetzt den Task in den Zustand „fehlerhaft“. Er wird nicht beim Aufruf ausgelöst. Erst `await` holt die Exception aus dem Task und löst sie beim Aufrufer erneut aus."
+    },
+    {
+      "id": "m13-l03-q2",
+      "lesson": "m13-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l03/catch-at-await.cs",
+      "explanation": "Der Aufruf gibt einen Task zurück (Zeile 1 und 2 erscheinen). Die Exception wird erst am `await` ausgelöst. Deshalb fehlt die Zeile 3, und die `catch`-Klausel gibt Zeile 4 aus."
+    },
+    {
+      "id": "m13-l03-q3",
+      "lesson": "m13-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l03/before-first-await.cs",
+      "explanation": "Die Methode löst die Exception aus, ohne auf einen unfertigen Task zu warten. Auch dann löst der Aufruf sie nicht aus: Der zurückgegebene Task ist schon fehlerhaft (`True`). Erst `await task` löst sie aus, und `catch` gibt den Typ aus."
+    },
+    {
+      "id": "m13-l03-q4",
+      "lesson": "m13-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l03/task-states.cs",
+      "explanation": "`good` ist erfolgreich beendet: `IsCompletedSuccessfully` ist `True`, `IsFaulted` ist `False`. `lost` hat eine Exception ausgelöst: `IsFaulted` ist `True`, `IsCompletedSuccessfully` ist `False`. Auf `lost` wartet niemand, deshalb bleibt die Exception unbemerkt, und das Programm läuft weiter."
+    },
+    {
+      "id": "m13-l03-q5",
+      "lesson": "m13-l03",
+      "type": "single",
+      "question": "Eine `async`-Methode löst eine Exception aus. Der Aufrufer speichert den Task in einer Variablen und wartet nie darauf. Was passiert?",
+      "options": [
+        {
+          "text": "Der Task ist fehlerhaft. Das Programm läuft ohne Meldung weiter.",
+          "correct": true,
+          "feedback": "Die Exception steckt im Task. Ohne `await` (oder ein Lesen der Exception) bemerkt sie niemand."
+        },
+        {
+          "text": "Die Exception wird sofort an der Stelle der Variablen ausgelöst.",
+          "feedback": "Eine Zuweisung löst die Exception des Tasks nicht aus. Nur `await` tut das."
+        },
+        {
+          "text": "Das Programm endet mit einer Fehlermeldung, sobald der Task fehlerhaft wird.",
+          "feedback": "Im Beispiel dieser Lektion läuft das Programm trotz des fehlerhaften Tasks ohne Meldung weiter.",
+          "misconception": "m13-l03-async-exception-lost"
+        },
+        {
+          "text": "Der Task wiederholt die Arbeit, bis sie klappt.",
+          "feedback": "Ein Task wiederholt nichts von selbst."
+        }
+      ],
+      "explanation": "Die Exception wird im Task gespeichert. Wartet niemand auf den Task und liest niemand seine Exception, geht der Fehler unbemerkt verloren. Das Programm läuft weiter. Deshalb wartest du auf jeden Task, dessen Fehler dir wichtig sind."
+    },
+    {
+      "id": "m13-l03-q6",
+      "lesson": "m13-l03",
+      "type": "cloze",
+      "question": "Ergänze das Warten, die `catch`-Klausel, den Typ der Exception und die Eigenschaft, die den Fehlerzustand zeigt.",
+      "example": "m13/l03/gap-catch.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Hier wird die Exception des Tasks wieder ausgelöst."
+        },
+        {
+          "text": "catch",
+          "hint": "Diese Klausel behandelt die Exception."
+        },
+        {
+          "text": "FormatException",
+          "hint": "Diesen Typ löst `ReadNameAsync` aus."
+        },
+        {
+          "text": "IsFaulted",
+          "hint": "Die Eigenschaft sagt, ob der Task mit einer Exception endete."
+        }
+      ],
+      "explanation": "Die Ausgabe ist `Failed: FormatException` und `Faulted: True`. Das `await` löst die Exception des Tasks aus, `catch` behandelt sie. Der Task bleibt danach fehlerhaft."
+    },
+    {
+      "id": "m13-l03-q7",
+      "lesson": "m13-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `try`/`catch` um das `await` eine Exception aus einer `async`-Methode abfängt, aber nicht um den Aufruf allein, und wann eine solche Exception verloren geht.",
+      "modelAnswer": "Die async-Methode löst die Exception nicht beim Aufruf aus, sondern speichert sie im Task, der fehlerhaft wird. Erst das `await` holt sie aus dem Task und löst sie beim Aufrufer wieder aus. Deshalb muss das `await` im `try`-Block stehen.\n\nVerloren geht die Exception, wenn nie jemand auf den Task wartet oder seine Exception liest. Dann bleibt sie im Task, und das Programm läuft ohne Meldung weiter."
+    },
+    {
+      "id": "m13-l03-q8",
+      "lesson": "m13-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm startest du eine `async`-Methode, deren Fehler du behandeln musst, und wo würde ein vergessenes `await` einen Fehler verstecken?",
+      "modelAnswer": "Zum Beispiel beim Laden einer Datei oder von Daten, die fehlen können: Ich rufe die Methode auf und warte mit `await` in einem `try`-Block, damit ich den Fehler melden kann. Vergesse ich das `await` bei einer Methode, die zum Beispiel Daten speichert, merkt das Programm nicht, dass das Speichern gescheitert ist."
+    },
+    {
+      "id": "m13-l04-q1",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/one-after-another.cs",
+      "explanation": "Das erste `await` wartet, bis `A` fertig ist. Erst danach beginnt der Aufruf von `WorkAsync(\"B\", …)`. Deshalb erscheint `start B` erst nach `A done`."
+    },
+    {
+      "id": "m13-l04-q2",
+      "lesson": "m13-l04",
+      "type": "single",
+      "question": "Das Programm schreibt `await WorkAsync(\"A\", steps);` und danach `await WorkAsync(\"B\", steps);`. Was stimmt?",
+      "options": [
+        {
+          "text": "Die Aufgabe `B` beginnt erst, wenn das Warten auf `A` beendet ist.",
+          "correct": true,
+          "feedback": "Jedes `await` hält die Methode an, bis sein Task fertig ist. Die nächste Zeile startet `B` erst danach."
+        },
+        {
+          "text": "`A` und `B` laufen gleichzeitig, weil beide Methoden `async` sind.",
+          "feedback": "`async` allein macht nichts gleichzeitig. Wer beide Tasks gleichzeitig will, startet sie zuerst und wartet dann.",
+          "misconception": "m13-l04-sequential-awaits-run-together"
+        },
+        {
+          "text": "`B` beginnt zuerst, weil es weiter unten steht.",
+          "feedback": "Die Zeilen laufen von oben nach unten. `A` ist zuerst dran."
+        },
+        {
+          "text": "`await` startet `A` und `B` beim ersten Aufruf zusammen.",
+          "feedback": "`await` startet nichts. Es wartet nur auf einen Task, der schon gestartet wurde.",
+          "misconception": "m13-l04-sequential-awaits-run-together"
+        }
+      ],
+      "explanation": "Ein Aufruf startet die Arbeit, das `await` wartet darauf. Steht das zweite `await` samt Aufruf erst nach dem ersten, beginnt die zweite Arbeit erst nach dem Ende der ersten. Die Gesamtzeit ist die Summe."
+    },
+    {
+      "id": "m13-l04-q3",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/start-then-await.cs",
+      "explanation": "Beide Aufrufe starten, bevor jemand wartet: `start A`, `start B`, dann `both started`. Erst `Task.WhenAll` wartet auf beide. Danach folgt `all done`."
+    },
+    {
+      "id": "m13-l04-q4",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l04/when-all-results.cs",
+      "explanation": "`SlowAsync` ist später fertig als `FastAsync`. Das Ergebnisfeld von `Task.WhenAll` folgt trotzdem der Reihenfolge der Argumente: zuerst der Wert von `SlowAsync` (1), dann der von `FastAsync` (2)."
+    },
+    {
+      "id": "m13-l04-q5",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/when-all-errors.cs",
+      "explanation": "Beide Tasks schlagen fehl. `await` löst nur eine Ausnahme aus (`first failed`), die `catch`-Klausel fängt sie. Die `AggregateException` in `all.Exception` enthält beide Ausnahmen, deshalb 2."
+    },
+    {
+      "id": "m13-l04-q6",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/when-any.cs",
+      "explanation": "`cached` ist schon fertig, `remote` braucht 5 Sekunden. `Task.WhenAny` liefert den ersten fertigen Task, `cached`. Den anderen Task bricht `WhenAny` nicht ab. Er läuft weiter, ist aber noch nicht fertig (`False`)."
+    },
+    {
+      "id": "m13-l04-q7",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l04/wait-with-timeout.cs",
+      "explanation": "`WaitAsync` gibt nach 50 ms einen Task zurück, der mit einer `TimeoutException` fehlerhaft endet. Das `await` löst sie aus, und `catch` gibt den Typ aus. Die Wartezeit des Tasks selbst (5 Sekunden) endet dadurch nicht."
+    },
+    {
+      "id": "m13-l04-q8",
+      "lesson": "m13-l04",
+      "type": "cloze",
+      "question": "Ergänze das Warten, den Task-Kombinator, den Modifizierer der Methode und das Warten in der Methode.",
+      "example": "m13/l04/gap-when-all.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Der Aufrufer wartet auf das Ergebnis."
+        },
+        {
+          "text": "WhenAll",
+          "hint": "Die Methode wartet auf beide Tasks."
+        },
+        {
+          "text": "async",
+          "hint": "Der Modifizierer erlaubt `await` in der Methode."
+        },
+        {
+          "text": "await",
+          "hint": "Die Methode wartet auf `Task.Delay(10)`."
+        }
+      ],
+      "explanation": "Beide Tasks starten zuerst, `Task.WhenAll` wartet auf beide und liefert `[1, 2]`. Die Summe ist `3`."
+    },
+    {
+      "id": "m13-l04-q9",
+      "lesson": "m13-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `await A(); await B();` länger dauert als `await Task.WhenAll(A(), B())`, und wozu du `WaitAsync` brauchst.",
+      "modelAnswer": "Beim ersten Weg startet `B` erst, wenn `A` fertig ist, die Zeiten addieren sich. Beim zweiten Weg werden beide Aufrufe ausgewertet, bevor gewartet wird. Beide Tasks laufen dann zugleich, und die Gesamtzeit ist ungefähr die des langsameren.\n\n`WaitAsync` begrenzt die Wartezeit. Dauert der Task länger, endet das Warten mit einer `TimeoutException`, und das Programm hängt nicht ewig."
+    },
+    {
+      "id": "m13-l04-q10",
+      "lesson": "m13-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du mehrere Tasks gleichzeitig warten lassen, und wo würdest du eine Wartezeit begrenzen?",
+      "modelAnswer": "Zum Beispiel beim Laden mehrerer unabhängiger Daten, etwa der Logs von mehreren Servern: Ich starte alle Aufrufe zuerst und warte mit `Task.WhenAll`. Eine Wartezeit begrenze ich bei Quellen, die hängen könnten, etwa einem langsamen Server. Nach dem Timeout melde ich den Fehler, statt weiter zu warten."
     }
   ]
 }

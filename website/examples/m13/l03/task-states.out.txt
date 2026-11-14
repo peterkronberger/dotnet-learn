@@ -1,0 +1,3 @@
+good: faulted False, ok True
+lost: faulted True, ok False
+The program goes on, good is 42
