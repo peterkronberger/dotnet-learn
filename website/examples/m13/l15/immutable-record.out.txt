@@ -1,0 +1,4 @@
+A reads Limits { MaxFailures = 3, Level = warn }
+B reads Limits { MaxFailures = 3, Level = warn }
+Old: Limits { MaxFailures = 3, Level = warn }
+New: Limits { MaxFailures = 1, Level = warn }

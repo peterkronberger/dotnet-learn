@@ -1,0 +1,4 @@
+db: 2
+mail: 4
+vpn: 3
+web: 3

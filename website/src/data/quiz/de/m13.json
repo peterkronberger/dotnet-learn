@@ -2105,6 +2105,415 @@
       "type": "explain",
       "question": "Transferfrage: Ein Server zählt in vielen Tasks die Anfragen und merkt sich zusätzlich in einer `List<string>` die Namen der letzten Fehler. Womit schützt du den Zähler, womit die Liste, und warum?",
       "modelAnswer": "Der Zähler ist eine einzelne Zahl, die nur hochgezählt wird. Dafür genügt `Interlocked.Increment`: kein `lock` nötig, und es geht kein Update verloren.\n\nDie Liste besteht aus mehreren zusammenhängenden Daten, und ein Hinzufügen ändert mehrere Dinge. Dafür reicht eine einzelne atomare Operation nicht. Hier braucht es einen `lock` mit einem privaten `Lock`-Objekt, und jeder Zugriff auf die Liste nimmt dieselbe Sperre."
+    },
+    {
+      "id": "m13-l15-q1",
+      "lesson": "m13-l15",
+      "type": "match",
+      "question": "Ordne jedem Vorgehen die passende Strategie für Thread-Sicherheit zu.",
+      "pairs": [
+        {
+          "left": "Jeder Task zählt in einer eigenen Variable, am Ende wird addiert",
+          "right": "Nicht teilen"
+        },
+        {
+          "left": "Alle Tasks lesen nur einen `record`, eine Änderung erzeugt ein neues Objekt",
+          "right": "Unveränderliche Daten"
+        },
+        {
+          "left": "Viele Tasks zählen in einem `ConcurrentDictionary`",
+          "right": "Threadsichere Sammlung"
+        },
+        {
+          "left": "Ein gemeinsamer Zähler wird nur innerhalb eines `lock` geändert",
+          "right": "Gezielt synchronisieren"
+        }
+      ],
+      "explanation": "Die erste Wahl ist, möglichst wenig zu teilen: eigene Daten pro Arbeiter oder Daten, die sich nicht ändern. Was geteilt werden muss und sich ändert, liegt in einer threadsicheren Sammlung oder wird gezielt mit `lock` oder `Interlocked` geschützt."
+    },
+    {
+      "id": "m13-l15-q2",
+      "lesson": "m13-l15",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l15/confinement.cs",
+      "explanation": "Jeder Task zählt nur in seinem eigenen Ergebnis. Die zwei Zahlen stehen in der Reihenfolge der Tasks, `Task.WhenAll` liefert sie so zurück. Erst nach dem Warten wird addiert. Es gibt nichts Gemeinsames, das ein Race erzeugen könnte."
+    },
+    {
+      "id": "m13-l15-q3",
+      "lesson": "m13-l15",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l15/concurrent-dictionary.cs",
+      "explanation": "`AddOrUpdate` legt den Namen mit 1 an oder erhöht den vorhandenen Wert um 1, als ein sicherer Schritt. Die Ausgabe ist nach dem Namen sortiert. Deshalb ist sie in jedem Lauf gleich, obwohl zwei Tasks gleichzeitig zählen."
+    },
+    {
+      "id": "m13-l15-q4",
+      "lesson": "m13-l15",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l15/get-or-add.cs",
+      "explanation": "Beim ersten Aufruf fehlt der Schlüssel `bob`, `GetOrAdd` speichert 3 und gibt 3 zurück. Beim zweiten Aufruf ist der Schlüssel da. `GetOrAdd` gibt den gespeicherten Wert 3 zurück und ignoriert den Wert 99."
+    },
+    {
+      "id": "m13-l15-q5",
+      "lesson": "m13-l15",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Alle Typen von .NET sind threadsicher, ich teile ein `Dictionary<string, int>` zwischen vielen Tasks, die Werte eintragen.“ Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "Die meisten Typen sind für Instanzmember nicht threadsicher, auch `Dictionary<TKey,TValue>`. Der Zugriff von mehreren Threads, die schreiben, braucht eigene Synchronisierung oder eine Sammlung aus `System.Collections.Concurrent`.",
+          "correct": true,
+          "feedback": "So ist es. Ob ein Typ threadsicher ist, steht in seiner Dokumentation."
+        },
+        {
+          "text": "Das stimmt: .NET-Typen schützen sich selbst, ein `Dictionary` ist mit mehreren schreibenden Tasks sicher.",
+          "feedback": "Die Klassenbibliothek macht Instanzdaten bewusst nicht threadsicher, weil Sperren Zeit kosten. Gleichzeitiges Schreiben kann Daten beschädigen.",
+          "misconception": "m13-l15-dotnet-types-are-thread-safe"
+        },
+        {
+          "text": "`Dictionary` ist threadsicher, nur `List<T>` nicht.",
+          "feedback": "Beide sind es nicht. Beide Typen sagen in ihrer Dokumentation, dass gleichzeitiges Schreiben eigene Synchronisierung braucht.",
+          "misconception": "m13-l15-dotnet-types-are-thread-safe"
+        },
+        {
+          "text": "Ein Typ ist threadsicher, sobald er im Namespace `System` liegt.",
+          "feedback": "Der Namespace sagt nichts darüber. Nur die Dokumentation des Typs sagt, ob er threadsicher ist.",
+          "misconception": "m13-l15-dotnet-types-are-thread-safe"
+        }
+      ],
+      "explanation": "Die Typen der .NET-Klassenbibliothek sind für Instanzdaten nicht standardmäßig threadsicher. Nur Typen, die es in ihrer Dokumentation zusagen, sind es, zum Beispiel die Sammlungen in `System.Collections.Concurrent`."
+    },
+    {
+      "id": "m13-l15-q6",
+      "lesson": "m13-l15",
+      "type": "find-bug",
+      "question": "Zwei Tasks sammeln Benutzernamen in einer gemeinsamen Liste. Welche Zeile ist eine Race Condition?",
+      "example": "m13/l15/find-shared-list.snippet.cs",
+      "bugLines": [
+        13
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "Die Deklaration ist kein Fehler. Das Problem entsteht erst, wenn mehrere Threads die Liste gleichzeitig ändern.",
+          "misconception": "m13-l15-dotnet-types-are-thread-safe"
+        },
+        "13": {
+          "feedback": "Richtig: `List<T>.Add` ist für gleichzeitigen Zugriff mehrerer Threads nicht threadsicher. Einträge können verloren gehen, oder die Liste wird beschädigt.",
+          "misconception": "m13-l15-dotnet-types-are-thread-safe"
+        },
+        "7": {
+          "feedback": "Die Ausgabe läuft erst nach `Task.WhenAll`, also nach beiden Tasks. Der Fehler liegt im Hinzufügen."
+        }
+      },
+      "explanation": "`List<T>` ist für mehrere schreibende Threads nicht threadsicher. Besser: Jeder Task sammelt in einer eigenen Liste und die Listen werden am Ende zusammengeführt, oder die Daten liegen in einer `ConcurrentBag<T>` oder `ConcurrentQueue<T>`."
+    },
+    {
+      "id": "m13-l15-q7",
+      "lesson": "m13-l15",
+      "type": "single",
+      "question": "Jeder einzelne Aufruf von `ConcurrentDictionary` ist threadsicher. Eine Methode prüft `if (!counts.ContainsKey(name))` und setzt dann `counts[name] = 1`. Warum kann das bei zwei Tasks trotzdem falsch sein?",
+      "options": [
+        {
+          "text": "Ein anderer Task kann zwischen der Prüfung und dem Setzen denselben Schlüssel eintragen. Zwei einzeln sichere Aufrufe hintereinander sind zusammen kein einzelner atomarer Schritt.",
+          "correct": true,
+          "feedback": "So ist es: wieder Check-then-act wie in Lektion 11."
+        },
+        {
+          "text": "`ContainsKey` ist bei `ConcurrentDictionary` nicht threadsicher.",
+          "feedback": "Jeder einzelne Aufruf ist threadsicher. Das Problem ist die Lücke zwischen den zwei Aufrufen."
+        },
+        {
+          "text": "`ConcurrentDictionary` darf nur von einem Thread geschrieben werden.",
+          "feedback": "Mehrere Threads dürfen gleichzeitig hinzufügen und ändern. Dafür ist die Klasse da."
+        },
+        {
+          "text": "Der Compiler übersetzt die zwei Aufrufe in einen einzelnen Aufruf, der den Fehler erzeugt.",
+          "feedback": "Der Compiler fasst nichts zusammen. Zwischen den Aufrufen können andere Threads laufen."
+        }
+      ],
+      "explanation": "Threadsicher ist der einzelne Aufruf, nicht eine Folge von Aufrufen. Eine Operation, die prüft und dann ändert, gehört in einen einzigen Aufruf wie `GetOrAdd` oder `AddOrUpdate`."
+    },
+    {
+      "id": "m13-l15-q8",
+      "lesson": "m13-l15",
+      "type": "single",
+      "question": "Vier Tasks greifen gleichzeitig zum ersten Mal auf `Settings.Level` zu. `Settings` hat einen statischen Konstruktor. Wie oft läuft er?",
+      "example": "m13/l15/static-constructor.cs",
+      "options": [
+        {
+          "text": "Genau einmal. Andere Threads warten, bis der statische Konstruktor fertig ist.",
+          "correct": true,
+          "feedback": "So ist es. Das gilt auch für gleichzeitige Zugriffe."
+        },
+        {
+          "text": "Viermal, einmal pro Task.",
+          "feedback": "Ein statischer Konstruktor gehört zur Klasse, nicht zu einem Task oder einer Instanz."
+        },
+        {
+          "text": "Zwischen einmal und viermal, je nachdem, wie die Tasks laufen.",
+          "feedback": "Die Anzahl hängt nicht vom Zufall ab. Die Laufzeit blockiert andere Threads, bis der Konstruktor fertig ist."
+        },
+        {
+          "text": "Gar nicht, weil in `Task.Run` keine statischen Konstruktoren laufen.",
+          "feedback": "Auch in Tasks läuft er beim ersten Zugriff auf einen statischen Member."
+        }
+      ],
+      "explanation": "Ein statischer Konstruktor läuft höchstens einmal. Die Laufzeit blockiert Aufrufe anderer Threads auf statische Member, bis er fertig ist. Danach gilt: Wenn das Feld nach dem Konstruktor nicht mehr geändert wird, ist es sicher zu lesen."
+    },
+    {
+      "id": "m13-l15-q9",
+      "lesson": "m13-l15",
+      "type": "multi",
+      "question": "Welche Aussagen über statischen veränderlichen Zustand stimmen?",
+      "options": [
+        {
+          "text": "Alle Threads teilen ihn, in einer Web-App sogar alle gleichzeitigen Anfragen. Deshalb braucht jeder Schreibzugriff Schutz.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Statische Felder sind automatisch sicher, weil es sie nur einmal gibt.",
+          "feedback": "Dass es das Feld nur einmal gibt, macht es zum gemeinsamen Zustand, nicht zu einem sicheren."
+        },
+        {
+          "text": "Eine statische Methode, die ein statisches Feld ändert, ist sicher, solange sie kurz ist.",
+          "feedback": "Auch eine kurze Änderung besteht aus mehreren Schritten, zum Beispiel Lesen, Addieren, Schreiben. Zwei Threads können sich dazwischen drängen."
+        },
+        {
+          "text": "Statische Methoden, die statischen Zustand ändern, sollte man möglichst vermeiden.",
+          "correct": true,
+          "feedback": "So ist es. Besser sind Daten in Objekten, die nicht zwischen Anfragen geteilt werden."
+        }
+      ],
+      "explanation": "Statischer veränderlicher Zustand gehört allen Threads gleichzeitig. Deshalb vermeidet man ihn oder schützt ihn."
+    },
+    {
+      "id": "m13-l15-q10",
+      "lesson": "m13-l15",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l15/immutable-record.cs",
+      "explanation": "Die Tasks lesen nur einen `record`, dessen Werte sich nicht ändern. Deshalb gibt es kein Race. `with` ändert das alte Objekt nicht, sondern erzeugt ein neues. Das alte Objekt zeigt weiter den Wert 3."
+    },
+    {
+      "id": "m13-l15-q11",
+      "lesson": "m13-l15",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum es besser ist, den Code so zu entwerfen, dass wenig geteilt wird, als jeden gemeinsamen Zugriff mit `lock` zu schützen.",
+      "modelAnswer": "Ein Race entsteht nur dort, wo mehrere Threads dieselben Daten ändern. Wenn jeder Arbeiter eigene Daten hat oder die Daten sich nicht ändern, kann kein Race entstehen. Dann braucht der Code keinen Schutz.\n\nJeder `lock` kostet Zeit, lässt andere warten und kann zu Deadlocks führen. Außerdem muss man jeden Zugriff daran denken. Wenn man erst am Ende Ergebnisse zusammenführt, bleibt die Stelle mit gemeinsamen Daten klein."
+    },
+    {
+      "id": "m13-l15-q12",
+      "lesson": "m13-l15",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm merkt sich, wie oft sich jeder Benutzer falsch angemeldet hat. Viele Tasks tragen gleichzeitig ein. Welche Strategie wählst du, und warum?",
+      "modelAnswer": "Die Daten werden geteilt und geändert, also reicht Nicht-Teilen hier nicht. Eine `ConcurrentDictionary<string, int>` ist passend: Mit `AddOrUpdate` erhöht jede Anfrage den Zähler ihres Benutzers als einen sicheren Schritt.\n\nEin normales `Dictionary` wäre falsch, weil es mehrere schreibende Threads nicht verträgt. Prüfen und dann Eintragen als zwei Aufrufe wäre wieder ein Check-then-act. Deshalb ein einziger Aufruf."
+    },
+    {
+      "id": "m13-l16-q1",
+      "lesson": "m13-l16",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l16/parallel-for.cs",
+      "explanation": "Jeder Durchlauf schreibt nur in seinen eigenen Platz des Arrays. Deshalb gibt es kein Race und keinen `lock`. Das Array hat die Reihenfolge der Zeilen, egal in welcher Reihenfolge die Durchläufe laufen. Gezählt wird erst nach der Schleife."
+    },
+    {
+      "id": "m13-l16-q2",
+      "lesson": "m13-l16",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l16/parallel-foreach.cs",
+      "explanation": "`Parallel.ForEach` verarbeitet beide Quellen, vielleicht gleichzeitig. Die Ergebnisse stehen in einem `ConcurrentDictionary`. Die Ausgabe wird nach dem Namen sortiert, damit sie nicht von der Reihenfolge der Durchläufe abhängt."
+    },
+    {
+      "id": "m13-l16-q3",
+      "lesson": "m13-l16",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l16/foreach-async.cs",
+      "explanation": "`Parallel.ForEachAsync` wartet auf asynchrone Arbeit und startet höchstens so viele Elemente gleichzeitig, wie `MaxDegreeOfParallelism` erlaubt, hier zwei. Das Ergebnis ist nach dem Namen sortiert, und `await` wartet auf alle Elemente."
+    },
+    {
+      "id": "m13-l16-q4",
+      "lesson": "m13-l16",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l16/plinq-ordered.cs",
+      "explanation": "`AsOrdered` hält die Reihenfolge der Quelle ein. Die Quadrate stehen deshalb aufsteigend. `Count` mit `AsParallel` gibt eine einzelne Zahl zurück, die nicht von der Reihenfolge abhängt."
+    },
+    {
+      "id": "m13-l16-q5",
+      "lesson": "m13-l16",
+      "type": "single",
+      "question": "Eine PLINQ-Abfrage `numbers.AsParallel().Select(n => n * n)` läuft über die Zahlen 1 bis 8 und wird mit `foreach` ausgegeben, ohne `AsOrdered`. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "Es erscheinen alle acht Quadrate, aber die Reihenfolge ist nicht festgelegt und kann sich von Lauf zu Lauf ändern.",
+          "correct": true,
+          "feedback": "So ist es. Mit `AsOrdered` wäre die Reihenfolge die der Quelle."
+        },
+        {
+          "text": "Die Quadrate erscheinen immer aufsteigend, weil die Quelle aufsteigend ist.",
+          "feedback": "Ohne `AsOrdered` darf PLINQ Ergebnisse in anderer Reihenfolge liefern."
+        },
+        {
+          "text": "Es erscheinen nur so viele Quadrate, wie der Rechner Kerne hat.",
+          "feedback": "Alle Elemente werden verarbeitet. Die Zahl der Kerne ändert nur, wie die Arbeit verteilt wird."
+        },
+        {
+          "text": "Die Abfrage läuft sofort beim Aufruf von `Select`, noch vor dem `foreach`.",
+          "feedback": "PLINQ führt wie LINQ erst beim Durchlaufen aus."
+        }
+      ],
+      "explanation": "PLINQ teilt die Quelle in Teile und liefert die Ergebnisse so, wie die Teile fertig werden. Ohne `AsOrdered` ist die Reihenfolge nicht festgelegt. `AsOrdered` stellt sie wieder her, kostet aber etwas Arbeit."
+    },
+    {
+      "id": "m13-l16-q6",
+      "lesson": "m13-l16",
+      "type": "find-bug",
+      "question": "Die Schleife sammelt die fehlgeschlagenen Zeilen parallel. Welche Zeile ist eine Race Condition?",
+      "example": "m13/l16/find-parallel-bug.snippet.cs",
+      "bugLines": [
+        9
+      ],
+      "lineFeedback": {
+        "3": {
+          "feedback": "Die Deklaration ist kein Fehler. Das Problem entsteht beim gleichzeitigen Hinzufügen."
+        },
+        "7": {
+          "feedback": "`line.Contains` liest nur die eigene Zeile des Durchlaufs und ändert nichts Gemeinsames."
+        },
+        "9": {
+          "feedback": "Richtig: Mehrere Durchläufe rufen gleichzeitig `failed.Add` auf derselben `List<string>` auf. `List<T>` ist dafür nicht threadsicher."
+        }
+      },
+      "explanation": "Der Schleifenkörper ändert die gemeinsame Liste. Lösung: eine `ConcurrentBag<string>` oder `ConcurrentQueue<string>` verwenden, oder nur zählen, oder für jede Zeile einen eigenen Platz in einem Array beschreiben."
+    },
+    {
+      "id": "m13-l16-q7",
+      "lesson": "m13-l16",
+      "type": "single",
+      "question": "Eine Schleife mit 8 Durchläufen, jeder addiert zwei Zahlen, wird von `for` auf `Parallel.For` umgestellt. Was ist zu erwarten?",
+      "options": [
+        {
+          "text": "Sie kann langsamer werden: Das Aufteilen und Koordinieren kostet mehr Zeit, als die winzige Arbeit spart.",
+          "correct": true,
+          "feedback": "So ist es. Bei wenigen Durchläufen und schneller Arbeit lohnt sich Parallelität selten. Messen entscheidet."
+        },
+        {
+          "text": "Sie wird immer schneller, weil mehr Threads mehr Arbeit gleichzeitig machen.",
+          "feedback": "Threads starten und koordinieren kostet Zeit. Bei kleiner Arbeit überwiegt das.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Sie wird genau so viel mal schneller, wie der Rechner Kerne hat.",
+          "feedback": "Der Aufwand und der serielle Anteil begrenzen die Beschleunigung. Sie ist fast nie so groß wie die Zahl der Kerne.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Sie läuft gleich schnell, weil `Parallel.For` bei kleiner Arbeit nichts ändert.",
+          "feedback": "Der Aufwand für das Aufteilen entsteht trotzdem."
+        }
+      ],
+      "explanation": "Paralleler Code hat Aufwand: Die Arbeit wird zerlegt, auf Threads verteilt und am Ende zusammengeführt. Bei wenig Arbeit pro Durchlauf kann der Aufwand größer sein als der Gewinn."
+    },
+    {
+      "id": "m13-l16-q8",
+      "lesson": "m13-l16",
+      "type": "single",
+      "question": "Ein Rechner hat 4 Kerne. Eine rechenintensive Schleife läuft mit 64 Threads statt mit 4. Was bringt das?",
+      "options": [
+        {
+          "text": "Meist nichts: Mehr rechnende Threads als Kerne können nicht gleichzeitig laufen, der Wechsel zwischen ihnen kostet zusätzlich Zeit.",
+          "correct": true,
+          "feedback": "So ist es. Mehr Threads helfen nur, wenn sie oft warten, zum Beispiel auf Eingabe und Ausgabe."
+        },
+        {
+          "text": "Die Schleife wird 16 Mal schneller, weil 64 durch 4 gleich 16 ist.",
+          "feedback": "Es können nur so viele rechnende Threads gleichzeitig laufen, wie Kerne da sind.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Die Schleife wird immer schneller, denn mehr Threads sind besser.",
+          "feedback": "Bei rechnender Arbeit hilft mehr Threads als Kerne nicht.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Die Schleife stürzt ab, weil höchstens so viele Threads wie Kerne erlaubt sind.",
+          "feedback": "Es sind mehr Threads erlaubt. Sie sind nur nicht schneller."
+        }
+      ],
+      "explanation": "Rechnende Threads brauchen je einen Kern. Mehr Threads als Kerne teilen sich die Kerne nur. Das ist der Grund, warum es einen Grad der Parallelität gibt, den man begrenzen kann."
+    },
+    {
+      "id": "m13-l16-q9",
+      "lesson": "m13-l16",
+      "type": "single",
+      "question": "Ein Programm braucht seriell 10 Sekunden, davon sind 2 Sekunden nicht parallelisierbar (der serielle Anteil). Wie schnell kann es mit beliebig vielen Kernen höchstens werden?",
+      "options": [
+        {
+          "text": "Nicht schneller als 2 Sekunden, weil der serielle Anteil bleibt und nicht verteilt werden kann.",
+          "correct": true,
+          "feedback": "So ist es. Die Beschleunigung ist also höchstens 5-fach, auch ohne Aufwand fürs Aufteilen."
+        },
+        {
+          "text": "Fast 0 Sekunden, weil sich die übrigen 8 Sekunden auf unendlich viele Kerne verteilen und der Rest klein wird.",
+          "feedback": "Die 2 Sekunden serielle Arbeit bleiben bestehen. Mehr Kerne verkürzen sie nicht.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Genau 10 durch die Zahl der Kerne Sekunden.",
+          "feedback": "Das würde bedeuten, dass alles parallel läuft. Der serielle Anteil läuft aber nur auf einem Kern.",
+          "misconception": "m13-l16-more-threads-always-faster"
+        },
+        {
+          "text": "Genau 5 Sekunden, weil die Hälfte parallel läuft.",
+          "feedback": "Es sind 8 von 10 Sekunden parallelisierbar, nicht die Hälfte, und die serielle Zeit bleibt unverändert."
+        }
+      ],
+      "explanation": "Der serielle Anteil begrenzt die mögliche Beschleunigung. Bleiben von 10 Sekunden 2 Sekunden seriell, ist die Laufzeit mindestens 2 Sekunden. Das ist ein Rechenbeispiel, keine Messung."
+    },
+    {
+      "id": "m13-l16-q10",
+      "lesson": "m13-l16",
+      "type": "multi",
+      "question": "Welche Schleifenkörper von `Parallel.ForEach` führen ihr Ergebnis sicher zusammen?",
+      "options": [
+        {
+          "text": "Jeder Durchlauf schreibt nur in seinen eigenen Platz eines vorher angelegten Arrays.",
+          "correct": true,
+          "feedback": "So ist es. Kein Platz wird von zwei Durchläufen geschrieben."
+        },
+        {
+          "text": "Jeder Durchlauf trägt sein Ergebnis mit `AddOrUpdate` oder einem Schlüssel in ein `ConcurrentDictionary` ein.",
+          "correct": true,
+          "feedback": "So ist es. Die Sammlung ist dafür gebaut."
+        },
+        {
+          "text": "Jeder Durchlauf rechnet `total += wert` auf einer gemeinsamen `int`-Variable.",
+          "feedback": "Das ist Lesen, Addieren und Schreiben in drei Schritten: ein verlorenes Update wie in Lektion 11."
+        },
+        {
+          "text": "Jeder Durchlauf ruft `list.Add(wert)` auf einer gemeinsamen `List<int>` auf.",
+          "feedback": "`List<T>` ist für gleichzeitiges Schreiben nicht threadsicher."
+        }
+      ],
+      "explanation": "Der Schleifenkörper darf gemeinsame Daten nur sicher ändern: eigener Platz pro Durchlauf, eine threadsichere Sammlung oder gezielte Synchronisierung. Besser ist, möglichst wenig zu teilen."
+    },
+    {
+      "id": "m13-l16-q11",
+      "lesson": "m13-l16",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein paralleler Code langsamer sein kann als ein serieller.",
+      "modelAnswer": "Parallel zu arbeiten kostet selbst Zeit: Die Daten müssen in Teile zerlegt werden, Threads müssen die Teile übernehmen, und am Ende müssen die Ergebnisse zusammengeführt werden. Ist die Arbeit pro Element winzig oder gibt es nur wenige Elemente, ist dieser Aufwand größer als die gesparte Zeit.\n\nAußerdem gibt es höchstens so viele gleichzeitige Rechner-Kerne wie Hardware da ist. Und was seriell bleiben muss, begrenzt die mögliche Beschleunigung."
+    },
+    {
+      "id": "m13-l16-q12",
+      "lesson": "m13-l16",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm prüft 5 Millionen Log-Zeilen, jede mit einem aufwendigen Muster-Test, und danach schreibt es einen kurzen Bericht. Wo würdest du Datenparallelität einsetzen, und wo nicht?",
+      "modelAnswer": "Die Prüfung der Zeilen ist die gleiche rechnende Operation auf vielen unabhängigen Elementen. Dafür passt `Parallel.ForEach` oder PLINQ mit `AsParallel`. Die Ergebnisse führe ich sicher zusammen, zum Beispiel mit einem Array-Platz pro Zeile, einem `ConcurrentDictionary` oder mit `Count`.\n\nDen kurzen Bericht schreibe ich seriell: Er ist wenig Arbeit, und paralleler Aufwand würde sich nicht lohnen. Dieser serielle Teil begrenzt die mögliche Beschleunigung. Ob es sich lohnt, muss ich messen."
     }
   ]
 }
