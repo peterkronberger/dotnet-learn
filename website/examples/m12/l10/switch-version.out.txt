@@ -1,0 +1,2 @@
+Square: area 9, perimeter 12
+Rectangle: area 10, perimeter 14

@@ -1123,6 +1123,334 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem eigenen Programm eine Union einsetzen, und wann reicht `null` oder `object` nicht?",
       "modelAnswer": "Eine Union passt, wenn ein Wert genau eine von wenigen, bekannten Möglichkeiten sein soll, zum Beispiel das Ergebnis einer Eingabe (gültiger Wert oder Fehler mit Grund) oder eine Nachricht aus einer festen Menge von Nachrichten.\n\n`null` sagt nur, dass etwas fehlt, aber nicht warum. Bei `object` kann alles drin sein, und der `switch` braucht `_`, sodass der Compiler einen vergessenen Fall nicht meldet. Die Union nennt alle Fälle, und der Compiler prüft sie."
+    },
+    {
+      "id": "m12-l09-q1",
+      "lesson": "m12-l09",
+      "type": "single",
+      "question": "Was gilt für `closed record Shape;`?",
+      "options": [
+        {
+          "text": "Von `Shape` dürfen Typen ableiten, aber nur in derselben Assembly.",
+          "correct": true,
+          "feedback": "Die Untertypen sind erlaubt, und ihre Menge ist durch die Assembly festgelegt."
+        },
+        {
+          "text": "Von `Shape` darf kein Typ ableiten, wie bei `sealed`.",
+          "feedback": "`sealed` verbietet jede Ableitung. `closed` erlaubt sie in derselben Assembly.",
+          "misconception": "m12-l09-closed-means-sealed"
+        },
+        {
+          "text": "`closed` und `sealed` sind zwei Schreibweisen für dasselbe.",
+          "feedback": "Beide Modifizierer wirken verschieden: `sealed` verbietet Untertypen, `closed` begrenzt sie auf die eigene Assembly.",
+          "misconception": "m12-l09-closed-means-sealed"
+        },
+        {
+          "text": "Mit `new Shape()` lässt sich ein Objekt von `Shape` erzeugen.",
+          "feedback": "Ein `closed`-Typ ist implizit abstrakt. Du kannst kein Objekt von ihm erzeugen."
+        }
+      ],
+      "explanation": "`closed` fixiert die direkten Untertypen auf die der eigenen Assembly und macht den Typ implizit abstrakt. `sealed` verbietet dagegen jede Ableitung."
+    },
+    {
+      "id": "m12-l09-q2",
+      "lesson": "m12-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l09/quiz-closed.cs",
+      "explanation": "`light` ist eine `Green`. `Next` wählt den Arm `Green` und liefert eine neue `Red`. Ein Record ohne Eigenschaften gibt seinen Namen und `{ }` aus."
+    },
+    {
+      "id": "m12-l09-q3",
+      "lesson": "m12-l09",
+      "type": "cloze",
+      "question": "Ergänze den `switch` über die direkten Untertypen und die Deklaration der Basis.",
+      "example": "m12/l09/gap-closed.cs",
+      "blanks": [
+        {
+          "text": "switch",
+          "hint": "Das Schlüsselwort, das den Wert mit den Armen vergleicht."
+        },
+        {
+          "text": "Open",
+          "hint": "Der zweite direkte Untertyp, der den Wert `Percent` hat."
+        },
+        {
+          "text": "closed",
+          "hint": "Der Modifizierer, der die direkten Untertypen auf die Assembly begrenzt."
+        }
+      ],
+      "explanation": "Der `switch` hat je einen Arm für `Shut` und `Open`, deshalb braucht er keinen `_`-Arm. `closed` vor `record Gate;` macht die Hierarchie geschlossen."
+    },
+    {
+      "id": "m12-l09-q4",
+      "lesson": "m12-l09",
+      "type": "single",
+      "question": "Der `switch`-Ausdruck hat nur einen Arm für `Circle`. Was meldet der Compiler?",
+      "example": "m12/l09/missing-case.snippet.cs",
+      "options": [
+        {
+          "text": "Die Warnung CS8509: Der Fall `Square` ist nicht abgedeckt.",
+          "correct": true,
+          "feedback": "Ein fehlender direkter Untertyp ist dieselbe Warnung wie bei jedem nicht exhaustiven `switch`."
+        },
+        {
+          "text": "Den Fehler CS8510: Der Arm ist nicht erreichbar.",
+          "feedback": "Der Arm für `Circle` ist erreichbar. Es fehlt ein anderer Arm."
+        },
+        {
+          "text": "Nichts, weil `closed` den fehlenden Arm ergänzt.",
+          "feedback": "Der Compiler ergänzt keinen Arm. Er prüft nur, ob alle direkten Untertypen vorkommen."
+        },
+        {
+          "text": "Nichts, weil `Circle` der erste Untertyp ist.",
+          "feedback": "Jeder direkte Untertyp braucht einen Arm."
+        }
+      ],
+      "explanation": "Der `switch` über eine geschlossene Hierarchie ist exhaustive, wenn jeder direkte Untertyp einen Arm hat. Fehlt einer, warnt der Compiler (CS8509) und nennt den Fall."
+    },
+    {
+      "id": "m12-l09-q5",
+      "lesson": "m12-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über `closed` stimmen?",
+      "options": [
+        {
+          "text": "Ein `closed`-Typ ist implizit abstrakt.",
+          "correct": true
+        },
+        {
+          "text": "Ein `switch` mit einem Arm je direktem Untertyp braucht keinen `_`-Arm.",
+          "correct": true
+        },
+        {
+          "text": "Ein direkter Untertyp, der nicht `sealed` ist, darf eigene Untertypen haben. Sein Arm deckt sie ab.",
+          "correct": true
+        },
+        {
+          "text": "`closed sealed class` ist erlaubt und verbietet jede Ableitung.",
+          "feedback": "Der Compiler meldet CS9381: Ein `closed`-Typ darf nicht `sealed` oder `static` sein.",
+          "misconception": "m12-l09-closed-means-sealed"
+        }
+      ],
+      "explanation": "`closed` macht den Typ abstrakt und die Menge der direkten Untertypen bekannt. Die Untertypen selbst dürfen offen oder `sealed` sein. `closed` und `sealed` lassen sich nicht verbinden."
+    },
+    {
+      "id": "m12-l09-q6",
+      "lesson": "m12-l09",
+      "type": "single",
+      "question": "Welche Aussage über einen Union-Typ und eine geschlossene Hierarchie stimmt?",
+      "options": [
+        {
+          "text": "Eine Union fasst bestehende, unabhängige Typen zusammen. Bei einer geschlossenen Hierarchie leiten die Fälle von deinem eigenen Basistyp ab.",
+          "correct": true
+        },
+        {
+          "text": "Bei beiden müssen die Fall-Typen von einem gemeinsamen Basistyp erben.",
+          "feedback": "Die Fall-Typen einer Union erben nicht von der Union."
+        },
+        {
+          "text": "Nur bei der Union braucht der `switch` keinen `_`-Arm.",
+          "feedback": "Auch bei einer geschlossenen Hierarchie ist der `switch` ohne `_`-Arm exhaustive."
+        },
+        {
+          "text": "Eine geschlossene Hierarchie lässt sich nur mit `sealed`-Untertypen bilden.",
+          "feedback": "Die Untertypen dürfen auch offen sein.",
+          "misconception": "m12-l09-closed-means-sealed"
+        }
+      ],
+      "explanation": "Beide Wege lassen den Compiler prüfen, ob jeder Fall behandelt ist. Sie unterscheiden sich darin, woher die Fälle kommen: aus bestehenden Typen oder aus Untertypen deines Basistyps."
+    },
+    {
+      "id": "m12-l09-q7",
+      "lesson": "m12-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `closed` und `sealed` bei einer Klasse.",
+      "modelAnswer": "`sealed` verbietet jede Ableitung: Von einer versiegelten Klasse kann kein Typ erben.\n\n`closed` erlaubt Untertypen, aber nur in derselben Assembly. Die Menge der direkten Untertypen steht damit fest, und der Compiler kann prüfen, ob ein `switch` alle behandelt. Eine `closed`-Klasse ist außerdem implizit abstrakt."
+    },
+    {
+      "id": "m12-l09-q8",
+      "lesson": "m12-l09",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm eine geschlossene Hierarchie einsetzen, und was hast du davon?",
+      "modelAnswer": "Eine geschlossene Hierarchie passt, wenn ein Wert genau einer von wenigen eigenen Fällen ist, zum Beispiel der Zustand einer Bestellung (offen, bezahlt, versendet) oder die Form einer Eingabe.\n\nEin `switch` über alle direkten Untertypen braucht keinen `_`-Arm. Kommt ein neuer Untertyp dazu, warnt der Compiler jeden `switch`, der ihn nicht behandelt."
+    },
+    {
+      "id": "m12-l10-q1",
+      "lesson": "m12-l10",
+      "type": "single",
+      "question": "Ein neuer Regeltyp kommt zu SecLog dazu. Die Regeln sind Klassen, die `IDetectionRule` umsetzen. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "Du schreibst eine neue Klasse, die das Interface umsetzt. Die bestehenden Regeln und der `Detector` bleiben unverändert.",
+          "correct": true,
+          "feedback": "Jede Regel bringt ihre Prüfung selbst mit. Ein neuer Typ ist eine neue Klasse."
+        },
+        {
+          "text": "Du musst jeden `switch` über die Regeltypen ergänzen.",
+          "feedback": "Der `Detector` ruft nur `IsMatch` auf. Er hat keinen `switch` über die Regeltypen."
+        },
+        {
+          "text": "Mit Pattern Matching entfällt das Interface. Ein einziger `switch` ersetzt alle Regelklassen.",
+          "feedback": "Muster ersetzen virtuelle Methoden nicht. Für einen neuen Regeltyp ist das Interface die leichtere Erweiterung.",
+          "misconception": "m12-l10-patterns-replace-polymorphism"
+        },
+        {
+          "text": "Der Compiler verlangt, die neue Regel in der Basisklasse einzutragen.",
+          "feedback": "Eine Basisklasse muss ihre Untertypen nicht kennen."
+        }
+      ],
+      "explanation": "Bei virtuellen Methoden (und Interfaces) ist ein neuer Typ leicht: neue Klasse, kein Eingriff in bestehenden Code."
+    },
+    {
+      "id": "m12-l10-q2",
+      "lesson": "m12-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l10/switch-version.cs",
+      "explanation": "Die Schleife nutzt zwei `switch`-Ausdrücke. Für `Square(3)` ist die Fläche 9 und der Umfang 12, für `Rectangle(2, 5)` ist die Fläche 10 und der Umfang 14."
+    },
+    {
+      "id": "m12-l10-q3",
+      "lesson": "m12-l10",
+      "type": "single",
+      "question": "Zu der geschlossenen Hierarchie kommt ein weiterer Untertyp `Triangle` dazu. Was meldet der Compiler?",
+      "example": "m12/l10/new-type-switch.snippet.cs",
+      "options": [
+        {
+          "text": "Zweimal die Warnung CS8509, je eine für `Area` und `Perimeter`. Beide nennen `Triangle`.",
+          "correct": true,
+          "feedback": "Jeder `switch` über die Hierarchie muss den neuen Untertyp behandeln."
+        },
+        {
+          "text": "Nichts, weil `Triangle` sealed ist.",
+          "feedback": "Die Warnung hängt nicht davon ab. Der neue direkte Untertyp ist in keinem `switch` behandelt."
+        },
+        {
+          "text": "Den Fehler CS0534 für `Triangle`.",
+          "feedback": "CS0534 betrifft nicht umgesetzte abstrakte Member. Hier gibt es keine."
+        },
+        {
+          "text": "Nichts, weil die Methoden bereits `Square` und `Rectangle` behandeln.",
+          "feedback": "Der Compiler prüft alle direkten Untertypen."
+        }
+      ],
+      "explanation": "Ein neuer Typ bedeutet bei `switch`-Ausdrücken über eine geschlossene Hierarchie: jeden `switch` ergänzen. Der Compiler zeigt dir die Stellen."
+    },
+    {
+      "id": "m12-l10-q4",
+      "lesson": "m12-l10",
+      "type": "single",
+      "question": "Zu der abstrakten Klasse kommt die abstrakte Methode `Perimeter()` dazu. Was meldet der Compiler?",
+      "example": "m12/l10/new-operation-virtual.snippet.cs",
+      "options": [
+        {
+          "text": "Den Fehler CS0534 für `Square` und für `Rectangle`: Sie setzen `Perimeter()` nicht um.",
+          "correct": true,
+          "feedback": "Jede Klasse muss die neue Operation umsetzen."
+        },
+        {
+          "text": "Die Warnung CS8509 für jeden `switch`.",
+          "feedback": "Hier gibt es keinen `switch`."
+        },
+        {
+          "text": "Nichts, weil abstrakte Methoden freiwillig sind.",
+          "feedback": "Eine abstrakte Methode muss in jeder nicht abstrakten Klasse überschrieben werden."
+        },
+        {
+          "text": "Nichts, weil `Perimeter()` nur in der Basisklasse steht.",
+          "feedback": "Die abgeleiteten Klassen müssen sie umsetzen."
+        }
+      ],
+      "explanation": "Bei virtuellen Methoden ist eine neue Operation aufwendiger: Jede Klasse braucht ihre Version. Der Compiler meldet jede Klasse, die sie noch nicht hat."
+    },
+    {
+      "id": "m12-l10-q5",
+      "lesson": "m12-l10",
+      "type": "cloze",
+      "question": "Ergänze die abstrakte Methode, ihre Umsetzung und den neuen Typ.",
+      "example": "m12/l10/gap-polymorphism.cs",
+      "blanks": [
+        {
+          "text": "abstract",
+          "hint": "Das Schlüsselwort für eine Methode ohne Rumpf in der Basis."
+        },
+        {
+          "text": "override",
+          "hint": "Das Schlüsselwort, mit dem `Square` die Methode der Basis umsetzt."
+        },
+        {
+          "text": "Triangle",
+          "hint": "Der Name des neuen Records, der von `Shape` ableitet."
+        }
+      ],
+      "explanation": "Für einen neuen Typ reicht ein neuer Record mit `override`. Die Schleife und die Basis bleiben unverändert."
+    },
+    {
+      "id": "m12-l10-q6",
+      "lesson": "m12-l10",
+      "type": "multi",
+      "question": "Welche Aussagen über virtuelle Methoden und `switch` mit Mustern stimmen?",
+      "options": [
+        {
+          "text": "Mit virtuellen Methoden ist ein neuer Typ leicht: Du schreibst eine neue Klasse.",
+          "correct": true
+        },
+        {
+          "text": "Mit einem `switch` über eine geschlossene Hierarchie ist eine neue Operation leicht: Du schreibst einen neuen `switch`, ohne die Typen zu ändern.",
+          "correct": true
+        },
+        {
+          "text": "Bei einem `switch` über eine geschlossene Hierarchie warnt der Compiler, wenn ein Typ fehlt.",
+          "correct": true
+        },
+        {
+          "text": "Mit Pattern Matching braucht man keine virtuellen Methoden mehr.",
+          "feedback": "Jeder Entwurf passt zu einer anderen Art von Änderung. Beide haben ihren Platz.",
+          "misconception": "m12-l10-patterns-replace-polymorphism"
+        }
+      ],
+      "explanation": "Virtuelle Methoden erleichtern neue Typen, ein `switch` über eine geschlossene Hierarchie erleichtert neue Operationen. Muster ersetzen virtuelle Methoden nicht."
+    },
+    {
+      "id": "m12-l10-q7",
+      "lesson": "m12-l10",
+      "type": "single",
+      "question": "SecLog soll zusätzlich prüfen, ob ein Vorfall mehr als 3 Fehlversuche hat. Die bestehenden Regeln sollen unverändert bleiben. Was passt?",
+      "options": [
+        {
+          "text": "Eine neue Regel als `FuncRule`, die dem `Detector` hinzugefügt wird.",
+          "correct": true,
+          "feedback": "Eine neue Art von Regel ist ein neuer Typ. Dafür sind virtuelle Methoden und das Interface gedacht."
+        },
+        {
+          "text": "Ein neuer `switch` über `IncidentStatus`.",
+          "feedback": "Die Anforderung betrifft die Anzahl der Fehlversuche, nicht den Status."
+        },
+        {
+          "text": "Ein Arm `_` in jedem bestehenden `switch`.",
+          "feedback": "Das ändert bestehenden Code und bringt keine neue Regel."
+        },
+        {
+          "text": "Ein neuer Untertyp von `IncidentStatus`.",
+          "feedback": "Die Anforderung betrifft keinen Status."
+        }
+      ],
+      "explanation": "Eine neue Regel ist ein neuer Typ, der `IDetectionRule` umsetzt. Eine `FuncRule` ist dafür der kürzeste Weg."
+    },
+    {
+      "id": "m12-l10-q8",
+      "lesson": "m12-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wann du eine virtuelle Methode und wann einen `switch` über eine geschlossene Hierarchie wählst.",
+      "modelAnswer": "Mit einer virtuellen Methode bringt jeder Typ seine Version selbst mit. Ein neuer Typ ist leicht, denn du schreibst nur eine neue Klasse. Eine neue Operation ist dagegen aufwendig, weil jede Klasse sie umsetzen muss.\n\nBei einem `switch` über eine geschlossene Hierarchie steht die Operation an einer Stelle. Eine neue Operation ist leicht, ein neuer Typ bedeutet aber, jeden `switch` zu ergänzen. Der Compiler zeigt dir diese Stellen.\n\nDie Wahl hängt davon ab, was sich öfter ändert: die Typen oder die Operationen."
+    },
+    {
+      "id": "m12-l10-q9",
+      "lesson": "m12-l10",
+      "type": "explain",
+      "question": "Transferfrage: Nenne ein Beispiel aus einem eigenen Programm, in dem eine virtuelle Methode besser passt, und eines, in dem ein `switch` besser passt.",
+      "modelAnswer": "Eine virtuelle Methode passt zum Beispiel bei Plug-ins oder Prüfregeln, die oft neu dazukommen: Jede neue Regel ist eine neue Klasse.\n\nEin `switch` passt zum Beispiel bei einer festen Menge von Zuständen (offen, in Arbeit, erledigt), für die immer neue Auswertungen dazukommen, etwa Anzeige, Sortierung oder Mahnung."
     }
   ]
 }

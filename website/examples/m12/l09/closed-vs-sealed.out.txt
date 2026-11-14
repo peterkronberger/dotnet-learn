@@ -1,0 +1,5 @@
+Shape is abstract: True
+Shape is sealed: False
+Circle is sealed: True
+Polygon is sealed: False
+polygon

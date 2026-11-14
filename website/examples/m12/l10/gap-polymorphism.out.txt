@@ -1,0 +1,2 @@
+Square: area 9
+Triangle: area 10

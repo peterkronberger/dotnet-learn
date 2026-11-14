@@ -7696,6 +7696,48 @@
         "title": "Union types",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union"
       }
+    },
+    {
+      "id": "closed-hierarchy",
+      "term": "Closed hierarchy",
+      "german": "Geschlossene Hierarchie",
+      "category": "language",
+      "definition": "Eine Klasse mit `closed` und ihre direkten Untertypen, die alle in derselben Assembly stehen. Ein `switch` mit einem Arm je direktem Untertyp ist exhaustive und braucht keinen Arm `_`. Das hat nichts mit dem geschlossenen Typ (`closed-type`) bei Generics zu tun.",
+      "aliases": [
+        "geschlossene Hierarchien",
+        "Closed Hierarchies"
+      ],
+      "related": [
+        "closed-modifier",
+        "exhaustive",
+        "union-type",
+        "sealed-class"
+      ],
+      "lesson": "m12-l09",
+      "source": {
+        "title": "closed modifier",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed"
+      }
+    },
+    {
+      "id": "closed-modifier",
+      "term": "closed modifier",
+      "german": "Modifizierer `closed`",
+      "category": "language",
+      "definition": "Der Modifizierer `closed` (C# 15) vor `class` oder `record`. Eine geschlossene Klasse ist implizit abstrakt. Direkte Untertypen dürfen nur in derselben Assembly stehen. `closed` lässt sich nicht mit `sealed`, `static` oder `abstract` verbinden.",
+      "aliases": [
+        "closed-Modifizierer"
+      ],
+      "related": [
+        "closed-hierarchy",
+        "abstract-class",
+        "sealed-class"
+      ],
+      "lesson": "m12-l09",
+      "source": {
+        "title": "closed modifier",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed"
+      }
     }
   ]
 }
