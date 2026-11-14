@@ -1,0 +1,174 @@
+---
+title: Asynchrone Streams
+sidebar_position: 6
+description: Elemente einzeln liefern, sobald sie da sind – mit async IAsyncEnumerable<T>, yield return und await foreach, dazu Abbruch und Task.WhenEach.
+lesson_id: m13-l06
+duration_min: 24
+---
+
+import firstAsyncStream from '!!raw-loader!@site/examples/m13/l06/first-async-stream.cs';
+import producedConsumed from '!!raw-loader!@site/examples/m13/l06/produced-consumed.cs';
+import producedConsumedOutput from '!!raw-loader!@site/examples/m13/l06/produced-consumed.out.txt';
+import stopEarly from '!!raw-loader!@site/examples/m13/l06/stop-early.cs';
+import cancelStream from '!!raw-loader!@site/examples/m13/l06/cancel-stream.cs';
+import whenEach from '!!raw-loader!@site/examples/m13/l06/when-each.cs';
+import linqAsync from '!!raw-loader!@site/examples/m13/l06/linq-async.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l06/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l06/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l06/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l06/seclog-async-solution.cs';
+
+# Asynchrone Streams
+
+:::note[Lernziele]
+- Du kannst einen asynchronen Iterator mit `async IAsyncEnumerable<T>` und `yield return` schreiben.
+- Du kannst einen asynchronen Stream mit `await foreach` verarbeiten.
+- Du kannst erklären, warum ein asynchroner Stream Elemente liefert, sobald sie da sind.
+- Du kannst mit `Task.WhenEach` Tasks in der Reihenfolge ihres Endes verarbeiten.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l04-q1" />
+
+<Quiz id="m11-l04-q2" />
+
+<Quiz id="m13-l05-q3" />
+
+## Alles auf einmal oder einzeln
+
+Ein `Task<string[]>` liefert alle Zeilen erst am Ende. Ein Iterator mit `yield return` aus Modul 11 liefert sie einzeln, kann aber nicht mit `await` warten. Ein <Term id="async-stream">asynchroner Stream</Term> verbindet beides: Er liefert Elemente einzeln und darf zwischen zwei Elementen warten. Der Typ dafür ist `IAsyncEnumerable<T>`.
+
+Eine Methode, die so einen Stream erzeugt, ist ein <Term id="async-iterator">asynchroner Iterator</Term>. Sie hat drei Merkmale: den Modifizierer `async`, den Rückgabetyp `IAsyncEnumerable<T>` und mindestens ein `yield return` ([§15.15 Synchronous and asynchronous iterators](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1515-synchronous-and-asynchronous-iterators)).
+
+Verarbeitet wird der Stream mit <Term id="asynchronous-foreach">`await foreach`</Term>. Die Schleife holt ein Element nach dem anderen und wartet dabei, wenn das nächste noch nicht da ist ([§13.9.5.3 Asynchronous foreach](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13953-asynchronous-foreach)). Die Schleife selbst steht in einem Kontext, in dem `await` erlaubt ist, hier in den Anweisungen auf oberster Ebene.
+
+<CSharpRunner id="m13-l06-first" code={firstAsyncStream} />
+
+<Quiz id="m13-l06-q1" />
+
+<Quiz id="m13-l06-q7" />
+
+## Der Rumpf läuft für jedes Element sofort
+
+Hinter `await foreach` steckt eine Schleife, die für jedes Element drei Dinge tut: mit `MoveNextAsync` auf das nächste Element warten, es über `Current` lesen und den Rumpf ausführen. Nach der Schleife wird der Enumerator mit `DisposeAsync` aufgeräumt.
+
+:::info[Vorhersage]
+Der Iterator gibt vor jedem `yield return` `produced` aus, der Schleifenrumpf gibt `consumed` aus. In welcher Reihenfolge erscheinen die sechs Zeilen?
+:::
+
+<CSharpRunner id="m13-l06-order" code={producedConsumed} predict expected={producedConsumedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erstes Element erzeugen:** Der Iterator wartet kurz, gibt `produced 1` aus und liefert die Zahl mit `yield return`. Dort hält er an.
+2. **Verarbeiten:** Die Schleife bekommt die 1 und gibt `consumed 1` aus.
+3. **Weiter:** Die Schleife fragt nach dem nächsten Element, der Iterator läuft ab der Stelle nach `yield return` weiter. So wechseln sich beide Ausgaben ab.
+
+</details>
+
+<Quiz id="m13-l06-q3" />
+
+Bricht die Schleife mit `break` ab, ruft sie `DisposeAsync` auf. Der Iterator wird beendet, ein `finally` im Iterator läuft dabei. Weitere Elemente entstehen nicht mehr.
+
+<CSharpRunner id="m13-l06-break" code={stopEarly} />
+
+<Quiz id="m13-l06-q4" />
+
+## Abbrechen
+
+Ein asynchroner Iterator nimmt den Token wie jede andere async-Methode als normalen Parameter. Er reicht ihn an `Task.Delay` weiter. Im Beispiel setzt die Schleife nach dem Element 2 das Signal, und das nächste Warten im Iterator löst die Ausnahme aus.
+
+<CSharpRunner id="m13-l06-cancel" code={cancelStream} />
+
+<Quiz id="m13-l06-q5" />
+
+## Tasks in der Reihenfolge ihres Endes
+
+<Since dotnet="9" />
+
+`Task.WhenAll` liefert die Ergebnisse in der Reihenfolge der Argumente. `Task.WhenEach` liefert einen asynchronen Stream von Tasks, und zwar in der Reihenfolge, in der sie fertig werden. So kannst du jedes Ergebnis verarbeiten, sobald es da ist ([Task.WhenEach](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.wheneach)). Enden zwei Tasks fast gleichzeitig, ist ihre Reihenfolge nicht festgelegt. Im Beispiel liegen die Zeiten weit auseinander.
+
+<CSharpRunner id="m13-l06-when-each" code={whenEach} />
+
+Jeder gelieferte Task ist schon fertig, `await finished` holt deshalb nur noch sein Ergebnis.
+
+<Quiz id="m13-l06-q6" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen die Schleife, der Modifizierer, der Rückgabetyp und die Anweisung, die ein Element liefert.
+
+<Quiz id="m13-l06-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog bricht das Laden einer Quelle ab, sofort oder nach einer Zeit.
+
+Im Runner siehst du nur den Block `// Cancel loading the sources`, das Ende des Programms und die Funktionen für das Laden. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `LoadSlowSourceAsync` und vor `static class Report` die lokale Funktion `async IAsyncEnumerable<string> ReadSourceLinesAsync(string name, CancellationToken token = default)`. Sie liefert die Zeilen von `logSources[name]` einzeln mit `yield return`. Vor jeder Zeile wartet sie mit `await Task.Delay(1, token)`.
+2. Schreibe hinter den Block `// Cancel loading the sources` und vor die Zeile `// End with exit code 0 …` den Block `// Read the sources line by line as async streams`. Er läuft mit `await foreach` über beide Quellen (`"web"`, dann `"vpn"`) und zählt die Zeilen mit `login-failed`. Er gibt `Failures in all sources: <Anzahl>` aus.
+
+<CSharpRunner id="m13-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Stream schreiben:** `ReadSourceLinesAsync` hat `async`, den Rückgabetyp `IAsyncEnumerable<string>` und `yield return`. Vor jeder Zeile wartet sie kurz.
+2. **Beide Quellen lesen:** Eine `foreach`-Schleife nimmt die Namen der Quellen, darin verarbeitet `await foreach` die Zeilen.
+3. **Zählen:** Jede Zeile mit `login-failed` erhöht den Zähler. Beide Quellen zusammen haben 7 solche Zeilen.
+
+</details>
+
+**Neuer Stand:** SecLog liest die Quellen zeilenweise als asynchrone Streams und zählt die Fehlversuche über alle Quellen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l06-await-foreach-waits-for-all" />
+
+**„`await foreach` wartet, bis alle Elemente da sind, und läuft dann durch.“** Das stimmt nicht. Der Rumpf läuft für jedes Element, sobald es geliefert wurde. Die Ausgaben von Iterator und Schleife wechseln sich ab. Auf alle Ergebnisse auf einmal wartest du mit `Task.WhenAll`.
+:::
+
+<Quiz id="m13-l06-q2" />
+
+<details>
+<summary>Vertiefung: Abbruch mit WithCancellation und LINQ für Streams (optional)</summary>
+
+Soll der Token erst beim Durchlaufen übergeben werden, gibt es die Erweiterungsmethode `WithCancellation` an der Schleife. Im Iterator markiert das Attribut `[EnumeratorCancellation]` den Parameter, der diesen Token erhält. Beides ist hier nur genannt ([Generate and consume async streams](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/generate-consume-asynchronous-stream)).
+
+<Forward concepts={['Attribute']} module="14" />
+
+<Since dotnet="10" />
+
+Die bekannten LINQ-Operatoren gibt es auch für asynchrone Streams. Sie stehen in der Klasse `System.Linq.AsyncEnumerable`. Im Beispiel filtert `Where` die geraden Zahlen, und `CountAsync` wartet auf das Ergebnis ([AsyncEnumerable](https://learn.microsoft.com/dotnet/api/system.linq.asyncenumerable)).
+
+<CSharpRunner id="m13-l06-linq" code={linqAsync} />
+
+</details>
+
+## Zusammenfassung
+
+Ein asynchroner Iterator hat `async`, den Rückgabetyp `IAsyncEnumerable<T>` und `yield return`. Er liefert Elemente einzeln und kann dazwischen mit `await` warten. `await foreach` führt den Rumpf für jedes Element aus, sobald es da ist, und räumt am Ende mit `DisposeAsync` auf. Der Token ist ein normaler Parameter des Iterators. `Task.WhenEach` liefert Tasks in der Reihenfolge ihres Endes.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l06-q9" />
+
+### Transferfrage
+
+<Quiz id="m13-l06-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Generate and consume async streams](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/generate-consume-asynchronous-stream)
+- Microsoft Learn: [Task.WhenEach](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.wheneach)
+- Spezifikation: [§13.9.5.3 Asynchronous foreach](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13953-asynchronous-foreach)

@@ -1,0 +1,2 @@
+Loop with check: OperationCanceledException
+Loop without check: 5 steps, requested: True
