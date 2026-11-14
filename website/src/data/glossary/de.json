@@ -8611,6 +8611,169 @@
         "title": "The lock statement",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock"
       }
+    },
+    {
+      "id": "deadlock",
+      "term": "Deadlock",
+      "german": "Verklemmung",
+      "category": "platform",
+      "definition": "Ein Zustand, in dem zwei oder mehr Threads im Kreis aufeinander warten, weil jeder eine Sperre hält, die der andere braucht. Keiner kommt weiter, und das Programm hängt ohne Ausnahme.",
+      "aliases": [
+        "Deadlocks"
+      ],
+      "related": [
+        "lock-ordering",
+        "lock-statement",
+        "sync-over-async",
+        "starvation"
+      ],
+      "lesson": "m13-l13",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "lock-ordering",
+      "term": "Lock ordering",
+      "german": "feste Sperr-Reihenfolge",
+      "category": "platform",
+      "definition": "Die Regel, dass alle Threads mehrere Sperren immer in derselben Reihenfolge nehmen. Dadurch kann kein Kreis aus Warten entstehen, und ein Deadlock ist ausgeschlossen.",
+      "aliases": [
+        "Sperr-Reihenfolge",
+        "Lock Ordering"
+      ],
+      "related": [
+        "deadlock",
+        "lock-statement"
+      ],
+      "lesson": "m13-l13",
+      "source": {
+        "title": "System.Threading.Lock",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.lock"
+      }
+    },
+    {
+      "id": "starvation",
+      "term": "Starvation",
+      "german": "Aushungern",
+      "category": "platform",
+      "definition": "Ein Zustand, in dem ein Thread über lange Zeit nicht zum Zug kommt, weil andere Threads die benötigte Ressource immer wieder vor ihm belegen. Das Programm läuft weiter, nur dieser Thread nicht.",
+      "aliases": [
+        "Thread-Starvation"
+      ],
+      "related": [
+        "deadlock",
+        "livelock",
+        "thread-pool"
+      ],
+      "lesson": "m13-l13",
+      "source": {
+        "title": "The managed thread pool",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool"
+      }
+    },
+    {
+      "id": "livelock",
+      "term": "Livelock",
+      "german": "Livelock",
+      "category": "platform",
+      "definition": "Ein Zustand, in dem Threads ständig aufeinander reagieren und ihren Zustand ändern, aber nicht vorankommen. Anders als beim Deadlock sind sie aktiv, doch ihre Arbeit führt zu nichts.",
+      "aliases": [
+        "Livelocks"
+      ],
+      "related": [
+        "deadlock",
+        "starvation"
+      ],
+      "lesson": "m13-l13",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "atomic-operation",
+      "term": "Atomic operation",
+      "german": "atomare Operation",
+      "category": "platform",
+      "definition": "Eine Operation, die für andere Threads unteilbar ist: Sie läuft entweder ganz oder gar nicht, und kein anderer Thread sieht einen Zwischenzustand. `Interlocked.Increment` ist eine atomare Operation.",
+      "aliases": [
+        "atomar",
+        "Atomic operation",
+        "atomic"
+      ],
+      "related": [
+        "lost-update",
+        "race-condition",
+        "volatile-field"
+      ],
+      "lesson": "m13-l14",
+      "source": {
+        "title": "Interlocked",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.interlocked"
+      }
+    },
+    {
+      "id": "memory-model",
+      "term": "Memory model",
+      "german": "Speichermodell",
+      "category": "platform",
+      "definition": "Die Regeln, die festlegen, welche Schreibzugriffe eines Threads ein anderer Thread wann und in welcher Reihenfolge sehen darf. Ohne Synchronisierung dürfen Compiler, Laufzeit und Hardware Zugriffe umordnen.",
+      "aliases": [
+        "Memory Model"
+      ],
+      "related": [
+        "visibility",
+        "volatile-field",
+        "interleaving"
+      ],
+      "lesson": "m13-l14",
+      "source": {
+        "title": "Volatile fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields"
+      }
+    },
+    {
+      "id": "visibility",
+      "term": "Visibility",
+      "german": "Sichtbarkeit von Schreibzugriffen",
+      "category": "platform",
+      "definition": "Die Frage, ob und wann ein Thread den Schreibzugriff eines anderen Threads sieht. Ohne Synchronisierung kann ein Schreibzugriff für andere Threads zu spät oder in anderer Reihenfolge sichtbar werden.",
+      "aliases": [
+        "Thread-Sichtbarkeit"
+      ],
+      "related": [
+        "memory-model",
+        "volatile-field",
+        "atomic-operation"
+      ],
+      "lesson": "m13-l14",
+      "source": {
+        "title": "Volatile fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields"
+      }
+    },
+    {
+      "id": "volatile-field",
+      "term": "Volatile field",
+      "german": "`volatile`-Feld",
+      "category": "platform",
+      "definition": "Ein Feld mit dem Modifizierer `volatile`. Für einzelne Lese- und Schreibzugriffe auf das Feld sind Umordnungen eingeschränkt. Es macht keine Operation wie `++` atomar und ersetzt keinen `lock`.",
+      "aliases": [
+        "volatile",
+        "volatile-Feld"
+      ],
+      "related": [
+        "memory-model",
+        "visibility",
+        "atomic-operation"
+      ],
+      "lesson": "m13-l14",
+      "source": {
+        "title": "Volatile fields (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields"
+      }
     }
   ]
 }

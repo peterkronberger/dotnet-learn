@@ -1086,7 +1086,7 @@
           "feedback": "Der Thread kann in der Zeit nichts anderes tun."
         },
         {
-          "text": "In einer Anwendung mit Synchronisationskontext, der nur einen Thread erlaubt, kann das zu einem Deadlock führen.",
+          "text": "In einer Anwendung mit Synchronisationskontext, der nur einen Thread erlaubt, kann das dazu führen, dass sich der Thread und der Task gegenseitig festfahren.",
           "correct": true,
           "feedback": "Der Kontext wartet auf die Rückkehr der Fortsetzung, die blockierte Methode hält ihn fest."
         },
@@ -1095,11 +1095,11 @@
           "feedback": "Sie starten nichts, sie warten nur."
         },
         {
-          "text": "In einer Konsolenanwendung führen sie immer zu einem Deadlock.",
+          "text": "In einer Konsolenanwendung fahren sie sich immer gegenseitig fest.",
           "feedback": "Eine Konsolenanwendung hat keinen solchen Kontext. Sie verschwenden dort aber trotzdem einen Thread."
         }
       ],
-      "explanation": "Blockierendes Warten belegt einen Thread. Wo ein Synchronisationskontext nur einen Thread erlaubt, kann es einen Deadlock geben. `await` wartet dagegen, ohne den Thread zu blockieren."
+      "explanation": "Blockierendes Warten belegt einen Thread. Wo ein Synchronisationskontext nur einen Thread erlaubt, können sich Thread und Task gegenseitig festfahren. `await` wartet dagegen, ohne den Thread zu blockieren."
     },
     {
       "id": "m13-l08-q7",
@@ -1652,7 +1652,7 @@
         },
         {
           "text": "Auf `this`, denn das ist immer verfügbar.",
-          "feedback": "Fremder Code kann auf dasselbe Objekt sperren. Dann blockieren sich beide, oder es entsteht ein Deadlock."
+          "feedback": "Fremder Code kann auf dasselbe Objekt sperren. Dann blockieren sich beide, oder sie fahren sich gegenseitig fest."
         },
         {
           "text": "Auf einen Text wie `\"counter\"`.",
@@ -1765,6 +1765,346 @@
       "type": "explain",
       "question": "Transferfrage: Ein Programm lädt in mehreren Tasks Dateien und sammelt die Namen fehlerhafter Dateien in einer gemeinsamen `List<string>`. Ein Kollege will das Laden selbst in den `lock` packen, damit \"alles sicher\" ist. Was rätst du?",
       "modelAnswer": "Nur das Hinzufügen zur Liste gehört in den `lock`, also die kurze Anweisung, die gemeinsame Daten ändert. Das Laden ist langsam. Läge es im `lock`, würden alle anderen Tasks warten, und es liefe nur noch ein Task zur Zeit. Ein `await` ist im `lock` ohnehin nicht erlaubt.\n\nAußerdem muss jeder Zugriff auf die Liste, auch das Lesen am Ende, dieselbe Sperre nehmen, und die Sperre sollte ein privates `Lock`-Objekt sein."
+    },
+    {
+      "id": "m13-l13-q1",
+      "lesson": "m13-l13",
+      "type": "single",
+      "question": "Worker 1 hält die Sperre `usersLock` und wartet auf `ipsLock`. Worker 2 hält `ipsLock` und wartet auf `usersLock`. Wie heißt dieser Zustand, und wie geht es weiter?",
+      "options": [
+        {
+          "text": "Deadlock: Beide warten im Kreis aufeinander und kommen nie weiter.",
+          "correct": true,
+          "feedback": "So ist es. Keiner kann die Sperre freigeben, die der andere braucht."
+        },
+        {
+          "text": "Race Condition: Beide ändern gleichzeitig dieselben Daten, das Ergebnis ist falsch, aber das Programm läuft weiter.",
+          "feedback": "Bei einer Race Condition läuft das Programm weiter und liefert ein falsches Ergebnis. Hier geht gar nichts mehr weiter."
+        },
+        {
+          "text": "Ein kurzer Stau: Sobald die Zeitscheibe eines Workers endet, bekommt der andere die Sperre.",
+          "feedback": "Eine Sperre wird nicht durch das Ende einer Zeitscheibe frei. Der Worker hält sie, bis er sie selbst freigibt."
+        },
+        {
+          "text": "Ein normales Warten: Der Worker mit der kleineren Nummer bekommt beide Sperren zuerst.",
+          "feedback": "Es gibt keine Rangfolge der Worker. Beide halten je eine Sperre und warten auf die des anderen."
+        }
+      ],
+      "explanation": "Ein Deadlock entsteht, wenn zwei Threads je eine Sperre halten und auf die Sperre des anderen warten. Beide warten im Kreis aufeinander, und keiner kann weitermachen."
+    },
+    {
+      "id": "m13-l13-q2",
+      "lesson": "m13-l13",
+      "type": "multi",
+      "question": "Beide Worker brauchen beide Sperren `usersLock` und `ipsLock`. Welche Regeln für die Reihenfolge verhindern einen Deadlock?",
+      "options": [
+        {
+          "text": "Jeder Worker nimmt zuerst `usersLock`, dann `ipsLock`.",
+          "correct": true,
+          "feedback": "Alle nehmen die Sperren in derselben Reihenfolge. Ein Kreis aus Warten kann nicht entstehen."
+        },
+        {
+          "text": "Jeder Worker nimmt zuerst `ipsLock`, dann `usersLock`.",
+          "correct": true,
+          "feedback": "Auch diese Reihenfolge ist fest. Sie gilt für alle Worker, deshalb gibt es keinen Kreis."
+        },
+        {
+          "text": "Worker 1 nimmt zuerst `usersLock`, Worker 2 nimmt zuerst `ipsLock`.",
+          "feedback": "Jetzt kann Worker 1 `usersLock` halten und auf `ipsLock` warten, während Worker 2 `ipsLock` hält und auf `usersLock` wartet. Das ist ein Deadlock."
+        },
+        {
+          "text": "Jeder Worker wählt die Reihenfolge nach der Uhrzeit, zu der er startet.",
+          "feedback": "Eine Reihenfolge, die sich ändert, kann bei zwei Workern verschieden sein. Dann ist der Kreis wieder möglich."
+        }
+      ],
+      "explanation": "Ein Deadlock braucht einen Kreis aus Warten. Nehmen alle Threads die Sperren in derselben festen Reihenfolge, kann kein Thread eine spätere Sperre halten und auf eine frühere warten. Der Kreis kann nicht entstehen."
+    },
+    {
+      "id": "m13-l13-q3",
+      "lesson": "m13-l13",
+      "type": "find-bug",
+      "question": "Beide Methoden brauchen beide Sperren. Welche Zeile nimmt die Sperren in einer anderen Reihenfolge als der Rest des Programms und kann deshalb einen Deadlock auslösen?",
+      "example": "m13/l13/find-deadlock.snippet.cs",
+      "bugLines": [
+        18
+      ],
+      "lineFeedback": {
+        "7": {
+          "feedback": "Diese Zeile gibt die Reihenfolge vor: erst `usersLock`. Das ist in Ordnung, solange alle anderen sich daran halten."
+        },
+        "9": {
+          "feedback": "Auf `usersLock` folgt `ipsLock`. Das ist die vorgegebene Reihenfolge."
+        },
+        "18": {
+          "feedback": "Richtig: Hier kommt `ipsLock` vor `usersLock`. Läuft `AddFailure` gleichzeitig, kann ein Kreis aus Warten entstehen."
+        },
+        "20": {
+          "feedback": "Diese Zeile ist nur die Folge von Zeile 18. Der Fehler liegt darin, dass `ipsLock` schon vorher genommen wurde."
+        }
+      },
+      "explanation": "AddFailure nimmt erst `usersLock`, dann `ipsLock`. RemoveEntry nimmt sie umgekehrt. Die Methode muss ebenfalls erst `usersLock` und dann `ipsLock` nehmen."
+    },
+    {
+      "id": "m13-l13-q4",
+      "lesson": "m13-l13",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l13/try-enter.cs",
+      "explanation": "Der Hauptthread hält die Sperre, bis der zweite Thread zu Ende ist. `TryEnter` wartet 50 Millisekunden und gibt dann `False` zurück. Der Thread bekommt die Sperre nicht und zeigt damit, dass sie nicht frei war."
+    },
+    {
+      "id": "m13-l13-q5",
+      "lesson": "m13-l13",
+      "type": "single",
+      "question": "Zwei Threads sind in einem Deadlock. Was zeigt das Programm?",
+      "options": [
+        {
+          "text": "Nichts: Es hängt, ohne Ausnahme und ohne Meldung. Man merkt nur, dass nichts mehr passiert.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Eine `DeadlockException` beendet einen der beiden Threads.",
+          "feedback": "Es gibt keine solche Ausnahme. Das Programm erkennt den Deadlock nicht von selbst.",
+          "misconception": "m13-l13-deadlock-throws-exception"
+        },
+        {
+          "text": "Die Laufzeit gibt eine Fehlermeldung aus und gibt eine der Sperren frei.",
+          "feedback": "Die Laufzeit erkennt Deadlocks nicht und gibt keine Sperre frei. Beide Threads warten weiter.",
+          "misconception": "m13-l13-deadlock-throws-exception"
+        },
+        {
+          "text": "Das Programm beendet sich nach einem Timeout mit einem Fehlercode.",
+          "feedback": "Ohne ein selbst gewähltes Zeitlimit wie bei `TryEnter` gibt es keinen Timeout. Das Programm wartet ewig.",
+          "misconception": "m13-l13-deadlock-throws-exception"
+        }
+      ],
+      "explanation": "Ein Deadlock wirft keine Ausnahme und erzeugt keine Meldung. Die Threads warten ewig. Erkennbar wird er nur, wenn man mit einem Zeitlimit wie bei `TryEnter` selbst nachfragt."
+    },
+    {
+      "id": "m13-l13-q6",
+      "lesson": "m13-l13",
+      "type": "single",
+      "question": "Das Programm wartet in einer Anwendung mit Fenster mit `.Result` auf einen Task. Warum kann das zu einem Deadlock führen?",
+      "example": "m13/l13/blocking-on-task.snippet.cs",
+      "options": [
+        {
+          "text": "Der Kontext lässt nur einen Thread zu. Dieser Thread blockiert und wartet auf den Task, aber der Rest der Methode nach dem `await` braucht genau diesen Thread.",
+          "correct": true,
+          "feedback": "So ist es. Beide warten aufeinander."
+        },
+        {
+          "text": "`.Result` nimmt eine Sperre, die der Task danach nicht bekommt.",
+          "feedback": "`.Result` nimmt keine Sperre. Es blockiert den aufrufenden Thread, bis der Task fertig ist."
+        },
+        {
+          "text": "Der Task startet nie, weil `.Result` ihn nicht startet.",
+          "feedback": "Der Task läuft bereits. Er kann nur nicht zu Ende laufen, weil sein Rest auf den blockierten Thread wartet."
+        },
+        {
+          "text": "In jeder Konsolenanwendung führt `.Result` immer zu einem Deadlock.",
+          "feedback": "Eine Konsolenanwendung hat keinen solchen Kontext. Dort blockiert `.Result` zwar den Thread, aber der Rest läuft auf einem anderen Thread weiter."
+        }
+      ],
+      "explanation": "Ein Kontext, der nur einen Thread zulässt, führt den Rest nach dem `await` auf dem blockierten Thread aus. Der Thread wartet auf den Task, der Task wartet auf den Thread: ein Kreis. In einer Konsolenanwendung gibt es diesen Kontext nicht."
+    },
+    {
+      "id": "m13-l13-q7",
+      "lesson": "m13-l13",
+      "type": "match",
+      "question": "Ordne den Begriffen die passende Beschreibung zu.",
+      "pairs": [
+        {
+          "left": "Deadlock",
+          "right": "Threads warten im Kreis aufeinander und kommen nie weiter."
+        },
+        {
+          "left": "Starvation",
+          "right": "Ein Thread kommt über lange Zeit nicht zum Zug, weil andere die Ressource immer wieder vor ihm belegen."
+        },
+        {
+          "left": "Livelock",
+          "right": "Threads reagieren ständig aufeinander und ändern ihren Zustand, kommen aber nicht voran."
+        }
+      ],
+      "explanation": "Beim Deadlock stehen alle still und warten. Bei Starvation läuft das Programm, aber ein Thread geht leer aus. Beim Livelock sind die Threads aktiv, aber ihre Arbeit führt zu nichts."
+    },
+    {
+      "id": "m13-l13-q8",
+      "lesson": "m13-l13",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum eine feste Sperr-Reihenfolge einen Deadlock verhindert.",
+      "modelAnswer": "Ein Deadlock braucht einen Kreis aus Warten: Thread A hält Sperre 1 und wartet auf Sperre 2, Thread B hält Sperre 2 und wartet auf Sperre 1.\n\nNehmen alle Threads die Sperren in derselben Reihenfolge, zum Beispiel erst 1, dann 2, kann kein Thread Sperre 2 halten und auf Sperre 1 warten. Wer Sperre 2 hält, hat Sperre 1 schon, und wer auf Sperre 1 wartet, hält noch keine von beiden. Der Kreis kann nicht entstehen."
+    },
+    {
+      "id": "m13-l13-q9",
+      "lesson": "m13-l13",
+      "type": "explain",
+      "question": "Transferfrage: Eine Methode soll Geld von Konto A auf Konto B überweisen, und jedes Konto hat eine eigene Sperre. Gleichzeitig läuft eine Überweisung von B nach A. Wie vermeidest du einen Deadlock?",
+      "modelAnswer": "Beide Überweisungen brauchen beide Sperren. Nehmen sie die Sperren in der Reihenfolge \"erst die Sperre des Absenders, dann die des Empfängers\", nehmen A→B und B→A die Sperren in entgegengesetzter Reihenfolge, und ein Deadlock ist möglich.\n\nStattdessen legt man eine feste Reihenfolge unabhängig von der Richtung fest, zum Beispiel nach der Kontonummer: Immer zuerst das Konto mit der kleineren Nummer sperren. Dann nehmen beide Überweisungen die Sperren in derselben Reihenfolge."
+    },
+    {
+      "id": "m13-l14-q1",
+      "lesson": "m13-l14",
+      "type": "single",
+      "question": "Was leistet `Interlocked.Increment(ref count)` im Vergleich zu `count++`?",
+      "options": [
+        {
+          "text": "Es erhöht `count` als einen unteilbaren Schritt: Kein anderer Thread kann zwischen Lesen und Schreiben dazwischenkommen, und ein `lock` ist nicht nötig.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Es erhöht `count` genauso wie `count++`, nur kürzer geschrieben.",
+          "feedback": "`count++` besteht aus drei Schritten, die ein anderer Thread unterbrechen kann. `Interlocked.Increment` führt sie als einen Schritt aus."
+        },
+        {
+          "text": "Es nimmt intern eine `lock`-Sperre auf `this`, die jeden anderen Thread ausschließt.",
+          "feedback": "Es ist eine eigene Operation, die ohne `lock` auskommt. Sie schließt nur andere Zugriffe auf diese Variable über `Interlocked` aus."
+        },
+        {
+          "text": "Es macht jeden anderen Zugriff auf `count` im Programm sicher, auch ein einfaches `count = 0`.",
+          "feedback": "Nur der Aufruf selbst ist atomar. Andere Zugriffe, die nicht über `Interlocked` laufen, sind dadurch nicht geschützt."
+        }
+      ],
+      "explanation": "`Interlocked.Increment` liest, addiert und speichert als eine unteilbare Operation. Deshalb geht kein Update verloren, und es braucht keinen `lock`."
+    },
+    {
+      "id": "m13-l14-q2",
+      "lesson": "m13-l14",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Zwei Tasks zählen je 1000 Mal mit `Interlocked.Increment` hoch, der Zähler soll am Ende genau 2000 sein.",
+      "example": "m13/l14/interlocked-counter.cs",
+      "explanation": "Zuerst der Zähler, dann die Funktion, die ihn atomar erhöht. Danach starten beide Tasks, `Task.WhenAll` wartet auf beide, und erst dann steht das Ergebnis fest."
+    },
+    {
+      "id": "m13-l14-q3",
+      "lesson": "m13-l14",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l14/exchange-compare.cs",
+      "explanation": "`Exchange` setzt den neuen Wert und gibt den alten zurück. `CompareExchange` ersetzt den Wert nur, wenn er dem Vergleichswert entspricht, und gibt in beiden Fällen den Wert zurück, der vorher in der Variablen stand. Beim ersten Aufruf passt 9, deshalb wird 12 gespeichert. Beim zweiten steht 12 in der Variablen, es passt nicht, und nichts ändert sich."
+    },
+    {
+      "id": "m13-l14-q4",
+      "lesson": "m13-l14",
+      "type": "single",
+      "question": "Thread A schreibt `data = 42` und danach `ready = true`, beide ohne Synchronisierung. Thread B wartet auf `ready` und liest dann `data`. Was kann passieren?",
+      "options": [
+        {
+          "text": "B sieht `ready == true`, liest aber noch den alten Wert von `data`, weil Compiler, Laufzeit oder Hardware die Schreibzugriffe umordnen können oder B sie später sieht.",
+          "correct": true,
+          "feedback": "So ist es. Ohne Synchronisierung ist weder festgelegt, wann B einen Schreibzugriff sieht, noch in welcher Reihenfolge."
+        },
+        {
+          "text": "Nichts: Die Zeilen laufen in dieser Reihenfolge, also sieht B sie auch in dieser Reihenfolge.",
+          "feedback": "Die Reihenfolge im Quelltext gilt nur für den Thread, der schreibt. Ein anderer Thread kann die Schreibzugriffe in anderer Reihenfolge sehen."
+        },
+        {
+          "text": "Der Compiler lehnt das Programm ab, weil zwei Threads dieselben Variablen benutzen.",
+          "feedback": "Der Compiler erkennt das nicht. Der Code kompiliert."
+        },
+        {
+          "text": "B sieht `data == 42` sofort, weil jede Schreiboperation sofort in den gemeinsamen Speicher geht.",
+          "feedback": "Das ist nicht garantiert. Ein Schreibzugriff muss für andere Threads nicht sofort sichtbar sein."
+        }
+      ],
+      "explanation": "Ohne Synchronisierung darf ein Thread die Schreibzugriffe eines anderen später oder in anderer Reihenfolge sehen. Compiler, Laufzeit und Hardware dürfen Zugriffe umordnen, solange ein einzelner Thread nichts davon merkt."
+    },
+    {
+      "id": "m13-l14-q5",
+      "lesson": "m13-l14",
+      "type": "single",
+      "question": "Ein Feld `private volatile int _count;` wird von zwei Tasks je 1000 Mal mit `_count++` erhöht. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "Der Endwert kann unter 2000 liegen: `volatile` macht Lesen und Schreiben einzeln sichtbar, aber `_count++` bleibt Lesen, Addieren und Schreiben.",
+          "correct": true,
+          "feedback": "So ist es. Dafür braucht es `Interlocked.Increment` oder einen `lock`."
+        },
+        {
+          "text": "Der Endwert ist immer 2000, denn `volatile` macht das Feld thread-sicher.",
+          "feedback": "`volatile` betrifft nur Sichtbarkeit und Reihenfolge einzelner Zugriffe. Ein verlorenes Update bleibt möglich.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        },
+        {
+          "text": "Der Endwert ist immer 2000, denn `volatile` ersetzt den `lock`.",
+          "feedback": "`volatile` schließt nichts aus. Zwei Threads können gleichzeitig lesen und denselben Wert schreiben.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        },
+        {
+          "text": "Der Compiler lehnt `_count++` auf einem `volatile`-Feld ab.",
+          "feedback": "`_count++` ist erlaubt. Der Compiler warnt nicht, aber das Ergebnis ist trotzdem nicht sicher."
+        }
+      ],
+      "explanation": "`volatile` schränkt Umordnung und Zwischenspeicherung einzelner Lese- und Schreibzugriffe ein. Es macht keinen Lese-Änderungs-Schreib-Ablauf wie `++` atomar. Dafür sind `Interlocked` oder `lock` da."
+    },
+    {
+      "id": "m13-l14-q6",
+      "lesson": "m13-l14",
+      "type": "find-bug",
+      "question": "Die Klasse nutzt `volatile`, damit der Zähler thread-sicher ist. Welche Zeile ist trotzdem eine Race Condition?",
+      "example": "m13/l14/find-volatile.snippet.cs",
+      "bugLines": [
+        8
+      ],
+      "lineFeedback": {
+        "4": {
+          "feedback": "Die Deklaration allein ist kein Fehler. Sie schränkt einzelne Zugriffe ein, macht aber keine Operation atomar.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        },
+        "8": {
+          "feedback": "Richtig: `_count++` liest, addiert und schreibt in drei Schritten. Zwei Threads können denselben Wert lesen, und ein Update geht verloren.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        },
+        "11": {
+          "feedback": "Das Lesen eines einzelnen `int`-Werts ist ein einzelner Zugriff. Der Fehler liegt im Hochzählen."
+        }
+      },
+      "explanation": "`volatile` ändert nichts daran, dass `_count++` aus drei Schritten besteht. Die Zeile muss `Interlocked.Increment(ref _count)` sein, oder ein `lock` muss sie schützen."
+    },
+    {
+      "id": "m13-l14-q7",
+      "lesson": "m13-l14",
+      "type": "multi",
+      "question": "Welche Aussagen über `Interlocked`, `lock` und `volatile` stimmen?",
+      "options": [
+        {
+          "text": "`Interlocked` eignet sich für einfache Änderungen einer einzelnen Variablen, zum Beispiel einen Zähler.",
+          "correct": true,
+          "feedback": "So ist es. Für mehrere Variablen oder längere Abschnitte braucht es einen `lock`."
+        },
+        {
+          "text": "Ein `lock` schützt auch einen Ablauf, der mehrere Variablen zusammen ändert. `Interlocked` kann das nicht.",
+          "correct": true,
+          "feedback": "Jeder `Interlocked`-Aufruf ist nur für eine Variable atomar. Mehrere Aufrufe hintereinander sind es zusammen nicht."
+        },
+        {
+          "text": "`volatile` ersetzt einen `lock` bei einem Zähler.",
+          "feedback": "`volatile` macht kein `++` atomar. Es ersetzt keinen `lock`.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        },
+        {
+          "text": "Mit `volatile` ist `ready = true` für andere Threads sofort und in jeder Reihenfolge sichtbar.",
+          "feedback": "Auch `volatile` verspricht keine sofortige Sichtbarkeit und keine einheitliche Gesamtordnung aller Schreibzugriffe.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        }
+      ],
+      "explanation": "`Interlocked` macht einzelne Operationen auf einer Variablen atomar. Ein `lock` schützt beliebige Abschnitte. `volatile` schränkt nur Reihenfolge und Zwischenspeicherung einzelner Zugriffe ein und ersetzt keins von beiden."
+    },
+    {
+      "id": "m13-l14-q8",
+      "lesson": "m13-l14",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Thread den Schreibzugriff eines anderen Threads ohne Synchronisierung zu spät oder in anderer Reihenfolge sehen kann.",
+      "modelAnswer": "Compiler, Laufzeit und Prozessor dürfen Zugriffe auf den Speicher umordnen oder Werte zwischenspeichern, solange der Thread, der den Code ausführt, davon nichts merkt. Für einen einzelnen Thread bleibt das Ergebnis gleich.\n\nEin zweiter Thread kann dagegen sehen, dass ein Wert später ankommt als erwartet oder dass zwei Schreibzugriffe in anderer Reihenfolge ankommen. Erst eine Synchronisierung wie `lock`, `Interlocked` oder `volatile` schränkt das ein. Ohne sie hängt es vom Zufall ab."
+    },
+    {
+      "id": "m13-l14-q9",
+      "lesson": "m13-l14",
+      "type": "explain",
+      "question": "Transferfrage: Ein Server zählt in vielen Tasks die Anfragen und merkt sich zusätzlich in einer `List<string>` die Namen der letzten Fehler. Womit schützt du den Zähler, womit die Liste, und warum?",
+      "modelAnswer": "Der Zähler ist eine einzelne Zahl, die nur hochgezählt wird. Dafür genügt `Interlocked.Increment`: kein `lock` nötig, und es geht kein Update verloren.\n\nDie Liste besteht aus mehreren zusammenhängenden Daten, und ein Hinzufügen ändert mehrere Dinge. Dafür reicht eine einzelne atomare Operation nicht. Hier braucht es einen `lock` mit einem privaten `Lock`-Objekt, und jeder Zugriff auf die Liste nimmt dieselbe Sperre."
     }
   ]
 }
