@@ -8,7 +8,9 @@
 #   *.cs            file-based app (`dotnet run file.cs`), output must match <name>.out.txt.
 #                   Console input comes from <name>.in.txt if it exists, otherwise from /dev/null.
 #   *.snippet.cs    fragment, skipped (cannot run on its own)
-#   _ci/<name>/     regular project, run by _ci/<name>/run.sh, output must match _ci/<name>/expected.out.txt
+#   *.compile.cs    output not fixed (race conditions, deadlocks): compiled with `dotnet build`,
+#                   never run, no .out.txt (also not written by --update)
+#   _ci/<name>/    regular project, run by _ci/<name>/run.sh, output must match _ci/<name>/expected.out.txt
 # At the end, tools/check-seclog.mjs checks the fold markers and the SecLog continuity chain.
 set -euo pipefail
 
@@ -51,12 +53,25 @@ check() { # <label> <snapshot> <command...>
   fi
 }
 
+compile_only() { # <label> <file>
+  local label="$1" file="$2" output
+  if ! output="$(dotnet build "$file" --nologo -v q 2>&1)"; then
+    echo "FAIL  $label: build failed"
+    echo "$output" | sed 's/^/      /'
+    failed=$((failed + 1))
+    return
+  fi
+  checked=$((checked + 1))
+  echo "OK    $label (compile only)"
+}
+
 # 1. Single-file examples
 while IFS= read -r -d '' file; do
   rel="${file#"$examples"/}"
   case "$rel" in
     _ci/*) continue ;;
     *.snippet.cs) echo "SKIP  $rel (snippet)"; continue ;;
+    *.compile.cs) compile_only "$rel" "$file"; continue ;;
   esac
   input="${file%.cs}.in.txt"
   [[ -f "$input" ]] || input=/dev/null
