@@ -1444,6 +1444,327 @@
       "type": "explain",
       "question": "Transferfrage: Dein Programm soll 20 große Dateien auswerten, indem es für jede Datei Zeilen zählt (rechnen), und danach eine Antwort aus dem Netz abwarten. Wo nimmst du `Task.Run`, wo nur `await`?",
       "modelAnswer": "Das Zählen der Zeilen rechnet nur: Das ist CPU-gebundene Arbeit, ich lege sie mit `Task.Run` auf den Thread-Pool und hole die Ergebnisse mit `await` ab. Das Warten auf das Netz ist I/O-gebunden: Ich rufe die asynchrone Methode auf und warte mit `await`, ohne `Task.Run`, weil dafür kein Thread gebraucht wird."
+    },
+    {
+      "id": "m13-l11-q1",
+      "lesson": "m13-l11",
+      "type": "multi",
+      "question": "Der gemeinsame Zähler `count` ist 0. Zwei Threads führen gleichzeitig je einmal `count++` aus. Welche Endwerte sind möglich?",
+      "options": [
+        {
+          "text": "2: Ein Thread schreibt seinen Wert, bevor der andere liest.",
+          "correct": true,
+          "feedback": "Das ist der erwartete Ablauf."
+        },
+        {
+          "text": "1: Beide lesen 0, beide schreiben 1.",
+          "correct": true,
+          "feedback": "Beide haben den alten Wert gelesen. Das zweite Schreiben überschreibt das erste."
+        },
+        {
+          "text": "0: Beide Threads setzen den Zähler zurück.",
+          "feedback": "`count++` addiert immer 1 zu dem Wert, den der Thread gelesen hat. Der Wert kann nicht unter 1 fallen."
+        },
+        {
+          "text": "3: Beide Threads addieren 1, und ein Thread addiert noch einmal.",
+          "feedback": "Jeder Thread schreibt höchstens 1 mehr als den Wert, den er gelesen hat. Mehr als 2 ist nicht möglich."
+        }
+      ],
+      "explanation": "Mögliche Endwerte (von Hand nachvollzogen): `count++` besteht aus Lesen, Addieren und Schreiben. Läuft ein Thread ganz durch, bevor der andere liest, ist das Ergebnis 2. Lesen beide den Wert 0, bevor einer schreibt, schreiben beide 1, und ein Update geht verloren."
+    },
+    {
+      "id": "m13-l11-q2",
+      "lesson": "m13-l11",
+      "type": "single",
+      "question": "Warum kann `count++` bei zwei Threads ein Update verlieren?",
+      "options": [
+        {
+          "text": "Die Anweisung besteht aus drei Schritten: lesen, addieren, schreiben. Der Scheduler kann zwischen den Schritten zu einem anderen Thread wechseln.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Eine einzelne Zeile Code läuft nie unterbrochen. Der Fehler muss woanders liegen.",
+          "feedback": "Der Scheduler darf einen Thread auch mitten in einer Zeile unterbrechen.",
+          "misconception": "m13-l11-increment-is-atomic"
+        },
+        {
+          "text": "`count++` ist so kurz, dass der Prozessor es in einem Schritt erledigt und kein anderer Thread dazwischenkommen kann.",
+          "feedback": "Die Spezifikation beschreibt `count++` als Folge von Lesen, Berechnen und Speichern und sichert keine Unteilbarkeit zu.",
+          "misconception": "m13-l11-increment-is-atomic"
+        },
+        {
+          "text": "Ein `int` kann von zwei Threads nicht gelesen werden.",
+          "feedback": "Lesen ist erlaubt. Das Problem entsteht beim Schreiben nach einem veralteten Lesen."
+        }
+      ],
+      "explanation": "`count++` liest den Wert, berechnet den neuen Wert und speichert ihn. Die C#-Spezifikation beschreibt diese Schritte und verspricht nicht, dass sie unteilbar sind. Wechselt der Scheduler dazwischen, arbeitet der andere Thread mit einem veralteten Wert."
+    },
+    {
+      "id": "m13-l11-q3",
+      "lesson": "m13-l11",
+      "type": "find-bug",
+      "question": "Das Programm soll die Fehlschläge beider Quellen zählen und `Failures: 7` ausgeben. Welche Zeile enthält die Race Condition?",
+      "example": "m13/l11/find-race.snippet.cs",
+      "bugLines": [
+        10
+      ],
+      "lineFeedback": {
+        "8": {
+          "feedback": "Die Prüfung liest nur die Zeile `line` des eigenen Tasks. Sie ändert keine gemeinsamen Daten."
+        },
+        "10": {
+          "feedback": "Richtig: Zwei Tasks lesen und schreiben `failures` gleichzeitig. Ein Update kann verloren gehen."
+        },
+        "15": {
+          "feedback": "Das Starten der Tasks ist nicht das Problem. Sie greifen erst in `CountIn` auf `failures` zu."
+        }
+      },
+      "explanation": "Beide Tasks rufen `CountIn` auf und ändern dieselbe Variable `failures`. Das Hochzählen ist ein Lesen, Addieren und Schreiben. Das Ergebnis kann kleiner als 7 sein, und nicht in jedem Lauf."
+    },
+    {
+      "id": "m13-l11-q4",
+      "lesson": "m13-l11",
+      "type": "single",
+      "question": "Ein Test ruft einen Zähler aus zwei Threads auf und war in 100 Läufen grün. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Nichts Sicheres: Eine Race Condition zeigt sich nur bei manchen Abläufen, und 100 grüne Läufe können Glück sein.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Der Code hat keine Race Condition, sonst wäre der Test einmal rot geworden.",
+          "feedback": "Der Scheduler wählt den Ablauf. Der ungünstige Ablauf kann selten sein und trotzdem später auftreten.",
+          "misconception": "m13-l11-passing-runs-prove-no-race"
+        },
+        {
+          "text": "Mit 1000 grünen Läufen ist es bewiesen, mit 100 noch nicht.",
+          "feedback": "Auch 1000 oder eine Million Läufe beweisen es nicht. Ein Test zeigt höchstens, dass ein Fehler vorkommt, und nicht, dass keiner vorkommt.",
+          "misconception": "m13-l11-passing-runs-prove-no-race"
+        },
+        {
+          "text": "Der Test war zu langsam, deshalb ist nichts passiert.",
+          "feedback": "Die Dauer entscheidet nicht. Entscheidend ist, ob der ungünstige Ablauf auftritt."
+        }
+      ],
+      "explanation": "Bei einer Race Condition hängt das Ergebnis von der Verschränkung der Threads ab. Viele Abläufe sind harmlos, nur manche nicht. Ein Test kann das Auftreten eines Fehlers zeigen, aber nicht ausschließen."
+    },
+    {
+      "id": "m13-l11-q5",
+      "lesson": "m13-l11",
+      "type": "single",
+      "question": "Zwei Tasks führen gleichzeitig `if (!seen.ContainsKey(\"bob\")) seen.Add(\"bob\", 1);` aus. `seen` ist ein `Dictionary<string, int>` ohne Schlüssel `bob`. Was kann passieren?",
+      "options": [
+        {
+          "text": "Beide Tasks bestehen die Prüfung. Der zweite `Add` löst eine `ArgumentException` aus, weil der Schlüssel schon da ist.",
+          "correct": true,
+          "feedback": "Das ist ein Check-then-act-Fehler: Zwischen Prüfen und Handeln hat der andere Task die Bedingung geändert."
+        },
+        {
+          "text": "Nichts: Die Prüfung schützt vor dem doppelten `Add`.",
+          "feedback": "Die Prüfung gilt nur im Moment des Prüfens. Danach kann ein anderer Thread den Schlüssel anlegen."
+        },
+        {
+          "text": "Der Compiler lehnt den Code ab, weil zwei Tasks dieselbe Variable benutzen.",
+          "feedback": "Der Compiler erkennt solche Fehler nicht. Der Code kompiliert."
+        }
+      ],
+      "explanation": "Prüfen und Handeln sind zwei Schritte. Ein anderer Thread kann dazwischen die geprüfte Bedingung ändern. Außerdem ist `Dictionary` nicht dafür gebaut, dass mehrere Threads es gleichzeitig ändern."
+    },
+    {
+      "id": "m13-l11-q6",
+      "lesson": "m13-l11",
+      "type": "multi",
+      "question": "Welche Aussagen über Race Conditions stimmen?",
+      "options": [
+        {
+          "text": "Es muss gemeinsame Daten geben, die mindestens ein Thread ändert.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Wenn alle Threads die Daten nur lesen, entsteht keine Race Condition.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Race Conditions gibt es nur auf Rechnern mit mehreren Kernen.",
+          "feedback": "Der Scheduler kann auch auf einem Kern zwischen Threads wechseln und so die Schritte verschränken."
+        },
+        {
+          "text": "Ein Programm mit einem Thread kann eine Race Condition zwischen Threads haben.",
+          "feedback": "Ohne zweiten Thread gibt es keine Verschränkung von Threads."
+        }
+      ],
+      "explanation": "Eine Race Condition braucht mehrere Threads und gemeinsame Daten, die sich ändern. Auch auf einem Kern kann der Scheduler zwischen Threads wechseln, deshalb ist die Zahl der Kerne nicht entscheidend."
+    },
+    {
+      "id": "m13-l11-q7",
+      "lesson": "m13-l11",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum bei `count++` in zwei Threads ein Update verloren gehen kann. Nenne die drei Schritte.",
+      "modelAnswer": "`count++` besteht aus drei Schritten: den Wert lesen, 1 addieren und das Ergebnis zurückschreiben. Der Scheduler kann zwischen diesen Schritten zu einem anderen Thread wechseln.\n\nLesen beide Threads den Wert 0, addiert jeder 1 und schreibt jeder 1 zurück. Der zweite Thread überschreibt das Ergebnis des ersten. Es wurde zweimal gezählt, aber der Zähler steht nur auf 1."
+    },
+    {
+      "id": "m13-l11-q8",
+      "lesson": "m13-l11",
+      "type": "explain",
+      "question": "Transferfrage: Zwei Tasks buchen gleichzeitig Plätze in einem Raum mit 10 Plätzen. Jeder prüft `if (free > 0)` und zieht dann mit `free--` einen Platz ab. Wo steckt der Fehler, und warum findet ihn ein Test mit einem Task nicht?",
+      "modelAnswer": "Das ist ein Check-then-act-Fehler: Zwischen der Prüfung `free > 0` und dem Abziehen kann der andere Task den letzten Platz nehmen. Beide haben dann geprüft, und `free` wird negativ. Außerdem ist `free--` ein Lesen, Ändern und Schreiben und kann ein Update verlieren.\n\nMit einem Task gibt es keine Verschränkung mit einem anderen Thread. Der Test läuft immer in derselben Reihenfolge und ist grün. Auch viele grüne Läufe mit zwei Tasks würden nicht beweisen, dass der Fehler fehlt."
+    },
+    {
+      "id": "m13-l12-q1",
+      "lesson": "m13-l12",
+      "type": "single",
+      "question": "Was bewirkt `lock (countLock) { count++; }`, wenn mehrere Threads den Block erreichen?",
+      "options": [
+        {
+          "text": "Höchstens ein Thread führt den Block gleichzeitig aus. Die anderen warten, bis die Sperre frei ist.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Jeder Thread führt den Block aus, aber `count` wird in einem eigenen Speicher geändert.",
+          "feedback": "`count` bleibt eine gemeinsame Variable. Der Block läuft nur nacheinander."
+        },
+        {
+          "text": "Die wartenden Threads werden beendet.",
+          "feedback": "Die anderen Threads warten. Sie laufen weiter, sobald die Sperre frei ist."
+        },
+        {
+          "text": "Der Block läuft schneller, weil der Compiler ihn optimiert.",
+          "feedback": "`lock` dient dem gegenseitigen Ausschluss und macht den Code nicht schneller."
+        }
+      ],
+      "explanation": "Die `lock`-Anweisung nimmt die Sperre des Objekts, führt den Block aus und gibt die Sperre wieder frei. Solange ein Thread sie hält, warten andere Threads, die dieselbe Sperre nehmen wollen."
+    },
+    {
+      "id": "m13-l12-q2",
+      "lesson": "m13-l12",
+      "type": "single",
+      "question": "Worauf sollte eine Klasse mit `lock` sperren?",
+      "options": [
+        {
+          "text": "Auf ein privates Feld vom Typ `Lock`, das nur dafür da ist.",
+          "correct": true,
+          "feedback": "Nur der Code der Klasse kennt dieses Objekt, also kann kein fremder Code darauf sperren."
+        },
+        {
+          "text": "Auf `this`, denn das ist immer verfügbar.",
+          "feedback": "Fremder Code kann auf dasselbe Objekt sperren. Dann blockieren sich beide, oder es entsteht ein Deadlock."
+        },
+        {
+          "text": "Auf einen Text wie `\"counter\"`.",
+          "feedback": "Gleiche Texte können dasselbe Objekt sein. Ganz anderer Code könnte darauf sperren."
+        },
+        {
+          "text": "Auf `typeof(Counter)`.",
+          "feedback": "Das `Type`-Objekt ist von überall erreichbar. Fremder Code kann darauf sperren."
+        }
+      ],
+      "explanation": "Ein Sperrobjekt soll privat sein und nur diesem Zweck dienen. Sperrt Code auf öffentlich erreichbare Objekte wie `this`, Typen oder Texte, kann anderer Code dieselbe Sperre nehmen. Seit C# 13 und .NET 9 ist `System.Threading.Lock` der passende Typ."
+    },
+    {
+      "id": "m13-l12-q3",
+      "lesson": "m13-l12",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l12/lock-exception.cs",
+      "explanation": "Die Ausnahme verlässt den `lock`-Block, und die Sperre wird dabei freigegeben. Deshalb hält der Thread die Sperre danach nicht mehr, und das zweite `lock` kommt sofort hinein."
+    },
+    {
+      "id": "m13-l12-q4",
+      "lesson": "m13-l12",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Zwei Tasks zählen je 1000 Mal hoch, der Zähler soll am Ende genau 2000 sein.",
+      "example": "m13/l12/locked-counter.cs",
+      "explanation": "Zuerst das Sperrobjekt und den Zähler anlegen, dann die Funktion, die in `lock` zählt. Danach starten beide Tasks, `Task.WhenAll` wartet auf beide, und erst dann steht das Ergebnis fest."
+    },
+    {
+      "id": "m13-l12-q5",
+      "lesson": "m13-l12",
+      "type": "single",
+      "question": "Thread A ändert `count` nur innerhalb von `lock (gate)`. Thread B liest und ändert `count` ohne `lock`. Wie ist `count` geschützt?",
+      "options": [
+        {
+          "text": "Gar nicht gegen Thread B: Ein `lock` schließt nur Code aus, der dieselbe Sperre nimmt.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Vollständig, denn Thread A hält die Sperre auf `count`.",
+          "feedback": "Die Sperre gehört zum Objekt `gate`, nicht zur Variablen `count`. Wer die Sperre nicht nimmt, wird nicht aufgehalten.",
+          "misconception": "m13-l12-lock-protects-unlocked-access"
+        },
+        {
+          "text": "Nur das Lesen von Thread B ist geschützt, das Schreiben nicht.",
+          "feedback": "Thread B nimmt die Sperre nicht. Weder sein Lesen noch sein Schreiben wird aufgehalten.",
+          "misconception": "m13-l12-lock-protects-unlocked-access"
+        }
+      ],
+      "explanation": "Die Sperre schützt keine Daten, sondern sie sichert gegenseitigen Ausschluss zwischen Code, der dieselbe Sperre nimmt. Jeder Zugriff auf die gemeinsamen Daten muss durch dieselbe Sperre laufen."
+    },
+    {
+      "id": "m13-l12-q6",
+      "lesson": "m13-l12",
+      "type": "find-bug",
+      "question": "Die Klasse zählt mit `lock` sicher hoch. Welche Zeile liest die Daten, ohne die Sperre zu nehmen?",
+      "example": "m13/l12/find-unlocked.snippet.cs",
+      "bugLines": [
+        15
+      ],
+      "lineFeedback": {
+        "11": {
+          "feedback": "Diese Zeile steht in `lock (_gate)`. Sie ist geschützt."
+        },
+        "15": {
+          "feedback": "Richtig: `Total` liest `_count` ohne `lock`. Ein Thread, der gleichzeitig `Add` ausführt, wird nicht ausgeschlossen.",
+          "misconception": "m13-l12-lock-protects-unlocked-access"
+        }
+      },
+      "explanation": "`Add` sperrt, aber `Total` nicht. Der gegenseitige Ausschluss gilt nur für Code, der dieselbe Sperre nimmt. Der Fehler wird behoben, indem `Total` ebenfalls in `lock (_gate)` liest."
+    },
+    {
+      "id": "m13-l12-q7",
+      "lesson": "m13-l12",
+      "type": "single",
+      "question": "Was passiert beim Kompilieren des Programms, und warum ist die Regel sinnvoll?",
+      "example": "m13/l12/await-in-lock.snippet.cs",
+      "options": [
+        {
+          "text": "Der Compiler meldet Fehler CS1996. Nach einem `await` kann der Code auf einem anderen Thread weiterlaufen, und eine Sperre gehört dem Thread, der sie genommen hat.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Es kompiliert. Das `await` gibt die Sperre automatisch frei.",
+          "feedback": "Das `await` gibt die Sperre nicht frei. Deshalb ist der Code gar nicht erlaubt."
+        },
+        {
+          "text": "Es kompiliert und wartet 10 Millisekunden in der Sperre.",
+          "feedback": "Die Spezifikation verbietet `await` im Rumpf von `lock`. Der Compiler lehnt es ab."
+        },
+        {
+          "text": "Der Compiler meldet nur eine Warnung.",
+          "feedback": "Es ist ein Fehler, kein Hinweis. Das Programm wird nicht gebaut."
+        }
+      ],
+      "explanation": "`await` im Rumpf einer `lock`-Anweisung ist nicht erlaubt (Fehler CS1996). Die Sperre gehört einem Thread, und die Fortsetzung nach `await` kann auf einem anderen Thread laufen. Außerdem würde die Sperre beim Warten gehalten und andere Threads blockieren."
+    },
+    {
+      "id": "m13-l12-q8",
+      "lesson": "m13-l12",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein `lock` das verlorene Update aus Lektion 11 verhindert.",
+      "modelAnswer": "`count++` besteht aus Lesen, Addieren und Schreiben. Ohne Schutz kann ein anderer Thread zwischen diesen Schritten dazwischenkommen und mit einem veralteten Wert arbeiten.\n\nDer `lock` macht die drei Schritte für andere Threads zu einem einzigen unteilbaren Schritt: Wer die Sperre hält, führt alle drei Schritte aus, und alle anderen warten. Danach nimmt der nächste Thread die Sperre und liest den aktuellen Wert. Es geht kein Update verloren, aber alle Zugriffe müssen dieselbe Sperre nehmen."
+    },
+    {
+      "id": "m13-l12-q9",
+      "lesson": "m13-l12",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm lädt in mehreren Tasks Dateien und sammelt die Namen fehlerhafter Dateien in einer gemeinsamen `List<string>`. Ein Kollege will das Laden selbst in den `lock` packen, damit \"alles sicher\" ist. Was rätst du?",
+      "modelAnswer": "Nur das Hinzufügen zur Liste gehört in den `lock`, also die kurze Anweisung, die gemeinsame Daten ändert. Das Laden ist langsam. Läge es im `lock`, würden alle anderen Tasks warten, und es liefe nur noch ein Task zur Zeit. Ein `await` ist im `lock` ohnehin nicht erlaubt.\n\nAußerdem muss jeder Zugriff auf die Liste, auch das Lesen am Ende, dieselbe Sperre nehmen, und die Sperre sollte ein privates `Lock`-Objekt sein."
     }
   ]
 }

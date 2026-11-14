@@ -8414,6 +8414,203 @@
         "title": "The managed thread pool",
         "url": "https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool"
       }
+    },
+    {
+      "id": "race-condition",
+      "term": "Race condition",
+      "german": "Wettlaufsituation",
+      "category": "platform",
+      "definition": "Ein Fehler, bei dem das Ergebnis davon abhängt, in welcher Reihenfolge Threads ihre Schritte ausführen. Er zeigt sich nur bei manchen Abläufen.",
+      "aliases": [
+        "Race Condition",
+        "Race Conditions"
+      ],
+      "related": [
+        "shared-state",
+        "interleaving",
+        "lost-update"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "shared-state",
+      "term": "Shared mutable state",
+      "german": "gemeinsam genutzte veränderbare Daten",
+      "category": "platform",
+      "definition": "Daten, auf die mehrere Threads zugreifen und die mindestens ein Thread ändert. Nur lesende Threads oder nur Daten, die sich nie ändern, verursachen keine Race Condition.",
+      "aliases": [
+        "Shared State",
+        "gemeinsamer Zustand"
+      ],
+      "related": [
+        "race-condition",
+        "thread",
+        "immutable"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "read-modify-write",
+      "term": "Read-modify-write",
+      "german": "Lesen, Ändern, Schreiben",
+      "category": "platform",
+      "definition": "Eine Änderung in drei Schritten: Wert lesen, neuen Wert berechnen, Wert zurückschreiben. `count++` ist so ein Ablauf und kann zwischen den Schritten unterbrochen werden.",
+      "related": [
+        "lost-update",
+        "race-condition"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "lost-update",
+      "term": "Lost update",
+      "german": "verlorene Aktualisierung",
+      "category": "platform",
+      "definition": "Zwei Threads lesen denselben Wert und schreiben nacheinander ihr Ergebnis zurück. Das Ergebnis des ersten Threads wird überschrieben und geht verloren.",
+      "aliases": [
+        "Lost Update",
+        "verlorenes Update"
+      ],
+      "related": [
+        "read-modify-write",
+        "race-condition"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "check-then-act",
+      "term": "Check-then-act",
+      "german": "Prüfen, dann handeln",
+      "category": "platform",
+      "definition": "Ein Thread prüft eine Bedingung und handelt danach. Dazwischen kann ein anderer Thread die Bedingung ändern, sodass die Prüfung beim Handeln nicht mehr gilt.",
+      "aliases": [
+        "Check Then Act"
+      ],
+      "related": [
+        "race-condition",
+        "dictionary"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "non-determinism",
+      "term": "Non-determinism",
+      "german": "Nichtdeterminismus",
+      "category": "platform",
+      "definition": "Dasselbe Programm mit denselben Eingaben liefert nicht in jedem Lauf dasselbe Ergebnis. Bei Threads kommt das von der Reihenfolge, die der Scheduler wählt.",
+      "aliases": [
+        "nichtdeterministisch"
+      ],
+      "related": [
+        "scheduler",
+        "interleaving",
+        "race-condition"
+      ],
+      "lesson": "m13-l11",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "mutual-exclusion",
+      "term": "Mutual exclusion",
+      "german": "gegenseitiger Ausschluss",
+      "category": "platform",
+      "definition": "Zu jedem Zeitpunkt führt höchstens ein Thread einen geschützten Codeabschnitt aus. Andere Threads warten, bis er frei ist.",
+      "aliases": [
+        "Mutual Exclusion"
+      ],
+      "related": [
+        "critical-section",
+        "lock-statement"
+      ],
+      "lesson": "m13-l12",
+      "source": {
+        "title": "The lock statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock"
+      }
+    },
+    {
+      "id": "critical-section",
+      "term": "Critical section",
+      "german": "kritischer Abschnitt",
+      "category": "platform",
+      "definition": "Ein Codeabschnitt, der auf gemeinsame Daten zugreift und deshalb nie von zwei Threads gleichzeitig ausgeführt werden darf.",
+      "aliases": [
+        "kritischer Bereich"
+      ],
+      "related": [
+        "mutual-exclusion",
+        "lock-statement",
+        "shared-state"
+      ],
+      "lesson": "m13-l12",
+      "source": {
+        "title": "The lock statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock"
+      }
+    },
+    {
+      "id": "lock-statement",
+      "term": "lock statement",
+      "german": "`lock`-Anweisung",
+      "category": "platform",
+      "definition": "Die Anweisung `lock (x) { … }` nimmt die Sperre des Objekts `x`, führt den Block aus und gibt die Sperre danach frei, auch bei einer Ausnahme. Andere Threads warten.",
+      "aliases": [
+        "lock",
+        "lock-Anweisung"
+      ],
+      "related": [
+        "lock-object",
+        "critical-section",
+        "mutual-exclusion"
+      ],
+      "lesson": "m13-l12",
+      "source": {
+        "title": "The lock statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock"
+      }
+    },
+    {
+      "id": "lock-object",
+      "term": "Lock object",
+      "german": "Sperrobjekt",
+      "category": "platform",
+      "definition": "Das Objekt, auf das `lock` sperrt. Es ist privat und dient nur dazu. Seit C# 13 / .NET 9 ist der Typ `System.Threading.Lock` dafür gedacht.",
+      "aliases": [
+        "Sperrobjekte",
+        "Lock"
+      ],
+      "related": [
+        "lock-statement",
+        "critical-section"
+      ],
+      "lesson": "m13-l12",
+      "source": {
+        "title": "The lock statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock"
+      }
     }
   ]
 }
