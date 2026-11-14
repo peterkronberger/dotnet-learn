@@ -465,7 +465,15 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
 Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.json`, position 14.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
 - Lesson L1: mixed reading and tracing set (title chosen by the architect of W4).
 - Lesson L2: mixed writing set and final set (title chosen by the architect of W4).
-- **M12**: Filled by the module review of M12.
+- **M12** (from `module-digest.md` `## M12`):
+  - Concepts:
+    - declaration pattern vs. cast and `as` (`m12-l01`, `m08-l06`)
+    - `not A or B` vs. `not (A or B)` (`m12-l02`)
+    - positional pattern vs. property pattern (`m12-l04`, `m12-l03`)
+    - list pattern vs. slice pattern (`m12-l05`)
+    - `with` copy vs. changing a property (`m12-l07`, `m06-l06`)
+    - union type vs. closed hierarchy vs. `sealed` (`m12-l08`, `m12-l09`, `m08-l04`)
+  - Misconception ids: m12-l02-not-applies-to-whole-pattern, m12-l04-positional-pattern-matches-by-name, m12-l06-switch-arm-order-irrelevant, m12-l07-with-changes-original, m12-l09-closed-means-sealed
 - **M13**: Filled by the module review of M13.
 - **M14**: Filled by the module review of M14.
 - ▶/◻: M12 and M13 part A are runnable. M13 part B and M14 are ◻ (reading tasks without a runner).

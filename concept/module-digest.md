@@ -2,7 +2,7 @@
 
 Base since #450: C# 15 / .NET 11.
 
-As of 2026-11-13. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-14. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -163,7 +163,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m06-l…"` fields: class, instance, field, member, instance-method, object-creation, constructor, default-constructor, constructor-chaining, this-access, readonly-field, encapsulation, access-modifier, accessibility-domain, documentation-comment, property, accessor, backing-field, computed-property, object-initializer, auto-property, init-accessor, required-member, field-keyword, primary-constructor, static-member, instance-member, static-class, static-constructor, namespace, fully-qualified-name, using-directive, using-alias, global-using, implicit-usings, entry-point, main-method, command-line-argument, exit-code
 - **Misconception ids:** m06-l01-class-declaration-creates-object, m06-l02-readonly-object-immutable, m06-l03-private-per-object, m06-l04-property-is-field, m06-l05-initializer-before-constructor, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable, m06-l09-using-adds-library, m06-l10-top-level-has-no-main
 - **Open forward references:**
-  - `with` expression → M12 (`m06-l06`)
   - `async`/`await` → M13 (`m06-l10`)
   - Projects and assemblies, project file, attributes → M14 (`m06-l03`, `m06-l06`, `m06-l09`)
 - **SecLog end state:** `website/examples/m06/l10/seclog-classes-solution.cs` – the M5 end state plus: `LogEvent` (events from the sample log, `Describe()`) and `Incident` (failed logins of one user, validated `Status`, `required Source`, static `Count`). Both live in the namespace `SecLog.Model` at the end of the file. Chain: `m05/l11` → `m06/l01` → … → `m06/l10`. M6 milestone reached.
@@ -211,7 +210,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m08-l…"` fields: inheritance, base-class, derived-class, protected-access, base-constructor-call, virtual-member, override, polymorphism, member-hiding, base-access, abstract-class, abstract-member, sealed-class, sealed-member, code-analysis-rule, interface, interface-implementation, explicit-interface-implementation, default-interface-member, composition, type-test, as-operator, reference-conversion, declaration-pattern, enum, enum-member, underlying-type, flags-enum, struct, readonly-struct, readonly-member, equality-contract, hash-code, operator-overloading, record, positional-record, record-struct, compiler-generated-member, comparable, comparer, sort-order
 - **Misconception ids:** m08-l01-constructors-are-inherited, m08-l02-new-overrides-method, m08-l03-abstract-class-only-abstract-members, m08-l04-sealed-means-immutable, m08-l05-matching-methods-implement-interface, m08-l06-cast-changes-object, m08-l07-enum-only-named-values, m08-l08-struct-copy-changes-original, m08-l09-equals-without-gethashcode, m08-l10-record-always-immutable, m08-l11-sort-knows-order
 - **Open forward references:**
-  - More patterns (`m08-l06`), `with` expressions (`m08-l10`) → M12
   - Attributes (`m08-l07`), assemblies (`m08-l04`) → M14
 - **SecLog end state:** `website/examples/m08/l11/seclog-oop-solution.cs` – the M7 end state plus: `IDetectionRule`, abstract `DetectionRule`, sealed `FailedLoginRule`/`WatchListRule`/`StatusRule`, `Detector`, enums `EventType`/`Severity`, `readonly struct TimeWindow`, `sealed record SecurityEvent`, `LogEvent` with value equality, `IncidentComparer : IComparer<Incident>`. Chain: `m07/l09` → `m08/l01` → … → `m08/l11`. M8 milestone reached.
 - **Notes for later modules:**
@@ -284,6 +282,29 @@ Each module section has these fields:
   - `IsFailure()` and `IsFrom(user)` are the extension methods for log events; new log-event helpers belong in `LogEventExtensions`.
   - `reportedMessages` and `signalWords` hold the message rating data.
   - `with` on anonymous types is not covered.
+
+## M12 Pattern Matching
+
+- **Lessons:**
+  - `m12-l01` Typmuster, Deklarationsmuster und Nulltests – `is`, type and declaration pattern, `is null`/`is not null`, a type pattern never matches `null`.
+  - `m12-l02` Relationale und logische Muster – `<`, `>=` …, `and`/`or`/`not`, parentheses, precedence (`not` binds tighter than `and`, `and` tighter than `or`).
+  - `m12-l03` Eigenschaftsmuster – `{ Name: pattern }`, `{ }`, nested and extended property patterns (`A.B: …`).
+  - `m12-l04` Dekonstruktion und Positionsmuster – `Deconstruct` with `out` parameters, `var (a, b) = obj;`, positional pattern, `var` pattern, discards.
+  - `m12-l05` Listenmuster und Slice-Muster – `[p1, p2]`, length must match, `..` and `.. var rest`.
+  - `m12-l06` switch-Ausdrücke im Detail – first match wins, `when`, subsumption (CS8510), exhaustiveness (CS8509, CS8524), `SwitchExpressionException`, switch over a tuple.
+  - `m12-l07` Nicht-destruktive Änderung mit `with` – copy with changed properties for records, structs and anonymous types; shallow copy.
+  - `m12-l08` Union-Typen – `union Name(A, B)` (C# 15), case types, implicit conversion, exhaustive `switch`, `default` union without value.
+  - `m12-l09` Geschlossene Hierarchien – `closed` (C# 15): implicitly abstract, direct subtypes only in the same assembly, exhaustive `switch`; not `sealed`; union vs. closed hierarchy.
+  - `m12-l10` Muster oder Polymorphie? – virtual methods (easy new type) vs. `switch` over a closed hierarchy (easy new operation).
+- **Constructs taught:** `is` with patterns, type pattern, declaration pattern, constant pattern `null`, `is null`, `is not null` (`m12-l01`), relational patterns, `and`, `or`, `not`, parenthesized patterns (`m12-l02`), property pattern `{ … }`, `{ }`, extended property pattern (`m12-l03`), `Deconstruct`, `var (a, b) = obj;`, positional pattern, `var` pattern (`m12-l04`), list pattern, slice pattern `..` (`m12-l05`), `when`, subsumption, exhaustiveness, `SwitchExpressionException`, `switch` over a tuple (`m12-l06`), `with` (`m12-l07`), `union` (`m12-l08`), `closed` (`m12-l09`). The discard pattern `_` and the switch expression itself are older (M2).
+- **Glossary terms:** type-pattern, is-pattern-expression, logical-pattern, parenthesized-pattern, property-pattern, extended-property-pattern, positional-pattern, deconstruct-method, var-pattern, list-pattern, slice-pattern, subsumption, with-expression, nondestructive-mutation, shallow-copy, union-type, case-type, closed-hierarchy, closed-modifier. `closed-type` (M9) is a separate entry.
+- **Misconception ids:** m12-l01-type-pattern-matches-null, m12-l02-not-applies-to-whole-pattern, m12-l03-empty-property-pattern-matches-anything, m12-l04-positional-pattern-matches-by-name, m12-l05-list-pattern-matches-prefix, m12-l06-switch-arm-order-irrelevant, m12-l07-with-changes-original, m12-l08-case-types-inherit-from-union, m12-l09-closed-means-sealed, m12-l10-patterns-replace-polymorphism
+- **Open forward references:** none. The only `<Forward>` note of M12 (`not`, in `m12-l01`) points to `m12-l02`. The notes of `m06-l06`, `m08-l06` and `m08-l10` that named M12 are closed by `m12-l07` and `m12-l01`–`l06`. Assemblies are used in `m12-l09` without a mark and are taught in M14.
+- **SecLog end state:** `website/examples/m12/l10/seclog-patterns-solution.cs` – the M11 end state plus: `ParseWithPatterns` (list pattern with `or`, `and` and `var` on a split log line), `ActionFor` (tuple switch with relational patterns and `when`), `IncidentState` record updated with `with` (open → investigating → closed), `LineError` and `union ParseResult(SecurityEvent, LineError)` with `Parse` and `Describe`, `closed record IncidentStatus` with `OpenStatus`, `InvestigatingStatus`, `ResolvedStatus`. Chain: `m11/l10` → `m12/l01` → … → `m12/l10`. M12 milestone reached.
+- **Notes for later modules:**
+  - `Parse` returns a `ParseResult` (pattern-based, no exception); `ParseLine` (M7) is the exception-based parser.
+  - `IncidentState` is the immutable snapshot of an `Incident`; the mutable `Incident` class stays.
+  - `union` and `closed` need C# 15 / .NET 11; examples run in the playground and CI with the .NET 11 SDK.
 
 ## W1 Wiederholung M1–M4
 
