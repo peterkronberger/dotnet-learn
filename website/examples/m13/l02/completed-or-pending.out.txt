@@ -1,0 +1,3 @@
+quick completed: True
+slow completed: False
+Sum: 3

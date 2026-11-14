@@ -7738,6 +7738,154 @@
         "title": "closed modifier",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed"
       }
+    },
+    {
+      "id": "task",
+      "term": "Task object",
+      "german": "Task-Objekt (Vorgang)",
+      "category": "platform",
+      "definition": "Ein Objekt vom Typ `Task` oder `Task<T>`, das Arbeit darstellt, die erst später fertig wird. `Task<T>` liefert am Ende zusätzlich einen Wert vom Typ `T`.",
+      "aliases": [
+        "Tasks",
+        "Task<T>"
+      ],
+      "related": [
+        "asynchronous-programming",
+        "async-method",
+        "await-expression"
+      ],
+      "lesson": "m13-l01",
+      "source": {
+        "title": "Task-based asynchronous programming",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/task-based-asynchronous-programming"
+      }
+    },
+    {
+      "id": "asynchronous-programming",
+      "term": "Asynchronous programming",
+      "german": "asynchrone Programmierung",
+      "category": "language",
+      "definition": "Programmieren mit Arbeit, die später fertig wird, ohne dass das Programm in der Zwischenzeit untätig wartet. In C# dienen dafür `Task`, `async` und `await`.",
+      "aliases": [
+        "asynchron",
+        "Asynchronität"
+      ],
+      "related": [
+        "task",
+        "async-method",
+        "await-expression"
+      ],
+      "lesson": "m13-l01",
+      "source": {
+        "title": "Asynchronous programming with async and await",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
+      }
+    },
+    {
+      "id": "async-method",
+      "term": "Async method",
+      "german": "asynchrone Methode",
+      "category": "language",
+      "definition": "Eine Methode mit dem Modifizierer `async`. Sie darf `await` benutzen und gibt meist einen `Task` oder `Task<T>` zurück.",
+      "aliases": [
+        "async-Methode",
+        "async function",
+        "async-Funktion"
+      ],
+      "related": [
+        "task",
+        "await-expression",
+        "method"
+      ],
+      "lesson": "m13-l01",
+      "source": {
+        "title": "Async functions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions"
+      }
+    },
+    {
+      "id": "await-expression",
+      "term": "Await expression",
+      "german": "await-Ausdruck",
+      "category": "language",
+      "definition": "Der Ausdruck `await task`. Er gibt das Ergebnis des Tasks zurück, sobald der Task fertig ist. Ist er noch nicht fertig, gibt die Methode die Kontrolle an ihren Aufrufer zurück.",
+      "aliases": [
+        "await",
+        "await-Ausdrücke"
+      ],
+      "related": [
+        "task",
+        "async-method",
+        "continuation"
+      ],
+      "lesson": "m13-l01",
+      "source": {
+        "title": "Await expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1299-await-expressions"
+      }
+    },
+    {
+      "id": "continuation",
+      "term": "Continuation",
+      "german": "Fortsetzung",
+      "category": "language",
+      "definition": "Der Rest einer async-Methode hinter einem `await`. Er läuft erst, wenn der erwartete Task fertig ist.",
+      "aliases": [
+        "Continuations",
+        "resumption delegate"
+      ],
+      "related": [
+        "await-expression",
+        "async-method",
+        "callback"
+      ],
+      "lesson": "m13-l02",
+      "source": {
+        "title": "Async functions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions"
+      }
+    },
+    {
+      "id": "awaitable",
+      "term": "Awaitable",
+      "german": "erwartbar",
+      "category": "language",
+      "definition": "Ein Ausdruck, auf den `await` angewendet werden darf. Sein Typ hat eine Methode `GetAwaiter`, deren Ergebnis `IsCompleted` und `GetResult` bietet und `INotifyCompletion` umsetzt.",
+      "aliases": [
+        "awaitable expression",
+        "awaitable pattern",
+        "Awaiter"
+      ],
+      "related": [
+        "await-expression",
+        "task-type"
+      ],
+      "lesson": "m13-l02",
+      "source": {
+        "title": "Awaitable expressions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12992-awaitable-expressions"
+      }
+    },
+    {
+      "id": "task-type",
+      "term": "Task type",
+      "german": "Task-Typ",
+      "category": "language",
+      "definition": "Ein Rückgabetyp einer async-Methode, der Arbeit darstellt, die fertig werden kann: `Task`, `Task<T>` (und `ValueTask`, `ValueTask<T>`). Er ist erwartbar und hat die Zustände unfertig, erfolgreich, abgebrochen oder fehlerhaft.",
+      "aliases": [
+        "Task-Typen",
+        "task types"
+      ],
+      "related": [
+        "task",
+        "awaitable",
+        "async-method"
+      ],
+      "lesson": "m13-l02",
+      "source": {
+        "title": "Async functions (C# language specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions"
+      }
     }
   ]
 }

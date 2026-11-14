@@ -1,0 +1,5 @@
+1 before the call
+2 inside, before the await
+3 after the call
+4 inside, after the await
+5 value is 7

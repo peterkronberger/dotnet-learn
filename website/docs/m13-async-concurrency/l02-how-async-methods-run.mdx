@@ -1,0 +1,196 @@
+---
+title: Wie eine async-Methode abläuft
+sidebar_position: 2
+description: Eine async-Methode läuft synchron bis zum ersten await auf einen unfertigen Task und gibt dann einen unfertigen Task an den Aufrufer zurück. Dazu die erlaubten Rückgabetypen und das Awaitable-Muster.
+lesson_id: m13-l02
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import orderOfSteps from '!!raw-loader!@site/examples/m13/l02/order-of-steps.cs';
+import orderOfStepsOutput from '!!raw-loader!@site/examples/m13/l02/order-of-steps.out.txt';
+import completedOrPending from '!!raw-loader!@site/examples/m13/l02/completed-or-pending.cs';
+import completedOrPendingOutput from '!!raw-loader!@site/examples/m13/l02/completed-or-pending.out.txt';
+import returnTypes from '!!raw-loader!@site/examples/m13/l02/return-types.cs';
+import customAwaitable from '!!raw-loader!@site/examples/m13/l02/custom-awaitable.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l02/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l02/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l02/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l02/seclog-async-solution.cs';
+
+# Wie eine async-Methode abläuft
+
+:::note[Lernziele]
+- Du kannst vorhersagen, in welcher Reihenfolge die Ausgaben einer async-Methode und ihres Aufrufers erscheinen.
+- Du kannst erklären, dass eine async-Methode bis zum ersten `await` eines unfertigen Tasks synchron läuft.
+- Du kannst die erlaubten Rückgabetypen einer async-Methode nennen und den passenden wählen.
+- Du kannst erklären, warum `await` den Thread nicht blockiert.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l01-q4" />
+
+<Quiz id="m13-l01-q3" />
+
+<Quiz id="m11-l04-q4" />
+
+## Die Reihenfolge der Schritte
+
+Wer eine async-Methode aufruft, erwartet oft, dass der Aufruf ganz wartet und erst dann die nächste Zeile kommt. Das stimmt nur zum Teil. Das Programm zeigt, was wirklich passiert: Es nummeriert die Ausgaben in der Reihenfolge, in der sie im Code stehen.
+
+:::info[Vorhersage]
+In welcher Reihenfolge erscheinen die fünf Zeilen? Notiere die Nummern, bevor du das Programm startest.
+:::
+
+<CSharpRunner id="m13-l02-order" code={orderOfSteps} predict expected={orderOfStepsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Aufrufer bis zum Aufruf:** Zeile 1 erscheint, dann beginnt der Aufruf `LoadAsync()`.
+2. **Methode bis zum ersten await:** Der Rumpf läuft ganz normal los und gibt Zeile 2 aus. Beim `await Task.Delay(10)` ist der Task noch nicht fertig.
+3. **Rückkehr zum Aufrufer:** Die Methode gibt einen unfertigen `Task<int>` zurück. Der Aufrufer gibt Zeile 3 aus.
+4. **Fortsetzung:** Erst am `await pending` wartet der Aufrufer. Wenn der Task fertig ist, läuft der Rest von `LoadAsync` (Zeile 4) und danach der Aufrufer (Zeile 5).
+
+Was passiert, wenn du `await pending` vor die Ausgabe `3 after the call` schreibst? Dann erscheint Zeile 3 erst nach Zeile 4, weil der Aufrufer vorher wartet.
+
+</details>
+
+Das ist die Regel für jede async-Methode, die einen Task zurückgibt: Der Rumpf läuft synchron (Schritt für Schritt im Aufruf, ohne Pause) bis zum ersten `await` auf einen Task, der noch nicht fertig ist. Dort gibt die Methode einen unfertigen Task an ihren Aufrufer zurück. Den Rest der Methode führt später die <Term id="continuation">Continuation</Term> (Fortsetzung) aus, sobald der erwartete Task fertig ist ([§15.14.3 Evaluation of a task-returning async function](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15143-evaluation-of-a-task-returning-async-function)).
+
+## Ein fertiger Task macht keine Pause
+
+Der erste Schritt der Regel sagt „unfertig“. Ist der Task beim `await` schon fertig, ist nichts zu erwarten, und die Methode läuft ohne Unterbrechung weiter. `Task.FromResult(1)` liefert so einen schon fertigen Task mit dem Wert `1`. Mit der Eigenschaft `IsCompleted` fragst du, ob ein Task fertig ist.
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m13-l02-completed" code={completedOrPending} predict expected={completedOrPendingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Schon fertig:** `QuickAsync` wartet auf `Task.FromResult(1)`. Das `await` macht sofort weiter, die Methode läuft bis zum `return` durch. Der zurückgegebene Task ist fertig: `quick completed: True`.
+2. **Noch nicht fertig:** `SlowAsync` wartet auf `Task.Delay(10)`. Direkt nach dem Aufruf läuft die Wartezeit noch, deshalb ist der Task unfertig: `slow completed: False`.
+3. **Ergebnis:** Beide `await` im letzten Ausdruck liefern `1` und `2`. Die Summe ist `3`.
+
+</details>
+
+<Quiz id="m13-l02-q3" />
+
+## Warum `await` den Thread nicht blockiert
+
+Beim Warten auf einen unfertigen Task gibt die Methode ihre Kontrolle zurück (Schritt 3 im ersten Programm). Der Thread, der den Aufruf ausgeführt hat, steht dann nicht still, sondern führt die nächsten Zeilen des Aufrufers aus oder andere Arbeit. Erst wenn der Task fertig ist, wird der Rest der Methode fortgesetzt. Du siehst es am ersten Programm: Zeile 3 erscheint vor Zeile 4, obwohl die Methode in Zeile 2 noch „wartet“. Im Playground im Browser gibt es nur einen Thread, und die Reihenfolge ist trotzdem dieselbe.
+
+## Die Rückgabetypen einer async-Methode
+
+Der Rückgabetyp einer async-Methode ist `void`, ein <Term id="task-type">Task-Typ</Term> oder ein asynchroner Iteratortyp. Für den Anfang genügen zwei Task-Typen:
+
+- `Task` für Arbeit ohne Ergebniswert (kein `return` mit Wert).
+- `Task<T>` für Arbeit mit einem Ergebnis vom Typ `T` (`return` mit einem `T`).
+
+Weitere Task-Typen wie `ValueTask` gibt es auch. Dieser Kurs nutzt sie nicht.
+
+<Forward concepts={['`async void`']} module="13" />
+
+`void` ist erlaubt, hat aber Nachteile. Wann du es meiden solltest, erklärt die Lektion „Stolperfallen bei async“.
+
+<Forward concepts={['asynchrone Iteratoren']} module="13" />
+
+Auch asynchrone Iteratoren sind als Rückgabetyp erlaubt. Sie folgen in der Lektion „Asynchrone Streams“.
+
+<CSharpRunner id="m13-l02-return-types" code={returnTypes} />
+
+Der Aufrufer wartet auf `PrintAsync` ohne Ergebnis und holt mit `await CountAsync(…)` eine `int`-Zahl.
+
+<Quiz id="m13-l02-q4" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen die Schlüsselwörter und der Typ des Tasks. Die Zeilen sind mit A bis E belegt, die Reihenfolge folgt der Regel von oben.
+
+<Quiz id="m13-l02-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog hält zwei Log-Quellen im Speicher (`logSources`) und lädt eine davon mit der async-Funktion `LoadSourceAsync`.
+
+Im Runner siehst du nur den Block `// Load a log source asynchronously` und die Funktion `LoadSourceAsync`, hinter die du die neue Funktion schreibst. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `LoadSourceAsync` und vor `static class Report` die lokale Funktion `async Task<int> CountFailuresAsync(string name)`. Sie gibt zuerst `Loading <name>` aus, wartet dann mit `await LoadSourceAsync(name)` auf die Zeilen und gibt die Anzahl der Zeilen mit `login-failed` zurück.
+2. Schreibe hinter den Block `// Load a log source asynchronously` und vor die Zeile `// End with exit code 0 …` den Block `// Watch the order of steps in an async call`. Er ruft `Task<int> pending = CountFailuresAsync("vpn");` auf und gibt danach `Call returned, completed: <pending.IsCompleted>` aus. Dann wartet er mit `int vpnFailures = await pending;` und gibt `Failures in vpn: <vpnFailures>` aus.
+
+<CSharpRunner id="m13-l02-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Vor dem ersten await:** `Loading vpn` steht vor dem `await` und erscheint deshalb schon beim Aufruf.
+2. **Rückkehr:** Beim `await LoadSourceAsync(name)` ist der Task unfertig. `CountFailuresAsync` gibt einen unfertigen Task zurück, und der Aufrufer gibt `Call returned, completed: False` aus.
+3. **Fortsetzung:** `await pending` wartet. Danach zählt die Fortsetzung die Zeilen mit `login-failed`, in den Zeilen 8–14 sind es 2. Es erscheint `Failures in vpn: 2`.
+
+</details>
+
+**Neuer Stand:** SecLog zeigt in einer eigenen Ausgabe, dass ein Aufruf zurückkehrt, bevor die Arbeit fertig ist, und zählt die Fehlversuche einer Quelle asynchron.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l02-await-blocks-thread" />
+
+**„`await` blockiert den Thread, bis der Task fertig ist.“** Das stimmt nicht. Bei einem unfertigen Task gibt die Methode die Kontrolle an ihren Aufrufer zurück. Der Thread kann in der Zwischenzeit andere Arbeit erledigen. Im Browser mit nur einem Thread zeigt es sich daran, dass der Aufrufer seine Zeile vor dem Rest der Methode ausgibt.
+:::
+
+<Quiz id="m13-l02-q2" />
+
+<details>
+<summary>Vertiefung: Das Awaitable-Muster (optional)</summary>
+
+`await` funktioniert nicht nur mit Tasks. Ein Ausdruck ist <Term id="awaitable">awaitable</Term> (erwartbar), wenn sein Typ eine Methode `GetAwaiter` ohne Parameter hat. Das Ergebnis, der Awaiter, setzt `INotifyCompletion` um, bietet die lesbare Eigenschaft `IsCompleted` und die Methode `GetResult` ([§12.9.9.2 Awaitable expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12992-awaitable-expressions)). Zur Laufzeit holt `await` den Awaiter und liest `IsCompleted`. Ist der Wert `true`, geht es sofort mit `GetResult` weiter. Sonst meldet `await` die Fortsetzung beim Awaiter an und kehrt zum Aufrufer zurück ([§12.9.9.4 Run-time evaluation of await expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12994-run-time-evaluation-of-await-expressions)). Das erklärt den fertigen Task aus dem zweiten Programm.
+
+Im Beispiel liefert `Pause.GetAwaiter()` den Awaiter eines `Task.Delay(10)`. Damit kann man ein Objekt der Klasse `Pause` erwarten:
+
+<CSharpRunner id="m13-l02-awaitable" code={customAwaitable} />
+
+<Quiz id="m13-l02-q6" />
+
+<Quiz id="m13-l02-q7" />
+
+</details>
+
+<details>
+<summary>Vertiefung: Runtime Async in .NET 11 (optional)</summary>
+
+<Since dotnet="11" />
+
+Der Compiler wandelt eine async-Methode normalerweise in eine Hilfsklasse um, die sich merkt, wo die Methode beim `await` stehen geblieben ist. Mit Runtime Async übernimmt die Laufzeit das Unterbrechen und Fortsetzen selbst. Das bringt sauberere Stack-Traces während der Ausführung und weniger Aufwand. Die Bibliotheken von .NET 11 sind so gebaut, und für ein eigenes Projekt schaltest du es mit der Eigenschaft `<Features>runtime-async=on</Features>` ein ([What's new in .NET 11 runtime](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/runtime#runtime-async), Stand: 2026-11-14). Für den Code, den du schreibst, ändert sich nichts: Die Regeln dieser Lektion gelten unverändert.
+
+</details>
+
+## Zusammenfassung
+
+Eine async-Methode läuft synchron bis zum ersten `await` auf einen unfertigen Task. Dann gibt sie einen unfertigen Task an ihren Aufrufer zurück, und der Rest läuft später als Fortsetzung. Ist der Task schon fertig, macht `await` ohne Pause weiter. Dabei blockiert `await` den Thread nicht. Eine async-Methode gibt `Task`, `Task<T>` oder (mit Nachteilen) `void` zurück oder einen asynchronen Iteratortyp. Erwartbar ist jeder Typ mit passender Methode `GetAwaiter`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m13-l02-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m13-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Async-Funktionen in der C#-Spezifikation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions)
+- Microsoft Learn: [Await-Ausdrücke in der C#-Spezifikation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1299-await-expressions)
+- Microsoft Learn: [Task-basiertes asynchrones Muster](https://learn.microsoft.com/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap)

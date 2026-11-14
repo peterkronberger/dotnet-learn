@@ -1,4 +1,301 @@
 {
   "module": "m13",
-  "questions": []
+  "questions": [
+    {
+      "id": "m13-l01-q1",
+      "lesson": "m13-l01",
+      "type": "single",
+      "question": "Wofür steht ein Wert vom Typ `Task<int>`?",
+      "options": [
+        {
+          "text": "Für Arbeit, die später fertig wird und dann eine ganze Zahl liefert.",
+          "correct": true,
+          "feedback": "Der Task ist wie eine Abholnummer: Das Ergebnis gibt es erst, wenn die Arbeit fertig ist."
+        },
+        {
+          "text": "Für eine ganze Zahl, die der Compiler schneller berechnet.",
+          "feedback": "Ein `Task<int>` ist keine Zahl, sondern steht für Arbeit, die eine Zahl liefern wird."
+        },
+        {
+          "text": "Für einen neuen Thread, der eine ganze Zahl berechnet.",
+          "feedback": "Ein Task kann von einem Thread ausgeführt werden. Er muss es aber nicht, und er ist kein Thread.",
+          "misconception": "m13-l01-async-starts-new-thread"
+        },
+        {
+          "text": "Für eine Methode, die niemals einen Wert zurückgibt.",
+          "feedback": "Ohne Wert steht der Typ `Task`. `Task<int>` liefert am Ende eine `int`-Zahl."
+        }
+      ],
+      "explanation": "`Task<T>` steht für Arbeit, die später fertig wird und dann einen Wert vom Typ `T` liefert. `Task` ohne `<T>` steht für Arbeit ohne Ergebniswert."
+    },
+    {
+      "id": "m13-l01-q2",
+      "lesson": "m13-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l01/two-awaits.cs",
+      "explanation": "Jedes `await` liefert die Zahl des Tasks: erst 10, dann 20. Die Summe ist 30."
+    },
+    {
+      "id": "m13-l01-q3",
+      "lesson": "m13-l01",
+      "type": "single",
+      "question": "Das Programm läuft im Browser, der nur einen einzigen Thread hat, und gibt `hot coffee and hot tea` aus. Was folgt daraus für `async`?",
+      "example": "m13/l01/no-new-thread.cs",
+      "options": [
+        {
+          "text": "`async` startet nicht von selbst einen neuen Thread. Es erlaubt `await` in der Methode und ändert, wie die Methode zurückgibt.",
+          "correct": true,
+          "feedback": "Das Programm funktioniert mit einem Thread, also braucht `async` keinen weiteren."
+        },
+        {
+          "text": "`async` startet immer einen neuen Thread. Der Browser stellt ihn bereit.",
+          "feedback": "Der Browser hat nur einen Thread, und das Programm läuft trotzdem. Ein Thread pro `async` ist nicht nötig.",
+          "misconception": "m13-l01-async-starts-new-thread"
+        },
+        {
+          "text": "`async` funktioniert im Browser nicht, das Programm kann also nicht laufen.",
+          "feedback": "Das Programm läuft und gibt die Zeile aus."
+        },
+        {
+          "text": "Jedes `await` startet einen neuen Thread, `async` allein nicht.",
+          "feedback": "Auch `await` startet keinen Thread. Es wartet auf einen Task, der schon existiert.",
+          "misconception": "m13-l01-async-starts-new-thread"
+        }
+      ],
+      "explanation": "`async` ist keine Anweisung, einen Thread zu starten. Mit `async` darfst du `await` benutzen, und der Compiler gibt einen Task zurück. Ob und wo Arbeit läuft, entscheidet der Task selbst. `Task.Delay` braucht dafür keinen eigenen Thread."
+    },
+    {
+      "id": "m13-l01-q4",
+      "lesson": "m13-l01",
+      "type": "single",
+      "question": "Die Methode `GetAnswerAsync` hat den Rückgabetyp `Task<int>`. Welchen Typ hat der Ausdruck `await GetAnswerAsync()`?",
+      "options": [
+        {
+          "text": "`int`",
+          "correct": true,
+          "feedback": "`await` liefert das Ergebnis des Tasks, hier eine `int`-Zahl."
+        },
+        {
+          "text": "`Task<int>`",
+          "feedback": "Der Typ `Task<int>` hat der Ausdruck ohne `await`. Das `await` packt das Ergebnis aus."
+        },
+        {
+          "text": "`void`",
+          "feedback": "`void` ergibt sich nur beim Warten auf einen `Task` ohne Wert."
+        }
+      ],
+      "explanation": "Das Ergebnis von `await` auf einen `Task<T>` hat den Typ `T`. Bei einem `Task` ohne Wert liefert `await` keinen Wert."
+    },
+    {
+      "id": "m13-l01-q5",
+      "lesson": "m13-l01",
+      "type": "cloze",
+      "question": "Ergänze das Warten auf den Task, den Modifizierer der Methode, den Rückgabetyp und das Warten in der Methode.",
+      "example": "m13/l01/gap-await.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Das Schlüsselwort, das auf das Ergebnis des Tasks wartet."
+        },
+        {
+          "text": "async",
+          "hint": "Der Modifizierer, der `await` in der Methode erlaubt."
+        },
+        {
+          "text": "Task<int>",
+          "hint": "Die Methode gibt am Ende eine ganze Zahl zurück."
+        },
+        {
+          "text": "await",
+          "hint": "Auch `Task.Delay(10)` ist ein Task, auf den die Methode wartet."
+        }
+      ],
+      "explanation": "Eine Methode mit `await` braucht `async`. Gibt sie am Ende eine `int`-Zahl zurück, ist der Rückgabetyp `Task<int>`. Der Aufrufer wartet mit `await` auf das Ergebnis."
+    },
+    {
+      "id": "m13-l01-q6",
+      "lesson": "m13-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über `async` und `await` stimmen?",
+      "options": [
+        {
+          "text": "`await` darf nur in einer Methode mit `async` stehen. Anweisungen auf oberster Ebene gelten dafür auch.",
+          "correct": true
+        },
+        {
+          "text": "Eine `async`-Methode mit Ergebnis gibt mit `return` einen Wert vom Typ `T` zurück, ihr Rückgabetyp ist `Task<T>`.",
+          "correct": true
+        },
+        {
+          "text": "Ein `Task` steht für Arbeit, die später fertig wird.",
+          "correct": true
+        },
+        {
+          "text": "`async` startet für jede Methode einen neuen Thread.",
+          "feedback": "`async` startet keinen Thread. Es erlaubt `await`.",
+          "misconception": "m13-l01-async-starts-new-thread"
+        }
+      ],
+      "explanation": "`await` braucht eine `async`-Methode oder Anweisungen auf oberster Ebene. Der Rückgabewert steht im `Task<T>`. Einen neuen Thread startet `async` nicht von selbst."
+    },
+    {
+      "id": "m13-l01-q7",
+      "lesson": "m13-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein `Task<int>` ist und was `await` mit ihm macht.",
+      "modelAnswer": "Ein `Task<int>` steht für Arbeit, die später fertig wird und dann eine ganze Zahl liefert, ähnlich einer Abholnummer, die du am Tresen bekommst.\n\n`await` wartet auf diesen Task und gibt dann die Zahl zurück. Solange die Arbeit läuft, blockiert die Methode nicht, sondern gibt die Kontrolle an ihren Aufrufer zurück. Dafür braucht die Methode den Modifizierer `async`. Einen neuen Thread startet `async` allein nicht."
+    },
+    {
+      "id": "m13-l01-q8",
+      "lesson": "m13-l01",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du auf Arbeit warten, die später fertig wird, und was würde das Programm in der Wartezeit sonst tun?",
+      "modelAnswer": "Zum Beispiel beim Laden einer Datei oder einer Antwort von einem Server. Ohne `await` müsste das Programm in der Wartezeit untätig stehen bleiben. Mit `await` kann die Methode die Kontrolle abgeben, und das Programm kann in der Zeit andere Arbeit erledigen."
+    },
+    {
+      "id": "m13-l02-q1",
+      "lesson": "m13-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l02/order-of-steps.cs",
+      "explanation": "Der Aufruf `LoadAsync()` läuft bis zum `await` und gibt Zeile 2 aus. Der Task ist dann noch nicht fertig, der Aufrufer macht weiter und gibt Zeile 3 aus. Erst nach dem Warten läuft der Rest der Methode (Zeile 4) und danach der Aufrufer (Zeile 5)."
+    },
+    {
+      "id": "m13-l02-q2",
+      "lesson": "m13-l02",
+      "type": "single",
+      "question": "Eine `async`-Methode wartet mit `await` auf einen Task, der noch nicht fertig ist. Was passiert mit dem Thread, der die Methode ausführt?",
+      "options": [
+        {
+          "text": "Die Methode gibt einen unfertigen Task an ihren Aufrufer zurück, und der Thread kann andere Arbeit erledigen.",
+          "correct": true,
+          "feedback": "Genau so wartet `await`, ohne den Thread zu blockieren."
+        },
+        {
+          "text": "Der Thread bleibt an der Stelle stehen und tut nichts, bis der Task fertig ist.",
+          "feedback": "So würde ein blockierendes Warten arbeiten. `await` blockiert den Thread nicht. Im Browser mit nur einem Thread siehst du es daran, dass der Aufrufer sofort weitermacht.",
+          "misconception": "m13-l02-await-blocks-thread"
+        },
+        {
+          "text": "Der Thread beendet das Programm, weil die Methode nicht fertig ist.",
+          "feedback": "Das Programm läuft weiter. Die Methode wird später fortgesetzt."
+        },
+        {
+          "text": "Der Compiler ersetzt das `await` durch eine Schleife, die den Thread beschäftigt hält.",
+          "feedback": "Eine solche Schleife gibt es nicht. Die Methode gibt die Kontrolle ab und wird später fortgesetzt.",
+          "misconception": "m13-l02-await-blocks-thread"
+        }
+      ],
+      "explanation": "Bei einem unfertigen Task gibt die Methode die Kontrolle an ihren Aufrufer zurück. Den Rest der Methode führt die Fortsetzung aus, wenn der Task fertig ist. In der Zwischenzeit ist der Thread frei."
+    },
+    {
+      "id": "m13-l02-q3",
+      "lesson": "m13-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l02/completed-or-pending.cs",
+      "explanation": "`QuickAsync` wartet auf einen Task, der schon fertig ist (`Task.FromResult`). Das `await` macht dann sofort weiter, deshalb ist `quick` nach dem Aufruf fertig. `SlowAsync` wartet auf `Task.Delay(10)`, der noch läuft, und gibt einen unfertigen Task zurück. Die Summe ist 1 + 2 = 3."
+    },
+    {
+      "id": "m13-l02-q4",
+      "lesson": "m13-l02",
+      "type": "single",
+      "question": "Welchen Rückgabetyp wählst du für eine `async`-Methode, die auf etwas wartet und dann keinen Wert zurückgibt?",
+      "options": [
+        {
+          "text": "`Task`",
+          "correct": true,
+          "feedback": "Ein Task ohne Wert steht für Arbeit, die nur fertig wird."
+        },
+        {
+          "text": "`Task<void>`",
+          "feedback": "`void` ist kein gültiges Typargument. Ohne Wert heißt der Typ `Task`."
+        },
+        {
+          "text": "`int`",
+          "feedback": "Eine `async`-Methode gibt `void`, einen Task-Typ oder einen asynchronen Iteratortyp zurück, keinen einfachen `int`."
+        },
+        {
+          "text": "`Task<string>`",
+          "feedback": "Der Typ `Task<string>` liefert am Ende eine Zeichenfolge."
+        }
+      ],
+      "explanation": "Erlaubt sind `void`, Task-Typen wie `Task` und `Task<T>` und asynchrone Iteratortypen. Für Arbeit ohne Wert nimmst du `Task`. `async void` hat eigene Nachteile (Lektion „Stolperfallen bei async“)."
+    },
+    {
+      "id": "m13-l02-q5",
+      "lesson": "m13-l02",
+      "type": "cloze",
+      "question": "Ergänze den Typ der Variablen für den Task, das Warten im Aufrufer, den Modifizierer und das Warten in der Methode.",
+      "example": "m13/l02/gap-order.cs",
+      "blanks": [
+        {
+          "text": "Task",
+          "hint": "Die Methode hat keinen Ergebniswert."
+        },
+        {
+          "text": "await",
+          "hint": "Der Aufrufer wartet auf den Task."
+        },
+        {
+          "text": "async",
+          "hint": "Der Modifizierer erlaubt `await` in der Methode."
+        },
+        {
+          "text": "await",
+          "hint": "Die Methode wartet auf `Task.Delay(10)`."
+        }
+      ],
+      "explanation": "Die Ausgabe ist A, B, C, D, E. Der Aufruf läuft bis zum ersten `await` eines unfertigen Tasks (B). Dann macht der Aufrufer weiter (C). Nach dem Warten läuft der Rest der Methode (D) und danach der Aufrufer (E)."
+    },
+    {
+      "id": "m13-l02-q6",
+      "lesson": "m13-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l02/custom-awaitable.cs",
+      "explanation": "`await` verlangt nur, dass der Ausdruck erwartbar ist: Der Typ `Pause` hat eine Methode `GetAwaiter`, deren Ergebnis die nötigen Member hat. Erst nach dem Warten kommt `Done`."
+    },
+    {
+      "id": "m13-l02-q7",
+      "lesson": "m13-l02",
+      "type": "single",
+      "question": "Ein Typ soll mit `await` verwendbar sein. Was muss er mindestens haben?",
+      "options": [
+        {
+          "text": "Eine Methode `GetAwaiter` ohne Parameter, deren Ergebnistyp `INotifyCompletion` umsetzt und `IsCompleted` und `GetResult` hat.",
+          "correct": true,
+          "feedback": "Das ist das Awaitable-Muster."
+        },
+        {
+          "text": "Die Basisklasse `Task`.",
+          "feedback": "Tasks sind erwartbar, aber `await` verlangt nicht die Basisklasse `Task`. Es verlangt das Muster."
+        },
+        {
+          "text": "Den Modifizierer `async` an der Klasse.",
+          "feedback": "`async` gilt für Methoden, nicht für Klassen."
+        },
+        {
+          "text": "Eine Eigenschaft `Result` vom Typ `int`.",
+          "feedback": "`Result` gehört nicht zum Muster. `await` ruft `GetResult` am Awaiter auf."
+        }
+      ],
+      "explanation": "Ein Ausdruck ist erwartbar, wenn er eine passende Methode `GetAwaiter` hat. Der Awaiter muss `INotifyCompletion` umsetzen, `IsCompleted` lesen lassen und `GetResult` bieten."
+    },
+    {
+      "id": "m13-l02-q8",
+      "lesson": "m13-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, in welcher Reihenfolge eine `async`-Methode und ihr Aufrufer arbeiten, und warum `await` den Thread nicht blockiert.",
+      "modelAnswer": "Die Methode läuft ganz normal, bis sie das erste `await` auf einen noch nicht fertigen Task erreicht. Dort gibt sie einen unfertigen Task an den Aufrufer zurück, und der Aufrufer macht mit seinen nächsten Zeilen weiter.\n\nDen Rest der Methode führt später die Fortsetzung aus, wenn der Task fertig ist. Der Thread steht in der Zwischenzeit nicht still, denn er kann Arbeit des Aufrufers oder anderen Code erledigen. Ist der Task beim `await` schon fertig, läuft die Methode ohne Pause weiter."
+    },
+    {
+      "id": "m13-l02-q9",
+      "lesson": "m13-l02",
+      "type": "explain",
+      "question": "Transferfrage: Du rufst eine `async`-Methode auf und gibst direkt danach eine Zeile aus. Wo in einem eigenen Programm kann die Reihenfolge der Ausgaben überraschen, und wie machst du sie sichtbar?",
+      "modelAnswer": "Zum Beispiel beim Laden von Daten: Eine Zeile am Anfang der Methode erscheint vor der Zeile des Aufrufers, eine Zeile nach dem `await` erst danach. Ich mache die Reihenfolge sichtbar, indem ich vor und nach dem Aufruf und vor und nach dem `await` je eine Zeile ausgebe und das Ergebnis vorher vorhersage."
+    }
+  ]
 }

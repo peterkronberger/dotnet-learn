@@ -1,0 +1,193 @@
+---
+title: Asynchrone Methoden mit async und await
+sidebar_position: 1
+description: Ein Task steht für Arbeit, die später fertig wird. Eine async-Methode wartet mit await darauf und gibt in der Zwischenzeit die Kontrolle ab, statt zu blockieren.
+lesson_id: m13-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import answerTask from '!!raw-loader!@site/examples/m13/l01/answer-task.cs';
+import answerTaskOutput from '!!raw-loader!@site/examples/m13/l01/answer-task.out.txt';
+import taskNoValue from '!!raw-loader!@site/examples/m13/l01/task-no-value.cs';
+import twoAwaits from '!!raw-loader!@site/examples/m13/l01/two-awaits.cs';
+import noNewThread from '!!raw-loader!@site/examples/m13/l01/no-new-thread.cs';
+import noNewThreadOutput from '!!raw-loader!@site/examples/m13/l01/no-new-thread.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m13/l01/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l01/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l01/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l01/seclog-async-solution.cs';
+
+# Asynchrone Methoden mit async und await
+
+:::note[Lernziele]
+- Du kannst erklären, wofür ein `Task` und ein `Task<T>` stehen.
+- Du kannst eine `async`-Methode schreiben, die mit `await` auf einen `Task` wartet und einen Wert zurückgibt.
+- Du kannst `await` in Anweisungen auf oberster Ebene verwenden.
+- Du kannst erklären, warum `async` allein keinen neuen Thread startet.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog liest mehrere Log-Quellen asynchron ein, ohne untätig auf jede einzeln zu warten.
+- SecLog bricht das Einlesen ab, wenn es zu lange dauert oder abgebrochen wird.
+- SecLog wertet viele Log-Dateien parallel aus und sammelt die Ergebnisse sicher (als Code zum Lesen, nicht im Browser ausführbar).
+:::
+
+## Rückblick
+
+<Quiz id="m03-l01-q2" />
+
+<Quiz id="m06-l10-q1" />
+
+<Quiz id="m10-l01-q1" />
+
+## Warten, ohne untätig zu sein
+
+Viele Aufgaben dauern, weil das Programm auf etwas außerhalb wartet: auf eine Datei, auf einen Server, auf eine Pause. Ein Programm, das in dieser Zeit nur dasteht, verschenkt Zeit.
+
+Ein Bild aus dem Alltag: Du bestellst am Tresen und bekommst eine Abholnummer. Du musst nicht am Tresen stehen bleiben. Wenn dein Essen fertig ist, rufen sie deine Nummer, und du holst es ab. Die Abholnummer ist in C# ein <Term id="task">Task</Term> (Aufgabe, Vorgang): ein Objekt, das für Arbeit steht, die später fertig wird. Ein `Task<int>` liefert am Ende zusätzlich eine ganze Zahl, ein `Task<string>` eine Zeichenfolge. Ein `Task` ohne `<T>` steht für Arbeit ohne Ergebniswert.
+
+Wer so Arbeit startet und später auf sie wartet, betreibt <Term id="asynchronous-programming">asynchrone Programmierung</Term>. C# bietet dafür zwei Schlüsselwörter:
+
+- `async` steht vor einer <Term id="method">Methode</Term> und erlaubt in ihr das Warten mit `await`. Eine solche Methode heißt <Term id="async-method">async-Methode</Term>.
+- Ein <Term id="await-expression">await-Ausdruck</Term> (`await task`) wartet auf einen Task. Ist er fertig, ist das Ergebnis des Ausdrucks der Wert des Tasks.
+
+Das Programm unten wartet in `GetAnswerAsync` kurz mit `Task.Delay(10)`. Das ist ein Task, der nach 10 Millisekunden fertig wird. Danach gibt die Methode `42` zurück. Ihr Rückgabetyp ist `Task<int>`, im Rumpf steht aber `return 42;`, also ein `int`.
+
+:::info[Vorhersage]
+Welche Zeile gibt das Programm aus?
+:::
+
+<CSharpRunner id="m13-l01-answer" code={answerTask} predict expected={answerTaskOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Methode deklarieren:** `async Task<int> GetAnswerAsync()` darf `await` benutzen und liefert am Ende eine `int`-Zahl. Üblich ist es, solche Methoden mit der Endung `Async` zu benennen.
+2. **Warten:** `await Task.Delay(10)` wartet, bis der Task fertig ist.
+3. **Wert zurückgeben:** `return 42;` gibt einen `int` zurück. Die Methode macht daraus den `Task<int>`.
+4. **Ergebnis holen:** `await GetAnswerAsync()` im Aufrufer ergibt die Zahl `42`, nicht den Task.
+
+Was passiert, wenn du `await` weglässt? Dann steht in `answer` der Task selbst, und die Zeile `int answer = …` lässt sich nicht übersetzen, weil ein `Task<int>` kein `int` ist.
+
+</details>
+
+<Quiz id="m13-l01-q1" />
+
+<Quiz id="m13-l01-q4" />
+
+## Task ohne Wert und await auf oberster Ebene
+
+Nicht jede Arbeit liefert einen Wert. Dann gibt die Methode einen `Task` zurück und hat kein `return` mit Wert. Der Aufrufer wartet trotzdem mit `await`, damit der nächste Schritt erst nach dem Ende kommt.
+
+<CSharpRunner id="m13-l01-no-value" code={taskNoValue} />
+
+Das `await` steht hier direkt in den Anweisungen auf oberster Ebene, nicht in einer `async`-Methode. Das ist erlaubt: Der Compiler macht dann den erzeugten <Term id="entry-point">Einstiegspunkt</Term> selbst zu einer async-Methode (Lektion „Wo das Programm startet“). Du schreibst dafür kein `async` vor die erste Zeile.
+
+Mehrere `await` laufen nacheinander. Die zweite Zeile beginnt erst, wenn die erste fertig ist:
+
+:::info[Vorhersage]
+Welche Zeile gibt das Programm aus? Rechne mit den beiden Werten.
+:::
+
+<CSharpRunner id="m13-l01-two-awaits" code={twoAwaits} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erstes Warten:** `ReadValueAsync(10)` liefert `10`.
+2. **Zweites Warten:** `ReadValueAsync(20)` liefert `20`.
+3. **Summe:** `first + second` ist `30`, die Ausgabe ist `Sum: 30`.
+
+</details>
+
+<Quiz id="m13-l01-q2" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen die Schlüsselwörter und der Rückgabetyp.
+
+<Quiz id="m13-l01-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest und prüft Log-Zeilen, parst sie mit Mustern, hält Regeln in einem `Detector` und wertet den Status eines Vorfalls mit einer geschlossenen Hierarchie aus.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und die Funktionen `StatusLine` und `NeedsAttention`, hinter die du die neue Funktion schreibst. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Simulate two log sources in memory`. Er legt `Dictionary<string, string[]> logSources` an: der Schlüssel `"web"` gehört zu `sampleLog[..7]` (Zeilen 1–7), der Schlüssel `"vpn"` zu `sampleLog[7..]` (Zeilen 8–14). Die Quellen liegen im Speicher, weil es im Browser keine echten Dateien zum Warten gibt.
+2. Schreibe hinter `NeedsAttention` und vor `static class Report` die lokale Funktion `async Task<string[]> LoadSourceAsync(string name)`. Sie wartet mit `await Task.Delay(10)` und gibt `logSources[name]` zurück.
+3. Schreibe hinter den Block aus Punkt 1 den Block `// Load a log source asynchronously`. Er lädt `string[] webLines = await LoadSourceAsync("web");` und gibt `Loaded web: 7 lines` aus (die Zahl kommt aus `webLines.Length`).
+
+<CSharpRunner id="m13-l01-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Quellen anlegen:** Das Wörterbuch ordnet jedem Namen die Zeilen einer Quelle zu. `sampleLog[..7]` und `sampleLog[7..]` teilen das Feld in zwei Teile.
+2. **Async-Methode:** `LoadSourceAsync` simuliert die Wartezeit mit `Task.Delay(10)`. Der Rückgabetyp `Task<string[]>` sagt: Am Ende liegen die Zeilen vor. Die Funktion nutzt `logSources` aus den Anweisungen auf oberster Ebene.
+3. **Aufrufen und warten:** `await LoadSourceAsync("web")` ergibt das Feld `string[]`. Weil `await` in den Anweisungen auf oberster Ebene steht, ist der Einstiegspunkt von SecLog jetzt asynchron und gibt weiter den Exitcode `0` zurück.
+
+</details>
+
+**Neuer Stand:** SecLog hält zwei Log-Quellen im Speicher und lädt eine davon mit einer async-Methode.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l01-async-starts-new-thread" />
+
+**„`async` startet automatisch einen neuen Thread.“** Das stimmt nicht. Ein Thread ist ein Ausführungsstrang, der Anweisungen nacheinander abarbeitet. `async` erlaubt `await` in der Methode und ändert, wie die Methode zurückgibt (einen Task). Einen Thread startet es nicht.
+:::
+
+<Forward concepts={['Thread']} module="13" />
+
+:::info[Vorhersage]
+Der Playground im Browser hat nur einen Thread. Läuft dieses Programm dort? Was gibt es aus?
+:::
+
+<CSharpRunner id="m13-l01-no-thread" code={noNewThread} predict expected={noNewThreadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Läuft es?** Ja. Das Programm gibt `hot coffee and hot tea` aus.
+2. **Warum?** Die Methode `BrewAsync` braucht für ihr `await` keinen zweiten Thread. `await Task.Delay(10)` wartet auf einen Task, und die Methode setzt danach fort.
+3. **Schluss:** `async` ist keine Anweisung, einen Thread zu starten. Mit mehreren Threads und der Frage, wann sie nötig sind, beschäftigt sich Lektion „Threads und der Thread-Pool“.
+
+</details>
+
+<Quiz id="m13-l01-q3" />
+
+<details>
+<summary>Vertiefung: Was `await` im Ausdruck bedeutet (optional)</summary>
+
+Ein `await` darf nur im Rumpf einer async-Funktion stehen. Das sind Methoden, anonyme Funktionen und lokale Funktionen mit `async` ([§15.14.1 Async functions, General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15141-general)). Die Anweisungen auf oberster Ebene zählen dazu, wenn du `await` benutzt: Der Compiler erzeugt den Einstiegspunkt dann als async-Methode. Der Rückgabetyp einer async-Methode ist `void`, ein Task-Typ oder ein asynchroner Iteratortyp. Gibt sie einen Wert zurück, ist der Task-Typ generisch ([§15.14.1](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15141-general)). Der Typ des Ausdrucks `await t` ist der Typ, den `GetResult` des Awaiters zurückgibt ([§12.9.9.3 Classification of await expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12993-classification-of-await-expressions)). Für `Task<T>` ist das `T`.
+
+</details>
+
+## Zusammenfassung
+
+Ein `Task` steht für Arbeit, die später fertig wird, ein `Task<T>` zusätzlich für einen Wert vom Typ `T`. Eine Methode mit `async` darf mit `await` auf einen Task warten. Das Ergebnis von `await` auf einen `Task<T>` ist ein `T`. In Anweisungen auf oberster Ebene darfst du `await` direkt schreiben. `async` startet keinen neuen Thread, es erlaubt `await` und lässt die Methode einen Task zurückgeben. SecLog lädt jetzt eine Log-Quelle mit `await`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m13-l01-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l01-q7" />
+
+### Transferfrage
+
+<Quiz id="m13-l01-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Asynchrone Programmierung mit async und await](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/)
+- Microsoft Learn: [Async-Funktionen in der C#-Spezifikation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions)
+- Microsoft Learn: [Klasse `Task`](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task)
