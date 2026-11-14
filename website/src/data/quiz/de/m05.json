@@ -410,7 +410,7 @@
           "feedback": "Eine Liste ist ein Referenztyp. Nach `var b = a;` zeigen beide Variablen auf dieselbe Liste."
         },
         {
-          "text": "Nach `Remove` sind die Indizes der folgenden Elemente um 1 kleiner.",
+          "text": "Nach Aufruf von `Remove` auf eine Liste sind die Indizes der folgenden Elemente um 1 kleiner.",
           "correct": true,
           "feedback": "Die Elemente rücken nach vorn, damit keine Lücke bleibt."
         }
