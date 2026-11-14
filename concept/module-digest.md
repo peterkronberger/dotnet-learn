@@ -163,7 +163,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m06-l…"` fields: class, instance, field, member, instance-method, object-creation, constructor, default-constructor, constructor-chaining, this-access, readonly-field, encapsulation, access-modifier, accessibility-domain, documentation-comment, property, accessor, backing-field, computed-property, object-initializer, auto-property, init-accessor, required-member, field-keyword, primary-constructor, static-member, instance-member, static-class, static-constructor, namespace, fully-qualified-name, using-directive, using-alias, global-using, implicit-usings, entry-point, main-method, command-line-argument, exit-code
 - **Misconception ids:** m06-l01-class-declaration-creates-object, m06-l02-readonly-object-immutable, m06-l03-private-per-object, m06-l04-property-is-field, m06-l05-initializer-before-constructor, m06-l06-init-settable-later, m06-l07-primary-parameter-is-property, m06-l08-static-means-unchangeable, m06-l09-using-adds-library, m06-l10-top-level-has-no-main
 - **Open forward references:**
-  - `async`/`await` → M13 (`m06-l10`)
   - Projects and assemblies, project file, attributes → M14 (`m06-l03`, `m06-l06`, `m06-l09`)
 - **SecLog end state:** `website/examples/m06/l10/seclog-classes-solution.cs` – the M5 end state plus: `LogEvent` (events from the sample log, `Describe()`) and `Incident` (failed logins of one user, validated `Status`, `required Source`, static `Count`). Both live in the namespace `SecLog.Model` at the end of the file. Chain: `m05/l11` → `m06/l01` → … → `m06/l10`. M6 milestone reached.
 - **Notes for later modules:**
@@ -252,7 +251,6 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m10-l…"` fields: method-group, method-group-conversion, delegate-invocation, callback, func-delegate, action-delegate, predicate-delegate, lambda-expression, anonymous-function, expression-lambda, statement-lambda, anonymous-function-conversion, natural-type, discard-parameter, closure, captured-variable, static-anonymous-function, multicast-delegate, invocation-list, delegate-combination, event, field-like-event, event-accessor, publisher, subscriber, event-args, event-handler, standard-event-pattern
 - **Misconception ids:** m10-l01-method-group-calls-method, m10-l02-func-last-type-is-parameter, m10-l03-lambda-runs-when-defined, m10-l04-lambda-has-no-type, m10-l05-lambda-captures-value, m10-l06-multicast-returns-all-results, m10-l07-event-raised-from-outside, m10-l08-subscribers-removed-automatically
 - **Open forward references:**
-  - Asynchronous event handlers (`m10-l08`) → M13
   - Attributes on lambdas → M14, expression trees → M16 (not marked in a lesson; not taught)
 - **SecLog end state:** `website/examples/m10/l08/seclog-delegates-solution.cs` – the M9 end state plus: `delegate bool IncidentCheck(Incident)`, `FuncRule : IDetectionRule` (name plus `Func<Incident, bool>`), rules written as lambdas, `FailuresAtLeast(int)` returning a lambda (closure), alert chain with a multicast `Action`, `IncidentMonitor` with `event EventHandler<IncidentFoundEventArgs>? IncidentFound`, `IncidentFoundEventArgs : EventArgs`. Chain: `m09/l06` → `m10/l01` → … → `m10/l08`. M10 milestone reached.
 - **Notes for later modules:**
@@ -305,6 +303,39 @@ Each module section has these fields:
   - `Parse` returns a `ParseResult` (pattern-based, no exception); `ParseLine` (M7) is the exception-based parser.
   - `IncidentState` is the immutable snapshot of an `Incident`; the mutable `Incident` class stays.
   - `union` and `closed` need C# 15 / .NET 11; examples run in the playground and CI with the .NET 11 SDK.
+
+## M13 async/await und Nebenläufigkeit
+
+- **Lessons:**
+  - `m13-l01` Asynchrone Methoden mit async und await – `Task`/`Task<T>`, `async`, `await`; `async` does not start a thread.
+  - `m13-l02` Wie eine async-Methode abläuft – runs synchronously until the first incomplete `await`, the thread is released while waiting, return types, awaitable pattern, Runtime Async and `ValueTask` by name.
+  - `m13-l03` Ausnahmen in asynchronem Code – the exception is stored in the task and rethrown at `await`; unobserved exceptions.
+  - `m13-l04` Auf mehrere Tasks warten – sequential vs. concurrent awaits, `Task.WhenAll`, `Task.WhenAny`, `WaitAsync` timeout.
+  - `m13-l05` Abbrechen mit CancellationToken – `CancellationTokenSource`, token, cooperative cancellation, `OperationCanceledException`.
+  - `m13-l06` Asynchrone Streams – `IAsyncEnumerable<T>`, `await foreach`, `async` iterator with `yield return`.
+  - `m13-l07` Asynchrones Freigeben mit await using – `IAsyncDisposable`, `DisposeAsync`, `await using`.
+  - `m13-l08` Stolperfallen bei async – `async void` (event handlers only), blocking `.Result`/`.Wait()`, sync-over-async, I/O-bound vs. CPU-bound, `ConfigureAwait` by name.
+  - `m13-l09` Nebenläufigkeit, Parallelität, Asynchronität – three different ideas; process, thread, core; interleaving.
+  - `m13-l10` Threads und der Thread-Pool – `Thread`, `Start`, `Join`, thread pool, `Task.Run` for CPU-bound work.
+  - `m13-l11` Race Conditions – shared mutable state, `count++` is not atomic, lost update, check-then-act, passing runs prove nothing.
+  - `m13-l12` Gegenseitiger Ausschluss mit lock – critical section, `lock`, `System.Threading.Lock`, private lock object, release on exception, no `await` in a lock.
+  - `m13-l13` Deadlocks und andere Gefahren – circular waiting, lock ordering, timeouts, starvation and livelock by name.
+  - `m13-l14` Atomare Operationen und Sichtbarkeit – `Interlocked`, memory model in plain words, `volatile` is no replacement for a lock.
+  - `m13-l15` Strategien für Thread-Sicherheit – confinement, immutability, concurrent collections, static mutable state, static constructor runs once.
+  - `m13-l16` Datenparallelität – `Parallel.For`/`ForEach`/`ForEachAsync`, PLINQ, overhead, serial part limits speedup, result order.
+  - `m13-l17` Arbeiter koordinieren – `Channel` (bounded), producer/consumer, `SemaphoreSlim` with `WaitAsync`, cancel several workers.
+- **Constructs taught:** `Task`, `Task<T>`, `async`, `await` (`m13-l01`), `ValueTask` by name (`m13-l02`), `Task.WhenAll`, `Task.WhenAny`, `WaitAsync` (`m13-l04`), `CancellationTokenSource`, `CancellationToken`, `OperationCanceledException` (`m13-l05`), `IAsyncEnumerable<T>`, `await foreach`, async iterator (`m13-l06`), `IAsyncDisposable`, `await using` (`m13-l07`), `async void`, `.Result`, `.Wait()` (`m13-l08`), `Thread`, `Start`, `Join`, `Task.Run` (`m13-l10`), `lock`, `System.Threading.Lock` (`m13-l12`), `Interlocked`, `volatile` (`m13-l14`), `ConcurrentDictionary` and concurrent collections (`m13-l15`), `Parallel.For`/`ForEach`/`ForEachAsync`, `AsParallel` (`m13-l16`), `Channel`, `SemaphoreSlim` (`m13-l17`).
+- **Glossary terms:** task, asynchronous-programming, async-method, await-expression, continuation, awaitable, task-type, faulted-task, unobserved-exception, aggregate-exception, task-combinator, timeout, cancellation-token, cancellation-token-source, cooperative-cancellation, async-stream, async-iterator, asynchronous-foreach, async-disposable, asynchronous-using, async-void, sync-over-async, io-bound, cpu-bound, synchronization-context, concurrency, processor-core, scheduler, interleaving, thread-pool, work-item, race-condition, shared-state, read-modify-write, lost-update, check-then-act, non-determinism, mutual-exclusion, critical-section, lock-statement, lock-object, deadlock, lock-ordering, starvation, livelock, atomic-operation, memory-model, visibility, volatile-field, thread-safety, confinement, concurrent-collection, data-parallelism, parallel-loop, plinq, degree-of-parallelism, speedup, producer-consumer, channel, bounded-channel, semaphore
+- **Misconception ids:** m13-l01-async-starts-new-thread, m13-l02-await-blocks-thread, m13-l03-async-exception-lost, m13-l04-sequential-awaits-run-together, m13-l05-cancel-stops-task-immediately, m13-l06-await-foreach-waits-for-all, m13-l07-using-calls-disposeasync, m13-l08-async-void-is-safe, m13-l09-async-is-multithreading, m13-l10-every-task-has-own-thread, m13-l11-increment-is-atomic, m13-l11-passing-runs-prove-no-race, m13-l12-lock-protects-unlocked-access, m13-l13-deadlock-throws-exception, m13-l14-volatile-makes-thread-safe, m13-l15-dotnet-types-are-thread-safe, m13-l16-more-threads-always-faster, m13-l17-unlimited-tasks-are-fastest
+- **Open forward references:**
+  - Singleton service (lifetimes) → M15 (`m13-l15`)
+  - Attributes → M14 (`m13-l06`)
+  - The M6 note (`async`/`await`) and the M10 note (asynchronous event handlers) are closed by `m13-l01`–`l08`.
+- **SecLog end state:** `website/examples/m13/l17/seclog-async-solution.cs` – the M12 end state plus: reading several log sources asynchronously (`Task.WhenAll`, timeout, cancellation, async stream, `await using`), a lock-protected and an `Interlocked` counter, per-source failure counts with a thread-safe collection, parallel analysis, and many log files analyzed by two workers with a bounded `Channel` and a `ConcurrentDictionary` (`Total failures in files`). Chain: `m12/l10` → `m13/l01` → … → `m13/l17`; lessons without a step: `m13-l09`, `m13-l11`, `m13-l13`. M13 milestone reached.
+- **Notes for later modules:**
+  - The SecLog file uses threads and channels since part B and no longer runs in the browser; M14 moves it into a project.
+  - Output of concurrent code is printed only after all workers are done, sorted by key, so it is the same on every run.
+  - Racy examples without fixed output are `*.compile.cs` (compiled by CI, no output snapshot).
 
 ## W1 Wiederholung M1–M4
 

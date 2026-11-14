@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-11-13 (third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-11-14 (third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -438,7 +438,7 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
   - Notional machine: interleaving tables and sequence diagrams (`<Diagram>`) that show two threads step by step; learners trace them by hand.
   - Tasks: "Which outputs are possible?" (`multi`), find the race (`find-bug`), put the steps of an interleaving in order (`parsons`), explain in your own words why a lock fixes it.
   - Literature on prior conceptions of concurrency (check and add to `didactics.md` before use): Kolikant 2001, *Computer Science Education* 11(3), 221–245, https://doi.org/10.1076/csed.11.3.221.3831 (verified 2026-10-25); a 2010 *Communications of the ACM* article on beginners' commonsense understanding of concurrency ("concert tickets"; authors and pages not verified yet).
-- **Rule 4 (real outputs) for part B:** a racy program has no fixed output, so it cannot have a CI snapshot. Shown outputs only come from deterministic examples (for example the correctly synchronized counter). Racy examples are shown as code plus a *hand-traced* list of possible results that is labeled as such, never as a claimed real output. Open question for S2: a "compile only" mode in `tools/check-examples.sh` so racy examples are still compiled in CI.
+- **Rule 4 (real outputs) for part B:** a racy program has no fixed output, so it cannot have a CI snapshot. Shown outputs only come from deterministic examples (for example the correctly synchronized counter). Racy examples are shown as code plus a *hand-traced* list of possible results that is labeled as such, never as a claimed real output. Racy examples are named `*.compile.cs`: `tools/check-examples.sh` compiles them but compares no output (#519).
 - More misconceptions (part B): more threads always make a program faster; a simple increment is atomic; a program that ran correctly 100 times has no race; `volatile` makes code thread safe; async code and multithreaded code are the same.
 
 ### M14 Testen (testing) ◻
@@ -474,7 +474,15 @@ Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.
     - `with` copy vs. changing a property (`m12-l07`, `m06-l06`)
     - union type vs. closed hierarchy vs. `sealed` (`m12-l08`, `m12-l09`, `m08-l04`)
   - Misconception ids: m12-l02-not-applies-to-whole-pattern, m12-l04-positional-pattern-matches-by-name, m12-l06-switch-arm-order-irrelevant, m12-l07-with-changes-original, m12-l09-closed-means-sealed
-- **M13**: Filled by the module review of M13.
+- **M13** (from `module-digest.md` `## M13`):
+  - Concepts:
+    - `async` vs. a new thread (`m13-l01`, `m13-l10`)
+    - `await` vs. blocking `.Result` (`m13-l02`, `m13-l08`)
+    - timeout (`WaitAsync`) vs. cancellation (`m13-l04`, `m13-l05`)
+    - `using` vs. `await using` (`m13-l07`, `m07-l08`)
+    - `lock` vs. `Interlocked` vs. `volatile` (`m13-l12`, `m13-l14`)
+    - concurrency vs. parallelism vs. asynchrony (`m13-l09`)
+  - Misconception ids: m13-l01-async-starts-new-thread, m13-l02-await-blocks-thread, m13-l09-async-is-multithreading, m13-l12-lock-protects-unlocked-access, m13-l14-volatile-makes-thread-safe
 - **M14**: Filled by the module review of M14.
 - ▶/◻: M12 and M13 part A are runnable. M13 part B and M14 are ◻ (reading tasks without a runner).
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
@@ -542,6 +550,7 @@ Content of the specification or platform that the course leaves out, and why. "O
 | Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, …) | §6 | Tool and editor concerns; no effect on program logic. |
 | UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), `nameof` of unbound generic types (C# 14) | feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
 | Low-level threading primitives and expert topics: wait handles and mutexes across processes, spin locks, lock-free algorithms, TPL Dataflow, custom task schedulers and partitioners | library | Expert topics; Microsoft's best practices point to higher-level APIs. Multithreading as such **is** covered in full in M13 part B (concepts, race conditions, locks, deadlocks, atomic operations, thread-safe design, parallel loops, channels) – only without runnable examples, because the playground runs on one thread. |
+| Amdahl's law by name and formula | concept | The paper could not be opened (only the bibliographic record was checked), so `m13-l16` explains in plain words that the serial part limits the speedup, based on Microsoft Learn. |
 | Garbage collector internals, finalization details, memory profiling | runtime | Implementation detail, not specified by the standard (§7 only requires automatic memory management). Only a deep dive in M4/M7. |
 | Regular expressions | library | Useful for log parsing, but a separate language. Optional deep dive in M5 at most; SecLog uses string methods. |
 | Cryptography, password hashing, writing own security code | library | The SecLog domain is defensive and analytic; writing security primitives yourself is a known source of vulnerabilities. Only the advice "use vetted platform APIs". |
@@ -591,5 +600,4 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 Open questions from the review:
 - Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
-- M13 part B: a "compile only" mode for racy examples in `tools/check-examples.sh` (S2); source for Amdahl's law; authors and pages of the 2010 CACM article on concurrency conceptions.
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.
