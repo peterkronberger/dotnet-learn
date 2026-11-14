@@ -1,0 +1,4 @@
+Got: first
+Got: second
+Got: third
+Stream finished

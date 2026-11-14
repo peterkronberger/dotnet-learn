@@ -1,0 +1,3 @@
+consumed 1
+consumed 2
+Stream ended with TaskCanceledException

@@ -531,6 +531,294 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem eigenen Programm würdest du mehrere Tasks gleichzeitig warten lassen, und wo würdest du eine Wartezeit begrenzen?",
       "modelAnswer": "Zum Beispiel beim Laden mehrerer unabhängiger Daten, etwa der Logs von mehreren Servern: Ich starte alle Aufrufe zuerst und warte mit `Task.WhenAll`. Eine Wartezeit begrenze ich bei Quellen, die hängen könnten, etwa einem langsamen Server. Nach dem Timeout melde ich den Fehler, statt weiter zu warten."
+    },
+    {
+      "id": "m13-l05-q1",
+      "lesson": "m13-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l05/token-to-delay.cs",
+      "explanation": "Der Aufruf `source.Cancel()` setzt das Signal vor dem Warten. `Task.Delay` bekommt einen Token, der schon abgebrochen ist, und endet sofort mit einer Ausnahme. `Task.Delay` löst die abgeleitete `TaskCanceledException` aus, das `catch` für `OperationCanceledException` fängt sie."
+    },
+    {
+      "id": "m13-l05-q2",
+      "lesson": "m13-l05",
+      "type": "single",
+      "question": "Eine Methode läuft gerade und ruft `Task.Delay(5000)` ohne Token auf. Ein anderer Teil des Programms ruft `source.Cancel()` auf. Was passiert?",
+      "options": [
+        {
+          "text": "Nichts bricht ab: Das Signal ist gesetzt, aber die Methode prüft es nicht.",
+          "correct": true,
+          "feedback": "Der Abbruch ist kooperativ. Ohne Token oder Prüfung bemerkt der Code das Signal nie und läuft zu Ende."
+        },
+        {
+          "text": "Die Methode endet sofort, weil `Cancel()` den Task beendet.",
+          "feedback": "`Cancel()` beendet nichts. Es setzt nur ein Signal, das der Code lesen muss.",
+          "misconception": "m13-l05-cancel-stops-task-immediately"
+        },
+        {
+          "text": "Der Aufruf von `Task.Delay` löst sofort eine `OperationCanceledException` aus.",
+          "feedback": "Nur ein Aufruf, dem der Token übergeben wurde, reagiert auf das Signal. Hier hat er keinen.",
+          "misconception": "m13-l05-cancel-stops-task-immediately"
+        },
+        {
+          "text": "Das Programm bricht mit einem Fehler ab, weil `Cancel()` eine Ausnahme auslöst.",
+          "feedback": "`Cancel()` löst im aufrufenden Code keine Ausnahme aus. Die Ausnahme entsteht erst dort, wo der Code den Token prüft.",
+          "misconception": "m13-l05-cancel-stops-task-immediately"
+        }
+      ],
+      "explanation": "`Cancel()` setzt ein Signal. Die laufende Methode endet erst, wenn sie den Token prüft oder an eine Methode übergibt, die ihn prüft."
+    },
+    {
+      "id": "m13-l05-q3",
+      "lesson": "m13-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l05/cooperative-check.cs",
+      "explanation": "In Schritt 3 ruft der Code `Cancel()` auf. Die Schleife mit Prüfung löst beim nächsten `ThrowIfCancellationRequested` die `OperationCanceledException` aus. Die Schleife ohne Prüfung bemerkt das Signal nicht und macht alle 5 Schritte. Das Signal ist trotzdem gesetzt (`requested: True`)."
+    },
+    {
+      "id": "m13-l05-q4",
+      "lesson": "m13-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l05/cancel-after.cs",
+      "explanation": "`CancelAfter` setzt das Signal nach 50 ms. Das 5 Sekunden lange `Task.Delay` bemerkt es und endet im Zustand abgebrochen. `IsCanceled` ist `True`, `IsFaulted` ist `False`: Ein Abbruch ist kein Fehler des Tasks."
+    },
+    {
+      "id": "m13-l05-q5",
+      "lesson": "m13-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l05/cancel-or-error.cs",
+      "explanation": "Beim ersten Aufruf ist der Token schon abgebrochen: Der Filter `when (token.IsCancellationRequested)` trifft, es erscheint `canceled`. Beim zweiten Aufruf löst `WorkAsync` eine `InvalidOperationException` aus. Sie passt nicht zum ersten `catch`, das zweite meldet sie als Fehler. Der dritte Aufruf läuft ohne Token durch."
+    },
+    {
+      "id": "m13-l05-q6",
+      "lesson": "m13-l05",
+      "type": "single",
+      "question": "Eine Methode hat den Parameter `CancellationToken token = default`. Was bedeutet der Standardwert?",
+      "options": [
+        {
+          "text": "Aufrufer, die nichts abbrechen wollen, können den Parameter weglassen, der Token wird dann nie abgebrochen.",
+          "correct": true,
+          "feedback": "`default` ist ein Token ohne Quelle. Er meldet nie einen Abbruch."
+        },
+        {
+          "text": "Der Token ist beim Aufruf schon abgebrochen.",
+          "feedback": "Ein Token ohne Quelle wird nie abgebrochen."
+        },
+        {
+          "text": "Die Methode bricht nach dem Standardwert von 0 Millisekunden ab.",
+          "feedback": "Ein Token hat keine Zeitangabe. Die Zeit kommt von `CancelAfter` an der Quelle."
+        },
+        {
+          "text": "Der Aufrufer muss einen Token übergeben, sonst kompiliert das Programm nicht.",
+          "feedback": "Ein Parameter mit Standardwert darf weggelassen werden."
+        }
+      ],
+      "explanation": "Der Standardwert macht den Token optional. So bleiben Aufrufe ohne Abbruch unverändert."
+    },
+    {
+      "id": "m13-l05-q7",
+      "lesson": "m13-l05",
+      "type": "single",
+      "question": "Welches Objekt löst den Abbruch aus, und welches wird an die Methoden weitergereicht?",
+      "options": [
+        {
+          "text": "Die `CancellationTokenSource` löst mit `Cancel` aus, der `CancellationToken` wird weitergereicht.",
+          "correct": true,
+          "feedback": "Die Quelle sendet das Signal, der Token ist die Lesesicht darauf."
+        },
+        {
+          "text": "Der `CancellationToken` löst mit `Cancel` aus, die Quelle wird weitergereicht.",
+          "feedback": "Der Token kann nur gelesen werden. Es gibt keine Methode `Cancel` am Token."
+        },
+        {
+          "text": "Beide sind dasselbe Objekt, der Typ spielt keine Rolle.",
+          "feedback": "Es sind zwei Typen mit getrennten Aufgaben: senden und lesen."
+        },
+        {
+          "text": "Die `OperationCanceledException` löst den Abbruch aus.",
+          "feedback": "Die Ausnahme entsteht erst, wenn der Code das Signal bemerkt."
+        }
+      ],
+      "explanation": "Wer abbrechen darf, hält die Quelle. Wer nur reagieren soll, bekommt den Token."
+    },
+    {
+      "id": "m13-l05-q8",
+      "lesson": "m13-l05",
+      "type": "cloze",
+      "question": "Ergänze das Signal, den Token beim Aufruf, die abgefangene Ausnahme und den Typ des Parameters.",
+      "example": "m13/l05/gap-cancel.cs",
+      "blanks": [
+        {
+          "text": "Cancel()",
+          "hint": "Die Quelle setzt das Signal."
+        },
+        {
+          "text": "source.Token",
+          "hint": "Der Token der Quelle wird übergeben."
+        },
+        {
+          "text": "OperationCanceledException",
+          "hint": "Diese Ausnahme zeigt einen Abbruch an."
+        },
+        {
+          "text": "CancellationToken",
+          "hint": "Der Parameter nimmt den Token auf."
+        }
+      ],
+      "explanation": "Die Quelle ruft `Cancel()` auf, der Aufruf bekommt `source.Token`, und `Task.Delay` löst die `OperationCanceledException` aus. Der Parameter der Methode hat den Typ `CancellationToken`."
+    },
+    {
+      "id": "m13-l05-q9",
+      "lesson": "m13-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum Abbruch in .NET kooperativ ist und was `Cancel()` wirklich tut.",
+      "modelAnswer": "`Cancel()` setzt nur ein Signal an der `CancellationTokenSource`. Der laufende Code bekommt den `CancellationToken` und muss ihn selbst prüfen, zum Beispiel mit `ThrowIfCancellationRequested`, oder an Methoden wie `Task.Delay` weitergeben. Erst dort endet die Arbeit, mit einer `OperationCanceledException`.\n\nCode, der den Token nie prüft, läuft zu Ende. Das Verfahren heißt kooperativ, weil der Code beim Abbruch mitarbeiten muss."
+    },
+    {
+      "id": "m13-l05-q10",
+      "lesson": "m13-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du einen `CancellationToken` einsetzen?",
+      "modelAnswer": "Zum Beispiel bei einer langen Suche, die der Nutzer abbrechen kann, oder beim Laden von Daten mit einem Zeitlimit. Ich lege eine `CancellationTokenSource` an, rufe `Cancel()` oder `CancelAfter` auf und reiche den Token an alle Methoden weiter, die lange warten. Das `catch` für `OperationCanceledException` behandelt den Abbruch getrennt von echten Fehlern."
+    },
+    {
+      "id": "m13-l06-q1",
+      "lesson": "m13-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l06/first-async-stream.cs",
+      "explanation": "`await foreach` holt Zeile für Zeile aus dem Strom. Jede Zeile wird mit `yield return` geliefert und im Schleifenrumpf ausgegeben. Nach dem letzten Element endet der Strom, danach folgt `Stream finished`."
+    },
+    {
+      "id": "m13-l06-q2",
+      "lesson": "m13-l06",
+      "type": "single",
+      "question": "Das Programm liest einen asynchronen Strom mit `await foreach`. Wann läuft der Schleifenrumpf zum ersten Mal?",
+      "example": "m13/l06/produced-consumed.cs",
+      "options": [
+        {
+          "text": "Sobald das erste Element geliefert wurde, auch wenn der Strom noch weiter liefert.",
+          "correct": true,
+          "feedback": "Der Rumpf läuft für jedes Element, sobald es da ist."
+        },
+        {
+          "text": "Erst wenn der Strom alle Elemente geliefert hat.",
+          "feedback": "Das wäre bei einem `Task<string[]>` so. Ein asynchroner Strom liefert Element für Element.",
+          "misconception": "m13-l06-await-foreach-waits-for-all"
+        },
+        {
+          "text": "Erst wenn die Methode des Stroms mit `return` endet.",
+          "feedback": "Ein Iterator liefert mit `yield return`. Der Rumpf läuft schon vorher.",
+          "misconception": "m13-l06-await-foreach-waits-for-all"
+        },
+        {
+          "text": "Nie, denn `await foreach` wartet endlos.",
+          "feedback": "`await foreach` endet, wenn der Strom zu Ende ist."
+        }
+      ],
+      "explanation": "Jedes `yield return` übergibt ein Element an die Schleife. Der Rumpf läuft dann, bevor das nächste Element berechnet wird."
+    },
+    {
+      "id": "m13-l06-q3",
+      "lesson": "m13-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l06/produced-consumed.cs",
+      "explanation": "Der Strom liefert eine Zahl und hält an. Die Schleife verarbeitet sie. Dann läuft der Strom weiter bis zur nächsten Zahl. Deshalb wechseln `produced` und `consumed` einander ab."
+    },
+    {
+      "id": "m13-l06-q4",
+      "lesson": "m13-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l06/stop-early.cs",
+      "explanation": "Mit `break` verlässt die Schleife den Strom nach dem Element 2. Der Strom wird geschlossen, dabei läuft sein `finally` (`Stream closed`). Die Elemente 3 bis 5 werden nicht mehr geliefert."
+    },
+    {
+      "id": "m13-l06-q5",
+      "lesson": "m13-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l06/cancel-stream.cs",
+      "explanation": "Der Token ist ein normaler Parameter des Stroms und geht an `Task.Delay`. Nach dem Element 2 setzt die Schleife das Signal. Das nächste `Task.Delay` bemerkt es und löst die `TaskCanceledException` aus, die beim `await foreach` ankommt."
+    },
+    {
+      "id": "m13-l06-q6",
+      "lesson": "m13-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l06/when-each.cs",
+      "explanation": "`Task.WhenEach` liefert die Tasks in der Reihenfolge, in der sie fertig werden: erst `fast` (10 ms), dann `middle` (100 ms), zuletzt `slow` (300 ms). Die Reihenfolge der Argumente spielt keine Rolle."
+    },
+    {
+      "id": "m13-l06-q7",
+      "lesson": "m13-l06",
+      "type": "single",
+      "question": "Welchen Rückgabetyp hat eine asynchrone Methode, die mit `yield return` Zeilen vom Typ `string` liefert?",
+      "options": [
+        {
+          "text": "`IAsyncEnumerable<string>`",
+          "correct": true,
+          "feedback": "Dieser Typ steht für einen asynchronen Strom von Elementen."
+        },
+        {
+          "text": "`Task<string[]>`",
+          "feedback": "Dieser Task liefert alle Zeilen erst am Ende als Array."
+        },
+        {
+          "text": "`IEnumerable<string>`",
+          "feedback": "Ein normaler Iterator kann nicht mit `await` warten."
+        },
+        {
+          "text": "`Task<string>`",
+          "feedback": "Das ist ein einzelner Wert, kein Strom."
+        }
+      ],
+      "explanation": "Eine Methode mit `async`, `yield return` und dem Rückgabetyp `IAsyncEnumerable<T>` ist ein asynchroner Iterator."
+    },
+    {
+      "id": "m13-l06-q8",
+      "lesson": "m13-l06",
+      "type": "cloze",
+      "question": "Ergänze die Schleife, den Modifizierer, den Rückgabetyp und die Anweisung, die ein Element liefert.",
+      "example": "m13/l06/gap-async-stream.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Die Schleife wartet auf jedes Element."
+        },
+        {
+          "text": "async",
+          "hint": "Der Iterator wartet mit `await` auf `Task.Delay`."
+        },
+        {
+          "text": "IAsyncEnumerable<int>",
+          "hint": "Der Typ eines asynchronen Stroms von Zahlen."
+        },
+        {
+          "text": "yield",
+          "hint": "Diese Anweisung liefert ein Element."
+        }
+      ],
+      "explanation": "`await foreach` verarbeitet den Strom. Die Methode ist `async`, hat den Rückgabetyp `IAsyncEnumerable<int>` und liefert mit `yield return`. Die Summe ist `6`."
+    },
+    {
+      "id": "m13-l06-q9",
+      "lesson": "m13-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein asynchroner Strom Elemente liefert, sobald sie da sind, und worin er sich von `Task<string[]>` unterscheidet.",
+      "modelAnswer": "Ein `Task<string[]>` ist erst fertig, wenn alle Zeilen da sind. Ein asynchroner Strom liefert jedes Element mit `yield return` einzeln und kann zwischendurch mit `await` warten. `await foreach` führt den Rumpf für jedes Element aus, sobald es angekommen ist.\n\nDas Programm kann so schon mit dem ersten Element arbeiten, während später ankommende noch fehlen."
+    },
+    {
+      "id": "m13-l06-q10",
+      "lesson": "m13-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du einen asynchronen Strom einsetzen?",
+      "modelAnswer": "Zum Beispiel beim Lesen einer großen Datei oder einer Netzwerkverbindung, bei der Zeilen nach und nach ankommen. Ich verarbeite jede Zeile sofort mit `await foreach`, statt zu warten, bis alles geladen ist. Den Abbruch löse ich über einen Token aus, den ich dem Iterator als Parameter gebe."
     }
   ]
 }

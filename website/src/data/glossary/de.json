@@ -7989,6 +7989,127 @@
         "title": "Task.WaitAsync Method",
         "url": "https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.waitasync"
       }
+    },
+    {
+      "id": "cancellation-token",
+      "term": "CancellationToken",
+      "german": "Abbruchtoken",
+      "category": "platform",
+      "definition": "Ein Wert, den eine Methode erhält, um einen Abbruch zu bemerken. `IsCancellationRequested` zeigt das Signal, `ThrowIfCancellationRequested` löst eine `OperationCanceledException` aus.",
+      "aliases": [
+        "CancellationToken",
+        "Cancellation Token"
+      ],
+      "related": [
+        "cancellation-token-source",
+        "cooperative-cancellation"
+      ],
+      "lesson": "m13-l05",
+      "source": {
+        "title": "CancellationToken Struct",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.cancellationtoken"
+      }
+    },
+    {
+      "id": "cancellation-token-source",
+      "term": "CancellationTokenSource",
+      "german": "Abbruchquelle",
+      "category": "platform",
+      "definition": "Das Objekt, das den Abbruch auslöst: `Cancel` setzt das Signal sofort, `CancelAfter` nach einer Zeit. Die Eigenschaft `Token` liefert den `CancellationToken` zum Weitergeben.",
+      "aliases": [
+        "CancellationTokenSource"
+      ],
+      "related": [
+        "cancellation-token",
+        "using-declaration"
+      ],
+      "lesson": "m13-l05",
+      "source": {
+        "title": "CancellationTokenSource Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.cancellationtokensource"
+      }
+    },
+    {
+      "id": "cooperative-cancellation",
+      "term": "Cooperative Cancellation",
+      "german": "kooperativer Abbruch",
+      "category": "platform",
+      "definition": "Ein Abbruch, bei dem der laufende Code mitarbeitet: Er prüft den Token oder gibt ihn weiter. Code, der den Token nie prüft, läuft nach `Cancel()` zu Ende.",
+      "aliases": [
+        "kooperativ",
+        "Kooperativer Abbruch"
+      ],
+      "related": [
+        "cancellation-token",
+        "cancellation-token-source"
+      ],
+      "lesson": "m13-l05",
+      "source": {
+        "title": "Cancellation in Managed Threads",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/cancellation-in-managed-threads"
+      }
+    },
+    {
+      "id": "async-stream",
+      "term": "Async Stream",
+      "german": "asynchroner Strom",
+      "category": "language",
+      "definition": "Eine Folge von Elementen vom Typ `IAsyncEnumerable<T>`, die einzeln eintreffen. Die Schleife `await foreach` verarbeitet jedes Element, sobald es da ist.",
+      "aliases": [
+        "Async Streams",
+        "IAsyncEnumerable",
+        "asynchrone Streams"
+      ],
+      "related": [
+        "async-iterator",
+        "asynchronous-foreach",
+        "iterator"
+      ],
+      "lesson": "m13-l06",
+      "source": {
+        "title": "Generate and consume async streams",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/generate-consume-asynchronous-stream"
+      }
+    },
+    {
+      "id": "async-iterator",
+      "term": "Async Iterator",
+      "german": "asynchroner Iterator",
+      "category": "language",
+      "definition": "Eine Methode mit `async`, dem Rückgabetyp `IAsyncEnumerable<T>` und `yield return`. Sie kann zwischen zwei Elementen mit `await` warten.",
+      "aliases": [
+        "Async Iteratoren",
+        "asynchrone Iteratoren"
+      ],
+      "related": [
+        "async-stream",
+        "iterator",
+        "yield-statement"
+      ],
+      "lesson": "m13-l06",
+      "source": {
+        "title": "Generate and consume async streams",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/generate-consume-asynchronous-stream"
+      }
+    },
+    {
+      "id": "asynchronous-foreach",
+      "term": "await foreach",
+      "german": "asynchrone foreach-Schleife",
+      "category": "language",
+      "definition": "Die Schleife für einen asynchronen Strom. Sie wartet auf jedes Element und führt den Rumpf aus, sobald es da ist. Am Ende ruft sie `DisposeAsync` des Enumerators auf.",
+      "aliases": [
+        "await foreach-Schleife"
+      ],
+      "related": [
+        "async-stream",
+        "await-expression"
+      ],
+      "lesson": "m13-l06",
+      "source": {
+        "title": "The await foreach statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements#the-await-foreach-statement"
+      }
     }
   ]
 }

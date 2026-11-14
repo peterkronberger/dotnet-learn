@@ -1,0 +1,3 @@
+Finished: fast
+Finished: middle
+Finished: slow

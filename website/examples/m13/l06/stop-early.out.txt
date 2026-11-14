@@ -1,0 +1,4 @@
+consumed 1
+consumed 2
+Stream closed
+Loop finished
