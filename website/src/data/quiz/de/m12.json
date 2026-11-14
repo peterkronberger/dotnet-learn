@@ -152,6 +152,7 @@
     {
       "id": "m12-l02-q2",
       "lesson": "m12-l02",
+      "placement": true,
       "type": "single",
       "question": "`type` enthält `\"logout\"`. Was ergibt `type is not \"login-success\" or \"logout\"`?",
       "options": [
@@ -288,6 +289,10 @@
     {
       "id": "m12-l03-q1",
       "lesson": "m12-l03",
+      "placement": true,
+      "placementLessons": [
+        "m12-l01"
+      ],
       "type": "single",
       "question": "`object? value = null;` – was ergibt `value is { }`?",
       "options": [
@@ -435,6 +440,7 @@
     {
       "id": "m12-l04-q1",
       "lesson": "m12-l04",
+      "placement": true,
       "type": "single",
       "question": "`Visit` ist ein Record `(string User, string Ip)`. Was ergibt `new Visit(\"bob\", \"203.0.113.7\") is (\"203.0.113.7\", \"bob\")`?",
       "options": [
@@ -556,6 +562,7 @@
     {
       "id": "m12-l05-q1",
       "lesson": "m12-l05",
+      "placement": true,
       "type": "single",
       "question": "`int[] a = [1, 2, 3];` – was ergibt `a is [1, 2]`?",
       "options": [
@@ -691,6 +698,7 @@
     {
       "id": "m12-l06-q1",
       "lesson": "m12-l06",
+      "placement": true,
       "type": "single",
       "question": "Ein switch-Ausdruck hat die Arme `< 5 => \"a\"` und `< 3 => \"b\"` (in dieser Reihenfolge, danach `_`). Was passiert?",
       "options": [
@@ -831,6 +839,7 @@
     {
       "id": "m12-l07-q1",
       "lesson": "m12-l07",
+      "placement": true,
       "type": "single",
       "question": "`Ticket a = new(1, \"open\");` ist ein Record. Danach steht `Ticket b = a with { Status = \"closed\" };` im Code. Welchen Status hat `a`?",
       "options": [
@@ -1238,6 +1247,10 @@
     {
       "id": "m12-l09-q6",
       "lesson": "m12-l09",
+      "placement": true,
+      "placementLessons": [
+        "m12-l08"
+      ],
       "type": "single",
       "question": "Welche Aussage über einen Union-Typ und eine geschlossene Hierarchie stimmt?",
       "options": [
@@ -1313,6 +1326,7 @@
     {
       "id": "m12-l10-q3",
       "lesson": "m12-l10",
+      "placement": true,
       "type": "single",
       "question": "Zu der geschlossenen Hierarchie kommt ein weiterer Untertyp `Triangle` dazu. Was meldet der Compiler?",
       "example": "m12/l10/new-type-switch.snippet.cs",
