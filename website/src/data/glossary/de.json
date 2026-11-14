@@ -8110,6 +8110,140 @@
         "title": "The await foreach statement",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/iteration-statements#the-await-foreach-statement"
       }
+    },
+    {
+      "id": "async-disposable",
+      "term": "IAsyncDisposable",
+      "german": "asynchron freigebbar",
+      "category": "language",
+      "definition": "Eine Schnittstelle mit der Methode `DisposeAsync`, die einen `ValueTask` zurückgibt. Ein Typ, der beim Freigeben warten muss, implementiert sie.",
+      "aliases": [
+        "DisposeAsync",
+        "Async Disposable"
+      ],
+      "related": [
+        "dispose",
+        "asynchronous-using"
+      ],
+      "lesson": "m13-l07",
+      "source": {
+        "title": "Implement a DisposeAsync method",
+        "url": "https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-disposeasync"
+      }
+    },
+    {
+      "id": "asynchronous-using",
+      "term": "await using",
+      "german": "asynchrone using-Anweisung",
+      "category": "language",
+      "definition": "Die Form von `using` für Typen mit `IAsyncDisposable`. Sie ruft am Ende `DisposeAsync` auf und wartet darauf, auch bei einer Ausnahme.",
+      "aliases": [
+        "await using-Anweisung",
+        "await using-Deklaration"
+      ],
+      "related": [
+        "async-disposable",
+        "using-statement",
+        "using-declaration"
+      ],
+      "lesson": "m13-l07",
+      "source": {
+        "title": "The using statement",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/statements/using"
+      }
+    },
+    {
+      "id": "async-void",
+      "term": "async void",
+      "german": "asynchrone Methode ohne Task",
+      "category": "language",
+      "definition": "Eine `async`-Methode mit Rückgabetyp `void`. Der Aufrufer kann sie nicht abwarten und ihre Ausnahmen nicht abfangen. Sie ist für Event-Handler gedacht.",
+      "aliases": [
+        "async-void-Methode"
+      ],
+      "related": [
+        "event-handler",
+        "sync-over-async"
+      ],
+      "lesson": "m13-l08",
+      "source": {
+        "title": "Async return types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-return-types"
+      }
+    },
+    {
+      "id": "sync-over-async",
+      "term": "Sync over Async",
+      "german": "blockierendes Warten auf einen Task",
+      "category": "language",
+      "definition": "Der Aufruf von `.Result`, `.Wait()` oder `GetAwaiter().GetResult()` auf einen Task. Der Thread blockiert, und mit einem Synchronisationskontext kann ein Deadlock entstehen.",
+      "aliases": [
+        ".Result",
+        ".Wait()"
+      ],
+      "related": [
+        "async-void",
+        "synchronization-context"
+      ],
+      "lesson": "m13-l08",
+      "source": {
+        "title": "Asynchronous programming",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
+      }
+    },
+    {
+      "id": "io-bound",
+      "term": "I/O-bound",
+      "german": "I/O-gebunden",
+      "category": "platform",
+      "definition": "Arbeit, die vor allem auf die Außenwelt wartet, etwa auf Festplatte, Netzwerk oder Timer. Man wartet sie mit der asynchronen API und `await` ab.",
+      "aliases": [
+        "I/O-gebunden"
+      ],
+      "related": [
+        "cpu-bound"
+      ],
+      "lesson": "m13-l08",
+      "source": {
+        "title": "Asynchronous programming",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
+      }
+    },
+    {
+      "id": "cpu-bound",
+      "term": "CPU-bound",
+      "german": "CPU-gebunden",
+      "category": "platform",
+      "definition": "Arbeit, die vor allem rechnet und dafür einen Prozessor braucht. Sie wartet nicht auf die Außenwelt.",
+      "aliases": [
+        "CPU-gebunden"
+      ],
+      "related": [
+        "io-bound"
+      ],
+      "lesson": "m13-l08",
+      "source": {
+        "title": "Asynchronous programming",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
+      }
+    },
+    {
+      "id": "synchronization-context",
+      "term": "Synchronization Context",
+      "german": "Synchronisationskontext",
+      "category": "platform",
+      "definition": "Ein Objekt, das bestimmt, wo die Fortsetzung nach einem `await` läuft. Oberflächen-Anwendungen haben einen, der nur einen Thread zulässt. Konsolenanwendungen haben keinen.",
+      "aliases": [
+        "SynchronizationContext"
+      ],
+      "related": [
+        "sync-over-async"
+      ],
+      "lesson": "m13-l08",
+      "source": {
+        "title": "Asynchronous programming",
+        "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
+      }
     }
   ]
 }

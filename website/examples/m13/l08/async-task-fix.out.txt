@@ -1,0 +1,5 @@
+Start
+Sending alert for bob
+Alert for bob sent
+After the call
+Caught: ArgumentException

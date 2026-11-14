@@ -221,7 +221,7 @@
           "feedback": "Der Typ `Task<string>` liefert am Ende eine Zeichenfolge."
         }
       ],
-      "explanation": "Erlaubt sind `void`, Task-Typen wie `Task` und `Task<T>` und asynchrone Iteratortypen. Für Arbeit ohne Wert nimmst du `Task`. `async void` hat eigene Nachteile (Lektion „Stolperfallen bei async“)."
+      "explanation": "Erlaubt sind `void`, Task-Typen wie `Task` und `Task<T>` und asynchrone Iteratortypen. Für Arbeit ohne Wert nimmst du `Task`. Ein `void` als Rückgabetyp hat eigene Nachteile (Lektion „Stolperfallen bei async“)."
     },
     {
       "id": "m13-l02-q5",
@@ -819,6 +819,329 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem eigenen Programm würdest du einen asynchronen Strom einsetzen?",
       "modelAnswer": "Zum Beispiel beim Lesen einer großen Datei oder einer Netzwerkverbindung, bei der Zeilen nach und nach ankommen. Ich verarbeite jede Zeile sofort mit `await foreach`, statt zu warten, bis alles geladen ist. Den Abbruch löse ich über einen Token aus, den ich dem Iterator als Parameter gebe."
+    },
+    {
+      "id": "m13-l07-q1",
+      "lesson": "m13-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l07/first-async-dispose.cs",
+      "explanation": "`await using` ruft am Ende des Blocks `DisposeAsync` auf und wartet darauf. Deshalb steht `Closed web` vor `After the block`."
+    },
+    {
+      "id": "m13-l07-q2",
+      "lesson": "m13-l07",
+      "type": "single",
+      "question": "Der Typ `Connection` hat nur `IAsyncDisposable`, nicht `IDisposable`. Was passiert, wenn das Programm mit einem normalen `using` übersetzt wird?",
+      "example": "m13/l07/plain-using-error.snippet.cs",
+      "options": [
+        {
+          "text": "Der Compiler meldet einen Fehler: Der Typ muss `IDisposable` implementieren.",
+          "correct": true,
+          "feedback": "Ein normales `using` ruft `Dispose` auf und verlangt deshalb `IDisposable`."
+        },
+        {
+          "text": "Das Programm läuft, `using` ruft `DisposeAsync` auf.",
+          "feedback": "Nur `await using` ruft `DisposeAsync` auf.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        },
+        {
+          "text": "Das Programm läuft, aber `DisposeAsync` wird nie aufgerufen.",
+          "feedback": "Der Code wird gar nicht erst übersetzt.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        },
+        {
+          "text": "Das Programm übersetzt, bricht aber zur Laufzeit mit einer Ausnahme ab.",
+          "feedback": "Der Fehler tritt schon beim Übersetzen auf, nicht erst zur Laufzeit.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        }
+      ],
+      "explanation": "Die Anweisung `using` verlangt `IDisposable`. Für einen Typ, der nur `IAsyncDisposable` hat, meldet der Compiler CS8418 und schlägt `await using` vor."
+    },
+    {
+      "id": "m13-l07-q3",
+      "lesson": "m13-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)? Achte darauf, was bei der Ausnahme passiert.",
+      "example": "m13/l07/dispose-on-exception.cs",
+      "explanation": "Die Ausnahme verlässt den Block. Bevor sie den `catch` erreicht, läuft `DisposeAsync`. Deshalb steht `Closed web` vor `Caught: broken`."
+    },
+    {
+      "id": "m13-l07-q4",
+      "lesson": "m13-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l07/two-resources.cs",
+      "explanation": "Mehrere Ressourcen werden in umgekehrter Reihenfolge ihrer Deklaration freigegeben: zuerst `second`, dann `first`. Die Deklarationen gelten bis zum Ende des umgebenden Blocks."
+    },
+    {
+      "id": "m13-l07-q5",
+      "lesson": "m13-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)? Der Typ hat beide Schnittstellen.",
+      "example": "m13/l07/both-interfaces.cs",
+      "explanation": "Das normale `using` ruft `Dispose` auf, `await using` ruft `DisposeAsync` auf. Welche Methode läuft, entscheidet die Anweisung."
+    },
+    {
+      "id": "m13-l07-q6",
+      "lesson": "m13-l07",
+      "type": "cloze",
+      "question": "Ergänze die Anweisung, die Schnittstelle, den Modifizierer und den Rückgabetyp von `DisposeAsync`.",
+      "example": "m13/l07/gap-async-dispose.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Die Anweisung wartet auf `DisposeAsync`."
+        },
+        {
+          "text": "IAsyncDisposable",
+          "hint": "Die Schnittstelle für asynchrones Freigeben."
+        },
+        {
+          "text": "async",
+          "hint": "Die Methode wartet mit `await` auf `Task.Delay`."
+        },
+        {
+          "text": "ValueTask",
+          "hint": "Der Rückgabetyp von `DisposeAsync`."
+        }
+      ],
+      "explanation": "`await using` verlangt einen Typ mit `IAsyncDisposable`. Dessen Methode `DisposeAsync` gibt einen `ValueTask` zurück und ist hier `async`, weil sie wartet."
+    },
+    {
+      "id": "m13-l07-q7",
+      "lesson": "m13-l07",
+      "type": "single",
+      "question": "Welchen Rückgabetyp hat `DisposeAsync` in `IAsyncDisposable`?",
+      "options": [
+        {
+          "text": "`ValueTask`",
+          "correct": true,
+          "feedback": "`ValueTask` ist ein leichterer Task-Typ. Er lässt sich mit `await` abwarten."
+        },
+        {
+          "text": "`void`",
+          "feedback": "Mit `void` könnte `await using` nicht auf das Ende warten.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        },
+        {
+          "text": "`bool`",
+          "feedback": "`DisposeAsync` liefert kein Ergebnis zurück.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        },
+        {
+          "text": "`IAsyncEnumerable<T>`",
+          "feedback": "Das ist der Typ eines asynchronen Stroms aus der vorigen Lektion."
+        }
+      ],
+      "explanation": "`DisposeAsync` gibt einen `ValueTask` zurück, damit `await using` auf das Ende des Aufräumens warten kann."
+    },
+    {
+      "id": "m13-l07-q8",
+      "lesson": "m13-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über `await using` stimmen?",
+      "options": [
+        {
+          "text": "Am Ende des Blocks wird `DisposeAsync` aufgerufen und abgewartet.",
+          "correct": true,
+          "feedback": "Erst danach läuft die nächste Anweisung nach dem Block."
+        },
+        {
+          "text": "`DisposeAsync` läuft auch, wenn im Block eine Ausnahme auftritt.",
+          "correct": true,
+          "feedback": "Die Freigabe gilt für jeden Ausgang des Blocks."
+        },
+        {
+          "text": "Der Typ muss `IDisposable` implementieren.",
+          "feedback": "Verlangt wird `IAsyncDisposable`.",
+          "misconception": "m13-l07-using-calls-disposeasync"
+        },
+        {
+          "text": "Das Programm geht weiter, ohne auf `DisposeAsync` zu warten.",
+          "feedback": "`await using` wartet auf das Ende von `DisposeAsync`."
+        }
+      ],
+      "explanation": "`await using` ruft `DisposeAsync` auf jedem Ausgang des Blocks auf und wartet darauf. Der Typ braucht dafür `IAsyncDisposable`."
+    },
+    {
+      "id": "m13-l07-q9",
+      "lesson": "m13-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein normales `using` bei einem Typ, der nur `IAsyncDisposable` hat, nicht passt und was `await using` anders macht.",
+      "modelAnswer": "Ein normales `using` ruft die Methode `Dispose` auf, die aus `IDisposable` kommt. Ein Typ mit nur `IAsyncDisposable` hat sie nicht, deshalb meldet der Compiler einen Fehler.\n\n`await using` ruft stattdessen `DisposeAsync` auf und wartet darauf, bis das Aufräumen fertig ist. So kann das Freigeben selbst langsame Arbeit erledigen, ohne einen Thread zu blockieren."
+    },
+    {
+      "id": "m13-l07-q10",
+      "lesson": "m13-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du `IAsyncDisposable` und `await using` einsetzen?",
+      "modelAnswer": "Zum Beispiel bei einem Objekt, das beim Schließen noch Daten wegschreibt oder eine Verbindung sauber beendet, etwa ein Schreiber für eine Logdatei. Das Schließen dauert, also soll es mit `await` abgewartet werden. Ich schreibe `await using`, damit `DisposeAsync` auf jedem Weg aus dem Block läuft."
+    },
+    {
+      "id": "m13-l08-q1",
+      "lesson": "m13-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l08/async-task-fix.cs",
+      "explanation": "Die Methode ist `async Task`, der Aufrufer wartet mit `await` darauf. Deshalb steht `Alert for bob sent` vor `After the call`, und der `catch` fängt die Ausnahme des zweiten Aufrufs."
+    },
+    {
+      "id": "m13-l08-q2",
+      "lesson": "m13-l08",
+      "type": "single",
+      "question": "Die Methode `SendAlert` ist `async void` und löst nach dem `await` eine Ausnahme aus. Was passiert mit der Ausnahme?",
+      "example": "m13/l08/async-void-exception.snippet.cs",
+      "options": [
+        {
+          "text": "Der `catch` des Aufrufers fängt sie nicht. Sie wird später ausgelöst und kann das Programm beenden.",
+          "correct": true,
+          "feedback": "Der Aufrufer hat keinen Task, an dem die Ausnahme hängt."
+        },
+        {
+          "text": "Der `catch` des Aufrufers fängt sie, wie bei `async Task`.",
+          "feedback": "Bei `async void` läuft der Aufrufer weiter, bevor die Ausnahme auftritt.",
+          "misconception": "m13-l08-async-void-is-safe"
+        },
+        {
+          "text": "Sie geht ohne Folgen verloren.",
+          "feedback": "Sie geht nicht verloren, sie wird ausgelöst und bleibt unbehandelt.",
+          "misconception": "m13-l08-async-void-is-safe"
+        },
+        {
+          "text": "Der Compiler lehnt die Methode ab.",
+          "feedback": "`async void` ist erlaubt, nur selten sinnvoll."
+        }
+      ],
+      "explanation": "Eine `async void`-Methode gibt keinen Task zurück. Der Aufrufer kann nicht auf sie warten und ihre Ausnahme nicht abfangen."
+    },
+    {
+      "id": "m13-l08-q3",
+      "lesson": "m13-l08",
+      "type": "single",
+      "question": "Eine Methode ohne Ergebnis soll asynchron werden. Sie ist kein Event-Handler. Welche Signatur wählst du?",
+      "options": [
+        {
+          "text": "`async Task`",
+          "correct": true,
+          "feedback": "Der Aufrufer kann den Task abwarten und Ausnahmen abfangen."
+        },
+        {
+          "text": "`async void`, weil kein Ergebnis zurückkommt.",
+          "feedback": "Dass es kein Ergebnis gibt, ist kein Grund für `void`. `Task` steht für Arbeit ohne Ergebnis.",
+          "misconception": "m13-l08-async-void-is-safe"
+        },
+        {
+          "text": "`async void`, weil Ausnahmen dann sicher behandelt werden.",
+          "feedback": "Bei `async void` kann der Aufrufer Ausnahmen gerade nicht abfangen.",
+          "misconception": "m13-l08-async-void-is-safe"
+        },
+        {
+          "text": "`void` ohne `async`, mit `Task.Delay(1).Wait()` im Rumpf.",
+          "feedback": "Das blockiert den Thread."
+        }
+      ],
+      "explanation": "`async void` ist für Event-Handler gedacht, weil `EventHandler` den Rückgabetyp `void` hat. Alle anderen Methoden ohne Ergebnis sind `async Task`."
+    },
+    {
+      "id": "m13-l08-q4",
+      "lesson": "m13-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l08/handler-with-tasks.cs",
+      "explanation": "Der Handler ist eine normale Lambda. Er startet `SendAsync`, speichert den Task und kehrt sofort zurück. Danach wartet das Programm mit `Task.WhenAll` auf alle gespeicherten Tasks."
+    },
+    {
+      "id": "m13-l08-q5",
+      "lesson": "m13-l08",
+      "type": "cloze",
+      "question": "Ergänze den Handler, der den Task speichert, und das Warten auf alle Tasks.",
+      "example": "m13/l08/gap-handler.cs",
+      "blanks": [
+        {
+          "text": "Add",
+          "hint": "Die Methode, die den Task zur Liste hinzufügt."
+        },
+        {
+          "text": "await",
+          "hint": "Das Programm wartet auf das Ergebnis von `Task.WhenAll`."
+        },
+        {
+          "text": "WhenAll",
+          "hint": "Die Methode, die auf mehrere Tasks wartet."
+        }
+      ],
+      "explanation": "Der Handler fügt den Task mit `Add` der Liste hinzu. Das Programm wartet danach mit `await Task.WhenAll(...)` auf alle."
+    },
+    {
+      "id": "m13-l08-q6",
+      "lesson": "m13-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über `.Result`, `.Wait()` und `GetAwaiter().GetResult()` stimmen?",
+      "example": "m13/l08/blocking-on-task.snippet.cs",
+      "options": [
+        {
+          "text": "Sie blockieren den aufrufenden Thread, bis der Task fertig ist.",
+          "correct": true,
+          "feedback": "Der Thread kann in der Zeit nichts anderes tun."
+        },
+        {
+          "text": "In einer Anwendung mit Synchronisationskontext, der nur einen Thread erlaubt, kann das zu einem Deadlock führen.",
+          "correct": true,
+          "feedback": "Der Kontext wartet auf die Rückkehr der Fortsetzung, die blockierte Methode hält ihn fest."
+        },
+        {
+          "text": "Sie starten für den Task einen neuen Thread.",
+          "feedback": "Sie starten nichts, sie warten nur."
+        },
+        {
+          "text": "In einer Konsolenanwendung führen sie immer zu einem Deadlock.",
+          "feedback": "Eine Konsolenanwendung hat keinen solchen Kontext. Sie verschwenden dort aber trotzdem einen Thread."
+        }
+      ],
+      "explanation": "Blockierendes Warten belegt einen Thread. Wo ein Synchronisationskontext nur einen Thread erlaubt, kann es einen Deadlock geben. `await` wartet dagegen, ohne den Thread zu blockieren."
+    },
+    {
+      "id": "m13-l08-q7",
+      "lesson": "m13-l08",
+      "type": "multi",
+      "question": "Welche Arbeiten sind I/O-gebunden?",
+      "options": [
+        {
+          "text": "Warten auf die Antwort eines Servers",
+          "correct": true,
+          "feedback": "Hier wartet das Programm auf die Außenwelt."
+        },
+        {
+          "text": "Warten auf einen Timer mit `Task.Delay`",
+          "correct": true,
+          "feedback": "Es wird nur gewartet, nichts berechnet."
+        },
+        {
+          "text": "Lesen einer Datei von der Festplatte",
+          "correct": true,
+          "feedback": "Das Programm wartet auf das Laufwerk."
+        },
+        {
+          "text": "Berechnen der Primzahlen bis zwei Millionen",
+          "feedback": "Das ist CPU-gebunden: Der Prozessor rechnet die ganze Zeit."
+        }
+      ],
+      "explanation": "I/O-gebundene Arbeit wartet auf die Außenwelt und wird mit der asynchronen API und `await` abgewartet. CPU-gebundene Arbeit rechnet und braucht einen Prozessor."
+    },
+    {
+      "id": "m13-l08-q8",
+      "lesson": "m13-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `async void` nur für Event-Handler gedacht ist und wie du sonst vorgehst.",
+      "modelAnswer": "Eine `async void`-Methode gibt keinen Task zurück. Der Aufrufer kann deshalb nicht auf sie warten und ihre Ausnahmen nicht abfangen. Ein Event-Handler hat durch den Delegate `EventHandler` den Rückgabetyp `void`, deshalb ist es dort erlaubt.\n\nSonst schreibe ich `async Task`, damit der Aufrufer mit `await` wartet und Ausnahmen am `await` abfängt."
+    },
+    {
+      "id": "m13-l08-q9",
+      "lesson": "m13-l08",
+      "type": "explain",
+      "question": "Transferfrage: In deinem Programm löst ein Event asynchrone Arbeit aus, zum Beispiel das Senden einer Nachricht. Wie gehst du vor?",
+      "modelAnswer": "Der Handler ist eine normale Methode oder Lambda. Er startet die `async Task`-Methode und speichert den Task in einer Liste. Das Programm wartet später mit `await Task.WhenAll(...)` auf alle Tasks, so gehen Fehler nicht verloren. Muss der Handler selbst `async void` sein, fange ich alle Ausnahmen darin mit `try/catch` ab."
     }
   ]
 }

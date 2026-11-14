@@ -1,0 +1,199 @@
+---
+title: Stolperfallen bei async
+sidebar_position: 8
+description: Die typischen Fehler bei async-Code – async void, blockierendes Warten auf einen Task und die Wahl zwischen I/O-gebundener und CPU-gebundener Arbeit.
+lesson_id: m13-l08
+duration_min: 24
+---
+
+import asyncVoidLate from '!!raw-loader!@site/examples/m13/l08/async-void-late.snippet.cs';
+import asyncVoidException from '!!raw-loader!@site/examples/m13/l08/async-void-exception.snippet.cs';
+import asyncTaskFix from '!!raw-loader!@site/examples/m13/l08/async-task-fix.cs';
+import asyncTaskFixOutput from '!!raw-loader!@site/examples/m13/l08/async-task-fix.out.txt';
+import handlerWithTasks from '!!raw-loader!@site/examples/m13/l08/handler-with-tasks.cs';
+import safeAsyncHandler from '!!raw-loader!@site/examples/m13/l08/safe-async-handler.snippet.cs';
+import blockingOnTask from '!!raw-loader!@site/examples/m13/l08/blocking-on-task.snippet.cs';
+import ioAndCpuBound from '!!raw-loader!@site/examples/m13/l08/io-and-cpu-bound.snippet.cs';
+import configureAwait from '!!raw-loader!@site/examples/m13/l08/configure-await.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l08/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l08/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l08/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l08/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Stolperfallen bei async
+
+:::note[Lernziele]
+- Du kannst erklären, warum `async void` nur für Event-Handler gedacht ist, und eine `async void`-Methode in eine `async Task`-Methode umschreiben.
+- Du kannst erklären, warum man nicht mit `.Result` oder `.Wait()` auf einen Task wartet.
+- Du kannst entscheiden, ob Arbeit I/O-gebunden oder CPU-gebunden ist, und was das für `async` bedeutet.
+- Du kannst einen asynchronen Event-Handler sicher schreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l07-q2" />
+
+<Quiz id="m10-l08-q1" />
+
+<Quiz id="m13-l03-q1" />
+
+## Eine Methode, die man nicht abwarten kann
+
+Der Compiler hält jede Methode mit `async` für gültig, auch wenn ihr Rückgabetyp `void` ist. Das Beispiel ruft eine solche Methode auf:
+
+<CodeBlock language="csharp" title="async-void-late.cs">{asyncVoidLate}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen, und in welcher Reihenfolge?
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Start:** Das Programm gibt `Start` aus und ruft `SendAlert` auf.
+2. **Bis zum ersten await:** Die Methode läuft synchron weiter, gibt `Sending alert for bob` aus und trifft auf `await Task.Delay(10)`. Der Task ist nicht fertig, die Methode gibt die Kontrolle zurück.
+3. **Der Aufrufer läuft weiter:** Weil `SendAlert` keinen Task zurückgibt, kann der Aufrufer nicht darauf warten. Er gibt `After the call` aus, und das Programm endet.
+4. **Die letzte Zeile fehlt:** `Alert for bob sent` käme erst nach dem Warten. Zu dem Zeitpunkt ist das Programm schon zu Ende.
+
+Das Ergebnis eines echten Laufs: `Start`, `Sending alert for bob`, `After the call`. Die vierte Zeile erscheint nie.
+
+</details>
+
+Eine `async void`-Methode gibt keinen Task zurück. Der Aufrufer kann deshalb nicht auf sie warten. Ihre Ausnahmen kann er auch nicht abfangen: Sie werden nicht am Aufrufer ausgelöst, und eine unbehandelte Ausnahme kann das Programm beenden ([Async return types](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-return-types)).
+
+<CodeBlock language="csharp" title="async-void-exception.cs">{asyncVoidException}</CodeBlock>
+
+Der `catch` in diesem Programm fängt die Ausnahme nicht. Der Aufruf kehrt zurück, bevor die Ausnahme auftritt. `Caught` erscheint nie.
+
+<Quiz id="m13-l08-q2" />
+
+## async Task statt async void
+
+Die Lösung ist `async Task`. Der Task steht für die Arbeit, der Aufrufer wartet mit `await` darauf. Eine Ausnahme der Methode steckt im Task und wird am `await` ausgelöst.
+
+:::info[Vorhersage]
+Das Programm ruft dieselbe Methode zweimal auf, beide Male mit `await`. Welche Zeilen erscheinen?
+:::
+
+<CSharpRunner id="m13-l08-fix" code={asyncTaskFix} predict expected={asyncTaskFixOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erster Aufruf:** `SendAlertAsync("bob")` gibt `Sending alert for bob` aus, wartet und gibt `Alert for bob sent` aus. Erst dann läuft der Aufrufer weiter und gibt `After the call` aus.
+2. **Zweiter Aufruf:** Die Methode löst eine `ArgumentException` aus. Sie steckt im Task und wird am `await` ausgelöst, der `catch` fängt sie.
+
+</details>
+
+<Quiz id="m13-l08-q1" />
+
+## Ausnahme: Event-Handler
+
+Es gibt einen Fall, in dem `async void` richtig ist. Der Delegate `EventHandler` hat den Rückgabetyp `void`. Eine Methode oder Lambda, die ein Ereignis abonniert, muss deshalb `void` zurückgeben. Soll sie `await` benutzen, ist `async void` die einzige Möglichkeit. In Modul 10 war das als offene Frage markiert: asynchrone Event-Handler.
+
+Wenn du einen solchen Handler schreibst, fange alle Ausnahmen darin ab. Niemand außer dem Handler kann es tun.
+
+<CodeBlock language="csharp" title="safe-async-handler.cs">{safeAsyncHandler}</CodeBlock>
+
+Es geht auch ohne `async void`. Der Handler ist eine normale Lambda: Sie startet die `async Task`-Methode und speichert den Task. Das Programm wartet später auf alle gespeicherten Tasks. So gehen weder Ausnahmen noch laufende Arbeit verloren.
+
+<CSharpRunner id="m13-l08-handler" code={handlerWithTasks} />
+
+Beide Handler haben schon zurückgegeben, bevor die Tasks fertig sind. `Task.WhenAll` wartet auf beide. Ein Task, der eine Ausnahme enthält, löst sie dort aus, wo das Programm darauf wartet.
+
+<Quiz id="m13-l08-q4" />
+
+<Quiz id="m13-l08-q5" />
+
+## Nicht blockieren, sondern warten
+
+Ein Task lässt sich auch blockierend abwarten: mit `.Result`, `.Wait()` oder `GetAwaiter().GetResult()`. Der aufrufende Thread tut dann nichts, bis der Task fertig ist. Er ist belegt, obwohl er nur wartet. Das <Term id="sync-over-async">blockierende Warten auf einen Task</Term> ist deshalb ein typischer Fehler ([Asynchronous programming scenarios](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-scenarios)).
+
+<CodeBlock language="csharp" title="blocking-on-task.cs">{blockingOnTask}</CodeBlock>
+
+Dazu kommt ein Risiko. In manchen Anwendungen gibt es einen <Term id="synchronization-context">Synchronisationskontext</Term>: Er sorgt dafür, dass die Fortsetzung nach einem `await` auf einem bestimmten Thread läuft, etwa dem der Oberfläche. Blockiert dieser Thread auf einen Task, dessen Fortsetzung genau auf ihm laufen soll, warten beide aufeinander. Das ist ein Deadlock. Eine Konsolenanwendung hat keinen solchen Kontext, dort verschwendest du nur einen Thread. Im Browser-Playground schlägt das blockierende Warten sofort fehl.
+
+<Forward concepts={['Deadlock']} module="13" />
+
+Schreibe stattdessen `await`. Es wartet, ohne den Thread zu blockieren.
+
+<Quiz id="m13-l08-q6" />
+
+## I/O-gebunden oder CPU-gebunden
+
+Wie du asynchron arbeitest, hängt davon ab, worauf die Arbeit wartet. <Term id="io-bound">I/O-gebundene</Term> Arbeit wartet auf die Außenwelt: auf die Festplatte, das Netzwerk oder einen Timer. Dafür gibt es asynchrone Methoden, die du mit `await` abwartest. Es wird kein zusätzlicher Thread gebraucht. <Term id="cpu-bound">CPU-gebundene</Term> Arbeit rechnet: Der Prozessor ist die ganze Zeit beschäftigt. Sie wird mit `Task.Run` auf einen anderen Thread gelegt, damit der aufrufende Thread frei bleibt ([Asynchronous programming scenarios](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-scenarios)).
+
+<Forward concepts={['Task.Run', 'Thread-Pool']} module="13" />
+
+<CodeBlock language="csharp" title="io-and-cpu-bound.cs">{ioAndCpuBound}</CodeBlock>
+
+`Task.Delay` in den bisherigen Beispielen steht für I/O-gebundene Arbeit: Das Programm wartet nur.
+
+<Quiz id="m13-l08-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest eine Quelle mit einem Leser, der sich am Ende asynchron schließt.
+
+Im Runner siehst du nur den Block `// Release a log source reader asynchronously`, das Ende des Programms und die Funktionen für das Laden. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `ReadSourceLinesAsync` und vor `static class Report` die lokale Funktion `async Task NotifyAsync(Incident incident)`. Sie wartet mit `await Task.Delay(1)` und gibt nichts aus.
+2. Schreibe hinter den Block `// Release a log source reader asynchronously` und vor die Zeile `// End with exit code 0 …` den Block `// Start async work from an event handler safely`. Er legt `List<Task> notifications = [];` an und erzeugt einen neuen `IncidentMonitor notifier = new(detector);`. Der Handler `(sender, e) => notifications.Add(NotifyAsync(e.Incident))` ist eine normale Lambda. Dann ruft der Block `notifier.Check(incidents)` auf, wartet mit `await Task.WhenAll(notifications)` und gibt `Notifications sent: <Anzahl>` aus.
+
+<CSharpRunner id="m13-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Task-Methode:** `NotifyAsync` ist `async Task`, wartet kurz und gibt nichts aus. So bleibt die Ausgabe in jedem Lauf gleich.
+2. **Sicherer Handler:** Der Handler startet `NotifyAsync` und speichert den Task. Er ist keine `async void`-Lambda.
+3. **Warten und zählen:** `Check` löst das Ereignis für jeden gefundenen Vorfall aus. Danach wartet `Task.WhenAll` auf alle Tasks. Beide Vorfälle melden etwas, es sind also 2 Benachrichtigungen.
+
+</details>
+
+**Neuer Stand:** SecLog startet asynchrone Arbeit aus einem Event-Handler und wartet am Ende auf alle Tasks.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l08-async-void-is-safe" />
+
+**„`async void` ist für jede Methode ohne Rückgabewert in Ordnung.“** Das stimmt nicht. Eine `async void`-Methode kann nicht abgewartet werden, und der Aufrufer fängt ihre Ausnahmen nicht ab. Methoden ohne Ergebnis sind `async Task`. `async void` ist nur für Event-Handler gedacht.
+:::
+
+<Quiz id="m13-l08-q3" />
+
+<details>
+<summary>Vertiefung: Synchronisationskontext und async all the way (optional)</summary>
+
+Ein `await` merkt sich den aktuellen Synchronisationskontext, wenn es einen gibt, und setzt die Methode dort fort. In Bibliothekscode ist das oft nicht nötig. Mit `ConfigureAwait(false)` verzichtet ein `await` darauf. Das kann Leistung bringen und hilft, Deadlocks zu vermeiden, wenn ein Aufrufer blockiert. In Anwendungscode mit Oberfläche lässt man es meistens weg. Hier ist `ConfigureAwait` nur genannt ([Asynchronous programming scenarios](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-scenarios)).
+
+<CodeBlock language="csharp" title="configure-await.cs">{configureAwait}</CodeBlock>
+
+„Async all the way“ heißt: Wer eine asynchrone Methode aufruft, wartet mit `await` und ist selbst `async`. So zieht sich `async` bis zum Einstiegspunkt durch und nirgends muss blockiert werden. Blockiert werden darf nur, wenn `await` auf dem ganzen Aufrufweg nicht möglich ist, zum Beispiel in einer alten Schnittstelle, die du nicht ändern kannst.
+
+</details>
+
+## Zusammenfassung
+
+`async void` gibt keinen Task zurück: Der Aufrufer kann nicht warten und keine Ausnahme abfangen. Es ist nur für Event-Handler gedacht, alle anderen Methoden ohne Ergebnis sind `async Task`. Ein sicherer Handler startet eine `async Task`-Methode und speichert den Task, das Programm wartet danach mit `Task.WhenAll`. `.Result`, `.Wait()` und `GetAwaiter().GetResult()` blockieren einen Thread und können mit einem Synchronisationskontext einen Deadlock auslösen, `await` wartet ohne Blockieren. I/O-gebundene Arbeit wartet man mit `await` auf die asynchrone API ab, CPU-gebundene Arbeit legt man mit `Task.Run` auf einen anderen Thread.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l08-q8" />
+
+### Transferfrage
+
+<Quiz id="m13-l08-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Asynchronous programming scenarios](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-scenarios)
+- Microsoft Learn: [Async return types](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-return-types)
