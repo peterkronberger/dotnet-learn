@@ -1,0 +1,163 @@
+---
+title: Threads und der Thread-Pool
+sidebar_position: 10
+description: Was ein Thread ist, warum Anwendungscode selten selbst Threads erzeugt, wie der Thread-Pool Arbeitsaufträge verteilt und wie Task.Run CPU-gebundene Arbeit startet.
+lesson_id: m13-l10
+duration_min: 23
+---
+
+import threadStartJoin from '!!raw-loader!@site/examples/m13/l10/thread-start-join.cs';
+import runOnPool from '!!raw-loader!@site/examples/m13/l10/run-on-pool.cs';
+import runOnPoolOutput from '!!raw-loader!@site/examples/m13/l10/run-on-pool.out.txt';
+import manyWaits from '!!raw-loader!@site/examples/m13/l10/many-waits.cs';
+import manyWaitsOutput from '!!raw-loader!@site/examples/m13/l10/many-waits.out.txt';
+import poolInfo from '!!raw-loader!@site/examples/m13/l10/pool-info.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l10/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l10/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Threads und der Thread-Pool
+
+:::note[Lernziele]
+- Du kannst erklären, was ein Thread ist und warum Anwendungscode selten selbst Threads erzeugt.
+- Du kannst erklären, wie der Thread-Pool Arbeitsaufträge auf wenige Threads verteilt.
+- Du kannst CPU-gebundene Arbeit mit `Task.Run` starten und das Ergebnis mit `await` abholen.
+- Du kannst erklären, warum ein `await` beim Warten keinen Thread belegt.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l02-q4" />
+
+<Quiz id="m13-l08-q7" />
+
+<Quiz id="m13-l09-q1" />
+
+## Ein Thread von Hand
+
+In Lektion 8 stand: CPU-gebundene Arbeit legt man mit `Task.Run` auf einen anderen Thread. Wo läuft diese Arbeit genau? Zuerst der Thread selbst, wie er in der letzten Lektion vorkam: Ein <Term id="thread">Thread</Term> ist die Einheit, der das Betriebssystem Prozessorzeit zuteilt. Du erzeugst ihn mit `new Thread(...)` und gibst ihm den Code als Lambda. `Start` startet ihn, `Join` wartet, bis er fertig ist ([Threads and threading](https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading)).
+
+<CodeBlock language="csharp" title="thread-start-join.cs">{threadStartJoin}</CodeBlock>
+
+Das Beispiel gibt immer `done` aus, weil das Hauptprogramm erst nach `Join` ausgibt. Anwendungscode macht das selten selbst. Du müsstest jeden Thread starten, auf ihn warten und Fehler in ihm behandeln. Eine Ausnahme, die in einem Thread nicht behandelt wird, beendet in der Regel den ganzen Prozess. Der Thread-Pool nimmt dir diese Arbeit ab.
+
+<Quiz id="m13-l10-q5" />
+
+## Der Thread-Pool
+
+Der <Term id="thread-pool">Thread-Pool</Term> ist eine Gruppe von Arbeiter-Threads, die das System verwaltet. Ein Stück Arbeit, das der Pool ausführen soll, heißt <Term id="work-item">Arbeitsauftrag</Term> (Work Item). Der Pool arbeitet so ([The managed thread pool](https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool)):
+
+1. **Auftrag einreihen:** Ein neuer Arbeitsauftrag kommt in eine Warteschlange. Wie viele Aufträge warten dürfen, begrenzt nur der Speicher.
+2. **Freier Thread holt ihn:** Ein Thread des Pools nimmt den Auftrag und führt ihn aus.
+3. **Thread wird wiederverwendet:** Danach kehrt der Thread in den Pool zurück und kann den nächsten Auftrag ausführen. So muss das Programm nicht für jeden Auftrag einen Thread erzeugen.
+4. **Alle Threads belegt:** Der Pool begrenzt, wie viele Threads gleichzeitig aktiv sind. Weitere Aufträge warten in der Warteschlange, bis ein Thread frei ist.
+
+Wie viele Threads der Pool anlegt, entscheidet er selbst, um möglichst viele Aufträge pro Zeit zu schaffen. Meist ist das nicht dein Thema. Die Anzahl der Kerne liefert `Environment.ProcessorCount` ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)).
+
+<CodeBlock language="csharp" title="pool-info.cs">{poolInfo}</CodeBlock>
+
+Die Ausgabe dieses Beispiels hängt vom Rechner und vom Lauf ab, deshalb steht hier keine. Die Nummern der Threads ändern sich von Lauf zu Lauf.
+
+<Quiz id="m13-l10-q1" />
+
+## Task.Run
+
+Ein `Task` ist ein Arbeitsauftrag, kein Thread. Standardmäßig führt der Pool Tasks mit seinen Threads aus. `Task.Run` legt einen Auftrag in die Warteschlange des Pools und gibt einen Task für ihn zurück ([Task.Run](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.run)). Mit `await` holst du das Ergebnis ab.
+
+:::info[Vorhersage]
+Das Programm zählt die Primzahlen unter 20000 auf dem Thread-Pool. Welche Zeile gibt es aus?
+:::
+
+<CodeBlock language="csharp" title="run-on-pool.cs">{runOnPool}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Auftrag starten:** `Task.Run` reiht die Berechnung in die Warteschlange des Pools ein. Ein Pool-Thread führt sie aus, der Aufrufer bekommt sofort einen unfertigen Task.
+2. **Weiterarbeiten:** Der Hauptthread ist frei. Hier könnte er etwas anderes tun.
+3. **Abholen:** `await pending` wartet auf das Ergebnis, ohne den Hauptthread zu blockieren.
+
+Ein echter Lauf gibt <code>{runOnPoolOutput.trim()}</code> aus. Die Ausgabe ist immer gleich, weil das Programm erst nach `await` ausgibt.
+
+</details>
+
+:::info[Wichtig]
+Nimm `Task.Run` nur für Arbeit, die rechnet. Wartet die Arbeit auf die Außenwelt, reicht eine asynchrone Methode mit `await`. Dafür braucht es keinen Thread.
+:::
+
+<Quiz id="m13-l10-q4" />
+
+<Quiz id="m13-l10-q3" />
+
+## Warten braucht keinen Thread
+
+Ein `await` auf unfertige Arbeit gibt die Kontrolle zurück (Lektion 2). Solange gewartet wird, läuft kein Code des Tasks. Deshalb gehört zu einem wartenden Task kein Thread. Erst die Fortsetzung nach dem Warten braucht wieder einen Thread. Das Programm wartet auf 1000 Verzögerungen gleichzeitig:
+
+<CodeBlock language="csharp" title="many-waits.cs">{manyWaits}</CodeBlock>
+
+Es gibt <code>{manyWaitsOutput.trim()}</code> aus. Für 1000 gleichzeitige Wartevorgänge braucht es keine 1000 Threads.
+
+<Quiz id="m13-l10-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog startet asynchrone Arbeit aus einem Event-Handler und wartet am Ende auf alle Tasks.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die Quellen `logSources`, den letzten Block mit dem Ende des Programms und die Funktion `NotifyAsync`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `NotifyAsync` und vor `static class Report` die lokale Funktion `int CountFailuresIn(string[] lines)`. Sie zählt die Zeilen, die `login-failed` enthalten.
+2. Schreibe hinter den Block `// Start async work from an event handler safely` und vor die Zeile `// End with exit code 0 …` den Block `// Count failures on the thread pool`. Er startet für `logSources["web"]` und `logSources["vpn"]` je einen `Task.Run(() => CountFailuresIn(...))`, wartet mit `await Task.WhenAll(...)` auf beide und gibt `Failures per source: 5, 2` aus.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Zählfunktion:** `CountFailuresIn` rechnet nur und wartet auf nichts. Das ist CPU-gebundene Arbeit.
+2. **Aufträge starten:** Jeder `Task.Run` legt einen Auftrag in die Warteschlange des Pools. Die beiden Quellen werden unabhängig voneinander gezählt.
+3. **Abholen und ausgeben:** `Task.WhenAll` liefert die Ergebnisse in der Reihenfolge der Argumente, also zuerst `web`, dann `vpn`. Deshalb ist die Ausgabe in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog zählt die Fehlschläge der Quellen auf dem Thread-Pool.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l10-every-task-has-own-thread" />
+
+**„Jeder Task bekommt seinen eigenen Thread.“** Das stimmt nicht. Ein Task ist ein Arbeitsauftrag. Der Thread-Pool führt viele Aufträge mit wenigen Threads aus, und ein Task, der gerade wartet, belegt gar keinen Thread.
+:::
+
+<Quiz id="m13-l10-q2" />
+
+<details>
+<summary>Vertiefung: Wann ein eigener Thread sinnvoll ist (optional)</summary>
+
+Es gibt Fälle, in denen ein eigener Thread besser passt als der Pool: Der Thread muss ein Vordergrund-Thread sein, eine bestimmte Priorität haben oder lange blockieren. Weil der Pool die Zahl seiner Threads begrenzt, können viele lange blockierte Pool-Threads andere Aufträge am Start hindern ([The managed thread pool](https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool)). Für die Beispiele in diesem Kurs reicht der Pool.
+
+</details>
+
+## Zusammenfassung
+
+Ein Thread ist die Einheit, der das Betriebssystem Prozessorzeit zuteilt. Anwendungscode erzeugt selten selbst Threads, weil der Thread-Pool sie verwaltet und wiederverwendet. Der Pool reiht Arbeitsaufträge in eine Warteschlange ein, ein freier Thread führt sie aus, und sind alle Threads belegt, warten die Aufträge. `Task.Run` legt CPU-gebundene Arbeit als Auftrag in den Pool, und `await` holt das Ergebnis ab. Ein wartender `await` belegt keinen Thread, deshalb braucht I/O-gebundene Arbeit kein `Task.Run`.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l10-q7" />
+
+### Transferfrage
+
+<Quiz id="m13-l10-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [The managed thread pool](https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool)
+- Microsoft Learn: [Threads and threading](https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading)
+- Microsoft Learn: [Task.Run](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.run)

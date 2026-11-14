@@ -1142,6 +1142,308 @@
       "type": "explain",
       "question": "Transferfrage: In deinem Programm löst ein Event asynchrone Arbeit aus, zum Beispiel das Senden einer Nachricht. Wie gehst du vor?",
       "modelAnswer": "Der Handler ist eine normale Methode oder Lambda. Er startet die `async Task`-Methode und speichert den Task in einer Liste. Das Programm wartet später mit `await Task.WhenAll(...)` auf alle Tasks, so gehen Fehler nicht verloren. Muss der Handler selbst `async void` sein, fange ich alle Ausnahmen darin mit `try/catch` ab."
+    },
+    {
+      "id": "m13-l09-q1",
+      "lesson": "m13-l09",
+      "type": "single",
+      "question": "Ein Koch rührt abwechselnd in drei Töpfen, mit nur einer Hand frei. Alle drei Gerichte sind gleichzeitig in Arbeit, aber in jedem Moment bewegt sich nur ein Löffel. Was beschreibt das?",
+      "options": [
+        {
+          "text": "Nebenläufigkeit ohne Parallelität.",
+          "correct": true,
+          "feedback": "Mehrere Aufgaben sind in Arbeit, die Arbeit wechselt zwischen ihnen. Es läuft aber immer nur eine im selben Moment."
+        },
+        {
+          "text": "Parallelität.",
+          "feedback": "Parallelität heißt, dass Arbeit im selben Moment läuft, jede auf einem eigenen Kern. Hier arbeitet nur ein Koch."
+        },
+        {
+          "text": "Asynchronität.",
+          "feedback": "Asynchronität heißt, beim Warten nicht zu blockieren. Der Koch wartet hier nicht, er rührt."
+        },
+        {
+          "text": "Einen Prozess mit drei Threads.",
+          "feedback": "Das ist ein Begriff aus dem Betriebssystem. Das Bild vom Koch beschreibt die Idee, nicht die Technik."
+        }
+      ],
+      "explanation": "Nebenläufigkeit heißt: mehrere Aufgaben sind gleichzeitig begonnen und noch nicht fertig. Parallelität braucht mehrere Köche, also mehrere Kerne. Asynchronität ist das Warten auf den Ofen, ohne davor stehen zu bleiben."
+    },
+    {
+      "id": "m13-l09-q2",
+      "lesson": "m13-l09",
+      "type": "single",
+      "question": "Welche Aussage über `async`-Code und Multithreading stimmt?",
+      "options": [
+        {
+          "text": "Beides sind unterschiedliche Ideen: `async` löst das Warten, Threads lösen das gleichzeitige Rechnen.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Jeder `async`-Code läuft auf mehreren Threads.",
+          "feedback": "Das Playground-Beispiel aus Teil A läuft auf einem einzigen Thread und ist trotzdem asynchron.",
+          "misconception": "m13-l09-async-is-multithreading"
+        },
+        {
+          "text": "Mehrere Threads brauchen immer `async` und `await`.",
+          "feedback": "Ein Thread kann auch ohne `async` laufen, zum Beispiel mit `Thread` und `Start`.",
+          "misconception": "m13-l09-async-is-multithreading"
+        },
+        {
+          "text": "`async` und Multithreading sind dasselbe, nur mit verschiedenen Schlüsselwörtern.",
+          "feedback": "Sie lösen verschiedene Probleme: Warten und gleichzeitiges Rechnen.",
+          "misconception": "m13-l09-async-is-multithreading"
+        }
+      ],
+      "explanation": "Asynchroner Code gibt beim Warten die Kontrolle ab und kann dabei mit einem Thread auskommen. Multithreaded Code lässt mehrere Threads arbeiten und braucht dafür nicht `async`. Beides lässt sich kombinieren, ist aber nicht dasselbe."
+    },
+    {
+      "id": "m13-l09-q3",
+      "lesson": "m13-l09",
+      "type": "multi",
+      "question": "Zwei Threads laufen: Thread A gibt nacheinander `A1` und `A2` aus, Thread B gibt nacheinander `B1` und `B2` aus. Innerhalb eines Threads bleibt die Reihenfolge der Schritte erhalten. Welche Ausgaben sind möglich?",
+      "options": [
+        {
+          "text": "A1, A2, B1, B2",
+          "correct": true,
+          "feedback": "Thread A läuft vollständig vor Thread B."
+        },
+        {
+          "text": "A1, B1, A2, B2",
+          "correct": true,
+          "feedback": "Die Threads wechseln sich ab."
+        },
+        {
+          "text": "B1, B2, A1, A2",
+          "correct": true,
+          "feedback": "Thread B läuft vollständig vor Thread A."
+        },
+        {
+          "text": "A2, A1, B1, B2",
+          "feedback": "Innerhalb von Thread A kommt `A1` immer vor `A2`."
+        },
+        {
+          "text": "A1, B2, B1, A2",
+          "feedback": "Innerhalb von Thread B kommt `B1` immer vor `B2`."
+        }
+      ],
+      "explanation": "Es gibt 6 mögliche Ausgaben: Jede Mischung der beiden Folgen ist möglich, solange die Reihenfolge innerhalb jedes Threads gleich bleibt. Welche erscheint, entscheidet der Scheduler bei jedem Lauf neu."
+    },
+    {
+      "id": "m13-l09-q4",
+      "lesson": "m13-l09",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Der Thread soll gestartet werden, und das Hauptprogramm soll auf ihn warten, bevor es das Ergebnis ausgibt.",
+      "example": "m13/l09/thread-join.cs",
+      "blanks": [
+        {
+          "text": "Start",
+          "hint": "Der Thread läuft erst, wenn er gestartet wird."
+        },
+        {
+          "text": "Join",
+          "hint": "Welche Methode wartet, bis der Thread fertig ist?"
+        }
+      ],
+      "explanation": "`Start` startet den Thread. `Join` wartet, bis er fertig ist. Erst danach ist `result` sicher gesetzt."
+    },
+    {
+      "id": "m13-l09-q5",
+      "lesson": "m13-l09",
+      "type": "match",
+      "question": "Ordne zu: Welche Beschreibung passt zu welchem Begriff?",
+      "pairs": [
+        {
+          "left": "Prozess",
+          "right": "ein laufendes Programm"
+        },
+        {
+          "left": "Thread",
+          "right": "die Einheit, der das Betriebssystem Prozessorzeit zuteilt"
+        },
+        {
+          "left": "Prozessorkern",
+          "right": "die Hardware-Einheit, die Anweisungen ausführt"
+        },
+        {
+          "left": "Scheduler",
+          "right": "entscheidet, welcher Thread wann läuft"
+        }
+      ],
+      "explanation": "Ein Prozess enthält einen oder mehrere Threads. Der Scheduler verteilt die Threads auf die Kerne. Mehrere Kerne erlauben, dass mehrere Threads im selben Moment laufen."
+    },
+    {
+      "id": "m13-l09-q6",
+      "lesson": "m13-l09",
+      "type": "single",
+      "question": "Warum laufen die Beispiele ab dieser Lektion nicht im Browser-Playground?",
+      "options": [
+        {
+          "text": "Der Playground läuft auf einem einzigen Thread. Echte Threads und ihre wechselnde Reihenfolge lassen sich dort nicht zeigen.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Threads sind in C# im Browser verboten.",
+          "feedback": "Es geht nicht um ein Verbot, sondern darum, dass der Playground nur einen Thread hat."
+        },
+        {
+          "text": "Der Playground kennt `Console.WriteLine` nicht.",
+          "feedback": "`Console.WriteLine` benutzt jedes Beispiel des Kurses."
+        },
+        {
+          "text": "Threads brauchen immer `async` und `await`.",
+          "feedback": "Das stimmt nicht, und es erklärt auch nicht, warum der Playground sie nicht zeigt.",
+          "misconception": "m13-l09-async-is-multithreading"
+        }
+      ],
+      "explanation": "Der Playground ist auf einen Thread beschränkt. Beispiele mit mehreren Threads sind deshalb Code zum Lesen. Ihre Ergebnisse stammen aus Läufen mit echten Threads oder sind von Hand nachvollzogen und so beschriftet."
+    },
+    {
+      "id": "m13-l09-q7",
+      "lesson": "m13-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Nebenläufigkeit, Parallelität und Asynchronität unterscheidet.",
+      "modelAnswer": "Nebenläufigkeit: mehrere Aufgaben sind gleichzeitig in Arbeit, die Arbeit wechselt zwischen ihnen. Parallelität: Arbeit läuft wirklich im selben Moment, auf mehreren Prozessorkernen. Asynchronität: ein Programm blockiert beim Warten nicht und kann in der Zeit etwas anderes tun, das geht auch mit einem einzigen Thread."
+    },
+    {
+      "id": "m13-l09-q8",
+      "lesson": "m13-l09",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm soll eine Datei aus dem Netz laden und gleichzeitig eine große Zahlenmenge berechnen. Welche der drei Ideen hilft bei welchem Teil?",
+      "modelAnswer": "Das Laden ist Warten auf die Außenwelt: Dafür passt Asynchronität, der Thread muss beim Warten nicht blockieren. Die Berechnung braucht Prozessorzeit: Hier hilft Parallelität, also Arbeit auf mehreren Kernen. Nebenläufigkeit ist der Oberbegriff, weil beide Aufgaben gleichzeitig in Arbeit sind."
+    },
+    {
+      "id": "m13-l10-q1",
+      "lesson": "m13-l10",
+      "type": "single",
+      "question": "Warum erzeugt Anwendungscode in der Regel nicht selbst Threads mit `new Thread(...)`?",
+      "options": [
+        {
+          "text": "Der Thread-Pool stellt fertige Threads bereit und verwendet sie wieder. Das ist einfacher und spart das Erzeugen neuer Threads.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "`new Thread(...)` ist in .NET 11 entfernt worden.",
+          "feedback": "Die Klasse `Thread` gibt es weiterhin. Sie wird nur selten gebraucht."
+        },
+        {
+          "text": "Ein Thread kann kein Ergebnis zurückgeben, deshalb sind Threads nutzlos.",
+          "feedback": "Ein Thread kann Daten in gemeinsame Variablen schreiben. Der Grund ist ein anderer: Der Pool nimmt die Verwaltung ab."
+        },
+        {
+          "text": "Threads laufen nur im Browser.",
+          "feedback": "Threads gibt es auf dem Betriebssystem. Im Browser-Playground gibt es nur einen."
+        }
+      ],
+      "explanation": "Threads von Hand zu erzeugen und zu verwalten ist Aufwand. Der Thread-Pool verwaltet eine Gruppe von Threads und verwendet sie nach jedem Auftrag wieder. Eigene Threads braucht man nur in Sonderfällen, zum Beispiel für sehr lange blockierende Aufgaben."
+    },
+    {
+      "id": "m13-l10-q2",
+      "lesson": "m13-l10",
+      "type": "single",
+      "question": "Ein Programm startet 1000 Tasks mit `Task.Run`. Was stimmt?",
+      "options": [
+        {
+          "text": "Der Thread-Pool führt die Aufträge mit wenigen Threads aus. Aufträge, für die gerade kein Thread frei ist, warten in einer Warteschlange.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Das Programm erzeugt 1000 neue Threads.",
+          "feedback": "Ein Task ist ein Arbeitsauftrag, kein Thread. Der Pool verteilt viele Aufträge auf wenige Threads.",
+          "misconception": "m13-l10-every-task-has-own-thread"
+        },
+        {
+          "text": "Jeder Task behält seinen Thread, bis das Programm endet.",
+          "feedback": "Ein Thread kehrt nach einem Auftrag in den Pool zurück und führt den nächsten aus.",
+          "misconception": "m13-l10-every-task-has-own-thread"
+        },
+        {
+          "text": "Nur die ersten Tasks laufen. Der Rest wird verworfen.",
+          "feedback": "Kein Auftrag geht verloren. Er wartet, bis ein Thread frei ist."
+        }
+      ],
+      "explanation": "Ein Task ist eine Arbeitseinheit. Der Thread-Pool begrenzt, wie viele Threads gleichzeitig aktiv sind, und stellt weitere Aufträge in eine Warteschlange."
+    },
+    {
+      "id": "m13-l10-q3",
+      "lesson": "m13-l10",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l10/run-on-pool.cs",
+      "explanation": "Die Berechnung läuft als Arbeitsauftrag im Thread-Pool. `await pending` holt das Ergebnis ab, die Zahl der Primzahlen unter 20000 ist 2262."
+    },
+    {
+      "id": "m13-l10-q4",
+      "lesson": "m13-l10",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Die Berechnung soll auf dem Thread-Pool starten, und das Ergebnis soll abgeholt werden, ohne den Thread zu blockieren.",
+      "example": "m13/l10/run-on-pool.cs",
+      "blanks": [
+        {
+          "text": "Task.Run",
+          "hint": "Welche Methode legt Arbeit auf einen Thread des Pools?"
+        },
+        {
+          "text": "await",
+          "hint": "Womit wartest du, ohne zu blockieren?"
+        }
+      ],
+      "explanation": "`Task.Run` legt die Arbeit in die Warteschlange des Thread-Pools und gibt einen Task zurück. `await` holt das Ergebnis ab, ohne einen Thread zu blockieren."
+    },
+    {
+      "id": "m13-l10-q5",
+      "lesson": "m13-l10",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Der Thread soll eine Nachricht setzen, und das Programm soll sie erst ausgeben, wenn der Thread fertig ist.",
+      "example": "m13/l10/thread-start-join.cs",
+      "explanation": "Erst `message` anlegen, dann den Thread erzeugen. Er läuft erst nach `Start`. `Join` wartet, bis er fertig ist. Erst danach ist die Ausgabe sicher."
+    },
+    {
+      "id": "m13-l10-q6",
+      "lesson": "m13-l10",
+      "type": "single",
+      "question": "Das Programm wartet mit `await Task.WhenAll(waits)` auf 1000 Verzögerungen und läuft schnell durch. Was sagt das über `await`?",
+      "example": "m13/l10/many-waits.cs",
+      "options": [
+        {
+          "text": "Ein wartender `await` belegt keinen Thread. Deshalb brauchen 1000 Wartevorgänge nicht 1000 Threads.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Jeder `await` blockiert einen eigenen Thread, der Rechner schafft das aber schnell.",
+          "feedback": "`await` blockiert den Thread nicht, er gibt die Kontrolle zurück.",
+          "misconception": "m13-l02-await-blocks-thread"
+        },
+        {
+          "text": "Die 1000 Verzögerungen laufen nacheinander.",
+          "feedback": "Alle Verzögerungen sind gleichzeitig gestartet, sie laufen nebeneinander."
+        },
+        {
+          "text": "Jeder Task bekommt seinen eigenen Thread.",
+          "feedback": "Während eines Wartens gehört zum Task kein Thread.",
+          "misconception": "m13-l10-every-task-has-own-thread"
+        }
+      ],
+      "explanation": "Beim Warten steht der Task in keiner Thread-Warteschlange und läuft auf keinem Thread. Erst die Fortsetzung nach dem Warten braucht wieder einen Thread."
+    },
+    {
+      "id": "m13-l10-q7",
+      "lesson": "m13-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie der Thread-Pool viele Arbeitsaufträge auf wenige Threads verteilt und warum ein wartender `await` keinen Thread belegt.",
+      "modelAnswer": "Der Thread-Pool hat eine Gruppe von Threads und eine Warteschlange. Ein freier Thread holt einen Arbeitsauftrag, führt ihn aus und kehrt danach in den Pool zurück. Sind alle Threads belegt, warten weitere Aufträge in der Warteschlange.\n\nEin `await` auf eine unfertige Arbeit gibt die Kontrolle zurück. Während des Wartens läuft kein Code des Tasks, deshalb gehört auch kein Thread dazu. Die Fortsetzung bekommt erst wieder einen Thread, wenn die Arbeit fertig ist."
+    },
+    {
+      "id": "m13-l10-q8",
+      "lesson": "m13-l10",
+      "type": "explain",
+      "question": "Transferfrage: Dein Programm soll 20 große Dateien auswerten, indem es für jede Datei Zeilen zählt (rechnen), und danach eine Antwort aus dem Netz abwarten. Wo nimmst du `Task.Run`, wo nur `await`?",
+      "modelAnswer": "Das Zählen der Zeilen rechnet nur: Das ist CPU-gebundene Arbeit, ich lege sie mit `Task.Run` auf den Thread-Pool und hole die Ergebnisse mit `await` ab. Das Warten auf das Netz ist I/O-gebunden: Ich rufe die asynchrone Methode auf und warte mit `await`, ohne `Task.Run`, weil dafür kein Thread gebraucht wird."
     }
   ]
 }
