@@ -368,5 +368,3 @@ Call returned, completed: False
 Failures in vpn: 2
 Source backup failed: KeyNotFoundException
 Faulted: True
-Sources loaded: 2, lines: 14
-Slow source: timeout

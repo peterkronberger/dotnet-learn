@@ -1,0 +1,161 @@
+---
+title: Abbrechen mit CancellationToken
+sidebar_position: 5
+description: Laufende async-Arbeit mit CancellationTokenSource und CancellationToken kooperativ abbrechen, den Abbruch an der OperationCanceledException erkennen und vom Fehler unterscheiden.
+lesson_id: m13-l05
+duration_min: 24
+---
+
+import tokenToDelay from '!!raw-loader!@site/examples/m13/l05/token-to-delay.cs';
+import cancelAfter from '!!raw-loader!@site/examples/m13/l05/cancel-after.cs';
+import cooperativeCheck from '!!raw-loader!@site/examples/m13/l05/cooperative-check.cs';
+import cooperativeCheckOutput from '!!raw-loader!@site/examples/m13/l05/cooperative-check.out.txt';
+import cancelOrError from '!!raw-loader!@site/examples/m13/l05/cancel-or-error.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l05/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l05/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l05/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l05/seclog-async-solution.cs';
+
+# Abbrechen mit CancellationToken
+
+:::note[Lernziele]
+- Du kannst einer async-Methode einen `CancellationToken` übergeben und ihn an `Task.Delay` und andere Methoden weiterreichen.
+- Du kannst mit `CancellationTokenSource` einen Abbruch auslösen (`Cancel`, `CancelAfter`).
+- Du kannst einen Abbruch an der `OperationCanceledException` erkennen und von einem Fehler unterscheiden.
+- Du kannst erklären, warum Abbruch kooperativ ist.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l03-q2" />
+
+<Quiz id="m13-l04-q6" />
+
+<Quiz id="m07-l08-q1" />
+
+## Warten beenden ist nicht Arbeit beenden
+
+Im letzten Abschnitt der vorigen Lektion hat `WaitAsync` das Warten nach einem Zeitlimit beendet. Die langsame Arbeit lief trotzdem weiter. Oft soll die Arbeit selbst aufhören, weil niemand ihr Ergebnis mehr braucht: Der Nutzer hat abgebrochen, oder das Zeitlimit ist abgelaufen.
+
+Dafür gibt es in .NET einen einheitlichen Weg. Zwei Typen teilen sich die Aufgabe:
+
+- Die <Term id="cancellation-token-source">`CancellationTokenSource`</Term> (Abbruchquelle) löst den Abbruch aus. Wer sie besitzt, darf abbrechen.
+- Der <Term id="cancellation-token">`CancellationToken`</Term> (Abbruchtoken) kommt von der Quelle (Eigenschaft `Token`) und wird an die Methoden weitergereicht. Er kann das Signal nur lesen.
+
+Viele Methoden der Bibliothek nehmen einen Token an, auch `Task.Delay`. Ist der Token abgebrochen, endet der Aufruf mit einer `OperationCanceledException`. Im Beispiel wird die Quelle schon vor dem Warten abgebrochen. Die Quelle ist `IDisposable` und steht deshalb in einer `using`-Deklaration, die am Ende des Blocks `Dispose` aufruft.
+
+<CSharpRunner id="m13-l05-token" code={tokenToDelay} />
+
+Die Ausgabe zeigt `TaskCanceledException`. Das ist ein Typ, der von `OperationCanceledException` erbt. Das `catch` für den Basistyp fängt ihn deshalb ([Cancellation in managed threads](https://learn.microsoft.com/dotnet/standard/threading/cancellation-in-managed-threads)).
+
+<Quiz id="m13-l05-q1" />
+
+<Quiz id="m13-l05-q7" />
+
+## Abbruch nach einer Zeit
+
+Statt `Cancel()` direkt aufzurufen, kann die Quelle den Abbruch später selbst auslösen: `CancelAfter(TimeSpan)` setzt das Signal nach der angegebenen Zeit. Im Beispiel liegen 50 ms und 5 s weit auseinander. Der Task endet im Zustand abgebrochen, nicht im Zustand fehlerhaft ([Task-based asynchronous pattern](https://learn.microsoft.com/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap)).
+
+<CSharpRunner id="m13-l05-cancel-after" code={cancelAfter} />
+
+<Quiz id="m13-l05-q4" />
+
+## Abbruch ist kooperativ
+
+`Cancel()` beendet keine Methode. Es setzt nur ein Signal. Die laufende Methode muss es bemerken und selbst aufhören. Man nennt das <Term id="cooperative-cancellation">kooperativen Abbruch</Term>: Der Code arbeitet beim Abbruch mit. Es gibt zwei übliche Wege:
+
+- Den Token an eine Methode weitergeben, die ihn prüft, wie `Task.Delay(…, token)`.
+- Den Token selbst prüfen: `token.IsCancellationRequested` liefert den Zustand, `token.ThrowIfCancellationRequested()` löst bei einem Abbruch die `OperationCanceledException` aus.
+
+:::info[Vorhersage]
+Beide Schleifen rufen in Schritt 3 `Cancel()` auf. Die erste prüft danach den Token, die zweite nicht. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m13-l05-cooperative" code={cooperativeCheck} predict expected={cooperativeCheckOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Signal setzen:** In Schritt 3 ruft `RunStepsAsync` `source.Cancel()` auf. Ab jetzt ist `IsCancellationRequested` wahr.
+2. **Mit Prüfung:** Direkt danach löst `ThrowIfCancellationRequested` die `OperationCanceledException` aus. Der Aufrufer fängt sie, die Ausgabe zeigt den Typnamen.
+3. **Ohne Prüfung:** Die zweite Schleife liest das Signal nie. Sie macht alle 5 Schritte und gibt `5 steps` aus. Das Signal ist trotzdem gesetzt (`requested: True`).
+
+</details>
+
+<Quiz id="m13-l05-q3" />
+
+Üblich ist, den Token als letzten Parameter einer Methode zu schreiben. Mit dem Standardwert `default` wird er optional: Aufrufer ohne Abbruch lassen ihn weg, und der Token meldet nie einen Abbruch (`CancellationToken.None` ist gleichwertig).
+
+<Quiz id="m13-l05-q6" />
+
+## Abbruch oder Fehler?
+
+Ein `catch` für `OperationCanceledException` fängt jeden Abbruch, auch einen, den jemand anderes ausgelöst hat. Mit einem Ausnahmefilter prüfst du zusätzlich, ob der eigene Token abgebrochen ist: `catch (OperationCanceledException) when (token.IsCancellationRequested)`. Alle anderen Ausnahmen sind echte Fehler und kommen in ein eigenes `catch`.
+
+<CSharpRunner id="m13-l05-cancel-or-error" code={cancelOrError} />
+
+Der erste Aufruf wird abgebrochen, der zweite schlägt fehl, der dritte läuft durch.
+
+<Quiz id="m13-l05-q5" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen das Signal, der Token beim Aufruf, die abgefangene Ausnahme und der Typ des Parameters.
+
+<Quiz id="m13-l05-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog lädt alle Quellen zugleich und gibt bei einer zu langsamen Quelle nach einem Zeitlimit auf.
+
+Im Runner siehst du nur die Blöcke `// Load all sources at the same time` und `// Limit the waiting time of a slow source`, das Ende des Programms und die drei Funktionen `LoadSourceAsync`, `CountFailuresAsync` und `LoadSlowSourceAsync`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Gib `LoadSourceAsync` und `LoadSlowSourceAsync` je einen Parameter `CancellationToken token = default` und reiche ihn an `Task.Delay` weiter. Frühere Aufrufe ohne Token bleiben unverändert.
+2. Schreibe hinter den Block `// Limit the waiting time of a slow source` und vor die Zeile `// End with exit code 0 …` den Block `// Cancel loading the sources`. Er legt mit `using CancellationTokenSource cancelSource = new();` eine Quelle an und ruft `cancelSource.Cancel();` auf. In einem `try`-Block wartet er auf `LoadSourceAsync("web", cancelSource.Token)`. Das `catch (OperationCanceledException ex)` gibt `Loading web: canceled (<ex.GetType().Name>)` aus.
+3. Danach legt er eine zweite Quelle an und ruft `CancelAfter(TimeSpan.FromMilliseconds(50))` auf. Er wartet in einem `try`-Block auf `LoadSlowSourceAsync` mit dem Token dieser Quelle und gibt im `catch` `Slow source: canceled` aus.
+
+<CSharpRunner id="m13-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Token weiterreichen:** Beide Funktionen geben den Token an `Task.Delay` weiter. Mit `= default` bleiben Aufrufe ohne Token gültig.
+2. **Vorab abbrechen:** `Cancel()` kommt vor dem Aufruf. `Task.Delay` bekommt einen abgebrochenen Token und löst die `TaskCanceledException` aus, das `catch` gibt ihren Typnamen aus.
+3. **Nach einer Zeit abbrechen:** `CancelAfter` setzt das Signal nach 50 ms. Das 5 s lange `Task.Delay` bemerkt es, und das Programm endet ohne die 5 Sekunden abzuwarten.
+
+</details>
+
+**Neuer Stand:** SecLog bricht das Laden einer Quelle ab, sofort oder nach einer Zeit. Damit hat SecLog den ersten Teil des Modulziels erreicht: mehrere Quellen asynchron einlesen und das Einlesen abbrechen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l05-cancel-stops-task-immediately" />
+
+**„`Cancel()` beendet eine laufende Methode sofort.“** Das stimmt nicht. `Cancel()` setzt nur ein Signal. Die Methode endet erst an der nächsten Stelle, an der sie den Token prüft, zum Beispiel in `Task.Delay(…, token)` oder mit `ThrowIfCancellationRequested`. Code, der den Token nie prüft, läuft bis zum Ende.
+:::
+
+<Quiz id="m13-l05-q2" />
+
+## Zusammenfassung
+
+Die `CancellationTokenSource` löst den Abbruch aus (`Cancel`, `CancelAfter`), der `CancellationToken` wird an die Methoden weitergereicht, üblich als letzter Parameter mit Standardwert `default`. Der Abbruch ist kooperativ: Der Code prüft den Token oder gibt ihn an Methoden wie `Task.Delay` weiter. Dann endet er mit einer `OperationCanceledException`, oder mit der abgeleiteten `TaskCanceledException`. Ein abgebrochener Task ist nicht fehlerhaft. Mit einem Ausnahmefilter trennst du den eigenen Abbruch von echten Fehlern.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m13-l05-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Cancellation in managed threads](https://learn.microsoft.com/dotnet/standard/threading/cancellation-in-managed-threads)
+- Microsoft Learn: [Task-based asynchronous pattern (TAP)](https://learn.microsoft.com/dotnet/standard/asynchronous-programming-patterns/task-based-asynchronous-pattern-tap)

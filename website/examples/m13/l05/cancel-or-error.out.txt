@@ -1,0 +1,3 @@
+cancelled call: canceled
+failing call: failed with InvalidOperationException
+normal call: done
