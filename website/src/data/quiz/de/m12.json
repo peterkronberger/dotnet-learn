@@ -687,6 +687,146 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Listenmuster einsetzen, und wo reicht `Length` mit einem Index?",
       "modelAnswer": "Ein Listenmuster passt, wenn Form und Inhalt zusammen geprüft werden, zum Beispiel bei einer zerlegten Zeile oder bei Befehlen mit festen Argumenten wie `[\"copy\", var from, var to]`. Für eine einzelne Prüfung wie `parts.Length > 2` oder den Zugriff auf ein Element reicht `Length` mit Index, das ist kürzer und genauso klar."
+    },
+    {
+      "id": "m12-l06-q1",
+      "lesson": "m12-l06",
+      "type": "single",
+      "question": "Ein switch-Ausdruck hat die Arme `< 5 => \"a\"` und `< 3 => \"b\"` (in dieser Reihenfolge, danach `_`). Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler meldet CS8510, weil der zweite Arm nie erreichbar ist",
+          "correct": true,
+          "feedback": "Jeder Wert unter 3 ist auch unter 5. Der erste Arm nimmt alles an, was der zweite annehmen würde."
+        },
+        {
+          "text": "Der Ausdruck wählt immer den passendsten Arm, also `< 3` für 1",
+          "feedback": "Ein switch-Ausdruck sucht nicht den passendsten Arm. Der erste Treffer von oben gewinnt.",
+          "misconception": "m12-l06-switch-arm-order-irrelevant"
+        },
+        {
+          "text": "Die Reihenfolge ist egal, beide Arme werden geprüft",
+          "feedback": "Die Arme werden der Reihe nach geprüft, und nach dem ersten Treffer endet die Suche.",
+          "misconception": "m12-l06-switch-arm-order-irrelevant"
+        },
+        {
+          "text": "Der Compiler meldet eine Warnung, aber der Code läuft",
+          "feedback": "Ein unerreichbarer Arm ist ein Fehler, keine Warnung."
+        }
+      ],
+      "explanation": "Die Arme werden von oben nach unten geprüft. Ist ein Muster von früheren Armen ohne Bedingung schon ganz abgedeckt, ist das ein Compilerfehler."
+    },
+    {
+      "id": "m12-l06-q2",
+      "lesson": "m12-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l06/quiz-outputs.cs",
+      "explanation": "Für 2 passt `x > 5` nicht, aber `> 1`: `medium`. Für 6 und 10 gewinnt der erste Arm, weil die Bedingung erfüllt ist: `big`. Der Arm `_` wird für keinen der drei Werte gebraucht."
+    },
+    {
+      "id": "m12-l06-q3",
+      "lesson": "m12-l06",
+      "type": "cloze",
+      "question": "Ergänze die Muster, damit zuerst der engere und dann der weitere Fall geprüft wird.",
+      "example": "m12/l06/gap-switch.cs",
+      "blanks": [
+        {
+          "text": ">= 5",
+          "hint": "Das relationale Muster für mindestens fünf Fehlversuche."
+        },
+        {
+          "text": "_",
+          "hint": "Bei weniger Fehlversuchen ist die Anzahl egal. Dieses Muster nimmt jeden Wert an."
+        },
+        {
+          "text": "_",
+          "hint": "Dieser letzte Arm fängt jedes Tupel ab, das die Arme davor nicht annehmen."
+        }
+      ],
+      "explanation": "Der Arm mit `>= 5` steht vor dem weiteren Arm. Der letzte Arm `_` macht den switch exhaustive."
+    },
+    {
+      "id": "m12-l06-q4",
+      "lesson": "m12-l06",
+      "type": "multi",
+      "question": "Welche Aussagen über switch-Ausdrücke und die Compilermeldungen stimmen?",
+      "options": [
+        {
+          "text": "Ein Arm, den frühere Arme ohne Bedingung schon ganz abdecken, ist ein Compilerfehler.",
+          "correct": true
+        },
+        {
+          "text": "Ein Arm mit `when` zählt für die Prüfung auf fehlende Fälle nicht als Abdeckung.",
+          "correct": true
+        },
+        {
+          "text": "Ein nicht exhaustiver switch-Ausdruck löst bei einem unpassenden Wert zur Laufzeit eine `SwitchExpressionException` aus.",
+          "correct": true
+        },
+        {
+          "text": "Ein switch-Ausdruck wählt unabhängig von der Reihenfolge den passendsten Arm.",
+          "feedback": "Der erste passende Arm von oben gewinnt. Die Reihenfolge der Arme gehört zur Bedeutung des Codes.",
+          "misconception": "m12-l06-switch-arm-order-irrelevant"
+        }
+      ],
+      "explanation": "Subsumption ist ein Fehler, fehlende Fälle sind eine Warnung. Die Reihenfolge der Arme entscheidet über das Ergebnis."
+    },
+    {
+      "id": "m12-l06-q5",
+      "lesson": "m12-l06",
+      "type": "find-bug",
+      "question": "Eine Zeile ist ein Compilerfehler (CS8510, Muster nicht erreichbar). Welche?",
+      "example": "m12/l06/quiz-unreachable.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "lineFeedback": {
+        "6": {
+          "feedback": "`\"logout\"` wird schon vom Arm davor mit `or` angenommen. Dieser Arm kann nie gewählt werden."
+        }
+      },
+      "explanation": "Der Arm `\"login-success\" or \"logout\"` nimmt `\"logout\"` schon an. Ein späterer Arm mit derselben Konstante ist von ihm subsumiert."
+    },
+    {
+      "id": "m12-l06-q6",
+      "lesson": "m12-l06",
+      "type": "single",
+      "question": "`Severity` hat vier benannte Members. Ein switch-Ausdruck hat für jeden einen Arm, aber keinen `_`-Arm. Was passiert bei `(Severity)42`?",
+      "options": [
+        {
+          "text": "Der Compiler hat mit CS8524 gewarnt, und zur Laufzeit wird eine `SwitchExpressionException` ausgelöst",
+          "correct": true,
+          "feedback": "Der Wert 42 ist für einen Enum gültig, aber kein Arm passt."
+        },
+        {
+          "text": "Der Ausdruck liefert den Wert des letzten Arms",
+          "feedback": "Es gibt keinen Standardwert. Ohne passenden Arm wird eine Ausnahme ausgelöst."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `_` fehlt",
+          "feedback": "Fehlende Fälle sind eine Warnung. Das Programm lässt sich übersetzen."
+        },
+        {
+          "text": "Nichts, weil alle benannten Members behandelt sind",
+          "feedback": "Ein Enum kann jeden Wert seines zugrunde liegenden Typs haben, auch einen ohne Namen."
+        }
+      ],
+      "explanation": "Ein Enum hat auch unbenannte Werte. Ein `_`-Arm deckt sie ab und macht den switch exhaustive."
+    },
+    {
+      "id": "m12-l06-q7",
+      "lesson": "m12-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein switch-Ausdruck den Arm wählt und was der Compiler meldet, wenn die Arme nicht zusammenpassen.",
+      "modelAnswer": "Der Ausdruck prüft die Arme von oben nach unten und nimmt den ersten, dessen Muster passt und dessen `when`-Bedingung `true` ist. Danach prüft er nichts mehr.\n\nIst ein Arm von früheren Armen ohne Bedingung schon ganz abgedeckt, meldet der Compiler einen Fehler (nicht erreichbar). Fehlen Fälle, warnt er, und zur Laufzeit löst ein unpassender Wert eine `SwitchExpressionException` aus. Ein Arm `_` am Ende deckt den Rest ab."
+    },
+    {
+      "id": "m12-l06-q8",
+      "lesson": "m12-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm einen switch über ein Tupel einsetzen, und worauf achtest du bei der Reihenfolge der Arme?",
+      "modelAnswer": "Ein switch über ein Tupel passt, wenn eine Entscheidung von zwei Werten abhängt, zum Beispiel der Ereignistyp und die Anzahl der Fehlversuche oder der Zustand und ein Befehl. Ich schreibe die engen Fälle zuerst und die weiten danach, damit ein weiter Arm keinen engen verdeckt. Am Ende steht `_`, damit der Ausdruck alle Fälle behandelt."
     }
   ]
 }

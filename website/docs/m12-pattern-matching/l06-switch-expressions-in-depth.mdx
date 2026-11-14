@@ -1,0 +1,237 @@
+---
+title: switch-Ausdrücke im Detail
+sidebar_position: 6
+description: Ein switch-Ausdruck prüft seine Arme von oben nach unten und nimmt den ersten Treffer, auch mit Bedingung when. Der Compiler meldet einen Arm, der nie erreicht wird (Fehler), und fehlende Fälle (Warnung, zur Laufzeit eine Ausnahme).
+lesson_id: m12-l06
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import firstMatch from '!!raw-loader!@site/examples/m12/l06/first-match.cs';
+import firstMatchOutput from '!!raw-loader!@site/examples/m12/l06/first-match.out.txt';
+import caseGuard from '!!raw-loader!@site/examples/m12/l06/case-guard.cs';
+import caseGuardOutput from '!!raw-loader!@site/examples/m12/l06/case-guard.out.txt';
+import unreachableArm from '!!raw-loader!@site/examples/m12/l06/unreachable-arm.snippet.cs';
+import missingCase from '!!raw-loader!@site/examples/m12/l06/missing-case.snippet.cs';
+import enumNamedOnly from '!!raw-loader!@site/examples/m12/l06/enum-named-only.snippet.cs';
+import missingCaseAtRuntime from '!!raw-loader!@site/examples/m12/l06/missing-case-at-runtime.cs';
+import missingCaseAtRuntimeOutput from '!!raw-loader!@site/examples/m12/l06/missing-case-at-runtime.out.txt';
+import tupleSwitch from '!!raw-loader!@site/examples/m12/l06/tuple-switch.cs';
+import tupleSwitchOutput from '!!raw-loader!@site/examples/m12/l06/tuple-switch.out.txt';
+import switchStatementPatterns from '!!raw-loader!@site/examples/m12/l06/switch-statement-patterns.cs';
+import quizOrderCode from '!!raw-loader!@site/examples/m12/l06/quiz-order.cs';
+import quizOrderOutput from '!!raw-loader!@site/examples/m12/l06/quiz-order.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m12/l06/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l06/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l06/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l06/seclog-patterns-solution.cs';
+
+# switch-Ausdrücke im Detail
+
+:::note[Lernziele]
+- Du kannst vorhersagen, welchen Arm ein `switch`-Ausdruck wählt, wenn mehrere Arme passen.
+- Du kannst einen Arm mit einer Bedingung `when` schreiben.
+- Du kannst die Compilermeldungen „Arm nie erreichbar“ und „nicht alle Fälle behandelt“ erklären und beheben.
+- Du kannst einen `switch` über ein Tupel aus zwei Werten schreiben.
+:::
+
+## Rückblick
+
+<Quiz id="m02-l04-q3" />
+
+<Quiz id="m08-l07-q4" />
+
+<Quiz id="m12-l05-q1" />
+
+## Der erste Treffer gewinnt
+
+In SecLog ordnet `SeverityOf` einer Anzahl von Fehlversuchen einen Schweregrad zu, mit relationalen Armen wie `< 3` und `< 5`. Dort ist die Reihenfolge wichtig: Eine Anzahl von 1 passt zu beiden Armen. Ein <Term id="switch-expression">switch-Ausdruck</Term> prüft seine Arme in der Reihenfolge, in der sie im Text stehen, und liefert den Wert des ersten Arms, dessen Muster passt und dessen Bedingung (falls vorhanden) `true` ergibt ([§12.12 Switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1212-switch-expression)). Die weiteren Arme werden nicht mehr geprüft.
+
+Ein Arm besteht aus einem <Term id="pattern">Muster</Term>, einer optionalen Bedingung, dem Zeichen `=>` und einem Ausdruck. Die Bedingung heißt <Term id="case-guard">Case Guard</Term> und steht hinter dem Schlüsselwort `when`. Der Arm passt nur, wenn Muster **und** Bedingung passen.
+
+:::info[Vorhersage]
+Welche fünf Zeilen gibt das Programm aus? Die zweite Schleife hat dieselben Bedingungen in umgekehrter Reihenfolge.
+:::
+
+<CSharpRunner id="m12-l06-first-match" code={firstMatch} predict expected={firstMatchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Richtige Reihenfolge:** `1` passt zu `< 3` und ist `low`. `3` passt nicht zu `< 3`, aber zu `< 5`: `medium`. `4` ist ebenfalls `medium`. `7` passt zu keinem Vergleich und fällt in `_`: `high`.
+2. **Umgekehrt mit Bedingungen:** `count` ist 1. Der erste Arm `var n when n < 5` passt schon, also ist das Ergebnis `medium`. Der Arm für `low` wird nie erreicht, obwohl 1 kleiner als 3 ist.
+3. **Kein Compilerfehler:** Der Compiler kann Bedingungen mit `when` nicht immer auswerten. Deshalb übersetzt er die zweite Variante ohne Meldung. Die Reihenfolge ändert still das Ergebnis.
+
+</details>
+
+## Eine Bedingung mit when
+
+Ein Muster prüft die Form eines Werts. Brauchst du zusätzlich eine beliebige Bedingung, hängst du sie mit `when` an. Die Bedingung ist ein Ausdruck vom Typ `bool` und darf Variablen aus dem Muster und aus der Umgebung benutzen. Du kennst `when` schon aus der `switch`-Anweisung (Lektion „Die switch-Anweisung“).
+
+:::info[Vorhersage]
+Was gibt das Programm für die vier Aufrufe aus?
+:::
+
+<CSharpRunner id="m12-l06-guard" code={caseGuard} predict expected={caseGuardOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Mit Bedingung:** `"login-success" when user is null` passt für `("login-success", null)`: `check user`.
+2. **Ohne passende Bedingung:** Für `("login-success", "alice")` ist die Bedingung `false`, der Arm passt nicht. Der nächste Arm `"login-success"` passt: `ok`.
+3. **Weitere Arme:** `login-failed` ist `failed`, und `logout` fällt in `_`: `other`.
+
+</details>
+
+## Zwei Meldungen des Compilers
+
+Der Compiler prüft die Arme eines `switch`-Ausdrucks auf zwei Arten ([§11.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general)).
+
+**Arm nie erreichbar (Subsumption).** Ein Muster P ist <Term id="subsumption">subsumiert</Term> (subsumed), wenn jeder Wert, den P annimmt, schon von früheren Armen ohne Bedingung angenommen wird. Ein solcher Arm kann nie gewählt werden, und der Compiler meldet das als Fehler:
+
+<CodeBlock language="csharp" title="unreachable-arm.snippet.cs">{unreachableArm}</CodeBlock>
+
+Der Compiler meldet `error CS8510: The pattern is unreachable. It has already been handled by a previous arm of the switch expression or it is impossible to match.` für Zeile 5. Jeder Wert ab 5 ist auch ab 3, also nimmt der erste Arm alles an, was der zweite annehmen würde. Die Lösung ist die andere Reihenfolge: das engere Muster zuerst. Ein Arm mit `when` zählt nicht als Abdeckung, deshalb sieht der Compiler dort keinen Fehler (das Beispiel oben).
+
+**Nicht alle Fälle behandelt (Exhaustiveness).** Ein switch-Ausdruck ist <Term id="exhaustive">exhaustive</Term>, wenn für jeden möglichen Wert ein Arm passt. Sonst warnt der Compiler. Ein Arm mit `when` zählt für diese Prüfung nicht, weil der Compiler die Bedingung nicht auswertet.
+
+<CodeBlock language="csharp" title="missing-case.snippet.cs">{missingCase}</CodeBlock>
+
+Der Compiler meldet `warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern '5' is not covered.` für Zeile 2. Ein Arm `_ => …` am Ende deckt den Rest ab.
+
+Das Programm läuft trotz Warnung. Trifft zur Laufzeit ein Wert keinen Arm, löst der Ausdruck eine `SwitchExpressionException` aus:
+
+:::info[Vorhersage]
+Das Beispiel schaltet die Warnung mit `#pragma warning disable` aus, nur um das Laufzeitverhalten zu zeigen. Was gibt es für `Color.Red` und für `(Color)7` aus?
+:::
+
+<CSharpRunner id="m12-l06-runtime" code={missingCaseAtRuntime} predict expected={missingCaseAtRuntimeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Wert mit Arm:** `Color.Red` passt zum ersten Arm: `red`.
+2. **Wert ohne Arm:** `(Color)7` ist ein gültiger Wert des Typs, aber kein benannter. Kein Arm passt, und der Ausdruck löst eine `System.Runtime.CompilerServices.SwitchExpressionException` aus. Das `catch` gibt den Typnamen aus: `SwitchExpressionException`.
+
+</details>
+
+Das gilt auch für Enums mit allen benannten Members. Jeder Wert des zugrunde liegenden Typs ist gültig (Lektion „Enums“), also bleibt ein Arm für die unbenannten Werte offen:
+
+<CodeBlock language="csharp" title="enum-named-only.snippet.cs">{enumNamedOnly}</CodeBlock>
+
+Der Compiler meldet `warning CS8524: The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value. For example, the pattern '(Color)3' is not covered.` für Zeile 2. Fehlt dagegen ein benannter Member, lautet die Warnung CS8509.
+
+In der folgenden Aufgabe suchst du den Arm, den der Compiler nie erreichen kann:
+
+<Quiz id="m12-l06-q5" />
+
+## Ein switch über ein Tupel
+
+Ein `switch` kann zwei Werte zugleich prüfen: Du bildest ein Tupel `(a, b)` und schreibst in den Armen <Term id="positional-pattern">Positionsmuster</Term> (Lektion „Dekonstruktion und Positionsmuster“). Jeder Arm prüft beide Werte, und der erste Treffer gewinnt wie immer.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte auf die Reihenfolge der ersten beiden Arme.
+:::
+
+<CSharpRunner id="m12-l06-tuple" code={tupleSwitch} predict expected={tupleSwitchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zuerst das enge Muster:** `("login-failed", >= 5)` steht vor `("login-failed", _)`. Für 5 Fehlversuche gewinnt der erste Arm: `lock account`.
+2. **Danach das weite Muster:** Für 2 Fehlversuche passt der erste Arm nicht, der zweite schon: `watch`.
+3. **Erfolg:** `("login-success", _)` ignoriert die Anzahl: `none`.
+4. **Rest:** `logout` fällt in `_`: `unknown`.
+
+</details>
+
+Auch die `switch`-Anweisung nimmt Muster und `when` an ([§13.8.3 The switch statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1383-the-switch-statement)). Dort steht vor jedem Muster `case`, und jeder Abschnitt endet mit `break`:
+
+<CodeBlock language="csharp" title="switch-statement-patterns.cs">{switchStatementPatterns}</CodeBlock>
+
+## Projektschritt
+
+**Stand bisher:** SecLog zerlegt Log-Zeilen mit einem Listenmuster in `SecurityEvent?`. `ToSecurityEvent(e)` macht aus einem `LogEvent` einen `SecurityEvent`, `EventType` ist ein Enum mit `LoginSuccess`, `LoginFailed` und `Logout`.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und die Funktion `ParseWithPatterns`, hinter die du die neue Funktion schreibst. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `ParseWithPatterns` und vor `static class Report` die lokale Funktion `string ActionFor(SecurityEvent securityEvent, int failures)`. Sie gibt `(securityEvent.Type, failures) switch { … }` zurück mit diesen Armen in dieser Reihenfolge: fehlgeschlagene Anmeldung und mindestens 5 Fehlversuche → `"lock account"`; fehlgeschlagene Anmeldung → `"watch"`; erfolgreiche Anmeldung mit `securityEvent.User is null` (mit `when`) → `"check user"`; erfolgreiche Anmeldung oder Abmeldung → `"none"`; `_` → `"unknown"`.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Choose an action per event with a switch expression`. Für jedes Ereignis in `logEvents`, dessen Benutzer `bob` ist, zählt er mit `Count` die fehlgeschlagenen Anmeldungen desselben Benutzers (`failures`) und gibt `login-failed of bob: …` mit dem Ergebnis von `ActionFor` aus.
+
+<CSharpRunner id="m12-l06-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Reihenfolge:** Der Arm mit `>= 5` steht vor dem Arm für jede andere fehlgeschlagene Anmeldung. Umgekehrt würde der zweite Arm den ersten verdecken, und der Compiler meldet CS8510.
+2. **Bedingung:** `when securityEvent.User is null` gehört zum Arm für erfolgreiche Anmeldungen. Hat ein Ereignis einen Benutzer, passt der Arm nicht, und der nächste Arm ergibt `none`.
+3. **Der letzte Arm:** `EventType` hat nur drei benannte Werte, aber jeder `int` ist als Wert gültig. Ohne `_ => "unknown"` warnt der Compiler (CS8524), und ein unbenannter Wert löst zur Laufzeit eine `SwitchExpressionException` aus.
+4. **Ergebnis:** Bob hat 5 fehlgeschlagene Anmeldungen, jedes seiner Ereignisse ergibt `lock account`.
+
+</details>
+
+**Neuer Stand:** SecLog wählt für jedes Ereignis mit einem exhaustiven `switch`-Ausdruck eine Maßnahme.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l06-switch-arm-order-irrelevant" />
+
+**„Die Reihenfolge der Arme eines switch-Ausdrucks ist egal.“** Das stimmt nicht. Der erste Arm, der passt, gewinnt. Steht ein weites Muster früh, macht es spätere Arme unerreichbar (Fehler) oder ändert still das Ergebnis, wenn ein Arm `when` hat. Schreibe immer das engere Muster zuerst.
+:::
+
+:::info[Vorhersage]
+Der erste Arm hat eine Bedingung, der zweite eine Konstante. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l06-order" code={quizOrderCode} predict expected={quizOrderOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`bob`:** Der Arm mit `StartsWith("bo")` steht oben und passt schon: `starts with bo`. Der Arm `"bob"` wird nie erreicht.
+2. **`bobby`:** Beginnt auch mit `bo`: `starts with bo`.
+3. **`alice`:** Passt nur zu `_`: `other`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warnungen und Fehler im Zusammenspiel (optional)</summary>
+
+Subsumption ist ein Fehler, Exhaustiveness nur eine Warnung ([§11.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general)). Der Grund: Ein nicht erreichbarer Arm ist sicher ein Fehler im Code, ein fehlender Fall kann beabsichtigt sein. Ein Arm mit `when` zählt bei beiden Prüfungen nicht als Abdeckung. Die Ausnahme zur Laufzeit ist `System.Runtime.CompilerServices.SwitchExpressionException` ([switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression#nonexhaustive-switch-expressions)).
+
+</details>
+
+## Zusammenfassung
+
+Ein switch-Ausdruck prüft die Arme von oben nach unten und nimmt den ersten, dessen Muster und `when`-Bedingung passen. Ein Arm, der von früheren Armen ohne Bedingung schon ganz abgedeckt ist, ist ein Fehler (CS8510). Fehlen Fälle, warnt der Compiler (CS8509, bei Enums mit unbenannten Werten CS8524), und zur Laufzeit löst ein unpassender Wert eine `SwitchExpressionException` aus. Mit einem Tupel prüfst du zwei Werte in einem `switch`, und ein Arm `_` am Ende macht ihn exhaustive.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l06-q1" />
+
+<Quiz id="m12-l06-q2" />
+
+<Quiz id="m12-l06-q3" />
+
+<Quiz id="m12-l06-q4" />
+
+<Quiz id="m12-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [§12.12 Switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1212-switch-expression)
+- Microsoft Learn: [§11.1 General (Subsumption und Exhaustiveness)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general)
+- Microsoft Learn: [switch-Ausdruck](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression)
