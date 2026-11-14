@@ -8935,6 +8935,85 @@
         "title": "Understanding speedup in PLINQ",
         "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/understanding-speedup-in-plinq"
       }
+    },
+    {
+      "id": "producer-consumer",
+      "term": "Producer/Consumer",
+      "german": "Erzeuger-Verbraucher-Muster",
+      "category": "platform",
+      "definition": "Ein Muster, in dem ein oder mehrere Erzeuger Arbeit in eine Warteschlange legen und ein oder mehrere Verbraucher sie dort abholen und bearbeiten.",
+      "aliases": [
+        "producer/consumer",
+        "Erzeuger-Verbraucher"
+      ],
+      "related": [
+        "channel",
+        "bounded-channel"
+      ],
+      "lesson": "m13-l17",
+      "source": {
+        "title": "Channels",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/channels"
+      }
+    },
+    {
+      "id": "channel",
+      "term": "Channel",
+      "german": "Kanal",
+      "category": "platform",
+      "definition": "Ein `Channel<T>` aus `System.Threading.Channels` übergibt Einträge von Erzeugern an Verbraucher. Der Erzeuger schreibt mit `Writer`, der Verbraucher liest mit `Reader`.",
+      "aliases": [
+        "Channel<T>",
+        "Kanal"
+      ],
+      "related": [
+        "producer-consumer",
+        "bounded-channel"
+      ],
+      "lesson": "m13-l17",
+      "source": {
+        "title": "Channels",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/channels"
+      }
+    },
+    {
+      "id": "bounded-channel",
+      "term": "Bounded channel",
+      "german": "begrenzter Kanal",
+      "category": "platform",
+      "definition": "Ein Kanal mit fester Kapazität aus `Channel.CreateBounded`. Ist er voll, wartet `WriteAsync`, bis ein Platz frei ist.",
+      "aliases": [
+        "CreateBounded",
+        "begrenzter Kanal"
+      ],
+      "related": [
+        "channel",
+        "producer-consumer"
+      ],
+      "lesson": "m13-l17",
+      "source": {
+        "title": "Channels",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/channels"
+      }
+    },
+    {
+      "id": "semaphore",
+      "term": "Semaphore",
+      "german": "Semaphor",
+      "category": "platform",
+      "definition": "Ein Zähler freier Plätze, der begrenzt, wie viele Arbeiten gleichzeitig laufen. `SemaphoreSlim` bietet `WaitAsync` zum Warten ohne blockierten Thread und `Release` zum Freigeben.",
+      "aliases": [
+        "SemaphoreSlim",
+        "Semaphor"
+      ],
+      "related": [
+        "channel"
+      ],
+      "lesson": "m13-l17",
+      "source": {
+        "title": "SemaphoreSlim",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim"
+      }
     }
   ]
 }
