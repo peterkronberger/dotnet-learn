@@ -65,7 +65,7 @@ Ein echter Lauf gibt <code>{lockedCounterOutput.trim()}</code> aus. Die Ausgabe 
 
 ## Das Sperrobjekt
 
-Die Sperre gehört zu einem Objekt, nicht zu der Variablen, die sie schützen soll. Alle Threads müssen dasselbe Objekt benutzen, sonst schließen sie sich nicht aus. Ein gutes Sperrobjekt ist privat und nur für diesen Zweck da. Seit C# 13 und .NET 9 ist dafür der Typ `System.Threading.Lock` gedacht. Er ist schneller als ein beliebiges Objekt als Sperre ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
+Die Sperre gehört zu einem Objekt, nicht zu der Variablen, die sie schützen soll. Alle Threads müssen dasselbe Objekt benutzen, sonst schließen sie sich nicht aus. Ein gutes <Term id="lock-object">Sperrobjekt</Term> ist privat und nur für diesen Zweck da. Seit C# 13 und .NET 9 ist dafür der Typ `System.Threading.Lock` gedacht. Er ist schneller als ein beliebiges Objekt als Sperre ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
 
 <Since csharp="13" dotnet="9" />
 
