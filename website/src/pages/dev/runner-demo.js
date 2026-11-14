@@ -6,7 +6,9 @@ import predictDemo from '!!raw-loader!@site/examples/dev/predict-demo.cs';
 import predictDemoOutput from '!!raw-loader!@site/examples/dev/predict-demo.out.txt';
 import palindromeTask from '!!raw-loader!@site/examples/dev/palindrome-task.cs';
 import palindromeTests from '!!raw-loader!@site/examples/dev/palindrome-task.tests.snippet.cs';
-import loopTrace from '!!raw-loader!@site/examples/dev/loop-trace.cs';
+import asyncTask from '!!raw-loader!@site/examples/dev/async-task.cs';
+import asyncTaskTests from '!!raw-loader!@site/examples/dev/async-task.tests.snippet.cs';
+import loopTrace from'!!raw-loader!@site/examples/dev/loop-trace.cs';
 import readName from '!!raw-loader!@site/examples/dev/read-name.cs';
 import readNameInput from '!!raw-loader!@site/examples/dev/read-name.in.txt';
 import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
@@ -30,6 +32,11 @@ export default function RunnerDemo() {
           Implementiere <code>IsPalindrome</code>. Zwei Tests sind sichtbar, zwei versteckt.
         </p>
         <CSharpRunner id="s7-task" code={palindromeTask} tests={palindromeTests} />
+        <h2>Asynchroner Code</h2>
+        <p>
+          Das Programm nutzt <code>await</code> in Top-Level-Anweisungen. Die Tests starten es asynchron.
+        </p>
+        <CSharpRunner id="async-task" code={asyncTask} tests={asyncTaskTests} />
         <h2>Schrittansicht (Spike S5)</h2>
         <p>
           Mit <code>trace</code> zeigt der Runner nach dem Ausführen Zeile, Variablen und Ausgabe pro Schritt.

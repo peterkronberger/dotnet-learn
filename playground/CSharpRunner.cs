@@ -174,7 +174,15 @@ public sealed class CSharpRunner
 
                 if (entryPoint.Invoke(null, arguments) is Task task)
                 {
-                    await task;
+                    try
+                    {
+                        await task;
+                    }
+                    catch (Exception ex)
+                    {
+                        // Same handling as for a synchronous unhandled exception.
+                        throw new TargetInvocationException(ex);
+                    }
                 }
             }
             catch (Exception) when (testsTree is not null)
@@ -185,7 +193,7 @@ public sealed class CSharpRunner
             if (testsTree is not null)
             {
                 Console.SetIn(new StringReader(stdin ?? string.Empty));
-                tests = RunTests(loaded);
+                tests = await RunTestsAsync(loaded);
             }
         }
         catch (TargetInvocationException ex)
@@ -221,10 +229,19 @@ public sealed class CSharpRunner
     private static IEnumerable<SyntaxTree> WithTests(IEnumerable<SyntaxTree> trees, SyntaxTree? testsTree) =>
         testsTree is null ? trees : trees.Append(testsTree);
 
-    private static IReadOnlyList<TestOutcome> RunTests(Assembly assembly)
+    /// <summary>
+    /// "Run()" returns the result array or a Task of it (async programs). A Task is awaited, never blocked on.
+    /// </summary>
+    private static async Task<IReadOnlyList<TestOutcome>> RunTestsAsync(Assembly assembly)
     {
         var run = assembly.GetType(TestsTypeName)?.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
-        if (run?.Invoke(null, null) is not (string Name, bool Visible, bool Passed, string Feedback)[] raw)
+        var result = run?.Invoke(null, null);
+        if (result is Task<(string Name, bool Visible, bool Passed, string Feedback)[]> pending)
+        {
+            result = await pending;
+        }
+
+        if (result is not (string Name, bool Visible, bool Passed, string Feedback)[] raw)
         {
             return [new TestOutcome("Aufgabentests", true, false, "Die Aufgabe enthält keine ausführbaren Tests.")];
         }

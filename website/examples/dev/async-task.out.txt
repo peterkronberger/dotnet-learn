@@ -1,0 +1,8 @@
+Counts: 5, 4
+Delay was cancelled
+Item 1
+Item 2
+Item 3
+Using the resource
+Resource disposed
+Done

@@ -57,6 +57,7 @@
       <ReferenceName Include="System.Collections" />
       <ReferenceName Include="System.Collections.Concurrent" />
       <ReferenceName Include="System.Linq" />
+      <ReferenceName Include="System.Linq.AsyncEnumerable" />
       <ReferenceName Include="System.Memory" />
       <ReferenceName Include="System.IO" />
       <ReferenceName Include="System.Globalization" />
