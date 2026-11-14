@@ -1,0 +1,182 @@
+---
+title: Eigenschaftsmuster
+sidebar_position: 3
+description: "Ein Eigenschaftsmuster prüft mehrere Eigenschaften eines Objekts mit verschachtelten Mustern. Es prüft zuerst auf null, und die Kurzform { A.B: … } erreicht verschachtelte Eigenschaften."
+lesson_id: m12-l03
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import propertyPatterns from '!!raw-loader!@site/examples/m12/l03/property-patterns.cs';
+import propertyPatternsOutput from '!!raw-loader!@site/examples/m12/l03/property-patterns.out.txt';
+import nestedPatterns from '!!raw-loader!@site/examples/m12/l03/nested-patterns.cs';
+import nestedPatternsOutput from '!!raw-loader!@site/examples/m12/l03/nested-patterns.out.txt';
+import emptyPattern from '!!raw-loader!@site/examples/m12/l03/empty-pattern.cs';
+import emptyPatternOutput from '!!raw-loader!@site/examples/m12/l03/empty-pattern.out.txt';
+import notAProperty from '!!raw-loader!@site/examples/m12/l03/not-a-property.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l03/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l03/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l03/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l03/seclog-patterns-solution.cs';
+
+# Eigenschaftsmuster
+
+:::note[Lernziele]
+- Du kannst mit einem Eigenschaftsmuster mehrere Eigenschaften eines Objekts in einem Test prüfen.
+- Du kannst in einem Eigenschaftsmuster andere Muster verschachteln (Konstante, relationales Muster, Typmuster).
+- Du kannst ein erweitertes Eigenschaftsmuster `{ A.B: … }` lesen und schreiben.
+- Du kannst vorhersagen, was `x is { }` bei `null` ergibt.
+:::
+
+## Rückblick
+
+<Quiz id="m06-l04-q1" />
+
+<Quiz id="m12-l01-q1" />
+
+<Quiz id="m12-l02-q1" />
+
+## Mehrere Eigenschaften in einem Test
+
+Um ein Ereignis zu prüfen, brauchst du bisher drei Bedingungen: Das Objekt ist nicht `null`, der Ereignistyp stimmt, der Benutzer stimmt. Ein <Term id="property-pattern">Eigenschaftsmuster</Term> (Property Pattern) schreibt das als ein Muster:
+
+`e is { EventType: "login-failed", User: "bob" }`
+
+In den geschweiften Klammern steht pro Teil der Name einer Eigenschaft (oder eines Felds), ein Doppelpunkt und ein beliebiges Muster dafür, zum Beispiel eine Konstante, ein relationales Muster wie `>= 2` oder ein Typmuster. Alle Teile müssen passen. Der Compiler verlangt, dass jeder Name eine lesbare Eigenschaft oder ein lesbares Feld des Typs ist ([§11.2.6 Property pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern)).
+
+Vor den Klammern darf ein Typ stehen, zum Beispiel `obj is LogEvent { User: "bob" }`. Dann prüft das Muster zuerst den Laufzeittyp (wie ein <Term id="type-pattern">Typmuster</Term>). Hinter den Klammern darf ein Name stehen, der den Wert in einer Variablen herausgibt: `obj is LogEvent { User: "bob" } bobEvent`. Wie bei jedem Muster ist die Variable nur dort sicher zugewiesen, wo das Muster gepasst hat.
+
+Ein Eigenschaftsmuster prüft **immer zuerst, dass der Wert nicht `null` ist**. Erst dann liest es die Eigenschaften. Deshalb kommt es ohne eigene `null`-Prüfung aus.
+
+:::info[Vorhersage]
+Das Programm prüft vier Einträge, einen davon `null`, mit einer Kette aus Vergleichen und mit einem Eigenschaftsmuster. Was geben die vier Zeilen aus?
+:::
+
+<CSharpRunner id="m12-l03-property" code={propertyPatterns} predict expected={propertyPatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Treffer:** Nur der erste Eintrag hat den Typ `login-failed` und den Benutzer `bob`. Beide Schreibweisen ergeben `True`.
+2. **Kein Treffer:** Beim zweiten und dritten Eintrag stimmt ein Teil nicht, beide Spalten sind `False`.
+3. **`null`:** Die Kette prüft `entry != null` selbst, das Eigenschaftsmuster hat die Prüfung schon eingebaut. Beide Schreibweisen ergeben `False`.
+
+Was passiert, wenn du `User: "bob"` weglässt? Dann zählen alle Einträge mit `login-failed`, aber `null` bleibt `False`.
+
+</details>
+
+## Verschachtelte und erweiterte Muster
+
+Die Teilmuster dürfen selbst Eigenschaftsmuster sein. Hat ein Konto ein Profil und das Profil eine Zahl `Failures`, schreibst du `account is { Profile: { Failures: >= 5 } }`. Diese Prüfung testet `Profile` auf `null`, bevor sie `Failures` liest.
+
+Die Kurzform mit Punkt, das <Term id="extended-property-pattern">erweiterte Eigenschaftsmuster</Term> (Extended Property Pattern), bedeutet genau dasselbe: `account is { Profile.Failures: >= 5 }`. Auch hier wird jede Zwischenstufe auf `null` geprüft ([§11.2.6 Property pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern)).
+
+:::info[Vorhersage]
+Für jedes der drei Konten stehen drei Ergebnisse in der Zeile: verschachtelt, erweitert, und ob die E-Mail-Adresse nicht `null` ist. Das dritte Konto hat kein Profil. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l03-nested" code={nestedPatterns} predict expected={nestedPatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **bob:** 7 Fehlversuche sind `>= 5`, und die E-Mail-Adresse ist da. Alle drei Werte sind `True`.
+2. **dave:** 2 ist nicht `>= 5`, und seine E-Mail-Adresse ist `null`. Alle drei Werte sind `False`.
+3. **erin:** Das Profil ist `null`. Die Prüfung des Profils schlägt fehl, bevor `Failures` oder `Email` gelesen wird, also gibt es keine Ausnahme, und alle Werte sind `False`.
+
+</details>
+
+## Was nicht geht
+
+Der Name links vom Doppelpunkt muss eine Eigenschaft oder ein Feld des Typs sein:
+
+<CodeBlock language="csharp" title="not-a-property.snippet.cs">{notAProperty}</CodeBlock>
+
+Der Compiler meldet `error CS0117: 'Entry' does not contain a definition for 'Missing'` für Zeile 2.
+
+In der folgenden Aufgabe suchst du eine Zeile, in der eine Variable nicht zugewiesen ist:
+
+<Quiz id="m12-l03-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog prüft Log-Zeilen mit Bereichs- und Kombinationsmustern. `logEvents` enthält die 14 Ereignisse als `LogEvent`, `incidents` die Vorfälle, und `Summary()` liefert die Kurzbeschreibung eines Vorfalls.
+
+Im Runner siehst du nur den Block `// Check log lines with logical patterns`, die Stelle vor `// End with exit code 0 …` und die Funktion `IsMorningFailure`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Find log events with property patterns`:
+
+1. Zähle die Ereignisse in `logEvents`, die zu `{ EventType: "login-failed", User: "bob" }` passen, und gib `Failed logins of bob: …` aus.
+2. Zähle die Ereignisse, die zu `{ Timestamp.Hour: 9 }` passen, und gib `Events in the hour 09:00 to 09:59: …` aus.
+3. Gib die Zusammenfassung (`Summary()`) jedes Vorfalls in `incidents` aus, der zu `{ FailureCount: >= 5 }` passt.
+
+<CSharpRunner id="m12-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Ein Test statt drei:** `{ EventType: "login-failed", User: "bob" }` ersetzt `EventType == … && User == …`. Das Muster prüft auch auf `null`.
+2. **Verschachtelt:** `Timestamp.Hour: 9` greift über die Eigenschaft `Timestamp` auf `Hour` zu. Die Zeitstempel sind in UTC.
+3. **Relationales Muster als Teil:** `FailureCount: >= 5` vergleicht die Eigenschaft eines Vorfalls mit einer Grenze.
+
+</details>
+
+**Neuer Stand:** SecLog findet Ereignisse und Vorfälle mit Eigenschaftsmustern, ohne eigene `null`-Prüfung.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l03-empty-property-pattern-matches-anything" />
+
+**„`x is { }` ist immer wahr.“** Das stimmt nicht. Jedes Eigenschaftsmuster prüft zuerst, dass der Wert nicht `null` ist, auch das leere. `x is { }` ist bei `null` falsch und sonst wahr. Du kannst es also als Test auf „nicht `null`“ lesen, und `x is not { }` als Test auf `null`.
+:::
+
+<CSharpRunner id="m12-l03-empty" code={emptyPattern} predict expected={emptyPatternOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`null`:** `value is { }` ist `False`, `value is not { }` ist `True`.
+2. **Alle anderen Werte:** Auch der leere Text und die Zahl 0 sind nicht `null`. Hier ist `value is { }` `True` und `value is not { }` `False`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Eigenschaftsmuster in `switch` und in Lambdas (optional)</summary>
+
+Ein Eigenschaftsmuster steht überall, wo ein Muster erlaubt ist: hinter `is`, als Arm eines `switch`-Ausdrucks und in Lambdas, zum Beispiel `logEvents.Count(e => e is { User: "bob" })` ([§11.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general)). Die Reihenfolge, in der die Teile geprüft werden, ist nicht festgelegt, und ein fehlgeschlagener Teil kann die übrigen überspringen ([§11.2.6 Property pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern)). Eigenschaften mit Nebenwirkungen gehören deshalb nicht in ein Muster.
+
+</details>
+
+## Zusammenfassung
+
+Ein Eigenschaftsmuster `{ Name: Muster, … }` prüft mehrere Eigenschaften und Felder eines Werts mit je einem eigenen Muster, und alle Teile müssen passen. Es prüft zuerst, dass der Wert nicht `null` ist. Die Kurzform `{ A.B: Muster }` erreicht verschachtelte Eigenschaften und prüft jede Stufe auf `null`. Das leere Muster `{ }` ist ein Test auf „nicht `null`“ und bei `null` falsch.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l03-q1" />
+
+<Quiz id="m12-l03-q2" />
+
+<Quiz id="m12-l03-q3" />
+
+<Quiz id="m12-l03-q4" />
+
+<Quiz id="m12-l03-q6" />
+
+<Quiz id="m12-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m12-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [§11.2.6 Property pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1126-property-pattern)
+- Microsoft Learn: [Eigenschaftsmuster in der Referenz „Patterns“](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#property-pattern)

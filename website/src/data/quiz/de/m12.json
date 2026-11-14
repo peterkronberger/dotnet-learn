@@ -284,6 +284,274 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem Log-Werkzeug ein Muster mit `and` und wo eines mit `or` oder `not` einsetzen?",
       "modelAnswer": "Mit `and` prüfst du einen Bereich, zum Beispiel Fehlversuche von mindestens 3 und höchstens 5 oder Ereignisse zwischen 08:00 und 09:00 Uhr. Mit `or` fasst du mehrere erlaubte Werte zusammen, zum Beispiel zwei Ereignistypen. Mit `not` schließt du Werte aus, zum Beispiel alle Ereignisse, die weder Anmeldung noch Abmeldung sind."
+    },
+    {
+      "id": "m12-l03-q1",
+      "lesson": "m12-l03",
+      "type": "single",
+      "question": "`object? value = null;` – was ergibt `value is { }`?",
+      "options": [
+        {
+          "text": "`False`",
+          "correct": true,
+          "feedback": "Jedes Eigenschaftsmuster prüft zuerst, dass der Wert nicht `null` ist. Das leere Muster prüft nur das."
+        },
+        {
+          "text": "`True`, weil das Muster keine Bedingung nennt",
+          "feedback": "Das leere Muster ist kein Muster, das alles annimmt. Es verlangt einen Wert, der nicht `null` ist.",
+          "misconception": "m12-l03-empty-property-pattern-matches-anything"
+        },
+        {
+          "text": "Eine `NullReferenceException`",
+          "feedback": "Ein Muster löst bei `null` keine Ausnahme aus."
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler",
+          "feedback": "`{ }` ist ein gültiges Muster."
+        }
+      ],
+      "explanation": "`x is { }` ist ein Test auf \"nicht `null`\". Bei `null` ist das Ergebnis `False`, bei jedem anderen Wert `True`."
+    },
+    {
+      "id": "m12-l03-q2",
+      "lesson": "m12-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l03/quiz-property.cs",
+      "explanation": "Der erste Eintrag hat den Ereignistyp `login-failed` und einen Benutzer, der nicht `null` ist: `True`. Beim zweiten ist `User` gleich `null`, also passt `{ }` nicht: `False`. Der dritte Eintrag ist `null`, und schon die Prüfung auf `null` schlägt fehl: `False`."
+    },
+    {
+      "id": "m12-l03-q3",
+      "lesson": "m12-l03",
+      "type": "cloze",
+      "question": "Ergänze die Namen und das relationale Muster.",
+      "example": "m12/l03/gap-property.cs",
+      "blanks": [
+        {
+          "text": "EventType",
+          "hint": "Der Name der Eigenschaft, die `login-failed` enthält."
+        },
+        {
+          "text": "User",
+          "hint": "Der Name der Eigenschaft, die `bob` enthält."
+        },
+        {
+          "text": ">= 2",
+          "hint": "Ein relationales Muster: mindestens 2 Versuche."
+        }
+      ],
+      "explanation": "Links vom Doppelpunkt steht der Name einer Eigenschaft, rechts ein beliebiges Muster: eine Konstante oder ein relationales Muster. Alle Teile müssen passen."
+    },
+    {
+      "id": "m12-l03-q4",
+      "lesson": "m12-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Eigenschaftsmuster stimmen?",
+      "options": [
+        {
+          "text": "Links vom Doppelpunkt steht der Name einer lesbaren Eigenschaft oder eines Felds.",
+          "correct": true
+        },
+        {
+          "text": "Rechts vom Doppelpunkt darf wieder ein Eigenschaftsmuster stehen.",
+          "correct": true
+        },
+        {
+          "text": "`entry is { User: \"bob\" }` ist für `entry == null` wahr, weil kein anderer Benutzer gefunden wurde.",
+          "feedback": "Ein Eigenschaftsmuster passt nie auf `null`, auch wenn es kein Teilmuster hat.",
+          "misconception": "m12-l03-empty-property-pattern-matches-anything"
+        },
+        {
+          "text": "Mehrere Teile, die durch Kommas getrennt sind, müssen alle passen.",
+          "correct": true
+        }
+      ],
+      "explanation": "Ein Eigenschaftsmuster prüft erst auf `null`, liest dann die genannten Eigenschaften und verlangt, dass jedes Teilmuster passt."
+    },
+    {
+      "id": "m12-l03-q5",
+      "lesson": "m12-l03",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS0165, Variable nicht zugewiesen). Welche?",
+      "example": "m12/l03/quiz-scope.snippet.cs",
+      "bugLines": [
+        6
+      ],
+      "lineFeedback": {
+        "6": {
+          "feedback": "Außerhalb des `if` hat `name` keinen sicher zugewiesenen Wert, denn das Muster passt vielleicht nicht."
+        }
+      },
+      "explanation": "Die Variable am Ende eines Eigenschaftsmusters ist nur dort zugewiesen, wo das Muster gepasst hat."
+    },
+    {
+      "id": "m12-l03-q6",
+      "lesson": "m12-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l03/quiz-or-pattern.cs",
+      "explanation": "Der erste Eintrag passt: `login-failed` und 4 ist größer als 0. Der zweite hat zwar den Ereignistyp `logout`, aber 0 Versuche. Der dritte passt: `login-failed` und 1 ist größer als 0. Die Zahl ist 2."
+    },
+    {
+      "id": "m12-l03-q7",
+      "lesson": "m12-l03",
+      "type": "single",
+      "question": "Welches Muster bedeutet dasselbe wie `{ Profile: { Failures: >= 5 } }`?",
+      "options": [
+        {
+          "text": "`{ Profile.Failures: >= 5 }`",
+          "correct": true,
+          "feedback": "Der Punkt ist die Kurzform für das verschachtelte Muster. Auch hier wird `Profile` zuerst auf `null` geprüft."
+        },
+        {
+          "text": "`{ Profile: >= 5 }`",
+          "feedback": "Das vergleicht das Profil-Objekt selbst mit 5, nicht seine Eigenschaft `Failures`."
+        },
+        {
+          "text": "`{ Failures: >= 5 }`",
+          "feedback": "Das sucht `Failures` direkt am Konto. Die Eigenschaft liegt aber in `Profile`."
+        },
+        {
+          "text": "`{ Profile, Failures: >= 5 }`",
+          "feedback": "Jeder Teil braucht einen Namen, einen Doppelpunkt und ein Muster."
+        }
+      ],
+      "explanation": "Das erweiterte Eigenschaftsmuster `{ A.B: Muster }` ist gleichwertig mit `{ A: { B: Muster } }`."
+    },
+    {
+      "id": "m12-l03-q8",
+      "lesson": "m12-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Eigenschaftsmuster prüft und warum `x is { }` bei `null` falsch ist.",
+      "modelAnswer": "Ein Eigenschaftsmuster prüft zuerst, dass der Wert nicht `null` ist. Danach liest es die genannten Eigenschaften oder Felder und vergleicht jede mit dem Teilmuster, das daneben steht. Nur wenn alle Teile passen, passt das ganze Muster.\n\nBeim leeren Muster `{ }` gibt es keine Teile. Es bleibt nur die Prüfung auf `null`. Deshalb ist `x is { }` bei `null` falsch und sonst wahr."
+    },
+    {
+      "id": "m12-l03-q9",
+      "lesson": "m12-l03",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Eigenschaftsmuster statt einer Kette aus `!= null`, `&&` und `==` einsetzen?",
+      "modelAnswer": "Ein Eigenschaftsmuster passt, wenn ein Objekt fehlen darf und du gleichzeitig mehrere Eigenschaften prüfst, zum Beispiel Log-Ereignisse mit einem bestimmten Typ und Benutzer oder Vorfälle mit mindestens fünf Fehlversuchen. Der Test steht in einem Ausdruck, und die Prüfung auf `null` ist schon dabei."
+    },
+    {
+      "id": "m12-l04-q1",
+      "lesson": "m12-l04",
+      "type": "single",
+      "question": "`Visit` ist ein Record `(string User, string Ip)`. Was ergibt `new Visit(\"bob\", \"203.0.113.7\") is (\"203.0.113.7\", \"bob\")`?",
+      "options": [
+        {
+          "text": "`False`, ohne Compilerfehler",
+          "correct": true,
+          "feedback": "Das erste Teilmuster wird mit `User` verglichen, das zweite mit `Ip`. Die vertauschten Werte passen nicht."
+        },
+        {
+          "text": "`True`, weil beide Werte im Objekt vorkommen",
+          "feedback": "Ein Positionsmuster sucht die Werte nicht irgendwo im Objekt. Es vergleicht den ersten Teil mit dem ersten Muster, den zweiten mit dem zweiten.",
+          "misconception": "m12-l04-positional-pattern-matches-by-name"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Reihenfolge falsch ist",
+          "feedback": "Beide Teile sind Texte, also ist die Vertauschung für den Compiler gültig. Genau das macht den Fehler schwer zu finden."
+        },
+        {
+          "text": "Eine Ausnahme zur Laufzeit",
+          "feedback": "Ein Muster löst bei einem Vergleich ohne Treffer keine Ausnahme aus."
+        }
+      ],
+      "explanation": "Ein Positionsmuster vergleicht nach der Position der `out`-Parameter von `Deconstruct`, nicht nach dem Namen der Eigenschaften. Zwei vertauschte Texte ergeben ein anderes Ergebnis, aber keinen Compilerfehler."
+    },
+    {
+      "id": "m12-l04-q2",
+      "lesson": "m12-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l04/quiz-swap.cs",
+      "explanation": "Das Muster `(_, \"bob\")` prüft nur den zweiten Teil, `Ip`. Beim ersten Eintrag ist `Ip` gleich `203.0.113.7`: `False`. Beim zweiten Eintrag steht `bob` in `Ip`: `True`. Beim dritten auch: `True`."
+    },
+    {
+      "id": "m12-l04-q3",
+      "lesson": "m12-l04",
+      "type": "cloze",
+      "question": "Ergänze das Verwerfen und die Konstante in den Mustern.",
+      "example": "m12/l04/gap-positional.cs",
+      "blanks": [
+        {
+          "text": "_",
+          "hint": "Der Benutzer ist egal. Dieses Zeichen nimmt jeden Wert an."
+        },
+        {
+          "text": "\"203.0.113.7\"",
+          "hint": "Ein Konstantenmuster für die Adresse, die an zweiter Position steht."
+        },
+        {
+          "text": "_",
+          "hint": "Von der Zerlegung wird nur der Name gebraucht."
+        }
+      ],
+      "explanation": "Der Unterstrich nimmt in einem Positionsmuster und in einer Zerlegung jeden Teil an, ohne ihn zu speichern. Die Position entscheidet, welcher Teil gemeint ist."
+    },
+    {
+      "id": "m12-l04-q4",
+      "lesson": "m12-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über `Deconstruct` und Positionsmuster stimmen?",
+      "options": [
+        {
+          "text": "`Deconstruct` hat `out`-Parameter und gibt `void` zurück.",
+          "correct": true
+        },
+        {
+          "text": "Ein Positionsmuster für ein Objekt braucht genauso viele Teilmuster wie `Deconstruct` `out`-Parameter hat.",
+          "correct": true
+        },
+        {
+          "text": "Ein Positionsmuster vergleicht die Teile nach den Namen der Eigenschaften.",
+          "feedback": "Es vergleicht nach der Position. Die Namen der Eigenschaften spielen keine Rolle.",
+          "misconception": "m12-l04-positional-pattern-matches-by-name"
+        },
+        {
+          "text": "Ein positionaler Record hat `Deconstruct` schon, ohne dass du es schreibst.",
+          "correct": true
+        }
+      ],
+      "explanation": "Der Compiler erzeugt `Deconstruct` für positionale Records. Bei anderen Typen schreibst du die Methode selbst. Positionsmuster und `var (a, b) = obj;` nutzen dieselbe Methode."
+    },
+    {
+      "id": "m12-l04-q5",
+      "lesson": "m12-l04",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS8129, keine passende `Deconstruct`-Methode). Welche?",
+      "example": "m12/l04/quiz-count.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "lineFeedback": {
+        "3": {
+          "feedback": "`Visit` zerlegt sich in zwei Teile, hier stehen drei Variablen."
+        }
+      },
+      "explanation": "Die Zahl der Variablen oder Teilmuster muss zur Zahl der `out`-Parameter von `Deconstruct` passen."
+    },
+    {
+      "id": "m12-l04-q6",
+      "lesson": "m12-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l04/quiz-var-parts.cs",
+      "explanation": "`var user` und `var ip` nehmen jeden Wert an, auch `null`. Bei bob ist die Adresse nicht `null`: `False`. Bei dave ist sie `null`, und das Muster passt trotzdem: `True`."
+    },
+    {
+      "id": "m12-l04-q7",
+      "lesson": "m12-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Positionsmuster prüft und woher es die Teile des Objekts bekommt.",
+      "modelAnswer": "Ein Positionsmuster zerlegt den Wert in Teile und vergleicht jeden Teil mit dem Teilmuster an derselben Position. Bei einem Tupel sind die Teile die Elemente, bei anderen Typen liefert die `Deconstruct`-Methode sie über ihre `out`-Parameter. Positionale Records haben diese Methode automatisch.\n\nDie Namen der Eigenschaften spielen keine Rolle, nur die Reihenfolge. Zwei vertauschte Werte vom selben Typ ergeben also ein anderes Ergebnis, ohne dass der Compiler meldet."
+    },
+    {
+      "id": "m12-l04-q8",
+      "lesson": "m12-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Positionsmuster statt eines Eigenschaftsmusters einsetzen, und wo nicht?",
+      "modelAnswer": "Ein Positionsmuster passt, wenn die Reihenfolge der Teile schon die Bedeutung trägt und es wenige Teile gibt, zum Beispiel bei einem Tupel aus Benutzer und Adresse oder bei einem kleinen Record. Bei vielen Teilen oder gleichartigen Werten ist ein Eigenschaftsmuster besser, weil die Namen den Test erklären und eine Vertauschung auffällt."
     }
   ]
 }
