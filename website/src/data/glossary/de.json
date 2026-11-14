@@ -8244,6 +8244,176 @@
         "title": "Asynchronous programming",
         "url": "https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/"
       }
+    },
+    {
+      "id": "concurrency",
+      "term": "Concurrency",
+      "german": "Nebenläufigkeit",
+      "category": "platform",
+      "definition": "Mehrere Aufgaben sind gleichzeitig begonnen und noch nicht fertig. Sie müssen nicht im selben Moment laufen: Es genügt, dass die Arbeit zwischen ihnen wechselt.",
+      "aliases": [
+        "nebenläufig"
+      ],
+      "related": [
+        "parallelism",
+        "asynchronous-programming",
+        "interleaving"
+      ],
+      "lesson": "m13-l09",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "parallelism",
+      "term": "Parallelism",
+      "german": "Parallelität",
+      "category": "platform",
+      "definition": "Mehrere Teile der Arbeit laufen im selben Moment, jeder auf einem eigenen Prozessorkern.",
+      "aliases": [
+        "parallel"
+      ],
+      "related": [
+        "concurrency",
+        "processor-core"
+      ],
+      "source": {
+        "title": "Threads and threading",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading"
+      }
+    },
+    {
+      "id": "thread",
+      "term": "Thread",
+      "german": "Ausführungsstrang",
+      "category": "platform",
+      "definition": "Die Einheit, der das Betriebssystem Prozessorzeit zuteilt. Ein Thread arbeitet Anweisungen nacheinander ab. Mehrere Threads eines Prozesses teilen sich dessen Speicher.",
+      "aliases": [
+        "Threads"
+      ],
+      "related": [
+        "process",
+        "processor-core",
+        "scheduler",
+        "thread-pool"
+      ],
+      "source": {
+        "title": "Threads and threading",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading"
+      }
+    },
+    {
+      "id": "process",
+      "term": "Process",
+      "german": "Prozess",
+      "category": "platform",
+      "definition": "Ein laufendes Programm. Das Betriebssystem trennt Prozesse voneinander. In einem Prozess können mehrere Threads laufen.",
+      "aliases": [
+        "Prozesse"
+      ],
+      "related": [
+        "thread"
+      ],
+      "source": {
+        "title": "Threads and threading",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading"
+      }
+    },
+    {
+      "id": "processor-core",
+      "term": "Processor core",
+      "german": "Prozessorkern",
+      "category": "platform",
+      "definition": "Die Einheit eines Prozessors, die Anweisungen ausführt. Ein Rechner mit mehreren Kernen kann mehrere Threads im selben Moment ausführen.",
+      "aliases": [
+        "Kern",
+        "CPU-Kern",
+        "Kerne"
+      ],
+      "related": [
+        "thread",
+        "parallelism"
+      ],
+      "lesson": "m13-l09",
+      "source": {
+        "title": "Threads and threading",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading"
+      }
+    },
+    {
+      "id": "scheduler",
+      "term": "Scheduler",
+      "german": "Ablaufplaner",
+      "category": "platform",
+      "definition": "Der Teil des Betriebssystems, der entscheidet, welcher Thread wann Prozessorzeit bekommt. Er kann einen Thread unterbrechen, auch mitten in einer Zeile Code.",
+      "related": [
+        "thread",
+        "interleaving"
+      ],
+      "lesson": "m13-l09",
+      "source": {
+        "title": "Threads and threading",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/threads-and-threading"
+      }
+    },
+    {
+      "id": "interleaving",
+      "term": "Interleaving",
+      "german": "Verschränkung",
+      "category": "platform",
+      "definition": "Die Schritte mehrerer Threads wechseln sich ab. Die Reihenfolge der Schritte zwischen den Threads ist nicht festgelegt und kann bei jedem Lauf anders sein.",
+      "aliases": [
+        "Verschränkungstabelle"
+      ],
+      "related": [
+        "scheduler",
+        "concurrency"
+      ],
+      "lesson": "m13-l09",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "thread-pool",
+      "term": "Thread pool",
+      "german": "Thread-Pool",
+      "category": "platform",
+      "definition": "Eine Gruppe von Arbeiter-Threads, die das System verwaltet. Sie holen Arbeitsaufträge aus einer Warteschlange und werden danach wiederverwendet.",
+      "aliases": [
+        "ThreadPool"
+      ],
+      "related": [
+        "work-item",
+        "thread",
+        "task"
+      ],
+      "lesson": "m13-l10",
+      "source": {
+        "title": "The managed thread pool",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool"
+      }
+    },
+    {
+      "id": "work-item",
+      "term": "Work item",
+      "german": "Arbeitsauftrag",
+      "category": "platform",
+      "definition": "Ein Stück Arbeit, das in der Warteschlange des Thread-Pools wartet, bis ein Thread frei ist. Ein Task, der mit `Task.Run` gestartet wird, ist ein Arbeitsauftrag.",
+      "aliases": [
+        "Arbeitsaufträge"
+      ],
+      "related": [
+        "thread-pool",
+        "task"
+      ],
+      "lesson": "m13-l10",
+      "source": {
+        "title": "The managed thread pool",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/the-managed-thread-pool"
+      }
     }
   ]
 }
