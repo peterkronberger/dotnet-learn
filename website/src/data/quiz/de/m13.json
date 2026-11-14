@@ -415,6 +415,122 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem eigenen Programm startest du eine `async`-Methode, deren Fehler du behandeln musst, und wo würde ein vergessenes `await` einen Fehler verstecken?",
       "modelAnswer": "Zum Beispiel beim Laden einer Datei oder von Daten, die fehlen können: Ich rufe die Methode auf und warte mit `await` in einem `try`-Block, damit ich den Fehler melden kann. Vergesse ich das `await` bei einer Methode, die zum Beispiel Daten speichert, merkt das Programm nicht, dass das Speichern gescheitert ist."
+    },
+    {
+      "id": "m13-l04-q1",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/one-after-another.cs",
+      "explanation": "Das erste `await` wartet, bis `A` fertig ist. Erst danach beginnt der Aufruf von `WorkAsync(\"B\", …)`. Deshalb erscheint `start B` erst nach `A done`."
+    },
+    {
+      "id": "m13-l04-q2",
+      "lesson": "m13-l04",
+      "type": "single",
+      "question": "Das Programm schreibt `await WorkAsync(\"A\", steps);` und danach `await WorkAsync(\"B\", steps);`. Was stimmt?",
+      "options": [
+        {
+          "text": "Die Aufgabe `B` beginnt erst, wenn das Warten auf `A` beendet ist.",
+          "correct": true,
+          "feedback": "Jedes `await` hält die Methode an, bis sein Task fertig ist. Die nächste Zeile startet `B` erst danach."
+        },
+        {
+          "text": "`A` und `B` laufen gleichzeitig, weil beide Methoden `async` sind.",
+          "feedback": "`async` allein macht nichts gleichzeitig. Wer beide Tasks gleichzeitig will, startet sie zuerst und wartet dann.",
+          "misconception": "m13-l04-sequential-awaits-run-together"
+        },
+        {
+          "text": "`B` beginnt zuerst, weil es weiter unten steht.",
+          "feedback": "Die Zeilen laufen von oben nach unten. `A` ist zuerst dran."
+        },
+        {
+          "text": "`await` startet `A` und `B` beim ersten Aufruf zusammen.",
+          "feedback": "`await` startet nichts. Es wartet nur auf einen Task, der schon gestartet wurde.",
+          "misconception": "m13-l04-sequential-awaits-run-together"
+        }
+      ],
+      "explanation": "Ein Aufruf startet die Arbeit, das `await` wartet darauf. Steht das zweite `await` samt Aufruf erst nach dem ersten, beginnt die zweite Arbeit erst nach dem Ende der ersten. Die Gesamtzeit ist die Summe."
+    },
+    {
+      "id": "m13-l04-q3",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/start-then-await.cs",
+      "explanation": "Beide Aufrufe starten, bevor jemand wartet: `start A`, `start B`, dann `both started`. Erst `Task.WhenAll` wartet auf beide. Danach folgt `all done`."
+    },
+    {
+      "id": "m13-l04-q4",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l04/when-all-results.cs",
+      "explanation": "`SlowAsync` ist später fertig als `FastAsync`. Das Ergebnisfeld von `Task.WhenAll` folgt trotzdem der Reihenfolge der Argumente: zuerst der Wert von `SlowAsync` (1), dann der von `FastAsync` (2)."
+    },
+    {
+      "id": "m13-l04-q5",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/when-all-errors.cs",
+      "explanation": "Beide Tasks schlagen fehl. `await` löst nur eine Ausnahme aus (`first failed`), die `catch`-Klausel fängt sie. Die `AggregateException` in `all.Exception` enthält beide Ausnahmen, deshalb 2."
+    },
+    {
+      "id": "m13-l04-q6",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l04/when-any.cs",
+      "explanation": "`cached` ist schon fertig, `remote` braucht 5 Sekunden. `Task.WhenAny` liefert den ersten fertigen Task, `cached`. Den anderen Task bricht `WhenAny` nicht ab. Er läuft weiter, ist aber noch nicht fertig (`False`)."
+    },
+    {
+      "id": "m13-l04-q7",
+      "lesson": "m13-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m13/l04/wait-with-timeout.cs",
+      "explanation": "`WaitAsync` gibt nach 50 ms einen Task zurück, der mit einer `TimeoutException` fehlerhaft endet. Das `await` löst sie aus, und `catch` gibt den Typ aus. Die Wartezeit des Tasks selbst (5 Sekunden) endet dadurch nicht."
+    },
+    {
+      "id": "m13-l04-q8",
+      "lesson": "m13-l04",
+      "type": "cloze",
+      "question": "Ergänze das Warten, den Task-Kombinator, den Modifizierer der Methode und das Warten in der Methode.",
+      "example": "m13/l04/gap-when-all.cs",
+      "blanks": [
+        {
+          "text": "await",
+          "hint": "Der Aufrufer wartet auf das Ergebnis."
+        },
+        {
+          "text": "WhenAll",
+          "hint": "Die Methode wartet auf beide Tasks."
+        },
+        {
+          "text": "async",
+          "hint": "Der Modifizierer erlaubt `await` in der Methode."
+        },
+        {
+          "text": "await",
+          "hint": "Die Methode wartet auf `Task.Delay(10)`."
+        }
+      ],
+      "explanation": "Beide Tasks starten zuerst, `Task.WhenAll` wartet auf beide und liefert `[1, 2]`. Die Summe ist `3`."
+    },
+    {
+      "id": "m13-l04-q9",
+      "lesson": "m13-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `await A(); await B();` länger dauert als `await Task.WhenAll(A(), B())`, und wozu du `WaitAsync` brauchst.",
+      "modelAnswer": "Beim ersten Weg startet `B` erst, wenn `A` fertig ist, die Zeiten addieren sich. Beim zweiten Weg werden beide Aufrufe ausgewertet, bevor gewartet wird. Beide Tasks laufen dann zugleich, und die Gesamtzeit ist ungefähr die des langsameren.\n\n`WaitAsync` begrenzt die Wartezeit. Dauert der Task länger, endet das Warten mit einer `TimeoutException`, und das Programm hängt nicht ewig."
+    },
+    {
+      "id": "m13-l04-q10",
+      "lesson": "m13-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du mehrere Tasks gleichzeitig warten lassen, und wo würdest du eine Wartezeit begrenzen?",
+      "modelAnswer": "Zum Beispiel beim Laden mehrerer unabhängiger Daten, etwa der Logs von mehreren Servern: Ich starte alle Aufrufe zuerst und warte mit `Task.WhenAll`. Eine Wartezeit begrenze ich bei Quellen, die hängen könnten, etwa einem langsamen Server. Nach dem Timeout melde ich den Fehler, statt weiter zu warten."
     }
   ]
 }

@@ -7927,6 +7927,68 @@
         "title": "Exception handling (Task Parallel Library)",
         "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library"
       }
+    },
+    {
+      "id": "aggregate-exception",
+      "term": "AggregateException",
+      "german": "Sammelausnahme",
+      "category": "platform",
+      "definition": "Eine Exception vom Typ `AggregateException`, die mehrere Exceptions in `InnerExceptions` zusammenfasst. Ein Task, der auf mehrere Tasks wartet, speichert seine Fehler darin (`Task.Exception`).",
+      "aliases": [
+        "AggregateException",
+        "InnerExceptions"
+      ],
+      "related": [
+        "faulted-task",
+        "task",
+        "inner-exception"
+      ],
+      "lesson": "m13-l04",
+      "source": {
+        "title": "Exception handling (Task Parallel Library)",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library"
+      }
+    },
+    {
+      "id": "task-combinator",
+      "term": "Task combinator",
+      "german": "Task-Kombinator",
+      "category": "platform",
+      "definition": "Eine Methode, die mehrere Tasks zu einem neuen Task zusammenfasst: `Task.WhenAll` ist fertig, wenn alle fertig sind, `Task.WhenAny`, sobald der erste fertig ist.",
+      "aliases": [
+        "Kombinator",
+        "WhenAll",
+        "WhenAny"
+      ],
+      "related": [
+        "task",
+        "aggregate-exception"
+      ],
+      "lesson": "m13-l04",
+      "source": {
+        "title": "Task.WhenAll Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.whenall"
+      }
+    },
+    {
+      "id": "timeout",
+      "term": "Timeout",
+      "german": "Zeitlimit",
+      "category": "platform",
+      "definition": "Die Höchstdauer, die ein Programm auf etwas wartet. Mit `Task.WaitAsync(TimeSpan)` endet das Warten nach Ablauf mit einer `TimeoutException`.",
+      "aliases": [
+        "Timeouts",
+        "Zeitüberschreitung"
+      ],
+      "related": [
+        "task",
+        "task-combinator"
+      ],
+      "lesson": "m13-l04",
+      "source": {
+        "title": "Task.WaitAsync Method",
+        "url": "https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.waitasync"
+      }
     }
   ]
 }

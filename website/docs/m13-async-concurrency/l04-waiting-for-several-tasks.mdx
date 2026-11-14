@@ -1,0 +1,179 @@
+---
+title: Auf mehrere Tasks warten
+sidebar_position: 4
+description: Mehrere Tasks zuerst starten und dann mit Task.WhenAll auf alle oder mit Task.WhenAny auf den ersten warten, und die Wartezeit mit WaitAsync begrenzen.
+lesson_id: m13-l04
+duration_min: 24
+---
+
+import oneAfterAnother from '!!raw-loader!@site/examples/m13/l04/one-after-another.cs';
+import oneAfterAnotherOutput from '!!raw-loader!@site/examples/m13/l04/one-after-another.out.txt';
+import startThenAwait from '!!raw-loader!@site/examples/m13/l04/start-then-await.cs';
+import whenAllResults from '!!raw-loader!@site/examples/m13/l04/when-all-results.cs';
+import whenAllErrors from '!!raw-loader!@site/examples/m13/l04/when-all-errors.cs';
+import whenAllErrorsOutput from '!!raw-loader!@site/examples/m13/l04/when-all-errors.out.txt';
+import whenAny from '!!raw-loader!@site/examples/m13/l04/when-any.cs';
+import waitWithTimeout from '!!raw-loader!@site/examples/m13/l04/wait-with-timeout.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l04/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l04/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l04/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l04/seclog-async-solution.cs';
+
+# Auf mehrere Tasks warten
+
+:::note[Lernziele]
+- Du kannst mehrere Tasks starten und mit `Task.WhenAll` auf alle warten.
+- Du kannst erklären, warum `await A(); await B();` länger dauert als `await Task.WhenAll(A(), B())`.
+- Du kannst mit `Task.WhenAny` auf den ersten fertigen Task reagieren.
+- Du kannst eine Wartezeit mit `WaitAsync` begrenzen und die `TimeoutException` behandeln.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l01-q4" />
+
+<Quiz id="m13-l03-q2" />
+
+<Quiz id="m05-l01-q3" />
+
+## Hintereinander warten
+
+Ein Programm soll zwei Log-Quellen laden. Jede braucht eine kurze Zeit. Wartet es zuerst auf die eine und dann auf die andere, addieren sich die Zeiten. Das Programm unten schreibt in eine Liste mit, wann jede Arbeit beginnt und wann das Programm mit ihr fertig ist. Die Liste druckt es am Ende, so bleibt die Reihenfolge sichtbar.
+
+:::info[Vorhersage]
+In welcher Reihenfolge stehen die vier Einträge der Liste? Notiere sie, bevor du das Programm startest.
+:::
+
+<CSharpRunner id="m13-l04-sequential" code={oneAfterAnother} predict expected={oneAfterAnotherOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erste Arbeit starten und abwarten:** `WorkAsync("A", …)` trägt `start A` ein. Das `await` wartet, bis der Task fertig ist, dann folgt `A done`.
+2. **Zweite Arbeit starten:** Erst jetzt wird die nächste Zeile ausgeführt, also beginnt `B`: `start B`, danach `B done`.
+
+Was passiert, wenn du beide Aufrufe vor das erste `await` schreibst? Dann beginnen beide Arbeiten, bevor jemand wartet. Das zeigt der nächste Abschnitt.
+
+</details>
+
+## Erst starten, dann warten
+
+Ein Aufruf einer async-Methode startet die Arbeit und gibt einen Task zurück. Das `await` ist ein eigener zweiter Schritt, der auf diesen Task wartet. Die Reihenfolge der `await` entscheidet deshalb, wann Code weiterläuft ([§12.9.9 Await expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1299-await-expressions)). Beginnen beide Aufrufe, bevor das erste `await` kommt, laufen beide Arbeiten zugleich.
+
+`Task.WhenAll` ist ein <Term id="task-combinator">Task-Kombinator</Term>: Es fasst mehrere Tasks zu einem neuen Task zusammen, der fertig ist, wenn alle fertig sind. Mit `await Task.WhenAll(a, b)` wartet das Programm auf beide.
+
+<CSharpRunner id="m13-l04-together" code={startThenAwait} />
+
+Jetzt stehen `start A` und `start B` direkt hintereinander, noch vor `both started`. Die Wartezeiten überlappen sich, die Gesamtzeit ist ungefähr die des langsameren Tasks statt der Summe.
+
+<Quiz id="m13-l04-q1" />
+
+<Quiz id="m13-l04-q3" />
+
+## Ergebnisse und Fehler von WhenAll
+
+Sind die Tasks vom Typ `Task<T>`, liefert `await Task.WhenAll(…)` ein Array mit den Ergebnissen, in der Reihenfolge der Argumente, nicht in der Reihenfolge, in der die Tasks fertig wurden ([Task.WhenAll](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.whenall)).
+
+<CSharpRunner id="m13-l04-results" code={whenAllResults} />
+
+<Quiz id="m13-l04-q4" />
+
+Schlagen mehrere Tasks fehl, speichert der Task von `WhenAll` alle Ausnahmen. `await` löst nur eine davon aus. Alle zusammen stehen in `Task.Exception`, einer <Term id="aggregate-exception">Sammelausnahme</Term> (`AggregateException`). Ihre Eigenschaft `InnerExceptions` zählt sie auf.
+
+:::info[Vorhersage]
+Zwei Tasks schlagen fehl. Welche Zeilen erscheinen?
+:::
+
+<CSharpRunner id="m13-l04-errors" code={whenAllErrors} predict expected={whenAllErrorsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zusammenfassen:** `Task.WhenAll` wartet, bis beide Tasks beendet sind, beide enden fehlerhaft.
+2. **Warten und abfangen:** `await all` löst eine Ausnahme aus, nämlich die des Tasks `first`. Das `catch` gibt `Caught: first failed` aus.
+3. **Alle Fehler lesen:** `all.Exception` ist eine `AggregateException` mit beiden Ausnahmen, daher `Errors in the task: 2`.
+
+</details>
+
+<Quiz id="m13-l04-q5" />
+
+## Auf den ersten warten
+
+`Task.WhenAny` ist fertig, sobald der erste der Tasks fertig ist. Das Ergebnis ist dieser Task. Die anderen Tasks bricht es nicht ab, sie laufen weiter. Im Beispiel ist ein Task schon fertig und der andere braucht 5 Sekunden, der Sieger steht also fest.
+
+<CSharpRunner id="m13-l04-any" code={whenAny} />
+
+Das Programm endet, ohne die 5 Sekunden abzuwarten, denn niemand wartet mehr auf `remote`.
+
+<Quiz id="m13-l04-q6" />
+
+## Die Wartezeit begrenzen
+
+Ein Task kann sehr lange dauern. Mit `WaitAsync(TimeSpan)` legst du ein <Term id="timeout">Zeitlimit</Term> fest. Ist der Task bis dahin nicht fertig, endet das Warten mit einer `TimeoutException` ([Task.WaitAsync](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.waitasync)). Der Task selbst wird dadurch nicht abgebrochen. Im Beispiel liegen 50 ms und 5 s weit auseinander.
+
+<CSharpRunner id="m13-l04-timeout" code={waitWithTimeout} />
+
+<Quiz id="m13-l04-q7" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen das Warten, der Kombinator, der Modifizierer der Methode und das Warten in der Methode.
+
+<Quiz id="m13-l04-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog lädt Quellen asynchron und behandelt den Fehler einer unbekannten Quelle am `await`.
+
+Im Runner siehst du nur den Block `// Catch the error of a failed source at the await`, das Ende des Programms und die Funktionen `LoadSourceAsync` und `CountFailuresAsync`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `CountFailuresAsync` und vor `static class Report` die lokale Funktion `async Task<string[]> LoadSlowSourceAsync()`. Sie wartet mit `await Task.Delay(5000)` und gibt ein leeres Array zurück.
+2. Schreibe hinter den Block `// Catch the error of a failed source at the await` und vor die Zeile `// End with exit code 0 …` den Block `// Load all sources at the same time`: `string[][] all = await Task.WhenAll(LoadSourceAsync("web"), LoadSourceAsync("vpn"));` und gib `Sources loaded: <Anzahl Quellen>, lines: <Anzahl aller Zeilen>` aus.
+3. Danach kommt der Block `// Limit the waiting time of a slow source`: Warte in einem `try`-Block mit `await LoadSlowSourceAsync().WaitAsync(TimeSpan.FromMilliseconds(50))`, fange `TimeoutException` und gib `Slow source: timeout` aus.
+
+<CSharpRunner id="m13-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Beide Quellen starten:** Die beiden Aufrufe stehen als Argumente von `Task.WhenAll`, deshalb starten sie, bevor gewartet wird. Das Ergebnis ist ein Array von Arrays. Es hat 2 Einträge mit zusammen 14 Zeilen.
+2. **Langsame Quelle begrenzen:** `LoadSlowSourceAsync` wartet 5 Sekunden, `WaitAsync` gibt nach 50 ms auf und löst die `TimeoutException` aus.
+3. **Behandeln:** Das `catch` gibt `Slow source: timeout` aus. Das Programm endet danach mit `return 0`, ohne die 5 Sekunden abzuwarten.
+
+</details>
+
+**Neuer Stand:** SecLog lädt alle Quellen zugleich und gibt bei einer zu langsamen Quelle nach einem Zeitlimit auf.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l04-sequential-awaits-run-together" />
+
+**„`await A(); await B();` lässt A und B gleichzeitig laufen.“** Das stimmt nicht. Jedes `await` wartet, bis sein Task fertig ist, bevor die nächste Zeile läuft. Die zweite Arbeit beginnt also erst danach. Willst du beide gleichzeitig, starte beide Tasks zuerst und warte dann, zum Beispiel mit `Task.WhenAll`.
+:::
+
+<Quiz id="m13-l04-q2" />
+
+## Zusammenfassung
+
+Ein Aufruf startet die Arbeit, das `await` wartet auf sie. Zwei `await` hintereinander laufen nacheinander. Willst du Zeit sparen, startest du alle Tasks zuerst. `Task.WhenAll` wartet auf alle und liefert die Ergebnisse in der Reihenfolge der Argumente. Bei mehreren Fehlern löst `await` einen aus, alle stehen in `Task.Exception`. `Task.WhenAny` meldet den ersten fertigen Task und bricht die anderen nicht ab. `WaitAsync` begrenzt die Wartezeit und löst bei Ablauf eine `TimeoutException` aus.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l04-q9" />
+
+### Transferfrage
+
+<Quiz id="m13-l04-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Task.WhenAll](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.whenall)
+- Microsoft Learn: [Task.WhenAny](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.whenany)
+- Microsoft Learn: [Task.WaitAsync](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.waitasync)
