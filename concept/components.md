@@ -21,7 +21,7 @@ Today: `code` (string). The height is automatic: the iframe is as high as the ru
 Available (S7):
 - `id`: stable key of the instance (default: automatic). Matches `run-result` to the right instance.
 - `predict` (bool) + `expected` (string, output snapshot): one input field per expected output line. After "Ausführen" (run), ✓/✗ per line in neutral wording, result in an `aria-live` region. The check is against the real output.
-- `tests` (string): C# check code with `public static class TaskTests` and `Run()` (tuple `Name, Visible, Passed, Feedback`). The runner runs the program (its output is shown), then the tests. Result per test, hidden tests with a neutral name.
+- `tests` (string): C# check code with `public static class TaskTests` and `Run()` (tuple `Name, Visible, Passed, Feedback`). The runner runs the program (its output is shown), then the tests. Result per test, hidden tests with a neutral name. `Run()` may return the array or a `Task` of it (the runner awaits it). Async programs must be started with the helper pattern `RunProgramAsync()` of `website/examples/dev/async-task.tests.snippet.cs` (it calls the async `<Main>$`/`Main` and awaits it; `EntryPoint.Invoke` would block and fail in the browser). Determinism rule: print only from the top-level flow after an `await` has finished (or after `Task.WhenAll` in a fixed order), never from tasks that run at the same time, so the output is the same in the browser and in CI.
 - `onResult`: callback with the `run-result` message.
 - `code` comes from a `.cs` file (`import x from '!!raw-loader!@site/examples/…'`, S1). The former README limit "no backticks, backslashes, `${`" no longer applies.
 - `trace` (bool, S5): turns on the step view (variables, heap model).
