@@ -1,0 +1,2 @@
+bob failed at 08:00
+logout

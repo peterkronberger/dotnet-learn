@@ -1,0 +1,7 @@
+True
+False
+True
+True
+first = 1
+False
+True

@@ -1,0 +1,182 @@
+---
+title: Listenmuster und Slice-Muster
+sidebar_position: 5
+description: Ein Listenmuster prüft ein Array, eine Liste oder einen Text Element für Element und passt nur bei genau passender Länge. Ein Slice-Muster .. steht für null oder mehr Elemente.
+lesson_id: m12-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import listPatterns from '!!raw-loader!@site/examples/m12/l05/list-patterns.cs';
+import listPatternsOutput from '!!raw-loader!@site/examples/m12/l05/list-patterns.out.txt';
+import slicePatterns from '!!raw-loader!@site/examples/m12/l05/slice-patterns.cs';
+import slicePatternsOutput from '!!raw-loader!@site/examples/m12/l05/slice-patterns.out.txt';
+import prefixOrExact from '!!raw-loader!@site/examples/m12/l05/prefix-or-exact.cs';
+import prefixOrExactOutput from '!!raw-loader!@site/examples/m12/l05/prefix-or-exact.out.txt';
+import twoSlices from '!!raw-loader!@site/examples/m12/l05/two-slices.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l05/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l05/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l05/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l05/seclog-patterns-solution.cs';
+
+# Listenmuster und Slice-Muster
+
+:::note[Lernziele]
+- Du kannst mit einem Listenmuster prüfen, ob ein Array oder eine Liste genau eine bestimmte Form hat, und Elemente dabei in Variablen übernehmen.
+- Du kannst mit einem Slice-Muster `..` Anfang oder Ende einer Folge prüfen und den Rest in einer Variablen übernehmen.
+- Du kannst vorhersagen, ob ein Listenmuster bei einer anderen Länge passt.
+- Du kannst eine Log-Zeile mit `Split` und einem Listenmuster zerlegen.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l03-q2" />
+
+<Quiz id="m05-l01-q1" />
+
+<Quiz id="m12-l04-q1" />
+
+## Die Form einer Folge prüfen
+
+In Modul 7 hat `ParseLine` eine Log-Zeile mit `line.Split(' ')` in Teile zerlegt. Danach kamen `parts.Length != 4` und Zugriffe wie `parts[1]`. Das ist eine Prüfung der Form: Wie viele Teile gibt es, und was steht an welcher Stelle? Ein <Term id="list-pattern">Listenmuster</Term> (List Pattern) schreibt dieselbe Prüfung als ein einziges Muster: `parts is [var time, var type, var user, var ip]`.
+
+Ein Listenmuster steht in eckigen Klammern und enthält für jedes Element ein Teilmuster. Es passt nur, wenn die Folge **genau** so viele Elemente hat, wie das Muster Teilmuster hat, und jedes Element zu seinem Teilmuster passt. Die Teilmuster sind beliebige Muster: Konstanten, relationale Muster, `var`, `_` oder wieder ein Listenmuster ([§11.2.11 List pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11211-list-pattern)). Das leere Muster `[]` passt auf eine Folge ohne Elemente.
+
+Ein Listenmuster passt auf jeden Typ, der eine Länge (`Length` oder `Count`) und einen Zugriff mit Index hat. Das sind Arrays, `List<T>` und auch `string`, dessen Elemente `char`-Werte sind. Auf `null` passt ein Listenmuster nie.
+
+:::info[Vorhersage]
+Welche sieben Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l05-list" code={listPatterns} predict expected={listPatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Genaue Länge:** `two is [1, 2]` ist `True`. `three is [1, 2]` ist `False`, weil `three` drei Elemente hat. Das Muster hat nur zwei Teilmuster.
+2. **Liste:** `list is [1, 2]` ist für eine `List<int>` ebenfalls `True`.
+3. **Leer:** `none is []` ist `True`.
+4. **Variablen:** `[var first, > 1, _]` passt auf `[1, 2, 3]`. `first` bekommt `1`, das zweite Element ist größer als 1, das dritte ist egal.
+5. **null:** `missing is []` ist `False`. `missing is not [1, 2]` ist `True`, weil das Muster auf `null` nicht passt.
+
+</details>
+
+## Das Slice-Muster
+
+Oft kennst du nur Anfang oder Ende einer Folge. Das <Term id="slice-pattern">Slice-Muster</Term> (Slice Pattern) `..` steht für null oder mehr beliebige Elemente und darf in einem Listenmuster höchstens einmal vorkommen ([§11.2.12 Slice pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11212-slice-pattern)). Damit prüfst du, wie eine Folge beginnt (`[10, ..]`), wie sie endet (`[.., 40]`) oder beides (`[10, .., 40]`).
+
+Mit `.. var rest` legst du die übersprungenen Elemente in einer Variablen ab. Ihr Typ ist der Typ, den ein Bereich (`1..`, Modul 5) auf der Folge liefert: für ein Array wieder ein Array, für einen `string` wieder ein `string`. Das <Term id="var-pattern">var-Muster</Term> und das <Term id="discard">Verwerfen</Term> `_` kennst du aus der letzten Lektion.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Achte auf den Typ von `rest` und `name`.
+:::
+
+<CSharpRunner id="m12-l05-slice" code={slicePatterns} predict expected={slicePatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Anfang:** `[10, ..]` passt, weil das Array mit 10 beginnt: `True`.
+2. **Ende:** `[.., 40]` passt, weil das letzte Element 40 ist: `True`.
+3. **Beides:** `[10, .., 40]` passt: `True`.
+4. **Null Elemente im Slice:** `[10, 20, 30, 40, ..]` passt, weil `..` auch für null Elemente steht: `True`. Mit 50 als fünftem Element fehlt eines: `False`.
+5. **Rest:** `head` ist `10`, `rest` hat drei Elemente und ist ein `Int32[]`.
+6. **Text:** `name` ist `bob` und ein `String`.
+
+</details>
+
+Zwei Slice-Muster in einem Listenmuster sind ein Fehler, weil unklar wäre, wo das eine endet und das andere beginnt:
+
+<CodeBlock language="csharp" title="two-slices.snippet.cs">{twoSlices}</CodeBlock>
+
+Der Compiler meldet `error CS8980: Slice patterns may only be used once and directly inside a list pattern.` für Zeile 2.
+
+## Projektschritt
+
+**Stand bisher:** SecLog zerlegt Ereignisse mit `Deconstruct` und prüft Teile von Tupeln und Records nach ihrer Position. `ParseEventType(text)` macht aus einem Ereignistext einen `EventType`, `SecurityEvent` ist der Record mit Zeitpunkt, Typ und Benutzer.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und die Funktion `IsMorningFailure`, hinter die du die neue Funktion schreibst. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `IsMorningFailure` und vor `static class Report` die lokale Funktion `SecurityEvent? ParseWithPatterns(string line)`. Sie gibt `line.Split(' ') switch { … }` zurück. Ein Arm hat vier Teile: die Zeit (`var time`), einen der drei Ereignistexte `"login-success"`, `"login-failed"` oder `"logout"` (mit `and var type` gebunden, die `or`-Kette in Klammern), den Benutzerteil (`var userPart`) und den letzten Teil (`_`). Er liefert `new SecurityEvent(…)` mit `DateTimeOffset.Parse(time, CultureInfo.InvariantCulture)`, `ParseEventType(type)` und dem Benutzer ohne `user=`. Beginnt `userPart` nicht mit `user=`, ist der Benutzer `null` (wie bei `FindUser`). Der Arm `_ => null` fängt jede andere Form ab.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Parse log lines with list patterns`. Er parst alle Zeilen von `sampleLog` und gibt `Lines parsed with list patterns: …` aus. Danach parst er zwei ausgedachte ungültige Zeilen, eine mit nur zwei Teilen (`"2026-03-02T08:00:12Z login-success"`) und eine mit unbekanntem Ereignistext (`"2026-03-02T08:00:12Z reboot user=alice ip=192.0.2.10"`), und gibt für jedes `null` das Wort `invalid` aus.
+
+<CSharpRunner id="m12-l05-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Form prüfen:** Das Listenmuster mit vier Teilmustern passt nur auf Zeilen mit genau vier Teilen. Die Zeile mit zwei Teilen fällt deshalb in den Arm `_ => null`.
+2. **Ereignistext prüfen:** `("login-success" or "login-failed" or "logout") and var type` lässt nur die drei bekannten Texte zu und legt den passenden in `type` ab. Ohne die Klammern würde `and` stärker binden als `or`. Ein unbekannter Text wie `reboot` passt nicht, die Zeile wird `null`.
+3. **Benutzer lesen:** `userPart is ['u', 's', 'e', 'r', '=', .. var name]` prüft die ersten fünf Zeichen und legt den Rest in `name` ab. Fehlt `user=`, ist der Benutzer `null`.
+4. **Vergleich mit `ParseLine`:** Die Mustervariante wirft bei einer ungültigen Zeile keine Ausnahme, sie liefert `null`. Den Zeitstempel prüft sie nicht auf Gültigkeit, das tat `TryParseLine`.
+
+</details>
+
+**Neuer Stand:** SecLog zerlegt Log-Zeilen mit einem Listenmuster und erkennt ungültige Zeilen als `null`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l05-list-pattern-matches-prefix" />
+
+**„`[1, 2]` passt auf jede Liste, die mit 1 und 2 beginnt.“** Das stimmt nicht. Ein Listenmuster ohne `..` passt nur auf eine Folge mit genau so vielen Elementen wie Teilmustern. Für „beginnt mit 1, 2“ schreibst du `[1, 2, ..]`.
+:::
+
+:::info[Vorhersage]
+Das Programm prüft drei Arrays der Länge 2, 3 und 1. Was gibt es aus?
+:::
+
+<CSharpRunner id="m12-l05-prefix" code={prefixOrExact} predict expected={prefixOrExactOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Länge 2:** `[1, 2]` passt genau, und `[1, 2, ..]` passt auch: `2: True True`.
+2. **Länge 3:** `[1, 2]` passt nicht, weil das dritte Element fehlt im Muster: `False`. `[1, 2, ..]` passt: `3: False True`.
+3. **Länge 1:** Beide Muster verlangen zwei Elemente: `1: False False`.
+
+</details>
+
+In der folgenden Aufgabe suchst du die Zeile mit dem Fehler:
+
+<Quiz id="m12-l05-q5" />
+
+<details>
+<summary>Vertiefung: Wie der Compiler ein Listenmuster übersetzt (optional)</summary>
+
+Ein Listenmuster ist für jeden Typ erlaubt, der zählbar (`Length` oder `Count`) und indizierbar ist, also einen Indexer mit `Index` oder mit einem `int` hat. Ein Slice-Muster mit Teilmuster braucht zusätzlich einen Indexer mit `Range` oder eine Methode `Slice` mit zwei `int`-Parametern. Der Compiler prüft die Länge zuerst (bei `[1, .. var s, 3]` ist sie mindestens 2) und liest dann jedes Element über seinen Index, die hinteren Elemente vom Ende aus gezählt. Für `string` und Arrays liefert der Bereich `Substring` und eine Teil-Array-Kopie ([§11.2.11 List pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11211-list-pattern), [§11.2.12 Slice pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11212-slice-pattern)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Listenmuster `[p1, p2, …]` prüft ein Array, eine Liste oder einen Text Element für Element und passt nur, wenn die Länge genau stimmt. Auf `null` passt es nie. Ein Slice-Muster `..` steht für null oder mehr Elemente und darf einmal vorkommen. `.. var rest` legt sie in einer Variablen ab. Mit `line.Split(' ')` und einem Listenmuster in einem `switch`-Ausdruck zerlegst du eine Log-Zeile und prüfst gleichzeitig ihre Form.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l05-q1" />
+
+<Quiz id="m12-l05-q2" />
+
+<Quiz id="m12-l05-q3" />
+
+<Quiz id="m12-l05-q4" />
+
+<Quiz id="m12-l05-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [§11.2.11 List pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11211-list-pattern)
+- Microsoft Learn: [§11.2.12 Slice pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11212-slice-pattern)

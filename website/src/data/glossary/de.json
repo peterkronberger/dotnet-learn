@@ -7528,6 +7528,70 @@
         "title": "11.2.4 Var pattern",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1124-var-pattern"
       }
+    },
+    {
+      "id": "list-pattern",
+      "term": "List pattern",
+      "german": "Listenmuster",
+      "category": "language",
+      "definition": "Ein Pattern der Form `[p1, p2, …]`. Es passt auf ein Array, eine Liste oder einen Text, wenn die Folge genau so viele Elemente hat wie Teilmuster und jedes Element zu seinem Teilmuster passt. Auf `null` passt es nie.",
+      "aliases": [
+        "Listenpattern",
+        "List Pattern"
+      ],
+      "related": [
+        "pattern",
+        "slice-pattern",
+        "var-pattern",
+        "discard"
+      ],
+      "lesson": "m12-l05",
+      "source": {
+        "title": "11.2.11 List pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11211-list-pattern"
+      }
+    },
+    {
+      "id": "slice-pattern",
+      "term": "Slice pattern",
+      "german": "Slice-Muster",
+      "category": "language",
+      "definition": "Das Muster `..` in einem Listenmuster. Es steht für null oder mehr Elemente und darf nur einmal vorkommen. `.. var rest` legt die Elemente in einer Variablen ab.",
+      "aliases": [
+        "Slicepattern",
+        "Slice Pattern"
+      ],
+      "related": [
+        "pattern",
+        "list-pattern",
+        "var-pattern"
+      ],
+      "lesson": "m12-l05",
+      "source": {
+        "title": "11.2.12 Slice pattern",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11212-slice-pattern"
+      }
+    },
+    {
+      "id": "subsumption",
+      "term": "Subsumption",
+      "german": "Abdeckung durch frühere Muster",
+      "category": "language",
+      "definition": "Ein Muster ist subsumiert, wenn jeder Wert, den es annimmt, schon von früheren Armen ohne Bedingung angenommen wird. Ein subsumierter Arm eines switch-Ausdrucks kann nie gewählt werden, und der Compiler meldet das als Fehler.",
+      "aliases": [
+        "subsumiert",
+        "Subsumed"
+      ],
+      "related": [
+        "switch-expression",
+        "pattern",
+        "exhaustive"
+      ],
+      "lesson": "m12-l06",
+      "source": {
+        "title": "11.1 General",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general"
+      }
     }
   ]
 }
