@@ -1,0 +1,191 @@
+---
+title: Arbeiter koordinieren
+sidebar_position: 17
+description: Mehrere Arbeiter erledigen einen Auftrag gemeinsam und sicher. Erzeuger und Verbraucher mit Channel<T>, SemaphoreSlim begrenzt die gleichzeitige Arbeit, ein CancellationToken stoppt alle Arbeiter.
+lesson_id: m13-l17
+duration_min: 25
+---
+
+import oneTaskPerFile from '!!raw-loader!@site/examples/m13/l17/one-task-per-file.snippet.cs';
+import producerConsumer from '!!raw-loader!@site/examples/m13/l17/producer-consumer.cs';
+import producerConsumerOutput from '!!raw-loader!@site/examples/m13/l17/producer-consumer.out.txt';
+import semaphoreLimit from '!!raw-loader!@site/examples/m13/l17/semaphore-limit.cs';
+import semaphoreLimitOutput from '!!raw-loader!@site/examples/m13/l17/semaphore-limit.out.txt';
+import cancelWorkers from '!!raw-loader!@site/examples/m13/l17/cancel-workers.cs';
+import cancelWorkersOutput from '!!raw-loader!@site/examples/m13/l17/cancel-workers.out.txt';
+import gapWorkers from '!!raw-loader!@site/examples/m13/l17/gap-workers.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l17/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l17/seclog-async-solution.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l17/seclog-async-task.in.txt';
+import CodeBlock from '@theme/CodeBlock';
+
+# Arbeiter koordinieren
+
+:::note[Lernziele]
+- Du kannst ein Erzeuger-Verbraucher-Muster (producer/consumer) mit `Channel<T>` lesen und ergänzen.
+- Du kannst mit `SemaphoreSlim` und `WaitAsync`/`Release` begrenzen, wie viele Arbeiten gleichzeitig laufen.
+- Du kannst mehrere Arbeiter mit einem gemeinsamen `CancellationToken` abbrechen.
+- Du kannst erklären, warum unbegrenzt viele gleichzeitige Aufgaben nicht am schnellsten sind.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l05-q2" />
+
+<Quiz id="m13-l06-q2" />
+
+<Quiz id="m13-l15-q2" />
+
+## Viele Dateien, wie viele Arbeiter?
+
+SecLog soll viele Log-Dateien auswerten. Der naheliegende Weg ist ein Task pro Datei:
+
+<CodeBlock language="csharp" title="one-task-per-file.cs">{oneTaskPerFile}</CodeBlock>
+
+Bei 10 000 Dateien starten 10 000 Lesevorgänge gleichzeitig. Sie konkurrieren um Platte, Speicher und Kerne. Das kann das ganze Programm verlangsamen oder scheitern lassen. Besser ist eine feste Zahl von Arbeitern (Workers), die sich die Dateien nacheinander holen. Dafür braucht es drei Dinge: eine Übergabe der Arbeit, eine Begrenzung und einen gemeinsamen Abbruch.
+
+## Erzeuger und Verbraucher mit einem Kanal
+
+Beim <Term id="producer-consumer">Erzeuger-Verbraucher-Muster</Term> (Producer/Consumer) legt ein Erzeuger Arbeit in eine Warteschlange, und Verbraucher holen sie dort ab. In .NET übernimmt das ein <Term id="channel">Kanal</Term> (`Channel<T>` aus `System.Threading.Channels`). Der Erzeuger schreibt mit `Writer.WriteAsync`. Wenn er fertig ist, ruft er `Writer.Complete()` auf. Der Verbraucher liest mit `Reader.ReadAllAsync()`. Das ist ein asynchroner Strom aus Lektion 6, den `await foreach` liest, bis der Kanal abgeschlossen und leer ist ([Channels](https://learn.microsoft.com/dotnet/core/extensions/channels)).
+
+`Channel.CreateUnbounded<T>()` legt einen Kanal ohne Grenze an. `Channel.CreateBounded<T>(n)` legt einen <Term id="bounded-channel">begrenzten Kanal</Term> mit Platz für `n` Einträge an. Ist er voll, wartet `WriteAsync`, bis ein Platz frei ist. Das Warten blockiert keinen Thread (Lektion 2).
+
+:::info[Vorhersage]
+Der Erzeuger schreibt drei Einträge, der Verbraucher zählt `login-failed`. Welche Zeile gibt das Programm aus?
+:::
+
+<CSharpRunner id="m13-l17-producer-consumer" code={producerConsumer} predict expected={producerConsumerOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Schreiben:** Der Erzeuger läuft in `Task.Run` und legt die drei Einträge in den Kanal.
+2. **Ende melden:** `Complete()` sagt, dass nichts mehr kommt. Ohne diesen Aufruf wartet der Verbraucher für immer.
+3. **Lesen:** `await foreach` über `ReadAllAsync()` liefert die Einträge, bis der Kanal abgeschlossen ist.
+4. **Auf den Erzeuger warten:** `await producer` stellt sicher, dass er fertig ist, bevor ausgegeben wird.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{producerConsumerOutput.trim()}</code></pre>
+
+</details>
+
+<Quiz id="m13-l17-q1" />
+
+<Quiz id="m13-l17-q2" />
+
+<Quiz id="m13-l17-q7" />
+
+### Lückenbeispiel
+
+Das Programm hat einen Verbraucher. Ändere es so, dass zwei Verbraucher mit demselben Kanal arbeiten. Die Ausgabe bleibt `Failed: 3`. Warum zählt der Code mit `Interlocked.Increment`? Das ist die atomare Operation aus Lektion 14: Zwei Verbraucher ändern `failed` gleichzeitig.
+
+<CSharpRunner id="m13-l17-gap" code={gapWorkers} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Zwei Aufgaben:** Aus `Task consumer` wird eine Liste `List<Task> consumers = [];`. Eine Schleife mit zwei Durchläufen fügt je `Task.Run(…)` mit dem Schleifenkörper des alten Verbrauchers hinzu.
+2. **Auf alle warten:** `await Task.WhenAll(consumers);` ersetzt `await consumer;`.
+3. **Jeder Eintrag einmal:** Der Kanal gibt jeden Eintrag nur an einen Leser. Deshalb bleibt die Summe `3`.
+
+</details>
+
+<Quiz id="m13-l17-q10" />
+
+## Die Zahl der gleichzeitigen Arbeiten begrenzen
+
+Eine feste Zahl Verbraucher begrenzt die Arbeit schon. Eine <Term id="semaphore">Semaphore</Term> (`SemaphoreSlim`) begrenzt sie auch dann, wenn viele Aufgaben unabhängig voneinander starten. Sie zählt freie Plätze. `await limit.WaitAsync()` nimmt einen Platz oder wartet, bis einer frei ist. `limit.Release()` gibt ihn zurück. Das Warten blockiert keinen Thread, denn `await` gibt den Thread frei ([SemaphoreSlim](https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim)). Das `Release` steht im `finally` (Modul 7), damit der Platz auch bei einer Ausnahme zurückkommt.
+
+Ein `lock` passt hier nicht: Er lässt genau einen Thread durch und erlaubt kein `await` im Block (Lektion 12).
+
+<CodeBlock language="csharp" title="semaphore-limit.cs">{semaphoreLimit}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{semaphoreLimitOutput.trim()}</code></pre>
+
+Sechs Aufgaben starten, aber höchstens zwei sind gleichzeitig im Block. Die Zeile `More than 2 at the same time` bleibt `False`. Die genaue Reihenfolge der Aufgaben steht nicht fest, deshalb gibt das Programm nur diese Zusammenfassung aus.
+
+<Quiz id="m13-l17-q3" />
+
+<Quiz id="m13-l17-q13" />
+
+<Quiz id="m13-l17-q9" />
+
+## Alle Arbeiter gemeinsam abbrechen
+
+Ein `CancellationTokenSource` (Lektion 5) kann sein `Token` an beliebig viele Arbeiter geben. Ein Aufruf von `Cancel()` meldet den Abbruch allen:
+
+<CodeBlock language="csharp" title="cancel-workers.cs">{cancelWorkers}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{cancelWorkersOutput.trim()}</code></pre>
+
+Jeder Arbeiter fängt die `OperationCanceledException` und zählt sich. Zur Unterscheidung: `Complete()` am Kanal meldet nur, dass keine Einträge mehr kommen. Es bricht keine laufende Arbeit ab.
+
+<Quiz id="m13-l17-q4" />
+
+<Quiz id="m13-l17-q8" />
+
+## Wie viele Arbeiter?
+
+Eine passende Zahl hängt von der Hardware und der Art der Arbeit ab. Bei Arbeit, die viel wartet, helfen mehr Arbeiter als Kerne. Bei rechnender Arbeit nicht (Lektion 16). Ob sich eine Zahl lohnt, zeigt nur Messen. Dieser Kurs gibt deshalb keine Zeiten an.
+
+<Quiz id="m13-l17-q5" />
+
+<Quiz id="m13-l17-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog prüft alle Zeilen parallel und sammelt die Fehlschläge je Quelle sicher. Jetzt soll SecLog mehrere Log-Dateien mit Arbeitern und einem Kanal auswerten. Das ist der letzte Schritt von Teil B.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die ersten `using`-Zeilen, die Quellen `logSources`, den letzten Block und das Ende des Programms. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:** Schreibe hinter den Block `// Rate all log lines in parallel with PLINQ` und vor die Zeile `// End with exit code 0 …` den Block `// Analyze many log files with workers and a channel`. Er legt mit `Directory.CreateTempSubdirectory` einen neuen Ordner an und schreibt `sampleLog` in vier Dateien `part-1.log` bis `part-4.log` (Zeilen 1–4, 5–8, 9–11 und 12–14). Ein Erzeuger schreibt die Dateinamen in einen begrenzten `Channel<string>`. Zwei Verbraucher lesen den Kanal mit `ReadAllAsync`, lesen die Datei und tragen die Zahl der Fehlschläge mit `CountFailuresIn` in ein `ConcurrentDictionary<string, int> failuresPerFile` ein. Alle bekommen das Token eines `CancellationTokenSource`, der im Normalfall nicht abgebrochen wird. Nach `await Task.WhenAll(...)` gibt der Block die Zahlen **sortiert nach Dateinamen** aus, danach `Total failures in files: 7`. Der Ordner wird im `finally` gelöscht, und kein voller Pfad wird ausgegeben. Dafür kommt `using System.Threading.Channels;` an den Anfang.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" stdin={projectInput} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" stdin={projectInput} />
+
+1. **Ordner und Dateien:** Jede Datei, die gelesen wird, schreibt der Block vorher selbst. Das `finally` löscht den Ordner auf jedem Ausgang.
+2. **Erzeuger:** Er legt die vier Namen in den Kanal mit Platz für zwei und ruft danach `Complete()` auf.
+3. **Zwei Verbraucher:** Jeder holt sich mit `ReadAllAsync` den nächsten Namen. Zwei Arbeiter sind hier schon die Grenze. Eine zusätzliche `SemaphoreSlim(2)` würde nichts mehr begrenzen, deshalb fehlt sie.
+4. **Gemeinsames Token:** Alle Wartepunkte bekommen dasselbe Token. Im Normalfall wird es nicht abgebrochen.
+5. **Sicher sammeln und sortiert ausgeben:** Jeder Verbraucher schreibt unter dem Dateinamen in das `ConcurrentDictionary`. Ausgegeben wird erst nach `Task.WhenAll`, sortiert. Deshalb ist die Ausgabe in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog wertet viele Log-Dateien mit einer festen Zahl von Arbeitern parallel aus und sammelt die Ergebnisse sicher.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l17-unlimited-tasks-are-fastest" />
+
+**„Je mehr Aufgaben gleichzeitig laufen, desto schneller ist das Programm.“** Das stimmt nicht. Zu viele gleichzeitige Aufgaben konkurrieren um Platte, Speicher und Kerne und können das ganze Programm verlangsamen oder scheitern lassen. Eine feste Zahl von Arbeitern ist oft schneller und sicherer.
+:::
+
+## Zusammenfassung
+
+Mehrere Arbeiter teilen sich einen Auftrag über einen Kanal: Der Erzeuger schreibt mit `WriteAsync` und meldet das Ende mit `Complete`, die Verbraucher lesen mit `ReadAllAsync`. Ein begrenzter Kanal bremst den Erzeuger. `SemaphoreSlim` begrenzt mit `WaitAsync` und `Release` im `finally`, wie viele Arbeiten gleichzeitig laufen, und blockiert beim Warten keinen Thread. Ein gemeinsames `CancellationToken` stoppt alle Arbeiter. Unbegrenzt viele gleichzeitige Aufgaben sind nicht am schnellsten.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l17-q11" />
+
+### Transferfrage
+
+<Quiz id="m13-l17-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Channels](https://learn.microsoft.com/dotnet/core/extensions/channels)
+- Microsoft Learn: [SemaphoreSlim](https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim)
+- Microsoft Learn: [Cancellation in managed threads](https://learn.microsoft.com/dotnet/standard/threading/cancellation-in-managed-threads)
