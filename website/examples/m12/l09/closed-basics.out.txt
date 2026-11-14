@@ -1,0 +1,3 @@
+circle with radius 2
+square with side 3
+Shape is abstract: True

@@ -1,0 +1,199 @@
+---
+title: Muster oder Polymorphie?
+sidebar_position: 10
+description: Virtuelle Methoden erleichtern neue Typen, ein switch mit Mustern über eine geschlossene Hierarchie erleichtert neue Operationen. Eine Entwurfsentscheidung, keine Sprachregel.
+lesson_id: m12-l10
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import virtualVersion from '!!raw-loader!@site/examples/m12/l10/virtual-version.cs';
+import virtualVersionOutput from '!!raw-loader!@site/examples/m12/l10/virtual-version.out.txt';
+import switchVersion from '!!raw-loader!@site/examples/m12/l10/switch-version.cs';
+import switchVersionOutput from '!!raw-loader!@site/examples/m12/l10/switch-version.out.txt';
+import newTypeSwitch from '!!raw-loader!@site/examples/m12/l10/new-type-switch.snippet.cs';
+import newOperationVirtual from '!!raw-loader!@site/examples/m12/l10/new-operation-virtual.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l10/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l10/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l10/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l10/seclog-patterns-solution.cs';
+
+# Muster oder Polymorphie?
+
+:::note[Lernziele]
+- Du kannst dieselbe Aufgabe einmal mit einer virtuellen Methode und einmal mit einem `switch` über Typen lösen.
+- Du kannst begründen, welche Lösung leichter zu erweitern ist, wenn ein neuer Typ oder wenn eine neue Operation dazukommt.
+- Du kannst in SecLog entscheiden, ob eine neue Anforderung als neue Regel (`IDetectionRule`) oder als neuer `switch` umgesetzt wird.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l02-q3" />
+
+<Quiz id="m08-l05-q4" />
+
+<Quiz id="m12-l09-q1" />
+
+## Zwei Wege zum selben Ziel
+
+SecLog nutzt beide Wege. Die Regeln `FailedLoginRule`, `WatchListRule`, `StatusRule` und `FuncRule` setzen `IDetectionRule` um (Lektionen „Interfaces“ und „Func und Action: Verhalten als Parameter“). Der `Detector` ruft nur `IsMatch` auf und kennt die Regeltypen nicht. Der Status eines Vorfalls ist seit Lektion „Geschlossene Hierarchien“ die geschlossene Hierarchie `IncidentStatus`, und `StatusLine` wertet sie mit einem `switch` aus.
+
+Beide Wege lösen dieselbe Art von Aufgabe: Je nach Typ eines Werts soll etwas Verschiedenes passieren. Der Unterschied liegt darin, wo dieser Code steht.
+
+- **Virtuelle Methode** (Polymorphie, Lektion „Virtuelle Methoden, override und Verdecken“): Jeder Typ bringt seine Version selbst mit. Der Aufrufer schreibt nur `shape.Area()`.
+- **`switch` mit Mustern:** Die Operation steht an einer Stelle und fragt nach dem Typ. Mit `closed` (Lektion „Geschlossene Hierarchien“) prüft der Compiler, dass jeder direkte Untertyp vorkommt.
+
+Das ist eine Entwurfsentscheidung und keine Sprachregel. Die Sprache erlaubt beides. Mit virtuellen Methoden behandelst du Gruppen verwandter Objekte einheitlich, und abgeleitete Klassen erweitern eine Basisklasse, ohne deren Implementierung zu nutzen ([Polymorphism](https://learn.microsoft.com/dotnet/csharp/fundamentals/object-oriented/polymorphism)). Welcher Weg bei einer Änderung weniger Stellen berührt, zeigen die Beispiele unten. Das sind Überlegungen zum Entwurf, kein Satz aus einer Spezifikation.
+
+:::info[Vorhersage]
+Das Programm löst die Aufgabe mit virtuellen Methoden. Welche zwei Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m12-l10-virtual" code={virtualVersion} predict expected={virtualVersionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Basis:** `Shape` hat die abstrakte Methode `Area()`. Jeder Untertyp muss sie mit `override` umsetzen.
+2. **Aufruf:** `shape.Area()` führt die Version aus, die zum Laufzeittyp gehört: 3 · 3 = 9 und 2 · 5 = 10.
+3. **Typname:** `shape.GetType().Name` ist `Square` und `Rectangle`.
+
+</details>
+
+Dieselbe Aufgabe mit einer geschlossenen Hierarchie. Hier kommt gleich eine zweite Operation dazu:
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus? Die Typen `Square` und `Rectangle` enthalten keine Methoden.
+:::
+
+<CSharpRunner id="m12-l10-switch" code={switchVersion} predict expected={switchVersionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Typen:** Die Records enthalten nur Daten. `Shape` ist `closed`, die Untertypen sind `sealed`.
+2. **Operationen:** `Area` und `Perimeter` sind je ein `switch` mit einem Arm pro direktem Untertyp, ohne `_`.
+3. **Ergebnis:** Für `Square(3)` ist die Fläche 9 und der Umfang 12. Für `Rectangle(2, 5)` ist die Fläche 10 und der Umfang 14.
+4. **Neue Operation:** `Perimeter` wurde ergänzt, ohne dass `Shape`, `Square` oder `Rectangle` sich ändern.
+
+</details>
+
+<Quiz id="m12-l10-q2" />
+
+## Was ändert sich, wenn …
+
+Es gibt zwei Arten von Änderungen. Jeder Entwurf macht eine leicht und die andere aufwendiger.
+
+**Ein neuer Typ kommt dazu.** Mit virtuellen Methoden schreibst du eine neue Klasse mit `override`. Kein bestehender Code ändert sich. Mit `switch`-Ausdrücken über eine geschlossene Hierarchie musst du jeden `switch` ergänzen. Der Compiler zeigt dir die Stellen:
+
+<CodeBlock language="csharp" title="new-type-switch.snippet.cs">{newTypeSwitch}</CodeBlock>
+
+Der Compiler meldet für die Zeilen 1 und 7 je `warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern 'Triangle' is not covered.`
+
+<Quiz id="m12-l10-q3" />
+
+**Eine neue Operation kommt dazu.** Mit `switch`-Ausdrücken schreibst du einen neuen `switch`, ohne die Typen zu ändern (`Perimeter` oben). Mit virtuellen Methoden musst du jede Klasse ändern:
+
+<CodeBlock language="csharp" title="new-operation-virtual.snippet.cs">{newOperationVirtual}</CodeBlock>
+
+Der Compiler meldet `error CS0534: 'Square' does not implement inherited abstract member 'Shape.Perimeter()'` für Zeile 7 und dasselbe für `Rectangle` in Zeile 12.
+
+<Quiz id="m12-l10-q4" />
+
+Daraus ergeben sich Überlegungen für den Entwurf. Auch sie sind keine Sprachregeln:
+
+- **Was ändert sich öfter?** Kommen oft neue Typen dazu, sind virtuelle Methoden bequem. Kommen oft neue Operationen dazu, ist ein `switch` bequem.
+- **Wem gehören die Typen?** Eine geschlossene Hierarchie lässt Untertypen nur in der eigenen Assembly zu. Wer die Typen nicht selbst pflegt, kann sie nicht erweitern, und für ihn bleibt eine virtuelle Methode oder ein Interface der Weg für neue Typen. Auch für dich gilt: Ein weiterer Untertyp einer `closed`-Klasse kann Code in anderen Assemblys brechen ([Drawbacks](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies#drawbacks)).
+- **Wer prüft, dass kein Fall fehlt?** Beim `switch` über eine geschlossene Hierarchie prüft es der Compiler. Bei einer virtuellen Methode erzwingt es der Compiler auch, wenn sie `abstract` ist (CS0534).
+- **Wo steht die Logik?** Eine virtuelle Methode verteilt eine Operation auf viele Klassen. Ein `switch` hält sie an einer Stelle zusammen, sodass du die Regeln nebeneinander liest. Das hilft besonders bei Verhalten, das vom Zusammenspiel mehrerer Zustandswerte abhängt ([Pattern matching basics](https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/pattern-matching-basics)).
+
+## Lücken füllen
+
+Im nächsten Beispiel kommt ein neuer Typ zu einer Hierarchie mit einer virtuellen Methode. Es fehlen die abstrakte Methode, ihre Umsetzung und der neue Typ.
+
+<Quiz id="m12-l10-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog hat Regeln als Typen (`IDetectionRule`) und den Status eines Vorfalls als geschlossene Hierarchie `IncidentStatus` mit der Funktion `StatusLine`.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und die Funktion `StatusLine`, hinter die du die neue Funktion schreibst. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe hinter `StatusLine` und vor `static class Report` die lokale Funktion `bool NeedsAttention(IncidentStatus status)`. Sie nutzt einen `switch` über die geschlossene Hierarchie: `OpenStatus` ergibt `true`, `InvestigatingStatus` und `ResolvedStatus` ergeben `false`. Das ist eine neue Operation, die Status-Typen bleiben unverändert.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Choose between a new rule and a new switch`. Er gibt für jeden Wert aus `statuses` eine Zeile `Needs attention (<Typname>): <Ergebnis>` aus (`statusToCheck.GetType().Name`).
+3. Lege im selben Block die neue Regel `FuncRule moreThan3 = new("more than 3 failures", FailuresAtLeast(4));` an. Baue mit `new Detector([.. detector.Rules, moreThan3])` einen erweiterten Detector. Gib für jeden Vorfall aus `incidents` die Zeile `<User>: <n> of <m> rules match` aus (`CountMatches` und `Rules.Count`). Das ist ein neuer Regel-Typ, keine bestehende Regel ändert sich.
+
+<CSharpRunner id="m12-l10-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Neue Operation:** `NeedsAttention` ist ein `switch` ohne `_`. Die Typen `OpenStatus`, `InvestigatingStatus` und `ResolvedStatus` bleiben, wie sie sind.
+2. **Neue Regel:** `FuncRule` setzt `IDetectionRule` um. `[.. detector.Rules, moreThan3]` kopiert die bestehenden Regeln und hängt die neue an. Die Regelklassen und `CountMatches` ändern sich nicht.
+3. **Ergebnis:** Nur der offene Status braucht Aufmerksamkeit. `bob` erfüllt jetzt 3 von 4 Regeln, `dave` weiter 2 von 4, weil er nur einen Fehlversuch hat.
+
+</details>
+
+**Neuer Stand:** SecLog erweitert die Regeln mit neuen Typen und die Auswertung des Status mit neuen `switch`-Ausdrücken, jeweils ohne bestehenden Code zu ändern.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l10-patterns-replace-polymorphism" />
+
+**„Mit Pattern Matching braucht man keine virtuellen Methoden mehr.“** Das stimmt nicht. Muster ersetzen virtuelle Methoden nicht. Jeder Weg passt zu einer anderen Art von Änderung: virtuelle Methoden zu neuen Typen, ein `switch` über eine geschlossene Hierarchie zu neuen Operationen.
+:::
+
+**Aufgabe:** Ein neuer Regeltyp kommt dazu – welche Stellen musst du ändern? Notiere deine Antwort für beide Entwürfe, bevor du weiterliest:
+
+1. Die Regeln sind Klassen mit `IDetectionRule`.
+2. Die Regeln sind eine geschlossene Hierarchie, und `Detector` wertet sie mit einem `switch` aus.
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Interface:** Du schreibst nur die neue Klasse (oder eine `FuncRule`). `Detector` und alle anderen Regeln bleiben unverändert.
+2. **Geschlossene Hierarchie:** Du schreibst den neuen Untertyp und ergänzt jeden `switch` über die Regeln. Der Compiler warnt (CS8509) bei jedem, den du vergisst. Außerdem müssen alle Regeltypen in derselben Assembly stehen.
+
+Für neue Regeltypen passt der erste Entwurf besser. Deshalb nutzt SecLog dafür ein Interface und für den festen Satz von drei Status eine geschlossene Hierarchie.
+
+</details>
+
+<Quiz id="m12-l10-q1" />
+
+<Quiz id="m12-l10-q6" />
+
+<details>
+<summary>Vertiefung: Beides verbinden (optional)</summary>
+
+Die beiden Wege schließen sich nicht aus. Ein Typ kann eine virtuelle Methode für die Operationen haben, die zu jedem Typ gehören, und von außen werten `switch`-Ausdrücke weitere Operationen aus. Der Compiler prüft die Muster in jedem `switch` (Lektion „switch-Ausdrücke im Detail“), und bei einer geschlossenen Hierarchie kennt er die Menge der direkten Untertypen ([Closed hierarchy patterns](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#closed-hierarchy-patterns)).
+
+Ob eine Entwurfsregel wie „neue Typen oft: virtuell, neue Operationen oft: `switch`“ allgemein gilt, steht in keiner der hier genutzten Microsoft-Seiten. Sie bleibt eine Überlegung, die du auf deinen Fall prüfst.
+
+</details>
+
+## Zusammenfassung
+
+Dieselbe Aufgabe lässt sich mit einer virtuellen Methode oder mit einem `switch` über eine geschlossene Hierarchie lösen. Mit virtuellen Methoden ist ein neuer Typ leicht (neue Klasse) und eine neue Operation aufwendig (jede Klasse ändern). Mit einem `switch` ist es umgekehrt, und der Compiler zeigt jeden `switch`, der einen neuen Typ noch nicht behandelt. Es sind Entwurfsüberlegungen, keine Sprachregeln. Muster ersetzen virtuelle Methoden nicht. SecLog nutzt für Regeln ein Interface und für den Status eine geschlossene Hierarchie.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l10-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l10-q8" />
+
+### Transferfrage
+
+<Quiz id="m12-l10-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Polymorphie](https://learn.microsoft.com/dotnet/csharp/fundamentals/object-oriented/polymorphism)
+- Microsoft Learn: [Tutorial: Grundlagen des Pattern Matchings](https://learn.microsoft.com/dotnet/csharp/fundamentals/tutorials/pattern-matching-basics)
+- Microsoft Learn: [Muster](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns)

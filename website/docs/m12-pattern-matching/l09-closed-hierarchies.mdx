@@ -1,0 +1,200 @@
+---
+title: Geschlossene Hierarchien
+sidebar_position: 9
+description: Der Modifizierer closed (C# 15) legt die direkten Untertypen einer Klasse auf die Typen derselben Assembly fest. Ein switch über alle direkten Untertypen ist exhaustive, ohne dass ein Arm mit _ nötig ist.
+lesson_id: m12-l09
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import beforeClosed from '!!raw-loader!@site/examples/m12/l09/before-closed.cs';
+import closedBasics from '!!raw-loader!@site/examples/m12/l09/closed-basics.cs';
+import closedBasicsOutput from '!!raw-loader!@site/examples/m12/l09/closed-basics.out.txt';
+import missingCase from '!!raw-loader!@site/examples/m12/l09/missing-case.snippet.cs';
+import closedVsSealed from '!!raw-loader!@site/examples/m12/l09/closed-vs-sealed.cs';
+import closedVsSealedOutput from '!!raw-loader!@site/examples/m12/l09/closed-vs-sealed.out.txt';
+import closedModifiers from '!!raw-loader!@site/examples/m12/l09/closed-modifiers.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l09/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l09/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l09/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l09/seclog-patterns-solution.cs';
+
+# Geschlossene Hierarchien
+
+<Since csharp="15" dotnet="11" />
+
+:::note[Lernziele]
+- Du kannst eine geschlossene Hierarchie mit `closed` deklarieren und mit einem `switch` über alle direkten Untertypen ohne `_`-Arm auswerten.
+- Du kannst `closed` und `sealed` unterscheiden.
+- Du kannst vorhersagen, was der Compiler meldet, wenn ein Untertyp im `switch` fehlt.
+- Du kannst entscheiden, ob ein Union-Typ (Lektion „Union-Typen“) oder eine geschlossene Hierarchie besser passt.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l04-q4" />
+
+<Quiz id="m08-l03-q2" />
+
+<Quiz id="m12-l08-q6" />
+
+## Fälle, die der Compiler kennt
+
+In SecLog ist `Incident.Status` ein `string`. Drei Werte sind erlaubt, und jeder andere Wert fällt erst zur Laufzeit auf: Das Programm wirft eine `ArgumentException`. Ein `switch` über einen `string` braucht außerdem immer einen Arm `_`, weil der Compiler nicht weiß, welche Texte vorkommen.
+
+Mit einer abstrakten Basisklasse und abgeleiteten Records (Lektionen „Abstrakte Klassen und Polymorphie“ und „Records“) geht es besser, aber nicht ganz. Auch dort braucht der `switch` einen Arm `_`, denn jeder darf einen weiteren Untertyp ableiten.
+
+**So schrieb man es vorher:**
+
+<CSharpRunner id="m12-l09-before" code={beforeClosed} />
+
+Der Arm `_` fängt jeden Untertyp ab, den der Compiler nicht kennt. Vergisst du später, einen neuen Untertyp zu behandeln, meldet der Compiler nichts.
+
+Der Modifizierer <Term id="closed-modifier">`closed`</Term> (C# 15) löst das. Du schreibst ihn vor `class` oder `record`. Die direkten Untertypen eines solchen Typs dürfen nur in derselben Assembly stehen, also in dem, was der Compiler aus einem Projekt baut ([closed modifier](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed)). Die Menge der direkten Untertypen steht damit fest. Man nennt das eine <Term id="closed-hierarchy">geschlossene Hierarchie</Term> (closed hierarchy). Dein ganzes Programm ist hier eine Assembly. Ein `switch` mit einem Arm je direktem Untertyp ist dann <Term id="exhaustive">exhaustive</Term>: Er deckt alle Fälle ab, ohne `_`.
+
+Ein `closed`-Typ ist implizit abstrakt (Lektion „Abstrakte Klassen und Polymorphie“). Du kannst von ihm kein Objekt erzeugen, und du schreibst `abstract` nicht dazu.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der `switch` hat keinen Arm `_`. Die letzte Zeile fragt, ob `Shape` abstrakt ist.
+:::
+
+<CSharpRunner id="m12-l09-basics" code={closedBasics} predict expected={closedBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Deklarieren:** `closed record Shape;` legt die Basis fest. `Circle` und `Square` sind ihre direkten Untertypen und stehen in derselben Datei, also in derselben Assembly.
+2. **Verzweigen:** `first` ist ein `Circle`, `second` ein `Square`. Jeder Arm passt zum Laufzeittyp: `circle with radius 2`, `square with side 3`.
+3. **Kein `_`:** Der Compiler kennt alle direkten Untertypen von `Shape`. Hat jeder einen Arm, ist der `switch` exhaustive ([Closed hierarchy patterns](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#closed-hierarchy-patterns)).
+4. **Abstrakt:** `typeof(Shape).IsAbstract` ist `True`, weil `closed` den Typ implizit abstrakt macht.
+
+**Was passiert, wenn …** du `new Shape()` schreibst? Der Compiler meldet `error CS0144: Cannot create an instance of the abstract type or interface 'Shape'`.
+
+</details>
+
+Fehlt ein direkter Untertyp, meldet der Compiler das:
+
+<CodeBlock language="csharp" title="missing-case.snippet.cs">{missingCase}</CodeBlock>
+
+Der Compiler meldet `warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern 'Square' is not covered.` für Zeile 1. Es ist dieselbe Warnung wie bei jedem nicht exhaustiven `switch` (Lektion „switch-Ausdrücke im Detail“), und sie nennt den fehlenden Fall. Würdest du einen Arm `_` schreiben, bliebe die Warnung auch aus, wenn später ein neuer Untertyp dazukommt. Ohne `_` zeigt dir der Compiler jeden `switch`, den du ergänzen musst.
+
+<Quiz id="m12-l09-q4" />
+
+## closed ist nicht sealed
+
+Lektion „Versiegelte Klassen und Member“ hat `sealed` gezeigt: Von einer versiegelten Klasse kann gar kein Typ ableiten. `closed` sperrt die Ableitung nicht, sondern begrenzt sie: Untertypen sind erlaubt, aber nur in derselben Assembly. Ein Untertyp eines `closed`-Typs kann selbst offen oder `sealed` sein. Ist er offen, deckt sein Arm im `switch` auch seine eigenen Nachkommen ab.
+
+:::info[Vorhersage]
+`Polygon` ist ein offener direkter Untertyp von `Shape`, `Triangle` leitet von `Polygon` ab. Welche fünf Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l09-vs-sealed" code={closedVsSealed} predict expected={closedVsSealedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Basis:** `Shape` ist abstrakt (`True`), aber nicht versiegelt (`False`). Von `Shape` leiten `Circle` und `Polygon` ab.
+2. **Untertypen:** `Circle` ist `sealed` (`True`). `Polygon` ist es nicht (`False`), deshalb darf `Triangle` von ihm ableiten.
+3. **Arm für `Polygon`:** Das `Triangle` ist ein `Polygon`. Der Arm `Polygon` passt, und der `switch` liefert `polygon`.
+4. **Ohne `Triangle`-Arm:** Der `switch` ist trotzdem exhaustive. Er muss nur die direkten Untertypen von `Shape` abdecken, und `Polygon` deckt `Triangle` mit ab.
+
+</details>
+
+Nicht jede Kombination von Modifizierern ist erlaubt. Der Compiler meldet für die Datei unten drei Fehler:
+
+<CodeBlock language="csharp" title="closed-modifiers.snippet.cs">{closedModifiers}</CodeBlock>
+
+- Zeile 1: `error CS9381: 'Locked': a closed type cannot be sealed or static`. Dasselbe gilt für `static`.
+- Zeile 2: `error CS9384: 'Base': a closed type cannot be marked abstract because it is always implicitly abstract.`
+- Zeile 3: `error CS0106: The modifier 'closed' is not valid for this item`. `closed` gibt es nur für Klassen, auch für Record-Klassen, nicht für Structs.
+
+Das Wort „closed“ im geschlossenen Typ bei Generics (Lektion „Generische Klassen und konstruierte Typen“) ist etwas anderes. Dort heißt `List<int>` ein geschlossener konstruierter Typ, weil alle Typargumente festgelegt sind. Mit dem Modifizierer `closed` hat das nichts zu tun.
+
+## Union oder geschlossene Hierarchie?
+
+Beides lässt den Compiler prüfen, ob jeder Fall behandelt ist. Der Unterschied liegt bei den Fällen. Eine Union (Lektion „Union-Typen“) fasst bestehende, unabhängige Typen zusammen, zum Beispiel `SecurityEvent` und `LineError`, die voneinander nichts wissen. Bei einer geschlossenen Hierarchie ist die Basis dein eigener Typ, und die Fälle sind seine Untertypen. Sie teilen die Basis und können gemeinsame Member erben.
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen das Schlüsselwort des `switch`, der zweite Untertyp und der Modifizierer der Basis.
+
+<Quiz id="m12-l09-q3" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog liefert beim Einlesen eine Union `ParseResult` aus einem Ereignis oder einem Fehler. Der Status eines Vorfalls ist noch ein `string`.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`, die Funktion `Describe`, hinter die du die neue Funktion schreibst, und das Ende des Namensraums `SecLog.Model` mit der Union `ParseResult`, hinter die die neuen Typen gehören. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in den Namensraum `SecLog.Model` hinter `ParseResult` die Typen `closed record IncidentStatus;`, `sealed record OpenStatus : IncidentStatus;`, `sealed record InvestigatingStatus(string Analyst) : IncidentStatus;` und `sealed record ResolvedStatus(string Note) : IncidentStatus;`, jeweils mit einem XML-Kommentar.
+2. Schreibe hinter `Describe` und vor `static class Report` die lokale Funktion `string StatusLine(IncidentStatus status)`. Sie nutzt `status switch { OpenStatus => …, InvestigatingStatus i => …, ResolvedStatus r => … }` und **keinen** Arm `_`.
+3. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Describe incident statuses with a closed hierarchy`. Er legt ein `IncidentStatus[]` mit je einem Wert jedes Typs an (der Analyst heißt `"analyst-1"`) und gibt `StatusLine` für jeden Wert aus.
+
+<CSharpRunner id="m12-l09-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Neue Typen:** `IncidentStatus` ist `closed` und damit abstrakt. Die drei Untertypen sind `sealed` und stehen im selben Namensraum, also in derselben Assembly.
+2. **`StatusLine`:** Je ein Arm pro direktem Untertyp, kein `_`. Käme ein vierter Status dazu, meldet der Compiler diesen `switch`.
+3. **Block:** Das Array hat den Typ `IncidentStatus[]`. Jedes `new …` wird zur Basis umgewandelt.
+4. **Ergebnis:** `open: waiting for an analyst`, `investigating: analyst-1`, `resolved: false alarm`.
+
+</details>
+
+**Neuer Stand:** SecLog hat Status-Typen, die nur dieses Programm ableiten darf, und der Compiler prüft, dass jeder `switch` darüber alle Status behandelt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l09-closed-means-sealed" />
+
+**„`closed` ist dasselbe wie `sealed`.“** Das stimmt nicht. `sealed` verbietet jeden Untertyp. `closed` erlaubt Untertypen, aber nur in derselben Assembly, und macht den Typ abstrakt. Beides zusammen zu schreiben, ist ein Fehler.
+:::
+
+<Quiz id="m12-l09-q1" />
+
+<details>
+<summary>Vertiefung: Regeln für Untertypen und Generics (optional)</summary>
+
+Die Beschränkung gilt nur für direkte Untertypen: Ein Typ, der von einem Untertyp ableitet, darf in einer anderen Assembly stehen, solange der Untertyp weder `sealed` noch `closed` ist ([Same-assembly restriction](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies#same-assembly-restriction)). Ein Untertyp ist nicht selbst `closed`, wenn du es nicht schreibst.
+
+Ist der Wert des `switch` nullable (`Shape?`), ist `null` ein weiterer Fall. Ohne Arm `null` warnt der Compiler ([closed modifier](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed#exhaustive-switch-expressions)).
+
+Leitet eine generische Klasse direkt von einem `closed`-Typ ab, muss sie alle ihre Typparameter in der Basisklasse verwenden ([Type parameter restriction](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies#type-parameter-restriction)).
+
+Der Compiler markiert einen `closed`-Typ mit dem Attribut `IsClosedTypeAttribute`, damit andere Compiler ihn erkennen ([Lowering](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies#lowering)).
+
+Ein `closed`-Typ kann Teil eines Vertrags sein: Ein weiterer Untertyp oder der Modifizierer `closed` an einer bestehenden Klasse kann Code anderer Assemblys brechen ([Drawbacks](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies#drawbacks)).
+
+</details>
+
+## Zusammenfassung
+
+Eine Klasse mit `closed` ist implizit abstrakt, und ihre direkten Untertypen dürfen nur in derselben Assembly stehen. Ein `switch` mit einem Arm je direktem Untertyp ist exhaustive und braucht keinen Arm `_`. Fehlt ein Untertyp, warnt der Compiler (CS8509). `sealed` verbietet jede Ableitung, `closed` begrenzt sie. Beides zusammen ist ein Fehler (CS9381). Eine Union fasst bestehende Typen zusammen, eine geschlossene Hierarchie hat deinen eigenen Basistyp.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l09-q2" />
+
+<Quiz id="m12-l09-q5" />
+
+<Quiz id="m12-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l09-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [closed-Modifizierer](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/closed)
+- Microsoft Learn: [Closed hierarchies (Spezifikation der Funktion)](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/closed-hierarchies)
+- Microsoft Learn: [Muster](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#closed-hierarchy-patterns)
