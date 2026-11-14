@@ -1,0 +1,197 @@
+---
+title: Union-Typen
+sidebar_position: 8
+description: Ein Union-Typ (C# 15) enthält genau einen Wert von einem seiner Fall-Typen. Ein switch-Ausdruck über alle Fall-Typen ist exhaustive, ohne dass ein Arm mit _ nötig ist.
+lesson_id: m12-l08
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import beforeUnions from '!!raw-loader!@site/examples/m12/l08/before-unions.cs';
+import unionBasics from '!!raw-loader!@site/examples/m12/l08/union-basics.cs';
+import unionBasicsOutput from '!!raw-loader!@site/examples/m12/l08/union-basics.out.txt';
+import missingCase from '!!raw-loader!@site/examples/m12/l08/missing-case.snippet.cs';
+import defaultUnion from '!!raw-loader!@site/examples/m12/l08/default-union.cs';
+import defaultUnionOutput from '!!raw-loader!@site/examples/m12/l08/default-union.out.txt';
+import independentCaseTypes from '!!raw-loader!@site/examples/m12/l08/independent-case-types.cs';
+import independentCaseTypesOutput from '!!raw-loader!@site/examples/m12/l08/independent-case-types.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m12/l08/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l08/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l08/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l08/seclog-patterns-solution.cs';
+
+# Union-Typen
+
+<Since csharp="15" dotnet="11" />
+
+:::note[Lernziele]
+- Du kannst einen Union-Typ mit `union` deklarieren und einen Wert eines Fall-Typs zuweisen.
+- Du kannst mit einem `switch`-Ausdruck über alle Fall-Typen einer Union verzweigen, ohne `_`-Arm.
+- Du kannst erklären, was der Compiler meldet, wenn ein Fall-Typ im `switch` fehlt.
+- Du kannst entscheiden, wann ein Union-Typ besser passt als `object` oder ein Rückgabewert `null`.
+:::
+
+## Rückblick
+
+<Quiz id="m12-l06-q6" />
+
+<Quiz id="m08-l03-q3" />
+
+<Quiz id="m04-l04-q3" />
+
+## Eins von mehreren Typen
+
+`ParseWithPatterns` aus Lektion „Listenmuster und Slice-Muster“ liefert ein `SecurityEvent?`. Der Wert `null` sagt, dass eine Zeile ungültig ist, aber nicht, warum. Der Rückgabetyp `object` könnte einen Fehler-Record enthalten. Dann braucht der `switch` über das Ergebnis aber einen Arm `_`, und der Compiler merkt nicht, wenn du einen Fall vergisst.
+
+Ein <Term id="union-type">Union-Typ</Term> löst das. Du nennst die Typen, aus denen ein Wert genau einer sein darf: `union Pet(Dog, Cat);`. Diese Typen heißen <Term id="case-type">Fall-Typen</Term> (case types). Sie sind bestehende Typen, hier zwei Records. Ein Wert der Union enthält genau einen Wert von einem dieser Typen ([Union types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union)).
+
+**So schrieb man es vorher:** Du brauchst eine abstrakte Basisklasse, von der die Fälle erben (Lektionen „Abstrakte Klassen“ und „Records“), und einen Arm `_` im `switch`:
+
+<CSharpRunner id="m12-l08-before" code={beforeUnions} />
+
+Die Fälle müssen hier von `Pet` erben, und der Arm `_` fängt alles ab, was der Compiler nicht kennt. Mit einer Union ändert sich beides.
+
+## Union deklarieren und prüfen
+
+Ein Wert eines Fall-Typs lässt sich der Union direkt zuweisen. Das ist eine implizite Umwandlung. Die Union hat eine Eigenschaft `Value`, die den enthaltenen Wert liefert. Ein Typmuster oder Deklarationsmuster auf einen Union-Wert (Lektion „Typmuster, Deklarationsmuster und Nulltests“) prüft diesen enthaltenen Wert, nicht die Union selbst.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Der `switch` hat keinen Arm `_`.
+:::
+
+<CSharpRunner id="m12-l08-basics" code={unionBasics} predict expected={unionBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zuweisen:** `Pet first = new Dog("Rex");` wandelt den `Dog` implizit in ein `Pet` um. Dasselbe gilt für die `Cat`.
+2. **Verzweigen:** Der `switch` prüft mit `Dog dog` und `Cat cat` den enthaltenen Wert. Für `first` passt der erste Arm: `dog Rex`, für `second` der zweite: `cat Tom`.
+3. **Kein `_`:** Die Union kennt ihre Fall-Typen. Der `switch` ist exhaustive, wenn jeder Fall-Typ einen Arm hat ([Union types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union#union-exhaustiveness)).
+4. **`Value`:** `first.Value` ist der enthaltene Record: `Dog { Name = Rex }`.
+
+</details>
+
+Fehlt ein Fall-Typ, meldet der Compiler das:
+
+<CodeBlock language="csharp" title="missing-case.snippet.cs">{missingCase}</CodeBlock>
+
+Der Compiler meldet `warning CS8509: The switch expression does not handle all possible values of its input type (it is not exhaustive). For example, the pattern 'Cat' is not covered.` für Zeile 1. Es ist dieselbe Warnung wie bei jedem nicht exhaustiven `switch` (Lektion „switch-Ausdrücke im Detail“), und sie nennt den fehlenden Fall. Würdest du einen Arm `_` schreiben, bliebe die Warnung auch aus, wenn später ein neuer Fall-Typ dazukommt. Ohne `_` zeigt dir der Compiler jeden `switch`, den du ergänzen musst.
+
+<Quiz id="m12-l08-q5" />
+
+## Die Union ohne Wert
+
+Eine Union ist ein Werttyp. Der Standardwert `default` einer Union enthält keinen Fall-Wert: `Value` ist `null`. Das passiert zum Beispiel bei einem Feld oder einem Array-Element, das nie gesetzt wurde. Ein Arm `null` fängt diesen Zustand ab ([Union types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union#null-matching)).
+
+:::info[Vorhersage]
+Das Beispiel schaltet die Warnung für den zweiten `switch` aus, nur um das Laufzeitverhalten zu zeigen. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l08-default" code={defaultUnion} predict expected={defaultUnionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Kein Wert:** `Pet none = default;` enthält keinen `Dog` und keine `Cat`. `none.Value is null` ist `True`.
+2. **Mit Arm `null`:** Der erste `switch` hat einen Arm `null`. Er liefert `no pet`.
+3. **Ohne Arm `null`:** Beim zweiten `switch` passt kein Arm. Der Compiler hat dafür CS8655 gemeldet, und zur Laufzeit löst der Ausdruck eine `SwitchExpressionException` aus. Das `catch` gibt den Typnamen aus.
+
+</details>
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen das Schlüsselwort des `switch`, der zweite Fall-Typ und das Schlüsselwort der Deklaration.
+
+<Quiz id="m12-l08-q3" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog zerlegt Log-Zeilen mit `ParseWithPatterns` und liefert `null` für eine ungültige Zeile. `IncidentState` und `with` halten die Stände eines Vorfalls fest.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`, die Funktion `StateOf`, hinter die du die neuen Funktionen schreibst, und das Ende des Namensraums `SecLog.Model` mit dem Typ `IncidentState`, hinter den die neuen Typen gehören. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in den Namensraum `SecLog.Model` hinter `IncidentState` den Record `sealed record LineError(string Line, string Reason);` und die Union `union ParseResult(SecurityEvent, LineError);`, jeweils mit einem XML-Kommentar.
+2. Schreibe hinter `StateOf` und vor `static class Report` die lokale Funktion `ParseResult Parse(string line)`. Sie gibt das `SecurityEvent` von `ParseWithPatterns(line)` zurück, wenn es nicht `null` ist, sonst `new LineError(line, "not a valid log line")`. Beide Rückgaben nutzen die implizite Umwandlung.
+3. Schreibe dahinter die lokale Funktion `string Describe(ParseResult result)` mit `result switch { SecurityEvent … => …, LineError … => … }` und **ohne** Arm `_`.
+4. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Parse lines into a union of event or error`. Er gibt `Describe(Parse(…))` aus für `sampleLog[1]` und für die beiden ungültigen Zeilen aus `brokenLines`.
+
+<CSharpRunner id="m12-l08-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Neue Typen:** `LineError` hält die Zeile und den Grund. `ParseResult` fasst `SecurityEvent` und `LineError` zusammen. Beide Typen kennen die Union nicht.
+2. **`Parse`:** `return parsed;` wandelt das `SecurityEvent` implizit in ein `ParseResult` um, ebenso `return new LineError(…);`. Der Aufrufer sieht den Grund, nicht nur `null`.
+3. **`Describe`:** Je ein Arm pro Fall-Typ, kein `_`. Käme ein dritter Fall-Typ dazu, meldet der Compiler diesen `switch`.
+4. **Ergebnis:** Die gültige Zeile ergibt `event: LoginFailed of bob`, die beiden ungültigen ergeben `error: not a valid log line`.
+
+</details>
+
+**Neuer Stand:** SecLog meldet beim Einlesen entweder ein Ereignis oder den Grund für die Ablehnung, und der Compiler prüft, dass beide Fälle behandelt sind.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l08-case-types-inherit-from-union" />
+
+**„Die Fall-Typen erben von der Union.“** Das stimmt nicht. Die Fall-Typen sind bestehende, unabhängige Typen. Sie erben nicht von der Union und müssen sie nicht kennen. Die Union enthält einen Wert von einem von ihnen.
+:::
+
+:::info[Vorhersage]
+`Dog` ist ein Fall-Typ von `Pet`. Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l08-independent" code={independentCaseTypes} predict expected={independentCaseTypesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Basistyp:** Der Basistyp von `Dog` ist weiter `System.Object`. Die Union hat daran nichts geändert.
+2. **Enthaltener Wert:** `pet.Value is Dog` ist `True`: Die Union enthält einen `Dog`.
+3. **Kein `Pet`:** `pet.Value is Pet` ist `False`. Der enthaltene Wert ist ein `Dog`, kein `Pet`.
+4. **Typname:** `pet.Value?.GetType().Name` ist `Dog`.
+
+</details>
+
+<Quiz id="m12-l08-q1" />
+
+<details>
+<summary>Vertiefung: Wie der Compiler eine Union baut (optional)</summary>
+
+Der Compiler macht aus einer `union`-Deklaration einen Struct mit einem Konstruktor je Fall-Typ und einer Eigenschaft `Value` vom Typ `object?`. Wert-Typen als Fall-Typen werden dabei geboxt ([Union types](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union#custom-union-types)).
+
+Die Typen `UnionAttribute` und `IUnion` im Namensraum `System.Runtime.CompilerServices` gehören dazu, und die .NET-11-Laufzeit enthält sie. Du kannst eine Union auch von Hand als Klasse oder Struct mit dem Attribut `[Union]` schreiben, zum Beispiel für eine andere Speicherung. Das ist hier nicht nötig.
+
+Die Regeln für Umwandlung, Muster und Exhaustiveness stehen in der Spezifikation der Funktion ([Unions](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/unions)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Union-Typ `union Name(A, B)` enthält genau einen Wert von einem seiner Fall-Typen. Jeder Fall-Typ lässt sich der Union implizit zuweisen, und Muster prüfen den enthaltenen Wert. Ein `switch`-Ausdruck mit einem Arm je Fall-Typ ist exhaustive und braucht keinen Arm `_`. Fehlt ein Fall, warnt der Compiler (CS8509). Der Standardwert einer Union enthält `null`, dafür gibt es den Arm `null`. Die Fall-Typen bleiben unabhängige Typen. Eine Union passt besser als `object` oder `null`, wenn ein Wert genau einer von wenigen bekannten Typen ist.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l08-q2" />
+
+<Quiz id="m12-l08-q4" />
+
+<Quiz id="m12-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l08-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Union-Typen](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union)
+- Microsoft Learn: [Unions (Spezifikation der Funktion)](https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/unions)
+- Microsoft Learn: [Was ist neu in C# 15](https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-15)

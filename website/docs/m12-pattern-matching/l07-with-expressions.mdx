@@ -1,0 +1,193 @@
+---
+title: Nicht-destruktive Änderung mit with
+sidebar_position: 7
+description: Ein with-Ausdruck erzeugt eine geänderte Kopie eines Records, Structs oder anonymen Typs. Das Original bleibt unverändert, und die Kopie ist flach.
+lesson_id: m12-l07
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import withBasics from '!!raw-loader!@site/examples/m12/l07/with-basics.cs';
+import withBasicsOutput from '!!raw-loader!@site/examples/m12/l07/with-basics.out.txt';
+import notARecord from '!!raw-loader!@site/examples/m12/l07/not-a-record.snippet.cs';
+import shallowCopy from '!!raw-loader!@site/examples/m12/l07/shallow-copy.cs';
+import shallowCopyOutput from '!!raw-loader!@site/examples/m12/l07/shallow-copy.out.txt';
+import structAndAnonymous from '!!raw-loader!@site/examples/m12/l07/struct-and-anonymous.cs';
+import quizOriginalCode from '!!raw-loader!@site/examples/m12/l07/quiz-original.cs';
+import quizOriginalOutput from '!!raw-loader!@site/examples/m12/l07/quiz-original.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m12/l07/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l07/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l07/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l07/seclog-patterns-solution.cs';
+
+# Nicht-destruktive Änderung mit with
+
+:::note[Lernziele]
+- Du kannst mit `with` eine geänderte Kopie eines Records erzeugen.
+- Du kannst vorhersagen, dass das Original nach `with` unverändert ist.
+- Du kannst erklären, dass `with` flach kopiert (eine Liste in der Kopie ist dieselbe Liste).
+- Du kannst `with` bei einem Struct und einem anonymen Typ einsetzen.
+:::
+
+## Rückblick
+
+<Quiz id="m08-l10-q6" />
+
+<Quiz id="m06-l06-q3" />
+
+<Quiz id="m11-l06-q5" />
+
+## Ein neuer Stand, ohne den alten zu verlieren
+
+Ein <Term id="record">Record</Term> mit `init`-Eigenschaften lässt sich nach dem Erzeugen nicht mehr ändern. Das ist gewollt: Ein Wert, der sich nie ändert, ist leicht zu verstehen. Aber wie bekommst du „denselben Vorfall, nur jetzt in Untersuchung“? Du erzeugst einen neuen Record und übernimmst alle Werte bis auf den einen. Bei fünf Eigenschaften ist das viel Schreibarbeit.
+
+Dafür gibt es den <Term id="with-expression">`with`-Ausdruck</Term>. Er steht hinter dem vorhandenen Wert, in geschweiften Klammern nennst du die Eigenschaften, die sich ändern. Alle anderen werden aus dem Original übernommen. Diese Art der Änderung heißt <Term id="nondestructive-mutation">nicht-destruktive Änderung</Term> (nondestructive mutation): Das Original wird nicht überschrieben, du bekommst einen neuen Wert ([§12.10 With expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1210-with-expressions)).
+
+Eine Eigenschaft darf im `with`-Ausdruck gesetzt werden, wenn sie einen `init`- oder `set`-Zugriff hat. Die Zuweisungen schreibst du wie in einem Objektinitialisierer (Lektion „Eigenschaften“).
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Achte darauf, was mit `first` passiert und was `==` und `ReferenceEquals` für die leere Kopie liefern.
+:::
+
+<CSharpRunner id="m12-l07-basics" code={withBasics} predict expected={withBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Kopie mit Änderung:** `first with { Status = "closed" }` erzeugt einen neuen `Ticket` mit `Number = 1` aus dem Original und dem neuen Status. `second` zeigt `closed`.
+2. **Original unverändert:** `first` hat weiter den Status `open`. Die Änderung steht nur in `second`.
+3. **Leere Kopie:** `first with { }` ändert nichts. `first == copy` ist `True`, weil ein Record seine Werte vergleicht (Lektion „Records“). `ReferenceEquals(first, copy)` ist `False`, denn es sind zwei Objekte.
+
+</details>
+
+`with` gibt es nur dort, wo der Compiler eine Kopie herstellen kann. Eine gewöhnliche Klasse, die kein Record ist, hat dafür keine Methode:
+
+<CodeBlock language="csharp" title="not-a-record.snippet.cs">{notARecord}</CodeBlock>
+
+Der Compiler meldet `error CS8858: The receiver type 'Account' is not a valid record type and is not a struct type.` für Zeile 2. Die Lösung ist, `Account` als Record zu deklarieren oder die Kopie von Hand zu bauen.
+
+<Quiz id="m12-l07-q5" />
+
+## Die Kopie ist flach
+
+Ein `with`-Ausdruck kopiert Eigenschaft für Eigenschaft. Bei einem Wert wie `int` entsteht ein neuer, eigener Wert. Bei einer Eigenschaft mit <Term id="reference-type">Referenztyp</Term> (zum Beispiel einer Liste) wird nur die Referenz kopiert, nicht das Objekt. Man nennt das eine <Term id="shallow-copy">flache Kopie</Term> (shallow copy). Original und Kopie zeigen danach auf dasselbe Objekt (Lektion „Referenztypen“).
+
+:::info[Vorhersage]
+Das Original bekommt nach dem `with` noch einen Eintrag in seiner Liste. Was geben die drei Zeilen aus?
+:::
+
+<CSharpRunner id="m12-l07-shallow" code={shallowCopy} predict expected={shallowCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zwei Objekte, eine Liste:** `second` ist ein neuer `Watchlist` mit neuem Namen. Seine Eigenschaft `Users` zeigt aber auf dieselbe Liste wie `first.Users`.
+2. **Eine Änderung, zwei Sichten:** `first.Users.Add("dave")` ändert diese gemeinsame Liste. Beide Zählungen sind `2`.
+3. **Beweis:** `ReferenceEquals(first.Users, second.Users)` ist `True`.
+4. **Was passiert, wenn …?** Willst du eine eigene Liste für die Kopie, legst du sie im `with` an: `first with { Users = [.. first.Users] }`.
+
+</details>
+
+## Struct und anonymer Typ
+
+Seit C# 10 funktioniert `with` nicht nur bei Records, sondern auch bei einem <Term id="struct">Struct</Term> und bei einem <Term id="anonymous-type">anonymen Typ</Term>. Ein Struct wird dabei als Wert kopiert. Die Eigenschaften, die du setzt, brauchen einen `set`- oder `init`-Zugriff. Bei einem anonymen Typ sind die Eigenschaften schreibgeschützt, und `with` ist der Weg zu einer geänderten Kopie ([Referenzseite zu with](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/with-expression)).
+
+<CSharpRunner id="m12-l07-struct" code={structAndAnonymous} />
+
+Die erste Zeile zeigt `3 4`: Das Struct `before` behält seinen Wert, `after` hat den neuen. Die beiden anderen Zeilen zeigen die anonymen Objekte, `worse` mit `Failures = 6`.
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen drei Stellen: das Schlüsselwort, die Eigenschaft und der neue Wert.
+
+<Quiz id="m12-l07-q3" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog zerlegt Log-Zeilen mit einem Listenmuster und wählt für jedes Ereignis mit einem exhaustiven `switch`-Ausdruck eine Maßnahme. Ein `Incident` ist eine Klasse mit `Number`, `User`, `FailureCount` und `Status`, `SeverityOf` ordnet einer Anzahl einen Schweregrad zu.
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …`, die Funktion `ActionFor`, hinter die du die neue Funktion schreibst, und das Ende des Namensraums `SecLog.Model`, in das der neue Typ gehört. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in den Namensraum `SecLog.Model` hinter `IncidentExtensions` den Typ `sealed record IncidentState(int Number, string User, int FailureCount, Severity Severity, string Status);` mit einem XML-Kommentar wie bei den anderen Typen.
+2. Schreibe hinter `ActionFor` und vor `static class Report` die lokale Funktion `IncidentState StateOf(Incident incident)`. Sie gibt `new(incident.Number, incident.User, incident.FailureCount, SeverityOf(incident.FailureCount), incident.Status)` zurück.
+3. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Update incident states with with expressions`. Er legt `opened` an (`StateOf(bobIncident)` mit dem Status `open`, gesetzt mit `with`), danach `investigating` (`opened with { Status = "investigating" }`) und `done` (`investigating with { Status = "closed" }`). Er gibt die drei Zustände aus, dann `Status of the first state: …` mit `opened.Status`, `Same state: …` mit `opened == investigating` und `Same after an empty with: …` mit `opened == opened with { }`.
+
+<CSharpRunner id="m12-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Neuer Typ:** `IncidentState` ist ein `sealed record` mit den Werten eines Vorfalls zu einem Zeitpunkt. Der Typ ist unveränderlich, deshalb brauchst du `with` für jeden neuen Stand.
+2. **Zustand lesen:** `StateOf` macht aus dem `Incident` einen `IncidentState`. Der Vorfall von bob hat durch einen früheren Block schon den Status `investigating`. Darum setzt der erste `with`-Ausdruck den Status auf `open`.
+3. **Zustände ableiten:** `investigating` und `done` entstehen jeweils aus dem vorigen Zustand. Jeder `with`-Ausdruck lässt seinen Vorgänger unverändert.
+4. **Vergleichen:** `opened.Status` bleibt `open`. `opened == investigating` ist `False`, weil der Status verschieden ist, und `opened == opened with { }` ist `True`, weil die Werte gleich sind.
+
+</details>
+
+**Neuer Stand:** SecLog kann den Stand eines Vorfalls ändern, ohne den alten zu verlieren.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l07-with-changes-original" />
+
+**„`with` ändert das Original.“** Das stimmt nicht. Ein `with`-Ausdruck liefert immer einen neuen Wert. Das Original bleibt, wie es war. Wenn du den neuen Stand nicht in einer Variablen speicherst, geht er verloren.
+:::
+
+:::info[Vorhersage]
+Jede Zeile leitet einen Wert aus dem vorigen ab. Welche drei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l07-original" code={quizOriginalCode} predict expected={quizOriginalOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **`a`:** Bleibt bei Nummer 7 und `open`, obwohl zwei Kopien davon abstammen.
+2. **`b`:** Kopie von `a` mit Nummer 8. Der Status `open` wird übernommen.
+3. **`c`:** Kopie von `b` mit dem Status `closed`. Die Nummer 8 wird übernommen.
+
+</details>
+
+<Quiz id="m12-l07-q1" />
+
+<details>
+<summary>Vertiefung: Was der Compiler für with erzeugt (optional)</summary>
+
+Bei einem Record ruft der Compiler eine erzeugte Clone-Methode auf, die den Record kopiert. Danach setzt er die Eigenschaften aus den geschweiften Klammern in der Reihenfolge, in der sie dort stehen. Bei einem Struct wird der Wert kopiert ([§12.10 With expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1210-with-expressions)).
+
+Die Clone-Methode benutzt den Kopierkonstruktor, den der Compiler für jeden Record erzeugt ([§15.16.4.4 Copy and Clone members](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#151644-copy-and-clone-members)). Der Kopierkonstruktor lässt sich selbst schreiben, wenn die Kopie tiefer gehen soll.
+
+Wird ein Wert beim Erzeugen aus anderen Eigenschaften berechnet und gespeichert, passt er nach einem `with` nicht mehr: Er stammt vom Original. Berechne solche Werte beim Lesen der Eigenschaft ([Records](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record#nondestructive-mutation)).
+
+</details>
+
+## Zusammenfassung
+
+Ein `with`-Ausdruck erzeugt eine Kopie eines Records, eines Structs oder eines anonymen Typs und setzt in der Kopie die genannten Eigenschaften. Das Original bleibt unverändert. Die Kopie ist flach: Eine Liste im Original ist dieselbe Liste in der Kopie. Bei einer Klasse, die kein Record ist, meldet der Compiler einen Fehler (CS8858). SecLog leitet mit `with` aus einem Stand des Vorfalls den nächsten ab.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l07-q2" />
+
+<Quiz id="m12-l07-q4" />
+
+<Quiz id="m12-l07-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [§12.10 With expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1210-with-expressions)
+- Microsoft Learn: [with-Ausdruck](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/with-expression)
+- Microsoft Learn: [Records, nicht-destruktive Änderung](https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/record#nondestructive-mutation)

@@ -1,0 +1,3 @@
+dog Rex
+cat Tom
+Dog { Name = Rex }

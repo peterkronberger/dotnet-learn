@@ -827,6 +827,302 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem eigenen Programm einen switch über ein Tupel einsetzen, und worauf achtest du bei der Reihenfolge der Arme?",
       "modelAnswer": "Ein switch über ein Tupel passt, wenn eine Entscheidung von zwei Werten abhängt, zum Beispiel der Ereignistyp und die Anzahl der Fehlversuche oder der Zustand und ein Befehl. Ich schreibe die engen Fälle zuerst und die weiten danach, damit ein weiter Arm keinen engen verdeckt. Am Ende steht `_`, damit der Ausdruck alle Fälle behandelt."
+    },
+    {
+      "id": "m12-l07-q1",
+      "lesson": "m12-l07",
+      "type": "single",
+      "question": "`Ticket a = new(1, \"open\");` ist ein Record. Danach steht `Ticket b = a with { Status = \"closed\" };` im Code. Welchen Status hat `a`?",
+      "options": [
+        {
+          "text": "`open`, `a` bleibt unverändert",
+          "correct": true,
+          "feedback": "Ein `with`-Ausdruck erzeugt eine Kopie und ändert nur diese."
+        },
+        {
+          "text": "`closed`, weil `with` den Status von `a` setzt",
+          "feedback": "`with` schreibt nicht in `a`. Die Änderung gilt nur für die neue Kopie `b`.",
+          "misconception": "m12-l07-with-changes-original"
+        },
+        {
+          "text": "`a` und `b` sind nach `with` dasselbe Objekt",
+          "feedback": "`with` erzeugt ein neues Objekt. `ReferenceEquals(a, b)` ist `False`.",
+          "misconception": "m12-l07-with-changes-original"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil `Status` ein `init`-Member sein kann",
+          "feedback": "Ein `with`-Ausdruck darf `init`-Eigenschaften setzen. Das ist sein Zweck."
+        }
+      ],
+      "explanation": "`with` kopiert den Record und setzt die genannten Eigenschaften in der Kopie. Das Original bleibt, wie es war."
+    },
+    {
+      "id": "m12-l07-q2",
+      "lesson": "m12-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l07/quiz-original.cs",
+      "explanation": "`b` ist eine Kopie von `a` mit neuer Nummer. `c` ist eine Kopie von `b` mit neuem Status. Jeder `with`-Ausdruck lässt sein Original unverändert, deshalb zeigt `a` weiter Nummer 7 und `open`."
+    },
+    {
+      "id": "m12-l07-q3",
+      "lesson": "m12-l07",
+      "type": "cloze",
+      "question": "Ergänze den `with`-Ausdruck, der den Status der Kopie ändert.",
+      "example": "m12/l07/gap-with.cs",
+      "blanks": [
+        {
+          "text": "with",
+          "hint": "Das Schlüsselwort steht zwischen dem Original und den geänderten Eigenschaften."
+        },
+        {
+          "text": "Status",
+          "hint": "Der Name der Eigenschaft, die in der Kopie anders sein soll."
+        },
+        {
+          "text": "closed",
+          "hint": "Der neue Wert, den die Ausgabe der zweiten Zeile zeigt."
+        }
+      ],
+      "explanation": "`first with { Status = \"closed\" }` kopiert `first` und setzt `Status` in der Kopie. `first` behält `open`."
+    },
+    {
+      "id": "m12-l07-q4",
+      "lesson": "m12-l07",
+      "type": "multi",
+      "question": "Welche Aussagen über den `with`-Ausdruck stimmen?",
+      "options": [
+        {
+          "text": "Er funktioniert bei einem Record, bei einem Struct und bei einem anonymen Typ.",
+          "correct": true
+        },
+        {
+          "text": "Die Kopie ist flach: Eine Eigenschaft mit einem Referenztyp zeigt in der Kopie auf dasselbe Objekt wie im Original.",
+          "correct": true
+        },
+        {
+          "text": "`original == (original with { })` ist bei einem Record `True`, weil Records ihre Werte vergleichen.",
+          "correct": true
+        },
+        {
+          "text": "Er ändert das Original, wenn die Eigenschaft mit `init` deklariert ist.",
+          "feedback": "Eine `init`-Eigenschaft wird nur in der Kopie gesetzt. Das Original bleibt unverändert.",
+          "misconception": "m12-l07-with-changes-original"
+        },
+        {
+          "text": "Er funktioniert bei jeder Klasse, auch wenn sie kein Record ist.",
+          "feedback": "Bei einer Klasse, die kein Record ist, meldet der Compiler einen Fehler (CS8858)."
+        }
+      ],
+      "explanation": "`with` setzt einen Record, ein Struct oder einen anonymen Typ voraus. Die Kopie ist flach, und das Original wird nie verändert."
+    },
+    {
+      "id": "m12-l07-q5",
+      "lesson": "m12-l07",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS8858). Welche?",
+      "example": "m12/l07/not-a-record.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "2": {
+          "feedback": "`Account` ist eine Klasse und kein Record. `with` braucht einen Record, ein Struct oder einen anonymen Typ."
+        }
+      },
+      "explanation": "Der Empfänger von `with` muss ein Record, ein Struct oder ein anonymer Typ sein. Eine gewöhnliche Klasse hat dafür keine Kopier-Methode."
+    },
+    {
+      "id": "m12-l07-q6",
+      "lesson": "m12-l07",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l07/shallow-copy.cs",
+      "options": [
+        {
+          "text": "`2`, `2` und `True`",
+          "correct": true,
+          "feedback": "Die Kopie enthält dieselbe Liste. Der Eintrag `dave` ist in beiden zu sehen."
+        },
+        {
+          "text": "`2`, `1` und `False`",
+          "feedback": "Das wäre eine tiefe Kopie. `with` kopiert die Liste nicht mit, sondern nur die Referenz darauf."
+        },
+        {
+          "text": "`1`, `1` und `True`",
+          "feedback": "Das Original hat den Eintrag `dave` bekommen, also hat die Liste zwei Einträge."
+        },
+        {
+          "text": "`2`, `2` und `False`",
+          "feedback": "Beide Eigenschaften zeigen auf dasselbe Objekt, `ReferenceEquals` ist `True`."
+        }
+      ],
+      "explanation": "Die Kopie ist flach. Die Eigenschaft `Users` zeigt im Original und in der Kopie auf dieselbe `List<string>`."
+    },
+    {
+      "id": "m12-l07-q7",
+      "lesson": "m12-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein `with`-Ausdruck tut, was mit dem Original passiert und was „flache Kopie“ bedeutet.",
+      "modelAnswer": "Ein `with`-Ausdruck erzeugt eine Kopie eines Records (oder eines Structs oder anonymen Typs) und setzt in der Kopie die genannten Eigenschaften neu. Das Original bleibt unverändert.\n\nDie Kopie ist flach: Wertetypen werden kopiert, bei Referenztypen wie einer Liste wird nur die Referenz kopiert. Original und Kopie zeigen dann auf dieselbe Liste, und eine Änderung an der Liste sieht man in beiden."
+    },
+    {
+      "id": "m12-l07-q8",
+      "lesson": "m12-l07",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm `with` einsetzen, und worauf achtest du bei Eigenschaften mit Listen?",
+      "modelAnswer": "`with` passt, wenn ein Wert unveränderlich ist und ich trotzdem einen neuen Stand brauche, zum Beispiel den Zustand eines Auftrags oder eine Einstellung, bei der sich nur ein Feld ändert. Ich behalte so den alten Stand, etwa für eine Verlaufsliste.\n\nEnthält der Record eine Liste, teilen sich Original und Kopie diese Liste. Soll die Kopie eine eigene Liste haben, lege ich im `with` eine neue Liste an, zum Beispiel mit `new List<string>(old.Users)`."
+    },
+    {
+      "id": "m12-l08-q1",
+      "lesson": "m12-l08",
+      "type": "single",
+      "question": "Was stimmt für `record Dog(string Name);`, `record Cat(string Name);` und `union Pet(Dog, Cat);`?",
+      "options": [
+        {
+          "text": "`Dog` und `Cat` sind bestehende, unabhängige Typen. `Pet` speichert einen Wert von einem der beiden.",
+          "correct": true,
+          "feedback": "Die Union fasst Typen zusammen. Sie ändert deren Basistyp nicht."
+        },
+        {
+          "text": "`Dog` und `Cat` erben von `Pet`.",
+          "feedback": "Eine Union ist keine Basisklasse. `Dog` bleibt von `object` abgeleitet und muss `Pet` nicht kennen.",
+          "misconception": "m12-l08-case-types-inherit-from-union"
+        },
+        {
+          "text": "`Pet` ist eine abstrakte Basisklasse, und `Dog` und `Cat` müssen sie angeben.",
+          "feedback": "`Dog` und `Cat` schreiben nichts über `Pet`. Sie sind schon vorher deklarierte Typen.",
+          "misconception": "m12-l08-case-types-inherit-from-union"
+        },
+        {
+          "text": "`Pet` kann gleichzeitig einen `Dog` und eine `Cat` enthalten.",
+          "feedback": "Eine Union enthält genau einen Wert."
+        }
+      ],
+      "explanation": "Eine Union fasst bestehende Typen zu einer Auswahl zusammen. Die Fall-Typen sind unabhängig und erben nicht von der Union."
+    },
+    {
+      "id": "m12-l08-q2",
+      "lesson": "m12-l08",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l08/quiz-union.cs",
+      "explanation": "`Shape` hält zuerst ein `Square` und dann ein `Rectangle`. Der `switch` wählt den Arm nach dem Fall-Typ: 3 · 3 = 9 und 2 · 5 = 10."
+    },
+    {
+      "id": "m12-l08-q3",
+      "lesson": "m12-l08",
+      "type": "cloze",
+      "question": "Ergänze den `switch` über die Fall-Typen und die Deklaration der Union.",
+      "example": "m12/l08/gap-union.cs",
+      "blanks": [
+        {
+          "text": "switch",
+          "hint": "Das Schlüsselwort, das den Wert der Variablen mit den Armen vergleicht."
+        },
+        {
+          "text": "Phone",
+          "hint": "Der zweite Fall-Typ, mit dem Arm für die Telefonnummer."
+        },
+        {
+          "text": "union",
+          "hint": "Das Schlüsselwort, mit dem ein Union-Typ deklariert wird."
+        }
+      ],
+      "explanation": "Der `switch` hat für jeden Fall-Typ einen Arm. Deshalb braucht er keinen `_`-Arm. Die Union wird mit `union Contact(Email, Phone);` deklariert."
+    },
+    {
+      "id": "m12-l08-q4",
+      "lesson": "m12-l08",
+      "type": "multi",
+      "question": "Welche Aussagen über Union-Typen stimmen?",
+      "options": [
+        {
+          "text": "Ein Wert eines Fall-Typs lässt sich der Union direkt zuweisen (implizite Umwandlung).",
+          "correct": true
+        },
+        {
+          "text": "Ein `switch`-Ausdruck mit einem Arm je Fall-Typ braucht keinen `_`-Arm.",
+          "correct": true
+        },
+        {
+          "text": "Der Standardwert `default` einer Union enthält keinen Fall-Wert: `Value` ist `null`.",
+          "correct": true
+        },
+        {
+          "text": "Die Fall-Typen müssen von der Union erben, damit sie in die Union passen.",
+          "feedback": "Die Fall-Typen sind bestehende Typen. Sie erben nicht von der Union und kennen sie nicht.",
+          "misconception": "m12-l08-case-types-inherit-from-union"
+        }
+      ],
+      "explanation": "Die Union wandelt jeden Fall-Typ implizit um, und der Compiler prüft, ob der `switch` alle Fall-Typen behandelt. Der Standardwert enthält `null`."
+    },
+    {
+      "id": "m12-l08-q5",
+      "lesson": "m12-l08",
+      "type": "single",
+      "question": "Der `switch`-Ausdruck hat nur einen Arm für `Dog`. Was meldet der Compiler?",
+      "example": "m12/l08/missing-case.snippet.cs",
+      "options": [
+        {
+          "text": "Die Warnung CS8509: Der Fall `Cat` ist nicht abgedeckt.",
+          "correct": true,
+          "feedback": "Ein fehlender Fall-Typ ist eine Warnung, wie bei anderen nicht exhaustiven `switch`-Ausdrücken."
+        },
+        {
+          "text": "Den Fehler CS8510: Der Arm ist nicht erreichbar.",
+          "feedback": "Der Arm für `Dog` ist erreichbar. Es fehlt ein anderer Arm."
+        },
+        {
+          "text": "Nichts, weil `Dog` der erste Fall-Typ ist.",
+          "feedback": "Der Compiler prüft alle Fall-Typen. Jeder braucht einen Arm."
+        },
+        {
+          "text": "Nichts, weil der Compiler `_` ergänzt.",
+          "feedback": "Der Compiler ergänzt keinen Arm."
+        }
+      ],
+      "explanation": "Der `switch` über eine Union ist exhaustive, wenn jeder Fall-Typ einen Arm hat. Fehlt einer, warnt der Compiler (CS8509) und nennt den Fall."
+    },
+    {
+      "id": "m12-l08-q6",
+      "lesson": "m12-l08",
+      "type": "single",
+      "question": "Eine Methode liest eine Logzeile und soll entweder ein Ereignis oder den Grund für die Ablehnung liefern. Der Aufrufer soll gezwungen sein, beide Fälle zu behandeln. Was passt am besten?",
+      "options": [
+        {
+          "text": "Eine Union aus dem Ereignis-Typ und einem Fehler-Typ",
+          "correct": true,
+          "feedback": "Der Compiler warnt jeden `switch`, der einen der beiden Fälle auslässt."
+        },
+        {
+          "text": "Der Rückgabetyp `object` mit einem `switch` und `_`-Arm",
+          "feedback": "Mit `_` merkt der Compiler nicht, wenn ein Fall fehlt."
+        },
+        {
+          "text": "Der Rückgabewert `null` für die abgelehnte Zeile",
+          "feedback": "`null` sagt nicht, warum die Zeile abgelehnt wurde."
+        },
+        {
+          "text": "Eine Ausnahme für jede ungültige Zeile",
+          "feedback": "Eine ungültige Zeile ist hier ein erwarteter Fall, kein Ausnahmefall. Der Aufrufer muss auch nicht gezwungen sein, die Ausnahme zu fangen."
+        }
+      ],
+      "explanation": "Eine Union drückt „genau eins von diesen Typen“ aus, und der Compiler prüft, ob alle Fälle behandelt sind. `object` und `null` leisten das nicht."
+    },
+    {
+      "id": "m12-l08-q7",
+      "lesson": "m12-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Union-Typ ist und warum der `switch` darüber keinen `_`-Arm braucht.",
+      "modelAnswer": "Ein Union-Typ fasst bestehende Typen (die Fall-Typen) zusammen. Ein Wert der Union enthält genau einen Wert von einem dieser Typen, und jeder Fall-Typ lässt sich der Union direkt zuweisen.\n\nDer Compiler kennt die Liste der Fall-Typen. Hat der `switch` für jeden einen Arm, sind alle Fälle abgedeckt, und ein `_`-Arm ist nicht nötig. Fehlt ein Fall, warnt der Compiler."
+    },
+    {
+      "id": "m12-l08-q8",
+      "lesson": "m12-l08",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm eine Union einsetzen, und wann reicht `null` oder `object` nicht?",
+      "modelAnswer": "Eine Union passt, wenn ein Wert genau eine von wenigen, bekannten Möglichkeiten sein soll, zum Beispiel das Ergebnis einer Eingabe (gültiger Wert oder Fehler mit Grund) oder eine Nachricht aus einer festen Menge von Nachrichten.\n\n`null` sagt nur, dass etwas fehlt, aber nicht warum. Bei `object` kann alles drin sein, und der `switch` braucht `_`, sodass der Compiler einen vergessenen Fall nicht meldet. Die Union nennt alle Fälle, und der Compiler prüft sie."
     }
   ]
 }

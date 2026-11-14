@@ -1,0 +1,4 @@
+System.Object
+True
+False
+Dog
