@@ -1,0 +1,8 @@
+True
+True
+True
+True
+False
+head = 10, rest has 3 elements
+Int32[]
+bob String

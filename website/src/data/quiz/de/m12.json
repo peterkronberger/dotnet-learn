@@ -552,6 +552,141 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Positionsmuster statt eines Eigenschaftsmusters einsetzen, und wo nicht?",
       "modelAnswer": "Ein Positionsmuster passt, wenn die Reihenfolge der Teile schon die Bedeutung trägt und es wenige Teile gibt, zum Beispiel bei einem Tupel aus Benutzer und Adresse oder bei einem kleinen Record. Bei vielen Teilen oder gleichartigen Werten ist ein Eigenschaftsmuster besser, weil die Namen den Test erklären und eine Vertauschung auffällt."
+    },
+    {
+      "id": "m12-l05-q1",
+      "lesson": "m12-l05",
+      "type": "single",
+      "question": "`int[] a = [1, 2, 3];` – was ergibt `a is [1, 2]`?",
+      "options": [
+        {
+          "text": "`False`",
+          "correct": true,
+          "feedback": "Das Muster hat zwei Teilmuster, das Array hat drei Elemente. Die Länge passt nicht."
+        },
+        {
+          "text": "`True`, weil das Array mit 1 und 2 beginnt",
+          "feedback": "Ein Listenmuster ohne `..` verlangt genau so viele Elemente wie Teilmuster. Für den Anfang schreibst du `[1, 2, ..]`.",
+          "misconception": "m12-l05-list-pattern-matches-prefix"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler wegen der falschen Länge",
+          "feedback": "Die Länge eines Arrays ist zur Übersetzungszeit nicht bekannt. Das Muster ergibt zur Laufzeit `False`."
+        },
+        {
+          "text": "Eine Ausnahme zur Laufzeit",
+          "feedback": "Ein Muster ohne Treffer löst keine Ausnahme aus."
+        }
+      ],
+      "explanation": "Ein Listenmuster passt nur, wenn die Länge genau stimmt und jedes Element zu seinem Teilmuster passt. `[1, 2, ..]` wäre `True`."
+    },
+    {
+      "id": "m12-l05-q2",
+      "lesson": "m12-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l05/quiz-lengths.cs",
+      "explanation": "`..` allein passt auf jede Folge, auch auf eine leere: `True`. `[_, ..]` braucht mindestens ein Element: `True`. `[_, _, ..]` braucht zwei, `one` hat nur eines: `False`. `[.., \"b\"]` prüft das letzte Element: `True`."
+    },
+    {
+      "id": "m12-l05-q3",
+      "lesson": "m12-l05",
+      "type": "cloze",
+      "question": "Ergänze das Listenmuster und das Slice-Muster.",
+      "example": "m12/l05/gap-list.cs",
+      "blanks": [
+        {
+          "text": "var user",
+          "hint": "Das dritte Element soll in einer Variablen namens `user` liegen."
+        },
+        {
+          "text": "..",
+          "hint": "Dieses Muster steht für null oder mehr beliebige Elemente."
+        }
+      ],
+      "explanation": "`var user` legt das Element in einer Variablen ab. `..` überspringt die restlichen Teile, deshalb passt das Muster auch bei vier Teilen."
+    },
+    {
+      "id": "m12-l05-q4",
+      "lesson": "m12-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über Listenmuster und Slice-Muster stimmen?",
+      "options": [
+        {
+          "text": "Ein Listenmuster passt auf Arrays, `List<T>` und `string`.",
+          "correct": true
+        },
+        {
+          "text": "Ein Listenmuster passt nie auf `null`.",
+          "correct": true
+        },
+        {
+          "text": "In einem Listenmuster darf höchstens ein Slice-Muster stehen.",
+          "correct": true
+        },
+        {
+          "text": "`[1, 2]` passt auf jede Folge, die mit 1 und 2 beginnt.",
+          "feedback": "Dafür brauchst du `[1, 2, ..]`. Ohne `..` zählt die genaue Länge.",
+          "misconception": "m12-l05-list-pattern-matches-prefix"
+        }
+      ],
+      "explanation": "Ein Listenmuster verlangt eine Länge und einen Index-Zugriff. Das Slice-Muster `..` ist der einzige Teil, der eine offene Länge erlaubt."
+    },
+    {
+      "id": "m12-l05-q5",
+      "lesson": "m12-l05",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS8980). Welche?",
+      "example": "m12/l05/quiz-two-slices.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "lineFeedback": {
+        "3": {
+          "feedback": "Hier stehen zwei Slice-Muster in einem Listenmuster. Das ist nicht erlaubt."
+        }
+      },
+      "explanation": "Ein Listenmuster darf höchstens ein Slice-Muster haben, sonst wäre unklar, welche Elemente zu welchem `..` gehören."
+    },
+    {
+      "id": "m12-l05-q6",
+      "lesson": "m12-l05",
+      "type": "single",
+      "question": "`string[] parts = [\"a\", \"b\", \"c\"];` – welchen Typ hat `rest` in `parts is [\"a\", .. var rest]`?",
+      "options": [
+        {
+          "text": "`string[]`",
+          "correct": true,
+          "feedback": "Bei einem Array ergibt der Rest wieder ein Array."
+        },
+        {
+          "text": "`string`",
+          "feedback": "Das gilt nur, wenn die geprüfte Folge selbst ein `string` ist."
+        },
+        {
+          "text": "`List<string>`",
+          "feedback": "Der Rest hat den Typ des Bereichsergebnisses der geprüften Folge, hier ein Array."
+        },
+        {
+          "text": "`char[]`",
+          "feedback": "Die Elemente von `parts` sind Texte, keine Zeichen."
+        }
+      ],
+      "explanation": "Der Typ von `rest` ist der Typ, den ein Bereich auf der Folge liefert: für ein Array ein Array, für einen `string` ein `string`."
+    },
+    {
+      "id": "m12-l05-q7",
+      "lesson": "m12-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wann ein Listenmuster passt und wofür du das Slice-Muster brauchst.",
+      "modelAnswer": "Ein Listenmuster passt, wenn die Folge genau so viele Elemente hat wie das Muster Teilmuster und jedes Element zu seinem Teilmuster passt. Auf null passt es nie.\n\nDas Slice-Muster `..` steht für null oder mehr Elemente. Mit ihm prüfst du nur den Anfang, das Ende oder beides, und mit `.. var rest` übernimmst du den Rest in eine Variable."
+    },
+    {
+      "id": "m12-l05-q8",
+      "lesson": "m12-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Listenmuster einsetzen, und wo reicht `Length` mit einem Index?",
+      "modelAnswer": "Ein Listenmuster passt, wenn Form und Inhalt zusammen geprüft werden, zum Beispiel bei einer zerlegten Zeile oder bei Befehlen mit festen Argumenten wie `[\"copy\", var from, var to]`. Für eine einzelne Prüfung wie `parts.Length > 2` oder den Zugriff auf ein Element reicht `Length` mit Index, das ist kürzer und genauso klar."
     }
   ]
 }
