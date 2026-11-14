@@ -2514,6 +2514,217 @@
       "type": "explain",
       "question": "Transferfrage: Ein Programm prüft 5 Millionen Log-Zeilen, jede mit einem aufwendigen Muster-Test, und danach schreibt es einen kurzen Bericht. Wo würdest du Datenparallelität einsetzen, und wo nicht?",
       "modelAnswer": "Die Prüfung der Zeilen ist die gleiche rechnende Operation auf vielen unabhängigen Elementen. Dafür passt `Parallel.ForEach` oder PLINQ mit `AsParallel`. Die Ergebnisse führe ich sicher zusammen, zum Beispiel mit einem Array-Platz pro Zeile, einem `ConcurrentDictionary` oder mit `Count`.\n\nDen kurzen Bericht schreibe ich seriell: Er ist wenig Arbeit, und paralleler Aufwand würde sich nicht lohnen. Dieser serielle Teil begrenzt die mögliche Beschleunigung. Ob es sich lohnt, muss ich messen."
+    },
+    {
+      "id": "m13-l17-q1",
+      "lesson": "m13-l17",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l17/producer-consumer.cs",
+      "explanation": "Der Erzeuger schreibt drei Einträge in den Kanal und ruft danach `Complete` auf. Der Verbraucher liest, bis der Kanal leer und abgeschlossen ist, und zählt zwei `login-failed`."
+    },
+    {
+      "id": "m13-l17-q2",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Was passiert, wenn der Erzeuger nach dem letzten Eintrag `Writer.Complete()` nicht aufruft?",
+      "options": [
+        {
+          "text": "`ReadAllAsync` wartet nach dem letzten Eintrag weiter auf neue Einträge, die Schleife des Verbrauchers endet nie.",
+          "correct": true,
+          "feedback": "So ist es. Erst `Complete` meldet, dass nichts mehr kommt."
+        },
+        {
+          "text": "Die Schleife endet, sobald der Kanal einmal leer ist.",
+          "feedback": "Ein leerer Kanal ist nicht abgeschlossen. Es könnte noch ein Eintrag kommen."
+        },
+        {
+          "text": "Der Kanal gibt beim Lesen eine Ausnahme aus.",
+          "feedback": "Es gibt keine Ausnahme. Der Leser wartet."
+        }
+      ],
+      "explanation": "`Complete` ist das Ende-Signal des Erzeugers. Ohne es wartet der Verbraucher für immer."
+    },
+    {
+      "id": "m13-l17-q3",
+      "lesson": "m13-l17",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l17/semaphore-limit.cs",
+      "explanation": "Sechs Aufgaben starten, aber `WaitAsync` lässt nur zwei gleichzeitig in den Block. Deshalb zählt `tooMany` nie hoch. Alle sechs werden fertig."
+    },
+    {
+      "id": "m13-l17-q13",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Warum steht `limit.Release()` in einem `finally`?",
+      "options": [
+        {
+          "text": "Auch wenn die Arbeit eine Ausnahme auslöst, wird der Platz freigegeben. Sonst bliebe er für immer belegt.",
+          "correct": true,
+          "feedback": "So ist es. Ein verlorener Platz würde andere Arbeiter dauerhaft aufhalten."
+        },
+        {
+          "text": "Ohne `finally` kompiliert `WaitAsync` nicht.",
+          "feedback": "Der Compiler verlangt es nicht. Es geht um die Fehlerfälle zur Laufzeit."
+        },
+        {
+          "text": "`Release` darf nur nach `Task.Delay` laufen.",
+          "feedback": "`Release` hängt nicht von `Task.Delay` ab."
+        }
+      ],
+      "explanation": "Wie bei Dateien in Modul 7 sorgt `finally` dafür, dass die Freigabe auf jedem Ausgang läuft."
+    },
+    {
+      "id": "m13-l17-q4",
+      "lesson": "m13-l17",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m13/l17/cancel-workers.cs",
+      "explanation": "Ein einziger `CancellationTokenSource` hängt an allen drei Wartevorgängen. `Cancel` beendet sie alle mit einer `OperationCanceledException`, die jeder Arbeiter zählt."
+    },
+    {
+      "id": "m13-l17-q5",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Ein Programm soll 10 000 Log-Dateien prüfen und startet für jede Datei sofort einen eigenen Task. Was stimmt?",
+      "options": [
+        {
+          "text": "Das kann langsamer werden oder scheitern: Tausende gleichzeitige Zugriffe konkurrieren um Platte, Speicher und Kerne. Eine feste Zahl Arbeiter ist oft schneller und sicherer.",
+          "correct": true,
+          "feedback": "So ist es. Eine Begrenzung hält die Last in einem Rahmen."
+        },
+        {
+          "text": "Je mehr Tasks gleichzeitig laufen, desto schneller wird das Programm.",
+          "feedback": "Die Hardware ist begrenzt. Mehr Tasks bringen ab einem Punkt nur Konkurrenz.",
+          "misconception": "m13-l17-unlimited-tasks-are-fastest"
+        },
+        {
+          "text": "Tasks kosten nichts, deshalb ist jede Zahl gleich gut.",
+          "feedback": "Jede laufende Arbeit belegt Speicher, Dateien und Zeit.",
+          "misconception": "m13-l17-unlimited-tasks-are-fastest"
+        },
+        {
+          "text": "Das Programm ist am schnellsten, wenn die Zahl der Tasks gleich der Zahl der Dateien ist.",
+          "feedback": "Die beste Zahl hängt von der Hardware ab, nicht von der Zahl der Dateien.",
+          "misconception": "m13-l17-unlimited-tasks-are-fastest"
+        }
+      ],
+      "explanation": "Unbegrenzt viele gleichzeitige Aufgaben sind nicht am schnellsten. Ob und wie viel eine Begrenzung bringt, zeigt nur Messen."
+    },
+    {
+      "id": "m13-l17-q6",
+      "lesson": "m13-l17",
+      "type": "multi",
+      "question": "Warum nimmt man für das Begrenzen asynchroner Arbeit `SemaphoreSlim` und nicht `lock`?",
+      "options": [
+        {
+          "text": "In einem `lock`-Block ist kein `await` erlaubt.",
+          "correct": true,
+          "feedback": "So ist es. Der Block muss kurz sein und synchron bleiben."
+        },
+        {
+          "text": "`WaitAsync` wartet, ohne einen Thread zu blockieren.",
+          "correct": true,
+          "feedback": "So ist es. Wartende Arbeiter kosten keinen Thread."
+        },
+        {
+          "text": "`lock` lässt höchstens zwei Threads gleichzeitig durch.",
+          "feedback": "Ein `lock` lässt immer genau einen Thread durch."
+        }
+      ],
+      "explanation": "`SemaphoreSlim` zählt freie Plätze und bietet `WaitAsync`. `lock` kennt nur einen Platz und kein `await`."
+    },
+    {
+      "id": "m13-l17-q7",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Ein Kanal mit `Channel.CreateBounded<string>(2)` ist voll. Was macht `await writer.WriteAsync(x)`?",
+      "options": [
+        {
+          "text": "Es wartet, ohne einen Thread zu blockieren, bis ein Platz frei ist.",
+          "correct": true,
+          "feedback": "So ist es. Der Erzeuger kann nicht beliebig weit vorauslaufen."
+        },
+        {
+          "text": "Es wirft den Eintrag weg.",
+          "feedback": "Standardmäßig wartet `WriteAsync`. Es geht nichts verloren."
+        },
+        {
+          "text": "Es vergrößert den Kanal.",
+          "feedback": "Die Kapazität eines begrenzten Kanals bleibt fest."
+        }
+      ],
+      "explanation": "Ein begrenzter Kanal bremst den Erzeuger, wenn die Verbraucher nicht nachkommen."
+    },
+    {
+      "id": "m13-l17-q8",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Wie bricht man mehrere Arbeiter gemeinsam ab?",
+      "options": [
+        {
+          "text": "Alle bekommen das `Token` desselben `CancellationTokenSource`, und ein Aufruf von `Cancel` meldet es allen.",
+          "correct": true,
+          "feedback": "So ist es."
+        },
+        {
+          "text": "Jeder Arbeiter braucht einen eigenen `CancellationTokenSource`, der einzeln abgebrochen wird.",
+          "feedback": "Das geht, ist aber gerade nicht gemeinsam."
+        },
+        {
+          "text": "Man ruft `Complete` auf dem Kanal auf, dann brechen alle laufenden Arbeiten sofort ab.",
+          "feedback": "`Complete` meldet nur das Ende der Einträge. Laufende Arbeit endet damit nicht."
+        }
+      ],
+      "explanation": "Ein Token kann an beliebig viele Aufgaben gehen. `Complete` und Abbruch sind verschiedene Dinge."
+    },
+    {
+      "id": "m13-l17-q9",
+      "lesson": "m13-l17",
+      "type": "single",
+      "question": "Zehn Arbeiter warten mit `await limit.WaitAsync()` auf einen freien Platz. Wie viele Threads blockieren sie dabei?",
+      "options": [
+        {
+          "text": "Keinen: `await` gibt den Thread frei, bis ein Platz da ist.",
+          "correct": true,
+          "feedback": "So ist es, wie in Lektion 2."
+        },
+        {
+          "text": "Zehn, je einen pro Arbeiter.",
+          "feedback": "Das wäre bei einem blockierenden `Wait` so, nicht bei `await`."
+        },
+        {
+          "text": "Einen, der für alle wartet.",
+          "feedback": "Kein Thread wartet."
+        }
+      ],
+      "explanation": "Die Fortsetzung läuft erst, wenn ein Platz frei ist. Bis dahin gehört kein Thread dem Arbeiter."
+    },
+    {
+      "id": "m13-l17-q10",
+      "lesson": "m13-l17",
+      "type": "cloze",
+      "question": "Ergänze: Mit welcher Zeile liest ein Verbraucher alle Einträge, bis der Kanal abgeschlossen ist?",
+      "example": "m13/l17/producer-consumer.cs",
+      "blanks": [
+        { "text": "ReadAllAsync", "hint": "Die Methode des Readers, die einen asynchronen Strom liefert." }
+      ],
+      "explanation": "`Reader.ReadAllAsync()` liefert einen asynchronen Strom, den `await foreach` liest (Lektion 6)."
+    },
+    {
+      "id": "m13-l17-q11",
+      "lesson": "m13-l17",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum man für viele Dateien eine feste Zahl von Arbeitern mit einem Kanal einsetzt und nicht für jede Datei einen eigenen Task.",
+      "modelAnswer": "Der Erzeuger legt die Dateinamen in den Kanal, und eine feste Zahl Verbraucher nimmt sich jeweils die nächste Datei. So laufen nie mehr Lesevorgänge gleichzeitig als Arbeiter da sind. Bei einem Task pro Datei konkurrieren tausende Zugriffe um Platte, Speicher und Kerne, und das Programm kann langsamer werden oder scheitern.\n\nEin begrenzter Kanal bremst außerdem den Erzeuger, und ein gemeinsames Token stoppt alle Arbeiter."
+    },
+    {
+      "id": "m13-l17-q12",
+      "lesson": "m13-l17",
+      "type": "explain",
+      "question": "Transferfrage: Ein Dienst lädt Bilder von einem Server herunter, der höchstens fünf gleichzeitige Verbindungen erlaubt. Wo würdest du `SemaphoreSlim`, einen Kanal und ein `CancellationToken` einsetzen?",
+      "modelAnswer": "Ein `SemaphoreSlim(5)` begrenzt, wie viele Downloads gleichzeitig laufen: jeder Download ruft `WaitAsync` auf und gibt den Platz im `finally` mit `Release` frei. Ein Kanal kann die Adressen von einem Erzeuger an die Arbeiter verteilen. Ein gemeinsames `CancellationToken` bricht alle Downloads ab, wenn der Benutzer abbricht."
     }
   ]
 }
