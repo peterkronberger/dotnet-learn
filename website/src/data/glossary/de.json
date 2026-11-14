@@ -7592,6 +7592,110 @@
         "title": "11.1 General",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#111-general"
       }
+    },
+    {
+      "id": "with-expression",
+      "term": "with expression",
+      "german": "with-Ausdruck",
+      "category": "language",
+      "definition": "Ein Ausdruck der Form `original with { Eigenschaft = Wert }`. Er erzeugt eine Kopie eines Records, eines Structs oder eines anonymen Typs und setzt in der Kopie die genannten Eigenschaften. Das Original bleibt unverändert.",
+      "aliases": [
+        "with-Ausdruck"
+      ],
+      "related": [
+        "record",
+        "record-struct",
+        "anonymous-type",
+        "nondestructive-mutation",
+        "shallow-copy"
+      ],
+      "lesson": "m12-l07",
+      "source": {
+        "title": "12.10 With expressions",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1210-with-expressions"
+      }
+    },
+    {
+      "id": "nondestructive-mutation",
+      "term": "Nondestructive mutation",
+      "german": "nicht-destruktive Änderung",
+      "category": "language",
+      "definition": "Eine Änderung, die den alten Wert nicht überschreibt, sondern einen neuen Wert mit den Änderungen erzeugt. In C# macht das der `with`-Ausdruck.",
+      "aliases": [
+        "nicht-destruktive Änderung"
+      ],
+      "related": [
+        "with-expression",
+        "immutable",
+        "record"
+      ],
+      "lesson": "m12-l07",
+      "source": {
+        "title": "The with expression",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/with-expression"
+      }
+    },
+    {
+      "id": "shallow-copy",
+      "term": "Shallow copy",
+      "german": "flache Kopie",
+      "category": "language",
+      "definition": "Eine Kopie, bei der Werte kopiert werden, bei Referenztypen aber nur die Referenz. Original und Kopie zeigen dann auf dasselbe Objekt, zum Beispiel auf dieselbe Liste. Der `with`-Ausdruck kopiert flach.",
+      "aliases": [
+        "flache Kopie",
+        "oberflächliche Kopie"
+      ],
+      "related": [
+        "with-expression",
+        "reference-type",
+        "value-type"
+      ],
+      "lesson": "m12-l07",
+      "source": {
+        "title": "The with expression",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/with-expression"
+      }
+    },
+    {
+      "id": "union-type",
+      "term": "Union type",
+      "german": "Union-Typ",
+      "category": "language",
+      "definition": "Ein Typ, der mit `union Name(A, B)` deklariert wird und genau einen Wert von einem seiner Fall-Typen enthält. Die Fall-Typen lassen sich der Union implizit zuweisen, und ein `switch` darüber ist exhaustive, wenn jeder Fall-Typ einen Arm hat.",
+      "aliases": [
+        "Union-Typen"
+      ],
+      "related": [
+        "case-type",
+        "switch-expression",
+        "exhaustive"
+      ],
+      "lesson": "m12-l08",
+      "source": {
+        "title": "Union types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union"
+      }
+    },
+    {
+      "id": "case-type",
+      "term": "Case type",
+      "german": "Fall-Typ",
+      "category": "language",
+      "definition": "Einer der Typen in der Liste einer Union, zum Beispiel `Dog` und `Cat` in `union Pet(Dog, Cat)`. Ein Fall-Typ ist ein bestehender, unabhängiger Typ und erbt nicht von der Union.",
+      "aliases": [
+        "Fall-Typ",
+        "Fall-Typen",
+        "Case Type"
+      ],
+      "related": [
+        "union-type",
+        "type-pattern"
+      ],
+      "lesson": "m12-l08",
+      "source": {
+        "title": "Union types",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/builtin-types/union"
+      }
     }
   ]
 }

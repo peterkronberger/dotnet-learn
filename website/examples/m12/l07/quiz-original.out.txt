@@ -1,0 +1,3 @@
+Ticket { Number = 7, Status = open }
+Ticket { Number = 8, Status = open }
+Ticket { Number = 8, Status = closed }
