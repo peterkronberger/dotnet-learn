@@ -1,0 +1,192 @@
+---
+title: Gegenseitiger Ausschluss mit lock
+sidebar_position: 12
+description: Wie die lock-Anweisung einen kritischen Abschnitt schützt, warum man auf ein privates Sperrobjekt sperrt (seit C# 13 der Typ Lock), warum die Sperre auch bei einer Ausnahme frei wird und warum ein lock kurz sein muss und kein await enthalten darf.
+lesson_id: m13-l12
+duration_min: 24
+---
+
+import lockedCounter from '!!raw-loader!@site/examples/m13/l12/locked-counter.cs';
+import lockedCounterOutput from '!!raw-loader!@site/examples/m13/l12/locked-counter.out.txt';
+import lockException from '!!raw-loader!@site/examples/m13/l12/lock-exception.cs';
+import lockExceptionOutput from '!!raw-loader!@site/examples/m13/l12/lock-exception.out.txt';
+import lockTargets from '!!raw-loader!@site/examples/m13/l12/lock-targets.snippet.cs';
+import awaitInLock from '!!raw-loader!@site/examples/m13/l12/await-in-lock.snippet.cs';
+import unlockedRead from '!!raw-loader!@site/examples/m13/l12/unlocked-read.compile.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l12/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l12/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Gegenseitiger Ausschluss mit lock
+
+:::note[Lernziele]
+- Du kannst einen kritischen Abschnitt mit der `lock`-Anweisung schützen.
+- Du kannst ein passendes Sperrobjekt wählen (privat, eigens dafür angelegt, seit C# 13 der Typ `Lock`) und erklären, warum man nie auf öffentlich erreichbare Objekte sperrt.
+- Du kannst vorhersagen, dass ein `lock` auch bei einer Ausnahme freigegeben wird.
+- Du kannst erklären, warum ein `lock` kurz sein soll und kein `await` enthalten darf.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l11-q4" />
+
+<Quiz id="m13-l11-q2" />
+
+<Quiz id="m07-l04-q1" />
+
+## Die drei Schritte unteilbar machen
+
+In Lektion 11 ging bei `count++` ein Update verloren, weil ein anderer Thread zwischen Lesen, Addieren und Schreiben dazwischenkam. Die Lösung muss dafür sorgen, dass die drei Schritte für andere Threads wie ein einziger Schritt wirken: Solange ein Thread sie ausführt, darf kein anderer Thread dieselben Daten ändern. Das heißt <Term id="mutual-exclusion">gegenseitiger Ausschluss</Term> (Mutual exclusion). Der Codeabschnitt, der gemeinsame Daten ändert und deshalb nie von zwei Threads gleichzeitig laufen darf, heißt <Term id="critical-section">kritischer Abschnitt</Term> (Critical section).
+
+## Die lock-Anweisung
+
+Die <Term id="lock-statement">`lock`-Anweisung</Term> schützt einen kritischen Abschnitt. Sie nimmt die Sperre eines Objekts, führt den Block aus und gibt die Sperre danach frei. Solange ein Thread die Sperre hält, wartet jeder andere Thread, der dieselbe Sperre nehmen will. Höchstens ein Thread führt den Block gleichzeitig aus ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
+
+:::info[Vorhersage]
+Das ist der Zähler aus Lektion 11, nur mit `lock` um `count++`. Zwei Tasks addieren je 1000 Mal 1. Welche Zeile gibt das Programm aus, und ist sie in jedem Lauf gleich?
+:::
+
+<CodeBlock language="csharp" title="locked-counter.cs">{lockedCounter}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Sperrobjekt anlegen:** `countLock` ist das Objekt, dessen Sperre die Tasks nehmen. Es gehört zu `count`.
+2. **Kritischer Abschnitt:** `count++` steht in `lock (countLock)`. Wer dort ist, hat die Sperre. Alle anderen warten vor dem Block.
+3. **Auf beide warten:** `Task.WhenAll` wartet, bis beide Tasks fertig sind. Erst dann gibt das Programm `count` aus.
+
+Ein echter Lauf gibt <code>{lockedCounterOutput.trim()}</code> aus. Die Ausgabe ist in jedem Lauf gleich, weil kein Update mehr verloren geht.
+
+</details>
+
+<Quiz id="m13-l12-q1" />
+
+<Quiz id="m13-l12-q4" />
+
+## Das Sperrobjekt
+
+Die Sperre gehört zu einem Objekt, nicht zu der Variablen, die sie schützen soll. Alle Threads müssen dasselbe Objekt benutzen, sonst schließen sie sich nicht aus. Ein gutes Sperrobjekt ist privat und nur für diesen Zweck da. Seit C# 13 und .NET 9 ist dafür der Typ `System.Threading.Lock` gedacht. Er ist schneller als ein beliebiges Objekt als Sperre ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
+
+<Since csharp="13" dotnet="9" />
+
+Der Compiler erkennt, wenn die Sperre vom Typ `Lock` ist. Dann ruft er `EnterScope` auf und gibt die Sperre am Ende des Blocks frei. Bei jedem anderen Referenztyp, zum Beispiel `object`, benutzt er `Monitor`. `Monitor` ist die ältere Art der Sperre, du brauchst sie hier nur mit Namen zu kennen ([§13.13 The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1313-the-lock-statement)). Ein Wertetyp wie `int` ist als Sperrobjekt nicht erlaubt.
+
+Sperre nie auf Objekte, die auch anderer Code erreicht. Dann kann fremder Code dieselbe Sperre nehmen, und beide blockieren sich oder geraten in einen Deadlock ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)):
+
+<CodeBlock language="csharp" title="lock-targets.cs">{lockTargets}</CodeBlock>
+
+- `this` kann auch von außen gesperrt werden.
+- `typeof(Counter)` liefert ein `Type`-Objekt, das jeder Code erreicht.
+- Ein Text wie `"counter"` kann dasselbe Objekt sein wie ein gleicher Text an anderer Stelle.
+
+<Quiz id="m13-l12-q2" />
+
+## Die Sperre wird immer frei
+
+Hinter `lock` steckt ein `try`-`finally`. Die Sperre wird deshalb auf jedem Ausgang des Blocks freigegeben, auch wenn eine Ausnahme ihn verlässt (Lektion 4 von Modul 7). Ohne diese Garantie bliebe die Sperre für immer belegt, und alle anderen Threads würden ewig warten.
+
+:::info[Vorhersage]
+Im `lock`-Block wird eine Ausnahme geworfen. Ist die Sperre danach noch belegt? Was gibt das Programm aus?
+:::
+
+<CodeBlock language="csharp" title="lock-exception.cs">{lockException}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Ausnahme im Block:** `throw` verlässt den `lock`-Block.
+2. **Sperre frei:** Beim Verlassen gibt die Anweisung die Sperre frei, wie ein `finally`.
+3. **Zweites `lock`:** Es kommt sofort hinein, weil die Sperre frei ist.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{lockExceptionOutput.trim()}</code></pre>
+
+`IsHeldByCurrentThread` fragt, ob der aktuelle Thread die Sperre hält. Nach der Ausnahme ist die Antwort `False`.
+
+</details>
+
+<Quiz id="m13-l12-q3" />
+
+## Kurz halten, nie await
+
+Solange ein Thread im `lock` ist, warten alle anderen. Je länger der Block dauert, desto länger stehen die anderen. Deshalb gehört nur das in den `lock`, was gemeinsame Daten ändert: kurze Anweisungen wie `count++`. Langsame Arbeit wie Laden oder Rechnen gehört davor oder danach ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
+
+Ein `await` im Rumpf eines `lock` erlaubt der Compiler nicht:
+
+<CodeBlock language="csharp" title="await-in-lock.cs">{awaitInLock}</CodeBlock>
+
+Der Compiler meldet für dieses Programm `error CS1996: Cannot await in the body of a lock statement`. Die Regel hat zwei Gründe. Eine Sperre gehört einem Thread, und der Code nach einem `await` kann auf einem anderen Thread weiterlaufen ([Lock](https://learn.microsoft.com/dotnet/api/system.threading.lock)). Außerdem würde die Sperre während des Wartens gehalten, und alle anderen Threads müssten so lange warten.
+
+<Quiz id="m13-l12-q7" />
+
+## Die Sperre schützt nur, wer sie nimmt
+
+Ein `lock` schützt keine Variable. Er schließt nur Code aus, der dieselbe Sperre nimmt. Hier sind die Schreibzugriffe gesperrt, aber die Ausgabe liest `count` ohne Sperre:
+
+<CodeBlock language="csharp" title="unlocked-read.cs">{unlockedRead}</CodeBlock>
+
+Die Ausgabe `Current count` kann ein beliebiger Zwischenwert sein und ist nicht vorhersagbar. Der Lesezugriff nimmt die Sperre nicht, deshalb hält ihn der gesperrte Block nicht auf. Regel: Jeder Zugriff auf die gemeinsamen Daten, auch jedes Lesen, nimmt dieselbe Sperre.
+
+<Quiz id="m13-l12-q5" />
+
+<Quiz id="m13-l12-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt die Fehlschläge der Quellen auf dem Thread-Pool. Lektion 11 hat keinen Schritt, deshalb baut dieser auf Lektion 10 auf.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die Quellen `logSources` und die letzten Blöcke mit dem Ende des Programms. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:** Schreibe hinter den Block `// Count failures on the thread pool` und vor die Zeile `// End with exit code 0 …` den Block `// Count failures of all sources with a shared counter and a lock`. Er legt `Lock failureLock` und `int sharedFailures` an, startet für jede Quelle einen `Task.Run`-Arbeiter, der seine Zeilen durchgeht und bei jedem `login-failed` `sharedFailures` in `lock (failureLock)` erhöht, wartet mit `await Task.WhenAll(...)` auf beide und gibt `Shared failure count: 7` aus.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Gemeinsame Daten und Sperre:** `sharedFailures` ist der gemeinsame Zähler. `failureLock` gehört dazu.
+2. **Ein Arbeiter pro Quelle:** Jeder `Task.Run` geht die Zeilen seiner Quelle durch. Beide Arbeiter ändern denselben Zähler.
+3. **Kritischer Abschnitt:** Nur `sharedFailures++` steht im `lock`. Das Prüfen der Zeile liegt davor und bleibt kurz.
+4. **Auf alle warten:** Erst nach `Task.WhenAll` wird ausgegeben, deshalb ist das Ergebnis `7` in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog zählt Fehlschläge in mehreren Tasks mit einem gemeinsamen, gesperrten Zähler.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l12-lock-protects-unlocked-access" />
+
+**„Ein `lock` schützt die Daten auch dort, wo anderer Code sie ohne `lock` liest oder schreibt.“** Das stimmt nicht. Ein `lock` schließt nur Code aus, der dieselbe Sperre nimmt. Code, der die Daten ohne diese Sperre anfasst, wird nicht aufgehalten.
+:::
+
+<details>
+<summary>Vertiefung: Was der Compiler aus lock macht (optional)</summary>
+
+Ist das Sperrobjekt vom Typ `Lock`, ist `lock (x) { … }` gleichbedeutend mit `using (x.EnterScope()) { … }`. `EnterScope` gibt einen Wert zurück, dessen `Dispose` die Sperre freigibt. Bei jedem anderen Referenztyp steht dort ein `try` mit `Monitor.Enter` und im `finally` ein `Monitor.Exit` ([§13.13 The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1313-the-lock-statement)). Wirkt ein Ausdruck vom Typ `Lock` nur durch einen Cast als `object`, benutzt der Compiler `Monitor` und warnt davor ([The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)).
+
+</details>
+
+## Zusammenfassung
+
+Gegenseitiger Ausschluss sorgt dafür, dass höchstens ein Thread einen kritischen Abschnitt ausführt. Die `lock`-Anweisung nimmt die Sperre eines Objekts, führt den Block aus und gibt die Sperre auf jedem Ausgang frei, auch bei einer Ausnahme. Als Sperrobjekt dient ein privates, eigens angelegtes Objekt, seit C# 13 und .NET 9 vom Typ `Lock`, nie `this`, ein `Type` oder ein Text. Der Block bleibt kurz und enthält kein `await`. Ein `lock` schützt nur gegen Code, der dieselbe Sperre nimmt, deshalb läuft jeder Zugriff auf die gemeinsamen Daten durch dieselbe Sperre.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l12-q8" />
+
+### Transferfrage
+
+<Quiz id="m13-l12-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/lock)
+- Microsoft Learn: [System.Threading.Lock](https://learn.microsoft.com/dotnet/api/system.threading.lock)
+- C#-Spezifikation: [The lock statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1313-the-lock-statement)
