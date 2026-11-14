@@ -431,6 +431,127 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Eigenschaftsmuster statt einer Kette aus `!= null`, `&&` und `==` einsetzen?",
       "modelAnswer": "Ein Eigenschaftsmuster passt, wenn ein Objekt fehlen darf und du gleichzeitig mehrere Eigenschaften prüfst, zum Beispiel Log-Ereignisse mit einem bestimmten Typ und Benutzer oder Vorfälle mit mindestens fünf Fehlversuchen. Der Test steht in einem Ausdruck, und die Prüfung auf `null` ist schon dabei."
+    },
+    {
+      "id": "m12-l04-q1",
+      "lesson": "m12-l04",
+      "type": "single",
+      "question": "`Visit` ist ein Record `(string User, string Ip)`. Was ergibt `new Visit(\"bob\", \"203.0.113.7\") is (\"203.0.113.7\", \"bob\")`?",
+      "options": [
+        {
+          "text": "`False`, ohne Compilerfehler",
+          "correct": true,
+          "feedback": "Das erste Teilmuster wird mit `User` verglichen, das zweite mit `Ip`. Die vertauschten Werte passen nicht."
+        },
+        {
+          "text": "`True`, weil beide Werte im Objekt vorkommen",
+          "feedback": "Ein Positionsmuster sucht die Werte nicht irgendwo im Objekt. Es vergleicht den ersten Teil mit dem ersten Muster, den zweiten mit dem zweiten.",
+          "misconception": "m12-l04-positional-pattern-matches-by-name"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil die Reihenfolge falsch ist",
+          "feedback": "Beide Teile sind Texte, also ist die Vertauschung für den Compiler gültig. Genau das macht den Fehler schwer zu finden."
+        },
+        {
+          "text": "Eine Ausnahme zur Laufzeit",
+          "feedback": "Ein Muster löst bei einem Vergleich ohne Treffer keine Ausnahme aus."
+        }
+      ],
+      "explanation": "Ein Positionsmuster vergleicht nach der Position der `out`-Parameter von `Deconstruct`, nicht nach dem Namen der Eigenschaften. Zwei vertauschte Texte ergeben ein anderes Ergebnis, aber keinen Compilerfehler."
+    },
+    {
+      "id": "m12-l04-q2",
+      "lesson": "m12-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l04/quiz-swap.cs",
+      "explanation": "Das Muster `(_, \"bob\")` prüft nur den zweiten Teil, `Ip`. Beim ersten Eintrag ist `Ip` gleich `203.0.113.7`: `False`. Beim zweiten Eintrag steht `bob` in `Ip`: `True`. Beim dritten auch: `True`."
+    },
+    {
+      "id": "m12-l04-q3",
+      "lesson": "m12-l04",
+      "type": "cloze",
+      "question": "Ergänze das Verwerfen und die Konstante in den Mustern.",
+      "example": "m12/l04/gap-positional.cs",
+      "blanks": [
+        {
+          "text": "_",
+          "hint": "Der Benutzer ist egal. Dieses Zeichen nimmt jeden Wert an."
+        },
+        {
+          "text": "\"203.0.113.7\"",
+          "hint": "Ein Konstantenmuster für die Adresse, die an zweiter Position steht."
+        },
+        {
+          "text": "_",
+          "hint": "Von der Zerlegung wird nur der Name gebraucht."
+        }
+      ],
+      "explanation": "Der Unterstrich nimmt in einem Positionsmuster und in einer Zerlegung jeden Teil an, ohne ihn zu speichern. Die Position entscheidet, welcher Teil gemeint ist."
+    },
+    {
+      "id": "m12-l04-q4",
+      "lesson": "m12-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über `Deconstruct` und Positionsmuster stimmen?",
+      "options": [
+        {
+          "text": "`Deconstruct` hat `out`-Parameter und gibt `void` zurück.",
+          "correct": true
+        },
+        {
+          "text": "Ein Positionsmuster für ein Objekt braucht genauso viele Teilmuster wie `Deconstruct` `out`-Parameter hat.",
+          "correct": true
+        },
+        {
+          "text": "Ein Positionsmuster vergleicht die Teile nach den Namen der Eigenschaften.",
+          "feedback": "Es vergleicht nach der Position. Die Namen der Eigenschaften spielen keine Rolle.",
+          "misconception": "m12-l04-positional-pattern-matches-by-name"
+        },
+        {
+          "text": "Ein positionaler Record hat `Deconstruct` schon, ohne dass du es schreibst.",
+          "correct": true
+        }
+      ],
+      "explanation": "Der Compiler erzeugt `Deconstruct` für positionale Records. Bei anderen Typen schreibst du die Methode selbst. Positionsmuster und `var (a, b) = obj;` nutzen dieselbe Methode."
+    },
+    {
+      "id": "m12-l04-q5",
+      "lesson": "m12-l04",
+      "type": "find-bug",
+      "question": "Eine Zeile lässt sich nicht übersetzen (CS8129, keine passende `Deconstruct`-Methode). Welche?",
+      "example": "m12/l04/quiz-count.snippet.cs",
+      "bugLines": [
+        3
+      ],
+      "lineFeedback": {
+        "3": {
+          "feedback": "`Visit` zerlegt sich in zwei Teile, hier stehen drei Variablen."
+        }
+      },
+      "explanation": "Die Zahl der Variablen oder Teilmuster muss zur Zahl der `out`-Parameter von `Deconstruct` passen."
+    },
+    {
+      "id": "m12-l04-q6",
+      "lesson": "m12-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m12/l04/quiz-var-parts.cs",
+      "explanation": "`var user` und `var ip` nehmen jeden Wert an, auch `null`. Bei bob ist die Adresse nicht `null`: `False`. Bei dave ist sie `null`, und das Muster passt trotzdem: `True`."
+    },
+    {
+      "id": "m12-l04-q7",
+      "lesson": "m12-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Positionsmuster prüft und woher es die Teile des Objekts bekommt.",
+      "modelAnswer": "Ein Positionsmuster zerlegt den Wert in Teile und vergleicht jeden Teil mit dem Teilmuster an derselben Position. Bei einem Tupel sind die Teile die Elemente, bei anderen Typen liefert die `Deconstruct`-Methode sie über ihre `out`-Parameter. Positionale Records haben diese Methode automatisch.\n\nDie Namen der Eigenschaften spielen keine Rolle, nur die Reihenfolge. Zwei vertauschte Werte vom selben Typ ergeben also ein anderes Ergebnis, ohne dass der Compiler meldet."
+    },
+    {
+      "id": "m12-l04-q8",
+      "lesson": "m12-l04",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in einem eigenen Programm ein Positionsmuster statt eines Eigenschaftsmusters einsetzen, und wo nicht?",
+      "modelAnswer": "Ein Positionsmuster passt, wenn die Reihenfolge der Teile schon die Bedeutung trägt und es wenige Teile gibt, zum Beispiel bei einem Tupel aus Benutzer und Adresse oder bei einem kleinen Record. Bei vielen Teilen oder gleichartigen Werten ist ein Eigenschaftsmuster besser, weil die Namen den Test erklären und eine Vertauschung auffällt."
     }
   ]
 }

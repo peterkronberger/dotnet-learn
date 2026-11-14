@@ -1,0 +1,188 @@
+---
+title: Dekonstruktion und Positionsmuster
+sidebar_position: 4
+description: Eine Deconstruct-Methode zerlegt ein Objekt in Teile. Ein Positionsmuster nutzt dieselbe Methode (oder die Tupel-Elemente) und vergleicht die Teile nach ihrer Position. Das var-Muster und _ nehmen jeden Teil an.
+lesson_id: m12-l04
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import deconstructMethod from '!!raw-loader!@site/examples/m12/l04/deconstruct-method.cs';
+import deconstructMethodOutput from '!!raw-loader!@site/examples/m12/l04/deconstruct-method.out.txt';
+import positionalPatterns from '!!raw-loader!@site/examples/m12/l04/positional-patterns.cs';
+import positionalPatternsOutput from '!!raw-loader!@site/examples/m12/l04/positional-patterns.out.txt';
+import byPosition from '!!raw-loader!@site/examples/m12/l04/by-position.cs';
+import byPositionOutput from '!!raw-loader!@site/examples/m12/l04/by-position.out.txt';
+import wrongCount from '!!raw-loader!@site/examples/m12/l04/wrong-count.snippet.cs';
+import projectTask from '!!raw-loader!@site/examples/m12/l04/seclog-patterns-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m12/l04/seclog-patterns-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m12/l04/seclog-patterns-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m12/l04/seclog-patterns-solution.cs';
+
+# Dekonstruktion und Positionsmuster
+
+:::note[Lernziele]
+- Du kannst eine `Deconstruct`-Methode schreiben und ein Objekt mit `var (a, b) = obj;` zerlegen.
+- Du kannst mit einem Positionsmuster die Teile eines Records, eines Tupels oder eines Objekts mit `Deconstruct` prüfen.
+- Du kannst das `var`-Muster und `_` in einem Positionsmuster einsetzen.
+- Du kannst erklären, dass ein Positionsmuster nach der Position und nicht nach dem Namen vergleicht.
+:::
+
+## Rückblick
+
+<Quiz id="m03-l09-q1" />
+
+<Quiz id="m08-l10-q1" />
+
+<Quiz id="m12-l03-q1" />
+
+## Ein Objekt in Teile zerlegen
+
+In Modul 3 hast du ein Tupel zerlegt: `var (user, ip) = ReadUserAndIp(line);`. Ein positionaler Record zerlegt sich genauso, das hast du in Lektion „Records“ gesehen. Dasselbe geht für jeden eigenen Typ. Du brauchst dafür eine <Term id="deconstruct-method">Deconstruct-Methode</Term> (Deconstruct Method): eine Methode namens `Deconstruct` mit Rückgabetyp `void`, die jeden Teil über einen `out`-Parameter zurückgibt. Der Compiler ruft sie bei `var (a, b) = obj;` auf ([§12.7 Deconstruction](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#127-deconstruction)).
+
+Die Variablen links stehen in derselben Reihenfolge wie die `out`-Parameter. Mit `_` ignorierst du einen Teil (Discard, Verwerfen), und die Anzahl der Variablen muss zur Anzahl der `out`-Parameter passen. Ein Typ darf mehrere `Deconstruct`-Methoden mit verschiedener Anzahl von Parametern haben. Für einen Typ, den du nicht ändern kannst, geht auch eine Erweiterungsmethode namens `Deconstruct` (siehe Lektion „Erweiterungsmethoden“, `m11-l01`).
+
+:::info[Vorhersage]
+Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l04-deconstruct" code={deconstructMethod} predict expected={deconstructMethodOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Methode aufrufen:** `var (user, ip) = login;` ruft `Deconstruct` auf. `user` bekommt den ersten `out`-Wert, `ip` den zweiten.
+2. **Ausgabe:** `bob from 203.0.113.7`.
+3. **Teil ignorieren:** `var (onlyUser, _) = login;` behält nur den ersten Teil. Die Ausgabe ist `bob`.
+
+Was passiert, wenn du `var (user, ip, port) = login;` schreibst? Der Compiler meldet einen Fehler, weil `Deconstruct` nur zwei `out`-Parameter hat.
+
+</details>
+
+## Positionsmuster
+
+Ein <Term id="positional-pattern">Positionsmuster</Term> (Positional Pattern) steht in runden Klammern: `visit is ("bob", "203.0.113.7")`. Es prüft zuerst, dass der Wert nicht `null` ist, zerlegt ihn dann und vergleicht jeden Teil mit dem Teilmuster an derselben Position. Die Teile kommen aus einem Tupel (seine Elemente) oder aus der `Deconstruct`-Methode des Typs. Ein positionaler Record hat diese Methode automatisch ([§11.2.5 Positional pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1125-positional-pattern)).
+
+Die Teilmuster sind beliebige Muster: Konstanten, relationale Muster, `not` und so weiter. Die Zahl der Teilmuster muss zur Zahl der `out`-Parameter (oder der Tupel-Elemente) passen, sonst meldet der Compiler einen Fehler.
+
+Zwei Muster nehmen jeden Teil an. Das <Term id="discard">Verwerfen</Term> `_` ignoriert den Teil. Das <Term id="var-pattern">var-Muster</Term> (Var Pattern) `var name` nimmt ihn an und legt ihn in einer neuen Variablen ab, auch wenn er `null` ist ([§11.2.4 Var pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1124-var-pattern)). `var (a, b)` ist die Kurzform für `(var a, var b)`.
+
+:::info[Vorhersage]
+Die erste Schleife schreibt pro Besuch zwei Werte: ob der Besuch von `203.0.113.7` kam und ob der Benutzer `bob` ist. Danach stehen zwei Tests für ein Tupel. Was gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l04-positional" code={positionalPatterns} predict expected={positionalPatternsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Adresse prüfen:** `(_, "203.0.113.7")` ignoriert den Benutzer und vergleicht nur die Adresse. Das trifft die ersten beiden Besuche.
+2. **Benutzer prüfen:** `("bob", var ip)` trifft die Besuche von `bob`, das sind der erste und der dritte. `var ip` nimmt jede Adresse an.
+3. **Ausgabe der Schleife:** `True True`, `True False`, `False True`.
+4. **Tupel:** `("bob", >= 3)` passt, weil `bob` und 5 stimmen: `True`. `(not "bob", _)` passt nicht, weil der Name `bob` ist: `False`.
+
+</details>
+
+Namen sind erlaubt, aber nicht nötig. `visit is (User: "bob", Ip: _)` schreibt die Namen der Parameter dazu, und der Compiler prüft, dass sie an dieser Position stehen. Ohne Namen zählt nur die Reihenfolge.
+
+## Was nicht geht
+
+Die Zahl der Teilmuster muss zur Zahl der `out`-Parameter passen. `Visit` hat zwei Teile, das Muster nennt drei:
+
+<CodeBlock language="csharp" title="wrong-count.snippet.cs">{wrongCount}</CodeBlock>
+
+Der Compiler meldet `error CS8129: No suitable 'Deconstruct' instance or extension method was found for type 'Visit', with 3 out parameters and a void return type.` für Zeile 2.
+
+In der folgenden Aufgabe suchst du die Zeile mit der falschen Anzahl:
+
+<Quiz id="m12-l04-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog findet Ereignisse und Vorfälle mit Eigenschaftsmustern. `ReadUserAndIp(line)` liefert Benutzer und Adresse einer Zeile als Tupel, und `ToSecurityEvent(e)` macht aus einem `LogEvent` einen `SecurityEvent` (einen positionalen Record).
+
+Im Runner siehst du nur die Stelle vor `// End with exit code 0 …` und den Anfang der Klasse `LogEvent` bis zur Methode `Describe()`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in die Klasse `LogEvent` direkt nach `Describe()` die Methode `public void Deconstruct(out DateTimeOffset timestamp, out string eventType, out string? user)`. Sie gibt `Timestamp`, `EventType` und `User` zurück. Schreibe einen XML-Kommentar dazu wie bei den anderen Mitgliedern.
+2. Schreibe vor die Zeile `// End with exit code 0 …` den Block `// Split events with Deconstruct and positional patterns`. Er zerlegt `logEvents[1]` mit `var (…, …, …) = …;` und gibt die drei Teile als `Time: …` (Format `yyyy-MM-dd HH:mm`), `Type: …` und `User: …` aus.
+3. Zähle die Zeilen von `sampleLog`, für die `ReadUserAndIp(line) is (_, "203.0.113.7")` gilt, und gib `Lines from 203.0.113.7: …` aus.
+4. Zähle die Ereignisse in `logEvents`, für die `ToSecurityEvent(e) is (_, EventType.LoginFailed, var who) && who is not null` gilt, und gib `Failed logins with a user: …` aus.
+
+<CSharpRunner id="m12-l04-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-patterns-solution.cs" />
+
+1. **Methode schreiben:** `Deconstruct` hat drei `out`-Parameter und weist jeden zu. Die Reihenfolge legt fest, wie Zerlegung und Positionsmuster die Teile lesen.
+2. **Zerlegen:** `var (time, type, user) = logEvents[1];` nimmt die drei Werte in dieser Reihenfolge.
+3. **Tupel prüfen:** `(_, "203.0.113.7")` ignoriert den Benutzer und vergleicht die Adresse.
+4. **Record prüfen:** `EventType.LoginFailed` ist das Konstantenmuster für den zweiten Teil, `var who` nimmt den Benutzer an, und `who is not null` schließt Ereignisse ohne Benutzer aus.
+
+</details>
+
+**Neuer Stand:** SecLog zerlegt Ereignisse mit `Deconstruct` und prüft Teile von Tupeln und Records nach ihrer Position.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m12-l04-positional-pattern-matches-by-name" />
+
+**„Ein Positionsmuster vergleicht die Werte nach dem Namen der Eigenschaften.“** Das stimmt nicht. Die Teilmuster werden nach der Position mit den `out`-Parametern von `Deconstruct` (oder den Tupel-Elementen) verglichen. Vertauschst du zwei Texte, gibt es keinen Compilerfehler, aber ein anderes Ergebnis. Willst du Namen im Muster sehen, schreibe `(User: "bob", Ip: _)` oder nimm ein Eigenschaftsmuster.
+:::
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m12-l04-by-position" code={byPosition} predict expected={byPositionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Richtige Reihenfolge:** `("bob", "203.0.113.7")` passt: `True`.
+2. **Vertauscht:** `("203.0.113.7", "bob")` vergleicht `User` mit der Adresse. Das passt nicht: `False`.
+3. **Mit Namen:** `(User: "bob", Ip: "203.0.113.7")` passt: `True`. Die Namen sind nur eine geprüfte Hilfe.
+4. **Zwei Verwerfen:** `(_, _)` passt auf jeden Wert, der nicht `null` ist: `True`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wie der Compiler die Teile bestimmt (optional)</summary>
+
+Ein Positionsmuster liest die Teile auf einem von drei Wegen: als Elemente eines Tupels, über eine `Deconstruct`-Methode mit passend vielen `out`-Parametern oder über die Schnittstelle `ITuple`. Steht vor den Klammern ein Typ, dann prüft das Muster zusätzlich den Laufzeittyp ([§11.2.5 Positional pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1125-positional-pattern)). Die Reihenfolge, in der die Teilmuster geprüft werden, ist nicht festgelegt.
+
+</details>
+
+## Zusammenfassung
+
+Eine `Deconstruct`-Methode mit `out`-Parametern legt fest, in welche Teile ein Objekt zerfällt, bei `var (a, b) = obj;` und bei einem Positionsmuster. Ein Positionsmuster `(p1, p2, …)` prüft zuerst auf `null` und vergleicht jeden Teil nach seiner Position mit einem Teilmuster. Das `var`-Muster und `_` nehmen jeden Teil an, `var` legt ihn dabei in einer Variablen ab. Die Namen der Eigenschaften zählen nicht, und die Zahl der Teilmuster muss zur Zahl der `out`-Parameter passen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m12-l04-q1" />
+
+<Quiz id="m12-l04-q2" />
+
+<Quiz id="m12-l04-q3" />
+
+<Quiz id="m12-l04-q4" />
+
+<Quiz id="m12-l04-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m12-l04-q7" />
+
+### Transferfrage
+
+<Quiz id="m12-l04-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [§11.2.5 Positional pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1125-positional-pattern)
+- Microsoft Learn: [§12.7 Deconstruction](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#127-deconstruction)
+- Microsoft Learn: [Tupel und andere Typen zerlegen](https://learn.microsoft.com/dotnet/csharp/fundamentals/patterns/deconstruct)

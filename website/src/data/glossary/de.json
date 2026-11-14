@@ -7495,7 +7495,6 @@
       "category": "language",
       "definition": "Eine Methode namens `Deconstruct` mit `out`-Parametern und Rückgabetyp `void`. Sie legt fest, in welche Teile ein Objekt zerlegt wird, sowohl bei `var (a, b) = obj;` als auch in einem Positionsmuster.",
       "aliases": [
-        "Deconstruct",
         "Dekonstruktionsmethode"
       ],
       "related": [
