@@ -1,0 +1,177 @@
+---
+title: Atomare Operationen und Sichtbarkeit
+sidebar_position: 14
+description: Wie Interlocked einfache Zähler und Austauschvorgänge ohne lock atomar macht, warum ein Thread den Schreibzugriff eines anderen ohne Synchronisierung zu spät oder in anderer Reihenfolge sehen kann und warum volatile keinen lock ersetzt.
+lesson_id: m13-l14
+duration_min: 24
+---
+
+import interlockedCounter from '!!raw-loader!@site/examples/m13/l14/interlocked-counter.cs';
+import interlockedCounterOutput from '!!raw-loader!@site/examples/m13/l14/interlocked-counter.out.txt';
+import exchangeCompare from '!!raw-loader!@site/examples/m13/l14/exchange-compare.cs';
+import exchangeCompareOutput from '!!raw-loader!@site/examples/m13/l14/exchange-compare.out.txt';
+import staleFlag from '!!raw-loader!@site/examples/m13/l14/stale-flag.compile.cs';
+import volatileCounter from '!!raw-loader!@site/examples/m13/l14/volatile-counter.compile.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l14/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l14/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Atomare Operationen und Sichtbarkeit
+
+:::note[Lernziele]
+- Du kannst einen gemeinsamen Zähler mit `Interlocked.Increment` ohne `lock` sicher erhöhen.
+- Du kannst `Interlocked.Exchange` und `CompareExchange` in einfachen Fällen lesen.
+- Du kannst in eigenen Worten erklären, warum ein Thread den Schreibzugriff eines anderen ohne Synchronisierung zu spät oder in anderer Reihenfolge sehen kann.
+- Du kannst erklären, warum `volatile` keinen `lock` ersetzt.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l11-q2" />
+
+<Quiz id="m13-l12-q5" />
+
+<Quiz id="m13-l13-q5" />
+
+## Ein kleineres Werkzeug als der lock
+
+Der `lock` aus Lektion 12 schützt jeden Abschnitt. Für ein einzelnes `count++` ist er aber viel Aufwand: Sperre nehmen, eine Zeile ausführen, Sperre freigeben, und alle anderen Threads warten dazwischen. Gibt es ein kleineres Werkzeug für genau diesen Fall?
+
+Ja. Die Klasse `Interlocked` bietet Operationen, die für andere Threads unteilbar sind. Eine solche Operation heißt <Term id="atomic-operation">atomare Operation</Term> (Atomic operation): Sie läuft ganz oder gar nicht, und kein anderer Thread sieht einen Zwischenzustand. `Interlocked.Increment` liest, addiert und speichert in einem einzigen Schritt. Damit kann das verlorene Update aus Lektion 11 nicht mehr auftreten ([Interlocked](https://learn.microsoft.com/dotnet/api/system.threading.interlocked)).
+
+:::info[Vorhersage]
+Das ist der Zähler aus Lektion 12, nur mit `Interlocked.Increment` statt `lock`. Zwei Tasks addieren je 1000 Mal 1. Welche Zeile gibt das Programm aus, und ist sie in jedem Lauf gleich?
+:::
+
+<CodeBlock language="csharp" title="interlocked-counter.cs">{interlockedCounter}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zähler anlegen:** `count` ist die gemeinsame Variable. Es gibt kein Sperrobjekt.
+2. **Atomar erhöhen:** `Interlocked.Increment(ref count)` erhöht `count` um 1 als einen Schritt. `ref` übergibt die Variable selbst, nicht eine Kopie, damit die Methode sie ändern kann.
+3. **Auf beide warten:** `Task.WhenAll` wartet, bis beide Tasks fertig sind. Erst dann gibt das Programm `count` aus.
+
+Ein echter Lauf gibt <code>{interlockedCounterOutput.trim()}</code> aus. Die Ausgabe ist in jedem Lauf gleich, weil kein Update verloren geht.
+
+</details>
+
+<Quiz id="m13-l14-q1" />
+
+<Quiz id="m13-l14-q2" />
+
+Für größere Schritte gibt es `Interlocked.Add`. Es addiert eine beliebige ganze Zahl atomar. Für einfache Zustandsänderungen ist `Interlocked` die empfohlene Wahl statt `lock`, weil es schneller ist ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)). Das gilt nur für einzelne Variablen. Ändert ein Ablauf mehrere Variablen zusammen, braucht er weiter einen `lock`, denn mehrere atomare Aufrufe hintereinander sind zusammen nicht atomar.
+
+## Exchange und CompareExchange lesen
+
+Zwei weitere Operationen von `Interlocked` tauschen Werte atomar. `Exchange` setzt eine Variable auf einen neuen Wert und gibt den alten zurück. `CompareExchange` vergleicht zuerst: Ist der Wert der Variablen gleich dem Vergleichswert, setzt es den neuen Wert. Sonst ändert es nichts. In beiden Fällen gibt es den Wert zurück, der vorher in der Variablen stand ([Interlocked](https://learn.microsoft.com/dotnet/api/system.threading.interlocked)). Vergleichen und Setzen laufen dabei als ein Schritt, sodass kein anderer Thread dazwischenkommt.
+
+:::info[Vorhersage]
+Das Programm läuft auf einem Thread, damit du nur lesen musst, was die Aufrufe zurückgeben. Welche Zeilen gibt es aus?
+:::
+
+<CodeBlock language="csharp" title="exchange-compare.cs">{exchangeCompare}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Exchange:** `state` ist 5. `Exchange` setzt 9 und gibt den alten Wert 5 zurück.
+2. **CompareExchange mit Treffer:** `state` ist 9, der Vergleichswert ist 9. Es passt, deshalb wird 12 gespeichert. Zurück kommt der alte Wert 9.
+3. **CompareExchange ohne Treffer:** `state` ist 12, der Vergleichswert ist 9. Es passt nicht, `state` bleibt 12. Zurück kommt 12.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{exchangeCompareOutput.trim()}</code></pre>
+
+</details>
+
+<Quiz id="m13-l14-q3" />
+
+## Der Schreibzugriff eines Threads kommt spät oder anders an
+
+Bisher ging es darum, dass ein anderer Thread zwischen zwei Schritten dazwischenkommt. Es gibt ein zweites Problem, das auch ohne Zwischenschritte auftritt. Compiler, Laufzeit und Hardware dürfen Zugriffe auf den Speicher umordnen oder Werte zwischenspeichern, solange der ausführende Thread davon nichts merkt. Ohne Synchronisierung wie `lock` können deshalb unerwartete und unvorhersehbare Ergebnisse entstehen ([§15.5.4 Volatile fields](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields)). In Lektion 9 hast du gesehen, dass die Reihenfolge von Schritten zwischen Threads nicht festgelegt ist. Hier geht es darum, was ein Thread vom Schreiben eines anderen sieht.
+
+Die Regeln dafür heißen <Term id="memory-model">Speichermodell</Term> (Memory model). Die Frage, ob und wann ein Thread den Schreibzugriff eines anderen sieht, heißt <Term id="visibility">Sichtbarkeit</Term> (Visibility). Ein Beispiel in einer Tabelle: Thread A schreibt zuerst `data = 42`, dann `ready = true`. Thread B wartet auf `ready` und liest dann `data`.
+
+| Schritt | Thread A | Thread B | Was B sieht |
+| --- | --- | --- | --- |
+| 1 | schreibt `data = 42` | | |
+| 2 | schreibt `ready = true` | | |
+| 3 | | liest `ready` | `true` |
+| 4 | | liest `data` | möglicherweise noch `0` |
+
+Die Tabelle ist von Hand nachvollzogen, nicht von CI erzeugt. In Schritt 4 liest B einen alten Wert, wenn ein Schreibzugriff von A bei B später ankommt oder in anderer Reihenfolge. Jeder Thread sieht seine eigenen Schreibzugriffe in der richtigen Reihenfolge. Andere Threads sehen sie nur dann verlässlich so, wenn eine Synchronisierung sie ordnet.
+
+Auch eine Schleife, die auf ein Flag wartet, kann davon betroffen sein. Das Programm kann ewig laufen, weil der Worker den neuen Wert von `Stop` nie sieht:
+
+<CodeBlock language="csharp" title="stale-flag.cs">{staleFlag}</CodeBlock>
+
+<Quiz id="m13-l14-q4" />
+
+## volatile ist nur ein Hinweis, kein Ersatz für lock
+
+Das Schlüsselwort `volatile` auf einem Feld schränkt solche Umordnungen ein. Ein Lesen eines `volatile`-Felds hat Acquire-Semantik: Es geschieht vor allen Speicherzugriffen, die in der Anweisungsfolge danach stehen. Ein Schreiben hat Release-Semantik: Es geschieht nach allen Speicherzugriffen davor. Ein <Term id="volatile-field">`volatile`-Feld</Term> garantiert aber keine einheitliche Gesamtreihenfolge aller Schreibzugriffe für alle Threads ([§15.5.4 Volatile fields](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields)).
+
+Wichtig ist, was `volatile` nicht tut. Es macht nur einzelne Lese- und Schreibzugriffe eines Felds geordneter. Es macht keine Operation atomar, die mehrere Schritte hat, und verhindert keine Race Condition ([volatile](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/volatile)). Wer `count++` auf einem `volatile`-Feld schreibt, hat weiter Lesen, Addieren und Schreiben als drei Schritte:
+
+<CodeBlock language="csharp" title="volatile-counter.cs">{volatileCounter}</CodeBlock>
+
+Der Endwert kann kleiner als 2000 sein, wie in Lektion 11. Das Schlüsselwort wird oft missverstanden. Für die meisten Fälle sind `Interlocked`, `lock` oder höhere Werkzeuge die sichereren Mittel. In diesem Kurs ist `volatile` nur ein Begriff und eine Warnung: Du liest es, wenn du es siehst, aber du setzt es nicht ein, um ein Update zu sichern.
+
+<Quiz id="m13-l14-q5" />
+
+<Quiz id="m13-l14-q6" />
+
+<Quiz id="m13-l14-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt die Fehlschläge aller Quellen mit einem gemeinsamen Zähler und einem `lock`. Lektion 13 hat keinen Schritt, deshalb baut dieser auf Lektion 12 auf.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die Quellen `logSources` und die letzten Blöcke mit dem Ende des Programms. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:** Schreibe hinter den Block `// Count failures of all sources with a shared counter and a lock` und vor die Zeile `// End with exit code 0 …` den Block `// Count failures with an atomic operation`. Er legt `int atomicFailures` an, startet dieselben zwei Arbeiter wie im Block davor, erhöht aber bei jedem `login-failed` mit `Interlocked.Increment(ref atomicFailures)` ohne `lock`, wartet mit `await Task.WhenAll(...)` auf beide und gibt `Atomic failure count: 7` aus. Der Block mit dem `lock` bleibt unverändert.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Gemeinsame Daten:** `atomicFailures` ist der gemeinsame Zähler. Ein Sperrobjekt gibt es nicht.
+2. **Ein Arbeiter pro Quelle:** Jeder `Task.Run` geht die Zeilen seiner Quelle durch, wie im Block mit dem `lock`.
+3. **Atomarer Schritt:** `Interlocked.Increment(ref atomicFailures)` ersetzt `lock` und `++`. Das Prüfen der Zeile liegt davor.
+4. **Auf alle warten:** Erst nach `Task.WhenAll` wird ausgegeben, deshalb ist das Ergebnis `7` in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog zählt Fehlschläge in mehreren Tasks auch mit einer atomaren Operation, ohne Sperre.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l14-volatile-makes-thread-safe" />
+
+**„Mit `volatile` ist ein Feld thread-sicher, ich brauche keinen `lock`.“** Das stimmt nicht. `volatile` betrifft nur Reihenfolge und Sichtbarkeit einzelner Lese- und Schreibzugriffe eines Felds. Ein Ablauf aus Lesen, Ändern und Schreiben wie `count++` braucht weiter `Interlocked` oder einen `lock`.
+:::
+
+## Zusammenfassung
+
+`Interlocked` macht einfache Änderungen einer einzelnen Variablen atomar: `Increment` und `Add` zählen hoch, `Exchange` setzt einen Wert und gibt den alten zurück, `CompareExchange` setzt ihn nur, wenn der alte Wert passt. Das ist schneller als ein `lock`, gilt aber nur für eine Variable. Ohne Synchronisierung kann ein Thread den Schreibzugriff eines anderen zu spät oder in anderer Reihenfolge sehen, weil Compiler, Laufzeit und Hardware Zugriffe umordnen dürfen. `volatile` schränkt das für einzelne Zugriffe ein, macht aber kein `++` atomar und ersetzt keinen `lock`.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l14-q8" />
+
+### Transferfrage
+
+<Quiz id="m13-l14-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Interlocked](https://learn.microsoft.com/dotnet/api/system.threading.interlocked)
+- Microsoft Learn: [Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)
+- C#-Spezifikation: [Volatile fields](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields)

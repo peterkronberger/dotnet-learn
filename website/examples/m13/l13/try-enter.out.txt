@@ -1,0 +1,2 @@
+Second thread got the lock: False
+Timeout: the lock was not free within 50 ms
