@@ -1,0 +1,2 @@
+Level: warn
+Static constructor runs: 1

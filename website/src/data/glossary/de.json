@@ -8774,6 +8774,167 @@
         "title": "Volatile fields (C# specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1554-volatile-fields"
       }
+    },
+    {
+      "id": "thread-safety",
+      "term": "Thread safety",
+      "german": "Thread-Sicherheit",
+      "category": "platform",
+      "definition": "Eigenschaft von Code oder einem Typ: Er arbeitet richtig, wenn mehrere Threads ihn gleichzeitig benutzen. Ob ein Typ threadsicher ist, steht in seiner Dokumentation.",
+      "aliases": [
+        "threadsicher",
+        "thread-safe",
+        "thread safe"
+      ],
+      "related": [
+        "race-condition",
+        "confinement",
+        "concurrent-collection"
+      ],
+      "lesson": "m13-l15",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "confinement",
+      "term": "Confinement",
+      "german": "Beschränkung auf einen Thread",
+      "category": "platform",
+      "definition": "Eine Strategie für Thread-Sicherheit: Jeder Arbeiter bekommt seine eigenen Daten, andere Threads greifen nicht darauf zu. Die Ergebnisse werden am Ende zusammengeführt.",
+      "aliases": [
+        "Thread-Confinement"
+      ],
+      "related": [
+        "thread-safety",
+        "immutable"
+      ],
+      "lesson": "m13-l15",
+      "source": {
+        "title": "Managed threading best practices",
+        "url": "https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices"
+      }
+    },
+    {
+      "id": "concurrent-collection",
+      "term": "Concurrent collection",
+      "german": "threadsichere Sammlung",
+      "category": "platform",
+      "definition": "Eine Sammlung aus `System.Collections.Concurrent`, zum Beispiel `ConcurrentDictionary<TKey,TValue>`. Mehrere Threads dürfen gleichzeitig hinzufügen und entfernen, ohne eigene Synchronisierung.",
+      "aliases": [
+        "Concurrent collections",
+        "ConcurrentDictionary",
+        "threadsichere Sammlungen"
+      ],
+      "related": [
+        "thread-safety",
+        "race-condition"
+      ],
+      "lesson": "m13-l15",
+      "source": {
+        "title": "Thread-safe collections",
+        "url": "https://learn.microsoft.com/dotnet/standard/collections/thread-safe/"
+      }
+    },
+    {
+      "id": "data-parallelism",
+      "term": "Data parallelism",
+      "german": "Datenparallelität",
+      "category": "platform",
+      "definition": "Dieselbe Operation läuft gleichzeitig auf vielen Elementen einer Sammlung. Die Sammlung wird in Teile zerlegt, die auf mehreren Threads laufen.",
+      "aliases": [
+        "Datenparallelität"
+      ],
+      "related": [
+        "parallel-loop",
+        "plinq",
+        "degree-of-parallelism"
+      ],
+      "lesson": "m13-l16",
+      "source": {
+        "title": "Data parallelism (Task Parallel Library)",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/data-parallelism-task-parallel-library"
+      }
+    },
+    {
+      "id": "parallel-loop",
+      "term": "Parallel loop",
+      "german": "parallele Schleife",
+      "category": "platform",
+      "definition": "Eine Schleife, die `Parallel.For` oder `Parallel.ForEach` ausführt. Die Durchläufe können gleichzeitig laufen, müssen es aber nicht, und ihre Reihenfolge ist nicht festgelegt.",
+      "aliases": [
+        "Parallel.For",
+        "Parallel.ForEach",
+        "parallele Schleifen"
+      ],
+      "related": [
+        "data-parallelism",
+        "degree-of-parallelism"
+      ],
+      "lesson": "m13-l16",
+      "source": {
+        "title": "Data parallelism (Task Parallel Library)",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/data-parallelism-task-parallel-library"
+      }
+    },
+    {
+      "id": "plinq",
+      "term": "PLINQ",
+      "category": "platform",
+      "definition": "Parallel LINQ: Eine LINQ-Abfrage läuft mit `AsParallel` auf mehreren Threads. Ohne `AsOrdered` ist die Reihenfolge der Ergebnisse nicht festgelegt.",
+      "aliases": [
+        "Parallel LINQ",
+        "AsParallel"
+      ],
+      "related": [
+        "data-parallelism",
+        "degree-of-parallelism"
+      ],
+      "lesson": "m13-l16",
+      "source": {
+        "title": "Introduction to PLINQ",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/introduction-to-plinq"
+      }
+    },
+    {
+      "id": "degree-of-parallelism",
+      "term": "Degree of parallelism",
+      "german": "Grad der Parallelität",
+      "category": "platform",
+      "definition": "Die höchste Anzahl von Arbeitsteilen, die gleichzeitig laufen dürfen. Bei `Parallel` stellt man sie mit `MaxDegreeOfParallelism` ein, bei PLINQ mit `WithDegreeOfParallelism`.",
+      "aliases": [
+        "MaxDegreeOfParallelism",
+        "WithDegreeOfParallelism"
+      ],
+      "related": [
+        "parallel-loop",
+        "plinq"
+      ],
+      "lesson": "m13-l16",
+      "source": {
+        "title": "Introduction to PLINQ",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/introduction-to-plinq"
+      }
+    },
+    {
+      "id": "speedup",
+      "term": "Speedup",
+      "german": "Beschleunigung",
+      "category": "platform",
+      "definition": "Wie viel schneller ein paralleles Programm gegenüber dem seriellen ist. Der serielle Anteil, der Aufwand fürs Aufteilen und die Zahl der Kerne begrenzen sie.",
+      "aliases": [
+        "Beschleunigung"
+      ],
+      "related": [
+        "data-parallelism",
+        "plinq"
+      ],
+      "lesson": "m13-l16",
+      "source": {
+        "title": "Understanding speedup in PLINQ",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/understanding-speedup-in-plinq"
+      }
     }
   ]
 }

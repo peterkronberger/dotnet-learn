@@ -1,0 +1,219 @@
+---
+title: Datenparallelität
+sidebar_position: 16
+description: Dieselbe Operation auf vielen Elementen gleichzeitig mit Parallel.For, Parallel.ForEach, Parallel.ForEachAsync und PLINQ. Aufwand, die Grenze durch den seriellen Anteil, Reihenfolge der Ergebnisse und Nebeneffekte.
+lesson_id: m13-l16
+duration_min: 25
+---
+
+import parallelFor from '!!raw-loader!@site/examples/m13/l16/parallel-for.cs';
+import parallelForOutput from '!!raw-loader!@site/examples/m13/l16/parallel-for.out.txt';
+import parallelForeach from '!!raw-loader!@site/examples/m13/l16/parallel-foreach.cs';
+import parallelForeachOutput from '!!raw-loader!@site/examples/m13/l16/parallel-foreach.out.txt';
+import foreachAsync from '!!raw-loader!@site/examples/m13/l16/foreach-async.cs';
+import foreachAsyncOutput from '!!raw-loader!@site/examples/m13/l16/foreach-async.out.txt';
+import plinqOrdered from '!!raw-loader!@site/examples/m13/l16/plinq-ordered.cs';
+import plinqOrderedOutput from '!!raw-loader!@site/examples/m13/l16/plinq-ordered.out.txt';
+import plinqUnordered from '!!raw-loader!@site/examples/m13/l16/plinq-unordered.compile.cs';
+import sharedTotal from '!!raw-loader!@site/examples/m13/l16/shared-total.compile.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l16/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l16/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Datenparallelität
+
+:::note[Lernziele]
+- Du kannst eine Schleife mit `Parallel.For` oder `Parallel.ForEach` parallelisieren und das Ergebnis sicher zusammenführen.
+- Du kannst eine LINQ-Abfrage mit `AsParallel` parallel ausführen und erklären, warum die Reihenfolge der Ergebnisse dann nicht feststeht (`AsOrdered`).
+- Du kannst erklären, warum paralleler Code langsamer sein kann als serieller.
+- Du kannst erklären, warum der serielle Anteil eines Programms die mögliche Beschleunigung begrenzt.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l03-q7" />
+
+<Quiz id="m11-l07-q7" />
+
+<Quiz id="m13-l15-q7" />
+
+## Dieselbe Arbeit auf vielen Elementen
+
+SecLog hat viele Log-Zeilen, und für jede Zeile gibt es eine rechnende Prüfung, ob sie ein Fehlschlag ist. Die Prüfungen sind unabhängig: Keine Zeile braucht das Ergebnis einer anderen. Dieselbe Operation läuft auf vielen Elementen, und sie kann gleichzeitig laufen. Das heißt <Term id="data-parallelism">Datenparallelität</Term> (Data parallelism). Die Sammlung wird in Teile zerlegt, und mehrere Threads bearbeiten die Teile gleichzeitig ([Data parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/data-parallelism-task-parallel-library)).
+
+In Lektion 10 hast du `Task.Run` benutzt, um einzelne Arbeiten auf den Thread-Pool zu geben. Bei Datenparallelität übernimmt eine Bibliothek das Zerlegen, das Starten und das Warten.
+
+## Parallel.For und Parallel.ForEach
+
+Die Klasse `Parallel` hat parallele Versionen von `for` und `foreach`. Man schreibt den Schleifenkörper fast wie in einer normalen Schleife als Lambda. Die Methode kehrt erst zurück, wenn alle Durchläufe fertig sind ([Data parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/data-parallelism-task-parallel-library)). Eine solche Schleife heißt <Term id="parallel-loop">parallele Schleife</Term>. Ihre Durchläufe können gleichzeitig laufen, müssen es aber nicht, und ihre Reihenfolge ist nicht festgelegt ([Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)).
+
+`Parallel.For(0, n, i => …)` ruft den Lambda für jedes `i` von 0 bis n−1 auf. Wichtig ist, wie das Ergebnis zusammenkommt: Der Schleifenkörper darf gemeinsame Daten nicht unsicher ändern. Das kennst du aus Lektion 15: nicht teilen, wo es geht.
+
+:::info[Vorhersage]
+Jeder Durchlauf schreibt nur in seinen eigenen Platz eines Arrays. Welche Zeilen gibt das Programm aus, und braucht der Code einen `lock`?
+:::
+
+<CodeBlock language="csharp" title="parallel-for.cs">{parallelFor}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Eigener Platz pro Durchlauf:** `isFailure[i]` wird nur vom Durchlauf `i` geschrieben. Kein Platz wird von zwei Durchläufen geändert.
+2. **Kein lock nötig:** Es gibt keine gemeinsame Variable, die mehrere Threads ändern.
+3. **Erst danach zählen:** `Parallel.For` kehrt zurück, wenn alle Durchläufe fertig sind. Erst dann zählt `Count` die Treffer.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{parallelForOutput.trim()}</code></pre>
+
+Das Array hat die Reihenfolge der Zeilen, egal in welcher Reihenfolge die Durchläufe laufen.
+
+</details>
+
+<Quiz id="m13-l16-q1" />
+
+### Ergebnisse sicher zusammenführen
+
+Für `Parallel.ForEach` über eine Sammlung gilt dasselbe. Wenn die Ergebnisse nicht in ein Array mit festem Platz passen, kommen sie in eine threadsichere Sammlung, wie in Lektion 15 ([Thread-safe collections](https://learn.microsoft.com/dotnet/standard/collections/thread-safe/)). Zum Beispiel zählt der folgende Code die Fehlschläge je Quelle:
+
+<CodeBlock language="csharp" title="parallel-foreach.cs">{parallelForeach}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{parallelForeachOutput.trim()}</code></pre>
+
+Die Ausgabe ist sortiert, weil die Durchläufe in beliebiger Reihenfolge fertig werden. Ohne `OrderBy` hinge die Reihenfolge der Zeilen vom Zufall ab.
+
+<Quiz id="m13-l16-q2" />
+
+Es gibt auch Überladungen mit lokalem Zustand pro Teil, damit die Threads nicht um gemeinsame Daten konkurrieren. Der Kurs nennt sie nur ([Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)).
+
+### Nebeneffekte im Schleifenkörper
+
+Ein Schleifenkörper, der eine gemeinsame Variable ändert, ist eine Race Condition wie in Lektion 11:
+
+<CodeBlock language="csharp" title="shared-total.cs">{sharedTotal}</CodeBlock>
+
+`total += n` besteht aus Lesen, Addieren und Schreiben. Das Ergebnis kann kleiner als 36 sein. Auch `List<T>.Add` im Schleifenkörper ist nicht sicher, denn die Klasse ist nicht threadsicher ([Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)). Ein Körper sollte nicht davon abhängen, dass andere Durchläufe schon gelaufen sind oder gerade laufen, weil sie nicht gleichzeitig laufen müssen.
+
+<Quiz id="m13-l16-q6" />
+
+<Quiz id="m13-l16-q10" />
+
+## Parallel.ForEachAsync
+
+Wenn jeder Durchlauf auf etwas wartet, passt `Parallel.ForEachAsync`. Der Körper ist eine `async`-Funktion mit dem Element und einem `CancellationToken` als Parametern. Mit `ParallelOptions` und `MaxDegreeOfParallelism` legst du fest, wie viele Elemente gleichzeitig laufen. Diese Zahl heißt <Term id="degree-of-parallelism">Grad der Parallelität</Term> (Degree of parallelism). Die Methode gibt einen `Task` zurück, auf den du mit `await` wartest ([Parallel.ForEachAsync](https://learn.microsoft.com/dotnet/api/system.threading.tasks.parallel.foreachasync)).
+
+<CodeBlock language="csharp" title="foreach-async.cs">{foreachAsync}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{foreachAsyncOutput.trim()}</code></pre>
+
+Hier laufen höchstens zwei Elemente gleichzeitig. Das Warten mit `Task.Delay` blockiert keinen Thread (Lektion 2). Das Ergebnis ist wieder sortiert ausgegeben.
+
+<Quiz id="m13-l16-q3" />
+
+## PLINQ
+
+Mit PLINQ (Parallel LINQ) läuft eine LINQ-Abfrage aus Modul 11 parallel: `AsParallel()` an die Quelle hängen, der Rest der Abfrage wird parallelisiert, wenn es möglich ist ([Introduction to PLINQ](https://learn.microsoft.com/dotnet/standard/parallel-programming/introduction-to-plinq)). Der Begriff <Term id="plinq">PLINQ</Term> steht für Parallel LINQ. Mit `WithDegreeOfParallelism(n)` begrenzt man die Zahl der gleichzeitig genutzten Kerne.
+
+Bei einer parallelen Abfrage stehen die Ergebnisse nicht in der Reihenfolge der Quelle, wenn man nichts angibt. Die Teile der Quelle sind unterschiedlich schnell fertig. Mit `AsOrdered()` bleibt die Reihenfolge der Quelle erhalten. Die Abfrage läuft weiter parallel, die Ergebnisse werden aber gepuffert und sortiert. Das kostet etwas Zeit ([Introduction to PLINQ](https://learn.microsoft.com/dotnet/standard/parallel-programming/introduction-to-plinq)).
+
+:::info[Vorhersage]
+Die Quadrate der Zahlen 1 bis 8 werden mit `AsParallel().AsOrdered()` berechnet. Welche Zeilen gibt das Programm aus?
+:::
+
+<CodeBlock language="csharp" title="plinq-ordered.cs">{plinqOrdered}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Parallel starten:** `AsParallel()` schaltet die Abfrage auf PLINQ um.
+2. **Reihenfolge halten:** `AsOrdered()` stellt die Reihenfolge der Quelle her, also aufsteigend.
+3. **Zählen:** `Count` mit `AsParallel` liefert eine Zahl, die nicht von der Reihenfolge abhängt.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{plinqOrderedOutput.trim()}</code></pre>
+
+</details>
+
+Ohne `AsOrdered` ist die Reihenfolge nicht festgelegt:
+
+<CodeBlock language="csharp" title="plinq-unordered.cs">{plinqUnordered}</CodeBlock>
+
+Mögliche Ausgaben (von Hand nachvollzogen, nicht von CI erzeugt): Es erscheinen alle acht Quadrate 1, 4, 9, 16, 25, 36, 49 und 64, aber in einer Reihenfolge, die sich von Lauf zu Lauf ändern kann. Zum Beispiel `1, 4, 9, …` oder `25, 36, 49, 64, 1, 4, 9, 16`. Wer die Reihenfolge braucht, schreibt `AsOrdered`, oder sortiert am Ende.
+
+<Quiz id="m13-l16-q4" />
+
+<Quiz id="m13-l16-q5" />
+
+## Wann paralleler Code langsamer ist
+
+Parallel zu arbeiten kostet Zeit. Die Sammlung wird zerlegt, die Threads müssen die Teile übernehmen und synchronisieren, und am Ende werden die Ergebnisse zusammengeführt. Dieser Aufwand fällt immer an. Bei wenigen Durchläufen und schneller Arbeit pro Durchlauf kann eine parallele Schleife langsamer sein als die serielle ([Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)). Auch eine PLINQ-Abfrage mit kleiner Quelle und kleinem Lambda kann langsamer sein ([Understanding speedup in PLINQ](https://learn.microsoft.com/dotnet/standard/parallel-programming/understanding-speedup-in-plinq)).
+
+Außerdem gibt es höchstens so viele gleichzeitig rechnende Threads, wie Prozessorkerne da sind. Auf einem Kern bringen mehrere rechnende Threads keine Beschleunigung. Mehr Threads als Kerne helfen nur, wenn Threads oft warten, zum Beispiel auf Dateien ([Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)). Ob es sich lohnt, entscheidet nur Messen. Dieser Kurs gibt deshalb keine Zeiten an.
+
+<Quiz id="m13-l16-q7" />
+
+<Quiz id="m13-l16-q8" />
+
+## Der serielle Anteil begrenzt die Beschleunigung
+
+Die <Term id="speedup">Beschleunigung</Term> (Speedup) sagt, wie viel schneller das parallele Programm ist als das serielle. Wie groß sie wird, hängt davon ab, welcher Anteil der Arbeit überhaupt parallel laufen kann ([Understanding speedup in PLINQ](https://learn.microsoft.com/dotnet/standard/parallel-programming/understanding-speedup-in-plinq)). Ein Teil bleibt immer seriell, zum Beispiel das Einlesen der Daten vorher oder das Schreiben des Berichts nachher.
+
+Ein Rechenbeispiel, ohne Messung: Ein Programm braucht seriell 10 Sekunden, davon sind 2 Sekunden nicht parallelisierbar. Selbst mit unendlich vielen Kernen und ohne Aufwand bleiben diese 2 Sekunden. Das Programm wird also nicht schneller als 2 Sekunden, die Beschleunigung ist höchstens 5-fach.
+
+<Quiz id="m13-l16-q9" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlschläge in mehreren Tasks und sammelt sie pro Benutzer in einem `ConcurrentDictionary`. Jetzt soll SecLog alle Log-Zeilen parallel prüfen.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die ersten `using`-Zeilen, die Quellen `logSources`, den letzten Block und das Ende des Programms. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:** Schreibe hinter den Block `// Count failures per user with a concurrent dictionary` und vor die Zeile `// End with exit code 0 …` den Block `// Rate all log lines in parallel with PLINQ`. Er berechnet `int parallelFailures` mit `sampleLog.AsParallel().Count(…)` über alle `login-failed`-Zeilen und gibt `Failures (PLINQ): 7` aus. Danach legt er ein `ConcurrentDictionary<string, int> failuresPerSource` an. `Parallel.ForEach(logSources, source => …)` trägt dort je Quelle die Zahl der Fehlschläge ein, mit der vorhandenen Funktion `CountFailuresIn`. Die Einträge werden **sortiert nach dem Namen der Quelle** als `vpn: 2` und `web: 5` ausgegeben.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Parallel zählen:** `AsParallel().Count(…)` verteilt die Prüfung der Zeilen auf mehrere Threads und liefert eine einzelne Zahl. Die Reihenfolge spielt keine Rolle.
+2. **Pro Quelle in einer Sammlung:** Jeder Durchlauf von `Parallel.ForEach` schreibt unter dem Namen seiner Quelle. Kein Durchlauf ändert die Daten eines anderen.
+3. **Sortiert ausgeben:** Die Ausgabe läuft nach der Schleife, sortiert nach dem Namen. Deshalb ist sie in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog prüft alle Zeilen parallel und sammelt die Fehlschläge je Quelle sicher.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l16-more-threads-always-faster" />
+
+**„Mehr Threads machen ein Programm immer schneller.“** Das stimmt nicht. Das Starten und Koordinieren paralleler Arbeit kostet Zeit. Bei kleiner Arbeit oder großem seriellem Anteil kann paralleler Code langsamer sein, und mehr rechnende Threads als Kerne helfen nicht.
+:::
+
+## Zusammenfassung
+
+Datenparallelität führt dieselbe Operation gleichzeitig auf vielen Elementen aus: mit `Parallel.For` und `Parallel.ForEach`, mit `Parallel.ForEachAsync` für wartende Arbeit und mit PLINQ über `AsParallel`. Der Schleifenkörper darf gemeinsame Daten nur sicher ändern: ein Platz pro Durchlauf oder eine threadsichere Sammlung. Die Reihenfolge der Durchläufe und der Ergebnisse steht nicht fest, `AsOrdered` stellt sie bei PLINQ her. Paralleler Code hat Aufwand, und der serielle Anteil begrenzt die Beschleunigung. Ob es sich lohnt, zeigt nur Messen.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l16-q11" />
+
+### Transferfrage
+
+<Quiz id="m13-l16-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Data parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/data-parallelism-task-parallel-library)
+- Microsoft Learn: [Introduction to PLINQ](https://learn.microsoft.com/dotnet/standard/parallel-programming/introduction-to-plinq)
+- Microsoft Learn: [Potential pitfalls in data and task parallelism](https://learn.microsoft.com/dotnet/standard/parallel-programming/potential-pitfalls-in-data-and-task-parallelism)

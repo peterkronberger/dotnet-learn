@@ -1,0 +1,2 @@
+Per worker: 2, 1
+Total: 3

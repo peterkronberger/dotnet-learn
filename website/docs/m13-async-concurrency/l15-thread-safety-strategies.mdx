@@ -1,0 +1,246 @@
+---
+title: Strategien für Thread-Sicherheit
+sidebar_position: 15
+description: Wie Code so entworfen wird, dass wenig geteilt wird. Vier Strategien (nicht teilen, unveränderliche Daten, threadsichere Sammlungen, gezielt synchronisieren), ConcurrentDictionary mit AddOrUpdate und GetOrAdd, die Dokumentation eines Typs lesen und die Gefahr von statischem veränderlichem Zustand.
+lesson_id: m13-l15
+duration_min: 24
+---
+
+import confinement from '!!raw-loader!@site/examples/m13/l15/confinement.cs';
+import confinementOutput from '!!raw-loader!@site/examples/m13/l15/confinement.out.txt';
+import immutableRecord from '!!raw-loader!@site/examples/m13/l15/immutable-record.cs';
+import immutableRecordOutput from '!!raw-loader!@site/examples/m13/l15/immutable-record.out.txt';
+import concurrentDictionary from '!!raw-loader!@site/examples/m13/l15/concurrent-dictionary.cs';
+import concurrentDictionaryOutput from '!!raw-loader!@site/examples/m13/l15/concurrent-dictionary.out.txt';
+import getOrAdd from '!!raw-loader!@site/examples/m13/l15/get-or-add.cs';
+import getOrAddOutput from '!!raw-loader!@site/examples/m13/l15/get-or-add.out.txt';
+import checkThenAct from '!!raw-loader!@site/examples/m13/l15/check-then-act.compile.cs';
+import staticCounter from '!!raw-loader!@site/examples/m13/l15/static-counter.compile.cs';
+import staticConstructor from '!!raw-loader!@site/examples/m13/l15/static-constructor.cs';
+import staticConstructorOutput from '!!raw-loader!@site/examples/m13/l15/static-constructor.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m13/l15/seclog-async-task.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l15/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Strategien für Thread-Sicherheit
+
+:::note[Lernziele]
+- Du kannst vier Strategien für Thread-Sicherheit nennen und für ein Beispiel die passende wählen (nicht teilen, unveränderliche Daten, threadsichere Sammlungen, gezielt synchronisieren).
+- Du kannst `ConcurrentDictionary<TKey,TValue>` mit `AddOrUpdate` oder `GetOrAdd` verwenden.
+- Du kannst in der Dokumentation eines .NET-Typs nachlesen, ob er threadsicher ist.
+- Du kannst erklären, warum statischer veränderlicher Zustand gefährlich ist und warum ein statischer Konstruktor höchstens einmal läuft.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l12-q5" />
+
+<Quiz id="m13-l14-q5" />
+
+<Quiz id="m08-l10-q6" />
+
+## Besser vorbeugen als reparieren
+
+Die Lektionen 12 bis 14 haben Races repariert, nachdem sie aufgetreten waren: mit `lock` und mit `Interlocked`. Es geht auch umgekehrt. Ein Race braucht gemeinsame Daten, die mehrere Threads ändern. Wo es solche Daten nicht gibt, kann kein Race entstehen. Dieser Gedanke ist der Kern der Lektion.
+
+Code, der von mehreren Threads gleichzeitig richtig benutzt werden kann, heißt <Term id="thread-safety">threadsicher</Term> (Thread safe). Es gibt vier Strategien, ihn zu erreichen. Du wählst sie in dieser Reihenfolge:
+
+1. **Nicht teilen:** Jeder Arbeiter bekommt seine eigenen Daten.
+2. **Unveränderliche Daten:** Geteilte Daten ändern sich nie.
+3. **Threadsichere Sammlungen:** Was geteilt wird und sich ändert, liegt in einer Sammlung, die dafür gebaut ist.
+4. **Gezielt synchronisieren:** Für alles Übrige gibt es `lock` und `Interlocked` aus den Lektionen 12 und 14.
+
+## Nicht teilen: Beschränkung auf einen Arbeiter
+
+Die erste Strategie heißt <Term id="confinement">Confinement</Term> (Beschränkung auf einen Thread): Jeder Arbeiter ändert nur Daten, die nur er kennt. Am Ende führt der aufrufende Code die Ergebnisse zusammen. Das Warten mit `Task.WhenAll` sorgt dafür, dass alle Ergebnisse fertig sind ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)).
+
+:::info[Vorhersage]
+Zwei Tasks zählen die `login-failed`-Einträge je eines Teils. Der Code benutzt keinen `lock`. Welche Zeilen gibt das Programm aus, und warum ist das in jedem Lauf gleich?
+:::
+
+<CodeBlock language="csharp" title="confinement.cs">{confinement}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Eigene Ergebnisse:** Jeder `Task<int>` liefert seine Zahl als Rückgabewert. Die Tasks ändern keine gemeinsame Variable.
+2. **Zusammenführen:** `await Task.WhenAll(workers)` liefert die Zahlen als Array, in der Reihenfolge der Tasks.
+3. **Am Ende addieren:** Erst nach dem Warten addiert `Sum()` die Zahlen im aufrufenden Code.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{confinementOutput.trim()}</code></pre>
+
+Die Ausgabe ist in jedem Lauf gleich, weil es nichts Gemeinsames gibt, das ein Race erzeugen könnte.
+
+</details>
+
+<Quiz id="m13-l15-q2" />
+
+## Unveränderliche Daten
+
+Die zweite Strategie: Daten, die sich nach dem Anlegen nie ändern, dürfen alle Threads lesen. Ein Race braucht einen Schreibzugriff, und den gibt es nicht. Ein <Term id="immutable">unveränderliches</Term> Objekt hast du in Modul 4 kennengelernt, und `record` aus Modul 8 ist dafür gemacht. Soll sich etwas ändern, erzeugt `with` ein neues Objekt (Modul 12), und das alte bleibt unverändert.
+
+<CodeBlock language="csharp" title="immutable-record.cs">{immutableRecord}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{immutableRecordOutput.trim()}</code></pre>
+
+Beide Tasks lesen dasselbe Objekt, ohne Sperre. `stricter` ist ein zweites Objekt. `limits` ändert sich dadurch nicht.
+
+<Quiz id="m13-l15-q10" />
+
+<Quiz id="m13-l15-q1" />
+
+## Threadsichere Sammlungen
+
+Manche Daten müssen sich ändern und geteilt werden, zum Beispiel ein Zähler pro Benutzer. Dann ist die dritte Strategie eine <Term id="concurrent-collection">threadsichere Sammlung</Term> (Concurrent collection) aus dem Namespace `System.Collections.Concurrent`. Mehrere Threads dürfen dort gleichzeitig hinzufügen und entfernen, ohne eigene Synchronisierung. `ConcurrentDictionary<TKey,TValue>` ist die threadsichere Variante eines `Dictionary`. Daneben gibt es `ConcurrentQueue<T>` (eine Warteschlange), `ConcurrentStack<T>` und `ConcurrentBag<T>` (eine ungeordnete Sammlung) ([Thread-safe collections](https://learn.microsoft.com/dotnet/standard/collections/thread-safe/)).
+
+Die normalen Sammlungen `List<T>` und `Dictionary<TKey,TValue>` bieten keine Synchronisierung. Wer von mehreren Threads gleichzeitig hinzufügt oder entfernt, muss sie selbst schützen ([Thread-safe collections](https://learn.microsoft.com/dotnet/standard/collections/thread-safe/)).
+
+### AddOrUpdate und GetOrAdd
+
+Der Zähler pro Benutzer braucht zwei Fälle: Den Benutzer gibt es noch nicht, dann wird er mit 1 angelegt. Oder es gibt ihn schon, dann wird sein Wert um 1 erhöht. Das erledigt `AddOrUpdate` in einem einzigen Aufruf. Der erste Wert ist der Schlüssel, der zweite der Startwert für den Fall „fehlt noch“, der dritte eine Funktion, die aus dem alten Wert den neuen berechnet. `(_, count) => count + 1` ist ein Lambda mit zwei Parametern: Der Schlüssel interessiert nicht (`_`), `count` ist der alte Wert ([ConcurrentDictionary](https://learn.microsoft.com/dotnet/api/system.collections.concurrent.concurrentdictionary-2)).
+
+:::info[Vorhersage]
+Zwei Tasks zählen Namen in einem gemeinsamen `ConcurrentDictionary`. Die Ausgabe wird nach dem Namen sortiert. Welche Zeilen gibt das Programm aus?
+:::
+
+<CodeBlock language="csharp" title="concurrent-dictionary.cs">{concurrentDictionary}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Gemeinsame Sammlung:** `counts` ist ein `ConcurrentDictionary<string, int>`. Beide Tasks benutzen dasselbe Objekt.
+2. **Ein sicherer Schritt:** `AddOrUpdate` legt den Namen mit 1 an oder erhöht den vorhandenen Wert. Dazwischen kann kein anderer Task dazwischenkommen.
+3. **Sortiert ausgeben:** Erst nach `Task.WhenAll` gibt das Programm aus, sortiert mit `OrderBy`. Die Reihenfolge, in der die Tasks eintragen, spielt dann keine Rolle.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{concurrentDictionaryOutput.trim()}</code></pre>
+
+</details>
+
+<Quiz id="m13-l15-q3" />
+
+`GetOrAdd` ist die zweite Methode für ein „fehlt noch“. Sie gibt den gespeicherten Wert zurück oder speichert den neuen Wert, wenn der Schlüssel fehlt.
+
+<CodeBlock language="csharp" title="get-or-add.cs">{getOrAdd}</CodeBlock>
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{getOrAddOutput.trim()}</code></pre>
+
+Der zweite Aufruf ändert den gespeicherten Wert nicht. Er gibt 3 zurück.
+
+<Quiz id="m13-l15-q4" />
+
+### Ein sicherer Aufruf ist noch kein sicherer Ablauf
+
+Jeder einzelne Aufruf einer threadsicheren Sammlung ist sicher. Zwei Aufrufe hintereinander sind zusammen aber kein einzelner Schritt. Das ist dasselbe Muster wie das Check-then-act aus Lektion 11 (prüfen, dann handeln):
+
+<CodeBlock language="csharp" title="check-then-act.cs">{checkThenAct}</CodeBlock>
+
+Zwei Tasks können beide `ContainsKey` mit `false` beantwortet bekommen, bevor einer setzt. Ein Task überschreibt dann den Wert des anderen. Wo „prüfen und dann ändern“ ein Schritt sein muss, gehört es in einen Aufruf wie `GetOrAdd` oder `AddOrUpdate`.
+
+<Quiz id="m13-l15-q7" />
+
+## Gezielt synchronisieren
+
+Was weder verteilt noch unveränderlich noch in einer threadsicheren Sammlung liegen kann, schützt du mit `lock` oder `Interlocked`, wie in den Lektionen 12 und 14. Diese vierte Strategie ist die letzte Wahl: Sie kostet Zeit und kann zu Deadlocks führen. Alle Tasks müssen dieselbe Sperre nehmen, und die Stelle sollte klein sein ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)).
+
+## In der Dokumentation nachlesen
+
+Woher weißt du, ob ein Typ threadsicher ist? Die Typen der .NET-Klassenbibliothek sind für Instanzdaten nicht threadsicher, weil Sperren Zeit kosten und in den meisten Programmen nur ein Thread ein Objekt benutzt ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)). Ob eine Ausnahme gilt, steht in der Dokumentation des Typs auf Microsoft Learn. Die API-Seite der Klasse hat oft einen Abschnitt „Thread Safety“, und er sagt, ob mehrere Threads Instanzen gleichzeitig benutzen dürfen. Beim Typ `List<T>` steht dort: Öffentliche statische Member sind threadsicher, Instanzmember nicht garantiert. Mehrere Threads dürfen gleichzeitig lesen. Sobald einer ändert, braucht es eigene Synchronisierung, oder man nimmt eine Sammlung aus `System.Collections.Concurrent` ([List&lt;T&gt;](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)). Finde die Stelle, an der das im folgenden Beispiel schiefgeht:
+
+<Quiz id="m13-l15-q6" />
+
+<Quiz id="m13-l15-q5" />
+
+## Statischer veränderlicher Zustand und der statische Konstruktor
+
+Ein statisches Feld gibt es genau einmal pro Programm. Alle Threads teilen es. Ändert eine statische Methode es, ist das ein gemeinsamer Zustand, auch wenn der Code harmlos aussieht. In einem Server laufen viele Anfragen gleichzeitig durch denselben Code, deshalb gilt der Rat: statische Methoden, die statischen Zustand ändern, möglichst vermeiden, und Daten besser in Objekten halten, die nicht zwischen Anfragen geteilt werden ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)).
+
+<CodeBlock language="csharp" title="static-counter.cs">{staticCounter}</CodeBlock>
+
+`Total++` besteht wieder aus Lesen, Addieren und Schreiben, und der Zähler gehört allen Tasks. Das ist die Race Condition aus Lektion 11, nur versteckt in einer statischen Klasse.
+
+Es gibt aber einen Fall, in dem statischer Zustand sicher entsteht: der <Term id="static-constructor">statische Konstruktor</Term> (Lektion 8 aus Modul 6). Er läuft höchstens einmal. Angestoßen wird er vom ersten Ereignis aus: Eine Instanz der Klasse wird angelegt, oder auf einen statischen Member der Klasse wird zugegriffen ([§15.12 Static constructors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors)). Greifen mehrere Threads gleichzeitig zum ersten Mal zu, blockiert die Laufzeit die anderen, bis der Konstruktor fertig ist ([Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)).
+
+:::info[Vorhersage]
+Vier Tasks lesen `Settings.Level` gleichzeitig. `Runs` zählt, wie oft der statische Konstruktor läuft. Welchen Wert gibt das Programm für `Runs` aus?
+:::
+
+<CodeBlock language="csharp" title="static-constructor.cs">{staticConstructor}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Erster Zugriff:** Der erste Task, der `Settings.Level` liest, löst den statischen Konstruktor aus.
+2. **Andere warten:** Die anderen Tasks warten, bis er fertig ist. Er läuft nicht noch einmal.
+3. **Nur lesen:** Nach dem Konstruktor ändert niemand `Level` mehr, deshalb ist das Lesen sicher.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{staticConstructorOutput.trim()}</code></pre>
+
+</details>
+
+<Quiz id="m13-l15-q8" />
+
+<Quiz id="m13-l15-q9" />
+
+In einer Web-Anwendung laufen viele Anfragen gleichzeitig. Ein Dienst, den alle Anfragen gemeinsam benutzen, muss deshalb threadsicher sein. <Forward concepts={['Singleton-Dienst']} module="15" /> Wie solche Dienste entstehen, lernst du in Modul 15, und Web-Anfragen in Modul 17.
+
+## Projektschritt
+
+**Stand bisher:** SecLog zählt Fehlschläge in mehreren Tasks mit einem `lock` und mit `Interlocked`. Jetzt soll SecLog zählen, wie viele Fehlschläge jeder Benutzer hat.
+
+Du siehst die Teile, die du für diese Anforderung brauchst: die ersten `using`-Zeilen, die Quellen `logSources`, den letzten Block und das Ende des Programms. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft mit.
+
+**Neue Anforderung:** Ergänze unter den sichtbaren `using`-Zeilen oben die Zeile `using System.Collections.Concurrent;`. Schreibe hinter den Block `// Count failures with an atomic operation` und vor die Zeile `// End with exit code 0 …` den Block `// Count failures per user with a concurrent dictionary`. Er legt `ConcurrentDictionary<string, int> concurrentFailures` an und startet wieder einen `Task.Run`-Arbeiter pro Quelle. Jeder Arbeiter liest den Benutzer jeder Zeile mit der vorhandenen Funktion `FindUser` (sie gibt den Benutzernamen oder `null` zurück) und erhöht bei jedem `login-failed` den Zähler dieses Benutzers mit `AddOrUpdate(user, 1, (_, count) => count + 1)`. Danach wartest du mit `await Task.WhenAll(...)` und gibst die Einträge **sortiert nach Benutzer** als `alice: 1`, `bob: 5` und `dave: 1` aus. Der Name `failuresPerUser` ist im Programm schon belegt, deshalb heißt das neue Wörterbuch `concurrentFailures`.
+
+<FoldedCode code={projectTask} title="seclog-async-task.cs" />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Nichts Geteiltes außer der Sammlung:** `concurrentFailures` ist die einzige Struktur, die beide Arbeiter ändern, und sie ist threadsicher.
+2. **Ein Arbeiter pro Quelle:** Jeder `Task.Run` geht die Zeilen seiner Quelle durch.
+3. **Ein sicherer Schritt:** `AddOrUpdate` legt den Benutzer an oder erhöht seinen Zähler, ohne `lock`.
+4. **Sortiert ausgeben:** Erst nach `Task.WhenAll` gibt SecLog die Einträge sortiert aus, deshalb ist die Ausgabe in jedem Lauf gleich.
+
+</details>
+
+**Neuer Stand:** SecLog zählt die Fehlschläge pro Benutzer mit einer threadsicheren Sammlung.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l15-dotnet-types-are-thread-safe" />
+
+**„Die Typen von .NET sind automatisch threadsicher.“** Das stimmt nicht. Die meisten Typen sind für Instanzmember nicht threadsicher, zum Beispiel `List<T>` und `Dictionary<TKey,TValue>`. Threadsicher sind nur die Typen, die es in ihrer Dokumentation sagen, wie die Sammlungen in `System.Collections.Concurrent`.
+:::
+
+## Zusammenfassung
+
+Races entstehen nur bei gemeinsam geänderten Daten. Deshalb gilt die Reihenfolge: nicht teilen (Confinement), unveränderliche Daten, threadsichere Sammlungen wie `ConcurrentDictionary` mit `AddOrUpdate` und `GetOrAdd`, und erst dann gezielt synchronisieren. Ein einzelner Aufruf einer threadsicheren Sammlung ist sicher, zwei Aufrufe hintereinander sind es zusammen nicht. Instanzmember von .NET-Typen sind im Allgemeinen nicht threadsicher: Die Dokumentation sagt, wann doch. Statischer veränderlicher Zustand gehört allen Threads. Ein statischer Konstruktor läuft höchstens einmal, auch bei gleichzeitigem ersten Zugriff.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l15-q11" />
+
+### Transferfrage
+
+<Quiz id="m13-l15-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Thread-safe collections](https://learn.microsoft.com/dotnet/standard/collections/thread-safe/)
+- Microsoft Learn: [Managed threading best practices](https://learn.microsoft.com/dotnet/standard/threading/managed-threading-best-practices)
+- C#-Spezifikation: [Static constructors](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1512-static-constructors)
