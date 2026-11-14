@@ -1,0 +1,165 @@
+---
+title: Ausnahmen in asynchronem Code
+sidebar_position: 3
+description: Eine Ausnahme in einer async-Methode wird im Task gespeichert und beim await erneut ausgelöst. try/catch um das await behandelt sie; ohne await bleibt sie unbemerkt.
+lesson_id: m13-l03
+duration_min: 22
+---
+
+import catchAtAwait from '!!raw-loader!@site/examples/m13/l03/catch-at-await.cs';
+import catchAtAwaitOutput from '!!raw-loader!@site/examples/m13/l03/catch-at-await.out.txt';
+import beforeFirstAwait from '!!raw-loader!@site/examples/m13/l03/before-first-await.cs';
+import taskStates from '!!raw-loader!@site/examples/m13/l03/task-states.cs';
+import taskStatesOutput from '!!raw-loader!@site/examples/m13/l03/task-states.out.txt';
+import projectTask from '!!raw-loader!@site/examples/m13/l03/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l03/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l03/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l03/seclog-async-solution.cs';
+
+# Ausnahmen in asynchronem Code
+
+:::note[Lernziele]
+- Du kannst vorhersagen, wann eine Ausnahme aus einer async-Methode beim Aufrufer ankommt (beim `await`, nicht beim Aufruf).
+- Du kannst eine Ausnahme aus einer async-Methode mit `try`/`catch` um das `await` behandeln.
+- Du kannst erklären, warum ein Task, auf den nie gewartet wird, seine Ausnahme „verschluckt“.
+- Du kannst `IsFaulted` und `IsCompletedSuccessfully` eines Tasks deuten.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l01-q5" />
+
+<Quiz id="m07-l02-q5" />
+
+<Quiz id="m13-l02-q2" />
+
+## Wohin geht die Ausnahme?
+
+Eine Ausnahme wandert normalerweise die Aufrufkette nach oben, bis eine passende `catch`-Klausel sie behandelt (<Term id="exception-propagation">Weitergabe</Term>). Bei `async` kehrt der Aufruf aber früh zurück, noch bevor der Rest der Methode läuft (Lektion „Wie eine async-Methode abläuft“). Wohin geht die Ausnahme dann?
+
+Die Antwort: Die Methode gibt einen Task zurück, und die Ausnahme steckt in diesem Task. Der Task ist dann ein <Term id="faulted-task">fehlerhafter Task</Term> (Zustand „faulted“). Erst das `await` auf den Task löst die Ausnahme erneut aus, und zwar beim Aufrufer ([§15.14.3 Evaluation of a task-returning async function](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15143-evaluation-of-a-task-returning-async-function)). Deshalb fängt ein `try`/`catch` um das `await` die Ausnahme ab.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Die Methode löst nach dem Warten eine `InvalidOperationException` aus.
+:::
+
+<CSharpRunner id="m13-l03-catch" code={catchAtAwait} predict expected={catchAtAwaitOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Aufruf:** `ReadNumberAsync()` läuft bis zum `await Task.Delay(10)` und gibt einen unfertigen Task zurück. Die Zeilen 1 und 2 erscheinen, ohne dass etwas ausgelöst wird.
+2. **Fehler im Task:** Nach dem Warten löst die Methode die Ausnahme aus. Sie wird im Task gespeichert, der Task ist fehlerhaft.
+3. **Erneut ausgelöst:** Das `await pending` im `try`-Block löst die gespeicherte Ausnahme aus. Zeile 3 fehlt, weil der Code hinter dem `await` übersprungen wird. Die `catch`-Klausel gibt Zeile 4 aus.
+
+Was passiert, wenn du `try` und `catch` nur um die Zeile `Task<int> pending = ReadNumberAsync();` setzt? Dann fängt es nichts, denn der Aufruf löst nichts aus. Das `await` steht außerhalb, und die Ausnahme wäre nicht behandelt.
+
+</details>
+
+Das `catch` fängt hier den Typ `InvalidOperationException`, nicht eine Sammelausnahme: Bei einem einzelnen Task löst `await` die ursprüngliche Ausnahme aus, nicht eine `AggregateException` (Sammelausnahme, mehr dazu in der nächsten Lektion).
+
+## Auch ein früher Fehler steckt im Task
+
+Der Fehler muss nicht nach einem `await` auftreten. Löst die Methode die Ausnahme aus, bevor sie auf einen unfertigen Task wartet, ist es genauso: Der Aufruf löst nichts aus, der zurückgegebene Task ist schon fehlerhaft. Mit `IsFaulted` fragst du ab, ob ein Task fehlerhaft ist.
+
+<CSharpRunner id="m13-l03-early" code={beforeFirstAwait} />
+
+<Quiz id="m13-l03-q3" />
+
+## Was ein Task über sich verrät
+
+Ein Task kennt seinen Zustand. Die beiden Eigenschaften, die du jetzt brauchst:
+
+- `IsCompletedSuccessfully` ist `True`, wenn die Arbeit ohne Ausnahme fertig wurde.
+- `IsFaulted` ist `True`, wenn die Arbeit mit einer Ausnahme endete.
+
+Solange der Task noch läuft, sind beide `False`. Die Ausnahme selbst steht in der Eigenschaft `Exception` des Tasks (ein `AggregateException`-Objekt, dazu mehr in der nächsten Lektion). Wer sie liest, hat sie ebenfalls beachtet.
+
+:::info[Vorhersage]
+Zwei Tasks starten, einer gelingt, einer schlägt fehl. Auf den fehlerhaften wartet niemand. Welche drei Zeilen erscheinen? Läuft das Programm weiter?
+:::
+
+<CSharpRunner id="m13-l03-states" code={taskStates} predict expected={taskStatesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zwei Tasks starten:** Beide laufen an und warten kurz. `await Task.Delay(100)` gibt ihnen genug Zeit, fertig zu werden.
+2. **Zustände lesen:** `good` ist erfolgreich beendet, `IsCompletedSuccessfully` ist `True`. `lost` hat eine Ausnahme ausgelöst, `IsFaulted` ist `True`.
+3. **Niemand wartet auf `lost`:** Kein `await` löst die Ausnahme aus, also erscheint keine Fehlermeldung, und das Programm läuft weiter. Die Ausnahme ist eine <Term id="unobserved-exception">unbeobachtete Ausnahme</Term>. Nach den Regeln von .NET wird sie erst behandelt, wenn der Task vom Garbage Collector eingesammelt wird ([Exception handling (Task Parallel Library)](https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library)).
+
+</details>
+
+<Quiz id="m13-l03-q4" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen das Warten, die `catch`-Klausel, der Typ der Ausnahme und die Eigenschaft, die den Fehlerzustand zeigt.
+
+<Quiz id="m13-l03-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog lädt Log-Quellen asynchron, auch zwei gleichzeitig begonnene Schritte, und zeigt die Reihenfolge der Schritte eines async-Aufrufs.
+
+Im Runner siehst du nur den Block `// Watch the order of steps in an async call`, das Ende des Programms und die Funktion `LoadSourceAsync`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:** Schreibe hinter den Block `// Watch the order of steps in an async call` und vor die Zeile `// End with exit code 0 …` den Block `// Catch the error of a failed source at the await`:
+
+1. Rufe in einem `try`-Block `await LoadSourceAsync("backup")` auf und gib `Loaded backup: <Anzahl> lines` aus. Die Quelle `backup` gibt es nicht. Fange im `catch` die `KeyNotFoundException` und gib `Source backup failed: <Typname>` aus (`ex.GetType().Name`).
+2. Speichere einen zweiten Aufruf in `Task<string[]> failed = LoadSourceAsync("backup");`. Warte darauf in einem `try`-Block und gib im `catch` (wieder für `KeyNotFoundException`) `Faulted: <failed.IsFaulted>` aus.
+
+<CSharpRunner id="m13-l03-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Aufruf mit unbekannter Quelle:** `logSources["backup"]` löst nach der Wartezeit eine `KeyNotFoundException` aus. Sie steckt im Task.
+2. **Am await abfangen:** Das `await` im `try`-Block löst sie aus, das `catch` gibt `Source backup failed: KeyNotFoundException` aus. Die Zeile `Loaded backup` erscheint nie.
+3. **Task als Objekt:** Im zweiten Teil bleibt der Task in der Variablen `failed`. Nach dem `await` und dem `catch` zeigt `failed.IsFaulted` den Wert `True`: `Faulted: True`.
+
+</details>
+
+**Neuer Stand:** SecLog behandelt den Fehler einer unbekannten Log-Quelle an der Stelle, an der es auf sie wartet.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l03-async-exception-lost" />
+
+**„Eine Ausnahme in einer async-Methode geht verloren, weil die Methode schon zurückgekehrt ist.“** Das stimmt nicht, solange jemand auf den Task wartet: Die Ausnahme steckt im Task, und `await` löst sie erneut aus. Verloren geht sie nur, wenn niemand auf den Task wartet und niemand seine `Exception` liest. Dann läuft das Programm ohne Meldung weiter, wie bei `lost` im Programm oben.
+:::
+
+<Quiz id="m13-l03-q1" />
+
+<Quiz id="m13-l03-q5" />
+
+<details>
+<summary>Vertiefung: Was bei mehreren Fehlern passiert (optional)</summary>
+
+Ein Task kann mehrere Ausnahmen speichern, zum Beispiel wenn er auf mehrere andere Tasks wartet. Deshalb ist `Task.Exception` vom Typ `AggregateException`, das die einzelnen Ausnahmen in `InnerExceptions` sammelt. Beim `await` löst .NET trotzdem nur eine davon aus, nicht die Sammelausnahme ([Exception handling (Task Parallel Library)](https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library)). Die nächste Lektion zeigt das mit `Task.WhenAll`.
+
+</details>
+
+## Zusammenfassung
+
+Eine async-Methode, die einen Task zurückgibt, löst ihre Ausnahmen nicht beim Aufruf aus. Sie speichert sie im Task, der dann fehlerhaft ist (`IsFaulted`). Das `await` löst die Ausnahme erneut aus, deshalb gehört das `await` in den `try`-Block. Ohne `await` bleibt die Ausnahme im Task und geht unbemerkt verloren. Erfolgreiche Tasks erkennst du an `IsCompletedSuccessfully`.
+
+## Prüfe dein Wissen
+
+<Quiz id="m13-l03-q2" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m13-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Ausnahmebehandlung in der Task Parallel Library](https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library)
+- Microsoft Learn: [Auswertung einer async-Funktion mit Task-Rückgabe (C#-Spezifikation)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#15143-evaluation-of-a-task-returning-async-function)

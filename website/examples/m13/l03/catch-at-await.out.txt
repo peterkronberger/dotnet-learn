@@ -1,0 +1,3 @@
+1 before the call
+2 after the call
+4 caught InvalidOperationException

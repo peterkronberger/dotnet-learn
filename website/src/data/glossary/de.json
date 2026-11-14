@@ -7886,6 +7886,47 @@
         "title": "Async functions (C# language specification)",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1514-async-functions"
       }
+    },
+    {
+      "id": "faulted-task",
+      "term": "Faulted task",
+      "german": "fehlerhafter Task",
+      "category": "platform",
+      "definition": "Ein Task, dessen Arbeit mit einer Exception endete. `IsFaulted` ist `True`, die Exception steckt im Task. Ein `await` darauf löst sie erneut aus.",
+      "aliases": [
+        "faulted",
+        "Faulted"
+      ],
+      "related": [
+        "task",
+        "exception-propagation",
+        "await-expression"
+      ],
+      "lesson": "m13-l03",
+      "source": {
+        "title": "Exception handling (Task Parallel Library)",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library"
+      }
+    },
+    {
+      "id": "unobserved-exception",
+      "term": "Unobserved exception",
+      "german": "unbeobachtete Task-Exception",
+      "category": "platform",
+      "definition": "Die Exception eines fehlerhaften Tasks, auf den niemand wartet und dessen Exception niemand liest. Solange niemand sie liest, bleibt sie unbemerkt und das Programm läuft weiter.",
+      "aliases": [
+        "unbeobachtete Exception",
+        "unobserved task exception"
+      ],
+      "related": [
+        "faulted-task",
+        "unhandled-exception"
+      ],
+      "lesson": "m13-l03",
+      "source": {
+        "title": "Exception handling (Task Parallel Library)",
+        "url": "https://learn.microsoft.com/dotnet/standard/parallel-programming/exception-handling-task-parallel-library"
+      }
     }
   ]
 }
