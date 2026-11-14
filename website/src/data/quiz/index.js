@@ -11,6 +11,7 @@ import deM09 from './de/m09.json';
 import deM10 from './de/m10.json';
 import deM11 from './de/m11.json';
 import deM12 from './de/m12.json';
+import deM13 from './de/m13.json';
 import deW01 from './de/w01.json';
 import deW02 from './de/w02.json';
 import deDev from './de/dev.json';
@@ -23,7 +24,7 @@ export const QUESTION_TYPES = ['single', 'multi', 'output', 'explain', 'parsons'
 const DEFAULT_LOCALE = 'de';
 
 const FILES = {
-  de: [deM00, deM01, deM02, deM03, deM04, deM05, deM06, deM07, deM08, deM09, deM10, deM11, deM12, deW01, deW02, deDev],
+  de: [deM00, deM01, deM02, deM03, deM04, deM05, deM06, deM07, deM08, deM09, deM10, deM11, deM12, deM13, deW01, deW02, deDev],
 };
 
 const LESSON_PATTERN = /^[a-z0-9]+-l\d+$/;
