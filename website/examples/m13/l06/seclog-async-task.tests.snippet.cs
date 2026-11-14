@@ -10,7 +10,7 @@ public static class TaskTests
         [
             ("Exactly 374 lines are printed", true, lines.Length == 374, "The output has 374 lines (an empty line does not count). The new block prints 1 line."),
             ("Earlier lines stay unchanged", true, lines.Length > 372 && lines[0] == "SecLog project profile" && lines[116] == "Events: 14" && lines[366] == "Failures in vpn: 2" && lines[371] == "Loading web: canceled (TaskCanceledException)" && lines[372] == "Slow source: canceled", "All earlier lines must stay as they are."),
-            ("ReadSourceLinesAsync is an async stream", true, ReadSourceLinesAsyncReturnsAsyncStream(), "Write the local function async IAsyncEnumerable<string> ReadSourceLinesAsync(string name, CancellationToken token = default) with yield return."),
+            ("ReadSourceLinesAsync is an async stream", true, ReadSourceLinesAsyncReturnsAsyncStream(), "Write the local function async IAsyncEnumerable<string> ReadSourceLinesAsync(string name, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default) with yield return."),
             ("The failures of all sources are counted", true, lines.Length > 373 && lines[373] == "Failures in all sources: 7", "Use await foreach over the sources \"web\" and \"vpn\", count the lines with login-failed and print: Failures in all sources: 7"),
             ("The program has an async entry point", true, AsyncEntryPointReturnsTaskOfInt(), "Keep return 0; as the last top-level statement."),
         ];
