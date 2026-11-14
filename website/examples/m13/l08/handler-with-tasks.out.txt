@@ -1,0 +1,2 @@
+Handlers returned, tasks stored: 2
+All tasks completed: True

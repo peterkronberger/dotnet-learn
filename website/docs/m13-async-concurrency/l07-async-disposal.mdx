@@ -1,0 +1,157 @@
+---
+title: Asynchrones Freigeben mit await using
+sidebar_position: 7
+description: Ressourcen freigeben, die dabei warten müssen – mit IAsyncDisposable, DisposeAsync und await using.
+lesson_id: m13-l07
+duration_min: 20
+---
+
+import firstAsyncDispose from '!!raw-loader!@site/examples/m13/l07/first-async-dispose.cs';
+import disposeOnException from '!!raw-loader!@site/examples/m13/l07/dispose-on-exception.cs';
+import disposeOnExceptionOutput from '!!raw-loader!@site/examples/m13/l07/dispose-on-exception.out.txt';
+import twoResources from '!!raw-loader!@site/examples/m13/l07/two-resources.cs';
+import plainUsingError from '!!raw-loader!@site/examples/m13/l07/plain-using-error.snippet.cs';
+import bothInterfaces from '!!raw-loader!@site/examples/m13/l07/both-interfaces.cs';
+import projectTask from '!!raw-loader!@site/examples/m13/l07/seclog-async-task.cs';
+import projectInput from '!!raw-loader!@site/examples/m13/l07/seclog-async-task.in.txt';
+import projectTests from '!!raw-loader!@site/examples/m13/l07/seclog-async-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m13/l07/seclog-async-solution.cs';
+import CodeBlock from '@theme/CodeBlock';
+
+# Asynchrones Freigeben mit await using
+
+:::note[Lernziele]
+- Du kannst eine Klasse schreiben, die `IAsyncDisposable` mit `DisposeAsync` implementiert.
+- Du kannst `await using` als Anweisung mit Block und als Deklaration verwenden.
+- Du kannst vorhersagen, wann `DisposeAsync` aufgerufen wird, auch bei einer Ausnahme.
+- Du kannst erklären, warum ein normales `using` bei einem Typ, der nur `IAsyncDisposable` hat, nicht passt.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l08-q1" />
+
+<Quiz id="m07-l08-q2" />
+
+<Quiz id="m13-l06-q1" />
+
+## Wenn das Freigeben warten muss
+
+In Modul 7 hast du Ressourcen mit `using` und `Dispose` freigegeben. Manche Ressourcen müssen dabei noch Arbeit erledigen, die dauert: Sie schreiben restliche Daten weg oder beenden eine Verbindung. Eine solche Arbeit soll man mit `await` abwarten, statt einen Thread zu blockieren. `Dispose` kann das nicht, denn die Methode gibt nichts zurück, worauf man warten könnte.
+
+Dafür gibt es die Schnittstelle <Term id="async-disposable">`IAsyncDisposable`</Term>. Sie hat eine Methode: `DisposeAsync` ohne Parameter. Die Methode gibt einen `ValueTask` zurück. Das ist eine leichtere Variante von `Task`, die du hier nur als Rückgabetyp brauchst. Ein Typ mit `IAsyncDisposable` wird mit <Term id="asynchronous-using">`await using`</Term> freigegeben. Die Anweisung ruft am Ende des Blocks `DisposeAsync` auf und wartet darauf ([§13.14.1 The using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13141-general)). Der Block ist wie bei `using` eine <Term id="using-statement">using-Anweisung</Term>, hier mit dem Zusatz `await`.
+
+<CSharpRunner id="m13-l07-first" code={firstAsyncDispose} />
+
+Die Methode `DisposeAsync` ist `async`, weil sie selbst wartet. `await using` darf nur dort stehen, wo `await` erlaubt ist, hier in den Anweisungen auf oberster Ebene.
+
+<Quiz id="m13-l07-q1" />
+
+<Quiz id="m13-l07-q7" />
+
+## Auf jedem Weg aus dem Block
+
+Wie bei `using` läuft die Freigabe auf jedem Weg aus dem Block: am normalen Ende, mit `return` und auch, wenn eine Ausnahme den Block verlässt. Der Compiler setzt dafür einen `finally`-Block ein.
+
+:::info[Vorhersage]
+Im Block wird eine Ausnahme ausgelöst, ein `catch` außerhalb fängt sie. In welcher Reihenfolge erscheinen die drei Zeilen?
+:::
+
+<CSharpRunner id="m13-l07-exception" code={disposeOnException} predict expected={disposeOnExceptionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Im Block arbeiten:** Das Programm gibt `Working` aus und löst die Ausnahme aus.
+2. **Freigeben:** Beim Verlassen des Blocks läuft `DisposeAsync`. Es wartet kurz und gibt `Closed web` aus.
+3. **Fangen:** Erst danach erreicht die Ausnahme den `catch` und `Caught: broken` erscheint.
+
+</details>
+
+<Quiz id="m13-l07-q3" />
+
+## Als Deklaration und in umgekehrter Reihenfolge
+
+Statt eines Blocks gibt es die <Term id="using-declaration">using-Deklaration</Term> auch mit `await`. Die Variable lebt dann bis zum Ende des umgebenden Blocks. Mehrere Ressourcen werden in umgekehrter Reihenfolge ihrer Deklaration freigegeben ([§13.14.2 Using declaration](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#13142-using-declaration)).
+
+<CSharpRunner id="m13-l07-two" code={twoResources} />
+
+<Quiz id="m13-l07-q4" />
+
+## using oder await using
+
+Ein normales `using` verlangt `IDisposable` und ruft `Dispose` auf. Hat ein Typ nur `IAsyncDisposable`, passt es nicht. Der Compiler meldet einen Fehler und schlägt `await using` vor:
+
+<CodeBlock language="csharp" title="plain-using-error.cs">{plainUsingError}</CodeBlock>
+
+Der Compiler meldet in Zeile 1 den Fehler `CS8418`: „'Connection': type used in a using statement must implement 'System.IDisposable'. Did you mean 'await using' rather than 'using'?“
+
+Ein Typ kann beide Schnittstellen haben. Dann entscheidet die Anweisung, welche Methode läuft ([Implement a DisposeAsync method](https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-disposeasync)).
+
+<CSharpRunner id="m13-l07-both" code={bothInterfaces} />
+
+<Quiz id="m13-l07-q5" />
+
+<Quiz id="m13-l07-q8" />
+
+## Lücken füllen
+
+Im nächsten Beispiel fehlen die Anweisung, die Schnittstelle, der Modifizierer und der Rückgabetyp.
+
+<Quiz id="m13-l07-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog liest die Quellen zeilenweise als asynchrone Streams und zählt die Fehlversuche über alle Quellen.
+
+Im Runner siehst du nur den Block `// Read the sources line by line as async streams`, das Ende des Programms, die Funktionen für das Laden und das Ende des Namensraums `SecLog.Model`. Der übrige Code ist ausgeblendet (Zeilen mit ⋯) und läuft beim Ausführen mit. Lass die Zeilen mit ⋯ stehen.
+
+**Neue Anforderung:**
+
+1. Schreibe in den Namensraum `SecLog.Model` hinter `ResolvedStatus` die Klasse `sealed class LogSourceReader : IAsyncDisposable`. Sie hat den Konstruktor `LogSourceReader(string name, string[] lines)`, die Eigenschaft `Name`, die Methode `int CountFailures()` (zählt die Zeilen mit `login-failed`) und `public async ValueTask DisposeAsync()`. `DisposeAsync` wartet mit `await Task.Delay(1)` und gibt `Reader closed: <Name>` aus.
+2. Schreibe hinter den Block `// Read the sources line by line as async streams` und vor die Zeile `// End with exit code 0 …` den Block `// Release a log source reader asynchronously`. Er benutzt zuerst `await using (LogSourceReader reader = new("web", logSources["web"]))` und gibt im Block `Failures in web: <Anzahl>` aus. Danach folgt in einem eigenen Block `{ … }` ein Leser für `"vpn"` als `await using`-Deklaration. Er gibt `Failures in vpn: <Anzahl>` und `End of the block` aus. Nach dem Block gibt das Programm `After the blocks` aus.
+
+<CSharpRunner id="m13-l07-project" code={projectTask} stdin={projectInput} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="seclog-async-solution.cs" />
+
+1. **Klasse schreiben:** `LogSourceReader` ist `sealed`, hat `IAsyncDisposable` und die Methode `DisposeAsync` mit `async` und `ValueTask`. Sie wartet kurz und meldet das Schließen.
+2. **Mit Block:** Die Zeile mit den Fehlversuchen erscheint im Block, `Reader closed: web` danach, weil `DisposeAsync` erst am Ende des Blocks läuft. Die Quelle `web` hat 5 solche Zeilen.
+3. **Als Deklaration:** Der Leser für `vpn` wird am Ende seines Blocks geschlossen, nach `End of the block` und vor `After the blocks`. Die Quelle `vpn` hat 2 solche Zeilen.
+
+</details>
+
+**Neuer Stand:** SecLog liest eine Quelle mit einem Leser, der sich am Ende asynchron schließt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m13-l07-using-calls-disposeasync" />
+
+**„Ein normales `using` ruft auch `DisposeAsync` auf.“** Das stimmt nicht. Ein normales `using` verlangt `IDisposable` und ruft `Dispose` auf. Für einen Typ, der nur `IAsyncDisposable` hat, ist es ein Übersetzungsfehler. Nur `await using` ruft `DisposeAsync` auf und wartet darauf.
+:::
+
+<Quiz id="m13-l07-q2" />
+
+## Zusammenfassung
+
+Ein Typ, der beim Freigeben warten muss, implementiert `IAsyncDisposable` mit `public ValueTask DisposeAsync()`. `await using` ruft `DisposeAsync` am Ende des Blocks auf und wartet darauf, auch wenn der Block durch eine Ausnahme endet. Als Deklaration gilt die Freigabe bis zum Ende des umgebenden Blocks, mehrere Ressourcen werden in umgekehrter Reihenfolge freigegeben. Ein normales `using` ruft `Dispose` auf und passt nicht zu einem Typ, der nur `IAsyncDisposable` hat.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m13-l07-q9" />
+
+### Transferfrage
+
+<Quiz id="m13-l07-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Implement a DisposeAsync method](https://learn.microsoft.com/dotnet/standard/garbage-collection/implementing-disposeasync)
+- Microsoft Learn: [The using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/using)
+- Spezifikation: [§13.14 The using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1314-the-using-statement)
