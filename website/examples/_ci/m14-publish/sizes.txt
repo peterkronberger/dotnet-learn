@@ -1,0 +1,9 @@
+Stand: 2026-11-15, .NET SDK 11.0.100
+framework-dependent: 0.05 MB
+framework-dependent, no apphost: 0.02 MB
+self-contained: 80.21 MB
+self-contained, single file: 73.84 MB
+self-contained, ReadyToRun: 80.21 MB
+self-contained, trimmed: 19.33 MB
+Native AOT: 3.24 MB
+container image: 94.60 MB
