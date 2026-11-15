@@ -339,6 +339,237 @@
       "type": "explain",
       "question": "Transferfrage: Du schreibst ein Programm, das Rechnungen berechnet und als Konsolen-App ausgibt. Später soll eine zweite App dieselben Berechnungen nutzen. Wie teilst du die Projekte auf, und was musst du in der Berechnung `public` machen?",
       "modelAnswer": "Die Berechnung kommt in eine Klassenbibliothek, die Ausgabe in eine Konsolen-App, die auf die Bibliothek verweist. Die zweite App verweist ebenfalls auf die Bibliothek.\n\n`public` müssen die Typen und Member sein, die andere Projekte benutzen. Alles andere bleibt `internal` oder `private` und kann sich ändern, ohne die Apps zu stören."
+    },
+    {
+      "id": "m14-l03-q1",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Welche Konfiguration nutzt `dotnet publish` ohne `-c` bei einem Projekt für .NET 11?",
+      "options": [
+        {
+          "text": "`Release`",
+          "correct": true
+        },
+        {
+          "text": "`Debug`, wie `dotnet build`",
+          "feedback": "Das galt vor .NET 8. Seitdem wählt `dotnet publish` bei Projekten ab .NET 8 von selbst Release."
+        },
+        {
+          "text": "Keine. Ohne `-c` bricht der Befehl ab.",
+          "feedback": "Der Befehl braucht keine Angabe und nimmt Release."
+        }
+      ],
+      "explanation": "Seit .NET 8 baut `dotnet publish` Projekte ab .NET 8 standardmäßig in Release. `dotnet build` nimmt ohne `-c` weiter Debug."
+    },
+    {
+      "id": "m14-l03-q2",
+      "lesson": "m14-l03",
+      "type": "match",
+      "question": "Ordne jede Datei im Ausgabeordner ihrer Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "`m14-l03-build.dll`",
+          "right": "enthält den übersetzten Code (IL) der App"
+        },
+        {
+          "left": "`m14-l03-build` (Linux)",
+          "right": "Apphost: Datei zum Starten für das Betriebssystem"
+        },
+        {
+          "left": "`m14-l03-build.pdb`",
+          "right": "enthält Debug-Informationen"
+        },
+        {
+          "left": "`m14-l03-build.deps.json`",
+          "right": "listet die Abhängigkeiten der App auf"
+        },
+        {
+          "left": "`m14-l03-build.runtimeconfig.json`",
+          "right": "nennt die .NET-Laufzeit, die die App braucht"
+        }
+      ],
+      "explanation": "Die Assembly enthält den Code, die Apphost startet ihn. Die drei anderen Dateien liefern Zusatzangaben: Debug-Informationen, Abhängigkeiten und die Laufzeit."
+    },
+    {
+      "id": "m14-l03-q3",
+      "lesson": "m14-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Debug und Release stimmen für die kleine App dieser Lektion?",
+      "options": [
+        {
+          "text": "In Release ist `Optimize` an, in Debug aus.",
+          "correct": true
+        },
+        {
+          "text": "Das Symbol `DEBUG` ist in Debug definiert und in Release nicht.",
+          "correct": true
+        },
+        {
+          "text": "Beide Konfigurationen erzeugen eine `.pdb`-Datei.",
+          "correct": true
+        },
+        {
+          "text": "In Release fehlt die `.pdb`-Datei.",
+          "feedback": "`DebugType` ist in beiden Konfigurationen `portable`, deshalb liegt auch im Release-Ordner eine `.pdb`-Datei."
+        },
+        {
+          "text": "`dotnet build` nutzt ohne `-c` die Konfiguration Release.",
+          "feedback": "Ohne `-c` baut `dotnet build` in Debug."
+        }
+      ],
+      "explanation": "Release schaltet die Optimierung ein und kennt `DEBUG` nicht. Debug-Informationen entstehen in beiden Konfigurationen."
+    },
+    {
+      "id": "m14-l03-q4",
+      "lesson": "m14-l03",
+      "type": "cloze",
+      "question": "Ergänze die Direktiven. Das Symbol `EXTRA` soll definiert sein, und die zweite Ausgabe soll nur ohne `EXTRA` übersetzt werden.",
+      "example": "m14/l03/gap-conditional.cs",
+      "blanks": [
+        {
+          "text": "#define",
+          "hint": "Diese Direktive definiert ein Symbol."
+        },
+        {
+          "text": "#if",
+          "hint": "Diese Direktive beginnt die Bedingung."
+        },
+        {
+          "text": "#else",
+          "hint": "Dieser Abschnitt gilt, wenn die Bedingung nicht zutrifft."
+        },
+        {
+          "text": "#endif",
+          "hint": "Diese Direktive beendet die Gruppe."
+        }
+      ],
+      "explanation": "`#define` definiert `EXTRA`. `#if` prüft das Symbol, `#else` gilt sonst, und `#endif` schließt die Gruppe."
+    },
+    {
+      "id": "m14-l03-q5",
+      "lesson": "m14-l03",
+      "type": "find-bug",
+      "question": "Der Build bricht mit dem Fehler CS1032 ab. Welche Zeile ist die Ursache?",
+      "example": "m14/l03/define-too-late.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Die Anweisung ist in Ordnung. Sie ist aber der erste Code der Datei."
+        },
+        "3": {
+          "feedback": "Die Bedingung ist richtig geschrieben. Der Fehler liegt davor."
+        }
+      },
+      "explanation": "`#define` muss vor dem ersten Token der Datei stehen. Hier steht schon eine Anweisung davor."
+    },
+    {
+      "id": "m14-l03-q6",
+      "lesson": "m14-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l03/quiz-conditional.cs",
+      "explanation": "`VERBOSE` wird definiert und wieder aufgehoben. Deshalb trifft `#if VERBOSE` nicht zu, `#elif TRACE_STEPS` trifft zu. `#if !VERBOSE` trifft ebenfalls zu."
+    },
+    {
+      "id": "m14-l03-q7",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Auf einen Rechner mit installiertem .NET 11 kopierst du nur `m14-l03-build.dll` und die Nachbardateien ohne Apphost. Wie startest du das Programm?",
+      "options": [
+        {
+          "text": "`dotnet m14-l03-build.dll`",
+          "correct": true
+        },
+        {
+          "text": "`./m14-l03-build`",
+          "feedback": "Diese Datei ist die Apphost. Du hast sie nicht kopiert."
+        },
+        {
+          "text": "`dotnet run`",
+          "feedback": "`dotnet run` baut aus dem Quelltext und braucht ein Projekt. Hier gibt es nur die gebauten Dateien."
+        }
+      ],
+      "explanation": "`dotnet <app>.dll` startet eine Assembly ohne Apphost. Es braucht eine installierte Laufzeit."
+    },
+    {
+      "id": "m14-l03-q8",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Eine framework-abhängige App ist für `11.0.0` gebaut. Auf dem Rechner sind die Laufzeiten `11.0.1` und `11.0.3` installiert. Mit welcher läuft sie?",
+      "options": [
+        {
+          "text": "Mit `11.0.3`, der neuesten installierten Patch-Version.",
+          "correct": true
+        },
+        {
+          "text": "Mit `11.0.0`, denn die Datei `.runtimeconfig.json` nennt genau diese Version.",
+          "feedback": "Die Datei nennt die Mindestversion. Der Start nimmt den neuesten installierten Patch derselben Version."
+        },
+        {
+          "text": "Sie läuft nicht, weil `11.0.0` fehlt.",
+          "feedback": "Roll-forward lässt die App mit dem neuesten installierten Patch laufen."
+        }
+      ],
+      "explanation": "Roll-forward wählt den neuesten installierten Patch. Eine höhere Major-Version würde der Start standardmäßig nicht nehmen."
+    },
+    {
+      "id": "m14-l03-q9",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Ein Team liefert SecLog aus dem Ordner `bin/Debug/net11.0/` an Kunden aus, weil das Programm dort läuft. Welche Bewertung stimmt?",
+      "options": [
+        {
+          "text": "Für die Auslieferung nimmt das Team Release, am besten über `dotnet publish`. Debug schaltet die Optimierung aus und behält Code unter `#if DEBUG`.",
+          "correct": true
+        },
+        {
+          "text": "Ein Debug-Build ist für die Produktion gut genug: Er läuft mit demselben Code, nur mit anderem Ordnernamen.",
+          "feedback": "Debug schaltet die Optimierung aus, und Code unter `#if DEBUG` bleibt im Programm.",
+          "misconception": "m14-l03-debug-build-for-production"
+        },
+        {
+          "text": "Ein Debug-Build läuft nicht ohne Debugger.",
+          "feedback": "Ein Debug-Build läuft wie jedes Programm auch ohne Debugger."
+        }
+      ],
+      "explanation": "Die Konfiguration ändert Einstellungen und Symbole. Für die Auslieferung ist Release gedacht, und `dotnet publish` wählt es von selbst."
+    },
+    {
+      "id": "m14-l03-q10",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Die Projektdatei enthält `<DefineConstants>$(DefineConstants);AUDIT</DefineConstants>`. Was bewirkt die Zeile?",
+      "options": [
+        {
+          "text": "Das Symbol `AUDIT` wird zu den bisherigen Symbolen hinzugefügt.",
+          "correct": true
+        },
+        {
+          "text": "Alle bisherigen Symbole wie `DEBUG` entfallen, nur `AUDIT` bleibt.",
+          "feedback": "`$(DefineConstants)` steht für die bisherigen Symbole, sie bleiben erhalten."
+        },
+        {
+          "text": "Die Zeile ersetzt `#define AUDIT` in jeder Datei.",
+          "feedback": "Die Eigenschaft ergänzt die Symbole für das ganze Projekt. `#define` gilt nur in seiner Datei."
+        }
+      ],
+      "explanation": "`$(DefineConstants)` enthält die bisherigen Symbole. Die Zeile hängt `AUDIT` an."
+    },
+    {
+      "id": "m14-l03-q11",
+      "lesson": "m14-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `dotnet build` erzeugt, was `dotnet publish` anders macht und was Debug und Release ändern.",
+      "modelAnswer": "`dotnet build` übersetzt das Projekt und legt Assembly, Apphost, `.pdb`, `.deps.json` und `.runtimeconfig.json` in `bin/<Konfiguration>/<Zielframework>/` ab, ohne `-c` in Debug. `dotnet publish` bereitet die App für die Auslieferung vor und baut seit .NET 8 standardmäßig Release.\n\nRelease schaltet die Optimierung ein, und das Symbol `DEBUG` ist nur in Debug definiert. Code unter `#if DEBUG` steckt deshalb nur im Debug-Build."
+    },
+    {
+      "id": "m14-l03-q12",
+      "lesson": "m14-l03",
+      "type": "explain",
+      "question": "Transferfrage: Dein Programm soll in der Entwicklung zusätzliche Prüfzeilen ausgeben, in der Auslieferung nicht. Wie erreichst du das, und wie startest du die ausgelieferte Version ohne Entwicklungsumgebung?",
+      "modelAnswer": "Die Prüfzeilen stehen unter `#if DEBUG`. Im Debug-Build sind sie enthalten, im Release-Build übersetzt der Compiler sie nicht.\n\nDie Auslieferung baust du mit Release, am besten mit `dotnet publish`. Gestartet wird sie mit der Apphost oder mit `dotnet <app>.dll`. Auf dem Zielrechner muss eine passende .NET-Laufzeit installiert sein."
     }
   ]
 }

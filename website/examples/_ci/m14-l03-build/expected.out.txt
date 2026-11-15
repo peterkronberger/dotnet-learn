@@ -1,0 +1,39 @@
+== dotnet build (no -c: the default configuration) ==
+m14-l03-build
+m14-l03-build.deps.json
+m14-l03-build.dll
+m14-l03-build.pdb
+m14-l03-build.runtimeconfig.dev.json
+m14-l03-build.runtimeconfig.json
+
+== dotnet build -c Release ==
+m14-l03-build
+m14-l03-build.deps.json
+m14-l03-build.dll
+m14-l03-build.pdb
+m14-l03-build.runtimeconfig.json
+
+== What the configuration changes ==
+Debug: Optimize=false, DebugType=portable, DEBUG defined=yes
+Release: Optimize=true, DebugType=portable, DEBUG defined=no
+
+== Ways to start the Release build ==
+$ dotnet run -c Release
+Build: Release
+Symbol AUDIT: set in the project file
+Symbol FILE_SYMBOL: set with #define
+$ ./m14-l03-build
+Build: Release
+Symbol AUDIT: set in the project file
+Symbol FILE_SYMBOL: set with #define
+$ dotnet m14-l03-build.dll
+Build: Release
+Symbol AUDIT: set in the project file
+Symbol FILE_SYMBOL: set with #define
+
+== m14-l03-build.runtimeconfig.json (framework part) ==
+    "tfm": "net11.0",
+    "framework": {
+      "name": "Microsoft.NETCore.App",
+      "version": "11.0.0"
+    },
