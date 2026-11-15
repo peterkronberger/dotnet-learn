@@ -1,0 +1,211 @@
+---
+title: Solutions, Projektverweise und NuGet-Pakete
+sidebar_position: 2
+description: Ein Programm aus mehreren Projekten. Solution, Projektverweise, NuGet-Pakete, die Assembly als Einheit der Auslieferung und was internal bedeutet.
+lesson_id: m14-l02
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import packageDirective from '!!raw-loader!@site/examples/m14/l02/package-directive.cs';
+import packageDirectiveOutput from '!!raw-loader!@site/examples/m14/l02/package-directive.out.txt';
+import solutionFile from '!!raw-loader!@site/examples/_ci/seclog-m14-l02/SecLog.slnx';
+import coreProject from '!!raw-loader!@site/examples/_ci/seclog-m14-l02/src/SecLog.Core/SecLog.Core.csproj';
+import cliProject from '!!raw-loader!@site/examples/_ci/seclog-m14-l02/src/SecLog.Cli/SecLog.Cli.csproj';
+import logEventBefore from '!!raw-loader!@site/examples/_ci/seclog-m14-l01/Model/LogEvent.cs';
+import logEventAfter from '!!raw-loader!@site/examples/_ci/seclog-m14-l02/src/SecLog.Core/Model/LogEvent.cs';
+
+# Solutions, Projektverweise und NuGet-Pakete
+
+:::note[Lernziele]
+- Du kannst eine Solution mit einer Bibliothek und einer Konsolen-App anlegen.
+- Du kannst einen Projektverweis und ein NuGet-Paket hinzufügen.
+- Du kannst erklären, was eine Assembly ist und was `internal` bedeutet.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l01-q3" />
+
+<Quiz id="m14-l01-q7" />
+
+<Quiz id="m06-l03-q4" />
+
+## Warum mehrere Projekte?
+
+SecLog ist ein Projekt. Das genügt, solange alles in einem Programm steckt. Die Regeln von SecLog, also Ereignisse, Erkennung und Vorfälle, sollen aber später ein Testprojekt prüfen, und das Testprojekt muss sie benutzen können. Dafür trennst du die Regeln von der Konsolenausgabe: Die Regeln kommen in eine Bibliothek, die Ausgabe bleibt in der App.
+
+Eine <Term id="class-library">Klassenbibliothek</Term> (class library) ist ein Projekt ohne Startpunkt. Sie stellt nur Typen für andere Projekte bereit. Eine <Term id="solution">Solution</Term> fasst mehrere Projekte zusammen, damit du sie gemeinsam baust. Ihre Datei hat die Endung `.slnx`.
+
+```bash title="Solution mit Bibliothek und Konsolen-App anlegen"
+dotnet new sln -n SecLog
+dotnet new classlib -o src/SecLog.Core
+dotnet new console -o src/SecLog.Cli
+dotnet sln add src/SecLog.Core src/SecLog.Cli
+```
+
+`dotnet new sln` legt `SecLog.slnx` an, `dotnet new classlib` und `dotnet new console` legen die zwei Projekte an. `dotnet sln add` trägt beide Projekte in die Solution ein. Danach baut `dotnet build` im Ordner mit der Datei `SecLog.slnx` alle Projekte der Solution.
+
+## Projektverweise
+
+Die App braucht den Code der Bibliothek. Dafür trägt sie einen <Term id="project-reference">Projektverweis</Term> (project reference) ein:
+
+```bash title="Projektverweis hinzufügen"
+dotnet reference add src/SecLog.Core --project src/SecLog.Cli
+```
+
+Der Befehl schreibt einen `ProjectReference` in die Projektdatei der App. Das ist die Projektdatei von `SecLog.Cli` aus dem Projektschritt:
+
+<CodeBlock language="xml" title="src/SecLog.Cli/SecLog.Cli.csproj">{cliProject}</CodeBlock>
+
+Der Verweis kopiert keinen Quelltext. Er sagt dem SDK, dass `SecLog.Cli` die gebaute Bibliothek benutzt. Beim Bauen entsteht deshalb zuerst `SecLog.Core`, dann `SecLog.Cli`.
+
+## Die Assembly
+
+Jedes Projekt wird beim Bauen zu einer <Term id="assembly">Assembly</Term>: einer `.dll`-Datei, bei einer App auch mit einer ausführbaren Datei. Sie enthält den übersetzten Code. Die Assembly ist die Einheit, die du auslieferst. Im Ordner `bin` der App liegen nach dem Bauen `SecLog.Cli.dll` und `SecLog.Core.dll` nebeneinander. Die App findet dort die Bibliothek, die sie benutzt.
+
+Die Assembly ist auch die Grenze für `internal`. Aus Modul 6 kennst du `public` und `private`. Ein Typ ohne Modifizierer ist `internal`: Er ist in der eigenen Assembly sichtbar und in jeder anderen unsichtbar. Innerhalb eines Projekts sieht jede Klasse die `internal`-Member der anderen. Ein anderes Projekt sieht sie nicht, auch nicht mit einem Projektverweis.
+
+Das gilt auch für `closed`-Typen aus Modul 12: Ihre direkten Untertypen dürfen nur in derselben Assembly stehen.
+
+## NuGet-Pakete
+
+Fertigen Code anderer Teams liefern <Term id="nuget-package">NuGet-Pakete</Term>. Ein Paket enthält Assemblies und Angaben dazu. Du bindest es mit einem `PackageReference` ein:
+
+```bash title="NuGet-Paket hinzufügen"
+dotnet package add Newtonsoft.Json --version 13.0.3 --project src/SecLog.Cli
+```
+
+```xml title="Eintrag in der Projektdatei"
+<ItemGroup>
+  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+</ItemGroup>
+```
+
+Beim Bauen lädt `dotnet restore` fehlende Pakete herunter. Du rufst den Befehl selten selbst auf, denn `dotnet build` und `dotnet run` führen ihn bei Bedarf aus.
+
+SecLog bekommt in dieser Lektion kein Paket. Das Test-Framework kommt später im Modul in ein eigenes Projekt. Ein Paket zeigt sich gut in einer dateibasierten App, denn dort ersetzt die Direktive `#:package` den `PackageReference`:
+
+:::info[Vorhersage]
+Das Paket `Newtonsoft.Json` liefert die Klasse `JsonConvert`. Sie macht aus einem Objekt Text im JSON-Format, einem Textformat für Daten. Was gibt das Programm aus?
+:::
+
+<CodeBlock language="csharp" title="package-directive.cs">{packageDirective}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Paket aufnehmen:** `#:package Newtonsoft.Json@13.0.3` nennt Paket und Version. Das SDK lädt es beim Start.
+2. **Namespace öffnen:** `using Newtonsoft.Json;` macht die Klasse `JsonConvert` mit ihrem kurzen Namen sichtbar.
+3. **Methode nutzen:** `JsonConvert.SerializeObject(row)` schreibt die Eigenschaften des Objekts als Text, jede mit Name und Wert.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{packageDirectiveOutput.trim()}</code></pre>
+
+Was passiert, wenn du die Zeile `#:package` löschst? Dann findet der Compiler den Namespace `Newtonsoft.Json` nicht, und der Build scheitert.
+
+</details>
+
+## Befehle zuordnen
+
+<Quiz id="m14-l02-q4" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog ist ein Projekt mit `Program.cs` und den Typen unter `Model/` (Stand von Lektion 1).
+
+**Neue Anforderung:** SecLog wird eine Solution aus einer Bibliothek und einer App. Die Typen aus `Model/` ziehen in das Projekt `SecLog.Core`. `Program.cs` zieht in das Projekt `SecLog.Cli`, das auf `SecLog.Core` verweist. Die Typen, die die App benutzt, werden `public`. Die Ausgabe bleibt unverändert.
+
+Das ist der Anfang der Datei `Model/LogEvent.cs` im Projekt von Lektion 1:
+
+<CodeBlock language="csharp" title="Model/LogEvent.cs (Lektion 1)">{logEventBefore}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+Die Ordnerstruktur der Solution:
+
+```text title="SecLog/"
+SecLog/
+├── SecLog.slnx
+├── seclog-input.txt
+└── src/
+    ├── SecLog.Core/
+    │   ├── SecLog.Core.csproj
+    │   └── Model/ …
+    └── SecLog.Cli/
+        ├── SecLog.Cli.csproj
+        └── Program.cs
+```
+
+<CodeBlock language="xml" title="SecLog.slnx">{solutionFile}</CodeBlock>
+
+<CodeBlock language="xml" title="src/SecLog.Core/SecLog.Core.csproj">{coreProject}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/LogEvent.cs">{logEventAfter}</CodeBlock>
+
+1. **Solution anlegen:** `SecLog.slnx` listet die zwei Projekte.
+2. **Bibliothek:** `SecLog.Core` hat kein `OutputType`, also ist es eine Klassenbibliothek. Die Dateien aus `Model/` ziehen unverändert um.
+3. **App und Verweis:** `SecLog.Cli` ist die Konsolen-App mit `Program.cs` und einem `ProjectReference` auf die Bibliothek.
+4. **Sichtbarkeit:** Jeder Typ aus `Model/` bekommt `public`. Ohne das scheitert das Bauen der App mit dem Fehler CS0122, denn ein Typ ohne Modifizierer ist `internal` und liegt in einer anderen Assembly. `Report` bekommt zusätzlich den Namespace `SecLog.Model`, damit die Typen der Bibliothek in einem Namespace liegen. `Program.cs` bleibt unverändert, denn es hat schon `using SecLog.Model;`.
+5. **Gleichheit prüfen:** Die Ausgabe ist identisch mit der aus Lektion 1 und Modul 13. Die CI vergleicht sie.
+
+</details>
+
+**Neuer Stand:** SecLog ist eine Solution (`_ci/seclog-m14-l02/`) aus einer Bibliothek für die Regeln und einer App für die Ausgabe. Ein Testprojekt kann künftig auf die Bibliothek verweisen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l02-project-reference-copies-source" />
+
+**„Ein Projektverweis kopiert den Quelltext in das andere Projekt.“** Das stimmt nicht. Der Verweis zeigt auf das andere Projekt. Beim Bauen entsteht dessen Assembly, und das verweisende Projekt benutzt sie.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l02-internal-hides-from-classes" />
+
+**„`internal` verbirgt einen Member vor den anderen Klassen im selben Projekt.“** Das stimmt nicht. `internal` schließt nur Code aus anderen Assemblies aus. Innerhalb der Assembly sieht jede Klasse die `internal`-Member der anderen. Verborgen vor anderen Klassen ist nur `private`.
+:::
+
+<Quiz id="m14-l02-q1" />
+
+<Quiz id="m14-l02-q3" />
+
+<Quiz id="m14-l02-q2" />
+
+<details>
+<summary>Vertiefung: Zugriffsbereich von internal (optional)</summary>
+
+`internal` begrenzt den Zugriff auf die aktuelle Assembly. Typen auf oberster Ebene sind entweder `public` oder `internal`, und ohne Modifizierer gilt `internal`. Das beschreibt die Seite zu den [Zugriffsebenen](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/accessibility-levels).
+
+Ein Typ muss nicht ganz `public` sein, damit ein anderes Projekt ihn sieht. Es genügt, die Typen und Member `public` zu machen, die andere Projekte brauchen. Alles andere bleibt `internal` und kann sich ändern, ohne andere Projekte zu stören.
+
+</details>
+
+## Zusammenfassung
+
+Eine Solution (`.slnx`) fasst mehrere Projekte zusammen. Eine Klassenbibliothek hat keinen Startpunkt und stellt Typen bereit. Ein Projektverweis lässt ein Projekt die Assembly eines anderen benutzen, ohne Quelltext zu kopieren. Ein NuGet-Paket kommt mit `PackageReference` ins Projekt, und `dotnet restore` lädt es. Jedes Projekt wird zu einer Assembly, der Einheit der Auslieferung. `internal` gilt in genau dieser Assembly, was ein anderes Projekt nutzen soll, muss `public` sein.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l02-q5" />
+
+<Quiz id="m14-l02-q6" />
+
+<Quiz id="m14-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m14-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Organizing and testing projects with the .NET CLI](https://learn.microsoft.com/dotnet/core/tutorials/testing-with-cli)
+- Microsoft Learn: [Package references in project files](https://learn.microsoft.com/nuget/consume-packages/package-references-in-project-files)
+- Microsoft Learn: [Accessibility levels](https://learn.microsoft.com/dotnet/csharp/language-reference/keywords/accessibility-levels)
