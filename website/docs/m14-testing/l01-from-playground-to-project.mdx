@@ -1,0 +1,252 @@
+---
+title: Vom Playground zum Projekt
+sidebar_position: 1
+description: Der Schritt vom Playground zum echten .NET-Projekt. SDK und dotnet-Befehl, dateibasierte Apps als Brücke, die Projektdatei und der #nullable-Schalter.
+lesson_id: m14-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import helloFileApp from '!!raw-loader!@site/examples/m14/l01/hello-file-app.cs';
+import helloFileAppOutput from '!!raw-loader!@site/examples/m14/l01/hello-file-app.out.txt';
+import includeMain from '!!raw-loader!@site/examples/m14/l01/include-main.cs';
+import includeMainOutput from '!!raw-loader!@site/examples/m14/l01/include-main.out.txt';
+import includeHelper from '!!raw-loader!@site/examples/m14/l01/include-helper.snippet.cs';
+import nullableDirective from '!!raw-loader!@site/examples/m14/l01/nullable-directive.cs';
+import nullableDirectiveOutput from '!!raw-loader!@site/examples/m14/l01/nullable-directive.out.txt';
+import programHead from '!!raw-loader!@site/examples/m14/l01/program-head.snippet.cs';
+import projectFile from '!!raw-loader!@site/examples/_ci/seclog-m14-l01/SecLog.csproj';
+
+# Vom Playground zum Projekt
+
+:::note[Lernziele]
+- Du kannst ein C#-Programm als dateibasierte App mit `dotnet run` starten.
+- Du kannst eine Projektdatei lesen: Zielframework, Nullable, Implicit Usings und Warnungen als Fehler.
+- Du kannst eine dateibasierte App mit `dotnet project convert` in ein Projekt umwandeln.
+- Du kannst erklären, was das SDK und der Befehl `dotnet` tun.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog ist ein echtes .NET-Projekt: eine Solution mit Bibliothek, Konsolen-App und Testprojekt.
+- SecLog hat Unit-Tests für seine Regeln, auch für Zeitfenster mit einer Fake-Zeitquelle.
+- SecLog lässt sich veröffentlichen und ohne Entwicklungsumgebung starten.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m06-l03-q1" />
+
+<Quiz id="m06-l09-q1" />
+
+## Was der Playground dir abnimmt
+
+Bis hierher lief jeder Code im Playground. Dort steckt alles Nötige schon im Hintergrund: der Compiler, die Bibliotheken und die Einstellungen. Ein Programm auf deinem eigenen Rechner braucht dieselben Teile, und das <Term id="sdk">SDK</Term> liefert sie. Es enthält den Compiler, die Bibliotheken und den Befehl `dotnet`. Mit dem <Term id="dotnet-cli">dotnet-Befehl</Term> (dotnet CLI) legst du Projekte an, baust sie und startest sie:
+
+```bash title="Die ersten Befehle"
+dotnet new console -n SecLog
+cd SecLog
+dotnet build
+dotnet run
+```
+
+`dotnet new console` legt aus einer Vorlage ein neues Konsolenprojekt an. `dotnet build` übersetzt es, `dotnet run` baut bei Bedarf und startet das Programm. Wie sich Bauen und Veröffentlichen unterscheiden, ist Thema von Lektion 3 und 4.
+
+Ein Projekt besteht aus einer Projektdatei und deinen `.cs`-Dateien. Es gibt aber einen kürzeren Weg, der nur eine Datei braucht.
+
+## Dateibasierte Apps als Brücke
+
+<Since dotnet="10" />
+
+Eine <Term id="file-based-app">dateibasierte App</Term> (file-based app) ist ein C#-Programm in einer einzigen `.cs`-Datei. Du startest sie mit `dotnet run datei.cs`, eine Projektdatei brauchst du nicht. Das SDK erzeugt die Projekteinstellungen selbst. Wo du sie ändern willst, schreibst du am Dateianfang <Term id="preprocessing-directive">Direktiven</Term>: Zeilen, die mit `#` beginnen und den Compiler steuern, statt Code zu sein.
+
+<CodeBlock language="csharp" title="hello-file-app.cs">{helloFileApp}</CodeBlock>
+
+Die Datei enthält drei Besonderheiten:
+
+- `#!/usr/bin/env dotnet` ist die Shebang-Zeile. Sie steht ganz oben und erlaubt unter Linux und macOS, die Datei direkt zu starten.
+- `#:property TreatWarningsAsErrors=true` setzt eine Projekteigenschaft. Mit dieser Eigenschaft scheitert der Build bei jeder Warnung.
+- Alles danach ist gewöhnlicher C#-Code mit Top-Level-Statements, wie du ihn kennst.
+
+Ein Lauf mit `dotnet run hello-file-app.cs` gibt aus:
+
+<pre><code>{helloFileAppOutput.trim()}</code></pre>
+
+Zwei weitere Direktiven wählen ein anderes SDK (`#:sdk`) und nehmen ein NuGet-Paket auf (`#:package`, Lektion 2). Eine dritte teilt eine App auf mehrere Dateien auf.
+
+### Eine App auf mehrere Dateien verteilen
+
+<Since dotnet="11" />
+
+Die Direktive `#:include` nimmt eine weitere Datei in die App auf. Die aufgenommene Datei darf Typen enthalten, aber keine Top-Level-Statements. Eine App, die `#:include` nutzt, beginnt mit der Shebang-Zeile.
+
+<CodeBlock language="csharp" title="include-main.cs">{includeMain}</CodeBlock>
+
+<CodeBlock language="csharp" title="include-helper.snippet.cs">{includeHelper}</CodeBlock>
+
+Ein Lauf von `include-main.cs` gibt aus:
+
+<pre><code>{includeMainOutput.trim()}</code></pre>
+
+### Aus der Datei wird ein Projekt
+
+Wächst eine App, wandelst du sie um:
+
+```bash title="Eine dateibasierte App in ein Projekt umwandeln"
+dotnet project convert hello-file-app.cs
+```
+
+Der Befehl legt in einem neuen Ordner mit dem Namen der App eine Kopie der Datei und eine `.csproj`-Datei an. Die `#:`-Zeilen werden zu Einträgen der Projektdatei, die Originaldatei bleibt unverändert. Danach läuft die App als Projekt.
+
+## Die Projektdatei
+
+Die <Term id="project-file">Projektdatei</Term> (`.csproj`) ist eine XML-Datei. Sie sagt dem SDK, wie das Projekt gebaut wird. Das ist die Projektdatei von SecLog:
+
+<CodeBlock language="xml" title="SecLog.csproj">{projectFile}</CodeBlock>
+
+- `Sdk="Microsoft.NET.Sdk"` wählt das Standard-SDK für Konsolen-Apps und Bibliotheken.
+- `OutputType` `Exe` macht das Projekt zu einem Programm mit Startpunkt.
+- `TargetFramework` ist das <Term id="target-framework">Zielframework</Term>: die .NET-Version, für die gebaut wird. `net11.0` steht für .NET 11.
+- `Nullable` `enable` schaltet die Nullable-Prüfung für alle Dateien ein (Modul 4, Lektion 4).
+- `ImplicitUsings` `enable` fügt <Term id="implicit-usings">globale `using`-Zeilen</Term> für häufige Namespaces hinzu (Modul 6, Lektion 9). Deshalb brauchst du für `Console` kein `using System;`.
+- `TreatWarningsAsErrors` `true` macht jede Warnung zu einem Fehler. Ein Build mit Warnung gilt dann als gescheitert.
+- `InvariantGlobalization` `true` macht Zahlen- und Datumsformate unabhängig von der Sprache des Rechners. Der Playground arbeitet genauso, deshalb bleibt die Ausgabe von SecLog gleich.
+
+Eine Liste der Quelldateien steht nicht in der Datei. Das SDK nimmt alle `.cs`-Dateien unter dem Projektordner auf. Du legst eine neue Datei an, und sie ist dabei.
+
+## Der Schalter `#nullable`
+
+Die Einstellung `Nullable` gilt für das ganze Projekt. Die Direktive `#nullable` überschreibt sie für einen Abschnitt einer Datei: `#nullable disable` schaltet die Prüfung aus, `#nullable enable` wieder ein. Die Einstellung in der Projektdatei ist also der Standard, die Direktive die Ausnahme.
+
+:::info[Vorhersage]
+Das Programm setzt `TreatWarningsAsErrors`, und `string plain = null;` steht in einem Abschnitt mit `#nullable disable`. Wird es übersetzt? Welche Zeilen gibt es aus?
+:::
+
+<CodeBlock language="csharp" title="nullable-directive.cs">{nullableDirective}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Standard:** Eine dateibasierte App hat die Nullable-Prüfung eingeschaltet. `string? lastIp = null;` ist erlaubt, denn `string?` darf `null` sein.
+2. **Abschnitt ausschalten:** `#nullable disable` schaltet die Prüfung ab dieser Zeile aus. `string plain = null;` erzeugt deshalb keine Warnung. Ohne die Direktive entstünde die Warnung CS8600, und `TreatWarningsAsErrors` machte daraus einen Fehler.
+3. **Wieder einschalten:** `#nullable enable` stellt die Prüfung wieder her.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{nullableDirectiveOutput.trim()}</code></pre>
+
+Was passiert, wenn du die Zeile `#nullable disable` löschst? Dann wird die Datei nicht mehr übersetzt: Die Warnung CS8600 wird zum Fehler.
+
+</details>
+
+<Quiz id="m14-l01-q4" />
+
+<Quiz id="m14-l01-q5" />
+
+Die Aufgabe zeigt die Rollenverteilung: Die Projektdatei legt den Standard fest, `#nullable` ändert ihn dort, wo es nötig ist. In diesem Kurs bleibt `Nullable` eingeschaltet. Die Direktive brauchst du nur, um sie zu kennen.
+
+## Direktiven selbst ergänzen
+
+Die Direktiven haben jetzt drei Rollen: Eigenschaft setzen, Datei aufnehmen, Nullable-Abschnitt steuern. Ergänze sie in diesem Programm:
+
+<Quiz id="m14-l01-q6" />
+
+Ordne dann die Einstellungen der Projektdatei ihrer Wirkung zu:
+
+<Quiz id="m14-l01-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog ist ein einziges langes Programm in einer Datei. In dieser Lektion kommt keine neue Funktion dazu. SecLog zieht um: Das ist ein Umbau, deshalb startet der Schritt vom Stand am Ende von Modul 13.
+
+Du siehst nur die ersten Zeilen des Programms, denn die Datei hat über 2500 Zeilen:
+
+<CodeBlock language="csharp" title="seclog-async-solution.cs (Anfang)">{programHead}</CodeBlock>
+
+**Neue Anforderung:** SecLog wird ein Projekt mit den gezeigten Projekteinstellungen. Die Anweisungen des Programms bleiben unverändert in `Program.cs`. Die Typen aus dem Namespace `SecLog.Model` und die Klasse `Report` ziehen in Dateien unter `Model/`, eine Datei pro Typ. Die Ausgabe muss Zeichen für Zeichen dieselbe bleiben.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+Die Ordnerstruktur nach dem Umbau:
+
+```text title="SecLog/"
+SecLog/
+├── SecLog.csproj
+├── Program.cs
+├── seclog-input.txt
+└── Model/
+    ├── Counter.cs
+    ├── Detector.cs
+    ├── Incident.cs
+    ├── LogEvent.cs
+    ├── Report.cs
+    └── … (je eine Datei pro Typ)
+```
+
+Gestartet wird das Projekt mit der Eingabe von früher:
+
+```bash title="SecLog starten"
+dotnet run --project SecLog.csproj < seclog-input.txt
+```
+
+1. **Projekt anlegen:** `SecLog.csproj` enthält die Einstellungen von oben. Die Projektdatei zählt keine Quelldateien auf.
+2. **Anweisungen behalten:** `Program.cs` enthält die Top-Level-Statements und lokalen Funktionen von früher. Nur die Fold-Markierungen des Lernsystems fallen weg.
+3. **Typen verteilen:** Jeder Typ aus `SecLog.Model` steht in einer eigenen Datei mit `namespace SecLog.Model;`. `Report` hat keinen Namespace und steht in `Model/Report.cs`.
+4. **Gleichheit prüfen:** Die Ausgabe des Projekts ist identisch mit der Ausgabe von Modul 13. Die Prüfung läuft in der CI: Sie vergleicht beide Ausgaben.
+
+</details>
+
+**Neuer Stand:** SecLog ist ein .NET-Projekt (`_ci/seclog-m14-l01/`), das dasselbe tut wie vorher. Jede Datei hat nun eine klare Aufgabe.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l01-file-based-is-scripting-dialect" />
+
+**„Eine dateibasierte App ist ein Skript in einem eigenen Dialekt.“** Das stimmt nicht. Eine dateibasierte App ist normales C#, übersetzt vom selben Compiler. Nur die Projektdatei fehlt, weil das SDK die Einstellungen aus den `#:`-Zeilen erzeugt.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l01-project-file-lists-sources" />
+
+**„In der Projektdatei steht die Liste aller Quelldateien.“** Das stimmt nicht. Das SDK nimmt alle `.cs`-Dateien unter dem Projektordner automatisch auf. Eine neue Datei brauchst du nirgends einzutragen.
+:::
+
+<Quiz id="m14-l01-q2" />
+
+<Quiz id="m14-l01-q3" />
+
+<details>
+<summary>Vertiefung: Wie das SDK die Dateien findet (optional)</summary>
+
+Das SDK verwaltet drei Arten von Einträgen für ein Projekt: zu übersetzende Quelldateien (`Compile`), eingebettete Ressourcen und sonstige Dateien. Für `Compile` gilt das Muster `**/*.cs`. Ausgeschlossen sind unter anderem `bin`, `obj` und die Projekt- und Solution-Dateien selbst. Trägst du eine Datei, die schon durch das Muster erfasst ist, zusätzlich von Hand ein, entsteht der Fehler NETSDK1022. Die Muster sind in der Übersicht zum [Projekt-SDK](https://learn.microsoft.com/dotnet/core/project-sdk/overview) beschrieben.
+
+Die Befehle der dateibasierten Apps sind nur zum Teil gleich alt: Dateibasierte Apps gibt es ab dem .NET 10 SDK, `#:include` ab .NET 11. Eine dateibasierte App hat außerdem andere Standardwerte als ein Projekt aus `dotnet new`: Sie ist standardmäßig für Native AOT und als .NET-Tool vorbereitet. Die Seite zu [dateibasierten Apps](https://learn.microsoft.com/dotnet/core/sdk/file-based-apps) nennt die Details.
+
+</details>
+
+## Zusammenfassung
+
+Das SDK enthält Compiler, Bibliotheken und den Befehl `dotnet`, der Projekte anlegt, baut und startet. Eine dateibasierte App ist ein C#-Programm in einer Datei, das `dotnet run datei.cs` startet. Ihre Einstellungen stehen in `#:`-Zeilen, und `dotnet project convert` macht daraus ein Projekt. Die Projektdatei legt Zielframework, Nullable, Implicit Usings und Warnungen als Fehler fest, ohne Quelldateien aufzuzählen. `#nullable` überschreibt die Nullable-Einstellung für einen Abschnitt. SecLog ist jetzt ein Projekt mit denselben Anweisungen wie vorher.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l01-q1" />
+
+<Quiz id="m14-l01-q10" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l01-q8" />
+
+### Transferfrage
+
+<Quiz id="m14-l01-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dateibasierte Apps (File-based apps)](https://learn.microsoft.com/dotnet/core/sdk/file-based-apps)
+- Microsoft Learn: [MSBuild-Referenz für .NET-SDK-Projekte](https://learn.microsoft.com/dotnet/core/project-sdk/msbuild-props)
+- Microsoft Learn: [Nullable-Verweistypen](https://learn.microsoft.com/dotnet/csharp/nullable-references)
