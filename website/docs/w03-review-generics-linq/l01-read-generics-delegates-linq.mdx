@@ -1,0 +1,152 @@
+---
+title: "Generics, Delegates und LINQ: Code lesen"
+sidebar_position: 1
+description: "Gemischte Leseaufgaben zu den Modulen 9–11: erst das Konzept erkennen, dann das Ergebnis vorhersagen oder den Fehler finden."
+lesson_id: w03-l01
+duration_min: 25
+---
+
+import methodGroup from '!!raw-loader!@site/examples/w03/l01/method-group.cs';
+import methodGroupOutput from '!!raw-loader!@site/examples/w03/l01/method-group.out.txt';
+import loopCapture from '!!raw-loader!@site/examples/w03/l01/loop-capture.cs';
+import loopCaptureOutput from '!!raw-loader!@site/examples/w03/l01/loop-capture.out.txt';
+import deferredQuery from '!!raw-loader!@site/examples/w03/l01/deferred-query.cs';
+import deferredQueryOutput from '!!raw-loader!@site/examples/w03/l01/deferred-query.out.txt';
+
+# Generics, Delegates und LINQ: Code lesen
+
+:::note[Lernziele]
+- Du erkennst bei kurzem Code, welches Konzept aus den Modulen 9–11 das Verhalten bestimmt.
+- Du sagst die Ausgabe von kurzem Code aus den Modulen 9–11 vorher oder findest die fehlerhafte Zeile, ohne den Code auszuführen.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+<OptionalReview modules={[9, 10, 11]} />
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann sagst du das Ergebnis voraus oder findest den Fehler. Die Aufgaben mischen die Module 9–11. Notiere deinen Tipp, bevor du antwortest.
+
+### Aufgabe 1
+
+<Quiz id="w03-l01-q1" />
+
+<Quiz id="w03-l01-q2" />
+
+### Aufgabe 2
+
+<Quiz id="w03-l01-q3" />
+
+:::info[Vorhersage]
+Welche vier Zeilen gibt das Programm aus? Achte darauf, wann `calls` sich ändert.
+:::
+
+<CSharpRunner id="w03-l01-method-group" code={methodGroup} predict expected={methodGroupOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `0`, `True`, `False` und `2`.
+
+1. **Zuweisung:** `IsLong` ohne Klammern ist eine Methodengruppe. Die Zeile erzeugt nur den Delegate, darum ist `calls` danach noch `0`.
+2. **Aufrufe:** `isLong("password")` und `isLong("abc")` führen die Methode aus. Sie liefert `True` und `False` und zählt `calls` auf `2`.
+
+</details>
+
+<Quiz id="w03-l01-q4" />
+
+### Aufgabe 3
+
+<Quiz id="w03-l01-q5" />
+
+<Quiz id="w03-l01-q6" />
+
+### Aufgabe 4
+
+<Quiz id="w03-l01-q7" />
+
+<Quiz id="w03-l01-q8" />
+
+<Quiz id="w03-l01-q9" />
+
+### Aufgabe 5
+
+<Quiz id="w03-l01-q10" />
+
+:::info[Vorhersage]
+Welche sechs Zahlen gibt das Programm aus, erst die Lambdas der `for`-Schleife, dann die der `foreach`-Schleife?
+:::
+
+<CSharpRunner id="w03-l01-loop-capture" code={loopCapture} predict expected={loopCaptureOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `3`, `3`, `3`, `0`, `1` und `2`.
+
+1. **`for`:** Alle drei Lambdas erfassen dieselbe Variable `i`. Beim Aufruf ist sie `3`.
+2. **`foreach`:** Die Variable `n` ist in jeder Runde neu. Jedes Lambda sieht seine eigene Variable.
+
+</details>
+
+<Quiz id="w03-l01-q11" />
+
+### Aufgabe 6
+
+<Quiz id="w03-l01-q12" />
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen in welcher Reihenfolge? Überlege bei jeder Zeile, ob sie zur Definition, zu `Count()` oder zu `ToList()` gehört.
+:::
+
+<CSharpRunner id="w03-l01-deferred-query" code={deferredQuery} predict expected={deferredQueryOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `defined`, dann vier Zeilen `check …` und `3`, dann wieder vier Zeilen `check …` und `3`.
+
+1. **Definition:** `Where` läuft nicht. Darum erscheint zuerst nur `defined`.
+2. **`Count()`:** Die Abfrage läuft jetzt über die Quelle mit vier Elementen, darum erscheinen vier Zeilen `check`. Drei Elemente sind größer oder gleich `4`.
+3. **`ToList()`:** Die Abfrage läuft noch einmal, darum erscheinen wieder vier Zeilen. `snapshot` ist danach eine Kopie, und `12` ändert sie nicht.
+
+</details>
+
+<Quiz id="w03-l01-q13" />
+
+### Aufgabe 7
+
+<Quiz id="w03-l01-q14" />
+
+<Quiz id="w03-l01-q15" />
+
+<Quiz id="w03-l01-q16" />
+
+### Aufgabe 8
+
+<Quiz id="w03-l01-q17" />
+
+<Quiz id="w03-l01-q18" />
+
+### Aufgabe 9
+
+<Quiz id="w03-l01-q19" />
+
+<Quiz id="w03-l01-q20" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w03-l01-q21" />
+
+### Übertragen
+
+<Quiz id="w03-l01-q22" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- C#-Spezifikation: [Iteratoren](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/classes#1515-synchronous-and-asynchronous-iterators)
+- C#-Spezifikation: [Varianz bei Interfaces](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/interfaces#19231-general)

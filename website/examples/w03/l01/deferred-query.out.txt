@@ -1,0 +1,11 @@
+defined
+check 1
+check 4
+check 6
+check 9
+3
+check 1
+check 4
+check 6
+check 9
+3

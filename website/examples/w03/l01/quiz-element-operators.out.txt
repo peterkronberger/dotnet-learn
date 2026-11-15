@@ -1,0 +1,4 @@
+0
+True
+no match
+not exactly one
