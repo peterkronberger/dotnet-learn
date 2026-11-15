@@ -1,4 +1,283 @@
 {
   "module": "w03",
-  "questions": []
+  "questions": [
+    {
+      "id": "w03-l01-q1",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst wissen, was die generische Methode im Programm für drei verschiedene Typargumente zurückgibt.",
+      "example": "w03/l01/default-of-t.cs",
+      "options": [
+        { "text": "`default(T)` und `T?` bei einem Typparameter ohne Einschränkung", "correct": true },
+        { "text": "Nullable-Werttyp `int?`" },
+        { "text": "Einschränkung `where T : class`" },
+        { "text": "Null-Koaleszenz-Operator `??`" }
+      ],
+      "explanation": "Das Konzept ist `default` bei einem Typparameter. Du kennst es aus der Lektion „Standardwerte und Nullable bei Typparametern“ (Modul 9). Der Standardwert hängt vom Typargument ab. Der `int?` gehört zu Modul 4 und `where` zur Lektion über Einschränkungen."
+    },
+    {
+      "id": "w03-l01-q2",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die drei Zeilen stehen in der Reihenfolge der Aufrufe.",
+      "example": "w03/l01/default-of-t.cs",
+      "options": [
+        { "text": "`0`, `False`, `null`", "correct": true },
+        { "text": "`null`, `null`, `null`", "misconception": "m09-l04-default-t-is-null", "feedback": "`default(T)` ist der Standardwert des Typarguments. `null` ist er nur für Referenztypen, bei `int` ist er `0`." },
+        { "text": "`0`, `0`, `null`", "feedback": "Der Standardwert von `bool` ist `False`, nicht `0`." },
+        { "text": "Der Compiler meldet einen Fehler, weil `T?` für `int` nicht erlaubt ist", "misconception": "m09-l04-default-t-is-null", "feedback": "Bei einem `T` ohne Einschränkung ist `T?` erlaubt. Für `int` bleibt `T?` ein `int`." }
+      ],
+      "explanation": "`default` liefert den Standardwert des Typarguments: `0` für `int`, `False` für `bool`, `null` für `string`. Bei `Describe<int>()` bleibt `T?` ein `int`, darum ist `value is null` falsch und das Programm schreibt `0`."
+    },
+    {
+      "id": "w03-l01-q3",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Methode `IsLong(string text)` wird ohne Klammern einer Variable vom Typ `Func<string, bool>` zugewiesen. Du sollst vorhersagen, wann die Methode läuft.",
+      "options": [
+        { "text": "Methodengruppe, die in einen Delegate umgewandelt wird", "correct": true },
+        { "text": "Lambda-Ausdruck" },
+        { "text": "Multicast-Delegate" },
+        { "text": "Methodenüberladung" }
+      ],
+      "explanation": "Das Konzept ist die Methodengruppe. Du kennst sie aus der Lektion „Delegates und Methodengruppen“ (Modul 10). Der Name ohne Klammern ist eine Methodengruppe, und die Zuweisung erzeugt nur den Delegate."
+    },
+    {
+      "id": "w03-l01-q4",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was passiert in der Zeile `Func<string, bool> isLong = IsLong;`?",
+      "options": [
+        { "text": "Es entsteht ein Delegate, der auf `IsLong` verweist. Die Methode läuft noch nicht.", "correct": true },
+        { "text": "Die Methode `IsLong` läuft einmal, und ihr Ergebnis wird in `isLong` gespeichert.", "misconception": "m10-l01-method-group-calls-method", "feedback": "Ohne Klammern ist `IsLong` eine Methodengruppe. Die Zuweisung erzeugt nur einen Delegate. Die Methode läuft erst beim Aufruf." },
+        { "text": "Der Compiler meldet einen Fehler, weil die Klammern fehlen.", "feedback": "Die Methodengruppe ohne Klammern ist hier gerade richtig, weil sie in einen Delegate umgewandelt wird." }
+      ],
+      "explanation": "Die Zuweisung erzeugt nur den Delegate. Die Methode läuft erst, wenn du den Delegate aufrufst, zum Beispiel mit `isLong(\"password\")`."
+    },
+    {
+      "id": "w03-l01-q5",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst vorhersagen, was passiert, wenn kein Element zum Filter passt oder mehr als eines passt.",
+      "example": "w03/l01/quiz-element-operators.cs",
+      "options": [
+        { "text": "Element-Operatoren `First`, `FirstOrDefault` und `Single`", "correct": true },
+        { "text": "Quantoren `Any` und `All`" },
+        { "text": "Mengenoperationen `Union` und `Concat`" },
+        { "text": "Verzögerte Ausführung" }
+      ],
+      "explanation": "Das Konzept sind die Element-Operatoren. Du kennst sie aus der Lektion „Element-Operatoren und Quantoren“ (Modul 11). Sie unterscheiden sich darin, was sie bei null oder mehreren Treffern tun."
+    },
+    {
+      "id": "w03-l01-q6",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die vier Zeilen stehen in der Reihenfolge der `WriteLine`-Aufrufe.",
+      "example": "w03/l01/quiz-element-operators.cs",
+      "options": [
+        { "text": "`0`, `True`, `no match`, `not exactly one`", "correct": true },
+        { "text": "`null`, `True`, `no match`, `not exactly one`", "misconception": "m11-l08-first-returns-null", "feedback": "`FirstOrDefault` gibt den Standardwert zurück, und der ist bei einer `int`-Folge `0`, nicht `null`. `null` bekommst du nur bei Verweistypen." },
+        { "text": "`0`, `True`, `0`, `5`", "misconception": "m11-l08-first-returns-null", "feedback": "`First` gibt bei keinem Treffer nicht den Standardwert zurück, sondern wirft eine `InvalidOperationException`. `Single` wirft bei mehr als einem Treffer ebenfalls." },
+        { "text": "`0`, `True`, `no match`, `3`", "feedback": "`Single` verlangt genau einen Treffer. Hier passen `3` und `5`, darum wirft `Single` eine `InvalidOperationException`." }
+      ],
+      "explanation": "`FirstOrDefault` liefert bei `int` ohne Treffer `0`. Bei `string` ist der Standardwert `null`, darum ist der Vergleich `True`. `First` wirft ohne Treffer, und `Single` wirft bei zwei Treffern. Beide `catch`-Blöcke schreiben ihren Text."
+    },
+    {
+      "id": "w03-l01-q7",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Der Compiler meldet für eine der drei Zuweisungen im Code einen Fehler.",
+      "example": "w03/l01/invariance.snippet.cs",
+      "options": [
+        { "text": "Invarianz von `List<T>` und Kovarianz von `IEnumerable<T>`", "correct": true },
+        { "text": "Typargument ableiten" },
+        { "text": "Einschränkung mit `where`" },
+        { "text": "Boxing von Werttypen" }
+      ],
+      "explanation": "Das Konzept ist die Varianz. Du kennst sie aus der Lektion „Generische Interfaces, Delegates und Varianz“ (Modul 9). `List<T>` ist invariant, `IEnumerable<T>` ist kovariant."
+    },
+    {
+      "id": "w03-l01-q8",
+      "lesson": "w03-l01",
+      "type": "find-bug",
+      "question": "Der Compiler meldet für diesen Code einen Fehler. Welche Zeile ist die Ursache?",
+      "example": "w03/l01/invariance.snippet.cs",
+      "bugLines": [2],
+      "lineFeedback": {
+        "3": { "feedback": "Diese Zeile ist erlaubt. `IEnumerable<object>` gibt Elemente nur heraus, darum nimmt es eine `List<string>` an." },
+        "4": { "feedback": "Diese Zeile liest nur und ist in Ordnung. Der Fehler steht in einer Zuweisung davor." }
+      },
+      "explanation": "`List<object> items = users;` geht nicht, weil `List<T>` invariant ist. Sonst könnte Code einen `int` in die Liste von Texten legen. Die Zeile mit `IEnumerable<object>` ist erlaubt."
+    },
+    {
+      "id": "w03-l01-q9",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Warum ist `IEnumerable<object> view = users;` erlaubt, aber `List<object> items = users;` nicht?",
+      "options": [
+        { "text": "`IEnumerable<T>` gibt Elemente nur heraus und ist kovariant. `List<T>` ist invariant, weil sonst ein `int` in die Liste von Texten gelegt werden könnte.", "correct": true },
+        { "text": "Jeder `string` ist ein `object`, darum müsste eine `List<string>` überall passen, wo eine `List<object>` erwartet wird. Der Compiler ist hier nur streng.", "misconception": "m09-l06-list-object-accepts-list-string", "feedback": "Die Regel „jeder `string` ist ein `object`“ gilt nicht für `List<T>`. Die Liste ist invariant, weil sie auch Elemente aufnimmt." },
+        { "text": "`IEnumerable<T>` ist ein Werttyp, `List<T>` ein Verweistyp.", "feedback": "Beide sind Verweistypen beziehungsweise Interfaces. Der Unterschied ist die Varianz." }
+      ],
+      "explanation": "Nur Interfaces, die Elemente herausgeben, wie `IEnumerable<object>` und `IReadOnlyList<object>`, nehmen eine `List<string>` an. `List<T>` ist invariant."
+    },
+    {
+      "id": "w03-l01-q10",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine `for`-Schleife und eine `foreach`-Schleife legen jeweils drei Lambdas in eine Liste. Danach werden alle Lambdas aufgerufen, und du sollst die Zahlen vorhersagen.",
+      "options": [
+        { "text": "Erfasste Variablen in `for` und `foreach`", "correct": true },
+        { "text": "Methodengruppe" },
+        { "text": "Multicast-Delegate" },
+        { "text": "Verzögerte Ausführung bei LINQ" }
+      ],
+      "explanation": "Das Konzept ist die erfasste Variable. Du kennst es aus der Lektion „Closures: erfasste Variablen“ (Modul 10). Die `for`-Variable ist nur eine, die `foreach`-Variable ist in jeder Runde neu."
+    },
+    {
+      "id": "w03-l01-q11",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Die `for`-Variante gibt dreimal `3` aus, die `foreach`-Variante gibt `0`, `1`, `2` aus. Welche Erklärung stimmt?",
+      "options": [
+        { "text": "Die drei Lambdas der `for`-Schleife erfassen dieselbe Variable `i`, die nach der Schleife `3` ist. Die `foreach`-Variable ist in jeder Runde neu.", "correct": true },
+        { "text": "Jedes Lambda merkt sich den Wert, den die Variable beim Erstellen hatte. Die `for`-Schleife erstellt ihre Lambdas aber erst am Ende.", "misconception": "m10-l05-lambda-captures-value", "feedback": "Ein Lambda merkt sich keinen Wert, es erfasst die Variable selbst. Beim Aufruf sieht es den aktuellen Wert." },
+        { "text": "Die `foreach`-Schleife ruft die Lambdas sofort auf, die `for`-Schleife erst später.", "feedback": "Beide Schleifen legen die Lambdas nur in die Liste. Aufgerufen werden sie in den späteren `foreach`-Schleifen." }
+      ],
+      "explanation": "Das Lambda erfasst die Variable, nicht ihren Wert. Bei `for` gibt es nur ein `i`, und beim Aufruf ist es `3`. Bei `foreach` ist `n` in jeder Runde eine neue Variable."
+    },
+    {
+      "id": "w03-l01-q12",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Abfrage mit `Where` wird einer Variable zugewiesen. Danach wird die Quelle verändert, und die Abfrage wird durchlaufen.",
+      "options": [
+        { "text": "Verzögerte Ausführung", "correct": true },
+        { "text": "Iterator mit `yield return`" },
+        { "text": "Erfasste Variable" },
+        { "text": "Element-Operator `First`" }
+      ],
+      "explanation": "Das Konzept ist die verzögerte Ausführung. Du kennst sie aus der Lektion „Verzögerte Ausführung“ (Modul 11). Die Abfrage läuft erst, wenn jemand sie durchläuft."
+    },
+    {
+      "id": "w03-l01-q13",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was gilt für die Variable `many` im Programm?",
+      "options": [
+        { "text": "Sie hält die Abfrage. Das Lambda läuft erst, wenn jemand die Abfrage durchläuft, und dann sieht es die aktuelle Quelle.", "correct": true },
+        { "text": "Sie enthält die schon gefilterten Ergebnisse. `check` erscheint beim Definieren der Abfrage.", "misconception": "m11-l05-query-runs-when-defined", "feedback": "Die Definition beschreibt nur die Arbeit. Die Abfrage läuft, wenn jemand sie durchläuft, zum Beispiel mit `Count()` oder `ToList()`." },
+        { "text": "Sie enthält eine Kopie der Quelle von dem Moment, in dem sie definiert wurde.", "feedback": "Die Variable hält die Abfrage und sieht spätere Änderungen der Quelle. Nur `ToList()` oder `ToArray()` machen eine Kopie." }
+      ],
+      "explanation": "`Where` ist ein verzögerter Operator. `Count()` und `ToList()` laufen sofort und durchlaufen die Abfrage jeweils neu. Nur `ToList()` hält danach eine Kopie."
+    },
+    {
+      "id": "w03-l01-q14",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Der Compiler meldet für eine der Zeilen einen Fehler, weil er etwas nicht bestimmen kann.",
+      "example": "w03/l01/infer-from-target.snippet.cs",
+      "options": [
+        { "text": "Typargument ableiten und explizites Typargument angeben", "correct": true },
+        { "text": "`default(T)` bei einem Typparameter" },
+        { "text": "Invarianz von `List<T>`" },
+        { "text": "Erweiterungsmethode" }
+      ],
+      "explanation": "Das Konzept ist die Ableitung des Typarguments. Du kennst sie aus der Lektion „Generische Methoden“ (Modul 9). Der Compiler leitet `T` aus den Argumenten des Aufrufs ab."
+    },
+    {
+      "id": "w03-l01-q15",
+      "lesson": "w03-l01",
+      "type": "find-bug",
+      "question": "Der Compiler meldet für diesen Code einen Fehler. Welche Zeile ist die Ursache?",
+      "example": "w03/l01/infer-from-target.snippet.cs",
+      "bugLines": [2],
+      "lineFeedback": {
+        "1": { "feedback": "Hier kommt `T` in den Argumenten vor, darum kann der Compiler es ableiten: Beide Argumente sind `int`." }
+      },
+      "explanation": "In `Create()` kommt `T` nur im Rückgabetyp vor. Die Ableitung benutzt nur die Argumente des Aufrufs, und es gibt keine. Du musst das Typargument angeben: `Create<int>()`."
+    },
+    {
+      "id": "w03-l01-q16",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Wie bringst du `List<int> numbers = Create();` zum Laufen?",
+      "options": [
+        { "text": "Mit einem Typargument: `Create<int>()`", "correct": true },
+        { "text": "Gar nicht nötig: Der Compiler leitet das Typargument aus dem Typ der Zielvariable ab.", "misconception": "m09-l01-type-inferred-from-return-type", "feedback": "Die Ableitung benutzt nur die Argumente des Aufrufs, nicht den Rückgabetyp und nicht die Zielvariable." },
+        { "text": "Indem du den Typparameter von `Largest` änderst.", "feedback": "`Largest` hat mit dem Fehler nichts zu tun. Die Zeile mit `Create` braucht ein Typargument." }
+      ],
+      "explanation": "`T` ist der Typparameter in der Deklaration, `int` ist das Typargument beim Aufruf. Kommt `T` nur im Rückgabetyp vor, musst du das Typargument angeben."
+    },
+    {
+      "id": "w03-l01-q17",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du sollst vorhersagen, wann der Text `hello` erscheint.",
+      "example": "w03/l01/quiz-lambda-defined.cs",
+      "options": [
+        { "text": "Lambda-Ausdruck, dessen Körper beim Aufruf läuft", "correct": true },
+        { "text": "Methodengruppe" },
+        { "text": "Event" },
+        { "text": "Verzögerte Ausführung bei LINQ" }
+      ],
+      "explanation": "Das Konzept ist der Lambda-Ausdruck. Du kennst ihn aus der Lektion „Lambda-Ausdrücke“ (Modul 10). Die Zeile mit dem Lambda erzeugt nur einen Delegate."
+    },
+    {
+      "id": "w03-l01-q18",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die Zeilen stehen in der Reihenfolge der Ausgabe.",
+      "example": "w03/l01/quiz-lambda-defined.cs",
+      "options": [
+        { "text": "`start`, `hello`, `hello`", "correct": true },
+        { "text": "`hello`, `start`, `hello`, `hello`", "misconception": "m10-l03-lambda-runs-when-defined", "feedback": "Die Zeile mit dem Lambda erzeugt nur einen Delegate. Der Körper läuft bei jedem Aufruf, nicht bei der Zuweisung." },
+        { "text": "`start`, `hello`", "feedback": "Das Programm ruft `greet` zweimal auf, darum läuft der Körper zweimal." },
+        { "text": "`hello`, `start`", "misconception": "m10-l03-lambda-runs-when-defined", "feedback": "Der Körper läuft nicht bei der Zuweisung und nicht nur einmal. Er läuft bei jedem Aufruf des Delegates." }
+      ],
+      "explanation": "Der Körper des Lambdas läuft bei jedem Aufruf des Delegates: keinmal, einmal oder mehrmals. Hier ruft das Programm `greet()` zweimal auf."
+    },
+    {
+      "id": "w03-l01-q19",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Welches Konzept bestimmt hier die Reihenfolge der Ausgabezeilen?",
+      "example": "w03/l01/quiz-iterator.cs",
+      "options": [
+        { "text": "Iterator mit `yield return`", "correct": true },
+        { "text": "Methode mit `return` in einer Schleife" },
+        { "text": "Typparameter und Typargument" },
+        { "text": "Erfasste Variable" }
+      ],
+      "explanation": "Das Konzept ist der Iterator. Du kennst ihn aus der Lektion „Iteratoren: eigene Folgen mit yield“ (Modul 11). Der Rumpf läuft stückweise, jeweils bis zum nächsten `yield return`."
+    },
+    {
+      "id": "w03-l01-q20",
+      "lesson": "w03-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die Zeilen stehen in der Reihenfolge der Ausgabe.",
+      "example": "w03/l01/quiz-iterator.cs",
+      "options": [
+        { "text": "`making`, `ok`, `making`, `ok`, `end`", "correct": true },
+        { "text": "`making`, `ok`", "misconception": "m11-l04-yield-return-ends-method", "feedback": "`yield return` beendet die Methode nicht. Es gibt ein Element her und pausiert. Beim nächsten `MoveNext` läuft die Methode weiter." },
+        { "text": "`making`, `making`, `ok`, `ok`, `end`", "feedback": "Der Rumpf läuft nicht vorab. Er läuft Stück für Stück, wenn `foreach` das nächste Element anfordert." },
+        { "text": "`ok`, `ok`, `end`", "feedback": "Der Rumpf schreibt bei jedem Durchlauf der Schleife `making`, bevor er das Element hergibt." }
+      ],
+      "explanation": "Jede Runde der `foreach`-Schleife startet den Iterator bis zum nächsten `yield return`. Nach dem zweiten Element läuft die Schleife im Iterator zu Ende, und `end` erscheint."
+    },
+    {
+      "id": "w03-l01-q21",
+      "lesson": "w03-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du bei einem Stück Code mit Generics, Delegates oder LINQ, welches Konzept dein Ergebnis bestimmt?",
+      "modelAnswer": "Ich suche die Stelle, an der sich entscheidet, wann etwas läuft oder welcher Typ gilt: eine Zuweisung ohne Klammern (Delegate), ein Lambda in einer Schleife (erfasste Variable), eine Abfrage vor dem Durchlaufen (verzögerte Ausführung), ein `yield return` (Iterator) oder ein `T` (Typargument und Standardwert).\n\nDann frage ich, ob der Code dort etwas ausführt oder nur beschreibt, und sage erst danach die Ausgabe vorher."
+    },
+    {
+      "id": "w03-l01-q22",
+      "lesson": "w03-l01",
+      "type": "explain",
+      "question": "Übertragen: Du schreibst eine Prüfung, die eine Liste von SecLog-Ereignissen durchsucht und ein Lambda mit einer Variable aus der Umgebung benutzt. Welche zwei Stolperstellen aus dieser Lektion prüfst du, bevor du dem Ergebnis traust?",
+      "modelAnswer": "Erstens prüfe ich, ob die Abfrage verzögert läuft. Ändert sich die Liste nach der Definition, sieht die Abfrage beim Durchlaufen die neue Liste. Wenn ich einen festen Stand brauche, rufe ich `ToList()` auf.\n\nZweitens prüfe ich, ob das Lambda eine Variable erfasst, die sich später ändert, zum Beispiel die Variable einer `for`-Schleife. Dann kopiere ich den Wert in eine neue lokale Variable."
+    }
+  ]
 }
