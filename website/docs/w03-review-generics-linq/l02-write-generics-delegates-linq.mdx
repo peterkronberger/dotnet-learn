@@ -1,0 +1,150 @@
+---
+title: "Generics, Delegates und LINQ: Code schreiben"
+sidebar_position: 2
+description: "Gemischte Schreibaufgaben zu den Modulen 9–11: erst das Konzept erkennen, dann Code ergänzen oder schreiben."
+lesson_id: w03-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import extensionTask from '!!raw-loader!@site/examples/w03/l02/extension-task.cs';
+import extensionTests from '!!raw-loader!@site/examples/w03/l02/extension-task.tests.snippet.cs';
+import extensionSolution from '!!raw-loader!@site/examples/w03/l02/extension-solution.cs';
+import eventTask from '!!raw-loader!@site/examples/w03/l02/event-task.cs';
+import eventTests from '!!raw-loader!@site/examples/w03/l02/event-task.tests.snippet.cs';
+import eventSolution from '!!raw-loader!@site/examples/w03/l02/event-solution.cs';
+
+# Generics, Delegates und LINQ: Code schreiben
+
+:::note[Lernziele]
+- Du erkennst bei einer Schreibaufgabe, welches Konzept aus den Modulen 9–11 gebraucht wird.
+- Du ergänzt und schreibst kurzen Code zu den Modulen 9–11 so, dass er das verlangte Ergebnis liefert.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann ergänzt oder schreibst du den Code. Bei den Programmieraufgaben überlegst du vorher, was der Startcode ausgibt, und führst ihn dann aus. Die letzten vier Aufgaben mischen alles noch einmal.
+
+### Aufgabe 1
+
+<Quiz id="w03-l02-q1" />
+
+<Quiz id="w03-l02-q2" />
+
+### Aufgabe 2
+
+<Quiz id="w03-l02-q3" />
+
+<Quiz id="w03-l02-q4" />
+
+### Aufgabe 3
+
+<Quiz id="w03-l02-q5" />
+
+:::info[Vorhersage]
+Der Startcode gibt eine Zeile aus. Welche? Und welche zweite Zeile soll nach deiner Änderung erscheinen?
+:::
+
+Aufgabe: Schreibe die Erweiterungsmethode `Shout` in `TextExtensions` und gib `"ana".Shout()` im Hauptprogramm aus.
+
+<CSharpRunner id="w03-l02-extension" code={extensionTask} tests={extensionTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `3` aus. Mit der Lösung folgt eine zweite Zeile, `ANA!`.
+
+<CodeBlock language="csharp" title="extension-solution.cs">{extensionSolution}</CodeBlock>
+
+1. **Statische Klasse:** Die Methode steht in der statischen Klasse `TextExtensions` und ist selbst `static`.
+2. **`this`:** Das Wort `this` vor dem ersten Parameter macht die Methode zur Erweiterungsmethode für `string`.
+
+</details>
+
+<Quiz id="w03-l02-q6" />
+
+### Aufgabe 4
+
+<Quiz id="w03-l02-q7" />
+
+<Quiz id="w03-l02-q8" />
+
+### Aufgabe 5
+
+<Quiz id="w03-l02-q9" />
+
+:::info[Vorhersage]
+Der Startcode gibt eine Zeile aus. Welche? Und was soll sich an der Ausgabe ändern, wenn du `Alarm` zum Event machst?
+:::
+
+Aufgabe: Mach `Alarm` zu einem Event, ohne die Ausgabe zu ändern.
+
+<CSharpRunner id="w03-l02-event" code={eventTask} tests={eventTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode und die Lösung geben beide `alarm: 95 degrees` aus. Die Ausgabe ändert sich nicht, nur der Schutz kommt dazu.
+
+<CodeBlock language="csharp" title="event-solution.cs">{eventSolution}</CodeBlock>
+
+1. **Schlüsselwort:** `event` vor dem Delegate-Typ macht aus dem Feld ein Event.
+2. **Schutz:** Von außen geht nur `+=` und `-=`. Auslösen kann nur `Sensor` selbst, hier mit `Alarm?.Invoke(…)`.
+
+</details>
+
+<Quiz id="w03-l02-q10" />
+
+### Aufgabe 6
+
+<Quiz id="w03-l02-q11" />
+
+<Quiz id="w03-l02-q12" />
+
+### Aufgabe 7
+
+<Quiz id="w03-l02-q13" />
+
+<Quiz id="w03-l02-q14" />
+
+### Aufgabe 8
+
+<Quiz id="w03-l02-q15" />
+
+<Quiz id="w03-l02-q16" />
+
+### Aufgabe 9
+
+<Quiz id="w03-l02-q17" />
+
+<Quiz id="w03-l02-q18" />
+
+### Aufgabe 10
+
+<Quiz id="w03-l02-q19" />
+
+<Quiz id="w03-l02-q20" />
+
+### Aufgabe 11
+
+<Quiz id="w03-l02-q21" />
+
+<Quiz id="w03-l02-q22" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w03-l02-q23" />
+
+### Übertragen
+
+<Quiz id="w03-l02-q24" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- Microsoft Learn: [Generics overview](https://learn.microsoft.com/dotnet/csharp/fundamentals/types/generics)
+- C#-Spezifikation: [§21.2 Delegate declarations](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/delegates#212-delegate-declarations)

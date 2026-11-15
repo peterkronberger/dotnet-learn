@@ -278,6 +278,304 @@
       "type": "explain",
       "question": "Übertragen: Du schreibst eine Prüfung, die eine Liste von SecLog-Ereignissen durchsucht und ein Lambda mit einer Variable aus der Umgebung benutzt. Welche zwei Stolperstellen aus dieser Lektion prüfst du, bevor du dem Ergebnis traust?",
       "modelAnswer": "Erstens prüfe ich, ob die Abfrage verzögert läuft. Ändert sich die Liste nach der Definition, sieht die Abfrage beim Durchlaufen die neue Liste. Wenn ich einen festen Stand brauche, rufe ich `ToList()` auf.\n\nZweitens prüfe ich, ob das Lambda eine Variable erfasst, die sich später ändert, zum Beispiel die Variable einer `for`-Schleife. Dann kopiere ich den Wert in eine neue lokale Variable."
+    },
+    {
+      "id": "w03-l02-q1",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du brauchst eine Methode, die aus einer `List<string>` und aus einer `List<int>` das erste Element liefert, oder einen Ersatzwert bei einer leeren Liste. Du willst den Rumpf nur einmal schreiben.",
+      "options": [
+        {"text":"Generische Methode mit einem Typparameter","correct":true},
+        {"text":"Eine Überladung für jeden Typ"},
+        {"text":"Einschränkung mit `where`"},
+        {"text":"Delegate als Parameter"}
+      ],
+      "explanation": "Das Konzept ist die generische Methode. Du kennst sie aus der Lektion über generische Methoden (Modul 9). Ein Typparameter ersetzt die Überladungen aus Modul 3, die denselben Rumpf mehrfach wiederholen würden."
+    },
+    {
+      "id": "w03-l02-q2",
+      "lesson": "w03-l02",
+      "type": "cloze",
+      "question": "Ergänze die Methode, sodass sie für jeden Elementtyp funktioniert. Der Rückgabetyp und der Ersatzwert nutzen denselben Typ wie die Elemente der Liste.",
+      "example": "w03/l02/pick-generic.cs",
+      "blanks": [
+        {"text":"<T>","hint":"Der Typparameter steht in spitzen Klammern hinter dem Methodennamen.","wrongAnswers":[{"text":"<int>","feedback":"`int` wäre ein festes Typargument. Die Methode soll aber für jeden Typ gelten, dafür brauchst du den Typparameter `T`."}]},
+        {"text":"List<T>","hint":"Die Liste hat dasselbe `T` wie der Rückgabetyp.","wrongAnswers":[{"text":"List<string>","feedback":"Dann würde der Aufruf mit `List<int>` nicht übersetzen. Nutze den Typparameter."}]}
+      ],
+      "explanation": "Hinter dem Methodennamen deklariert `<T>` den Typparameter. Der Compiler leitet das Typargument aus den Argumenten ab: `string` im ersten, `int` im zweiten Aufruf. Der Rumpf gilt für beide."
+    },
+    {
+      "id": "w03-l02-q3",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du brauchst drei Variablen für Lambdas: eine prüft eine Zahl mit Ja oder Nein, eine macht aus einer Zahl einen Text, und eine gibt einen Text aus und liefert nichts zurück.",
+      "options": [
+        {"text":"`Predicate`, `Func` und `Action`","correct":true},
+        {"text":"Multicast-Delegate"},
+        {"text":"Event"},
+        {"text":"Methodengruppe"}
+      ],
+      "explanation": "Das Konzept sind die vordefinierten Delegate-Typen. Du kennst sie aus der Lektion über `Func`, `Action` und `Predicate` (Modul 10). `Predicate<T>` liefert `bool`, `Func<…>` liefert einen Wert, `Action<…>` liefert nichts."
+    },
+    {
+      "id": "w03-l02-q4",
+      "lesson": "w03-l02",
+      "type": "cloze",
+      "question": "Ergänze die drei Delegate-Typen passend zu den Lambdas.",
+      "example": "w03/l02/func-action-predicate.cs",
+      "blanks": [
+        {"text":"Predicate<int>","hint":"Das Lambda prüft eine Zahl und liefert `bool`.","wrongAnswers":[{"text":"Func<int>","feedback":"`Func<int>` hat keinen Parameter und liefert `int`. Das Lambda nimmt aber eine Zahl und liefert `bool`."}]},
+        {"text":"Func<int, string>","hint":"Der erste Typ ist der Parameter, der letzte der Rückgabewert.","wrongAnswers":[{"text":"Action<int>","feedback":"`Action` liefert nichts zurück. Das Lambda liefert einen Text."}]},
+        {"text":"Action<string>","hint":"Das Lambda gibt aus und liefert nichts zurück.","wrongAnswers":[{"text":"Func<string>","feedback":"`Func<string>` hat keinen Parameter und liefert einen Text."}]}
+      ],
+      "explanation": "Die Form des Lambdas bestimmt den Typ: eine Zahl hinein und `bool` heraus ist `Predicate<int>`, eine Zahl hinein und ein Text heraus ist `Func<int, string>`, ein Text hinein und nichts heraus ist `Action<string>`."
+    },
+    {
+      "id": "w03-l02-q5",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst `\"ana\".Shout()` schreiben können, obwohl der Typ `string` keine Methode `Shout` hat und du `string` nicht ändern kannst.",
+      "example": "w03/l02/extension-task.cs",
+      "options": [
+        {"text":"Erweiterungsmethode","correct":true},
+        {"text":"Instanzmethode in `string`"},
+        {"text":"Lambda-Ausdruck"},
+        {"text":"Generische Methode"}
+      ],
+      "explanation": "Das Konzept ist die Erweiterungsmethode. Du kennst sie aus der Lektion über Erweiterungsmethoden (Modul 11). Sie steht in einer statischen Klasse und hat `this` vor dem ersten Parameter. Eine Instanzmethode müsste im Typ selbst stehen."
+    },
+    {
+      "id": "w03-l02-q6",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "w03/l02/quiz-instance-wins.cs",
+      "options": [
+        {"text":"`instance method`","correct":true},
+        {"text":"`extension method`","misconception":"m11-l01-extension-beats-instance-method","feedback":"Die Erweiterungsmethode ersetzt die Instanzmethode nicht. Hat der Typ eine passende Instanzmethode, nimmt der Compiler immer diese."},
+        {"text":"Beide Zeilen nacheinander","feedback":"Der Aufruf `report.Title()` ruft genau eine Methode auf."},
+        {"text":"Der Compiler meldet einen Fehler wegen des doppelten Namens","misconception":"m11-l01-extension-beats-instance-method","feedback":"Es gibt keinen Fehler und keine Warnung. Der Compiler nimmt die Instanzmethode und ignoriert die Erweiterungsmethode."}
+      ],
+      "explanation": "Bei `report.Title()` sucht der Compiler zuerst eine passende Instanzmethode. Er findet sie und nimmt sie. Die Erweiterungsmethode kommt nur zum Zug, wenn keine Instanzmethode passt. Du erreichst sie dann nur in der statischen Form `ReportExtensions.Title(report)`."
+    },
+    {
+      "id": "w03-l02-q7",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Eine Methode soll von zwei Werten desselben Typs den größeren liefern. Sie soll für `int` und für jeden anderen Typ funktionieren, der sich vergleichen lässt.",
+      "options": [
+        {"text":"Einschränkung `where T : IComparable<T>`","correct":true},
+        {"text":"Cast nach `object` und Typtest mit `is`"},
+        {"text":"Nullable `T?`"},
+        {"text":"`default(T)`"}
+      ],
+      "explanation": "Das Konzept ist die Einschränkung. Du kennst sie aus der Lektion über Einschränkungen von Typparametern (Modul 9). Sie garantiert, dass `T` die Methode `CompareTo` hat. Casts und Typtests (Modul 8) prüfen erst zur Laufzeit und passen nicht zu jedem Typ."
+    },
+    {
+      "id": "w03-l02-q8",
+      "lesson": "w03-l02",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Die Methode `Larger` liefert den größeren von zwei Werten. Danach rufen zwei Zeilen sie auf.",
+      "example": "w03/l02/constraint-larger.cs",
+      "distractors": ["if (a > b)","static T Larger<T>(T a, T b)"],
+      "distractorMisconceptions": {"if (a > b)":"m09-l03-unconstrained-t-has-all-members","static T Larger<T>(T a, T b)":"m09-l03-unconstrained-t-has-all-members"},
+      "explanation": "Die Methode braucht `where T : IComparable<T>`. Ohne Einschränkung hat `T` nur die Member von `object`, und `>` ist nicht erlaubt, auch wenn der Aufruf mit `int` später funktionieren würde. Mit der Einschränkung ist `a.CompareTo(b)` erlaubt. Die Aufrufe folgen der Methode."
+    },
+    {
+      "id": "w03-l02-q9",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Andere Klassen sollen sich bei `Sensor` mit `+=` anmelden und mit `-=` abmelden können. Sie sollen den Alarm weder auslösen noch die Liste der Abonnenten überschreiben können.",
+      "example": "w03/l02/event-task.cs",
+      "options": [
+        {"text":"Event","correct":true},
+        {"text":"Öffentliches Delegate-Feld"},
+        {"text":"Multicast-Delegate ohne Schutz"},
+        {"text":"Methodengruppe"}
+      ],
+      "explanation": "Das Konzept ist das Event. Du kennst es aus der Lektion über Events (Modul 10). Ein Event schützt den Delegate: Von außen geht nur `+=` und `-=`. Ein öffentliches Delegate-Feld erlaubt auch Aufruf und Zuweisung."
+    },
+    {
+      "id": "w03-l02-q10",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Der Alarm in `Sensor` ist jetzt ein Event. Was passiert, wenn du im Hauptprogramm die Zeile `sensor.Alarm?.Invoke(\"test\");` einfügst?",
+      "options": [
+        {"text":"Der Compiler meldet einen Fehler","correct":true},
+        {"text":"Der Alarm wird ausgelöst und das Programm gibt `alarm: test` aus","misconception":"m10-l07-event-raised-from-outside","feedback":"Ein Event kann nur die Klasse auslösen, die es deklariert. Von außen ist der Aufruf nicht erlaubt."},
+        {"text":"Die Zeile tut nichts, weil kein Abonnent da ist","feedback":"Es gibt einen Abonnenten. Die Zeile kommt aber gar nicht bis zur Ausführung, weil sie nicht übersetzt wird."},
+        {"text":"Das Programm wirft zur Laufzeit eine Exception","feedback":"Der Fehler tritt schon beim Übersetzen auf, nicht erst zur Laufzeit."}
+      ],
+      "explanation": "Von außen sind bei einem Event nur `+=` und `-=` erlaubt. Auslösen kann nur Code in `Sensor`. Bei einem öffentlichen Delegate-Feld wäre der Aufruf erlaubt."
+    },
+    {
+      "id": "w03-l02-q11",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei Listen enthalten die Besucher von Montag und Dienstag. Eine Zahl soll jede Person nur einmal zählen, eine zweite Zahl soll alle Besuche zählen.",
+      "options": [
+        {"text":"Mengenoperationen `Union` und `Concat`","correct":true},
+        {"text":"Element-Operatoren `First` und `Single`"},
+        {"text":"Verzögerte Ausführung mit `Where`"},
+        {"text":"`ToList` als Kopie"}
+      ],
+      "explanation": "Das Konzept sind `Union` und `Concat`. Du kennst sie aus der Lektion über Mengenoperationen (Modul 11). `Union` entfernt doppelte Werte, `Concat` hängt nur an und behält sie."
+    },
+    {
+      "id": "w03-l02-q12",
+      "lesson": "w03-l02",
+      "type": "cloze",
+      "question": "Ergänze die Methodennamen: `everyone` enthält jede Person einmal, `allVisits` enthält jeden Besuch.",
+      "example": "w03/l02/union-concat.cs",
+      "blanks": [
+        {"text":"Union","hint":"Diese Operation entfernt doppelte Werte.","wrongAnswers":[{"text":"Concat","feedback":"`Concat` behält doppelte Werte. `ben` käme zweimal vor."}]},
+        {"text":"Concat","hint":"Diese Operation hängt die zweite Folge nur an.","wrongAnswers":[{"text":"Union","feedback":"`Union` entfernt doppelte Werte. Dann würdest du nur vier Besuche zählen."}]}
+      ],
+      "explanation": "`Union` liefert jeden Wert einmal: `ana`, `ben`, `carol`, `dora`, also vier. `Concat` hängt die zweite Liste an, und `ben` bleibt doppelt: fünf Besuche."
+    },
+    {
+      "id": "w03-l02-q13",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst für Methoden mit einem `string`-Parameter und dem Rückgabetyp `bool` einen eigenen, sprechenden Typnamen `Check` festlegen.",
+      "options": [
+        {"text":"Delegate-Typ-Deklaration mit `delegate`","correct":true},
+        {"text":"Vordefinierter Typ `Func<string, bool>`"},
+        {"text":"Event"},
+        {"text":"Erweiterungsmethode"}
+      ],
+      "explanation": "Das Konzept ist die Delegate-Typ-Deklaration. Du kennst sie aus der Lektion über Delegates (Modul 10). `delegate bool Check(string text);` legt einen eigenen Typnamen fest. `Func<string, bool>` passt zur selben Form, hat aber keinen eigenen Namen."
+    },
+    {
+      "id": "w03-l02-q14",
+      "lesson": "w03-l02",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge: Eine Methode `IsShort` wird über den Delegate-Typ `Check` aufgerufen. Die Typdeklaration steht am Ende der Datei.",
+      "example": "w03/l02/delegate-declaration.cs",
+      "distractors": ["Check isShort = IsShort();"],
+      "distractorMisconceptions": {"Check isShort = IsShort();":"m10-l01-method-group-calls-method"},
+      "explanation": "Zuerst steht die Methode, dann die Zuweisung der Methodengruppe `IsShort` ohne Klammern an `isShort`, dann die Aufrufe. Mit Klammern würde `IsShort()` die Methode schon aufrufen und es fehlt ein Argument. Eine Typdeklaration wie `delegate` steht bei Top-Level-Anweisungen am Ende."
+    },
+    {
+      "id": "w03-l02-q15",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du speicherst 10 000 Zahlen und fragst dich, ob eine `List<int>` jede Zahl in ein Objekt verpackt und deshalb langsamer ist.",
+      "options": [
+        {"text":"Boxing bei Werttypen in generischen Sammlungen","correct":true},
+        {"text":"Invarianz von `List<T>`"},
+        {"text":"Einschränkung `where T : struct`"},
+        {"text":"Erfasste Variable"}
+      ],
+      "explanation": "Das Konzept ist Boxing bei Werttypen. Du kennst es aus der Lektion über generische Sammlungen (Modul 9). Es entscheidet, wo Werte verpackt werden und wo nicht."
+    },
+    {
+      "id": "w03-l02-q16",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Was stimmt für `List<int>` im Vergleich mit einer `ArrayList`?",
+      "options": [
+        {"text":"`List<int>` speichert die Zahlen direkt, `ArrayList` verpackt sie als `object`","correct":true},
+        {"text":"`List<int>` verpackt jede Zahl in ein Objekt, weil Generics Referenztypen brauchen","misconception":"m09-l05-generics-box-value-types","feedback":"Eine generische Sammlung mit einem Werttyp als Typargument speichert die Werte direkt, ohne Boxing."},
+        {"text":"Beide verpacken jede Zahl, nur der Name unterscheidet sich","misconception":"m09-l05-generics-box-value-types","feedback":"Boxing entsteht bei `object`-Sammlungen wie `ArrayList`, nicht bei `List<int>`."},
+        {"text":"Keine von beiden kann Zahlen speichern","feedback":"Beide können Zahlen speichern. Sie unterscheiden sich darin, wie."}
+      ],
+      "explanation": "Bei `List<int>` ist `int` das Typargument, und die Werte liegen direkt in der Liste. Eine `ArrayList` speichert `object`, darum werden Zahlen dort verpackt (Boxing)."
+    },
+    {
+      "id": "w03-l02-q17",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du wendest `Where` auf eine Liste an, kopierst das Ergebnis mit einem Aufruf in eine zweite Liste und änderst danach die Quelle. Du willst wissen, wie viele Elemente die beiden Ergebnisse danach haben.",
+      "example": "w03/l02/quiz-query-copy.cs",
+      "options": [
+        {"text":"Verzögerte Ausführung und Kopie mit `ToList`","correct":true},
+        {"text":"Iterator mit `yield return`"},
+        {"text":"Element-Operator `First`"},
+        {"text":"Erweiterungsmethode"}
+      ],
+      "explanation": "Das Konzept ist die verzögerte Ausführung mit dem Unterschied zwischen Abfrage und Kopie. Du kennst es aus der Lektion über verzögerte Ausführung (Modul 11)."
+    },
+    {
+      "id": "w03-l02-q18",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welche zwei Zahlen gibt das Programm aus?",
+      "example": "w03/l02/quiz-query-copy.cs",
+      "options": [
+        {"text":"`3` und `2`","correct":true},
+        {"text":"`2` und `2`","misconception":"m11-l05-query-result-is-copy","feedback":"Die Variable `high` hält die Abfrage, nicht ihre Ergebnisse. Sie sieht die später hinzugefügte `40`."},
+        {"text":"`3` und `3`","feedback":"`saved` ist eine Kopie von `ToList()`. Die spätere `40` ändert sie nicht."},
+        {"text":"`2` und `3`","misconception":"m11-l05-query-result-is-copy","feedback":"Es ist umgekehrt: Die Abfrage `high` sieht die Änderung, die Kopie `saved` nicht."}
+      ],
+      "explanation": "`high.Count()` läuft nach `scores.Add(40)` und zählt `20`, `30` und `40`. `saved` wurde vorher mit `ToList()` kopiert und enthält `20` und `30`."
+    },
+    {
+      "id": "w03-l02-q19",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Drei Lambdas sind an eine `Func<int>`-Variable gehängt, jedes liefert eine andere Zahl. Du willst wissen, welcher Wert beim Aufruf `score()` herauskommt.",
+      "example": "w03/l02/quiz-multicast.cs",
+      "options": [
+        {"text":"Multicast-Delegate mit Rückgabewert","correct":true},
+        {"text":"Methodengruppe"},
+        {"text":"Event"},
+        {"text":"Erfasste Variable"}
+      ],
+      "explanation": "Das Konzept ist der Multicast-Delegate. Du kennst ihn aus der Lektion über Multicast-Delegates (Modul 10). Alle Ziele laufen, aber der Aufruf liefert nur den Wert des letzten Ziels."
+    },
+    {
+      "id": "w03-l02-q20",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "w03/l02/quiz-multicast.cs",
+      "options": [
+        {"text":"`30`","correct":true},
+        {"text":"`60`","misconception":"m10-l06-multicast-returns-all-results","feedback":"Der Aufruf addiert die Ergebnisse nicht. Er liefert nur den Wert des letzten Ziels."},
+        {"text":"`10`","feedback":"Das erste Ziel läuft zwar, aber der Rückgabewert kommt vom letzten Ziel."},
+        {"text":"`10`, `20` und `30` in drei Zeilen","misconception":"m10-l06-multicast-returns-all-results","feedback":"Der Aufruf liefert nur einen Wert. Die Zeile gibt ihn einmal aus."}
+      ],
+      "explanation": "Alle drei Lambdas laufen in der Reihenfolge des Kombinierens. Den Rückgabewert liefert nur das letzte Ziel, also `30`. Für alle Ergebnisse brauchst du `GetInvocationList()`."
+    },
+    {
+      "id": "w03-l02-q21",
+      "lesson": "w03-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst aus jedem Benutzernamen ein kleines Objekt mit den Eigenschaften `Name` und `Length` machen, nur für diese eine Abfrage und ohne eine eigene Typdeklaration.",
+      "options": [
+        {"text":"Anonymer Typ mit `new { … }`","correct":true},
+        {"text":"Record mit Positionsparametern"},
+        {"text":"Delegate-Typ-Deklaration"},
+        {"text":"Iterator mit `yield return`"}
+      ],
+      "explanation": "Das Konzept ist der anonyme Typ. Du kennst ihn aus der Lektion über anonyme Typen (Modul 11). Er braucht keine Deklaration. Ein Record (Modul 8) wäre eine eigene Typdeklaration."
+    },
+    {
+      "id": "w03-l02-q22",
+      "lesson": "w03-l02",
+      "type": "cloze",
+      "question": "Ergänze die Abfrage: Sie erzeugt pro Benutzer ein Objekt, und die Schleife gibt `Name` und `Length` aus.",
+      "example": "w03/l02/anonymous-select.cs",
+      "blanks": [
+        {"text":"Select","hint":"Dieser Operator macht aus jedem Element ein neues Objekt.","wrongAnswers":[{"text":"Where","feedback":"`Where` filtert nur und ändert die Elemente nicht."}]},
+        {"text":"row.Length","hint":"Die Eigenschaft heißt so, wie du sie im anonymen Typ festgelegt hast.","wrongAnswers":[{"text":"row.Count","feedback":"Der anonyme Typ hat nur die Eigenschaften `Name` und `Length`."}]}
+      ],
+      "explanation": "`Select` projiziert jedes Element auf ein neues Objekt. Der Compiler erzeugt für `new { Name = …, Length = … }` einen Typ mit genau diesen zwei Eigenschaften."
+    },
+    {
+      "id": "w03-l02-q23",
+      "lesson": "w03-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du bei einer Schreibaufgabe, ob du eine generische Methode, einen Delegate, ein Event oder eine LINQ-Methode brauchst?",
+      "modelAnswer": "Ich schaue zuerst, was sich ändern darf und was fest bleibt. Soll derselbe Rumpf für mehrere Typen gelten, nehme ich eine generische Methode, und brauche ich dort einen Vergleich, kommt eine Einschränkung dazu. Soll ein Stück Verhalten als Parameter oder Variable mitgegeben werden, nehme ich einen Delegate: `Predicate`, `Func` oder `Action` je nach Form, oder einen eigenen Delegate-Typ, wenn ich einen Namen will. Sollen sich andere nur an- und abmelden dürfen, nehme ich ein Event. Arbeite ich mit Folgen von Werten, nehme ich LINQ und achte darauf, ob die Abfrage verzögert läuft."
+    },
+    {
+      "id": "w03-l02-q24",
+      "lesson": "w03-l02",
+      "type": "explain",
+      "question": "Übertragen: Nenne eine Stelle in einem eigenen Programm, in der du ein Event statt eines öffentlichen Delegate-Felds oder `Union` statt `Concat` einsetzen würdest, und begründe die Wahl.",
+      "modelAnswer": "Ein Beispiel für ein Event: Eine Klasse `LoginMonitor` meldet fehlgeschlagene Anmeldungen. Andere Teile des Programms, etwa Logging oder Warnungen, melden sich mit `+=` an. Sie sollen die Meldung nicht selbst auslösen können, darum ist es ein Event. Ein Beispiel für `Union`: Zwei Logdateien nennen IP-Adressen, und ich will jede Adresse nur einmal zählen. `Concat` würde Adressen doppelt behalten."
     }
   ]
 }
