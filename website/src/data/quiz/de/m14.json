@@ -1,4 +1,344 @@
 {
   "module": "m14",
-  "questions": []
+  "questions": [
+    {
+      "id": "m14-l01-q1",
+      "lesson": "m14-l01",
+      "type": "single",
+      "question": "Die Datei `report.cs` liegt ohne Projektdatei in einem Ordner. Mit welchem Befehl startest du sie?",
+      "options": [
+        {
+          "text": "`dotnet run report.cs`",
+          "correct": true
+        },
+        {
+          "text": "`dotnet new report.cs`",
+          "feedback": "`dotnet new` legt ein neues Projekt oder eine neue Datei aus einer Vorlage an. Es startet nichts."
+        },
+        {
+          "text": "Gar nicht: Ohne Projektdatei lässt sich C# nicht starten.",
+          "feedback": "Seit dem .NET 10 SDK startet `dotnet run` auch eine einzelne `.cs`-Datei."
+        }
+      ],
+      "explanation": "`dotnet run report.cs` baut die Datei mit dem SDK und startet das Programm. Die Projekteinstellungen erzeugt das SDK selbst aus den `#:`-Zeilen der Datei."
+    },
+    {
+      "id": "m14-l01-q2",
+      "lesson": "m14-l01",
+      "type": "single",
+      "question": "Was stimmt über eine dateibasierte App?",
+      "options": [
+        {
+          "text": "Sie ist normales C#. Das SDK erzeugt die Projekteinstellungen aus den `#:`-Zeilen und übersetzt den Code mit demselben Compiler wie ein Projekt.",
+          "correct": true
+        },
+        {
+          "text": "Sie ist ein Skript in einem eigenen Dialekt, der weniger Sprachfunktionen kennt.",
+          "feedback": "Die Sprache ist dieselbe. Nur die Projektdatei fehlt, weil das SDK sie ersetzt.",
+          "misconception": "m14-l01-file-based-is-scripting-dialect"
+        },
+        {
+          "text": "Sie wird nicht übersetzt, sondern Zeile für Zeile gelesen und ausgeführt.",
+          "feedback": "Auch eine dateibasierte App wird vom Compiler übersetzt, bevor sie läuft.",
+          "misconception": "m14-l01-file-based-is-scripting-dialect"
+        }
+      ],
+      "explanation": "Eine dateibasierte App unterscheidet sich von einem Projekt nur darin, wo die Einstellungen stehen: in `#:`-Zeilen statt in einer `.csproj`-Datei. Sprache, Compiler und Bibliotheken sind gleich."
+    },
+    {
+      "id": "m14-l01-q3",
+      "lesson": "m14-l01",
+      "type": "single",
+      "question": "Du legst im Ordner eines Projekts die neue Datei `Model/Rule.cs` an. Was musst du in der Projektdatei ändern, damit sie übersetzt wird?",
+      "options": [
+        {
+          "text": "Nichts. Das SDK nimmt alle `.cs`-Dateien des Projektordners automatisch auf.",
+          "correct": true
+        },
+        {
+          "text": "Du trägst die Datei in einem `Compile`-Eintrag ein, sonst wird sie ignoriert.",
+          "feedback": "In einem SDK-Projekt ist `**/*.cs` schon eingeschlossen. Ein zusätzlicher Eintrag für dieselbe Datei führt sogar zum Fehler NETSDK1022.",
+          "misconception": "m14-l01-project-file-lists-sources"
+        },
+        {
+          "text": "Du erhöhst die Version in `TargetFramework`.",
+          "feedback": "`TargetFramework` wählt die .NET-Version. Mit neuen Dateien hat es nichts zu tun."
+        }
+      ],
+      "explanation": "Das SDK schließt standardmäßig alle `.cs`-Dateien unter dem Projektordner ein, außer `bin` und `obj`. Deshalb braucht die Projektdatei keine Liste der Quelldateien."
+    },
+    {
+      "id": "m14-l01-q4",
+      "lesson": "m14-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Das Projekt wandelt jede Warnung in einen Fehler um.",
+      "example": "m14/l01/nullable-directive.cs",
+      "explanation": "Die Zeile `#nullable disable` schaltet die Nullable-Prüfung ab dieser Stelle aus. Deshalb ist `string plain = null;` ohne Warnung erlaubt. Mit `#nullable enable` gilt die Prüfung wieder."
+    },
+    {
+      "id": "m14-l01-q5",
+      "lesson": "m14-l01",
+      "type": "find-bug",
+      "question": "Der Build bricht mit dem Fehler CS8600 ab. Welche Zeile ist die Ursache?",
+      "example": "m14/l01/nullable-warning.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Die Zeile setzt nur `TreatWarningsAsErrors`. Sie macht aus einer Warnung einen Fehler, ist aber nicht die Ursache der Warnung."
+        }
+      },
+      "explanation": "Der Nullable-Kontext ist eingeschaltet, deshalb warnt der Compiler bei `string plain = null;`. `TreatWarningsAsErrors` macht daraus einen Fehler. Mit `string?` oder einem `#nullable disable` davor wäre die Zeile erlaubt."
+    },
+    {
+      "id": "m14-l01-q6",
+      "lesson": "m14-l01",
+      "type": "cloze",
+      "question": "Ergänze die Zeilen am Dateianfang.",
+      "example": "m14/l01/gap-directives.cs",
+      "blanks": [
+        {
+          "text": "#:property",
+          "hint": "Diese Direktive setzt eine Projekteigenschaft."
+        },
+        {
+          "text": "#:include",
+          "hint": "Diese Direktive nimmt eine weitere Datei in die App auf."
+        },
+        {
+          "text": "#nullable disable",
+          "hint": "Die Zeile schaltet die Nullable-Prüfung aus, damit `null` ohne Warnung erlaubt ist."
+        }
+      ],
+      "explanation": "`#:property` setzt eine Eigenschaft, `#:include` nimmt eine zweite Datei in die App auf, und `#nullable disable` schaltet die Nullable-Prüfung ab dieser Zeile aus."
+    },
+    {
+      "id": "m14-l01-q7",
+      "lesson": "m14-l01",
+      "type": "match",
+      "question": "Ordne jede Einstellung der Projektdatei ihrer Wirkung zu.",
+      "pairs": [
+        {
+          "left": "`TargetFramework`",
+          "right": "legt die .NET-Version fest, für die gebaut wird"
+        },
+        {
+          "left": "`Nullable`",
+          "right": "schaltet die Nullable-Prüfung für das ganze Projekt ein"
+        },
+        {
+          "left": "`ImplicitUsings`",
+          "right": "fügt globale `using`-Zeilen für häufige Namespaces hinzu"
+        },
+        {
+          "left": "`TreatWarningsAsErrors`",
+          "right": "lässt den Build bei jeder Warnung scheitern"
+        }
+      ],
+      "explanation": "Diese vier Einstellungen stehen im `PropertyGroup` der Projektdatei von SecLog. Jede wirkt auf alle Dateien des Projekts."
+    },
+    {
+      "id": "m14-l01-q8",
+      "lesson": "m14-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was das SDK und der Befehl `dotnet` tun, wenn du `dotnet run` eingibst.",
+      "modelAnswer": "Das SDK ist die Werkzeugsammlung zum Bauen und Starten von .NET-Programmen. Der Befehl `dotnet` ist ihre Befehlszeile. Bei `dotnet run` liest das SDK die Projektdatei, übersetzt alle `.cs`-Dateien mit dem Compiler zu einer ausführbaren Datei und startet sie.\n\nBei einer dateibasierten App erzeugt das SDK die Projekteinstellungen aus den `#:`-Zeilen der Datei."
+    },
+    {
+      "id": "m14-l01-q9",
+      "lesson": "m14-l01",
+      "type": "explain",
+      "question": "Transferfrage: Du willst schnell prüfen, wie eine Methode für Zeitspannen arbeitet. Später soll daraus ein Programm mit mehreren Dateien werden. Wann nimmst du eine dateibasierte App, wann ein Projekt?",
+      "modelAnswer": "Für den schnellen Test reicht eine dateibasierte App: eine Datei, `dotnet run test.cs`, keine Projektdatei. Sobald mehrere Dateien, eigene Einstellungen oder weitere Projekte dazukommen, wandelst du sie mit `dotnet project convert` in ein Projekt um. Ein Projekt ist auch die Grundlage für alles, was später dazukommt, zum Beispiel mehrere Projekte, die zusammen gebaut werden."
+    },
+    {
+      "id": "m14-l01-q10",
+      "lesson": "m14-l01",
+      "type": "single",
+      "question": "Du führst `dotnet project convert hello.cs` aus. Was passiert?",
+      "options": [
+        {
+          "text": "Das SDK legt in einem neuen Ordner eine Kopie der Datei und eine `.csproj`-Datei an. Die `#:`-Zeilen werden zu Einträgen der Projektdatei, `hello.cs` bleibt unverändert.",
+          "correct": true
+        },
+        {
+          "text": "Das SDK ändert `hello.cs` und löscht alle `#:`-Zeilen, eine Projektdatei entsteht nicht.",
+          "feedback": "Die Originaldatei bleibt unverändert, und es entsteht eine Projektdatei."
+        },
+        {
+          "text": "Das SDK startet die App als Projekt, ohne Dateien zu erzeugen.",
+          "feedback": "Starten ist Aufgabe von `dotnet run`. `dotnet project convert` erzeugt Dateien."
+        }
+      ],
+      "explanation": "Der Befehl kopiert die Datei in einen Ordner mit dem Namen der App und legt dort die `.csproj`-Datei an. Aus `#:property` wird eine Eigenschaft, aus `#:package` ein Paketverweis."
+    },
+    {
+      "id": "m14-l02-q1",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "Was bewirkt `dotnet reference add src/SecLog.Core --project src/SecLog.Cli`?",
+      "options": [
+        {
+          "text": "Die Projektdatei von `SecLog.Cli` bekommt einen `ProjectReference`. Das Projekt nutzt die gebaute Assembly von `SecLog.Core`, und `SecLog.Core` wird zuerst gebaut.",
+          "correct": true
+        },
+        {
+          "text": "Der Quelltext von `SecLog.Core` wird in das Projekt `SecLog.Cli` kopiert.",
+          "feedback": "Es gibt keine Kopie. Der Verweis zeigt auf das andere Projekt, und `SecLog.Cli` bekommt dessen `.dll`.",
+          "misconception": "m14-l02-project-reference-copies-source"
+        },
+        {
+          "text": "`SecLog.Cli` wird dadurch zu einer Klassenbibliothek.",
+          "feedback": "Ob ein Projekt eine App oder eine Bibliothek ist, bestimmt `OutputType` und die Vorlage, nicht ein Verweis."
+        }
+      ],
+      "explanation": "Ein Projektverweis verbindet zwei Projekte der Solution. Beim Bauen entsteht zuerst die Assembly des referenzierten Projekts, dann baut das andere Projekt gegen sie."
+    },
+    {
+      "id": "m14-l02-q2",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "Der Typ `LogEvent` steht in `SecLog.Core` als `class LogEvent` ohne Modifizierer. `SecLog.Cli` verweist auf `SecLog.Core` und benutzt `LogEvent`. Was passiert beim Bauen?",
+      "options": [
+        {
+          "text": "Der Build scheitert mit CS0122: Der Typ ist `internal` und liegt in einer anderen Assembly.",
+          "correct": true
+        },
+        {
+          "text": "Der Build gelingt, weil beide Projekte in derselben Solution liegen.",
+          "feedback": "Die Solution bündelt Projekte nur. Die Grenze für `internal` ist die Assembly."
+        },
+        {
+          "text": "Der Build gelingt, weil `SecLog.Cli` einen Projektverweis hat.",
+          "feedback": "Der Verweis macht die Assembly bekannt, öffnet aber keine `internal`-Typen."
+        }
+      ],
+      "explanation": "Ein Typ ohne Modifizierer ist `internal`. Er ist nur in der eigenen Assembly sichtbar. Damit das Cli-Projekt `LogEvent` nutzen kann, muss er `public` sein."
+    },
+    {
+      "id": "m14-l02-q3",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "`Detector` und `Incident` sind Klassen in demselben Projekt. `Incident` hat die Methode `internal void Close()`. Darf `Detector` sie aufrufen?",
+      "options": [
+        {
+          "text": "Ja. `internal` gilt für die ganze Assembly, und beide Klassen liegen in ihr.",
+          "correct": true
+        },
+        {
+          "text": "Nein. `internal` verbirgt die Methode vor allen Klassen außer `Incident`.",
+          "feedback": "So wirkt `private`. `internal` schließt nur Code aus anderen Assemblies aus.",
+          "misconception": "m14-l02-internal-hides-from-classes"
+        },
+        {
+          "text": "Nur, wenn `Detector` von `Incident` erbt.",
+          "feedback": "Vererbung spielt für `internal` keine Rolle. Die Assembly entscheidet."
+        }
+      ],
+      "explanation": "`internal` begrenzt den Zugriff auf die Assembly. Innerhalb eines Projekts sieht jede Klasse die `internal`-Member der anderen."
+    },
+    {
+      "id": "m14-l02-q4",
+      "lesson": "m14-l02",
+      "type": "match",
+      "question": "Ordne jeden Befehl seiner Wirkung zu.",
+      "pairs": [
+        {
+          "left": "`dotnet sln add`",
+          "right": "nimmt ein Projekt in die Solution auf"
+        },
+        {
+          "left": "`dotnet reference add`",
+          "right": "trägt einen Projektverweis in eine Projektdatei ein"
+        },
+        {
+          "left": "`dotnet package add`",
+          "right": "trägt ein NuGet-Paket in eine Projektdatei ein"
+        },
+        {
+          "left": "`dotnet new classlib`",
+          "right": "legt ein Bibliotheksprojekt ohne Startpunkt an"
+        }
+      ],
+      "explanation": "Die vier Befehle richten SecLog ein: Die Bibliothek entsteht mit der Vorlage `classlib`, `sln add` sammelt die Projekte, `reference add` verbindet sie und `package add` holt ein Paket."
+    },
+    {
+      "id": "m14-l02-q5",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "Was ist eine Assembly?",
+      "options": [
+        {
+          "text": "Die `.dll`- oder `.exe`-Datei, die beim Bauen eines Projekts entsteht und den übersetzten Code enthält.",
+          "correct": true
+        },
+        {
+          "text": "Eine Gruppe von Namespaces im Quelltext.",
+          "feedback": "Namespaces ordnen Namen im Quelltext. Eine Assembly ist eine Datei und kann mehrere Namespaces enthalten."
+        },
+        {
+          "text": "Die Datei `SecLog.slnx`, die alle Projekte auflistet.",
+          "feedback": "Das ist die Solution-Datei. Sie enthält keinen Code."
+        }
+      ],
+      "explanation": "Jedes Projekt wird zu einer Assembly. Sie ist die Einheit, die ausgeliefert wird, und die Grenze für `internal`."
+    },
+    {
+      "id": "m14-l02-q6",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "Welche Zeile in einer Projektdatei bindet ein NuGet-Paket ein?",
+      "options": [
+        {
+          "text": "`<PackageReference Include=\"Newtonsoft.Json\" Version=\"13.0.3\" />`",
+          "correct": true
+        },
+        {
+          "text": "`<ProjectReference Include=\"..\\SecLog.Core\\SecLog.Core.csproj\" />`",
+          "feedback": "Das ist ein Projektverweis auf ein anderes Projekt der Solution, kein Paket."
+        },
+        {
+          "text": "`<TargetFramework>net11.0</TargetFramework>`",
+          "feedback": "Das wählt die .NET-Version und bindet nichts ein."
+        }
+      ],
+      "explanation": "`PackageReference` nennt Paket und Version. Beim Bauen lädt `dotnet restore` das Paket, falls es fehlt."
+    },
+    {
+      "id": "m14-l02-q7",
+      "lesson": "m14-l02",
+      "type": "single",
+      "question": "Ein Ordner enthält `SecLog.slnx` mit zwei Projekten. Das Konsolenprojekt verweist auf die Bibliothek. Was macht `dotnet build` in diesem Ordner?",
+      "options": [
+        {
+          "text": "Es baut beide Projekte, die Bibliothek zuerst.",
+          "correct": true
+        },
+        {
+          "text": "Es baut nur das Konsolenprojekt.",
+          "feedback": "Der Befehl baut die ganze Solution. Das Konsolenprojekt braucht die Bibliothek ohnehin zuerst."
+        },
+        {
+          "text": "Es scheitert, weil `dotnet build` nur ein einzelnes Projekt kennt.",
+          "feedback": "`dotnet build` akzeptiert auch eine Solution-Datei."
+        }
+      ],
+      "explanation": "Mit einer Solution im Ordner baut `dotnet build` alle ihre Projekte. Die Verweise bestimmen die Reihenfolge."
+    },
+    {
+      "id": "m14-l02-q8",
+      "lesson": "m14-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was eine Assembly ist und was `internal` damit zu tun hat.",
+      "modelAnswer": "Jedes Projekt wird beim Bauen zu einer Assembly, einer `.dll`- oder `.exe`-Datei mit dem übersetzten Code. Sie ist die Einheit, die ausgeliefert wird.\n\n`internal` bedeutet: sichtbar in derselben Assembly. Klassen im selben Projekt sehen einander, ein anderes Projekt sieht sie nicht, auch nicht mit einem Projektverweis. Was ein anderes Projekt nutzen soll, muss `public` sein."
+    },
+    {
+      "id": "m14-l02-q9",
+      "lesson": "m14-l02",
+      "type": "explain",
+      "question": "Transferfrage: Du schreibst ein Programm, das Rechnungen berechnet und als Konsolen-App ausgibt. Später soll eine zweite App dieselben Berechnungen nutzen. Wie teilst du die Projekte auf, und was musst du in der Berechnung `public` machen?",
+      "modelAnswer": "Die Berechnung kommt in eine Klassenbibliothek, die Ausgabe in eine Konsolen-App, die auf die Bibliothek verweist. Die zweite App verweist ebenfalls auf die Bibliothek.\n\n`public` müssen die Typen und Member sein, die andere Projekte benutzen. Alles andere bleibt `internal` oder `private` und kann sich ändern, ohne die Apps zu stören."
+    }
+  ]
 }

@@ -9014,6 +9014,205 @@
         "title": "SemaphoreSlim",
         "url": "https://learn.microsoft.com/dotnet/api/system.threading.semaphoreslim"
       }
+    },
+    {
+      "id": "dotnet-cli",
+      "term": "dotnet CLI",
+      "german": "Befehlszeilenwerkzeug dotnet",
+      "category": "platform",
+      "definition": "Das Programm `dotnet` aus dem SDK. Mit Unterbefehlen wie `dotnet new`, `dotnet build` und `dotnet run` legst du Projekte an, baust sie und startest sie.",
+      "aliases": [
+        "dotnet-Befehl",
+        "CLI"
+      ],
+      "related": [
+        "sdk",
+        "project-file"
+      ],
+      "lesson": "m14-l01",
+      "source": {
+        "title": ".NET CLI overview",
+        "url": "https://learn.microsoft.com/dotnet/core/tools/"
+      }
+    },
+    {
+      "id": "file-based-app",
+      "term": "File-based app",
+      "german": "dateibasierte App",
+      "category": "platform",
+      "definition": "Ein C#-Programm in einer einzigen `.cs`-Datei, das du mit `dotnet run datei.cs` startest. Eine Projektdatei ist nicht nötig. Einstellungen stehen in Zeilen mit `#:` am Dateianfang.",
+      "aliases": [
+        "file-based apps",
+        "dateibasierte Apps"
+      ],
+      "related": [
+        "dotnet-cli",
+        "project-file",
+        "preprocessing-directive"
+      ],
+      "lesson": "m14-l01",
+      "source": {
+        "title": "File-based apps",
+        "url": "https://learn.microsoft.com/dotnet/core/sdk/file-based-apps"
+      }
+    },
+    {
+      "id": "project-file",
+      "term": "Project file",
+      "german": "Projektdatei",
+      "category": "platform",
+      "definition": "Eine XML-Datei mit der Endung `.csproj`. Sie legt fest, wie das Projekt gebaut wird, zum Beispiel Zielframework, Nullable und Paketverweise. Die Quelldateien listet sie nicht auf: Das SDK nimmt alle `.cs`-Dateien des Ordners.",
+      "aliases": [
+        "csproj",
+        "Projektdateien"
+      ],
+      "related": [
+        "target-framework",
+        "sdk"
+      ],
+      "lesson": "m14-l01",
+      "source": {
+        "title": "MSBuild reference for .NET SDK projects",
+        "url": "https://learn.microsoft.com/dotnet/core/project-sdk/msbuild-props"
+      }
+    },
+    {
+      "id": "target-framework",
+      "term": "Target framework",
+      "german": "Zielframework",
+      "category": "platform",
+      "definition": "Die .NET-Version, für die ein Projekt gebaut wird. Sie steht in der Projektdatei als `TargetFramework`, zum Beispiel `net11.0`.",
+      "aliases": [
+        "TargetFramework",
+        "TFM"
+      ],
+      "related": [
+        "project-file"
+      ],
+      "lesson": "m14-l01",
+      "source": {
+        "title": "Target frameworks in SDK-style projects",
+        "url": "https://learn.microsoft.com/dotnet/standard/frameworks"
+      }
+    },
+    {
+      "id": "preprocessing-directive",
+      "term": "Preprocessing directive",
+      "german": "Präprozessor-Direktive",
+      "category": "language",
+      "definition": "Eine Zeile, die mit `#` beginnt und den Compiler steuert, statt Code zu sein. Beispiele sind `#nullable enable` und die Zeilen `#:property` einer dateibasierten App.",
+      "aliases": [
+        "#nullable"
+      ],
+      "related": [
+        "nullable-context",
+        "file-based-app"
+      ],
+      "lesson": "m14-l01",
+      "source": {
+        "title": "C# preprocessor directives",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/preprocessor-directives"
+      }
+    },
+    {
+      "id": "solution",
+      "term": "Solution",
+      "german": "Lösung (Projektsammlung)",
+      "category": "platform",
+      "definition": "Eine Datei mit der Endung `.slnx`, die mehrere Projekte zu einem Ganzen zusammenfasst. So baust und testest du alle Projekte mit einem Befehl.",
+      "aliases": [
+        "slnx",
+        "Solutions"
+      ],
+      "related": [
+        "project-reference",
+        "project-file"
+      ],
+      "lesson": "m14-l02",
+      "source": {
+        "title": "dotnet sln",
+        "url": "https://learn.microsoft.com/dotnet/core/tools/dotnet-sln"
+      }
+    },
+    {
+      "id": "project-reference",
+      "term": "Project reference",
+      "german": "Projektverweis",
+      "category": "platform",
+      "definition": "Ein Eintrag `ProjectReference` in einer Projektdatei. Das Projekt nutzt dann die Assembly eines anderen Projekts. Der Quelltext wird nicht kopiert.",
+      "aliases": [
+        "ProjectReference",
+        "Projektverweise"
+      ],
+      "related": [
+        "assembly",
+        "solution"
+      ],
+      "lesson": "m14-l02",
+      "source": {
+        "title": "dotnet reference add",
+        "url": "https://learn.microsoft.com/dotnet/core/tools/dotnet-reference-add"
+      }
+    },
+    {
+      "id": "nuget-package",
+      "term": "NuGet package",
+      "german": "NuGet-Paket",
+      "category": "platform",
+      "definition": "Ein Paket mit fertigen Assemblies, das du mit `PackageReference` in ein Projekt einbindest. Der Befehl `dotnet restore` lädt es herunter.",
+      "aliases": [
+        "PackageReference",
+        "NuGet",
+        "Paket"
+      ],
+      "related": [
+        "assembly",
+        "project-file"
+      ],
+      "lesson": "m14-l02",
+      "source": {
+        "title": "Package references in project files",
+        "url": "https://learn.microsoft.com/nuget/consume-packages/package-references-in-project-files"
+      }
+    },
+    {
+      "id": "assembly",
+      "term": "Assembly",
+      "german": "Baueinheit",
+      "category": "platform",
+      "definition": "Das Ergebnis, wenn ein Projekt gebaut wird: eine `.dll`- oder `.exe`-Datei mit dem übersetzten Code. Sie wird ausgeliefert, und `internal` gilt genau in ihr.",
+      "aliases": [
+        "Assemblies",
+        "dll"
+      ],
+      "related": [
+        "class-library",
+        "project-reference",
+        "accessibility-domain"
+      ],
+      "source": {
+        "title": "Assemblies in .NET",
+        "url": "https://learn.microsoft.com/dotnet/standard/assembly/"
+      }
+    },
+    {
+      "id": "class-library",
+      "term": "Class library",
+      "german": "Klassenbibliothek",
+      "category": "platform",
+      "definition": "Ein Projekt ohne Startpunkt, das nur Typen für andere Projekte bereitstellt. Es wird zu einer `.dll`.",
+      "aliases": [
+        "Klassenbibliotheken",
+        "library"
+      ],
+      "related": [
+        "assembly",
+        "project-reference"
+      ],
+      "source": {
+        "title": "Class libraries",
+        "url": "https://learn.microsoft.com/dotnet/standard/class-libraries"
+      }
     }
   ]
 }
