@@ -144,7 +144,7 @@ Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: <the 
 
 - If a lesson cannot add a real step, the section has one sentence instead: "In dieser Lektion kommt kein Projektschritt dazu, weil …". It does not invent an unrelated SecLog snippet.
 - The "Im Runner siehst du …" sentence is only needed when the task file has folds (more than 40 lines, from module 1 on; module 0 has none). The first lesson of the course that has folds adds one more sentence: the placeholder lines (⋯) must stay. Details and rules: `concept/project-seclog.md`, "Short task files".
-- For ◻ (not runnable) lessons, the runner is replaced by the existing fallback: a `<CodeBlock>` and a collapsed model solution (the code comes from a CI project).
+- For ◻ (not runnable) lessons, the runner is replaced by the existing fallback: a `<CodeBlock>` and a collapsed model solution (the code comes from a CI project). Folders, file names and the PR diff: `concept/project-seclog.md`, "◻ modules: SecLog as a project".
 - File names: `website/examples/mXX/lYY/seclog-<name>-task.cs`, `seclog-<name>-task.tests.snippet.cs`, `seclog-<name>-solution.cs` and their `.out.txt` snapshots. `<name>` stays the same in a module.
 - Continuity rule (start code identical to the previous solution after removing the fold marker lines, checked by `node tools/check-seclog.mjs`) and the sample data: `concept/project-seclog.md`.
 - Module box: the first lesson of every module has `:::tip[Projekt: Was SecLog nach diesem Modul kann]` right after the learning goals, with 2–4 bullets from the milestone row of the module.

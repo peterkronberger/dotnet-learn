@@ -1,0 +1,71 @@
+== framework-dependent ==
+m14-publish
+m14-publish.deps.json
+m14-publish.dll
+m14-publish.pdb
+m14-publish.runtimeconfig.json
+$ ./m14-publish
+Hello from the published app.
+JIT available: True
+$ dotnet m14-publish.dll
+Hello from the published app.
+JIT available: True
+
+== framework-dependent, no apphost ==
+m14-publish.deps.json
+m14-publish.dll
+m14-publish.pdb
+m14-publish.runtimeconfig.json
+$ dotnet m14-publish.dll
+Hello from the published app.
+JIT available: True
+
+== self-contained ==
+m14-publish
+m14-publish.deps.json
+m14-publish.dll
+m14-publish.pdb
+m14-publish.runtimeconfig.json
++ .NET runtime files (not listed)
+$ ./m14-publish
+Hello from the published app.
+JIT available: True
+
+== self-contained, single file ==
+m14-publish
+m14-publish.pdb
+$ ./m14-publish
+Hello from the published app.
+JIT available: True
+
+== self-contained, ReadyToRun ==
+m14-publish
+m14-publish.deps.json
+m14-publish.dll
+m14-publish.pdb
+m14-publish.runtimeconfig.json
++ .NET runtime files (not listed)
+$ ./m14-publish
+Hello from the published app.
+JIT available: True
+
+== self-contained, trimmed ==
+m14-publish
+m14-publish.deps.json
+m14-publish.dll
+m14-publish.pdb
+m14-publish.runtimeconfig.json
++ .NET runtime files (not listed)
+$ ./m14-publish
+Hello from the published app.
+JIT available: True
+
+== Native AOT ==
+m14-publish
+m14-publish.dbg
+$ ./m14-publish
+Hello from the published app.
+JIT available: False
+
+== container image ==
+m14-publish.tar.gz
