@@ -14,6 +14,7 @@ paths:
 - Fold markers (`// @fold-start` / `// @fold-end`) hide unchanged code in the runner. SecLog task files with more than 40 lines get them from module 1 on; rules in `concept/project-seclog.md`, "Short task files".
 - Runnable examples must run on their own. Fragments that cannot run on their own end in `.snippet.cs` (CI skips them).
 - Examples that need NuGet packages (EF Core, Minimal API, xUnit, DI/logging) are projects under `website/examples/_ci/<name>/` with `run.sh` and `expected.out.txt`.
+- Test projects print their results with `tools/run-tests.sh` (add `--allow-failures` when a lesson shows failing tests on purpose). The isolated test examples of a lesson are one project `_ci/mXX-lYY-<slug>/`; SecLog as a project in ◻ modules: `concept/project-seclog.md`, "◻ modules: SecLog as a project".
 - Input for `Console.ReadLine()` goes into `<name>.in.txt` next to the example. CI feeds it, and the lesson passes it as `stdin` to `<CSharpRunner>`.
 - Output must not depend on culture (`InvariantCulture`): the playground uses `InvariantGlobalization`.
 - If the example should be runnable, use only namespaces that the playground has (`playground/Playground.csproj`, `ReferenceName`).

@@ -1886,7 +1886,8 @@ async Task<string[]> LoadSlowSourceAsync(CancellationToken token = default)
 }
 
 // Read the lines of a source one by one: each line arrives after a short wait
-async IAsyncEnumerable<string> ReadSourceLinesAsync(string name, CancellationToken token = default)
+async IAsyncEnumerable<string> ReadSourceLinesAsync(string name,
+    [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token = default)
 {
     foreach (string line in logSources[name])
     {

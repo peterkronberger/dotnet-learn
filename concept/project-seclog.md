@@ -53,6 +53,26 @@ Exceptions:
 
 The first project step of a module starts from the last solution of the previous module.
 
+### ◻ modules: SecLog as a project
+
+From `m14-l01` on, SecLog is no longer one `.cs` file but a .NET project, later a solution. It lives in CI projects (exception 3 above), with these rules:
+
+- **One folder per project step.** Every lesson with a project step gets the folder `website/examples/_ci/seclog-m14-lYY/` (later modules: `seclog-mXX-lYY/`). The folder is the **solution state** after lesson YY. There is no task copy: the start state of a step is the folder of the previous step, so the continuity rule holds by construction. The first step of M14 starts from the last SecLog solution file of M13 (exception 2: the lesson moves that code into the project).
+- **File names.** The solution file is `SecLog.slnx`. Code goes into `src/SecLog.Core/` (the analysis: events, rules, detection), `src/SecLog.Cli/` (the console app that prints the results) and `tests/SecLog.Tests/` (the xUnit tests). A folder only contains the parts that exist at that step; for example the first step can be a single project without `SecLog.slnx`.
+- **`run.sh` and `expected.out.txt`.** Every folder has both, like every `_ci` project, so `bash tools/check-examples.sh` checks it without changes. `run.sh` prints the program output first, then the test results of the shared helper, for example:
+
+  ```bash
+  #!/usr/bin/env bash
+  set -euo pipefail
+  cd "$(dirname "$0")"
+  dotnet run --project src/SecLog.Cli --verbosity quiet
+  bash ../../../../tools/run-tests.sh SecLog.slnx
+  ```
+
+  SecLog folders never use `--allow-failures`: the solution state is green. Failing tests that a lesson shows on purpose belong to the isolated test examples of the lesson (`_ci/mXX-lYY-<slug>/`, see `.claude/rules/examples.md`).
+- **In the lesson.** The project step shows the start code from the previous folder with `<CodeBlock>` and the model solution from the new folder with `<FoldedCode>` (folds are allowed in big files, rules as in "Short task files"). Only the files that the step changes are shown; each code block title is the path inside the folder, for example `src/SecLog.Core/FailureRule.cs`.
+- **In the PR.** The PR of a lesson shows `diff -r <previous folder> <new folder>` without `bin/`, `obj/` and `TestResults/` (for example `diff -r -x bin -x obj -x TestResults …`) and says that the diff contains only the new requirement.
+
 ## Milestones
 
 | Module | After this module SecLog can … | Concepts |
