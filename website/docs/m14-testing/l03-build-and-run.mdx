@@ -1,0 +1,253 @@
+---
+title: Bauen und Ausführen
+sidebar_position: 3
+description: Was dotnet build erzeugt, was Debug und Release ändern, wie bedingte Kompilierung mit #if DEBUG arbeitet und auf welchen Wegen ein gebautes Programm startet.
+lesson_id: m14-l03
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import conditionalSymbols from '!!raw-loader!@site/examples/m14/l03/conditional-symbols.cs';
+import conditionalSymbolsOutput from '!!raw-loader!@site/examples/m14/l03/conditional-symbols.out.txt';
+import buildProgram from '!!raw-loader!@site/examples/_ci/m14-l03-build/Program.cs';
+import buildProject from '!!raw-loader!@site/examples/_ci/m14-l03-build/m14-l03-build.csproj';
+import buildOutput from '!!raw-loader!@site/examples/_ci/m14-l03-build/expected.out.txt';
+import headBefore from '!!raw-loader!@site/examples/m14/l03/seclog-program-head-before.snippet.cs';
+import headAfter from '!!raw-loader!@site/examples/m14/l03/seclog-program-head-after.snippet.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l03/expected.out.txt';
+
+export const sections = buildOutput.trim().split('\n\n');
+export const seclogHead = seclogOutput.split('\n').slice(0, 10).join('\n');
+export const seclogTail = seclogOutput.slice(seclogOutput.indexOf('== Release build (dotnet run')).trim();
+
+# Bauen und Ausführen
+
+:::note[Lernziele]
+- Du kannst erklären, was `dotnet build` erzeugt und wie sich Bauen und Veröffentlichen unterscheiden.
+- Du kannst sagen, was sich zwischen Debug und Release ändert.
+- Du kannst bedingte Kompilierung mit `#if DEBUG` lesen.
+- Du kannst ein Programm auf drei Arten starten: mit `dotnet run`, mit der Startdatei und mit `dotnet <app>.dll`.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l02-q5" />
+
+<Quiz id="m14-l01-q1" />
+
+<Quiz id="m00-l05-q2" />
+
+## Was dotnet build erzeugt
+
+Bisher hast du Projekte mit `dotnet run` gestartet. Der Befehl baut bei Bedarf. In dieser Lektion schaust du auf das, was dabei entsteht. `dotnet build` übersetzt das Projekt und alles, wovon es abhängt, in eine Gruppe von Dateien. Wohin sie kommen, bestimmt die <Term id="build-configuration">Build-Konfiguration</Term> (build configuration): ein Name wie `Debug` oder `Release`, der einen Satz von Einstellungen auswählt. Ohne Angabe baut der Befehl in der Konfiguration `Debug`. Die Dateien liegen im Ordner `bin/<Konfiguration>/<Zielframework>/`.
+
+Die kleine App dieser Lektion ist ein Projekt mit einer Datei `Program.cs`. Du baust sie zweimal:
+
+```bash title="In zwei Konfigurationen bauen"
+dotnet build
+dotnet build -c Release
+```
+
+Das ist der Inhalt der zwei Ordner:
+
+<CodeBlock language="text" title="Ausgabe: Ordner bin/Debug/net11.0 und bin/Release/net11.0">{sections[0] + '\n\n' + sections[1]}</CodeBlock>
+
+1. **Konfiguration wählen:** Ohne `-c` entsteht der Ordner `bin/Debug/net11.0/`, mit `-c Release` der Ordner `bin/Release/net11.0/`. `net11.0` ist das Zielframework aus der Projektdatei.
+2. **Code und Start:** `m14-l03-build.dll` ist die Assembly mit dem übersetzten Code (IL). `m14-l03-build` ist eine Datei zum Starten, die <Term id="apphost">Apphost</Term> (apphost). Sie ist für das Betriebssystem gebaut, auf Windows heißt sie `m14-l03-build.exe`.
+3. **Zusatzdateien:** `.pdb` enthält Debug-Informationen. `.deps.json` listet die Abhängigkeiten auf. `.runtimeconfig.json` nennt die .NET-Laufzeit, die die App braucht.
+4. **Unterschied lesen:** Nur der Debug-Ordner hat zusätzlich `m14-l03-build.runtimeconfig.dev.json` mit Einstellungen für die Entwicklung.
+
+<Forward concepts={['Debugger']} module="14" />
+
+Mit der `.pdb`-Datei arbeitet später ein Debugger. Das Programm läuft auch ohne sie.
+
+<Quiz id="m14-l03-q2" />
+
+## Bauen oder veröffentlichen?
+
+Neben `dotnet build` gibt es `dotnet publish`. Beide übersetzen den Code, aber sie haben verschiedene Ziele. Der Befehl <Term id="publish">`dotnet publish`</Term> bereitet die App für die Auslieferung vor: Er stellt in einem Unterordner `publish` zusammen, was die App an einem anderen Ort braucht. Welche Optionen es dafür gibt, zeigt Lektion 4.
+
+| | `dotnet build` | `dotnet publish` |
+| --- | --- | --- |
+| Aufgabe | übersetzt das Projekt | bereitet die App für die Auslieferung vor |
+| Standardkonfiguration | `Debug` | `Release` <Since dotnet="8" /> |
+| Ordner | `bin/<Konfiguration>/<Zielframework>/` | `publish` unterhalb davon |
+
+Dass `dotnet publish` von selbst Release wählt, gilt für Projekte ab .NET 8. Vorher baute der Befehl in Debug, wenn du nichts angegeben hast.
+
+<Quiz id="m14-l03-q1" />
+
+## Debug und Release
+
+Die zwei Konfigurationen unterscheiden sich in Einstellungen der Projektdatei. Sie lassen sich abfragen, ohne zu bauen. Hier steht, was die kleine App dieser Lektion in beiden Konfigurationen hat:
+
+<CodeBlock language="text" title="Ausgabe: Einstellungen je Konfiguration">{sections[2]}</CodeBlock>
+
+- **Optimierung:** In Release ist `Optimize` an. Der Compiler erzeugt dann kleineren, schnelleren Code. In Debug ist die Optimierung aus.
+- **Debug-Informationen:** `DebugType` ist in beiden Konfigurationen `portable`. Deshalb entsteht auch in Release eine `.pdb`-Datei, wie die Ordner oben zeigen.
+- **Symbol `DEBUG`:** Der Compiler kennt das Symbol `DEBUG` nur in Debug. Was ein Symbol ist, zeigt der nächste Abschnitt.
+
+Der Programmcode selbst bleibt derselbe. Was sich ändert, sind die Einstellungen für den Compiler und die Symbole, die er kennt.
+
+<Quiz id="m14-l03-q3" />
+
+## Bedingte Kompilierung
+
+Mit einem <Term id="conditional-compilation-symbol">Symbol für bedingte Kompilierung</Term> (conditional compilation symbol) entscheidest du, welche Teile einer Datei der Compiler übersetzt. Ein Symbol ist entweder definiert oder nicht definiert, einen Wert hat es nicht. Die Direktiven `#if`, `#elif`, `#else` und `#endif` wählen einen Abschnitt aus: Der Compiler übersetzt den Abschnitt nach der ersten Bedingung, die zutrifft, und überspringt alle anderen.
+
+Ein Symbol wird auf drei Wegen definiert:
+
+- Das SDK definiert Symbole wie `DEBUG` je nach Konfiguration.
+- Die Eigenschaft `DefineConstants` in der Projektdatei nennt weitere Symbole.
+- Die Direktive `#define` definiert ein Symbol in einer Datei, `#undef` hebt es wieder auf. Beide stehen ganz oben in der Datei, vor dem ersten Code.
+
+In Bedingungen darfst du `!` (nicht), `&&` (und) und `||` (oder) benutzen. Ein Symbol, das nirgends definiert wurde, gilt als nicht definiert.
+
+:::info[Vorhersage]
+Welche Zeilen gibt das Programm aus? Das Ergebnis hängt nicht von der Konfiguration ab, denn `DEBUG` kommt nicht vor. Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<CodeBlock language="csharp" title="conditional-symbols.cs">{conditionalSymbols}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Symbole am Anfang bestimmen:** `AUDIT` und `FAST` werden definiert, `#undef FAST` hebt `FAST` wieder auf. Ab der ersten Anweisung ist nur `AUDIT` definiert.
+2. **Kette auswählen:** `#if FAST` trifft nicht zu, `#elif AUDIT` trifft zu. Der Compiler übersetzt nur die Zeile dieses Abschnitts. Der `#else`-Abschnitt wird übersprungen, obwohl sonst keine Bedingung zutrifft.
+3. **Ausdrücke prüfen:** `AUDIT && !FAST` trifft zu. `FAST || SPEED` trifft nicht zu: `FAST` ist aufgehoben, und `SPEED` wurde nie definiert.
+
+Ein echter Lauf gibt aus:
+
+<pre><code>{conditionalSymbolsOutput.trim()}</code></pre>
+
+Was passiert, wenn du die Zeile `#undef FAST` löschst? Dann ist `FAST` definiert. Das Programm gibt `Mode: fast` und `Fast or speed` aus.
+
+</details>
+
+Jetzt ergänzt du die Direktiven in einem Programm:
+
+<Quiz id="m14-l03-q4" />
+
+Auch die Stelle von `#define` ist festgelegt:
+
+<Quiz id="m14-l03-q5" />
+
+Zuletzt sagst du die Ausgabe eines Programms voraus, das Symbole definiert und aufhebt:
+
+<Quiz id="m14-l03-q6" />
+
+### Die drei Wege in einem Projekt
+
+Die kleine App dieser Lektion nutzt alle drei Wege. Die Projektdatei setzt `DefineConstants`:
+
+<CodeBlock language="xml" title="m14-l03-build.csproj">{buildProject}</CodeBlock>
+
+`$(DefineConstants)` steht für die bisherigen Symbole. Die Zeile hängt `AUDIT` an sie an und ersetzt sie nicht. Das Programm benutzt `DEBUG`, `AUDIT` und ein Symbol aus `#define`:
+
+<CodeBlock language="csharp" title="Program.cs">{buildProgram}</CodeBlock>
+
+Der Compiler übersetzt je Konfiguration nur eine der beiden ersten Ausgaben. Das Programm besteht nach dem Bauen also aus anderem Code.
+
+## Ein gebautes Programm starten
+
+Das Ergebnis von `dotnet build` startest du auf drei Arten. Hier läuft die Release-Variante der kleinen App:
+
+<CodeBlock language="text" title="Ausgabe: drei Wege zu starten">{sections[3]}</CodeBlock>
+
+1. **`dotnet run`:** Der Befehl baut bei Bedarf und startet das Programm. Er arbeitet mit einem Projekt und mit einer einzelnen `.cs`-Datei (Lektion 1). Er braucht den Quelltext.
+2. **Apphost:** Im Ausgabeordner startest du `./m14-l03-build` direkt, wie jedes Programm des Betriebssystems. Auf Windows ist das `m14-l03-build.exe`.
+3. **`dotnet m14-l03-build.dll`:** Der Befehl `dotnet` startet die Assembly. Du brauchst dafür nur die `.dll` und ihre Nachbardateien, nicht die Apphost.
+
+Alle drei Wege geben dasselbe aus. Die Apphost und `dotnet <app>.dll` laufen nur, wenn auf dem Rechner eine passende .NET-Laufzeit installiert ist. Das ist der Normalfall, wenn du ein Projekt baust: Die App ist <Term id="framework-dependent-deployment">framework-abhängig</Term> (framework-dependent).
+
+<Quiz id="m14-l03-q7" />
+
+### Welche Laufzeit nutzt der Start?
+
+Die Datei `.runtimeconfig.json` nennt die Laufzeit, für die die App gebaut ist. In der Ausgabe oben steht dort `Microsoft.NETCore.App` in der Version `11.0.0`. Beim Start sucht der Befehl `dotnet` oder die Apphost aber nicht genau diese Version:
+
+<CodeBlock language="text" title="Ausgabe: Laufzeit in m14-l03-build.runtimeconfig.json">{sections[4]}</CodeBlock>
+
+- **Neuester Patch:** Sind mehrere `11.0.*`-Laufzeiten installiert, läuft die App mit der neuesten. Ist `11.0.3` installiert, läuft die App ohne neuen Build mit `11.0.3`.
+- **Höhere Minor-Version:** Fehlt jede `11.0.*`-Laufzeit, nimmt der Start die nächste höhere Minor-Version derselben Major-Version, zum Beispiel `11.1.0`.
+- **Keine höhere Major-Version:** Ist nur `12.0.0` installiert, läuft die App nicht. Niedrigere Versionen kommen nie in Frage.
+
+Dieses Verhalten heißt <Term id="roll-forward">Roll-forward</Term> (Vorwärtsrollen). Die Eigenschaft `RollForward` ändert die Regel. Der Kurs nennt sie nur.
+
+<Quiz id="m14-l03-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog ist eine Solution aus der Bibliothek `SecLog.Core` und der App `SecLog.Cli` (Stand von Lektion 2).
+
+**Neue Anforderung:** SecLog gibt nach der Zeile `Execution model: Native AOT` eine Zeile mit seiner Build-Konfiguration aus, `Build: Debug` oder `Build: Release`. Die Auswahl trifft `#if DEBUG`. Die übrige Ausgabe bleibt unverändert.
+
+Das ist der Anfang der Datei im Stand von Lektion 2:
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (Lektion 2, Anfang)">{headBefore}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={headAfter} title="src/SecLog.Cli/Program.cs (Anfang)" />
+
+1. **Stelle finden:** Die neue Zeile gehört direkt nach `Execution model: Native AOT`, vor die leere Zeile.
+2. **Auswahl schreiben:** `#if DEBUG` übersetzt die Zeile `Build: Debug`. Der `#else`-Abschnitt übersetzt `Build: Release`. Der Kommentar steht vor `#if`.
+3. **Beide Konfigurationen prüfen:** Die CI baut SecLog in Debug und in Release. Sie startet die Release-Variante mit `dotnet run`, mit der Apphost und mit `dotnet SecLog.Cli.dll`.
+
+Ein Lauf in Debug beginnt so:
+
+<CodeBlock language="text" title="Ausgabe: Anfang der Debug-Ausgabe">{seclogHead}</CodeBlock>
+
+Der Vergleich der Release-Läufe mit dem Debug-Lauf:
+
+<CodeBlock language="text" title="Ausgabe: Vergleich der Läufe">{seclogTail}</CodeBlock>
+
+Nur die neue Zeile unterscheidet die Konfigurationen. Alle drei Startwege der Release-Variante geben dasselbe aus.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l03/`) meldet, in welcher Konfiguration es gebaut wurde. Es lässt sich auf drei Wegen starten.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l03-debug-build-for-production" />
+
+**„Ein Debug-Build ist für die Produktion gut genug.“** Das stimmt nicht. Debug schaltet die Optimierung des Compilers aus, und Code unter `#if DEBUG` bleibt im Programm. Für die Auslieferung nimmst du Release. `dotnet publish` wählt Release seit .NET 8 von selbst.
+:::
+
+<Quiz id="m14-l03-q9" />
+
+<details>
+<summary>Vertiefung: Wie der Compiler bedingte Kompilierung auswertet (optional)</summary>
+
+In C# gibt es keinen eigenen Vorverarbeitungsschritt: Die Direktiven werden schon bei der lexikalischen Analyse verarbeitet ([§6.5.1 General](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#651-general)). Ein Symbol ist definiert oder nicht definiert. Nicht deklarierte Symbole gelten als nicht definiert ([§6.5.2 Conditional compilation symbols](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#652-conditional-compilation-symbols)).
+
+In Bedingungen sind `!`, `==`, `!=`, `&&`, `||` und Klammern erlaubt ([§6.5.3 Pre-processing expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#653-pre-processing-expressions)). `#define` und `#undef` müssen vor dem ersten Token der Datei stehen, sonst entsteht ein Fehler ([§6.5.4 Definition directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#654-definition-directives)). Der Compiler meldet ihn als CS1032.
+
+Aus einer Gruppe von `#if`, `#elif`, `#else` und `#endif` wird höchstens ein Abschnitt übersetzt. Übersprungener Code muss nicht einmal gültig übersetzbar sein, er muss nur die Direktiven richtig schreiben ([§6.5.5 Conditional compilation directives](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#655-conditional-compilation-directives)).
+
+</details>
+
+## Zusammenfassung
+
+`dotnet build` übersetzt ein Projekt und legt Assembly, Apphost, `.pdb`, `.deps.json` und `.runtimeconfig.json` in `bin/<Konfiguration>/<Zielframework>/` ab. Ohne Angabe ist die Konfiguration Debug. `dotnet publish` bereitet die App für die Auslieferung vor und baut seit .NET 8 standardmäßig Release. Release schaltet die Optimierung ein und kennt das Symbol `DEBUG` nicht, Debug-Informationen gibt es in beiden. Mit `#if`, `#elif`, `#else` und `#endif` übersetzt der Compiler nur den Abschnitt, dessen Symbolbedingung zutrifft. Ein gebautes Programm startest du mit `dotnet run`, mit der Apphost oder mit `dotnet <app>.dll`. Eine framework-abhängige App läuft mit dem neuesten installierten Patch ihrer Laufzeit.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l03-q10" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l03-q11" />
+
+### Transferfrage
+
+<Quiz id="m14-l03-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [dotnet build](https://learn.microsoft.com/dotnet/core/tools/dotnet-build)
+- Microsoft Learn: [Preprocessor directives](https://learn.microsoft.com/dotnet/csharp/language-reference/preprocessor-directives)
+- Microsoft Learn: [Select the .NET version to use](https://learn.microsoft.com/dotnet/core/versions/selection)

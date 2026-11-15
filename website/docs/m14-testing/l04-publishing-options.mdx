@@ -1,0 +1,230 @@
+---
+title: Veröffentlichungsoptionen
+sidebar_position: 4
+description: Wie du für eine Situation die passende Veröffentlichungsoption wählst – framework-abhängig, self-contained, Single-File, ReadyToRun, Trimming, Native AOT und Container – und wie du das Ergebnis startest.
+lesson_id: m14-l04
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import publishProgram from '!!raw-loader!@site/examples/_ci/m14-publish/Program.cs';
+import publishOutput from '!!raw-loader!@site/examples/_ci/m14-publish/expected.out.txt';
+import publishSizes from '!!raw-loader!@site/examples/_ci/m14-publish/sizes.txt';
+import csprojBefore from '!!raw-loader!@site/examples/_ci/seclog-m14-l03/src/SecLog.Cli/SecLog.Cli.csproj';
+import csprojAfter from '!!raw-loader!@site/examples/_ci/seclog-m14-l04/src/SecLog.Cli/SecLog.Cli.csproj';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l04/expected.out.txt';
+
+export const modes = publishOutput.trim().split('\n\n');
+export const sizeLines = publishSizes.trim().split('\n');
+export const sizeRows = sizeLines.slice(1).map((line) => line.split(': '));
+export const seclogTail = seclogOutput.slice(seclogOutput.indexOf('== Files in the publish folder')).trim();
+
+# Veröffentlichungsoptionen
+
+:::note[Lernziele]
+- Du kannst für eine Situation die passende Veröffentlichungsoption wählen, mit einer Entscheidungstabelle.
+- Du kannst sagen, wie das Ergebnis jeder Option gestartet wird.
+- Du kannst die Grenzen von Self-contained und Native AOT nennen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l03-q1" />
+
+<Quiz id="m14-l03-q8" />
+
+<Quiz id="m00-l05-q5" />
+
+## Zwei Fragen vor dem Veröffentlichen
+
+Lektion 3 hat gezeigt, dass `dotnet publish` eine App für die Auslieferung vorbereitet. Wie das Ergebnis aussieht, bestimmst du mit Optionen. Zwei Fragen ordnen sie:
+
+1. **Ist auf dem Zielrechner eine passende .NET-Laufzeit installiert?** Wenn ja, genügt eine kleine App ohne Laufzeit. Wenn nein, muss die Laufzeit mit.
+2. **Was ist wichtig: Dateigröße, Startzeit oder wenige Dateien?** Dafür gibt es Zusatzoptionen.
+
+Die kleine App `m14-publish` dient in dieser Lektion als Beispiel. Sie gibt zwei Zeilen aus. Die zweite zeigt, ob zur Laufzeit ein <Term id="jit">JIT</Term> zur Verfügung steht. Hier ist `Program.cs`:
+
+<CodeBlock language="csharp" title="Program.cs">{publishProgram}</CodeBlock>
+
+## Framework-abhängig
+
+Die Standardoption ist <Term id="framework-dependent-deployment">framework-abhängig</Term>. Der Ordner enthält die App, ihre Abhängigkeiten und eine Apphost, aber keine Laufzeit. Er ist klein, und die App läuft mit dem neuesten installierten Patch der Laufzeit (Lektion 3). Dafür muss auf dem Zielrechner eine passende Laufzeit installiert sein.
+
+<CodeBlock language="text" title="Ausgabe: framework-abhängig, Befehl dotnet publish -c Release -r linux-x64">{modes[0]}</CodeBlock>
+
+Das SDK legt die Apphost für ein Betriebssystem an. Willst du nur die DLL, die auf mehreren Betriebssystemen läuft, schaltest du die Apphost ab:
+
+<CodeBlock language="text" title="Ausgabe: DLL ohne Apphost, Befehl dotnet publish -c Release -p:UseAppHost=false">{modes[1]}</CodeBlock>
+
+Gestartet wird die DLL mit `dotnet m14-publish.dll`.
+
+## Self-contained und Runtime Identifier
+
+Bei <Term id="self-contained-deployment">Self-contained</Term> kopiert das SDK die .NET-Laufzeit in den Ordner. Der Zielrechner braucht keine installierte Laufzeit. Die App gehört dann zu einer Plattform, und du musst sie nennen: mit einem <Term id="runtime-identifier">Runtime Identifier</Term> (RID), einer Kennung aus Betriebssystem und Architektur wie `linux-x64`, `win-x64` oder `osx-arm64`. Verwende RIDs ohne Version und ohne Distribution.
+
+<CodeBlock language="text" title="Ausgabe: self-contained, Befehl dotnet publish -c Release -r linux-x64 --self-contained">{modes[2]}</CodeBlock>
+
+Die Zeile `+ .NET runtime files (not listed)` steht für die Dateien der Laufzeit. Gestartet wird mit `./m14-publish`.
+
+Der Preis: Die Laufzeit gehört zur App. Sie bekommt keine neuen Sicherheits-Patches von selbst. Erst eine neu veröffentlichte App enthält einen neueren Patch.
+
+<Quiz id="m14-l04-q1" />
+
+<Quiz id="m14-l04-q10" />
+
+## Single-File
+
+Die Option <Term id="single-file-deployment">Single-File</Term> bündelt die Dateien der App in einer. Sie geht mit framework-abhängig und mit Self-contained. Die Datei gilt immer für ein Betriebssystem und eine Architektur, und die Dateien `.runtimeconfig.json` und `.deps.json` stecken in ihr.
+
+<CodeBlock language="text" title="Ausgabe: Single-File, Befehl dotnet publish -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true">{modes[3]}</CodeBlock>
+
+Neben der Datei liegt nur die `.pdb`. Bei Self-contained steckt auch die Laufzeit in der Datei, deshalb bleibt sie groß.
+
+<Quiz id="m14-l04-q6" />
+
+## ReadyToRun und Trimming
+
+Zwei Optionen verändern Self-contained: Sie machen den Start schneller oder das Ergebnis kleiner.
+
+**ReadyToRun** (<Term id="ready-to-run">ReadyToRun</Term> kennst du aus Modul 0) legt IL und vorab übersetzten Maschinencode in dieselbe Datei. Der JIT hat beim Start weniger zu tun. Die Assemblies werden dadurch etwa zwei- bis dreimal so groß ([ReadyToRun-Übersicht](https://learn.microsoft.com/dotnet/core/deploying/ready-to-run)). Die Option geht auch framework-abhängig.
+
+<CodeBlock language="text" title="Ausgabe: ReadyToRun, Befehl dotnet publish -c Release -r linux-x64 --self-contained -p:PublishReadyToRun=true">{modes[4]}</CodeBlock>
+
+**Trimming** lässt ungenutzten Code der Bibliotheken weg. Es gibt es nur bei Self-contained. Der Trimmer entscheidet beim Bauen, was die App braucht. Code, den er nicht sieht, etwa bei Reflection, kann fehlen und zur Laufzeit Fehler auslösen. Deshalb warnt er, wenn er ein Muster nicht auswerten kann.
+
+<CodeBlock language="text" title="Ausgabe: getrimmt, Befehl dotnet publish -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true">{modes[5]}</CodeBlock>
+
+Beide starten mit `./m14-publish`. Die Dateilisten sehen aus wie bei Self-contained. Den Unterschied zeigt die Größe, die der nächste Abschnitt vergleicht.
+
+<Quiz id="m14-l04-q7" />
+
+## Native AOT
+
+Bei <Term id="native-aot">Native AOT</Term> (Modul 0) übersetzt das SDK die App beim Veröffentlichen vollständig in Maschinencode für eine Plattform. Das Ergebnis braucht keine installierte Laufzeit und keinen JIT, startet schnell und braucht weniger Speicher. Die zweite Ausgabezeile der App zeigt es:
+
+<CodeBlock language="text" title="Ausgabe: Native AOT, Befehl dotnet publish -c Release -r linux-x64 -p:PublishAot=true">{modes[6]}</CodeBlock>
+
+`JIT available: False`: Es gibt keinen JIT, den die App nutzen könnte. Die Datei `.dbg` enthält die Debug-Symbole. Gestartet wird mit `./m14-publish`.
+
+Native AOT hat Grenzen:
+
+- **Bibliotheken:** Nicht jede .NET-Funktion und nicht jede Bibliothek ist kompatibel. Prüfe das vor der Umstellung.
+- **Build:** Die Übersetzung dauert länger. Auf Linux braucht der Build außerdem einen C-Compiler wie `clang`.
+- **Plattform:** Du brauchst einen Build für jede Plattform.
+- **Einstellung:** `PublishAot` gehört in die Projektdatei, weil die Einstellung auch Prüfungen beim Bauen einschaltet.
+
+<Quiz id="m14-l04-q4" />
+
+<Quiz id="m14-l04-q5" />
+
+## Container-Image
+
+Das SDK kann die App auch direkt als <Term id="container-image">Container-Image</Term> veröffentlichen, ohne Dockerfile. <Since dotnet="8" /> Mit dem Ziel `PublishContainer` entsteht ein Image, das eine Container-Runtime wie Docker oder Podman startet. Zum Erzeugen brauchst du keine Container-Runtime, zum Starten schon. Das Beispiel schreibt das Image als Archiv:
+
+<CodeBlock language="text" title="Ausgabe: Container-Image als Archiv, Befehl dotnet publish -c Release -r linux-x64 -t:PublishContainer">{modes[7]}</CodeBlock>
+
+<Quiz id="m14-l04-q8" />
+
+## Entscheidungstabelle
+
+Die Tabelle fasst die Optionen zusammen. Jede Zeile nennt eine Situation, die Option, ihre Einstellung und den Start des Ergebnisses.
+
+| Situation | Option | Einstellung | Start |
+| --- | --- | --- | --- |
+| Die Laufzeit ist installiert, das Paket soll klein sein | framework-abhängig | Standard | `./app` oder `dotnet app.dll` |
+| Ein Build soll auf mehreren Betriebssystemen laufen | DLL ohne Apphost | `-p:UseAppHost=false` | `dotnet app.dll` |
+| Der Zielrechner hat keine Laufzeit, die Version ist fest | self-contained | `-r <RID> --self-contained` | `./app` |
+| Du verteilst eine einzelne Datei | Single-File | `PublishSingleFile` | `./app` |
+| Der Start soll schneller werden, ohne die Laufzeit zu ändern | ReadyToRun | `PublishReadyToRun` | `./app` |
+| Eine Self-contained-App soll kleiner werden | Trimming | `PublishTrimmed` | `./app` |
+| Schneller Start, keine Laufzeit, alle Bibliotheken passen | Native AOT | `PublishAot` | `./app` |
+| Die App läuft in Containern | Container-Image | `-t:PublishContainer` | Container-Runtime startet das Image |
+
+Wie groß die Ergebnisse der kleinen App sind, zeigt die nächste Tabelle. Die Größen ändern sich mit dem SDK, deshalb gehören Datum und Version dazu.
+
+<table>
+  <caption>{sizeLines[0]} (Ordnergröße der App m14-publish)</caption>
+  <thead>
+    <tr><th scope="col">Option</th><th scope="col">Größe</th></tr>
+  </thead>
+  <tbody>
+    {sizeRows.map(([mode, size]) => (
+      <tr key={mode}><td>{mode}</td><td>{size}</td></tr>
+    ))}
+  </tbody>
+</table>
+
+Die Zahlen zeigen die Richtung: Self-contained ist mit der Laufzeit um ein Vielfaches größer als framework-abhängig, Trimming spart davon einen großen Teil, und Native AOT ist am kleinsten. Bei ReadyToRun fällt die größere Assembly hier nicht auf, denn fast die ganze Größe stammt aus den Laufzeitdateien.
+
+<Quiz id="m14-l04-q9" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog meldet seine Build-Konfiguration und startet auf drei Wegen (Stand von Lektion 3). Das ist die Projektdatei der App:
+
+<CodeBlock language="xml" title="src/SecLog.Cli/SecLog.Cli.csproj (Lektion 3)">{csprojBefore}</CodeBlock>
+
+**Neue Anforderung:** SecLog lässt sich als Self-contained-Single-File für `linux-x64` veröffentlichen. Die Einstellungen stehen in `SecLog.Cli.csproj`. Die Ausgabe der veröffentlichten App ist dieselbe wie die des Release-Builds.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={csprojAfter} title="src/SecLog.Cli/SecLog.Cli.csproj" />
+
+1. **Plattform nennen:** `RuntimeIdentifier` legt `linux-x64` fest.
+2. **Laufzeit mitnehmen:** `SelfContained` ist `true`, die Laufzeit kommt in die App.
+3. **Bündeln:** `PublishSingleFile` ist `true`.
+4. **Veröffentlichen und vergleichen:** Die CI führt `dotnet publish` aus, startet die Datei und vergleicht ihre Ausgabe mit der des Release-Builds.
+
+<CodeBlock language="text" title="Ausgabe: veröffentlichte Dateien und Vergleich">{seclogTail}</CodeBlock>
+
+Im Ordner liegen die Datei `SecLog.Cli` und die `.pdb`-Dateien. Ein Unterschied in der Ausgabe besteht nicht.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l04/`) lässt sich als eine Datei für Linux veröffentlichen und ohne installierte Laufzeit starten.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l04-self-contained-auto-patched" />
+
+**„Self-contained-Apps bekommen Sicherheits-Patches der Laufzeit automatisch.“** Das stimmt nicht. Die Laufzeit liegt bei der App und ändert sich nicht, wenn auf dem Rechner eine neuere installiert wird. Einen neueren Patch bekommt die App erst durch eine neu veröffentlichte Version.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l04-native-aot-every-library" />
+
+**„Native AOT funktioniert mit jeder Bibliothek.“** Das stimmt nicht. Nicht jede .NET-Funktion und nicht jede Bibliothek ist mit Native AOT kompatibel. Du prüfst das vor der Umstellung und testest die veröffentlichte App.
+:::
+
+<Quiz id="m14-l04-q3" />
+
+<details>
+<summary>Vertiefung: Wann die Laufzeit gewählt wird (optional)</summary>
+
+Bei einer framework-abhängigen App wählt der Start die Laufzeit, bei Self-contained das Veröffentlichen. `dotnet publish` bindet die App an den neuesten Patch der Laufzeitfamilie und kennt die Regeln des Roll-forward nicht. Die Regeln stehen in der Seite zur [Auswahl der .NET-Version](https://learn.microsoft.com/dotnet/core/versions/selection).
+
+</details>
+
+## Zusammenfassung
+
+Zwei Fragen ordnen die Optionen: Ist eine Laufzeit installiert, und was zählt, Größe, Startzeit oder eine einzelne Datei? Framework-abhängig ist klein und braucht eine installierte Laufzeit, die DLL ohne Apphost startet mit `dotnet app.dll`. Self-contained bringt die Laufzeit mit, gilt für einen RID und bekommt Patches nur durch einen neuen Build. Single-File bündelt, ReadyToRun beschleunigt den Start, Trimming verkleinert Self-contained. Native AOT braucht weder Laufzeit noch JIT, hat aber Grenzen bei Bibliotheken und braucht einen Build je Plattform. Ein Container-Image erzeugt das SDK ohne Dockerfile, gestartet wird es von einer Container-Runtime.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l04-q2" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l04-q11" />
+
+### Transferfrage
+
+<Quiz id="m14-l04-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [.NET application publishing overview](https://learn.microsoft.com/dotnet/core/deploying/)
+- Microsoft Learn: [.NET RID Catalog](https://learn.microsoft.com/dotnet/core/rid-catalog)
+- Microsoft Learn: [Containerize a .NET app with dotnet publish](https://learn.microsoft.com/dotnet/core/containers/sdk-publish)

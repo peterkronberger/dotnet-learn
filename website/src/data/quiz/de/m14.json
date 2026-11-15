@@ -339,6 +339,483 @@
       "type": "explain",
       "question": "Transferfrage: Du schreibst ein Programm, das Rechnungen berechnet und als Konsolen-App ausgibt. Später soll eine zweite App dieselben Berechnungen nutzen. Wie teilst du die Projekte auf, und was musst du in der Berechnung `public` machen?",
       "modelAnswer": "Die Berechnung kommt in eine Klassenbibliothek, die Ausgabe in eine Konsolen-App, die auf die Bibliothek verweist. Die zweite App verweist ebenfalls auf die Bibliothek.\n\n`public` müssen die Typen und Member sein, die andere Projekte benutzen. Alles andere bleibt `internal` oder `private` und kann sich ändern, ohne die Apps zu stören."
+    },
+    {
+      "id": "m14-l03-q1",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Welche Konfiguration nutzt `dotnet publish` ohne `-c` bei einem Projekt für .NET 11?",
+      "options": [
+        {
+          "text": "`Release`",
+          "correct": true
+        },
+        {
+          "text": "`Debug`, wie `dotnet build`",
+          "feedback": "Das galt vor .NET 8. Seitdem wählt `dotnet publish` bei Projekten ab .NET 8 von selbst Release."
+        },
+        {
+          "text": "Keine. Ohne `-c` bricht der Befehl ab.",
+          "feedback": "Der Befehl braucht keine Angabe und nimmt Release."
+        }
+      ],
+      "explanation": "Seit .NET 8 baut `dotnet publish` Projekte ab .NET 8 standardmäßig in Release. `dotnet build` nimmt ohne `-c` weiter Debug."
+    },
+    {
+      "id": "m14-l03-q2",
+      "lesson": "m14-l03",
+      "type": "match",
+      "question": "Ordne jede Datei im Ausgabeordner ihrer Aufgabe zu.",
+      "pairs": [
+        {
+          "left": "`m14-l03-build.dll`",
+          "right": "enthält den übersetzten Code (IL) der App"
+        },
+        {
+          "left": "`m14-l03-build` (Linux)",
+          "right": "Apphost: Datei zum Starten für das Betriebssystem"
+        },
+        {
+          "left": "`m14-l03-build.pdb`",
+          "right": "enthält Debug-Informationen"
+        },
+        {
+          "left": "`m14-l03-build.deps.json`",
+          "right": "listet die Abhängigkeiten der App auf"
+        },
+        {
+          "left": "`m14-l03-build.runtimeconfig.json`",
+          "right": "nennt die .NET-Laufzeit, die die App braucht"
+        }
+      ],
+      "explanation": "Die Assembly enthält den Code, die Apphost startet ihn. Die drei anderen Dateien liefern Zusatzangaben: Debug-Informationen, Abhängigkeiten und die Laufzeit."
+    },
+    {
+      "id": "m14-l03-q3",
+      "lesson": "m14-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Debug und Release stimmen für die kleine App dieser Lektion?",
+      "options": [
+        {
+          "text": "In Release ist `Optimize` an, in Debug aus.",
+          "correct": true
+        },
+        {
+          "text": "Das Symbol `DEBUG` ist in Debug definiert und in Release nicht.",
+          "correct": true
+        },
+        {
+          "text": "Beide Konfigurationen erzeugen eine `.pdb`-Datei.",
+          "correct": true
+        },
+        {
+          "text": "In Release fehlt die `.pdb`-Datei.",
+          "feedback": "`DebugType` ist in beiden Konfigurationen `portable`, deshalb liegt auch im Release-Ordner eine `.pdb`-Datei."
+        },
+        {
+          "text": "`dotnet build` nutzt ohne `-c` die Konfiguration Release.",
+          "feedback": "Ohne `-c` baut `dotnet build` in Debug."
+        }
+      ],
+      "explanation": "Release schaltet die Optimierung ein und kennt `DEBUG` nicht. Debug-Informationen entstehen in beiden Konfigurationen."
+    },
+    {
+      "id": "m14-l03-q4",
+      "lesson": "m14-l03",
+      "type": "cloze",
+      "question": "Ergänze die Direktiven. Das Symbol `EXTRA` soll definiert sein, und die zweite Ausgabe soll nur ohne `EXTRA` übersetzt werden.",
+      "example": "m14/l03/gap-conditional.cs",
+      "blanks": [
+        {
+          "text": "#define",
+          "hint": "Diese Direktive definiert ein Symbol."
+        },
+        {
+          "text": "#if",
+          "hint": "Diese Direktive beginnt die Bedingung."
+        },
+        {
+          "text": "#else",
+          "hint": "Dieser Abschnitt gilt, wenn die Bedingung nicht zutrifft."
+        },
+        {
+          "text": "#endif",
+          "hint": "Diese Direktive beendet die Gruppe."
+        }
+      ],
+      "explanation": "`#define` definiert `EXTRA`. `#if` prüft das Symbol, `#else` gilt sonst, und `#endif` schließt die Gruppe."
+    },
+    {
+      "id": "m14-l03-q5",
+      "lesson": "m14-l03",
+      "type": "find-bug",
+      "question": "Der Build bricht mit dem Fehler CS1032 ab. Welche Zeile ist die Ursache?",
+      "example": "m14/l03/define-too-late.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Die Anweisung ist in Ordnung. Sie ist aber der erste Code der Datei."
+        },
+        "3": {
+          "feedback": "Die Bedingung ist richtig geschrieben. Der Fehler liegt davor."
+        }
+      },
+      "explanation": "`#define` muss vor dem ersten Token der Datei stehen. Hier steht schon eine Anweisung davor."
+    },
+    {
+      "id": "m14-l03-q6",
+      "lesson": "m14-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l03/quiz-conditional.cs",
+      "explanation": "`VERBOSE` wird definiert und wieder aufgehoben. Deshalb trifft `#if VERBOSE` nicht zu, `#elif TRACE_STEPS` trifft zu. `#if !VERBOSE` trifft ebenfalls zu."
+    },
+    {
+      "id": "m14-l03-q7",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Auf einen Rechner mit installiertem .NET 11 kopierst du nur `m14-l03-build.dll` und die Nachbardateien ohne Apphost. Wie startest du das Programm?",
+      "options": [
+        {
+          "text": "`dotnet m14-l03-build.dll`",
+          "correct": true
+        },
+        {
+          "text": "`./m14-l03-build`",
+          "feedback": "Diese Datei ist die Apphost. Du hast sie nicht kopiert."
+        },
+        {
+          "text": "`dotnet run`",
+          "feedback": "`dotnet run` baut aus dem Quelltext und braucht ein Projekt. Hier gibt es nur die gebauten Dateien."
+        }
+      ],
+      "explanation": "`dotnet <app>.dll` startet eine Assembly ohne Apphost. Es braucht eine installierte Laufzeit."
+    },
+    {
+      "id": "m14-l03-q8",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Eine framework-abhängige App ist für `11.0.0` gebaut. Auf dem Rechner sind die Laufzeiten `11.0.1` und `11.0.3` installiert. Mit welcher läuft sie?",
+      "options": [
+        {
+          "text": "Mit `11.0.3`, der neuesten installierten Patch-Version.",
+          "correct": true
+        },
+        {
+          "text": "Mit `11.0.0`, denn die Datei `.runtimeconfig.json` nennt genau diese Version.",
+          "feedback": "Die Datei nennt die Mindestversion. Der Start nimmt den neuesten installierten Patch derselben Version."
+        },
+        {
+          "text": "Sie läuft nicht, weil `11.0.0` fehlt.",
+          "feedback": "Roll-forward lässt die App mit dem neuesten installierten Patch laufen."
+        }
+      ],
+      "explanation": "Roll-forward wählt den neuesten installierten Patch. Eine höhere Major-Version würde der Start standardmäßig nicht nehmen."
+    },
+    {
+      "id": "m14-l03-q9",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Ein Team liefert SecLog aus dem Ordner `bin/Debug/net11.0/` an Kunden aus, weil das Programm dort läuft. Welche Bewertung stimmt?",
+      "options": [
+        {
+          "text": "Für die Auslieferung nimmt das Team Release, am besten über `dotnet publish`. Debug schaltet die Optimierung aus und behält Code unter `#if DEBUG`.",
+          "correct": true
+        },
+        {
+          "text": "Ein Debug-Build ist für die Produktion gut genug: Er läuft mit demselben Code, nur mit anderem Ordnernamen.",
+          "feedback": "Debug schaltet die Optimierung aus, und Code unter `#if DEBUG` bleibt im Programm.",
+          "misconception": "m14-l03-debug-build-for-production"
+        },
+        {
+          "text": "Ein Debug-Build läuft nicht ohne Debugger.",
+          "feedback": "Ein Debug-Build läuft wie jedes Programm auch ohne Debugger."
+        }
+      ],
+      "explanation": "Die Konfiguration ändert Einstellungen und Symbole. Für die Auslieferung ist Release gedacht, und `dotnet publish` wählt es von selbst."
+    },
+    {
+      "id": "m14-l03-q10",
+      "lesson": "m14-l03",
+      "type": "single",
+      "question": "Die Projektdatei enthält `<DefineConstants>$(DefineConstants);AUDIT</DefineConstants>`. Was bewirkt die Zeile?",
+      "options": [
+        {
+          "text": "Das Symbol `AUDIT` wird zu den bisherigen Symbolen hinzugefügt.",
+          "correct": true
+        },
+        {
+          "text": "Alle bisherigen Symbole wie `DEBUG` entfallen, nur `AUDIT` bleibt.",
+          "feedback": "`$(DefineConstants)` steht für die bisherigen Symbole, sie bleiben erhalten."
+        },
+        {
+          "text": "Die Zeile ersetzt `#define AUDIT` in jeder Datei.",
+          "feedback": "Die Eigenschaft ergänzt die Symbole für das ganze Projekt. `#define` gilt nur in seiner Datei."
+        }
+      ],
+      "explanation": "`$(DefineConstants)` enthält die bisherigen Symbole. Die Zeile hängt `AUDIT` an."
+    },
+    {
+      "id": "m14-l03-q11",
+      "lesson": "m14-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was `dotnet build` erzeugt, was `dotnet publish` anders macht und was Debug und Release ändern.",
+      "modelAnswer": "`dotnet build` übersetzt das Projekt und legt Assembly, Apphost, `.pdb`, `.deps.json` und `.runtimeconfig.json` in `bin/<Konfiguration>/<Zielframework>/` ab, ohne `-c` in Debug. `dotnet publish` bereitet die App für die Auslieferung vor und baut seit .NET 8 standardmäßig Release.\n\nRelease schaltet die Optimierung ein, und das Symbol `DEBUG` ist nur in Debug definiert. Code unter `#if DEBUG` steckt deshalb nur im Debug-Build."
+    },
+    {
+      "id": "m14-l03-q12",
+      "lesson": "m14-l03",
+      "type": "explain",
+      "question": "Transferfrage: Dein Programm soll in der Entwicklung zusätzliche Prüfzeilen ausgeben, in der Auslieferung nicht. Wie erreichst du das, und wie startest du die ausgelieferte Version ohne Entwicklungsumgebung?",
+      "modelAnswer": "Die Prüfzeilen stehen unter `#if DEBUG`. Im Debug-Build sind sie enthalten, im Release-Build übersetzt der Compiler sie nicht.\n\nDie Auslieferung baust du mit Release, am besten mit `dotnet publish`. Gestartet wird sie mit der Apphost oder mit `dotnet <app>.dll`. Auf dem Zielrechner muss eine passende .NET-Laufzeit installiert sein."
+    },
+    {
+      "id": "m14-l04-q1",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "SecLog soll auf einem Server laufen, auf dem keine .NET-Laufzeit installiert ist. Auf dem Server soll auch nichts installiert werden. Welche Option passt?",
+      "options": [
+        {
+          "text": "Self-contained: Die Laufzeit liegt neben der App.",
+          "correct": true
+        },
+        {
+          "text": "Framework-abhängig mit Apphost.",
+          "feedback": "Auch mit Apphost braucht die App eine installierte .NET-Laufzeit."
+        },
+        {
+          "text": "Framework-abhängig als DLL ohne Apphost (`UseAppHost=false`).",
+          "feedback": "Die DLL läuft auf vielen Plattformen, aber sie braucht ebenfalls eine installierte Laufzeit."
+        }
+      ],
+      "explanation": "Nur Self-contained und Native AOT bringen alles mit, was die App zum Laufen braucht. Framework-abhängige Apps brauchen eine installierte Laufzeit."
+    },
+    {
+      "id": "m14-l04-q2",
+      "lesson": "m14-l04",
+      "type": "match",
+      "question": "Ordne jede Veröffentlichungsoption der Einstellung zu, die sie einschaltet.",
+      "pairs": [
+        {
+          "left": "Framework-abhängig als DLL ohne Apphost",
+          "right": "`-p:UseAppHost=false`"
+        },
+        {
+          "left": "Self-contained",
+          "right": "`--self-contained`"
+        },
+        {
+          "left": "Single-File",
+          "right": "`PublishSingleFile`"
+        },
+        {
+          "left": "ReadyToRun",
+          "right": "`PublishReadyToRun`"
+        },
+        {
+          "left": "Trimming",
+          "right": "`PublishTrimmed`"
+        },
+        {
+          "left": "Native AOT",
+          "right": "`PublishAot`"
+        }
+      ],
+      "explanation": "Jede Option hat ihre eigene Einstellung. Du setzt sie mit `-p:` auf der Befehlszeile oder in der Projektdatei. Native AOT gehört in die Projektdatei."
+    },
+    {
+      "id": "m14-l04-q3",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "SecLog wurde als Self-contained-App mit der Laufzeit `11.0.1` veröffentlicht. Auf dem Server wird später .NET `11.0.4` installiert. Mit welcher Laufzeit läuft SecLog?",
+      "options": [
+        {
+          "text": "Mit `11.0.1`, der mitgelieferten Laufzeit. Eine neue Laufzeit kommt nur durch eine neu veröffentlichte App.",
+          "correct": true
+        },
+        {
+          "text": "Mit `11.0.4`, denn die App nimmt automatisch den neuesten Sicherheits-Patch.",
+          "feedback": "Das gilt für framework-abhängige Apps. Eine Self-contained-App bringt ihre Laufzeit mit und rollt nicht vor.",
+          "misconception": "m14-l04-self-contained-auto-patched"
+        },
+        {
+          "text": "Sie läuft gar nicht, weil zwei Laufzeiten vorhanden sind.",
+          "feedback": "Zwei Laufzeiten stören nicht. Die App benutzt ihre eigene."
+        }
+      ],
+      "explanation": "Bei Self-contained entscheidet der Zeitpunkt der Veröffentlichung, welche Laufzeit mitkommt. Sicherheits-Patches gelangen nur durch einen neuen Build zum Kunden."
+    },
+    {
+      "id": "m14-l04-q4",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "Ein Team schaltet `PublishAot` ein, weil Native AOT jede Bibliothek unterstützt, die das Projekt benutzt. Was ist an der Annahme falsch?",
+      "options": [
+        {
+          "text": "Nicht jede Bibliothek ist mit Native AOT kompatibel. Das Team muss die Warnungen beim Bauen prüfen und das Ergebnis testen.",
+          "correct": true
+        },
+        {
+          "text": "Nichts. Native AOT läuft mit jeder Bibliothek, weil der Code vorher übersetzt wird.",
+          "feedback": "Native AOT hat Einschränkungen bei Funktionen und Bibliotheken. Das Übersetzen vorab ändert daran nichts.",
+          "misconception": "m14-l04-native-aot-every-library"
+        },
+        {
+          "text": "Native AOT läuft nur mit Bibliotheken, die ReadyToRun benutzen.",
+          "feedback": "ReadyToRun ist eine andere Option und keine Voraussetzung für Native AOT."
+        }
+      ],
+      "explanation": "Native AOT unterstützt nicht alle .NET-Funktionen und Bibliotheken. `PublishAot` schaltet deshalb schon beim Bauen Prüfungen ein, die auf Probleme hinweisen."
+    },
+    {
+      "id": "m14-l04-q5",
+      "lesson": "m14-l04",
+      "type": "multi",
+      "question": "Welche Aussagen über Native AOT stimmen?",
+      "options": [
+        {
+          "text": "Das Ergebnis braucht keine installierte .NET-Laufzeit.",
+          "correct": true
+        },
+        {
+          "text": "Zur Laufzeit gibt es keinen JIT.",
+          "correct": true
+        },
+        {
+          "text": "Das Ergebnis gilt für ein Betriebssystem und eine Architektur.",
+          "correct": true
+        },
+        {
+          "text": "Ein Build läuft auf Linux, Windows und macOS.",
+          "feedback": "Native AOT erzeugt nativen Code für genau eine Plattform. Für jede weitere brauchst du einen eigenen Build."
+        },
+        {
+          "text": "Der Build dauert kürzer als ein normaler Build.",
+          "feedback": "Die Übersetzung in Maschinencode verlängert den Build."
+        }
+      ],
+      "explanation": "Native AOT übersetzt vorab in Maschinencode für eine Plattform. Dafür entfallen Laufzeit und JIT, aber der Build dauert länger."
+    },
+    {
+      "id": "m14-l04-q6",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "Welche Aussage über Single-File stimmt?",
+      "options": [
+        {
+          "text": "Die Datei ist für ein Betriebssystem und eine Architektur gebaut.",
+          "correct": true
+        },
+        {
+          "text": "Eine Single-File-App braucht keine Plattformangabe und läuft überall.",
+          "feedback": "Single-File-Apps sind immer für ein Betriebssystem und eine Architektur gebaut."
+        },
+        {
+          "text": "Die Datei ist immer kleiner als der Ordner einer normalen Veröffentlichung.",
+          "feedback": "Bei Self-contained steckt die Laufzeit in der Datei, sie bleibt groß. Kleiner wird sie zum Beispiel durch Trimming."
+        }
+      ],
+      "explanation": "Single-File bündelt die Dateien der App in eine. Es spart Dateien, nicht Größe, und gilt wie Self-contained für eine Plattform."
+    },
+    {
+      "id": "m14-l04-q7",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "`PublishTrimmed` entfernt ungenutzten Code aus einer Self-contained-App. Welches Risiko gehört dazu?",
+      "options": [
+        {
+          "text": "Code, den die Analyse beim Bauen nicht sieht, zum Beispiel bei Reflection, kann fehlen und zur Laufzeit Fehler verursachen.",
+          "correct": true
+        },
+        {
+          "text": "Der Trimmer löscht Teile deines Quelltexts.",
+          "feedback": "Der Trimmer ändert den Quelltext nicht. Er lässt ungenutzten Code nur aus dem Ergebnis weg."
+        },
+        {
+          "text": "Getrimmte Apps laufen nur im Debug-Build.",
+          "feedback": "Trimmen gehört zur Veröffentlichung und hat nichts mit Debug zu tun."
+        }
+      ],
+      "explanation": "Der Trimmer entscheidet beim Bauen, was die App braucht. Muster wie Reflection kann er nicht sicher auswerten. Deshalb gibt er Warnungen aus."
+    },
+    {
+      "id": "m14-l04-q8",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "Du erzeugst mit `dotnet publish -t:PublishContainer` ein Container-Image. Was stimmt?",
+      "options": [
+        {
+          "text": "Es braucht kein Dockerfile. Eine Container-Runtime brauchst du, um das Image zu starten.",
+          "correct": true
+        },
+        {
+          "text": "Es braucht ein Dockerfile im Projektordner.",
+          "feedback": "Das SDK erzeugt das Image ohne Dockerfile."
+        },
+        {
+          "text": "Das Image läuft ohne Container-Runtime direkt auf dem Betriebssystem.",
+          "feedback": "Ein Container-Image startet eine Container-Runtime wie Docker oder Podman."
+        }
+      ],
+      "explanation": "Das SDK erzeugt das Image selbst, ab .NET 8. Zum Starten braucht der Zielrechner eine Container-Runtime."
+    },
+    {
+      "id": "m14-l04-q9",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "Ein kleines Kommandozeilenprogramm soll schnell starten und auf Servern ohne installierte Laufzeit laufen. Es benutzt nur Bibliotheken, die Native AOT unterstützen. Welche Option passt am besten?",
+      "options": [
+        {
+          "text": "Native AOT",
+          "correct": true
+        },
+        {
+          "text": "Framework-abhängig mit Apphost",
+          "feedback": "Die App braucht dann eine installierte Laufzeit und startet über den JIT."
+        },
+        {
+          "text": "Nur Trimming",
+          "feedback": "Trimming macht eine Self-contained-App kleiner. Der Start bleibt JIT-basiert."
+        }
+      ],
+      "explanation": "Native AOT braucht weder Laufzeit noch JIT und startet schnell. Die Bedingung, dass alle Bibliotheken passen, ist hier erfüllt."
+    },
+    {
+      "id": "m14-l04-q10",
+      "lesson": "m14-l04",
+      "type": "single",
+      "question": "Was ist ein Runtime Identifier (RID) wie `linux-x64`?",
+      "options": [
+        {
+          "text": "Eine Kennung für Betriebssystem und Prozessorarchitektur, für die veröffentlicht wird.",
+          "correct": true
+        },
+        {
+          "text": "Die .NET-Version der Laufzeit, zum Beispiel `net11.0`.",
+          "feedback": "Das ist das Zielframework aus der Projektdatei. Der RID nennt die Plattform."
+        },
+        {
+          "text": "Der Name der Assembly der App.",
+          "feedback": "Der Assembly-Name kommt aus dem Projekt. Ein RID nennt Betriebssystem und Architektur."
+        }
+      ],
+      "explanation": "Ein RID besteht aus Betriebssystem und Architektur, zum Beispiel `linux-x64`, `win-x64` oder `osx-arm64`. Self-contained, Single-File und Native AOT brauchen ihn."
+    },
+    {
+      "id": "m14-l04-q11",
+      "lesson": "m14-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie du für eine Situation die passende Veröffentlichungsoption wählst und wie du das Ergebnis jeweils startest.",
+      "modelAnswer": "Die erste Frage lautet: Ist auf dem Zielrechner eine passende .NET-Laufzeit installiert? Wenn ja, reicht framework-abhängig. Das Ergebnis ist klein und startet mit der Apphost oder mit `dotnet <app>.dll`. Wenn nein, brauchst du Self-contained oder Native AOT.\n\nDanach fragst du nach Größe und Startzeit: Single-File gibt eine Datei, Trimming verkleinert, ReadyToRun beschleunigt den Start, Native AOT braucht keinen JIT, hat aber Grenzen bei Bibliotheken. Self-contained, Single-File und Native AOT starten mit der erzeugten Datei."
+    },
+    {
+      "id": "m14-l04-q12",
+      "lesson": "m14-l04",
+      "type": "explain",
+      "question": "Transferfrage: Du lieferst ein Werkzeug an Kollegen aus, deren Rechner unterschiedliche .NET-Versionen haben. Welche Option wählst du, und was nimmst du dafür in Kauf?",
+      "modelAnswer": "Self-contained mit einem RID je Plattform, am einfachsten als Single-File: Die Kollegen brauchen keine installierte Laufzeit und starten eine Datei.\n\nDafür nimmst du in Kauf: Die Datei ist groß, du brauchst einen Build je Betriebssystem und Architektur, und Sicherheits-Patches der Laufzeit kommen nur durch eine neu veröffentlichte Version."
     }
   ]
 }

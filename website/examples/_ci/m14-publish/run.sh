@@ -2,7 +2,7 @@
 # Publishes m14-publish in every mode of lesson m14-l04 and shows the files and the program output.
 #
 #   bash run.sh           file names + program output per mode (snapshot: expected.out.txt)
-#   bash run.sh --sizes   total size per mode in MB; changes between SDK versions, so it is
+#   bash run.sh --sizes   total size per mode in MB (two decimals); changes between SDK versions, so it is
 #                         not part of the snapshot (not used by tools/check-examples.sh)
 #
 # File list: the app files (names that start with "m14-publish") are listed by name. Other
@@ -37,7 +37,7 @@ publish() { # <mode> <dotnet publish arguments...>; sets $out to the publish fol
 }
 
 size_mb() { # <file or folder>
-  du -sb "$1" | awk '{ printf "%.1f", $1 / 1048576 }'
+  du -sb "$1" | awk '{ printf "%.2f", $1 / 1048576 }'
 }
 
 list_files() { # <folder>

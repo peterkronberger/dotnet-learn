@@ -9213,6 +9213,218 @@
         "title": "Class libraries",
         "url": "https://learn.microsoft.com/dotnet/standard/class-libraries"
       }
+    },
+    {
+      "id": "build-configuration",
+      "term": "Build configuration",
+      "german": "Build-Konfiguration",
+      "category": "platform",
+      "definition": "Ein Name wie `Debug` oder `Release`, der einen Satz von Build-Einstellungen auswählt. Ohne Angabe baut `dotnet build` in Debug. Die Ergebnisse liegen in `bin/<Konfiguration>/<Zielframework>/`.",
+      "related": [
+        "conditional-compilation-symbol",
+        "publish"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": "dotnet build",
+        "url": "https://learn.microsoft.com/dotnet/core/tools/dotnet-build"
+      }
+    },
+    {
+      "id": "conditional-compilation-symbol",
+      "term": "Conditional compilation symbol",
+      "german": "Symbol für bedingte Kompilierung",
+      "category": "language",
+      "definition": "Ein Name, der definiert oder nicht definiert ist und keinen Wert hat. `#if`, `#elif`, `#else` und `#endif` wählen danach den Code aus, den der Compiler übersetzt. `DEBUG` ist ein Beispiel.",
+      "aliases": [
+        "Symbol",
+        "DefineConstants"
+      ],
+      "related": [
+        "preprocessing-directive",
+        "build-configuration"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": "Conditional compilation symbols (C# specification)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#652-conditional-compilation-symbols"
+      }
+    },
+    {
+      "id": "publish",
+      "term": "Publish",
+      "german": "veröffentlichen",
+      "category": "platform",
+      "definition": "`dotnet publish` bereitet eine App für die Auslieferung vor und stellt in einem Ordner `publish` zusammen, was sie am Zielort braucht. Es baut ab .NET 8 standardmäßig in Release.",
+      "aliases": [
+        "dotnet publish",
+        "Veröffentlichung"
+      ],
+      "related": [
+        "build-configuration",
+        "apphost"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": ".NET application publishing overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/"
+      }
+    },
+    {
+      "id": "apphost",
+      "term": "Apphost",
+      "german": "Startdatei der App",
+      "category": "platform",
+      "definition": "Die ausführbare Datei, die neben der `.dll` liegt, zum Beispiel `app` unter Linux oder `app.exe` unter Windows. Sie startet die App direkt und sucht die installierte .NET-Laufzeit.",
+      "aliases": [
+        "Apphosts"
+      ],
+      "related": [
+        "assembly",
+        "framework-dependent-deployment"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": ".NET application publishing overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/"
+      }
+    },
+    {
+      "id": "roll-forward",
+      "term": "Roll-forward",
+      "german": "Vorwärtsrollen der Laufzeit",
+      "category": "platform",
+      "definition": "Eine framework-abhängige App läuft mit dem neuesten installierten Patch ihrer Laufzeit. Fehlt jede Patch-Version, nimmt der Start die nächste höhere Minor-Version, aber standardmäßig keine höhere Major-Version.",
+      "aliases": [
+        "RollForward"
+      ],
+      "related": [
+        "framework-dependent-deployment",
+        "apphost"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": "Select the .NET version to use",
+        "url": "https://learn.microsoft.com/dotnet/core/versions/selection"
+      }
+    },
+    {
+      "id": "framework-dependent-deployment",
+      "term": "Framework-dependent deployment",
+      "german": "framework-abhängige Auslieferung",
+      "category": "platform",
+      "definition": "Die App enthält nur ihren Code und ihre Abhängigkeiten, nicht die .NET-Laufzeit. Auf dem Rechner muss eine passende Laufzeit installiert sein. Das ist der Standard.",
+      "aliases": [
+        "framework-dependent",
+        "framework-abhängig"
+      ],
+      "related": [
+        "roll-forward",
+        "apphost"
+      ],
+      "lesson": "m14-l03",
+      "source": {
+        "title": ".NET application publishing overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/"
+      }
+    },
+    {
+      "id": "self-contained-deployment",
+      "term": "Self-contained deployment",
+      "german": "eigenständige Auslieferung",
+      "category": "platform",
+      "definition": "Die App bringt die .NET-Laufzeit mit und läuft ohne installierte Laufzeit. Sie gilt für eine Plattform und bekommt Laufzeit-Patches nur durch eine neu veröffentlichte Version.",
+      "aliases": [
+        "self-contained"
+      ],
+      "related": [
+        "framework-dependent-deployment",
+        "runtime-identifier",
+        "single-file-deployment"
+      ],
+      "lesson": "m14-l04",
+      "source": {
+        "title": ".NET application publishing overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/"
+      }
+    },
+    {
+      "id": "runtime-identifier",
+      "term": "Runtime identifier",
+      "german": "Laufzeitkennung",
+      "category": "platform",
+      "definition": "Eine Kennung für Betriebssystem und Prozessorarchitektur, zum Beispiel `linux-x64` oder `win-x64`. Du gibst sie mit `-r` an, wenn du für eine bestimmte Plattform veröffentlichst.",
+      "aliases": [
+        "RID"
+      ],
+      "related": [
+        "self-contained-deployment",
+        "native-aot"
+      ],
+      "lesson": "m14-l04",
+      "source": {
+        "title": ".NET RID Catalog",
+        "url": "https://learn.microsoft.com/dotnet/core/rid-catalog"
+      }
+    },
+    {
+      "id": "single-file-deployment",
+      "term": "Single-file deployment",
+      "german": "Auslieferung als eine Datei",
+      "category": "platform",
+      "definition": "Alle Dateien der App sind in einer Datei gebündelt. Die Datei gilt für ein Betriebssystem und eine Architektur. Bei Self-contained enthält sie auch die Laufzeit.",
+      "aliases": [
+        "single-file"
+      ],
+      "related": [
+        "self-contained-deployment",
+        "trimming"
+      ],
+      "lesson": "m14-l04",
+      "source": {
+        "title": ".NET application publishing overview",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/"
+      }
+    },
+    {
+      "id": "trimming",
+      "term": "Trimming",
+      "german": "Beschneiden",
+      "category": "platform",
+      "definition": "Der Trimmer lässt beim Veröffentlichen ungenutzten Code der Bibliotheken weg. Das macht eine Self-contained-App kleiner, kann aber Code entfernen, den die Analyse nicht sieht, zum Beispiel bei Reflection.",
+      "aliases": [
+        "trimmen",
+        "PublishTrimmed"
+      ],
+      "related": [
+        "self-contained-deployment",
+        "native-aot"
+      ],
+      "lesson": "m14-l04",
+      "source": {
+        "title": "Trim self-contained deployments and executables",
+        "url": "https://learn.microsoft.com/dotnet/core/deploying/trimming/trim-self-contained"
+      }
+    },
+    {
+      "id": "container-image",
+      "term": "Container image",
+      "german": "Container-Abbild",
+      "category": "platform",
+      "definition": "Ein Paket aus App und Laufzeitumgebung, das eine Container-Runtime wie Docker oder Podman startet. Das .NET SDK erzeugt es ab .NET 8 ohne Dockerfile.",
+      "aliases": [
+        "Container-Images",
+        "Image"
+      ],
+      "related": [
+        "publish",
+        "self-contained-deployment"
+      ],
+      "lesson": "m14-l04",
+      "source": {
+        "title": "Containerize a .NET app with dotnet publish",
+        "url": "https://learn.microsoft.com/dotnet/core/containers/sdk-publish"
+      }
     }
   ]
 }
