@@ -351,8 +351,8 @@ Misconception: the query already runs when it is defined.
 
 ### W3 Wiederholung M9–M11 ▶
 Mixes M9–M11. Folder `w03-review-generics-linq/`, quiz file `de/w03.json`, position 11.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
-- Lesson L1: mixed reading and tracing set (title chosen by the architect of W3).
-- Lesson L2: mixed writing set and final set (title chosen by the architect of W3).
+- Lesson L1: mixed reading and tracing set (Generics, Delegates und LINQ: Code lesen).
+- Lesson L2: mixed writing set and final set (Generics, Delegates und LINQ: Code schreiben).
 - **M9** (from `module-digest.md` `## M9`):
   - Concepts:
     - type parameter vs. type argument (`m09-l01`)
