@@ -99,7 +99,7 @@ section "self-contained, ReadyToRun" "./$app"
 publish trimmed -r linux-x64 --self-contained -p:PublishTrimmed=true
 section "self-contained, trimmed" "./$app"
 
-# 7. Native AOT: one native file, no JIT at run time. Needs clang and zlib on Linux.
+# 7. Native AOT: one native file, no JIT at run time. Needs clang on Linux.
 publish native-aot -r linux-x64 -p:PublishAot=true
 section "Native AOT" "./$app"
 
