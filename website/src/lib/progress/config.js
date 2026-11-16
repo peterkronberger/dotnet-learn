@@ -16,6 +16,10 @@ export const PLACEMENT_VIA = 'placement';
 export const MODULE_KEY_PATTERN = /^[a-z0-9]+$/;
 export const MAX_MODULE_KEY_LENGTH = 20;
 
+// Review reminder on lesson pages (see reviewReminder in leitner.js).
+export const REMINDER_AFTER_DAYS = 2; // a decision, not an empirical value
+export const REMINDER_MIN_DUE = 1; // a decision, not an empirical value
+
 // Display stages for the Leitner boxes (index = box - 1).
 // The limits are a decision, not an empirical value – like the intervals above.
 export const STAGE_BY_BOX = ['shaky', 'building', 'building', 'solid', 'solid'];

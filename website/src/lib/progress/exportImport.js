@@ -34,7 +34,7 @@ function invalid(field) {
 }
 
 // Validates a progress object; only known fields are copied into the result.
-// `lessons`, `activity` and `placement` are optional, so a file with questions only stays valid.
+// `lessons`, `activity`, `placement` and `reviewedAt` are optional, so a file with questions only stays valid.
 export function validateProgress(value) {
   if (!isPlainObject(value) || value.version !== 1) return invalid('version');
 
@@ -100,10 +100,11 @@ export function validateProgress(value) {
     cleanPlacement[key] = { date: e.date, correct: e.correct, total: e.total, passed: e.passed };
   }
 
-  return {
-    ok: true,
-    progress: { version: 1, questions: cleanQuestions, lessons: cleanLessons, activity: cleanActivity, placement: cleanPlacement },
-  };
+  if (value.reviewedAt !== undefined && !isValidIsoDate(value.reviewedAt)) return invalid('reviewedAt');
+
+  const progress = { version: 1, questions: cleanQuestions, lessons: cleanLessons, activity: cleanActivity, placement: cleanPlacement };
+  if (value.reviewedAt !== undefined) progress.reviewedAt = value.reviewedAt;
+  return { ok: true, progress };
 }
 
 // Pretty JSON (2 spaces).

@@ -1,4 +1,4 @@
-import { BOX_COUNT, LEITNER_INTERVALS_DAYS } from './config';
+import { BOX_COUNT, LEITNER_INTERVALS_DAYS, REMINDER_AFTER_DAYS, REMINDER_MIN_DUE } from './config';
 import { addDays } from './dates';
 
 // First answer: correct -> box 2, otherwise box 1.
@@ -42,8 +42,10 @@ export function nextDueDate(progress, intervals = LEITNER_INTERVALS_DAYS) {
 
 // Pure: returns a new progress object, the input stays unchanged.
 // Every recorded answer also counts in the daily activity log (no time limit).
+// An answer to a question that was due is a review: it sets `reviewedAt` to today.
 export function recordAnswer(progress, questionId, result, today) {
   const old = progress.questions[questionId];
+  const wasDue = old !== undefined && isDue(old, today);
   const entry = {
     box: nextBox(old ? old.box : undefined, result),
     lastReviewed: today,
@@ -55,6 +57,7 @@ export function recordAnswer(progress, questionId, result, today) {
   const day = activity[today] ?? { answered: 0, correct: 0, partial: 0 };
   return {
     ...progress,
+    ...(wasDue ? { reviewedAt: today } : {}),
     questions: { ...progress.questions, [questionId]: entry },
     activity: {
       ...activity,
@@ -65,6 +68,28 @@ export function recordAnswer(progress, questionId, result, today) {
       },
     },
   };
+}
+
+// Pure: decides whether a lesson page shows a review reminder.
+// dueIds: ids of the due questions, oldest due date first (see dueQuestionIds).
+// Reference date: `reviewedAt`, else the oldest due date. Shown when it is more than `afterDays` days ago.
+// Returns { show, dueCount, since }; `since` is the reference date used (null without due questions).
+export function reviewReminder(
+  progress,
+  dueIds,
+  today,
+  { afterDays = REMINDER_AFTER_DAYS, minDue = REMINDER_MIN_DUE, intervals = LEITNER_INTERVALS_DAYS } = {},
+) {
+  const dueCount = dueIds.length;
+  if (dueCount === 0) return { show: false, dueCount, since: null };
+  let since = progress.reviewedAt ?? null;
+  if (since === null) {
+    const firstId = dueIds.find((id) => progress.questions[id] !== undefined);
+    if (firstId !== undefined) since = dueDate(progress.questions[firstId], intervals);
+  }
+  if (since === null) return { show: false, dueCount, since: null };
+  const show = dueCount >= minDue && since < addDays(today, -afterDays);
+  return { show, dueCount, since };
 }
 
 // Pure: marks a lesson as completed (keeps the first date if it is already marked).

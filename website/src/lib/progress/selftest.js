@@ -11,6 +11,7 @@ import {
   nextReviewAfter,
   recordAnswer,
   reopenLesson,
+  reviewReminder,
 } from './leitner';
 import { allPlacementsPassed, applyPlacementPass, evaluatePlacement, placementResult, resetPlacement } from './placement';
 import { createMemoryStorage, emptyProgress, loadProgress, saveProgress } from './storage';
@@ -300,6 +301,55 @@ const TESTS = [
     expectEqual(r.progress.placement, {}, 'placement');
     expectEqual(r.progress.lessons, { 'm01-l01': { completedAt: '2026-10-24' } }, 'lessons without via');
     expectEqual(emptyProgress(), { version: 1, questions: {}, lessons: {}, activity: {}, placement: {} }, 'emptyProgress');
+  }],
+  ['reviewedAt: set by an answer to a due question, not by a first or not-due answer', () => {
+    let p = recordAnswer(emptyProgress(), 'q', 'correct', '2026-10-23'); // first answer, box 2
+    check(!('reviewedAt' in p), 'first answer must not set reviewedAt');
+    p = recordAnswer(p, 'q', 'correct', '2026-10-24'); // not due
+    check(!('reviewedAt' in p), 'not-due answer must not set reviewedAt');
+    p = { ...p, reviewedAt: '2026-10-01' };
+    const kept = recordAnswer(p, 'q', 'correct', '2026-10-24');
+    expectEqual(kept.reviewedAt, '2026-10-01', 'reviewedAt kept on not-due answer');
+    const due = recordAnswer(emptyProgress(), 'q', 'wrong', '2026-10-23'); // box 1, due 2026-10-24
+    expectEqual(recordAnswer(due, 'q', 'correct', '2026-10-24').reviewedAt, '2026-10-24', 'due answer sets reviewedAt');
+  }],
+  ['reviewedAt: validateProgress accepts, keeps and rejects', () => {
+    const base = { version: 1, questions: {} };
+    const none = validateProgress(base);
+    check(none.ok && !('reviewedAt' in none.progress), 'no field -> no key');
+    const ok = validateProgress({ ...base, reviewedAt: '2026-11-14' });
+    check(ok.ok && ok.progress.reviewedAt === '2026-11-14', 'valid date kept');
+    const bad = validateProgress({ ...base, reviewedAt: '2026-13-01' });
+    check(!bad.ok && bad.error.includes('"reviewedAt"'), 'invalid date rejected');
+  }],
+  ['reviewedAt: export → import round trip', () => {
+    const p = { ...emptyProgress(), reviewedAt: '2026-11-14' };
+    const r = parseImport(serializeProgress(p));
+    check(r.ok, 'import ok');
+    expectEqual(r.progress.reviewedAt, '2026-11-14', 'reviewedAt');
+  }],
+  ['reviewReminder: empty dueIds → no reminder', () => {
+    expectEqual(reviewReminder(emptyProgress(), [], '2026-11-16'), { show: false, dueCount: 0, since: null }, 'result');
+  }],
+  ['reviewReminder: reviewedAt 2 days ago → no, 3 days ago → yes', () => {
+    const today = '2026-11-16';
+    const mk = (reviewedAt) => ({ ...recordAnswer(emptyProgress(), 'q', 'wrong', '2026-11-01'), reviewedAt });
+    expectEqual(reviewReminder(mk('2026-11-14'), ['q'], today), { show: false, dueCount: 1, since: '2026-11-14' }, '2 days');
+    expectEqual(reviewReminder(mk('2026-11-13'), ['q'], today), { show: true, dueCount: 1, since: '2026-11-13' }, '3 days');
+  }],
+  ['reviewReminder: without reviewedAt the oldest due date is the reference', () => {
+    const today = '2026-11-16';
+    const p2 = recordAnswer(emptyProgress(), 'q', 'wrong', '2026-11-13'); // box 1, due 2026-11-14
+    expectEqual(reviewReminder(p2, ['q'], today), { show: false, dueCount: 1, since: '2026-11-14' }, '2 days');
+    const p3 = recordAnswer(emptyProgress(), 'q', 'wrong', '2026-11-12'); // due 2026-11-13
+    expectEqual(reviewReminder(p3, ['q'], today), { show: true, dueCount: 1, since: '2026-11-13' }, '3 days');
+    expectEqual(reviewReminder(p3, ['unknown'], today), { show: false, dueCount: 1, since: null }, 'unknown id');
+  }],
+  ['reviewReminder: minDue 3 with 2 due → no reminder', () => {
+    let p = recordAnswer(emptyProgress(), 'a', 'wrong', '2026-11-01');
+    p = recordAnswer(p, 'b', 'wrong', '2026-11-01');
+    check(!reviewReminder(p, ['a', 'b'], '2026-11-16', { minDue: 3 }).show, 'no reminder');
+    check(reviewReminder(p, ['a', 'b'], '2026-11-16').show, 'reminder with default');
   }],
 ];
 
