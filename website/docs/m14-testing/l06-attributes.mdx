@@ -1,0 +1,238 @@
+---
+title: Attribute
+sidebar_position: 6
+description: Wie Attribute Code mit Zusatzinformationen versehen – Parameter, Attributziele, Obsolete, Conditional, Caller-Info und eigene Attributklassen.
+lesson_id: m14-l06
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import callerInfo from '!!raw-loader!@site/examples/m14/l06/caller-info.cs';
+import callerInfoOutput from '!!raw-loader!@site/examples/m14/l06/caller-info.out.txt';
+import conditionalCalls from '!!raw-loader!@site/examples/m14/l06/conditional-calls.cs';
+import conditionalCallsOutput from '!!raw-loader!@site/examples/m14/l06/conditional-calls.out.txt';
+import customAttribute from '!!raw-loader!@site/examples/m14/l06/custom-attribute.cs';
+import customAttributeOutput from '!!raw-loader!@site/examples/m14/l06/custom-attribute.out.txt';
+import gapAttribute from '!!raw-loader!@site/examples/m14/l06/gap-attribute.cs';
+import gapAttributeOutput from '!!raw-loader!@site/examples/m14/l06/gap-attribute.out.txt';
+import obsoleteWarning from '!!raw-loader!@site/examples/_ci/m14-l06-diagnostics/obsolete-warning.snippet.cs';
+import obsoleteError from '!!raw-loader!@site/examples/_ci/m14-l06-diagnostics/obsolete-error.snippet.cs';
+import wrongTarget from '!!raw-loader!@site/examples/_ci/m14-l06-diagnostics/wrong-target.snippet.cs';
+import diagnostics from '!!raw-loader!@site/examples/_ci/m14-l06-diagnostics/expected.out.txt';
+import stepLog from '!!raw-loader!@site/examples/_ci/seclog-m14-l06/src/SecLog.Cli/StepLog.cs';
+import analysisSteps from '!!raw-loader!@site/examples/_ci/seclog-m14-l06/src/SecLog.Cli/AnalysisSteps.cs';
+import programTail from '!!raw-loader!@site/examples/m14/l06/seclog-program-tail.snippet.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l06/expected.out.txt';
+
+export const diagnosticParts = diagnostics.trim().split('== ').slice(1).map((part) => part.split('\n').slice(1).join('\n'));
+export const seclogNew = seclogOutput.slice(seclogOutput.indexOf('[CountFailures]'), seclogOutput.indexOf('\n\n== Files')).trim();
+
+# Attribute
+
+:::note[Lernziele]
+- Du kannst ein Attribut mit Positions- und benannten Parametern anwenden.
+- Du kannst sagen, worauf sich ein Attribut bezieht (Attributziel).
+- Du kannst `[Obsolete]`, `[Conditional]` und die Caller-Info-Attribute einsetzen.
+- Du kannst eine eigene Attributklasse mit `[AttributeUsage]` deklarieren.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l03-q6" />
+
+<Quiz id="m14-l03-q10" />
+
+<Quiz id="m14-l05-q5" />
+
+## Zusatzinformation für Code
+
+Ein <Term id="attribute">Attribut</Term> (attribute) ist eine Zusatzinformation, die du in eckigen Klammern vor eine Deklaration schreibst, zum Beispiel vor eine Methode. Du kennst schon zwei: `[Flags]` an einem Enum (Modul 8) und `[EnumeratorCancellation]` an einem Parameter einer asynchronen Iteratormethode (Modul 13). Dort stand nur, was sie bewirken. Jetzt siehst du, wie sie funktionieren.
+
+Ein Attribut führt von sich aus keinen Code aus. Es beschreibt das Element, an dem es steht. Der Compiler wertet manche Attribute aus. Andere liest ein Werkzeug oder ein Framework zur Laufzeit. xUnit liest `[Fact]` (Lektion 7), ASP.NET Core und EF Core lesen ihre Attribute ebenfalls. Wie das Auslesen funktioniert, ist nicht Thema des Kurses.
+
+## Attribute anwenden
+
+Ein Attribut ist der Name einer <Term id="attribute-class">Attributklasse</Term> ohne das Suffix `Attribute`: `[Obsolete]` meint die Klasse `ObsoleteAttribute`. Die Argumente stehen in runden Klammern:
+
+- **Positionsparameter** stehen zuerst und gehören zum Konstruktor: `[Author("Dana")]`.
+- **Benannte Parameter** folgen mit `Name = Wert` und setzen eine öffentliche Eigenschaft: `[Author("Dana", Version = 2)]`.
+
+Mehrere Attribute stehen untereinander oder getrennt durch Kommas in einer Klammer. Nur Werte, die der Compiler selbst kennt, sind erlaubt, zum Beispiel Zahlen, Texte und `true`.
+
+Das <Term id="attribute-target">Attributziel</Term> (attribute target) ist das Element, auf das sich das Attribut bezieht. Meistens ergibt es sich aus der Stelle: Vor einer Methode meint es die Methode, vor einer Klasse die Klasse. Du kannst es mit einem Präfix nennen: `[return: …]` meint den Rückgabewert, `[assembly: …]` die ganze Assembly.
+
+## Eine eigene Attributklasse
+
+Eine Attributklasse erbt von `Attribute`. Ihr Konstruktor legt die Positionsparameter fest, öffentliche Eigenschaften mit `set` sind die benannten Parameter. Mit `[AttributeUsage]` legst du fest, wo das Attribut stehen darf (`AttributeTargets`) und ob es mehrfach erlaubt ist (`AllowMultiple`). Ohne `[AttributeUsage]` darf es überall stehen, aber nur einmal je Element.
+
+:::info[Vorhersage]
+Das Programm erzeugt einen `Report` und ruft `Print` auf. Beide tragen `[Author]`. Was gibt es aus?
+:::
+
+<CSharpRunner id="m14-l06-custom" code={customAttribute} predict expected={customAttributeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Klasse deklarieren:** `AuthorAttribute` erbt von `Attribute`. Der Konstruktor nimmt den Positionsparameter `name`, `Version` ist ein benannter Parameter.
+2. **Gültigkeit festlegen:** `[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]` erlaubt das Attribut an Klassen und Methoden.
+3. **Anwenden:** `[Author("Dana", Version = 2)]` an der Klasse, `[Author("Dana")]` an der Methode.
+4. **Ausführen:** Die Ausgabe ist nur `Report printed`. Die Attribute haben keinen Code ausgeführt. Dieses Programm liest sie auch nicht aus.
+
+Was passiert, wenn du `[Author("Dana")]` vor ein Feld setzt? Der Compiler meldet den Fehler CS0592, weil `[AttributeUsage]` nur Klassen und Methoden erlaubt:
+
+<CodeBlock language="csharp" title="wrong-target.snippet.cs">{wrongTarget}</CodeBlock>
+
+<CodeBlock language="text" title="Compiler-Ausgabe">{diagnosticParts[2]}</CodeBlock>
+
+</details>
+
+<Quiz id="m14-l06-q3" />
+
+<Quiz id="m14-l06-q4" />
+
+## Gap-Beispiel: mehrfach anwendbar
+
+<CSharpRunner id="m14-l06-gap" code={gapAttribute} />
+
+<Quiz id="m14-l06-q2" />
+
+## Obsolete
+
+`[Obsolete("Text")]` markiert ein Element als veraltet. Jede Verwendung löst eine Warnung des Compilers aus, die den Text enthält.
+
+<CodeBlock language="csharp" title="obsolete-warning.snippet.cs">{obsoleteWarning}</CodeBlock>
+
+<CodeBlock language="text" title="Compiler-Ausgabe (CS0618)">{diagnosticParts[0]}</CodeBlock>
+
+Der Parameter `error: true` macht daraus einen Fehler. Der Build bricht dann ab:
+
+<CodeBlock language="csharp" title="obsolete-error.snippet.cs">{obsoleteError}</CodeBlock>
+
+<CodeBlock language="text" title="Compiler-Ausgabe (CS0619)">{diagnosticParts[1]}</CodeBlock>
+
+<Quiz id="m14-l06-q1" />
+
+<Quiz id="m14-l06-q9" />
+
+## Conditional
+
+`[Conditional("SYMBOL")]` an einer Methode macht sie zu einer bedingten Methode (Symbole für bedingte Kompilierung kennst du aus Lektion 3). Der Compiler übernimmt einen Aufruf nur, wenn das Symbol **an der Aufrufstelle** definiert ist. Sonst entfällt der Aufruf samt seiner Argumente.
+
+:::info[Vorhersage]
+`TRACE_STEPS` ist definiert, `VERBOSE_STEPS` nicht. Was gibt das Programm aus, und wie oft läuft `Next()`?
+:::
+
+<CSharpRunner id="m14-l06-conditional" code={conditionalCalls} predict expected={conditionalCallsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Symbol prüfen:** `TRACE_STEPS` ist am Dateianfang definiert, der Aufruf von `Trace` bleibt. `Next()` läuft und gibt 1 zurück.
+2. **Zweiten Aufruf prüfen:** `VERBOSE_STEPS` ist nicht definiert. Der Aufruf von `Verbose` entfällt mit dem Argument `Next()`. Die Methode läuft nicht.
+3. **Ergebnis:** `Next()` lief genau einmal. Das ist Absicht der Sprache: Ein Argument mit Nebenwirkung gehört nicht in einen bedingten Aufruf, wenn du den Effekt brauchst.
+
+</details>
+
+<Quiz id="m14-l06-q5" />
+
+<Quiz id="m14-l06-q6" />
+
+## Caller-Info-Attribute
+
+<Term id="caller-info-attribute">Caller-Info-Attribute</Term> (caller info attributes) stehen an optionalen Parametern. An der Aufrufstelle setzt der Compiler den Wert ein:
+
+- `[CallerMemberName]`: Name der aufrufenden Methode
+- `[CallerLineNumber]`: Zeilennummer des Aufrufs
+- `[CallerFilePath]`: Pfad der Quelldatei (er ist maschinenabhängig, das Beispiel druckt ihn nicht)
+- `[CallerArgumentExpression("parameter")]`: der Text des Ausdrucks, der für einen anderen Parameter übergeben wurde
+
+<Forward concepts={['statische Klassen (`static class`)']} module="6" />
+
+:::info[Vorhersage]
+Was geben die drei Aufrufe aus? Die Zeilennummer zählt von der ersten Zeile der Datei.
+:::
+
+<CSharpRunner id="m14-l06-caller" code={callerInfo} predict expected={callerInfoOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Ausdruck:** `Check(5 > 3)` bekommt als `expression` den Text `5 > 3`, genau wie im Quelltext geschrieben.
+2. **Aufrufer:** `Log.Write` wird in `Run` aufgerufen, deshalb setzt der Compiler `Run` ein.
+3. **Zeile:** Der Aufruf steht in Zeile 27.
+
+Der Aufrufer übergibt diese Parameter nicht. Wer es doch tut, überschreibt den Wert des Compilers.
+
+</details>
+
+<Quiz id="m14-l06-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l04/`) liest und analysiert den Beispiel-Log und lässt sich veröffentlichen. Lektion 5 hat nichts verändert.
+
+**Neue Anforderung:** SecLog meldet, welcher Analyseschritt läuft. Ein Hilfsmethode `StepLog.Write` gibt den Namen der aufrufenden Methode mit aus. Zwei Schritte nutzen sie: `CountFailures` und `CountUsers`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={stepLog} title="src/SecLog.Cli/StepLog.cs" />
+
+<FoldedCode code={analysisSteps} title="src/SecLog.Cli/AnalysisSteps.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (Ende)">{programTail}</CodeBlock>
+
+1. **Hilfsmethode:** `StepLog.Write` hat den optionalen Parameter `step` mit `[CallerMemberName]`.
+2. **Schritte:** `CountFailures` und `CountUsers` rufen `StepLog.Write` auf. Der Compiler setzt ihre Namen ein.
+3. **Aufruf:** `Program.cs` ruft beide Schritte vor `return 0;` auf.
+
+Die zusätzlichen Zeilen der Ausgabe:
+
+<CodeBlock language="text" title="Ausgabe">{seclogNew}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l06/`) meldet seine Analyseschritte mit Namen. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l04/` nur durch die zwei neuen Dateien, die drei Zeilen in `Program.cs` und die zwei Ausgabezeilen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l06-attribute-runs-code" />
+
+**„Ein Attribut führt beim Aufruf der Methode Code aus.“** Das stimmt nicht. Ein Attribut ist eine Information. Ein Objekt der Attributklasse entsteht erst, wenn ein Werkzeug das Attribut ausliest, nicht beim Aufruf der Methode.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l06-conditional-arguments-evaluated" />
+
+**„Bei einem entfallenen bedingten Aufruf werden die Argumente trotzdem ausgewertet.“** Das stimmt nicht. Der Aufruf entfällt mit allen Argumenten.
+:::
+
+<details>
+<summary>Vertiefung: Wann ein Attributobjekt entsteht (optional)</summary>
+
+Der Compiler speichert Attributklasse, Konstruktor und Argumente in der Assembly. Ein Objekt der Attributklasse entsteht erst, wenn das Attribut zur Laufzeit abgefragt wird ([§23.4.2](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2342-compilation-of-an-attribute), [§23.4.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2343-run-time-retrieval-of-an-attribute-instance)). Ohne `[AttributeUsage]` gilt `AttributeTargets.All`, `AllowMultiple = false` und `Inherited = true` ([§23.2.2](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2322-attribute-usage)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Attribut ist eine Zusatzinformation in eckigen Klammern. Positionsparameter gehören zum Konstruktor, benannte Parameter setzen Eigenschaften. Das Attributziel ergibt sich aus der Stelle oder aus einem Präfix wie `return:` oder `assembly:`. `[Obsolete]` löst eine Warnung oder mit `error: true` einen Fehler aus, `[Conditional]` lässt Aufrufe samt Argumenten entfallen, Caller-Info-Attribute setzt der Compiler an der Aufrufstelle ein. Eine eigene Attributklasse erbt von `Attribute`, `[AttributeUsage]` legt Ziele und Mehrfachverwendung fest.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l06-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l06-q10" />
+
+### Transferfrage
+
+<Quiz id="m14-l06-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Attribute in der C#-Sprachspezifikation](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes)
+- Microsoft Learn: [Attribute in .NET](https://learn.microsoft.com/dotnet/csharp/advanced-topics/reflection-and-attributes/)
