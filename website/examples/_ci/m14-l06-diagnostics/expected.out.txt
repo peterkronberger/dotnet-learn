@@ -1,0 +1,6 @@
+== obsolete-warning.snippet.cs
+Program.cs(1,19): warning CS0618: 'Totals.Old(int)' is obsolete: 'Use New instead.'
+== obsolete-error.snippet.cs
+Program.cs(1,19): error CS0619: 'Totals.Old(int)' is obsolete: 'Removed, use New instead.'
+== wrong-target.snippet.cs
+Program.cs(1,2): error CS0592: Attribute 'Author' is not valid on this declaration type. It is only valid on 'method' declarations.

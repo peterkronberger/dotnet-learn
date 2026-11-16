@@ -9425,6 +9425,190 @@
         "title": "Containerize a .NET app with dotnet publish",
         "url": "https://learn.microsoft.com/dotnet/core/containers/sdk-publish"
       }
+    },
+    {
+      "id": "debugger",
+      "term": "Debugger",
+      "german": "Fehlersuchwerkzeug",
+      "category": "platform",
+      "definition": "Ein Werkzeug, das ein Programm anhält, schrittweise ausführt und dabei Variablenwerte und den Aufrufstapel zeigt. Damit prüfst du eine Vermutung über einen Fehler.",
+      "aliases": [
+        "Debugging"
+      ],
+      "related": [
+        "breakpoint",
+        "stepping",
+        "call-stack"
+      ],
+      "lesson": "m14-l05",
+      "source": {
+        "title": "Debugger feature tour (Visual Studio)",
+        "url": "https://learn.microsoft.com/visualstudio/debugger/debugger-feature-tour"
+      }
+    },
+    {
+      "id": "breakpoint",
+      "term": "Breakpoint",
+      "german": "Haltepunkt",
+      "category": "platform",
+      "definition": "Eine Markierung an einer Codezeile. Erreicht das Programm die Zeile, hält der Debugger an, bevor er sie ausführt. Ein bedingter Haltepunkt hält nur an, wenn eine Bedingung gilt.",
+      "aliases": [
+        "Haltepunkt",
+        "Breakpoints",
+        "bedingter Haltepunkt"
+      ],
+      "related": [
+        "debugger",
+        "stepping"
+      ],
+      "lesson": "m14-l05",
+      "source": {
+        "title": "Use breakpoints in the Visual Studio debugger",
+        "url": "https://learn.microsoft.com/visualstudio/debugger/using-breakpoints"
+      }
+    },
+    {
+      "id": "stepping",
+      "term": "Stepping",
+      "german": "Einzelschritt-Ausführung",
+      "category": "platform",
+      "definition": "Das Ausführen eines angehaltenen Programms Zeile für Zeile. Step Over führt eine Zeile aus, Step Into springt in eine aufgerufene Methode, Step Out läuft bis zur Rückkehr aus der Methode.",
+      "aliases": [
+        "Step Over",
+        "Step Into",
+        "Step Out",
+        "Einzelschritt"
+      ],
+      "related": [
+        "debugger",
+        "breakpoint",
+        "call-stack"
+      ],
+      "lesson": "m14-l05",
+      "source": {
+        "title": "Navigate code with the Visual Studio debugger",
+        "url": "https://learn.microsoft.com/visualstudio/debugger/navigating-through-code-with-the-debugger"
+      }
+    },
+    {
+      "id": "attribute",
+      "term": "Attribute",
+      "german": "Attribut",
+      "category": "language",
+      "definition": "Eine Zusatzinformation, die du in eckigen Klammern vor eine Deklaration schreibst, etwa `[Obsolete]`. Sie führt von sich aus keinen Code aus. Der Compiler oder ein Werkzeug liest sie aus.",
+      "aliases": [
+        "Attribut",
+        "Attribute"
+      ],
+      "related": [
+        "attribute-class",
+        "attribute-target"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: Attributes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes"
+      }
+    },
+    {
+      "id": "attribute-class",
+      "term": "Attribute Class",
+      "german": "Attributklasse",
+      "category": "language",
+      "definition": "Eine Klasse, die von `System.Attribute` erbt. Ihr Name endet meist auf `Attribute`, beim Anwenden darfst du das Suffix weglassen. Mit `[AttributeUsage]` legst du fest, wo sie gilt.",
+      "aliases": [
+        "Attributklasse",
+        "AttributeUsage"
+      ],
+      "related": [
+        "attribute",
+        "attribute-target"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: Attributes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes"
+      }
+    },
+    {
+      "id": "attribute-target",
+      "term": "Attribute Target",
+      "german": "Attributziel",
+      "category": "language",
+      "definition": "Das Element, auf das sich ein Attribut bezieht, zum Beispiel Methode, Klasse, Rückgabewert (`[return: …]`) oder Assembly (`[assembly: …]`).",
+      "aliases": [
+        "Attributziel",
+        "Attributziele"
+      ],
+      "related": [
+        "attribute",
+        "attribute-class"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: Attributes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes"
+      }
+    },
+    {
+      "id": "obsolete-attribute",
+      "term": "Obsolete Attribute",
+      "german": "Attribut für veralteten Code",
+      "category": "language",
+      "definition": "`[Obsolete(\"Text\")]` markiert ein Element als veraltet: Jede Verwendung löst eine Compiler-Warnung aus. Mit `error: true` wird daraus ein Fehler.",
+      "aliases": [
+        "Obsolete",
+        "[Obsolete]"
+      ],
+      "related": [
+        "attribute"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: The Obsolete attribute",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2354-the-obsolete-attribute"
+      }
+    },
+    {
+      "id": "conditional-attribute",
+      "term": "Conditional Attribute",
+      "german": "Attribut für bedingte Aufrufe",
+      "category": "language",
+      "definition": "`[Conditional(\"SYMBOL\")]` an einer Methode: Der Compiler übernimmt einen Aufruf nur, wenn das Symbol an der Aufrufstelle definiert ist. Sonst entfällt der Aufruf samt Argumenten.",
+      "aliases": [
+        "Conditional",
+        "[Conditional]"
+      ],
+      "related": [
+        "attribute",
+        "conditional-compilation-symbol"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: The Conditional attribute",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2353-the-conditional-attribute"
+      }
+    },
+    {
+      "id": "caller-info-attribute",
+      "term": "Caller Info Attribute",
+      "german": "Aufruferinformations-Attribut",
+      "category": "language",
+      "definition": "Attribute wie `[CallerMemberName]`, `[CallerLineNumber]` und `[CallerArgumentExpression]` an einem optionalen Parameter. Der Compiler setzt an der Aufrufstelle den Namen, die Zeile oder den Ausdruck ein.",
+      "aliases": [
+        "CallerMemberName",
+        "CallerLineNumber",
+        "CallerFilePath",
+        "CallerArgumentExpression"
+      ],
+      "related": [
+        "attribute"
+      ],
+      "lesson": "m14-l06",
+      "source": {
+        "title": "C# language specification: Caller-info attributes",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2356-caller-info-attributes"
+      }
     }
   ]
 }

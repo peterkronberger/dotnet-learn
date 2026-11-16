@@ -1,0 +1,147 @@
+---
+title: Einen Debugger benutzen
+sidebar_position: 5
+description: Wie du mit einem Debugger einen Fehler findest – Haltepunkte setzen, Zeile für Zeile weitergehen, Variablenwerte und Aufrufstapel lesen.
+lesson_id: m14-l05
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import findTheBug from '!!raw-loader!@site/examples/m14/l05/find-the-bug.cs';
+import findTheBugOutput from '!!raw-loader!@site/examples/m14/l05/find-the-bug.out.txt';
+
+# Einen Debugger benutzen
+
+:::note[Lernziele]
+- Du kannst einen Haltepunkt setzen und ein Programm mit Step Over, Step Into und Step Out schrittweise ausführen.
+- Du kannst Variablenwerte beobachten und den Aufrufstapel lesen.
+- Du kannst mit dem Debugger eine Vermutung über einen Fehler prüfen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l03-q3" />
+
+<Quiz id="m14-l03-q9" />
+
+## Was ein Debugger tut
+
+Wenn ein Programm ein falsches Ergebnis liefert, fehlt dir oft der Blick in das Programm, während es läuft. Ein <Term id="debugger">Debugger</Term> (debugger) gibt ihn dir: Er hält das Programm an, führt es Zeile für Zeile aus und zeigt dabei die Werte der Variablen. So prüfst du eine Vermutung, statt zu raten.
+
+Visual Studio, VS Code (mit C# Dev Kit) und JetBrains Rider haben jeweils einen Debugger. Die Begriffe in dieser Lektion sind in allen gleich. Menüs und Tastenkürzel unterscheiden sich, deshalb nennt die Lektion keine.
+
+Ein Debugger arbeitet mit dem Debug-Build aus Lektion 3. Der Release-Build ist optimiert. Dann kann der Debugger Zeilen und Variablen weniger genau zeigen. Zum Untersuchen baust du deshalb in Debug.
+
+## Haltepunkte
+
+Ein <Term id="breakpoint">Haltepunkt</Term> (breakpoint) ist eine Markierung an einer Codezeile. Erreicht das Programm die Zeile, hält der Debugger an, **bevor** er sie ausführt. Der Haltepunkt gehört dem Werkzeug. Er steht nicht in deinem Quellcode und ändert nichts an der Berechnung.
+
+Ein bedingter Haltepunkt hält nur an, wenn eine Bedingung gilt, zum Beispiel `i == 3`. Das hilft in einer Schleife, die oft läuft, wenn nur ein Durchlauf auffällig ist. Mit „Break on Exception“ hält der Debugger an der Stelle an, an der eine Ausnahme auftritt.
+
+## Schritte
+
+Am Haltepunkt gehst du in <Term id="stepping">Einzelschritten</Term> (stepping) weiter:
+
+| Schritt | Wirkung |
+| --- | --- |
+| Step Over | Führt die aktuelle Zeile aus. Ein Methodenaufruf läuft dabei als Ganzes. |
+| Step Into | Springt in die aufgerufene Methode und hält in ihrer ersten Zeile. |
+| Step Out | Läuft bis zur Rückkehr aus der aktuellen Methode. |
+| Continue | Läuft weiter bis zum nächsten Haltepunkt oder zum Ende. |
+
+<Quiz id="m14-l05-q1" />
+
+<Quiz id="m14-l05-q2" />
+
+## Werte und Aufrufstapel
+
+Beim Halt zeigt der Debugger den Zustand des Programms:
+
+- **Locals:** die Variablen des aktuellen Bereichs mit ihren Werten.
+- **Watch:** Ausdrücke, die du selbst eingibst, zum Beispiel `sum + values[i]`. Der Debugger wertet sie bei jedem Halt neu aus.
+- **Aufrufstapel:** der <Term id="call-stack">Call Stack</Term> (Aufrufstapel) mit den Methoden, die gerade laufen. Die jüngste steht oben. Ein Klick auf eine ältere zeigt dort die Variablen.
+
+## Praxisbeispiel: Eine Summe ist zu klein
+
+Das Programm summiert die Fehlversuche von vier Stunden. Es soll 9 ausgeben, denn 1 + 5 + 0 + 3 ist 9.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp. Überlege dann, welche Vermutung du über den Fehler hast.
+:::
+
+<CodeBlock language="csharp" title="find-the-bug.cs">{findTheBug}</CodeBlock>
+
+<CodeBlock language="text" title="Ausgabe">{findTheBugOutput}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Eine Debug-Sitzung in vier Schritten. Die Werte sind die des Programms oben.
+
+1. **Vermutung formulieren:** Ein Wert fehlt in der Summe. Die Schleife in `SumFailures` ist verdächtig.
+2. **Haltepunkt setzen:** auf die Zeile `sum += values[i];` (Zeile 11) und mit dem Debug-Build starten.
+3. **Werte lesen:** Beim ersten Halt zeigt „Locals“ `i` gleich 1 und `sum` gleich 0. Die Zeile ist noch nicht ausgeführt. Ein Step Over führt sie aus, danach ist `sum` gleich 5. Mit Continue hält das Programm im nächsten Durchlauf: `i` ist 2, `sum` ist 5. Beim dritten Halt ist `i` gleich 3 und `sum` gleich 5, danach 8.
+4. **Vermutung prüfen:** Der Index 0 kam nie vor. `values[0]` ist 1, genau die Differenz zu 9. Die Schleife beginnt bei `i = 1`. Mit `int i = 0` gibt das Programm 9 aus.
+
+Der Aufrufstapel zeigt beim Halt `SumFailures` oben. Darunter steht die Zeile des Hauptprogramms, die `SumFailures(failuresPerHour)` aufgerufen hat.
+
+Was passiert, wenn du in Zeile 9 `i <= values.Length` schreibst? Der Index 4 liegt außerhalb des Arrays, das Programm wirft eine `IndexOutOfRangeException`. Mit „Break on Exception“ hält der Debugger genau an dieser Zeile.
+
+</details>
+
+<Quiz id="m14-l05-q3" />
+
+<Quiz id="m14-l05-q4" />
+
+<details>
+<summary>Vertiefung: Haltepunkte mit Bedingung (optional)</summary>
+
+Ein bedingter Haltepunkt wertet seine Bedingung bei jedem Erreichen aus und hält nur an, wenn sie wahr ist ([Haltepunkte im Visual-Studio-Debugger](https://learn.microsoft.com/visualstudio/debugger/using-breakpoints)). Das kostet Zeit, wenn die Zeile sehr oft läuft. VS Code und Rider bieten dasselbe unter ähnlichen Namen.
+
+</details>
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil ein Debugger Fehler findet, aber SecLog nicht verändert. Du kannst SecLog aus `_ci/seclog-m14-l04/` trotzdem untersuchen: Setze einen Haltepunkt auf eine Zeile in `Program.cs` und gehe mit Step Over durch den Block.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l05-breakpoint-changes-program" />
+
+**„Ein Haltepunkt verändert das Programm.“** Das stimmt nicht. Ein Haltepunkt ist eine Einstellung des Debuggers. Er steht nicht im Quellcode und ändert die Berechnung nicht. Das Programm hält nur an der Stelle an.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l05-writeline-always-enough" />
+
+**„`Console.WriteLine` reicht immer.“** Für einfache Fälle genügt es. Jede neue Frage kostet aber eine Änderung, einen Build und einen Start. Der Debugger lässt dich beim Halt beliebige Variablen und Ausdrücke ansehen, ohne den Code zu ändern.
+:::
+
+<Quiz id="m14-l05-q5" />
+
+<Quiz id="m14-l05-q6" />
+
+## Zusammenfassung
+
+Ein Debugger hält ein Programm an und zeigt seinen Zustand. Ein Haltepunkt hält vor der markierten Zeile an. Mit Step Over, Step Into, Step Out und Continue gehst du weiter. „Locals“ und „Watch“ zeigen Werte, der Aufrufstapel zeigt, wer wen aufgerufen hat. Du untersuchst mit dem Debug-Build, weil Release optimiert ist. Der Ablauf ist immer: Vermutung, Haltepunkt, Werte lesen, Vermutung prüfen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l05-q7" />
+
+<Quiz id="m14-l05-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m14-l05-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Debugger feature tour](https://learn.microsoft.com/visualstudio/debugger/debugger-feature-tour)
+- Microsoft Learn: [Haltepunkte im Debugger verwenden](https://learn.microsoft.com/visualstudio/debugger/using-breakpoints)
+- Microsoft Learn: [Debugging in VS Code mit C#](https://learn.microsoft.com/dotnet/core/tutorials/debugging-with-visual-studio-code)

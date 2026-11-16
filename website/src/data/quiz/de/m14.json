@@ -530,8 +530,8 @@
           "misconception": "m14-l03-debug-build-for-production"
         },
         {
-          "text": "Ein Debug-Build läuft nicht ohne Debugger.",
-          "feedback": "Ein Debug-Build läuft wie jedes Programm auch ohne Debugger."
+          "text": "Ein Debug-Build läuft nur, wenn ein Entwicklungswerkzeug ihn begleitet.",
+          "feedback": "Ein Debug-Build läuft wie jedes Programm auch allein."
         }
       ],
       "explanation": "Die Konfiguration ändert Einstellungen und Symbole. Für die Auslieferung ist Release gedacht, und `dotnet publish` wählt es von selbst."
@@ -816,6 +816,356 @@
       "type": "explain",
       "question": "Transferfrage: Du lieferst ein Werkzeug an Kollegen aus, deren Rechner unterschiedliche .NET-Versionen haben. Welche Option wählst du, und was nimmst du dafür in Kauf?",
       "modelAnswer": "Self-contained mit einem RID je Plattform, am einfachsten als Single-File: Die Kollegen brauchen keine installierte Laufzeit und starten eine Datei.\n\nDafür nimmst du in Kauf: Die Datei ist groß, du brauchst einen Build je Betriebssystem und Architektur, und Sicherheits-Patches der Laufzeit kommen nur durch eine neu veröffentlichte Version."
+    },
+    {
+      "id": "m14-l05-q1",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Der Debugger hält an einem Haltepunkt, der auf der Zeile `sum += values[i];` sitzt. Was gilt für diese Zeile?",
+      "options": [
+        {
+          "text": "Sie ist noch nicht ausgeführt. Der Debugger hält an, bevor er sie ausführt.",
+          "correct": true
+        },
+        {
+          "text": "Sie ist schon ausgeführt. Die Variablen zeigen die Werte danach.",
+          "feedback": "Der Debugger hält vor der Zeile an. Die Werte in „Locals“ sind die Werte vor dieser Zeile."
+        },
+        {
+          "text": "Sie wird übersprungen und nie ausgeführt.",
+          "feedback": "Die Zeile wird ausgeführt, sobald du einen Schritt machst oder das Programm fortsetzt."
+        }
+      ],
+      "explanation": "Ein Haltepunkt hält das Programm an, bevor die markierte Zeile läuft. Erst ein Schritt (Step Over) oder „Continue“ führt sie aus."
+    },
+    {
+      "id": "m14-l05-q2",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Der Debugger steht auf einer Zeile, die eine Methode aufruft. Du willst die Zeilen der aufgerufenen Methode einzeln sehen. Welcher Schritt passt?",
+      "options": [
+        {
+          "text": "Step Into",
+          "correct": true
+        },
+        {
+          "text": "Step Over",
+          "feedback": "Step Over führt den ganzen Aufruf in einem Schritt aus und hält erst in der nächsten Zeile des aktuellen Codes wieder an."
+        },
+        {
+          "text": "Step Out",
+          "feedback": "Step Out läuft bis zur Rückkehr aus der aktuellen Methode. Du willst aber in die aufgerufene Methode hinein."
+        }
+      ],
+      "explanation": "Step Into springt in die aufgerufene Methode. Step Over führt die Zeile samt Aufruf aus, und Step Out verlässt die aktuelle Methode."
+    },
+    {
+      "id": "m14-l05-q3",
+      "lesson": "m14-l05",
+      "type": "find-bug",
+      "question": "Das Programm gibt `Failures in total: 8` aus, erwartet sind 9. Welche Zeile ist die Ursache?",
+      "example": "m14/l05/find-the-bug.cs",
+      "bugLines": [9],
+      "lineFeedback": {
+        "8": {
+          "feedback": "`sum` muss bei 0 beginnen. Das ist richtig."
+        },
+        "11": {
+          "feedback": "Die Zeile addiert den Wert richtig. Nur wird sie für das erste Element nie erreicht."
+        }
+      },
+      "explanation": "Die Schleife beginnt bei `i = 1`. Das Element mit dem Index 0 (der Wert 1) wird nie addiert. Mit `i = 0` ist die Summe 9."
+    },
+    {
+      "id": "m14-l05-q4",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Du setzt in `SumFailures` einen Haltepunkt auf `sum += values[i];` und startest das Programm mit den Werten `[1, 5, 0, 3]`. Welche Werte zeigt „Locals“ beim ersten Halt?",
+      "options": [
+        {
+          "text": "`i` ist 1 und `sum` ist 0.",
+          "correct": true
+        },
+        {
+          "text": "`i` ist 0 und `sum` ist 0.",
+          "feedback": "Die Schleife beginnt bei `i = 1`. Genau das ist der Fehler."
+        },
+        {
+          "text": "`i` ist 1 und `sum` ist 5.",
+          "feedback": "Der Debugger hält vor der Zeile. `sum` ist noch 0, weil die Zeile noch nicht gelaufen ist."
+        }
+      ],
+      "explanation": "Beim ersten Halt ist `i` gleich 1 und `sum` gleich 0. Die Addition steht noch aus. Dass `i` nicht bei 0 beginnt, zeigt den Fehler."
+    },
+    {
+      "id": "m14-l05-q5",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Du setzt einen Haltepunkt und startest das Programm im Debugger. Was stimmt?",
+      "options": [
+        {
+          "text": "Der Quellcode und das Verhalten des Programms bleiben gleich. Das Programm hält nur an der Stelle an.",
+          "correct": true
+        },
+        {
+          "text": "Der Haltepunkt wird als Code in die Datei geschrieben und gehört zum Programm.",
+          "feedback": "Ein Haltepunkt ist eine Einstellung des Debuggers und steht nicht im Quellcode.",
+          "misconception": "m14-l05-breakpoint-changes-program"
+        },
+        {
+          "text": "Das Programm läuft mit Haltepunkt anders als ohne und liefert dann ein anderes Ergebnis.",
+          "feedback": "Ein Haltepunkt ändert die Berechnung nicht. Er hält das Programm nur an, damit du den Zustand ansiehst.",
+          "misconception": "m14-l05-breakpoint-changes-program"
+        }
+      ],
+      "explanation": "Ein Haltepunkt ist eine Markierung im Werkzeug. Er ändert weder den Quellcode noch die Berechnung, er hält das Programm nur an."
+    },
+    {
+      "id": "m14-l05-q6",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Ein Fehler tritt erst im dritten Durchlauf einer Schleife auf. Du willst mehrere Variablen in diesem Durchlauf ansehen. Welche Aussage über Debugger und `Console.WriteLine` stimmt?",
+      "options": [
+        {
+          "text": "Mit dem Debugger hältst du im dritten Durchlauf an und siehst alle Variablen, ohne den Code zu ändern und neu zu bauen.",
+          "correct": true
+        },
+        {
+          "text": "`Console.WriteLine` ist immer die bessere Wahl, weil es in jeder Lage ausreicht.",
+          "feedback": "Für jede neue Frage musst du eine Zeile ergänzen, neu bauen und starten. Der Debugger lässt dich beim Halt beliebige Werte ansehen.",
+          "misconception": "m14-l05-writeline-always-enough"
+        },
+        {
+          "text": "Der Debugger zeigt nur den Wert der Variable, auf die du den Haltepunkt gesetzt hast.",
+          "feedback": "„Locals“ zeigt alle Variablen des aktuellen Bereichs, „Watch“ zusätzlich Ausdrücke deiner Wahl."
+        }
+      ],
+      "explanation": "Beim Halt siehst du den ganzen Zustand, ohne den Code zu ändern. Ausgaben mit `Console.WriteLine` zeigen nur, was du vorher eingebaut hast."
+    },
+    {
+      "id": "m14-l05-q7",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Der Debugger hält in `SumFailures`. Was zeigt der Aufrufstapel?",
+      "options": [
+        {
+          "text": "`SumFailures` oben und darunter die Stelle des Hauptprogramms, die sie aufgerufen hat.",
+          "correct": true
+        },
+        {
+          "text": "Alle Methoden des Programms in der Reihenfolge, wie sie im Quelltext stehen.",
+          "feedback": "Der Aufrufstapel zeigt nur die Methoden, die gerade aufgerufen sind und noch nicht zurückgekehrt sind."
+        },
+        {
+          "text": "Nur die Werte der lokalen Variablen von `SumFailures`.",
+          "feedback": "Die Werte stehen in „Locals“. Der Aufrufstapel zeigt, welche Aufrufe zum aktuellen Halt geführt haben."
+        }
+      ],
+      "explanation": "Der Aufrufstapel listet die laufenden Aufrufe, der jüngste steht oben. So findest du, von wo aus die aktuelle Methode aufgerufen wurde."
+    },
+    {
+      "id": "m14-l05-q8",
+      "lesson": "m14-l05",
+      "type": "single",
+      "question": "Du willst ein Programm mit dem Debugger untersuchen. Warum nimmst du dafür den Debug-Build und nicht den Release-Build?",
+      "options": [
+        {
+          "text": "Der Release-Build ist optimiert. Der Debugger kann dort Zeilen und Variablen weniger genau zeigen.",
+          "correct": true
+        },
+        {
+          "text": "Der Release-Build enthält keinen Code, den man anhalten könnte.",
+          "feedback": "Auch Release enthält den Code. Er ist aber optimiert, deshalb passt das Bild im Debugger weniger gut zum Quelltext."
+        },
+        {
+          "text": "Nur der Debug-Build kann Variablen im Speicher halten.",
+          "feedback": "Beide Builds halten Variablen im Speicher. Release darf sie aber wegoptimieren oder zusammenfassen."
+        }
+      ],
+      "explanation": "Release schaltet die Optimierung ein, das macht das Debuggen schwerer (Lektion 3). Debug bildet den Quelltext genauer ab."
+    },
+    {
+      "id": "m14-l05-q9",
+      "lesson": "m14-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie du mit einem Debugger eine Vermutung über einen Fehler prüfst. Nenne die Schritte.",
+      "modelAnswer": "Du formulierst eine Vermutung, zum Beispiel „die Schleife beginnt am falschen Index“. Dann setzt du einen Haltepunkt vor die verdächtige Zeile und startest im Debug-Build. Beim Halt liest du die Werte in „Locals“ oder „Watch“ und gehst mit Step Over weiter. Stimmen die Werte nicht mit deiner Erwartung überein, hast du die Stelle gefunden. Sonst verwirfst du die Vermutung und setzt den Haltepunkt woanders."
+    },
+    {
+      "id": "m14-l05-q10",
+      "lesson": "m14-l05",
+      "type": "explain",
+      "question": "Transferfrage: In SecLog zählt eine Regel bei einem Nutzer zu viele Fehlversuche, aber nur bei einem von 1000 Ereignissen. Wie gehst du mit dem Debugger vor?",
+      "modelAnswer": "Ich setze einen bedingten Haltepunkt in die Zeile der Regel, zum Beispiel mit der Bedingung `user == \"bob\"`. Das Programm hält dann nur bei den Ereignissen dieses Nutzers an. Dort lese ich die Werte und den Aufrufstapel und vergleiche sie mit meiner Erwartung. So muss ich nicht 1000-mal fortsetzen."
+    },
+    {
+      "id": "m14-l06-q1",
+      "lesson": "m14-l06",
+      "type": "single",
+      "question": "Eine Methode trägt `[Obsolete(\"Use New instead.\")]`. Was passiert, wenn eine andere Stelle sie aufruft?",
+      "options": [
+        {
+          "text": "Der Compiler gibt eine Warnung mit dem Text aus. Das Programm lässt sich trotzdem bauen und starten.",
+          "correct": true
+        },
+        {
+          "text": "Der Aufruf wird zur Laufzeit übersprungen.",
+          "feedback": "Das Attribut ändert den Ablauf nicht. Es löst nur die Compiler-Meldung aus."
+        },
+        {
+          "text": "Der Compiler meldet immer einen Fehler.",
+          "feedback": "Ein Fehler entsteht nur mit `error: true`. Ohne diesen Parameter ist es eine Warnung."
+        }
+      ],
+      "explanation": "`[Obsolete]` löst bei jeder Verwendung eine Warnung aus. Erst `error: true` macht daraus einen Fehler."
+    },
+    {
+      "id": "m14-l06-q2",
+      "lesson": "m14-l06",
+      "type": "cloze",
+      "question": "Ergänze die Attributklasse. Sie darf nur an Methoden stehen und mehrfach an derselben Methode.",
+      "example": "m14/l06/gap-attribute.cs",
+      "blanks": [
+        {
+          "text": "AttributeUsage",
+          "hint": "Dieses Attribut legt fest, wo ein Attribut gilt."
+        },
+        {
+          "text": "AttributeTargets.Method",
+          "hint": "Das Ziel „Methode“ steht in `AttributeTargets`."
+        },
+        {
+          "text": "AllowMultiple",
+          "hint": "Dieser benannte Parameter erlaubt mehrere Anwendungen."
+        }
+      ],
+      "explanation": "`[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]` beschränkt die Klasse auf Methoden und erlaubt `[Tag]` mehrfach an derselben Methode."
+    },
+    {
+      "id": "m14-l06-q3",
+      "lesson": "m14-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l06/custom-attribute.cs",
+      "explanation": "Die Attribute `[Author]` tragen nur Informationen. Sie führen beim Aufruf von `Print` keinen Code aus. Deshalb erscheint nur die Zeile der Methode."
+    },
+    {
+      "id": "m14-l06-q4",
+      "lesson": "m14-l06",
+      "type": "single",
+      "question": "Die Methode `Print` trägt `[Author(\"Dana\")]`. Was bewirkt das Attribut beim Aufruf von `Print()`?",
+      "options": [
+        {
+          "text": "Nichts. Das Attribut ist eine Information, die ein Werkzeug auslesen kann.",
+          "correct": true
+        },
+        {
+          "text": "Der Konstruktor von `AuthorAttribute` läuft bei jedem Aufruf von `Print`.",
+          "feedback": "Ein Attribut ist beim Aufruf nicht beteiligt. Ein Objekt der Attributklasse entsteht erst, wenn ein Werkzeug das Attribut ausliest.",
+          "misconception": "m14-l06-attribute-runs-code"
+        },
+        {
+          "text": "Das Programm gibt vor `Print` den Namen „Dana“ aus.",
+          "feedback": "Ein Attribut führt keinen Code aus. Eine Ausgabe entsteht nur, wenn Code sie schreibt.",
+          "misconception": "m14-l06-attribute-runs-code"
+        }
+      ],
+      "explanation": "Ein Attribut ist deklarative Information. Es führt von sich aus keinen Code aus. Compiler und Werkzeuge lesen es aus."
+    },
+    {
+      "id": "m14-l06-q5",
+      "lesson": "m14-l06",
+      "type": "single",
+      "question": "`Trace` trägt `[Conditional(\"TRACE_STEPS\")]`, das Symbol ist nicht definiert. Der Code ruft `Trace(Next())` auf, und `Next()` zählt einen Zähler hoch. Was passiert?",
+      "options": [
+        {
+          "text": "Der Compiler lässt den Aufruf samt Argument weg. `Next()` läuft nicht, der Zähler bleibt gleich.",
+          "correct": true
+        },
+        {
+          "text": "`Next()` läuft, nur der Aufruf von `Trace` entfällt.",
+          "feedback": "Auch das Argument wird nicht ausgewertet, wenn der Aufruf entfällt. Der Zähler ändert sich nicht.",
+          "misconception": "m14-l06-conditional-arguments-evaluated"
+        },
+        {
+          "text": "Der Compiler meldet einen Fehler, weil das Symbol fehlt.",
+          "feedback": "Ein fehlendes Symbol ist kein Fehler. Der Aufruf entfällt einfach."
+        }
+      ],
+      "explanation": "Ist das Symbol an der Aufrufstelle nicht definiert, entfällt der Aufruf mit seinen Argumenten. Auswertungen mit Nebenwirkung sollten deshalb nie in solchen Argumenten stehen, wenn sie später gebraucht werden."
+    },
+    {
+      "id": "m14-l06-q6",
+      "lesson": "m14-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Das Symbol `TRACE_STEPS` ist am Dateianfang definiert, `VERBOSE_STEPS` nicht.",
+      "example": "m14/l06/conditional-calls.cs",
+      "explanation": "`Tracer.Trace` bleibt erhalten, weil `TRACE_STEPS` definiert ist. Der Aufruf von `Tracer.Verbose` entfällt samt `Next()`. Deshalb hat `Next()` genau einmal gelaufen."
+    },
+    {
+      "id": "m14-l06-q7",
+      "lesson": "m14-l06",
+      "type": "single",
+      "question": "Eine Hilfsmethode `Write(string message, … string member = \"\")` soll den Namen der aufrufenden Methode ausgeben, ohne dass der Aufrufer ihn übergibt. Welches Attribut steht vor `member`?",
+      "options": [
+        {
+          "text": "`[CallerMemberName]`",
+          "correct": true
+        },
+        {
+          "text": "`[CallerLineNumber]`",
+          "feedback": "Das Attribut liefert die Zeilennummer des Aufrufs, keinen Namen."
+        },
+        {
+          "text": "`[Conditional]`",
+          "feedback": "`[Conditional]` gehört an eine Methode und steuert, ob Aufrufe erhalten bleiben. Es setzt keine Parameterwerte."
+        }
+      ],
+      "explanation": "`[CallerMemberName]` an einem optionalen Parameter lässt den Compiler an der Aufrufstelle den Namen des aufrufenden Members einsetzen."
+    },
+    {
+      "id": "m14-l06-q8",
+      "lesson": "m14-l06",
+      "type": "find-bug",
+      "question": "Der Build bricht mit dem Fehler CS0592 ab. Welche Zeile ist die Ursache?",
+      "example": "_ci/m14-l06-diagnostics/wrong-target.snippet.cs",
+      "bugLines": [1],
+      "explanation": "`AuthorAttribute` erlaubt mit `AttributeTargets.Method` nur Methoden. `[Author(\"Dana\")]` steht aber an einer Klasse."
+    },
+    {
+      "id": "m14-l06-q9",
+      "lesson": "m14-l06",
+      "type": "single",
+      "question": "Eine alte Methode soll nicht mehr benutzt werden. Aufrufe sollen den Build sofort abbrechen. Was schreibst du?",
+      "options": [
+        {
+          "text": "`[Obsolete(\"Use New instead.\", error: true)]`",
+          "correct": true
+        },
+        {
+          "text": "`[Obsolete(\"Use New instead.\")]`",
+          "feedback": "Ohne `error: true` entsteht nur eine Warnung. Der Build läuft weiter, außer das Projekt macht Warnungen zu Fehlern."
+        },
+        {
+          "text": "`[Conditional(\"OLD\")]`",
+          "feedback": "`[Conditional]` entfernt Aufrufe, wenn ein Symbol fehlt. Es verbietet keine Aufrufe."
+        }
+      ],
+      "explanation": "`error: true` macht aus der Warnung CS0618 den Fehler CS0619."
+    },
+    {
+      "id": "m14-l06-q10",
+      "lesson": "m14-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Attribut ist und wer es liest.",
+      "modelAnswer": "Ein Attribut ist eine Zusatzinformation in eckigen Klammern vor einer Deklaration, zum Beispiel `[Obsolete]`. Es führt selbst keinen Code aus. Der Compiler wertet manche Attribute aus, etwa `[Obsolete]` und `[Conditional]`. Andere liest ein Werkzeug oder Framework erst zur Laufzeit aus."
+    },
+    {
+      "id": "m14-l06-q11",
+      "lesson": "m14-l06",
+      "type": "explain",
+      "question": "Transferfrage: Wo würdest du in SecLog ein Attribut einsetzen, und welches?",
+      "modelAnswer": "Ich markiere eine Methode, die ersetzt wurde, mit `[Obsolete(\"…\")]`, damit der Compiler alle Aufrufer meldet. Eine Hilfsmethode zum Protokollieren bekommt `[CallerMemberName]`, damit sie den Namen des Aufrufers selbst ausgibt. Für Tests nutzt die nächste Lektion `[Fact]`."
     }
   ]
 }
