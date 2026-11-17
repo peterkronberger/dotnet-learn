@@ -1,0 +1,209 @@
+---
+title: Exceptions und asynchronen Code testen
+sidebar_position: 12
+description: Mit Assert.Throws prüfen, dass Code die richtige Exception wirft, und asynchrone Methoden mit async-Task-Tests und ThrowsAsync testen.
+lesson_id: m14-l12
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import userCheck from '!!raw-loader!@site/examples/_ci/m14-l12-exceptions-async/UserCheck.cs';
+import failureCounter from '!!raw-loader!@site/examples/_ci/m14-l12-exceptions-async/FailureCounter.cs';
+import exceptionTests from '!!raw-loader!@site/examples/_ci/m14-l12-exceptions-async/ExceptionTests.cs';
+import asyncTests from '!!raw-loader!@site/examples/_ci/m14-l12-exceptions-async/AsyncTests.cs';
+import exceptionsOutput from '!!raw-loader!@site/examples/_ci/m14-l12-exceptions-async/expected.out.txt';
+import gapThrows from '!!raw-loader!@site/examples/m14/l12/gap-throws.snippet.cs';
+import programCalls from '!!raw-loader!@site/examples/m14/l12/seclog-program-calls.snippet.cs';
+import readerAsync from '!!raw-loader!@site/examples/m14/l12/seclog-reader-async.snippet.cs';
+import logParser from '!!raw-loader!@site/examples/_ci/seclog-m14-l12/src/SecLog.Core/Model/LogParser.cs';
+import parseLineTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l12/tests/SecLog.Tests/ParseLineTests.cs';
+import readerTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l12/tests/SecLog.Tests/LogSourceReaderTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l12/expected.out.txt';
+
+export const exceptionLines = exceptionsOutput.split('\n').reduce((blocks, line) => {
+  if (/^(Passed|Failed) /.test(line)) blocks.push([line]);
+  else if (blocks.length) blocks[blocks.length - 1].push(line);
+  return blocks;
+}, []).filter((block) => block[0].includes('ExceptionTests')).map((block) => block.join('\n')).join('\n');
+
+export const newResults = seclogOutput.split('\n').filter((line) => line.includes('ParseLineTests') || line.includes('LogSourceReaderTests')).join('\n');
+
+# Exceptions und asynchronen Code testen
+
+:::note[Lernziele]
+- Du kannst mit `Assert.Throws<T>` prüfen, dass eine Methode die richtige Exception wirft, und ihre Eigenschaften prüfen.
+- Du kannst asynchrone Methoden mit `async Task`-Tests und `Assert.ThrowsAsync<T>` testen.
+- Du kannst erklären, warum Testmethoden nicht `async void` sein dürfen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l11-q5" />
+
+<Quiz id="m14-l07-q2" />
+
+<Quiz id="m14-l07-q3" />
+
+## Eine Exception als erwartetes Ergebnis
+
+Manchmal ist die Exception das richtige Ergebnis: Eine Methode soll bei einem ungültigen Argument einen Fehler melden (Modul 7). Dann prüft der Test, dass sie geworfen wird. Das Muster der <Term id="exception-assertion">Exception-Prüfung</Term> ist `Assert.Throws<T>`. Du übergibst einen Lambda-Ausdruck (Modul 10) mit dem Aufruf. `Throws` führt ihn aus, erwartet genau den Typ `T` und gibt die Exception zurück. An ihr prüfst du die Eigenschaften, etwa `ParamName` oder `Message`.
+
+`ThrowsAny<T>` nimmt dagegen `T` und alle abgeleiteten Typen. Der Unterschied zählt, wenn die Exception aus einer Vererbungskette kommt (Modul 7): `ArgumentNullException` erbt von `ArgumentException`.
+
+Der Code unter Test prüft einen Benutzernamen:
+
+<CodeBlock language="csharp" title="UserCheck.cs">{userCheck}</CodeBlock>
+
+:::info[Vorhersage]
+Welche der vier Tests bestehen? Achte besonders auf den dritten: `Require(null)` wirft eine `ArgumentNullException`, der Test erwartet `ArgumentException`.
+:::
+
+<CodeBlock language="csharp" title="ExceptionTests.cs">{exceptionTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Lauf der Exception-Tests steht gemeinsam mit den asynchronen Tests weiter unten. Hier die Zeilen dieser Tests:
+
+<CodeBlock language="text" title="Ausgabe von dotnet test (Exception-Tests)">{exceptionLines}</CodeBlock>
+
+1. **Ersten Test lesen:** `Require(null)` wirft eine `ArgumentNullException`. `Throws<ArgumentNullException>` trifft den Typ genau. Der Test prüft danach `ParamName`.
+2. **Zweiten Test lesen:** `Require("")` wirft eine `ArgumentException`. Der Typ passt genau.
+3. **Dritten Test lesen:** `Throws<ArgumentException>` erwartet genau diesen Typ. Geworfen wird eine abgeleitete Klasse. Der Test schlägt fehl, mit der Meldung, der Typ sei kein exakter Treffer.
+4. **Vierten Test lesen:** `ThrowsAny<ArgumentException>` akzeptiert auch abgeleitete Typen und besteht.
+
+Was passiert, wenn der Aufruf gar keine Exception wirft? Dann schlägt der Test fehl: Die erwartete Exception blieb aus.
+
+</details>
+
+<Quiz id="m14-l12-q2" />
+
+<Quiz id="m14-l12-q4" />
+
+## Gap-Beispiel: eine Exception prüfen
+
+Der Test soll die Exception speichern und ihren Parameternamen prüfen. Die Lücken `___` fehlen.
+
+<CodeBlock language="csharp" title="gap-throws.snippet.cs">{gapThrows}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die erste Lücke ist `Throws`, die zweite `ParamName`. Der Rückgabewert von `Throws<T>` ist die Exception.
+
+</details>
+
+<Quiz id="m14-l12-q3" />
+
+## Asynchronen Code testen
+
+Ein asynchroner Test ist eine Methode mit der Signatur `async Task` (Modul 13). Sie ruft die Methode mit `await` auf und prüft danach das Ergebnis. Ein <Term id="async-test">asynchroner Test</Term> gibt `Task` zurück, damit xUnit auf das Ende wartet. Für Exceptions in asynchronem Code gibt es `Assert.ThrowsAsync<T>` und `Assert.ThrowsAnyAsync<T>`. Beide musst du mit `await` abwarten.
+
+Der Code unter Test zählt Fehlversuche mit einer kurzen Wartezeit je Zeile:
+
+<CodeBlock language="csharp" title="FailureCounter.cs">{failureCounter}</CodeBlock>
+
+Die Methode bekommt ein `CancellationToken` (Modul 13). Im Test übergibst du `TestContext.Current.CancellationToken`: Das Token gehört zum laufenden Test, und xUnit löst es aus, wenn der Test abgebrochen wird, etwa durch ein Zeitlimit.
+
+:::info[Vorhersage]
+Welche Tests bestehen? Im zweiten Test ist das Token schon abgebrochen, bevor `CountAsync` startet. Welche Exception kommt, und passt `ThrowsAnyAsync<OperationCanceledException>`?
+:::
+
+<CodeBlock language="csharp" title="AsyncTests.cs">{asyncTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test (alle Tests)">{exceptionsOutput}</CodeBlock>
+
+1. **Ersten Test lesen:** `await` wartet auf `CountAsync`. Zwei der drei Zeilen enthalten `login-failed`, das Ergebnis ist 2.
+2. **Zweiten Test lesen:** Das Token ist abgebrochen. `Task.Delay` wirft eine `TaskCanceledException`. Sie erbt von `OperationCanceledException`.
+3. **Prüfung wählen:** `ThrowsAnyAsync<OperationCanceledException>` akzeptiert die abgeleitete Klasse. `ThrowsAsync<OperationCanceledException>` verlangt den exakten Typ und würde fehlschlagen.
+4. **Warten nicht vergessen:** Beide Tests tragen `await`. Ohne `await` liefe der Test an der Prüfung vorbei.
+
+</details>
+
+<Quiz id="m14-l12-q5" />
+
+<Quiz id="m14-l12-q6" />
+
+<Quiz id="m14-l12-q7" />
+
+<Quiz id="m14-l12-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l11/`) hat Tests für Regeln, Zeitfenster, Parser, Detektor, Monitor und Aktivität. Die Prüfung, die eine ungültige Zeile mit `InvalidLogLineException` abweist, steckt noch als lokale Funktion `ParseLine` in `Program.cs`. `LogSourceReader` hat keine asynchrone Methode, die ein Test abwarten kann.
+
+**Neue Anforderung:** `ParseLine` zieht als `LogParser.ParseLine` nach `SecLog.Core`. `LogSourceReader` bekommt `CountFailuresAsync(CancellationToken)`. Tests prüfen die Exception (Typ, `LineNumber`, `Message`, `InnerException`) und den asynchronen Aufruf, auch mit abgebrochenem Token. Die Ausgabe des Programms bleibt gleich.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={logParser} title="src/SecLog.Core/Model/LogParser.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/LogSourceReader.cs (neue Methode)">{readerAsync}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Aufrufe)">{programCalls}</CodeBlock>
+
+<FoldedCode code={parseLineTests} title="tests/SecLog.Tests/ParseLineTests.cs" />
+
+<FoldedCode code={readerTests} title="tests/SecLog.Tests/LogSourceReaderTests.cs" />
+
+1. **Parser verschieben:** `ParseLine` wird `public static` in `LogParser`. Die Hilfsfunktionen `TimestampOf` und `FindUser` ersetzt die Methode durch `parts[0]` und eine kleine private Methode `UserOf`. Das Verhalten bleibt gleich.
+2. **Aufrufe ändern:** In `Program.cs` steht `LogParser.` vor jedem Aufruf. Die lokale Funktion ist weg.
+3. **Asynchrone Methode ergänzen:** `CountFailuresAsync` wartet je Zeile kurz und reicht das Token an `Task.Delay` weiter.
+4. **Exception-Tests schreiben:** Jeder Test speichert die Exception von `Assert.Throws` und prüft Eigenschaften. Beim ungültigen Zeitstempel prüft `Assert.IsType<FormatException>` die `InnerException`.
+5. **Asynchrone Tests schreiben:** Beide Tests sind `async Task`. Der zweite startet mit abgebrochenem Token und erwartet eine `OperationCanceledException` oder eine abgeleitete.
+
+Die neuen Tests:
+
+<CodeBlock language="text" title="Ausgabe">{newResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l12/`) ist ein Projekt mit Tests für Regeln, Zeitfenster, Parser, Exceptions, Zeitabhängigkeit und asynchronen Code. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l11/` nur durch die Verschiebung von `ParseLine`, die neue Methode in `LogSourceReader`, die geänderten Aufrufe und zwei neue Testdateien.
+
+<Quiz id="m14-l12-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l12-throws-accepts-derived-type" />
+
+**„`Assert.Throws<ArgumentException>` besteht auch bei einer abgeleiteten Exception.“** Das stimmt nicht. `Throws<T>` verlangt genau den Typ `T`. Eine `ArgumentNullException` besteht `Throws<ArgumentException>` nicht. Willst du auch abgeleitete Typen zulassen, nimmst du `ThrowsAny<T>`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l12-async-void-test-is-ok" />
+
+**„Ein asynchroner Test darf `async void` sein.“** Das stimmt nicht. xUnit v3 unterstützt `async void` bei Tests nicht mehr. Ein Analyzer meldet das beim Bauen als Fehler. Ein Test gibt `Task` zurück, damit xUnit auf das Ende wartet.
+:::
+
+<details>
+<summary>Vertiefung: Warum async void nicht geht (optional)</summary>
+
+Eine Methode mit `async void` gibt dem Aufrufer nichts zurück, worauf er warten könnte (Modul 13). xUnit v3 bricht Tests mit dieser Signatur darum ab. Die Umstellung auf `Task` oder `ValueTask` ist Teil der Migration von v2 auf v3 ([Migration zu v3](https://xunit.net/docs/getting-started/v3/migration)). Der zugehörige Analyzer heißt xUnit1049 ([Analyzer-Regel](https://xunit.net/xunit.analyzers/rules/xUnit1049)).
+
+</details>
+
+## Zusammenfassung
+
+`Assert.Throws<T>` prüft, dass ein Aufruf genau die Exception `T` wirft, und gibt sie zurück, damit du `ParamName`, `Message`, `LineNumber` und `InnerException` prüfst. `ThrowsAny<T>` akzeptiert auch abgeleitete Typen. Asynchrone Tests haben die Signatur `async Task`, rufen mit `await` auf und prüfen danach. Für Exceptions in asynchronem Code nimmst du `ThrowsAsync` oder `ThrowsAnyAsync` und wartest sie ab. Ein abgebrochenes `Task.Delay` wirft eine `TaskCanceledException`, darum passt dort `ThrowsAnyAsync<OperationCanceledException>`. `async void` ist bei xUnit v3 nicht erlaubt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l12-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l12-q10" />
+
+### Transferfrage
+
+<Quiz id="m14-l12-q11" />
+
+## Weiterlesen
+
+- xUnit.net: [Getting started with xUnit.net v3](https://xunit.net/docs/getting-started/v3/getting-started)
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)

@@ -1932,6 +1932,393 @@
       "type": "explain",
       "question": "Transferfrage: Welche Abhängigkeit in SecLog würdest du im Test ersetzen, und mit welchem Double?",
       "modelAnswer": "Das Versenden einer Benachrichtigung für einen Incident. Ich lege ein Interface an und ersetze es im Test durch einen Spy, der die Nachrichten aufzeichnet. Für den Fall, dass das Senden fehlschlägt, nehme ich einen Stub."
+    },
+    {
+      "id": "m14-l11-q1",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Warum macht `DateTimeOffset.UtcNow` im geprüften Code Tests unzuverlässig?",
+      "options": [
+        {
+          "text": "Die Methode liest die echte Uhr. Das Ergebnis ändert sich mit der Zeit, und der Test kann die Grenze nicht gezielt treffen.",
+          "correct": true
+        },
+        {
+          "text": "`DateTimeOffset.UtcNow` ist langsam und lässt Tests ablaufen.",
+          "feedback": "Der Aufruf ist schnell. Das Problem ist, dass der Test die Zeit nicht festlegen kann."
+        },
+        {
+          "text": "`DateTimeOffset.UtcNow` gibt in Tests immer den Wert 0 zurück.",
+          "feedback": "Er gibt auch im Test die echte Uhrzeit zurück."
+        }
+      ],
+      "explanation": "Code, der die Uhr selbst liest, liefert bei jedem Lauf andere Ergebnisse. Ein Test kann nicht festlegen, wie spät es ist, und deshalb weder Grenzfälle noch Wiederholbarkeit sichern."
+    },
+    {
+      "id": "m14-l11-q2",
+      "lesson": "m14-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l11/time-provider.cs",
+      "explanation": "Die Systemuhr liefert „jetzt“, ein Fehler vor 5 Minuten ist im Fenster. Die feste Uhr zeigt 08:16:48. Ein Fehler um 08:06:48 liegt genau 10 Minuten zurück und gilt wegen `<=` noch als aktuell. Eine Sekunde früher liegt außerhalb."
+    },
+    {
+      "id": "m14-l11-q3",
+      "lesson": "m14-l11",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l11/clock-dependent.cs",
+      "explanation": "Die Methode liest die echte Uhr. Ein Zeitpunkt vor 5 Minuten liegt immer im Fenster von 10 Minuten, einer vor 15 Minuten nie. Der Test dieser Methode kann die Grenze von genau 10 Minuten aber nicht treffen."
+    },
+    {
+      "id": "m14-l11-q4",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Welche Methode von `TimeProvider` liefert die aktuelle Zeit in UTC?",
+      "options": [
+        {
+          "text": "`GetUtcNow()`",
+          "correct": true
+        },
+        {
+          "text": "`Now()`",
+          "feedback": "`TimeProvider` hat keine Methode `Now()`."
+        },
+        {
+          "text": "`TimeProvider.System`",
+          "feedback": "`TimeProvider.System` ist die Standardimplementierung, also die Systemuhr. Die Zeit liefert `GetUtcNow()` auf einem `TimeProvider`."
+        }
+      ],
+      "explanation": "`GetUtcNow()` gibt ein `DateTimeOffset` in UTC zurück. `TimeProvider.System` ist ein Objekt, das dafür die Systemuhr nutzt."
+    },
+    {
+      "id": "m14-l11-q5",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Der Test soll prüfen, ob ein Fenster von 10 Minuten abgelaufen ist. Wie lässt du die Zeit vergehen?",
+      "options": [
+        {
+          "text": "`clock.Advance(TimeSpan.FromMinutes(10))` auf einem `FakeTimeProvider`.",
+          "correct": true
+        },
+        {
+          "text": "`Thread.Sleep(TimeSpan.FromMinutes(10))`.",
+          "feedback": "Der Test würde 10 Minuten warten. Mit einem Fake-Provider geht es sofort.",
+          "misconception": "m14-l11-test-must-wait-window"
+        },
+        {
+          "text": "`await Task.Delay(TimeSpan.FromMinutes(10))`.",
+          "feedback": "Auch das wartet wirklich. Der Test wäre langsam.",
+          "misconception": "m14-l11-test-must-wait-window"
+        }
+      ],
+      "explanation": "`FakeTimeProvider.Advance` schiebt die Uhr des Fakes um eine Zeitspanne vor. Der Test läuft in Millisekunden."
+    },
+    {
+      "id": "m14-l11-q6",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Welche Aussage über `FakeTimeProvider` stimmt?",
+      "options": [
+        {
+          "text": "Er ist eine Uhr nur für den Code, dem der Test sie übergibt. Die Systemuhr bleibt unverändert.",
+          "correct": true
+        },
+        {
+          "text": "Er stellt die Systemuhr des Rechners auf die gewünschte Zeit.",
+          "feedback": "`FakeTimeProvider` ändert nichts am Rechner. Nur Code, der ihn als `TimeProvider` bekommt, sieht seine Zeit.",
+          "misconception": "m14-l11-fake-time-provider-changes-system-clock"
+        },
+        {
+          "text": "Er wirkt auf alle Programme, die gleichzeitig laufen.",
+          "feedback": "Er ist ein gewöhnliches Objekt innerhalb des Testprozesses.",
+          "misconception": "m14-l11-fake-time-provider-changes-system-clock"
+        }
+      ],
+      "explanation": "`FakeTimeProvider` ist eine Klasse, die von `TimeProvider` erbt. Der Code unter Test fragt sie, wie spät es ist. Kein Systemaufruf ändert die echte Uhr."
+    },
+    {
+      "id": "m14-l11-q7",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Welches NuGet-Paket bringt `FakeTimeProvider` mit?",
+      "options": [
+        {
+          "text": "`Microsoft.Extensions.TimeProvider.Testing`",
+          "correct": true
+        },
+        {
+          "text": "`System.TimeProvider`",
+          "feedback": "`TimeProvider` gehört seit .NET 8 zum Framework. Der Fake steckt in einem eigenen Testpaket."
+        },
+        {
+          "text": "`xunit.v3.mtp-v2`",
+          "feedback": "Das ist das Test-Framework. Es enthält keinen Fake für die Zeit."
+        }
+      ],
+      "explanation": "`TimeProvider` ist Teil von .NET. `FakeTimeProvider` kommt aus `Microsoft.Extensions.TimeProvider.Testing` und gehört ins Testprojekt."
+    },
+    {
+      "id": "m14-l11-q8",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Das Fenster beträgt 10 Minuten, und `IsActive` prüft mit `<=`. Welche zwei Zeitpunkte nach dem Fehler prüft ein guter Grenztest?",
+      "options": [
+        {
+          "text": "Genau 10 Minuten und 10 Minuten plus 1 Sekunde.",
+          "correct": true
+        },
+        {
+          "text": "1 Minute und 60 Minuten.",
+          "feedback": "Beide Werte liegen weit weg von der Grenze. Ein Fehler wie `<` statt `<=` bliebe unentdeckt."
+        },
+        {
+          "text": "0 Minuten und 5 Minuten.",
+          "feedback": "Beide liegen mitten im Fenster."
+        }
+      ],
+      "explanation": "An der Grenze entscheidet `<=` oder `<`. Ein Test auf genau 10 Minuten (aktiv) und eine Sekunde später (nicht mehr aktiv) zeigt, ob die Grenze richtig liegt."
+    },
+    {
+      "id": "m14-l11-q9",
+      "lesson": "m14-l11",
+      "type": "single",
+      "question": "Warum übergibt `Program.cs` von SecLog eine `FixedTimeProvider`-Uhr an `IncidentActivity` statt `TimeProvider.System`?",
+      "options": [
+        {
+          "text": "Die Ausgabe bleibt bei jedem Lauf gleich, weil die Uhr immer denselben Zeitpunkt zeigt.",
+          "correct": true
+        },
+        {
+          "text": "`TimeProvider.System` lässt sich in einer Konsolenanwendung nicht benutzen.",
+          "feedback": "`TimeProvider.System` funktioniert überall. Seine Ausgabe wäre aber vom Zeitpunkt des Laufs abhängig."
+        },
+        {
+          "text": "`IncidentActivity` verlangt eine Unterklasse von `TimeProvider`.",
+          "feedback": "Jeder `TimeProvider` genügt, auch `TimeProvider.System`."
+        }
+      ],
+      "explanation": "Die Beispielausgabe ist ein Snapshot. Mit der Systemuhr würde sie sich ändern. Mit einer festen Uhr bleibt sie gleich."
+    },
+    {
+      "id": "m14-l11-q10",
+      "lesson": "m14-l11",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie du Code mit Zeitabhängigkeit testbar machst und wie der Test die Zeit steuert.",
+      "modelAnswer": "Der Code liest die Zeit nicht selbst aus `DateTimeOffset.UtcNow`, sondern bekommt einen `TimeProvider` übergeben und ruft `GetUtcNow()` auf. Im Programm ist das `TimeProvider.System`. Im Test übergebe ich einen `FakeTimeProvider` mit einer Startzeit und lasse die Zeit mit `Advance` vergehen. So prüfe ich Grenzen sofort, ohne zu warten."
+    },
+    {
+      "id": "m14-l11-q11",
+      "lesson": "m14-l11",
+      "type": "explain",
+      "question": "Transferfrage: Wo in SecLog hängt Code noch von der Uhrzeit ab, und wie würdest du ihn testen?",
+      "modelAnswer": "Eine Regel „5 Fehlversuche in 10 Minuten“ vergleicht Zeitpunkte. Sie bekommt die Zeitpunkte aus den Ereignissen. Soll sie auch „jetzt“ nutzen, übergebe ich einen `TimeProvider`. Im Test starte ich einen `FakeTimeProvider` mit der Zeit des fünften Fehlversuchs und prüfe den Fall nach 10 und nach 11 Minuten."
+    },
+    {
+      "id": "m14-l12-q1",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Was prüft `Assert.Throws<ArgumentNullException>(() => check.Require(null))`?",
+      "options": [
+        {
+          "text": "Dass der Aufruf eine `ArgumentNullException` wirft. Das Ergebnis ist die Exception, die du weiter prüfen kannst.",
+          "correct": true
+        },
+        {
+          "text": "Dass der Aufruf `null` zurückgibt.",
+          "feedback": "`Throws` prüft eine Exception, keinen Rückgabewert."
+        },
+        {
+          "text": "Dass der Aufruf keine Exception wirft.",
+          "feedback": "Das Gegenteil: Der Test schlägt fehl, wenn keine Exception kommt."
+        }
+      ],
+      "explanation": "`Assert.Throws<T>` führt den Lambda-Ausdruck aus, erwartet genau diesen Typ und gibt die Exception zurück. So prüfst du danach `ParamName`, `Message` und andere Eigenschaften."
+    },
+    {
+      "id": "m14-l12-q2",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "`Require(null)` wirft eine `ArgumentNullException`. Was meldet der Test im Programm?",
+      "example": "m14/l12/quiz-throws-exact.snippet.cs",
+      "options": [
+        {
+          "text": "Er schlägt fehl: `Assert.Throws` verlangt den genauen Typ `ArgumentException`, die Exception ist aber eine abgeleitete Klasse.",
+          "correct": true
+        },
+        {
+          "text": "Er besteht, weil `ArgumentNullException` von `ArgumentException` erbt.",
+          "feedback": "`Assert.Throws<T>` akzeptiert keine abgeleiteten Typen. Dafür gibt es `ThrowsAny<T>`.",
+          "misconception": "m14-l12-throws-accepts-derived-type"
+        },
+        {
+          "text": "Er bricht mit einem Compilerfehler ab.",
+          "feedback": "Der Code kompiliert. Der Fehlschlag kommt erst zur Laufzeit."
+        }
+      ],
+      "explanation": "`Throws<T>` prüft den exakten Typ. Eine abgeleitete Exception führt zum Fehlschlag mit der Meldung, der Typ sei kein exakter Treffer."
+    },
+    {
+      "id": "m14-l12-q3",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Der Test soll jede `ArgumentException` akzeptieren, auch abgeleitete. Was schreibst du?",
+      "options": [
+        {
+          "text": "`Assert.ThrowsAny<ArgumentException>(…)`",
+          "correct": true
+        },
+        {
+          "text": "`Assert.Throws<Exception>(…)`",
+          "feedback": "Das wäre erst recht ein exakter Treffer auf `Exception` und würde `ArgumentException` ablehnen."
+        },
+        {
+          "text": "`Assert.NotThrows<ArgumentException>(…)`",
+          "feedback": "Diese Methode prüft das Gegenteil und passt nicht."
+        }
+      ],
+      "explanation": "`ThrowsAny<T>` akzeptiert `T` und alle davon abgeleiteten Typen. `Throws<T>` nur genau `T`."
+    },
+    {
+      "id": "m14-l12-q4",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Wie prüfst du, dass die Exception die richtige Eigenschaft `LineNumber` hat?",
+      "options": [
+        {
+          "text": "Du speicherst die Rückgabe von `Assert.Throws<InvalidLogLineException>(…)` und prüfst `exception.LineNumber`.",
+          "correct": true
+        },
+        {
+          "text": "Du fängst die Exception mit `catch` im Test und gibst die Zeilennummer aus.",
+          "feedback": "Das prüft nichts. Der Test würde auch ohne Exception bestehen."
+        },
+        {
+          "text": "`Assert.Throws` kann nur den Typ prüfen, nie Eigenschaften.",
+          "feedback": "Die Methode gibt die Exception zurück, damit du Eigenschaften prüfen kannst."
+        }
+      ],
+      "explanation": "Der Rückgabewert von `Assert.Throws<T>` ist die geworfene Exception. Daran prüfst du `LineNumber`, `Message` und `InnerException`."
+    },
+    {
+      "id": "m14-l12-q5",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Welche Signatur hat ein asynchroner xUnit-Test?",
+      "options": [
+        {
+          "text": "`public async Task Name()`",
+          "correct": true
+        },
+        {
+          "text": "`public async void Name()`",
+          "feedback": "xUnit v3 unterstützt `async void` nicht mehr. Der Analyzer meldet einen Build-Fehler.",
+          "misconception": "m14-l12-async-void-test-is-ok"
+        },
+        {
+          "text": "`public Task<void> Name()`",
+          "feedback": "`Task<void>` gibt es nicht. Ohne Wert heißt der Typ `Task`."
+        }
+      ],
+      "explanation": "Ein asynchroner Test gibt `Task` (oder `ValueTask`) zurück. Dann wartet xUnit auf das Ende. Bei `async void` gäbe es nichts, worauf xUnit warten kann."
+    },
+    {
+      "id": "m14-l12-q6",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Ein Test ruft `Assert.ThrowsAsync<…>(…)` ohne `await` auf. Was passiert?",
+      "options": [
+        {
+          "text": "Die Prüfung wird nicht abgewartet. Der Test kann bestehen, obwohl die Ausnahme ausbleibt.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler lehnt den Aufruf immer ab.",
+          "feedback": "Der Aufruf kompiliert. Ein Analyzer warnt aber vor der fehlenden Wartezeit."
+        },
+        {
+          "text": "Der Aufruf blockiert den Test, bis die Ausnahme kommt.",
+          "feedback": "Ohne `await` blockiert nichts. Die Methode läuft weiter."
+        }
+      ],
+      "explanation": "Ohne `await` läuft der Test an der Prüfung vorbei. Ein falsch positives Ergebnis ist möglich."
+    },
+    {
+      "id": "m14-l12-q7",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Warum nimmst du `ThrowsAnyAsync<OperationCanceledException>` statt `ThrowsAsync<OperationCanceledException>`, wenn `Task.Delay` mit einem abgebrochenen Token läuft?",
+      "options": [
+        {
+          "text": "`Task.Delay` wirft eine `TaskCanceledException`. Das ist eine abgeleitete Klasse, die `ThrowsAsync` nicht als exakten Treffer zählt.",
+          "correct": true
+        },
+        {
+          "text": "`ThrowsAsync` funktioniert nicht mit abgebrochenen Tokens.",
+          "feedback": "Es funktioniert, aber nur mit dem exakten Typ."
+        },
+        {
+          "text": "`OperationCanceledException` ist eine Struktur.",
+          "feedback": "Sie ist eine Klasse."
+        }
+      ],
+      "explanation": "Die tatsächlich geworfene Klasse ist `TaskCanceledException`. `ThrowsAnyAsync<OperationCanceledException>` akzeptiert sie, weil sie von `OperationCanceledException` erbt."
+    },
+    {
+      "id": "m14-l12-q8",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Wozu dient `TestContext.Current.CancellationToken` in xUnit v3?",
+      "options": [
+        {
+          "text": "Du übergibst es an Methoden, die ein `CancellationToken` nehmen. xUnit löst es aus, wenn der Test abgebrochen wird, etwa durch ein Zeitlimit.",
+          "correct": true
+        },
+        {
+          "text": "Es bricht jeden Test sofort ab.",
+          "feedback": "Es wird nur ausgelöst, wenn der Test oder der Lauf abgebrochen wird."
+        },
+        {
+          "text": "Es ersetzt `await` in Tests.",
+          "feedback": "`await` bleibt nötig. Das Token ist nur ein Signal."
+        }
+      ],
+      "explanation": "Das Token des Testkontexts hilft, dass ein hängender Test früher endet. Ein xUnit-Analyzer weist auf Aufrufe hin, die kein Token bekommen."
+    },
+    {
+      "id": "m14-l12-q9",
+      "lesson": "m14-l12",
+      "type": "single",
+      "question": "Welche Werte prüft der Test für eine fehlerhafte Logzeile in SecLog neben dem Typ der Exception?",
+      "options": [
+        {
+          "text": "`LineNumber` und `Message`, bei einem ungültigen Zeitstempel auch `InnerException`.",
+          "correct": true
+        },
+        {
+          "text": "Nur die Länge der Zeile.",
+          "feedback": "Die Länge steht nicht in der Exception."
+        },
+        {
+          "text": "Die Uhrzeit des Aufrufs.",
+          "feedback": "Die Exception speichert keine Uhrzeit."
+        }
+      ],
+      "explanation": "`InvalidLogLineException` trägt die Zeilennummer, die Meldung und bei einem Formatfehler die ursprüngliche `FormatException`."
+    },
+    {
+      "id": "m14-l12-q10",
+      "lesson": "m14-l12",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie du testest, dass Code die richtige Exception wirft, und wie du asynchronen Code testest.",
+      "modelAnswer": "Für Exceptions nutze ich `Assert.Throws<T>` mit einem Lambda. Es prüft den genauen Typ und gibt die Exception zurück, an der ich Message und Eigenschaften prüfe. Für abgeleitete Typen nehme ich `ThrowsAny<T>`. Asynchrone Tests haben die Signatur `async Task`, rufen die Methode mit `await` auf und prüfen danach. Für Exceptions in asynchronem Code gibt es `ThrowsAsync` und `ThrowsAnyAsync`, die ich ebenfalls abwarte."
+    },
+    {
+      "id": "m14-l12-q11",
+      "lesson": "m14-l12",
+      "type": "explain",
+      "question": "Transferfrage: Welchen Fehlerfall in SecLog hast du noch nicht getestet, und wie würdest du ihn prüfen?",
+      "modelAnswer": "Den Fall, dass `Incident.Status` einen unbekannten Wert bekommt. Der Setter wirft eine `ArgumentException`. Ich prüfe mit `Assert.Throws<ArgumentException>`, dass `incident.Status = \"unknown\"` die Exception wirft, und prüfe danach, dass der alte Status erhalten bleibt."
     }
   ]
 }
