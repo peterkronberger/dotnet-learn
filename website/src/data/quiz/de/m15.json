@@ -1,4 +1,457 @@
 {
   "module": "m15",
-  "questions": []
+  "questions": [
+    {
+      "id": "m15-l01-q1",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Welche Abhängigkeit hat die Klasse `AlertService` im Programm?",
+      "example": "m15/l01/tight-coupling.cs",
+      "options": [
+        {
+          "text": "`ConsoleSender`: `AlertService` benutzt die Klasse und erzeugt sie selbst mit `new`.",
+          "correct": true
+        },
+        {
+          "text": "Die Variable `service` in der ersten Zeile.",
+          "feedback": "`service` ist eine Variable des aufrufenden Codes. `AlertService` benutzt sie nicht."
+        },
+        {
+          "text": "Keine: `AlertService` ruft nur Methoden auf, die zu ihm selbst gehören.",
+          "feedback": "`AlertService` ruft `sender.Send(…)` auf. Diese Methode gehört zu `ConsoleSender`, also zu etwas, das nicht zu `AlertService` gehört."
+        }
+      ],
+      "explanation": "Eine Abhängigkeit ist etwas, das ein Stück Code benutzt und das nicht zu ihm gehört. `AlertService` ruft `Send` von `ConsoleSender` auf und erzeugt das Objekt dafür selbst."
+    },
+    {
+      "id": "m15-l01-q2",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Was ist am Feld `private readonly ConsoleSender sender = new();` in `AlertService` ein Nachteil?",
+      "example": "m15/l01/tight-coupling.cs",
+      "options": [
+        {
+          "text": "`AlertService` ist fest an die Klasse `ConsoleSender` gebunden. Ein anderer Sender oder ein Test-Double geht nur, wenn du `AlertService` änderst.",
+          "correct": true
+        },
+        {
+          "text": "`new` ist in einem Feld nicht erlaubt, der Code kompiliert nicht.",
+          "feedback": "Der Code kompiliert und läuft. Das Problem ist die feste Bindung, kein Fehler des Compilers."
+        },
+        {
+          "text": "`readonly` verhindert, dass `Send` aufgerufen wird.",
+          "feedback": "`readonly` verbietet nur, das Feld neu zu belegen. Der Aufruf von `Send` ist erlaubt."
+        }
+      ],
+      "explanation": "Wer die Abhängigkeit mit `new` selbst erzeugt, legt den konkreten Typ fest. Jede Änderung des Typs verlangt eine Änderung der Klasse, und ein Test kann die Abhängigkeit nicht ersetzen."
+    },
+    {
+      "id": "m15-l01-q3",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Wie bekommt `AlertService` seinen Sender im Programm?",
+      "example": "m15/l01/constructor-injection.cs",
+      "options": [
+        {
+          "text": "Als Parameter seines Konstruktors, mit dem Typ des Interfaces `IAlertSender`.",
+          "correct": true
+        },
+        {
+          "text": "Er erzeugt ihn selbst mit `new ConsoleSender()`.",
+          "feedback": "Das tat die Klasse in der ersten Version. Hier steht kein `new` in `AlertService`."
+        },
+        {
+          "text": "Aus einer statischen Variable, die irgendwo im Programm gesetzt wird.",
+          "feedback": "Es gibt keine statische Variable. Der Sender kommt als Konstruktorparameter."
+        }
+      ],
+      "explanation": "Das ist Constructor Injection: Die Klasse nennt ihre Abhängigkeit als Parameter des Konstruktors, und der Code, der das Objekt erzeugt, übergibt sie."
+    },
+    {
+      "id": "m15-l01-q4",
+      "lesson": "m15-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m15/l01/constructor-injection.cs",
+      "explanation": "`first` bekommt den `ConsoleSender`, `second` den `PrefixSender`. Beide Objekte sind vom Typ `AlertService`, nur die übergebene Abhängigkeit unterscheidet sich."
+    },
+    {
+      "id": "m15-l01-q5",
+      "lesson": "m15-l01",
+      "type": "cloze",
+      "question": "Ergänze die Stellen, an denen der Code die Objekte zusammensetzt und der Konstruktor die Abhängigkeit speichert.",
+      "example": "m15/l01/constructor-injection.cs",
+      "blanks": [
+        {
+          "text": "IAlertSender",
+          "hint": "Welcher Typ lässt sich später austauschen?",
+          "wrongAnswers": [
+            {
+              "text": "ConsoleSender",
+              "feedback": "Das läuft auch, bindet die Variable aber an die Klasse. Mit dem Interface bleibt der Typ austauschbar."
+            }
+          ]
+        },
+        {
+          "text": "new(console)",
+          "accept": [
+            "new(console)",
+            "newAlertService(console)"
+          ],
+          "hint": "Der Konstruktor bekommt den Sender als Argument."
+        },
+        {
+          "text": "this.sender",
+          "hint": "Der Konstruktor speichert den Parameter im Feld."
+        }
+      ],
+      "explanation": "Die Variable hat den Typ des Interfaces, das Objekt entsteht mit `new(console)`, und der Konstruktor legt den Parameter im Feld `sender` ab."
+    },
+    {
+      "id": "m15-l01-q6",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Dependency Injection gibt es nur mit einem Framework oder Container.“ Stimmt das?",
+      "options": [
+        {
+          "text": "Ja, ohne Container kann eine Klasse ihre Abhängigkeiten nicht von außen bekommen.",
+          "feedback": "Der Konstruktor von `AlertService` im Beispiel nimmt den Sender ohne jeden Container entgegen. Das ist Dependency Injection von Hand.",
+          "misconception": "m15-l01-di-needs-container"
+        },
+        {
+          "text": "Nein: Wenn dein Code die Abhängigkeit selbst im Konstruktor übergibt, ist das schon Dependency Injection.",
+          "correct": true
+        },
+        {
+          "text": "Nein, aber nur in Tests. Im Programm braucht man immer einen Container.",
+          "feedback": "Auch im Programm geht es von Hand. Ein Container nimmt dir später nur die Arbeit ab, die Objekte zusammenzusetzen.",
+          "misconception": "m15-l01-di-needs-container"
+        }
+      ],
+      "explanation": "Dependency Injection ist ein Entwurfsmuster: Abhängigkeiten kommen von außen, über den Konstruktor. Ein Container ist ein Werkzeug, das diese Arbeit automatisiert. Er kommt in der nächsten Lektion."
+    },
+    {
+      "id": "m15-l01-q7",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "`IAlertSender` hat bisher nur die Implementierung `ConsoleSender`. Warum ist der Interface-Parameter trotzdem sinnvoll?",
+      "options": [
+        {
+          "text": "Ein Interface mit nur einer Implementierung bringt nichts. Es macht den Code nur länger.",
+          "feedback": "Der Nutzen zeigt sich beim Test: Der Test übergibt ein Double statt `ConsoleSender`. Auch eine zweite Implementierung später verlangt dann keine Änderung an `AlertService`.",
+          "misconception": "m15-l01-interface-no-benefit"
+        },
+        {
+          "text": "`AlertService` kennt nur den Vertrag. Ein Test kann ein Double übergeben, und eine zweite Implementierung verlangt später keine Änderung an `AlertService`.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler verlangt für jeden Konstruktorparameter ein Interface.",
+          "feedback": "Ein Konstruktorparameter darf jeden Typ haben. Das Interface ist eine Entscheidung für den Entwurf."
+        }
+      ],
+      "explanation": "Der Aufwand ist ein Interface mit einer Methode und ein Parameter. Dafür hängt die Klasse nur vom Vertrag ab und lässt sich testen, ohne die echte Implementierung zu benutzen."
+    },
+    {
+      "id": "m15-l01-q8",
+      "lesson": "m15-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über den Composition Root stimmen?",
+      "options": [
+        {
+          "text": "Es ist die Stelle im Programm, an der die Objekte erzeugt und verbunden werden, meist am Anfang von `Program.cs`.",
+          "correct": true
+        },
+        {
+          "text": "Klassen wie `AlertService` rufen dort `new` nicht auf. Sie bekommen ihre Abhängigkeiten übergeben.",
+          "correct": true
+        },
+        {
+          "text": "Es ist eine Klasse, die genau `CompositionRoot` heißen muss.",
+          "feedback": "Der Name einer Klasse ist egal. Gemeint ist eine Stelle im Code, kein festgelegter Typ."
+        },
+        {
+          "text": "Jede Klasse braucht ihren eigenen Composition Root.",
+          "feedback": "Es gibt eine einzige Stelle für das ganze Programm."
+        }
+      ],
+      "explanation": "Der Composition Root sammelt alle `new`-Aufrufe der Anwendung an einer Stelle. Die übrigen Klassen kennen nur Interfaces."
+    },
+    {
+      "id": "m15-l01-q9",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Wie prüft ein Test, welche Nachricht `AlertService` gesendet hat, ohne dass etwas auf der Konsole erscheint?",
+      "options": [
+        {
+          "text": "Er übergibt ein Objekt wie `RecordingSender`, das die Nachrichten in einer Liste sammelt, und liest die Liste danach.",
+          "correct": true
+        },
+        {
+          "text": "Er liest die Ausgabe der Konsole mit.",
+          "feedback": "Das geht, ist aber umständlich und von der Konsole abhängig. Mit einem Double entfällt beides."
+        },
+        {
+          "text": "Gar nicht: Ein `AlertService` mit einer Abhängigkeit lässt sich nicht testen.",
+          "feedback": "Gerade durch die Übergabe im Konstruktor lässt sich die Abhängigkeit ersetzen."
+        }
+      ],
+      "explanation": "Weil `AlertService` den Sender im Konstruktor bekommt, übergibt der Test ein Test-Double. Das ist ein Spy: Er merkt sich, was er bekommen hat."
+    },
+    {
+      "id": "m15-l01-q10",
+      "lesson": "m15-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m15/l01/recording-sender.cs",
+      "explanation": "Zwei Aufrufe von `Raise` legen zwei Texte in die Liste. `Messages[0]` ist der erste Text. Auf der Konsole erscheint nur, was das Programm selbst ausgibt."
+    },
+    {
+      "id": "m15-l01-q11",
+      "lesson": "m15-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Constructor Injection ist und warum eine Klasse ihre Abhängigkeit nicht mit `new` erzeugen sollte.",
+      "modelAnswer": "Bei Constructor Injection nennt die Klasse ihre Abhängigkeit als Parameter des Konstruktors, am besten als Interface. Wer das Objekt erzeugt, übergibt die Abhängigkeit.\n\nErzeugt die Klasse sie mit `new` selbst, ist sie an einen konkreten Typ gebunden. Ein anderer Typ oder ein Test-Double geht dann nur, wenn man die Klasse ändert."
+    },
+    {
+      "id": "m15-l01-q12",
+      "lesson": "m15-l01",
+      "type": "explain",
+      "question": "Transferfrage: Welche Klasse in einem eigenen Programm erzeugt heute eine Abhängigkeit selbst mit `new`, und wie würdest du sie umbauen?",
+      "modelAnswer": "Zum Beispiel eine Klasse, die selbst eine Datei öffnet, auf die Konsole schreibt oder die Uhr liest. Ich würde ein kleines Interface für diese Aufgabe schreiben, es als Konstruktorparameter nehmen und die konkrete Klasse nur im Composition Root erzeugen."
+    },
+    {
+      "id": "m15-l02-q1",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Was liefert `provider.GetService<UnregisteredSender>()`, wenn `UnregisteredSender` nicht registriert ist?",
+      "options": [
+        {
+          "text": "`null`",
+          "correct": true
+        },
+        {
+          "text": "Es wirft eine `InvalidOperationException`.",
+          "feedback": "Das macht `GetRequiredService`. `GetService` meldet einen fehlenden Service mit `null`.",
+          "misconception": "m15-l02-getservice-throws"
+        },
+        {
+          "text": "Ein neues `UnregisteredSender`-Objekt, das der Container selbst mit `new` erzeugt.",
+          "feedback": "Der Container erzeugt nur Typen, die registriert sind.",
+          "misconception": "m15-l02-container-finds-types"
+        }
+      ],
+      "explanation": "`GetService<T>()` gibt `null` zurück, wenn es keinen Service dieses Typs gibt. `GetRequiredService<T>()` wirft in diesem Fall eine `InvalidOperationException`."
+    },
+    {
+      "id": "m15-l02-q2",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Welche Methode benutzt du im Normalfall, wenn dein Code den Service unbedingt braucht, und warum?",
+      "options": [
+        {
+          "text": "`GetRequiredService<T>()`: Fehlt die Registrierung, scheitert der Aufruf sofort mit einer verständlichen Exception.",
+          "correct": true
+        },
+        {
+          "text": "`GetService<T>()`: Das Ergebnis ist nie `null`.",
+          "feedback": "`GetService<T>()` gibt bei einer fehlenden Registrierung `null` zurück. Das Ergebnis ist ein nullable Typ.",
+          "misconception": "m15-l02-getservice-throws"
+        },
+        {
+          "text": "Beide sind gleich. Es gibt keinen Unterschied bei einem fehlenden Service.",
+          "feedback": "Bei einem fehlenden Service gibt `GetService<T>()` `null` zurück, und `GetRequiredService<T>()` wirft eine Exception."
+        }
+      ],
+      "explanation": "Wer den Service braucht, wählt `GetRequiredService<T>()`. Der Fehler zeigt sich dann beim Holen und nicht erst später als `NullReferenceException`."
+    },
+    {
+      "id": "m15-l02-q3",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Es gibt zwei Registrierungen: erst `AddSingleton<IAlertSender, ConsoleSender>()`, dann `AddSingleton<IAlertSender, PrefixSender>()`. Was liefert `GetRequiredService<IAlertSender>()`?",
+      "options": [
+        {
+          "text": "Ein `PrefixSender`: Bei einer einzelnen Anfrage gilt die zuletzt registrierte Implementierung.",
+          "correct": true
+        },
+        {
+          "text": "Ein `ConsoleSender`: Die erste Registrierung gilt.",
+          "feedback": "Bei einer einzelnen Anfrage gewinnt die letzte Registrierung."
+        },
+        {
+          "text": "Eine Exception, weil ein Interface nur eine Registrierung haben darf.",
+          "feedback": "Mehrere Registrierungen für dasselbe Interface sind erlaubt."
+        }
+      ],
+      "explanation": "Die letzte Registrierung überschreibt die vorherige bei einer einzelnen Anfrage. Mit `IEnumerable<IAlertSender>` bekommst du alle, in der Reihenfolge der Registrierung."
+    },
+    {
+      "id": "m15-l02-q4",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Wie bekommt ein Konstruktor alle registrierten Implementierungen von `IAlertSender`?",
+      "options": [
+        {
+          "text": "Mit dem Parameter `IEnumerable<IAlertSender> senders`.",
+          "correct": true
+        },
+        {
+          "text": "Gar nicht: Pro Interface liefert der Container immer nur eine Implementierung.",
+          "feedback": "Mit `IEnumerable<T>` als Parameter oder mit `GetServices<T>()` bekommst du alle."
+        },
+        {
+          "text": "Mit `TryAddSingleton`.",
+          "feedback": "`TryAddSingleton` gehört zur Registrierung. Es registriert nur, wenn noch nichts registriert ist."
+        }
+      ],
+      "explanation": "Der Container füllt einen `IEnumerable<T>`-Parameter mit allen Registrierungen von `T`, in der Reihenfolge, in der du sie eingetragen hast."
+    },
+    {
+      "id": "m15-l02-q5",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "`TryAddSingleton<IAlertSender, PrefixSender>()` steht nach `AddSingleton<IAlertSender, ConsoleSender>()`. Was bewirkt der Aufruf?",
+      "options": [
+        {
+          "text": "Nichts: Für `IAlertSender` gibt es schon eine Registrierung.",
+          "correct": true
+        },
+        {
+          "text": "Er ersetzt die vorhandene Registrierung.",
+          "feedback": "`TryAdd…` ändert nie eine vorhandene Registrierung."
+        },
+        {
+          "text": "Er fügt eine zweite Registrierung hinzu.",
+          "feedback": "Das macht `AddSingleton`. `TryAdd…` fügt nur hinzu, wenn es noch keine Registrierung gibt."
+        }
+      ],
+      "explanation": "`TryAdd…` registriert nur, wenn für den Service-Typ noch keine Implementierung eingetragen ist. Bibliotheken nutzen das für Standardwerte, die der Anwender überschreiben darf."
+    },
+    {
+      "id": "m15-l02-q6",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Wie wählt ein Konstruktorparameter den Service mit dem Schlüssel `\"prefix\"` aus?",
+      "options": [
+        {
+          "text": "Mit dem Attribut `[FromKeyedServices(\"prefix\")]` vor dem Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Mit `[Key(\"prefix\")]` vor der Klasse.",
+          "feedback": "Dieses Attribut gibt es hier nicht. Der Schlüssel gehört an den Parameter und heißt `FromKeyedServices`."
+        },
+        {
+          "text": "Mit `new PrefixSender()` im Konstruktor.",
+          "feedback": "Das wäre wieder eine fest verdrahtete Abhängigkeit."
+        }
+      ],
+      "explanation": "`FromKeyedServices` ist ein Attribut (Lektion „Attribute“ in Modul 14), das an einem Konstruktorparameter steht. Registriert wird der Service mit `AddKeyedSingleton<…>(\"prefix\")`."
+    },
+    {
+      "id": "m15-l02-q7",
+      "lesson": "m15-l02",
+      "type": "multi",
+      "question": "Welche Aussagen über `ServiceCollection` und `ServiceProvider` stimmen?",
+      "options": [
+        {
+          "text": "In der `ServiceCollection` trägst du Registrierungen ein. Sie erzeugt selbst noch keine Objekte.",
+          "correct": true
+        },
+        {
+          "text": "`BuildServiceProvider()` macht aus den Registrierungen den Container.",
+          "correct": true
+        },
+        {
+          "text": "Der `ServiceProvider` findet Implementierungen eines Interfaces von selbst, auch ohne Registrierung.",
+          "feedback": "Der Container kennt nur, was registriert ist. Für ein Interface ohne Registrierung gibt es keinen Service.",
+          "misconception": "m15-l02-container-finds-types"
+        },
+        {
+          "text": "`GetService<T>()` wirft bei einem fehlenden Service immer eine Exception.",
+          "feedback": "Das macht `GetRequiredService<T>()`. `GetService<T>()` gibt `null` zurück.",
+          "misconception": "m15-l02-getservice-throws"
+        }
+      ],
+      "explanation": "Erst registrieren, dann bauen, dann holen: Die Collection sammelt, der Provider erzeugt."
+    },
+    {
+      "id": "m15-l02-q8",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "`AlertService` hat den Konstruktor `AlertService(IAlertSender sender)`. Beide Typen sind registriert. Was passiert bei `GetRequiredService<AlertService>()`?",
+      "options": [
+        {
+          "text": "Der Container erkennt den Konstruktorparameter, erzeugt den Sender nach der Registrierung und übergibt ihn.",
+          "correct": true
+        },
+        {
+          "text": "Du musst den Sender vorher selbst mit `new` bauen und dem Container geben.",
+          "feedback": "Der Container löst Konstruktorparameter selbst auf, wenn die Typen registriert sind."
+        },
+        {
+          "text": "Der Container ruft den parameterlosen Konstruktor auf.",
+          "feedback": "`AlertService` hat keinen. Der Container nimmt den Konstruktor, dessen Parameter er füllen kann."
+        }
+      ],
+      "explanation": "Der Container erzeugt die ganze Kette: `AlertService` braucht `IAlertSender`, die Registrierung nennt `ConsoleSender`, also erzeugt er diesen und übergibt ihn."
+    },
+    {
+      "id": "m15-l02-q9",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "Wozu dient `services.AddSingleton<IAlertSender>(sp => new PrefixSender(\"[ALERT]\"))`?",
+      "options": [
+        {
+          "text": "Die Lambda erzeugt das Objekt selbst. So kannst du dem Konstruktor feste Argumente mitgeben.",
+          "correct": true
+        },
+        {
+          "text": "Sie ruft den Sender bei jeder Nachricht auf.",
+          "feedback": "Die Lambda ist eine Fabrik: Sie erzeugt das Objekt. Der Sender wird erst bei `Send` benutzt."
+        },
+        {
+          "text": "Sie prüft, ob `IAlertSender` registriert ist.",
+          "feedback": "Dafür gibt es `GetService<T>()`. Die Lambda erzeugt ein Objekt."
+        }
+      ],
+      "explanation": "Eine Registrierung mit Lambda (Factory) bekommt den `IServiceProvider` und gibt das Objekt zurück. Das ist nützlich für Konstruktorparameter wie ein Präfix, die der Container nicht selbst kennt."
+    },
+    {
+      "id": "m15-l02-q10",
+      "lesson": "m15-l02",
+      "type": "single",
+      "question": "In SecLog fragt `Program.cs` den Container nach `LogReaderFactory`. Woher bekommt die Factory den `IReportWriter`?",
+      "options": [
+        {
+          "text": "Der Container übergibt ihn, weil `IReportWriter` registriert ist und die Factory ihn im Konstruktor verlangt.",
+          "correct": true
+        },
+        {
+          "text": "Die Factory erzeugt einen `ConsoleReportWriter` selbst mit `new`.",
+          "feedback": "Dann wäre sie wieder an den konkreten Typ gebunden. Die Factory bekommt den Writer über ihren Konstruktor."
+        },
+        {
+          "text": "`Program.cs` übergibt den Writer bei jedem Aufruf von `Create`.",
+          "feedback": "`Create` bekommt nur Name und Zeilen. Den Writer bringt der Konstruktor mit."
+        }
+      ],
+      "explanation": "Die Factory nennt ihre Abhängigkeit im Konstruktor. Der Container löst sie über die Registrierung `AddSingleton<IReportWriter, ConsoleReportWriter>()` auf."
+    },
+    {
+      "id": "m15-l02-q11",
+      "lesson": "m15-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein DI-Container einen `AlertService` erzeugt: Was registrierst du, was baust du, und was löst der Container selbst auf?",
+      "modelAnswer": "Zuerst registrierst du in einer `ServiceCollection`, welcher Typ für welches Interface erzeugt wird. `BuildServiceProvider()` baut daraus den Container.\n\nMit `GetRequiredService<AlertService>()` fragst du ihn nach dem Objekt. Der Container schaut auf den Konstruktor, sieht, dass er einen `IAlertSender` braucht, erzeugt ihn nach der Registrierung und übergibt ihn."
+    },
+    {
+      "id": "m15-l02-q12",
+      "lesson": "m15-l02",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du mehrere Implementierungen eines Interfaces registrieren, und wann brauchst du dafür einen Schlüssel?",
+      "modelAnswer": "Zum Beispiel mehrere Benachrichtigungswege (Konsole, Datei, Netzwerk) hinter einem Interface. Soll ein Service alle benutzen, nimmt er `IEnumerable<T>`. Soll er genau einen bestimmten Weg benutzen, registriere ich die Wege mit Schlüsseln und wähle am Parameter mit `[FromKeyedServices(\"…\")]`."
+    }
+  ]
 }

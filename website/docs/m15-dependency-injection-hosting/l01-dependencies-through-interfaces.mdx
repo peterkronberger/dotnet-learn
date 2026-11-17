@@ -1,0 +1,212 @@
+---
+title: Abhängigkeiten über Interfaces
+sidebar_position: 1
+description: Warum new in einer Klasse ihre Abhängigkeit fest verdrahtet, wie Constructor Injection sie von außen übergibt und wo alle Objekte zusammengesetzt werden.
+lesson_id: m15-l01
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import tightCoupling from '!!raw-loader!@site/examples/m15/l01/tight-coupling.cs';
+import tightCouplingOutput from '!!raw-loader!@site/examples/m15/l01/tight-coupling.out.txt';
+import constructorInjection from '!!raw-loader!@site/examples/m15/l01/constructor-injection.cs';
+import constructorInjectionOutput from '!!raw-loader!@site/examples/m15/l01/constructor-injection.out.txt';
+import recordingSender from '!!raw-loader!@site/examples/m15/l01/recording-sender.cs';
+import gapRoot from '!!raw-loader!@site/examples/m15/l01/gap-composition-root.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l01/seclog-program-block.snippet.cs';
+import reportWriter from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/src/SecLog.Core/Model/IReportWriter.cs';
+import logSourceReader from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/src/SecLog.Core/Model/LogSourceReader.cs';
+import consoleReportWriter from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/src/SecLog.Cli/ConsoleReportWriter.cs';
+import reportSpy from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/tests/SecLog.Tests/Doubles/ReportSpy.cs';
+import readerTests from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/tests/SecLog.Tests/LogSourceReaderTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m15-l01/expected.out.txt';
+
+export const readerLines = seclogOutput.split('\n').filter((line) => line.startsWith('Reader closed') || line.startsWith('Failures in web') || line.startsWith('Failures in vpn:') || line.startsWith('End of the block')).join('\n');
+export const readerResults = seclogOutput.split('\n').filter((line) => line.includes('LogSourceReaderTests')).join('\n');
+
+# Abhängigkeiten über Interfaces
+
+:::note[Lernziele]
+- Du erklärst, was eine <Term id="dependency">Abhängigkeit</Term> ist und warum `new` in einer Klasse sie fest verdrahtet.
+- Du kannst eine Abhängigkeit als Interface über den Konstruktor übergeben (<Term id="constructor-injection">Constructor Injection</Term>).
+- Du kannst alle Objekte an einer Stelle zusammensetzen (<Term id="composition-root">Composition Root</Term>).
+- Du erklärst, warum eine übergebene Abhängigkeit Tests einfacher macht.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+SecLog …
+- bekommt seine Dienste über Dependency Injection, statt sie selbst zu erzeugen,
+- protokolliert, was es tut, mit strukturiertem Logging,
+- liest Schwellenwerte (zum Beispiel 5 Versuche in 10 Minuten) aus der Konfiguration statt aus dem Code,
+- läuft als Anwendung im Generic Host.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l10-q1" />
+
+<Quiz id="m14-l10-q5" />
+
+<Quiz id="m08-l05-q4" />
+
+## Das Problem: `new` in der Klasse
+
+Eine Klasse, die ein anderes Objekt benutzt, hat eine Abhängigkeit. Im Beispiel braucht `AlertService` einen `ConsoleSender`, um eine Nachricht zu senden. Die Klasse erzeugt ihn selbst mit `new`.
+
+<CSharpRunner code={tightCoupling} />
+
+<CodeBlock language="text" title="Ausgabe">{tightCouplingOutput}</CodeBlock>
+
+Das Programm läuft, aber `AlertService` ist jetzt fest mit `ConsoleSender` verdrahtet. Drei Dinge folgen daraus:
+
+1. Soll die Nachricht in eine Datei statt auf die Konsole gehen, musst du `AlertService` ändern.
+2. Braucht `ConsoleSender` selbst etwas, muss `AlertService` es besorgen. Der Aufbau der Objekte verteilt sich über viele Klassen.
+3. Ein Test kann den Sender nicht ersetzen. Jeder Test von `AlertService` schreibt auf die Konsole.
+
+<Quiz id="m15-l01-q1" />
+
+<Quiz id="m15-l01-q2" />
+
+## Die Lösung: die Abhängigkeit von außen übergeben
+
+Die Lösung hat zwei Teile. Erstens sagt `AlertService` nicht mehr, **welche** Klasse er braucht, sondern nur, **was** sie können muss: Er verlangt ein Interface (Modul 8). Zweitens erzeugt er das Objekt nicht selbst. Er nimmt es als Parameter seines Konstruktors entgegen und speichert es im Feld. Wer das `AlertService`-Objekt erzeugt, übergibt die Abhängigkeit. Das heißt <Term id="dependency-injection">Dependency Injection</Term> (DI, Abhängigkeiten übergeben), und diese Form heißt Constructor Injection.
+
+Die Objekte werden an einer einzigen Stelle zusammengesetzt, am Anfang von `Program.cs`. Diese Stelle heißt Composition Root. Alle anderen Klassen rufen `new` für ihre Abhängigkeiten nicht auf.
+
+Dahinter steckt eine Idee, die <Term id="inversion-of-control">Inversion of Control</Term> (Umkehr der Steuerung) heißt: Die Klasse bestimmt nicht mehr selbst, welche Abhängigkeit sie benutzt. Der Code, der sie erzeugt, entscheidet.
+
+:::info[Vorhersage]
+Das Programm erzeugt zwei `AlertService`-Objekte mit verschiedenen Sendern. Was geben die zwei Aufrufe von `Raise` aus? Notiere deinen Tipp für jede Zeile und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={constructorInjection} expected={constructorInjectionOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `SEND: bob failed 5 times` und danach `[ALERT] dave failed 3 times`. Die Erklärung folgt den Schritten, die du bei jeder Constructor Injection brauchst:
+
+1. **Vertrag festlegen:** `IAlertSender` beschreibt, was ein Sender kann: `Send(string text)`.
+2. **Abhängigkeit als Parameter nennen:** Der Konstruktor von `AlertService` verlangt einen `IAlertSender` und speichert ihn im Feld `sender`. In der Klasse steht kein `new` für den Sender.
+3. **Objekte zusammensetzen:** Am Anfang des Programms entstehen `ConsoleSender`, `PrefixSender` und die beiden `AlertService`-Objekte. Das ist der Composition Root.
+4. **Benutzen:** `Raise` ruft `sender.Send(…)` auf. Welche Klasse dahinter steckt, weiß `AlertService` nicht.
+
+**Was passiert, wenn …** du `first` einen `PrefixSender` übergibst? Dann gibt die erste Zeile `[ALERT] bob failed 5 times` aus, und du hast `AlertService` nicht geändert.
+
+</details>
+
+<Quiz id="m15-l01-q3" />
+
+<Quiz id="m15-l01-q4" />
+
+<details>
+<summary>Vertiefung: Dependency Inversion (optional)</summary>
+
+Ohne Interface hängt `AlertService` im Quelltext von `ConsoleSender` ab. Mit Interface hängen beide vom Interface ab: `AlertService` benutzt es, `ConsoleSender` setzt es um. Die Abhängigkeit zeigt vom Detail zur Abstraktion. Dieses Prinzip heißt Dependency Inversion, und Dependency Injection ist die Praxis, die dadurch möglich wird ([Architectural principles: Dependency inversion](https://learn.microsoft.com/dotnet/architecture/modern-web-apps-azure/architectural-principles#dependency-inversion)). Ein weiteres Prinzip dort: Eine Klasse nennt in ihrem Konstruktor alles, was sie zum Arbeiten braucht (Explicit Dependencies).
+
+</details>
+
+## Die Abhängigkeit im Test ersetzen
+
+In Modul 14 hast du Test-Doubles von Hand geschrieben. Jetzt siehst du, warum das geht: `AlertService` nimmt jeden `IAlertSender`, also auch einen, der die Nachrichten nur sammelt.
+
+<CSharpRunner code={recordingSender} />
+
+Der `RecordingSender` ist ein Spy. Im Programm erscheint keine `SEND:`-Zeile, und `recorder.Messages` enthält trotzdem beide Texte. Ein Unit-Test würde genau das prüfen, ohne die Konsole zu benutzen.
+
+<Quiz id="m15-l01-q9" />
+
+<Quiz id="m15-l01-q10" />
+
+## Gap-Beispiel: Objekte zusammensetzen
+
+Die Reihenfolge im Composition Root hat drei Schritte. Die Lücken `___` fehlen.
+
+<CodeBlock language="csharp" title="gap-composition-root.snippet.cs">{gapRoot}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Zeile lautet `AlertService service = new(sender);`. Statt des Zieltyps kannst du auch `new AlertService(sender)` schreiben.
+
+</details>
+
+<Quiz id="m15-l01-q5" />
+
+<Quiz id="m15-l01-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l12/`) hat Regeln, Detektor, Parser und Tests. Die Klasse `LogSourceReader` schreibt beim Schließen selbst auf die Konsole (`Console.WriteLine`). Das ist eine fest verdrahtete Abhängigkeit.
+
+**Neue Anforderung:** `LogSourceReader` bekommt ein neues Interface `IReportWriter` über den Konstruktor und schreibt nur noch dorthin. In `SecLog.Cli` entsteht der Composition Root als gekennzeichneter Block in `Program.cs`. Die Ausgabe des Programms bleibt gleich. Die Tests erzeugen die Klasse weiter direkt mit `new` und übergeben einen Spy.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={reportWriter} title="src/SecLog.Core/Model/IReportWriter.cs" />
+
+<FoldedCode code={logSourceReader} title="src/SecLog.Core/Model/LogSourceReader.cs" />
+
+<FoldedCode code={consoleReportWriter} title="src/SecLog.Cli/ConsoleReportWriter.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+<FoldedCode code={reportSpy} title="tests/SecLog.Tests/Doubles/ReportSpy.cs" />
+
+<FoldedCode code={readerTests} title="tests/SecLog.Tests/LogSourceReaderTests.cs" />
+
+1. **Vertrag schreiben:** `IReportWriter` hat eine Methode `WriteLine`.
+2. **Abhängigkeit im Konstruktor:** `LogSourceReader` nimmt den Writer entgegen, speichert ihn und ruft ihn in `DisposeAsync` auf.
+3. **Konsolen-Implementierung:** `ConsoleReportWriter` setzt das Interface um und schreibt auf die Konsole.
+4. **Composition Root:** In `Program.cs` entstehen Writer und Leser am Anfang des Blocks. Der Rest des Programms benutzt die fertigen Objekte.
+5. **Tests:** Ein `ReportSpy` merkt sich die Zeilen. Ein neuer Test prüft, dass `DisposeAsync` „Reader closed: sample“ schreibt.
+
+Die Ausgabe des Programms bleibt unverändert:
+
+<CodeBlock language="text" title="Ausgabe des Programms (Ausschnitt)">{readerLines}</CodeBlock>
+
+Die Tests des Lesers:
+
+<CodeBlock language="text" title="Ausgabe der Tests">{readerResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l01/`) übergibt dem `LogSourceReader` seinen Writer von außen und setzt die Objekte in einem Block zusammen. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l12/` nur durch `IReportWriter`, den geänderten Konstruktor von `LogSourceReader`, `ConsoleReportWriter`, den Composition-Root-Block in `Program.cs`, `ReportSpy` und die geänderten Tests von `LogSourceReader`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l01-di-needs-container" />
+
+**„Dependency Injection gibt es nur mit einem Container.“** Das stimmt nicht. Sobald eine Klasse ihre Abhängigkeit im Konstruktor entgegennimmt und der aufrufende Code sie übergibt, ist das Dependency Injection von Hand. Ein Container, den du in der nächsten Lektion kennenlernst, nimmt dir nur die Arbeit ab, die Objekte zusammenzusetzen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l01-interface-no-benefit" />
+
+**„Ein Interface mit nur einer Implementierung bringt nichts.“** Das stimmt nicht. Der Nutzen zeigt sich, sobald eine zweite Implementierung nötig wird: im Test (ein Spy statt der Konsole) oder später im Betrieb (eine Datei statt der Konsole). Dann ändert sich nur der Composition Root, nicht die Klasse.
+:::
+
+## Zusammenfassung
+
+Eine Klasse, die ihre Abhängigkeit mit `new` selbst erzeugt, ist an einen konkreten Typ gebunden. Bei Constructor Injection nennt sie die Abhängigkeit als Interface-Parameter ihres Konstruktors, und der aufrufende Code übergibt sie. Die Objekte setzt ein Composition Root am Anfang des Programms zusammen. Für einen Test übergibst du ein Test-Double. Dafür brauchst du keinen Container und keine Bibliothek.
+
+## Prüfe dein Wissen
+
+<Quiz id="m15-l01-q6" />
+
+<Quiz id="m15-l01-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l01-q11" />
+
+### Transferfrage
+
+<Quiz id="m15-l01-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dependency injection (Überblick)](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview)
+- Microsoft Learn: [Dependency injection guidelines](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines)

@@ -1,0 +1,6 @@
+[ALERT] one sender requested
+SEND: every registered sender
+[ALERT] every registered sender
+[ALERT] One: bob failed 5 times
+SEND: All: dave failed 3 times
+[ALERT] All: dave failed 3 times
