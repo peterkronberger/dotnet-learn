@@ -26,6 +26,7 @@
       "id": "m14-l01-q2",
       "lesson": "m14-l01",
       "type": "single",
+      "placement": true,
       "question": "Was stimmt über eine dateibasierte App?",
       "options": [
         {
@@ -575,6 +576,7 @@
       "id": "m14-l04-q1",
       "lesson": "m14-l04",
       "type": "single",
+      "placement": true,
       "question": "SecLog soll auf einem Server laufen, auf dem keine .NET-Laufzeit installiert ist. Auf dem Server soll auch nichts installiert werden. Welche Option passt?",
       "options": [
         {
@@ -865,7 +867,9 @@
       "type": "find-bug",
       "question": "Das Programm gibt `Failures in total: 8` aus, erwartet sind 9. Welche Zeile ist die Ursache?",
       "example": "m14/l05/find-the-bug.cs",
-      "bugLines": [9],
+      "bugLines": [
+        9
+      ],
       "lineFeedback": {
         "8": {
           "feedback": "`sum` muss bei 0 beginnen. Das ist richtig."
@@ -967,6 +971,10 @@
       "id": "m14-l05-q8",
       "lesson": "m14-l05",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m14-l03"
+      ],
       "question": "Du willst ein Programm mit dem Debugger untersuchen. Warum nimmst du dafür den Debug-Build und nicht den Release-Build?",
       "options": [
         {
@@ -1076,6 +1084,7 @@
       "id": "m14-l06-q5",
       "lesson": "m14-l06",
       "type": "single",
+      "placement": true,
       "question": "`Trace` trägt `[Conditional(\"TRACE_STEPS\")]`, das Symbol ist nicht definiert. Der Code ruft `Trace(Next())` auf, und `Next()` zählt einen Zähler hoch. Was passiert?",
       "options": [
         {
@@ -1129,7 +1138,9 @@
       "type": "find-bug",
       "question": "Der Build bricht mit dem Fehler CS0592 ab. Welche Zeile ist die Ursache?",
       "example": "_ci/m14-l06-diagnostics/wrong-target.snippet.cs",
-      "bugLines": [1],
+      "bugLines": [
+        1
+      ],
       "explanation": "`AuthorAttribute` erlaubt mit `AttributeTargets.Method` nur Methoden. `[Author(\"Dana\")]` steht aber an einer Klasse."
     },
     {
@@ -1354,7 +1365,9 @@
       "type": "find-bug",
       "question": "Eines der beiden Tests im Programm wird nie ausgeführt. Welche Zeile ist die Ursache?",
       "example": "m14/l07/quiz-missing-fact.snippet.cs",
-      "bugLines": [8],
+      "bugLines": [
+        8
+      ],
       "lineFeedback": {
         "1": {
           "feedback": "Hier steht `[Fact]`. Diese Methode läuft als Test."
@@ -1369,6 +1382,10 @@
       "id": "m14-l07-q10",
       "lesson": "m14-l07",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m14-l02"
+      ],
       "question": "Das Testprojekt verweist auf `SecLog.Core`. `FailedLoginRule` ist dort eine Klasse ohne Zugriffsmodifizierer, also `internal`. Was passiert beim Bauen des Testprojekts?",
       "options": [
         {
@@ -1881,6 +1898,10 @@
       "id": "m14-l10-q7",
       "lesson": "m14-l10",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m14-l09"
+      ],
       "question": "Welche Abhängigkeit ersetzt du im Unit-Test durch ein Double?",
       "options": [
         {
@@ -2062,6 +2083,10 @@
       "id": "m14-l11-q8",
       "lesson": "m14-l11",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m14-l08"
+      ],
       "question": "Das Fenster beträgt 10 Minuten, und `IsActive` prüft mit `<=`. Welche zwei Zeitpunkte nach dem Fehler prüft ein guter Grenztest?",
       "options": [
         {
@@ -2289,6 +2314,7 @@
       "id": "m14-l12-q9",
       "lesson": "m14-l12",
       "type": "single",
+      "placement": true,
       "question": "Welche Werte prüft der Test für eine fehlerhafte Logzeile in SecLog neben dem Typ der Exception?",
       "options": [
         {

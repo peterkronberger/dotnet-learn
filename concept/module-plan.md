@@ -443,14 +443,19 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
 
 ### M14 Testen (testing) ◻
 xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. The test runner output is produced in CI (S2).
-- *(new)* Lesson "From the playground to a project" (first lessons of the module): the SDK and the `dotnet` CLI, file-based apps (one `.cs` file, .NET 10; since the .NET 11 SDK also `#:include` to split an app across files) as the bridge from the playground, SDK-style project file (target framework, nullable, implicit usings, warnings as errors), solutions and project references, NuGet package references, build configurations, assemblies (link `internal` from M6).
-- *(new)* Lesson "Build and run": the difference between build and publish; build configurations (Debug vs. Release, what changes); the ways to start a program – `dotnet run` (project or single file), the apphost executable, `dotnet <app>.dll`; runtime version roll-forward to the newest installed patch (framework-dependent only).
-- *(new)* Lesson "Publishing options" (decision table): framework-dependent (needs an installed runtime, small) incl. the cross-platform DLL without apphost; self-contained (runtime included, platform-specific, patches only through a new build); runtime identifiers (target OS and architecture); single-file; ReadyToRun (faster startup, larger files); Native AOT (no JIT, no installed runtime, but limited library compatibility, longer builds, one build per platform; must be set in the project file); trimming (smaller self-contained output, risk of removed code); container images directly from the SDK (.NET 8 SDK and newer, no Dockerfile needed; a container runtime is needed to run them). For each option: how the result is started.
-- *(new)* Lesson "Using a debugger" (breakpoints, stepping, watching variables; tool-neutral, ◻).
-- *(new)* Lesson "Attributes" (▶ possible: obsolete warnings, caller info) – needed for `[Fact]`, ASP.NET Core and EF Core.
-- *(new)* Lesson "Test doubles": hand-written fakes first; mocking libraries only by name.
-- *(new)* Lesson "Testing time-dependent code" (time provider abstraction and its fake; SecLog time windows).
-- *(new)* Testing exceptions and async code.
+- Lessons as built (12, folder `website/docs/m14-testing/`):
+  - `m14-l01` Vom Playground zum Projekt: SDK, `dotnet` CLI, file-based apps (`#:` directives, `#:include`), project file (target framework, nullable, implicit usings, warnings as errors), `#nullable`.
+  - `m14-l02` Solutions, Projektverweise und NuGet-Pakete: solution, project reference, package reference, assembly, `internal` (link from M6).
+  - `m14-l03` Bauen und Ausführen: build vs. publish, Debug vs. Release, `#if`/`#define`, `dotnet run`, apphost, `dotnet <app>.dll`, roll-forward.
+  - `m14-l04` Veröffentlichungsoptionen (decision table): framework-dependent, self-contained, RID, single-file, ReadyToRun, trimming, Native AOT, container images.
+  - `m14-l05` Einen Debugger benutzen (◻, tool-neutral): breakpoints, stepping, variables, call stack. No SecLog step.
+  - `m14-l06` Attribute (▶ possible): parameters, targets, `[Obsolete]`, `[Conditional]`, caller info, own attribute class.
+  - `m14-l07` Unit-Tests mit xUnit: `[Fact]`, `Assert`, Arrange-Act-Assert, `dotnet test`, xUnit v3, VSTest vs. MTP.
+  - `m14-l08` Datengetriebene Tests mit [Theory]: `[Theory]`, `[InlineData]`, `[MemberData]`, boundary values.
+  - `m14-l09` Testbarer Code: pure methods, input as parameters, code coverage.
+  - `m14-l10` Test-Doubles: hand-written stub, spy and fake; mocking libraries only by name.
+  - `m14-l11` Zeitabhängigen Code testen: `TimeProvider`, `FakeTimeProvider`, SecLog time windows.
+  - `m14-l12` Exceptions und asynchronen Code testen: `Assert.Throws`, `ThrowsAsync`, async tests.
 - **Spec:**
   - §22: attribute classes, attribute usage, positional and named parameters, attribute targets, reserved attributes (conditional, obsolete, caller info attributes, attribute usage).
   - §6: preprocessing directives – only conditional compilation symbols (Debug/Release), the nullable directive and the directives of file-based apps; nothing else.
@@ -483,7 +488,14 @@ Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.
     - `lock` vs. `Interlocked` vs. `volatile` (`m13-l12`, `m13-l14`)
     - concurrency vs. parallelism vs. asynchrony (`m13-l09`)
   - Misconception ids: m13-l01-async-starts-new-thread, m13-l02-await-blocks-thread, m13-l09-async-is-multithreading, m13-l12-lock-protects-unlocked-access, m13-l14-volatile-makes-thread-safe
-- **M14**: Filled by the module review of M14.
+- **M14** (from `module-digest.md` `## M14`):
+  - Concepts:
+    - `Assert.Throws<T>` (exact type) vs. `catch` (also derived types) (`m14-l12`, `m07-l03`)
+    - `async Task` test vs. `async void` (`m14-l12`, `m13-l08`)
+    - `ThrowsAsync` with `await` vs. without (`m14-l12`, `m13-l03`)
+    - `ThrowsAnyAsync<OperationCanceledException>` vs. `ThrowsAsync`; test cancellation token vs. `CancellationTokenSource` (`m14-l12`, `m13-l05`)
+    - `FakeTimeProvider.Advance` vs. waiting with `Task.Delay`/`WaitAsync` (`m14-l11`, `m13-l04`)
+  - Misconception ids: m14-l12-throws-accepts-derived-type, m14-l12-async-void-test-is-ok, m14-l11-test-must-wait-window, m14-l11-fake-time-provider-changes-system-clock
 - ▶/◻: M12 and M13 part A are runnable. M13 part B and M14 are ◻ (reading tasks without a runner).
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 

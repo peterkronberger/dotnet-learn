@@ -99,7 +99,7 @@ Was passiert, wenn du `[Author("Dana")]` vor ein Feld setzt? Der Compiler meldet
 
 ## Obsolete
 
-`[Obsolete("Text")]` markiert ein Element als veraltet. Jede Verwendung löst eine Warnung des Compilers aus, die den Text enthält.
+<Term id="obsolete-attribute">`[Obsolete("Text")]`</Term> markiert ein Element als veraltet. Jede Verwendung löst eine Warnung des Compilers aus, die den Text enthält.
 
 <CodeBlock language="csharp" title="obsolete-warning.snippet.cs">{obsoleteWarning}</CodeBlock>
 
@@ -117,7 +117,7 @@ Der Parameter `error: true` macht daraus einen Fehler. Der Build bricht dann ab:
 
 ## Conditional
 
-`[Conditional("SYMBOL")]` an einer Methode macht sie zu einer bedingten Methode (Symbole für bedingte Kompilierung kennst du aus Lektion 3). Der Compiler übernimmt einen Aufruf nur, wenn das Symbol **an der Aufrufstelle** definiert ist. Sonst entfällt der Aufruf samt seiner Argumente.
+<Term id="conditional-attribute">`[Conditional("SYMBOL")]`</Term> an einer Methode macht sie zu einer bedingten Methode (Symbole für bedingte Kompilierung kennst du aus Lektion 3). Der Compiler übernimmt einen Aufruf nur, wenn das Symbol **an der Aufrufstelle** definiert ist. Sonst entfällt der Aufruf samt seiner Argumente.
 
 :::info[Vorhersage]
 `TRACE_STEPS` ist definiert, `VERBOSE_STEPS` nicht. Was gibt das Programm aus, und wie oft läuft `Next()`?
