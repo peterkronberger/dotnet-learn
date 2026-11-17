@@ -1,0 +1,8 @@
+Scope 1
+  singleton: id 1, same: True
+  scoped: id 1, same: True
+  transient: ids 1/2, same: False
+Scope 2
+  singleton: id 1, same: True
+  scoped: id 2, same: True
+  transient: ids 3/4, same: False

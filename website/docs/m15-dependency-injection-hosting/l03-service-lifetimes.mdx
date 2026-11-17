@@ -1,0 +1,209 @@
+---
+title: Lebensdauern von Services
+sidebar_position: 3
+description: Wie lange eine Instanz lebt, bestimmt der Container – Singleton, Scoped und Transient, Scopes mit CreateScope und wann der Container Dispose aufruft.
+lesson_id: m15-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import lifetimes from '!!raw-loader!@site/examples/_ci/m15-l03-lifetimes/Program.cs';
+import lifetimesOutput from '!!raw-loader!@site/examples/_ci/m15-l03-lifetimes/expected.out.txt';
+import disposal from '!!raw-loader!@site/examples/_ci/m15-l03-disposal/Program.cs';
+import disposalOutput from '!!raw-loader!@site/examples/_ci/m15-l03-disposal/expected.out.txt';
+import gapLifetimes from '!!raw-loader!@site/examples/m15/l03/gap-lifetimes.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l03/seclog-program-block.snippet.cs';
+import failureCounter from '!!raw-loader!@site/examples/_ci/seclog-m15-l03/src/SecLog.Cli/FailureCounter.cs';
+import failureMatcher from '!!raw-loader!@site/examples/_ci/seclog-m15-l03/src/SecLog.Cli/FailureMatcher.cs';
+import analysisRun from '!!raw-loader!@site/examples/_ci/seclog-m15-l03/src/SecLog.Cli/AnalysisRun.cs';
+
+# Lebensdauern von Services
+
+:::note[Lernziele]
+- Du kannst die <Term id="service-lifetime">Lebensdauern</Term> <Term id="singleton-lifetime">Singleton</Term>, <Term id="scoped-lifetime">Scoped</Term> und <Term id="transient-lifetime">Transient</Term> unterscheiden und vorhersagen, wann der Container eine neue Instanz erzeugt.
+- Du kannst mit `CreateScope` einen <Term id="service-scope">Scope</Term> anlegen und Services daraus holen.
+- Du erklärst, wann der Container `Dispose` aufruft und welche Objekte er nicht entsorgt.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l02-q1" />
+
+<Quiz id="m15-l02-q8" />
+
+<Quiz id="m07-l08-q1" />
+
+<Quiz id="m07-l08-q5" />
+
+## Der Container entscheidet, wie lange eine Instanz lebt
+
+In der letzten Lektion hat jedes Beispiel `AddSingleton` benutzt. Das war eine Entscheidung, die du nicht gesehen hast: Mit der Registrierung legst du auch fest, wie lange eine Instanz lebt und wann der Container eine neue erzeugt. Diese Festlegung heißt Lebensdauer (Service Lifetime). Es gibt drei:
+
+| Lebensdauer | Registrierung | Der Container erzeugt eine neue Instanz … |
+| --- | --- | --- |
+| Singleton | `AddSingleton` | einmal pro Provider, bei der ersten Anfrage. Danach bekommen alle dieselbe. |
+| Scoped | `AddScoped` | einmal pro Scope. |
+| Transient | `AddTransient` | bei jeder Anfrage. |
+
+Ein **Scope** ist eine Arbeitseinheit, die du mit `provider.CreateScope()` anlegst. Du holst die Services aus `scope.ServiceProvider` und gibst den Scope am Ende frei. Du kannst dir einen Scope als einen Durchlauf vorstellen, zum Beispiel die Analyse einer Datei. Auch `IServiceScope` ist `IDisposable`, darum steht `using` davor.
+
+<Forward concepts={['Web-Anfragen']} module="17" />
+
+Bei einer Web-Anwendung ist ein Scope normalerweise eine Anfrage. Dafür legt das Framework den Scope an. Das lernst du in Modul 17.
+
+:::info[Vorhersage]
+Das Programm registriert je einen Singleton-, einen Scoped- und einen Transient-Service. Jeder Service nummeriert seine Instanzen in der Reihenfolge, in der sie entstehen. Das Programm legt zwei Scopes an und holt in jedem Scope jeden Service zweimal. Es druckt die Nummer und ob beide Objekte dasselbe sind. Welche Ausgabe erwartest du? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={lifetimes} expected={lifetimesOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe hat acht Zeilen. Die Schritte:
+
+1. **Singleton:** Beide Scopes bekommen die Instanz mit der Nummer 1. Der Container hat sie einmal erzeugt, und alle teilen sie.
+2. **Scoped:** In Scope 1 ist es die Nummer 1, in Scope 2 die Nummer 2. Innerhalb eines Scopes liefern beide Anfragen dasselbe Objekt (`same: True`), ein neuer Scope bekommt ein neues.
+3. **Transient:** Jede Anfrage erzeugt ein neues Objekt. Darum zählen die Nummern 1 bis 4 weiter, und `same` ist immer `False`, auch innerhalb eines Scopes.
+
+**Was passiert, wenn …** du `AddScoped<ScopedService>()` durch `AddSingleton<ScopedService>()` ersetzt? Dann zeigt `scoped` in beiden Scopes die Nummer 1.
+
+</details>
+
+<details>
+<summary>Vertiefung: Wann entsteht ein Singleton? (optional)</summary>
+
+Der Container erzeugt ein Singleton bei der ersten Anfrage. Alternativ gibst du dem Container eine fertige Instanz: `AddSingleton(new ReadyResource())`. Jede weitere Anfrage bekommt dieselbe Instanz ([Service lifetimes: Singleton](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes#singleton)).
+
+</details>
+
+<Quiz id="m15-l03-q1" />
+
+<Quiz id="m15-l03-q2" />
+
+<Quiz id="m15-l03-q3" />
+
+## Welche Lebensdauer passt?
+
+Die Lebensdauer richtet sich danach, wer das Objekt teilen soll:
+
+- **Singleton** für Zustand, den alle teilen, zum Beispiel ein Zähler für das ganze Programm.
+- **Scoped** für den Zustand einer Arbeitseinheit: Alle Teile eines Durchlaufs benutzen dasselbe Objekt, der nächste Durchlauf beginnt neu.
+- **Transient** für kleine Helfer ohne Zustand. Ein neues Objekt kostet wenig, und niemand teilt es.
+
+<Quiz id="m15-l03-q6" />
+
+<Quiz id="m15-l03-q7" />
+
+## Wann ruft der Container Dispose auf?
+
+Der Container entsorgt die Objekte, die er selbst erzeugt hat und die `IDisposable` (oder `IAsyncDisposable`) umsetzen (Modul 7, Modul 13). Der Zeitpunkt hängt von der Lebensdauer ab:
+
+- **Scoped** und **Transient**: am Ende des Scopes, in dem sie angefragt wurden.
+- **Singleton**: wenn der Provider entsorgt wird, zum Beispiel am Ende des Programms.
+- **Fertige Objekte**, die du mit `AddSingleton(new …)` übergibst: gar nicht. Der Container hat sie nicht erzeugt, also bleibt der Code dafür verantwortlich, der sie erzeugt hat.
+
+Dein Code ruft `Dispose` auf Objekten, die der Container geliefert hat, nicht selbst auf ([Dependency injection guidelines: Disposal of services](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#disposal-of-services)).
+
+:::info[Vorhersage]
+Vier `IDisposable`-Klassen melden in `Dispose`, dass sie entsorgt wurden: ein Singleton, ein Scoped-Service, ein Transient-Service und ein fertiges Objekt, das mit `AddSingleton(new …)` registriert ist. Das Programm benutzt alle vier, schließt den Scope und entsorgt danach den Provider. In welcher Reihenfolge erscheinen die `disposed`-Zeilen, und welche fehlt? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={disposal} expected={disposalOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Scope noch offen:** Nach der Zeile `Resources used, scope still open` ist noch nichts entsorgt, obwohl der Code die Objekte nicht mehr braucht.
+2. **Scope schließen:** Beim Ende des `using`-Blocks entsorgt der Container die Objekte, die er in diesem Scope erzeugt hat: Transient und Scoped. (In dieser Ausgabe steht `transient` vor `scoped`. Auf die Reihenfolge verlässt du dich nicht.)
+3. **Provider entsorgen:** Erst `provider.Dispose()` entsorgt das Singleton.
+4. **Fertiges Objekt:** `disposed: ready object` erscheint nie. Der Container hat das Objekt nicht erzeugt.
+
+**Was passiert, wenn …** du das Singleton nur im Scope anfragst, nicht auf dem Provider? Es bleibt trotzdem ein Singleton und wird erst mit dem Provider entsorgt.
+
+</details>
+
+<Quiz id="m15-l03-q4" />
+
+<Quiz id="m15-l03-q5" />
+
+<details>
+<summary>Vertiefung: Transient und IDisposable (optional)</summary>
+
+Der Container hält jedes Transient-Objekt, das `IDisposable` umsetzt, bis sein Scope entsorgt wird, um es dann zu entsorgen. Holt der Code ein solches Objekt direkt aus dem Root-Provider, entsorgt der Container es erst mit dem Provider. Wer dort viele Objekte anfragt, hält sie alle im Speicher: eine Art Speicherleck. Die Richtlinien empfehlen deshalb, `IDisposable`-Objekte nicht als Transient zu registrieren, sondern eine Factory zu benutzen ([Dependency injection guidelines: Disposable transient services captured by container](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#disposable-transient-services-captured-by-container)).
+
+</details>
+
+## Gap-Beispiel: Lebensdauern wählen
+
+Die Lücken `___` fehlen. Setze für jede Zeile den Namen der passenden Registrierungsmethode ein.
+
+<CodeBlock language="csharp" title="gap-lifetimes.snippet.cs">{gapLifetimes}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die erste Lücke ist `AddSingleton`, die zweite `AddScoped` und die dritte `AddTransient`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l02/`) registriert `IReportWriter` und `LogReaderFactory` im Container, jeweils mit `AddSingleton`.
+
+**Neue Anforderung:** Jede Registrierung von SecLog bekommt bewusst eine Lebensdauer. Ein `TimeProvider` und der gemeinsame Fehlerzähler `FailureCounter` sind Singletons. Ein Analyselauf `AnalysisRun` mit eigenem Zustand ist Scoped und läuft in einem `CreateScope`-Block. Der kleine Helfer `FailureMatcher` ohne Zustand ist Transient. Die Ausgabe des Programms und die Tests bleiben unverändert.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={failureCounter} title="src/SecLog.Cli/FailureCounter.cs" />
+
+<FoldedCode code={failureMatcher} title="src/SecLog.Cli/FailureMatcher.cs" />
+
+<FoldedCode code={analysisRun} title="src/SecLog.Cli/AnalysisRun.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Singleton wählen:** `FailureCounter` zählt für das ganze Programm, darum gibt es genau eine Instanz. Das Gleiche gilt für den `TimeProvider`.
+2. **Scoped wählen:** `AnalysisRun` merkt sich die Fehler eines Laufs. Beide Aufrufe von `Analyze` im selben Scope benutzen dasselbe Objekt.
+3. **Transient wählen:** `FailureMatcher` hat keinen Zustand und wird bei jeder Anfrage neu erzeugt.
+4. **Scope anlegen:** `CreateScope` öffnet den Scope, `analysisScope.ServiceProvider` holt den `AnalysisRun`, und das `using` am Ende entsorgt den Scope.
+
+Die Tests erzeugen ihre Klassen weiterhin direkt mit `new`, ohne Container. Das ist ein Vorteil von DI: Eine Klasse mit Konstruktor lässt sich auch ohne Container benutzen.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l03/`) wählt für jede Registrierung eine Lebensdauer. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l02/` nur durch die drei neuen Klassen in `SecLog.Cli` und die geänderte Registrierung samt Scope-Block in `Program.cs`.
+
+<Quiz id="m15-l03-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l03-transient-disposed-immediately" />
+
+**„Ein Transient-Objekt wird sofort entsorgt, wenn ich es nicht mehr benutze.“** Das stimmt nicht. Der Container weiß nicht, wann dein Code fertig ist. Er hält das Objekt und ruft `Dispose` erst am Ende des Scopes auf (oder mit dem Provider, wenn du es dort angefragt hast). „Transient“ sagt nur, dass jede Anfrage ein neues Objekt bekommt.
+:::
+
+## Zusammenfassung
+
+Mit der Registrierung legst du die Lebensdauer fest: Ein Singleton entsteht einmal pro Provider, ein Scoped-Service einmal pro Scope, und ein Transient-Service bei jeder Anfrage. Einen Scope legst du mit `CreateScope` an, die Services holst du aus `scope.ServiceProvider`. Der Container entsorgt Objekte, die er erzeugt hat und die `IDisposable` umsetzen: Scoped und Transient am Ende des Scopes, Singletons mit dem Provider. Fertige Objekte entsorgt er nicht.
+
+## Prüfe dein Wissen
+
+<Quiz id="m15-l03-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l03-q10" />
+
+### Transferfrage
+
+<Quiz id="m15-l03-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Service lifetimes](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes)
+- Microsoft Learn: [Dependency injection guidelines](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines)

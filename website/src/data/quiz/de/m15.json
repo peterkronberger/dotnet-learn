@@ -452,6 +452,428 @@
       "type": "explain",
       "question": "Transferfrage: Wo in einem eigenen Programm würdest du mehrere Implementierungen eines Interfaces registrieren, und wann brauchst du dafür einen Schlüssel?",
       "modelAnswer": "Zum Beispiel mehrere Benachrichtigungswege (Konsole, Datei, Netzwerk) hinter einem Interface. Soll ein Service alle benutzen, nimmt er `IEnumerable<T>`. Soll er genau einen bestimmten Weg benutzen, registriere ich die Wege mit Schlüsseln und wähle am Parameter mit `[FromKeyedServices(\"…\")]`."
+    },
+    {
+      "id": "m15-l03-q1",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Ein Programm holt im selben Scope zweimal `GetRequiredService<T>()`. `T` ist als Transient registriert. Wie verhalten sich die beiden Objekte?",
+      "options": [
+        {
+          "text": "Es sind zwei verschiedene Objekte, weil der Container bei jeder Anfrage ein neues erzeugt.",
+          "correct": true
+        },
+        {
+          "text": "Es ist dasselbe Objekt, weil beide Anfragen im selben Scope stehen.",
+          "feedback": "Das gilt für Scoped. Transient erzeugt bei jeder Anfrage ein neues Objekt, auch im selben Scope."
+        },
+        {
+          "text": "Es ist dasselbe Objekt, weil der Container es nach der ersten Anfrage speichert.",
+          "feedback": "Das gilt für Singleton. Transient wird nicht wiederverwendet."
+        }
+      ],
+      "explanation": "Transient heißt: bei jeder Anfrage ein neues Objekt. Der Scope ändert daran nichts."
+    },
+    {
+      "id": "m15-l03-q2",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Ein Singleton wird in Scope 1 und danach in Scope 2 angefragt. Was stimmt?",
+      "options": [
+        {
+          "text": "Beide Scopes bekommen dieselbe Instanz.",
+          "correct": true
+        },
+        {
+          "text": "Jeder Scope bekommt eine eigene Instanz.",
+          "feedback": "Das gilt für Scoped. Ein Singleton gehört zum ganzen Provider, nicht zu einem Scope."
+        },
+        {
+          "text": "Scope 2 bekommt eine neue Instanz, weil Scope 1 schon beendet ist.",
+          "feedback": "Das Ende eines Scopes entsorgt kein Singleton. Es lebt, bis der Provider entsorgt wird."
+        }
+      ],
+      "explanation": "Ein Singleton entsteht einmal pro Provider (bei der ersten Anfrage) und wird von allen Scopes geteilt."
+    },
+    {
+      "id": "m15-l03-q3",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Ein Scoped-Service wird zweimal in Scope 1 und einmal in Scope 2 angefragt. Wie viele Instanzen entstehen?",
+      "options": [
+        {
+          "text": "Zwei: eine pro Scope.",
+          "correct": true
+        },
+        {
+          "text": "Drei: eine pro Anfrage.",
+          "feedback": "Das wäre Transient. Innerhalb eines Scopes bekommt jede Anfrage dieselbe Instanz."
+        },
+        {
+          "text": "Eine: für den ganzen Provider.",
+          "feedback": "Das wäre Singleton. Ein Scoped-Service gehört zu seinem Scope."
+        }
+      ],
+      "explanation": "Scoped heißt: eine Instanz pro Scope. Scope 1 hat eine, Scope 2 hat eine andere."
+    },
+    {
+      "id": "m15-l03-q4",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Eine `IDisposable`-Klasse ist als Transient registriert. Der Code holt sie in einem Scope, benutzt sie und läuft weiter. Wann ruft der Container `Dispose` auf?",
+      "options": [
+        {
+          "text": "Wenn der Scope entsorgt wird, in dem das Objekt angefragt wurde.",
+          "correct": true
+        },
+        {
+          "text": "Sofort, wenn der Code das Objekt nicht mehr benutzt.",
+          "feedback": "Der Container weiß nicht, wann der Code fertig ist. Er hält das Objekt und entsorgt es erst am Ende des Scopes.",
+          "misconception": "m15-l03-transient-disposed-immediately"
+        },
+        {
+          "text": "Nie, weil Transient-Objekte nicht zum Container gehören.",
+          "feedback": "Der Container hat das Objekt erzeugt, also entsorgt er es auch. Das Ende des Scopes löst das aus."
+        }
+      ],
+      "explanation": "Der Container hält Transient-Objekte, die `IDisposable` umsetzen, bis ihr Scope (oder der Provider) entsorgt wird. Erst dann ruft er `Dispose` auf, nicht direkt nach dem Benutzen."
+    },
+    {
+      "id": "m15-l03-q5",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Der Code ruft `services.AddSingleton(new ReadyResource())` auf, und `ReadyResource` setzt `IDisposable` um. Was passiert beim Entsorgen des Providers?",
+      "options": [
+        {
+          "text": "Der Container ruft `Dispose` nicht auf, weil er das Objekt nicht erzeugt hat.",
+          "correct": true
+        },
+        {
+          "text": "Der Container ruft `Dispose` auf, weil das Objekt ein Singleton ist.",
+          "feedback": "Der Container entsorgt nur, was er selbst erzeugt hat. Ein fertiges Objekt entsorgt der Code, der es erzeugt hat."
+        },
+        {
+          "text": "Der Container ruft `Dispose` sofort bei der Registrierung auf.",
+          "feedback": "Bei der Registrierung passiert nichts mit dem Objekt."
+        }
+      ],
+      "explanation": "Bei einer Registrierung mit fertigem Objekt hat der Container das Objekt nicht erzeugt. Er entsorgt es deshalb nicht."
+    },
+    {
+      "id": "m15-l03-q6",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Jeder Analyselauf von SecLog soll seinen eigenen Zustand haben, und alle Schritte eines Laufs sollen dasselbe Objekt benutzen. Welche Lebensdauer passt?",
+      "options": [
+        {
+          "text": "Scoped, mit einem Scope pro Lauf.",
+          "correct": true
+        },
+        {
+          "text": "Singleton, weil der Zustand nur einmal gebraucht wird.",
+          "feedback": "Ein Singleton würde den Zustand aller Läufe mischen."
+        },
+        {
+          "text": "Transient, weil jeder Lauf neu beginnt.",
+          "feedback": "Transient liefert bei jedem Schritt ein neues Objekt. Die Schritte eines Laufs würden den Zustand nicht teilen."
+        }
+      ],
+      "explanation": "Scoped gibt innerhalb eines Scopes immer dieselbe Instanz und in jedem neuen Scope eine neue."
+    },
+    {
+      "id": "m15-l03-q7",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "Ein Zähler soll die Fehlversuche aller Läufe des ganzen Programms zusammenzählen. Welche Lebensdauer passt?",
+      "options": [
+        {
+          "text": "Singleton.",
+          "correct": true
+        },
+        {
+          "text": "Scoped.",
+          "feedback": "Jeder Lauf hätte seinen eigenen Zähler. Die Summe über alle Läufe entstünde nicht."
+        },
+        {
+          "text": "Transient.",
+          "feedback": "Jede Anfrage bekäme einen neuen Zähler, der bei 0 beginnt."
+        }
+      ],
+      "explanation": "Zustand, den alle teilen, gehört in ein Singleton. Das Singleton muss dann auch threadsicher sein (nächste Lektion)."
+    },
+    {
+      "id": "m15-l03-q8",
+      "lesson": "m15-l03",
+      "type": "multi",
+      "question": "Welche Aussagen über Lebensdauern und Scopes stimmen?",
+      "options": [
+        {
+          "text": "`provider.CreateScope()` legt einen neuen Scope an, und `scope.ServiceProvider` holt die Services dieses Scopes.",
+          "correct": true
+        },
+        {
+          "text": "Das Entsorgen eines Scopes ruft `Dispose` auf den Scoped- und Transient-Objekten auf, die der Container in diesem Scope erzeugt hat.",
+          "correct": true
+        },
+        {
+          "text": "Das Entsorgen eines Scopes entsorgt auch die Singletons.",
+          "feedback": "Singletons gehören zum Provider. Sie werden entsorgt, wenn der Provider entsorgt wird."
+        },
+        {
+          "text": "Ein Transient-Objekt lebt genau so lange wie die Methode, die es angefragt hat.",
+          "feedback": "Der Container kennt Methoden nicht. Er hält das Objekt bis zum Ende des Scopes.",
+          "misconception": "m15-l03-transient-disposed-immediately"
+        }
+      ],
+      "explanation": "Ein Scope ist eine Arbeitseinheit. Scoped- und Transient-Objekte enden mit ihr, Singletons mit dem Provider."
+    },
+    {
+      "id": "m15-l03-q9",
+      "lesson": "m15-l03",
+      "type": "single",
+      "question": "In SecLog ist `FailureMatcher` als Transient registriert. Warum passt das?",
+      "options": [
+        {
+          "text": "Die Klasse hat keinen Zustand, ein neues Objekt kostet kaum etwas, und niemand teilt es.",
+          "correct": true
+        },
+        {
+          "text": "Weil Transient die einzige Lebensdauer ist, die Konstruktorparameter auflöst.",
+          "feedback": "Alle Lebensdauern lösen Konstruktorparameter auf."
+        },
+        {
+          "text": "Weil der Container Transient-Objekte nicht entsorgen muss.",
+          "feedback": "Der Container entsorgt auch Transient-Objekte, wenn sie `IDisposable` umsetzen."
+        }
+      ],
+      "explanation": "Ein kleiner Helfer ohne Zustand muss nicht geteilt werden. Transient ist dafür passend."
+    },
+    {
+      "id": "m15-l03-q10",
+      "lesson": "m15-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten die Unterschiede zwischen Singleton, Scoped und Transient. Wann erzeugt der Container jeweils eine neue Instanz?",
+      "modelAnswer": "Singleton: Der Container erzeugt eine Instanz bei der ersten Anfrage und gibt sie danach an alle weiter, bis der Provider entsorgt wird.\n\nScoped: Pro Scope gibt es eine Instanz. Wer im selben Scope anfragt, bekommt dasselbe Objekt, ein neuer Scope bekommt ein neues.\n\nTransient: Bei jeder Anfrage entsteht ein neues Objekt."
+    },
+    {
+      "id": "m15-l03-q11",
+      "lesson": "m15-l03",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm verarbeitet nacheinander viele Dateien. Welche Teile würdest du als Singleton, Scoped und Transient registrieren? Begründe jede Wahl kurz.",
+      "modelAnswer": "Singleton: alles, was alle Dateien teilen, zum Beispiel ein Zähler für die Gesamtzahl der Fehler oder ein `TimeProvider`.\n\nScoped: der Zustand einer einzelnen Datei, zum Beispiel ihre Zwischenergebnisse. Pro Datei ein Scope.\n\nTransient: kleine Helfer ohne Zustand, zum Beispiel ein Prüfer für eine Zeile."
+    },
+    {
+      "id": "m15-l04-q1",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "`Dashboard` ist ein Singleton und verlangt im Konstruktor einen `RequestInfo`, der als Scoped registriert ist. Wie heißt dieser Fehler?",
+      "options": [
+        {
+          "text": "Captive Dependency: Der langlebige Service hält den kurzlebigen fest.",
+          "correct": true
+        },
+        {
+          "text": "Circular Dependency: Zwei Services brauchen sich gegenseitig.",
+          "feedback": "Hier braucht nur `Dashboard` den `RequestInfo`. Das Problem sind die verschiedenen Lebensdauern."
+        },
+        {
+          "text": "Race Condition: Zwei Threads schreiben gleichzeitig.",
+          "feedback": "Das ist ein anderes Problem. Eine Race Condition hat mit gleichzeitigem Zugriff zu tun, nicht mit Lebensdauern."
+        }
+      ],
+      "explanation": "Eine Captive Dependency entsteht, wenn ein Service mit längerer Lebensdauer einen mit kürzerer Lebensdauer als Abhängigkeit hält."
+    },
+    {
+      "id": "m15-l04-q2",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Warum ist ein Singleton, das einen Scoped-Service im Konstruktor verlangt, ein Fehler?",
+      "options": [
+        {
+          "text": "Der Scoped-Service lebt dann so lange wie das Singleton und gehört nicht mehr zu seinem Scope.",
+          "correct": true
+        },
+        {
+          "text": "Der Container kann den Scoped-Service nicht erzeugen und wirft immer eine Exception.",
+          "feedback": "Ohne Validierung erzeugt der Container ihn ohne Fehlermeldung. Gerade das macht den Fehler gefährlich.",
+          "misconception": "m15-l04-singleton-may-use-scoped"
+        },
+        {
+          "text": "Der Scoped-Service wird dadurch zu einem Transient-Service.",
+          "feedback": "Er wird länger gehalten, nicht kürzer: Das Singleton behält ihn für seine ganze Lebensdauer."
+        }
+      ],
+      "explanation": "Das Singleton erzeugt seine Abhängigkeit einmal und behält sie. Der Scoped-Service verhält sich damit wie ein Singleton, auch wenn er als Scoped registriert ist."
+    },
+    {
+      "id": "m15-l04-q3",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Ein Kollege sagt: „Ein Singleton darf ruhig einen Scoped-Service benutzen, der Container erzeugt ihn ja richtig.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Das ist ein Fehler. Der Container erzeugt den Service zwar, aber das Singleton hält ihn länger als ein Scope dauert.",
+          "correct": true
+        },
+        {
+          "text": "Das stimmt, der Container passt die Lebensdauer des Scoped-Service automatisch an.",
+          "feedback": "Der Container ändert die Lebensdauer nicht. Das Singleton hält den Scoped-Service, solange es selbst lebt.",
+          "misconception": "m15-l04-singleton-may-use-scoped"
+        },
+        {
+          "text": "Das stimmt, wenn mindestens zwei Scopes existieren.",
+          "feedback": "Die Zahl der Scopes ändert nichts: Das Singleton bekommt seinen Scoped-Service nur einmal.",
+          "misconception": "m15-l04-singleton-may-use-scoped"
+        }
+      ],
+      "explanation": "Das Erzeugen ist nicht das Problem, sondern wie lange der Service gehalten wird."
+    },
+    {
+      "id": "m15-l04-q4",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Welche Einstellung findet Captive Dependencies schon beim Bauen des Providers, auch wenn der Service noch nie angefragt wurde?",
+      "options": [
+        {
+          "text": "`ValidateOnBuild = true`",
+          "correct": true
+        },
+        {
+          "text": "`ValidateScopes = true` allein",
+          "feedback": "`ValidateScopes` prüft beim Auflösen. Beim Bauen prüft `ValidateOnBuild`."
+        },
+        {
+          "text": "`GetRequiredService` statt `GetService`",
+          "feedback": "Das betrifft nur, ob ein fehlender Service eine Exception wirft."
+        }
+      ],
+      "explanation": "`ValidateOnBuild` prüft beim Bauen alle Registrierungen. `ValidateScopes` meldet Fehler, sobald ein Service aufgelöst wird."
+    },
+    {
+      "id": "m15-l04-q5",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Was macht `ValidateScopes = true`?",
+      "options": [
+        {
+          "text": "Der Container wirft eine `InvalidOperationException`, wenn ein Scoped-Service aus dem Root-Provider aufgelöst oder in ein Singleton eingefügt wird.",
+          "correct": true
+        },
+        {
+          "text": "Der Container macht alle Singletons threadsicher.",
+          "feedback": "Die Validierung prüft Lebensdauern. Sie ändert den Code der Services nicht.",
+          "misconception": "m15-l04-container-makes-singleton-thread-safe"
+        },
+        {
+          "text": "Der Container entsorgt alle Scopes automatisch am Ende des Programms.",
+          "feedback": "Das Entsorgen hat mit der Validierung nichts zu tun."
+        }
+      ],
+      "explanation": "Die Scope-Validierung findet Lebensdauer-Fehler: Scoped-Service aus dem Root-Provider und Scoped-Service in einem Singleton."
+    },
+    {
+      "id": "m15-l04-q6",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Der Container erzeugt ein Singleton für alle Aufrufer. Vier Tasks rufen gleichzeitig `counter.Add()` auf, und `Add` macht `total++`. Was stimmt?",
+      "options": [
+        {
+          "text": "Der Zähler kann Erhöhungen verlieren, weil `total++` nicht atomar ist. Du brauchst `Interlocked` oder `lock`.",
+          "correct": true
+        },
+        {
+          "text": "Der Container sorgt dafür, dass immer nur ein Task gleichzeitig `Add` ausführt.",
+          "feedback": "Der Container ist nur für das Erzeugen und Auflösen threadsicher. Der Zustand der Services ist deine Sache.",
+          "misconception": "m15-l04-container-makes-singleton-thread-safe"
+        },
+        {
+          "text": "Das ist sicher, weil jeder Task seinen eigenen Scope hat.",
+          "feedback": "Ein Singleton gehört nicht zum Scope. Alle Scopes teilen dieselbe Instanz.",
+          "misconception": "m15-l04-container-makes-singleton-thread-safe"
+        }
+      ],
+      "explanation": "Ein Singleton wird von allen Aufrufern gleichzeitig benutzt. Gemeinsamer veränderlicher Zustand braucht die Werkzeuge aus Modul 13."
+    },
+    {
+      "id": "m15-l04-q7",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "Das Programm zeigt, dass vier Worker je 1000-mal `Add()` aufrufen und `Total: 4000` ausgeben. Warum ist die Summe immer richtig?",
+      "options": [
+        {
+          "text": "`Add` benutzt `Interlocked.Increment`, das den Zähler atomar erhöht.",
+          "correct": true
+        },
+        {
+          "text": "Weil die Tasks nacheinander laufen.",
+          "feedback": "Die Tasks dürfen gleichzeitig laufen. Die Summe stimmt, weil `Add` atomar zählt."
+        },
+        {
+          "text": "Weil der Container jeden Aufruf mit einem `lock` schützt.",
+          "feedback": "Der Container schützt keine Aufrufe der Services."
+        }
+      ],
+      "explanation": "Die Atomarität kommt aus `Interlocked.Increment` im Service, nicht aus dem Container."
+    },
+    {
+      "id": "m15-l04-q8",
+      "lesson": "m15-l04",
+      "type": "multi",
+      "question": "Welche Kombinationen von Lebensdauern sind erlaubt (die Abhängigkeit hält höchstens so lange wie der Service)?",
+      "options": [
+        {
+          "text": "Ein Scoped-Service verlangt ein Singleton.",
+          "correct": true
+        },
+        {
+          "text": "Ein Transient-Service verlangt einen Scoped-Service (im selben Scope).",
+          "correct": true
+        },
+        {
+          "text": "Ein Singleton verlangt einen Scoped-Service.",
+          "feedback": "Das ist eine Captive Dependency: Das Singleton hält den Scoped-Service länger als sein Scope dauert."
+        },
+        {
+          "text": "Ein Singleton verlangt einen Transient-Service, den es für immer behält.",
+          "feedback": "Auch das ist problematisch: Das Transient-Objekt lebt dann so lange wie das Singleton."
+        }
+      ],
+      "explanation": "Ein Service darf nur von Services mit gleicher oder längerer Lebensdauer abhängen."
+    },
+    {
+      "id": "m15-l04-q9",
+      "lesson": "m15-l04",
+      "type": "single",
+      "question": "SecLog baut den Provider jetzt mit `ValidateScopes` und `ValidateOnBuild`. Wozu dient das?",
+      "options": [
+        {
+          "text": "Ein Lebensdauer-Fehler wie ein Singleton mit einem Scoped-Service fällt beim Bauen auf und nicht erst im Betrieb.",
+          "correct": true
+        },
+        {
+          "text": "Es beschleunigt das Auflösen der Services.",
+          "feedback": "Die Validierung kostet Zeit und beschleunigt nichts."
+        },
+        {
+          "text": "Es ersetzt die Tests, weil der Container das Programm prüft.",
+          "feedback": "Die Validierung prüft nur Lebensdauern, nicht die Logik des Programms."
+        }
+      ],
+      "explanation": "Die Validierung findet Fehler früh. Die Ausgabe von SecLog bleibt unverändert."
+    },
+    {
+      "id": "m15-l04-q10",
+      "lesson": "m15-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was eine Captive Dependency ist, warum sie ein Fehler ist und wie du sie findest.",
+      "modelAnswer": "Eine Captive Dependency entsteht, wenn ein Service mit langer Lebensdauer (zum Beispiel ein Singleton) einen Service mit kürzerer Lebensdauer (zum Beispiel Scoped) im Konstruktor verlangt. Das Singleton erzeugt ihn einmal und behält ihn, also lebt der Scoped-Service so lange wie das Singleton. Er gehört dann nicht mehr zu seinem Scope.\n\nIch finde den Fehler mit `ValidateScopes` und `ValidateOnBuild`: Der Container wirft eine `InvalidOperationException` mit einer Meldung, welcher Service welchen nicht benutzen darf."
+    },
+    {
+      "id": "m15-l04-q11",
+      "lesson": "m15-l04",
+      "type": "explain",
+      "question": "Transferfrage: Ein Singleton-Service speichert die zuletzt gesehenen Benutzernamen in einer `List<string>`, und viele Anfragen laufen gleichzeitig. Was ist das Problem, und wie löst du es?",
+      "modelAnswer": "Alle Anfragen teilen dieselbe Instanz, und `List<string>` ist nicht threadsicher. Gleichzeitiges Hinzufügen kann Daten verlieren oder die Liste beschädigen.\n\nIch schütze den Zugriff mit `lock` oder nehme eine threadsichere Sammlung wie `ConcurrentQueue<string>`."
     }
   ]
 }
