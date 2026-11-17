@@ -1,0 +1,206 @@
+---
+title: Testbarer Code
+sidebar_position: 9
+description: Logik von Ein- und Ausgabe trennen, Eingaben als Parameter übergeben und verstehen, was Testabdeckung aussagt und was nicht.
+lesson_id: m14-l09
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import hardToTest from '!!raw-loader!@site/examples/m14/l09/hard-to-test.cs';
+import hardToTestOutput from '!!raw-loader!@site/examples/m14/l09/hard-to-test.out.txt';
+import testableVersion from '!!raw-loader!@site/examples/m14/l09/testable-version.cs';
+import testableVersionOutput from '!!raw-loader!@site/examples/m14/l09/testable-version.out.txt';
+import gapPure from '!!raw-loader!@site/examples/m14/l09/gap-pure.snippet.cs';
+import alarmRule from '!!raw-loader!@site/examples/_ci/m14-l09-coverage/AlarmRule.cs';
+import alarmRuleTests from '!!raw-loader!@site/examples/_ci/m14-l09-coverage/AlarmRuleTests.cs';
+import coverageOutput from '!!raw-loader!@site/examples/_ci/m14-l09-coverage/expected.out.txt';
+import programBefore from '!!raw-loader!@site/examples/m14/l09/seclog-program-before.snippet.cs';
+import programAfter from '!!raw-loader!@site/examples/m14/l09/seclog-program-after.snippet.cs';
+import logParser from '!!raw-loader!@site/examples/_ci/seclog-m14-l09/src/SecLog.Core/Model/LogParser.cs';
+import logParserTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l09/tests/SecLog.Tests/LogParserTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l09/expected.out.txt';
+
+export const parserResults = seclogOutput.split('\n').filter((line) => line.includes('LogParserTests')).join('\n');
+
+# Testbarer Code
+
+:::note[Lernziele]
+- Du erkennst, warum eine Methode schwer zu testen ist (Konsole, Datei, statischer Zustand).
+- Du kannst Logik von Ein- und Ausgabe trennen.
+- Du kannst die Eingaben einer Methode als Parameter übergeben.
+- Du kannst erklären, was Testabdeckung aussagt und was nicht.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l07-q3" />
+
+<Quiz id="m14-l08-q5" />
+
+<Quiz id="m14-l06-q4" />
+
+## Wann Code schwer zu testen ist
+
+Ein Test ruft Code auf und prüft das Ergebnis. Das klappt gut, wenn der Code ein Ergebnis zurückgibt und seine Eingaben als Parameter bekommt. Es klappt schlecht, wenn
+
+- das Ergebnis nur auf der Konsole oder in einer Datei landet,
+- der Code seine Eingaben selbst holt, etwa mit `Console.ReadLine()` oder aus einer Datei,
+- der Code veränderlichen statischen Zustand benutzt (Modul 13, Lektion 15).
+
+Code, bei dem das nicht zutrifft, heißt <Term id="testable-code">testbarer Code</Term> (testable code). Du erkennst ihn an einer Eigenschaft: Ein Test braucht einen Aufruf und eine Prüfung.
+
+:::info[Vorhersage]
+Das Programm meldet drei fehlgeschlagene Logins nacheinander. Wann erscheint die Zeile mit `ALARM`, und wie würdest du `Record` mit einem Test prüfen?
+:::
+
+<CodeBlock language="csharp" title="hard-to-test.cs">{hardToTest}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{hardToTestOutput}</CodeBlock>
+
+1. **Zustand erkennen:** `failures` ist ein statisches Feld. Es behält seinen Wert zwischen den Aufrufen.
+2. **Ablauf verfolgen:** Die ersten beiden Aufrufe erhöhen es auf 2, der dritte auf 3. Erst dann gilt `failures >= 3`, und die Zeile erscheint genau einmal.
+3. **Prüfung suchen:** `Record` gibt nichts zurück. Das Ergebnis steht nur auf der Konsole, die ein Test schlecht abfragt.
+4. **Folge:** Der Wert von `failures` hängt davon ab, wie oft vorher irgendein Test `Record` aufgerufen hat. Ein Test hängt dadurch von anderen ab.
+
+Was passiert, wenn ein zweiter Test `Record` einmal aufruft? Er sieht den Zähler des ersten Tests und kann schon beim ersten Aufruf `ALARM` melden.
+
+</details>
+
+<Quiz id="m14-l09-q2" />
+
+<Quiz id="m14-l09-q7" />
+
+## Logik und Ein-/Ausgabe trennen
+
+Die Lösung: Das Ergebnis kommt als Rückgabewert, die Eingaben kommen als Parameter. Eine Methode, deren Ergebnis nur von ihren Parametern abhängt und die sonst nichts verändert, heißt <Term id="pure-method">reine Methode</Term> (pure method). Mit denselben Eingaben liefert sie immer dasselbe Ergebnis. Die Konsole oder die Datei bleibt außerhalb, am Rand des Programms.
+
+<CodeBlock language="csharp" title="testable-version.cs">{testableVersion}</CodeBlock>
+
+<CodeBlock language="text" title="Ausgabe">{testableVersionOutput}</CodeBlock>
+
+`CountFailures` nimmt die Ereignistypen als `IEnumerable<string>`. Woher sie kommen, ist ihr egal: aus einer Datei (Modul 7), aus dem Netzwerk oder aus einem Array im Test. `IsAlarm` bekommt die Schwelle als Parameter und hat nichts Verstecktes. Ein Test ruft `IsAlarm(3, 3)` auf und prüft `true`.
+
+Allgemein heißt das: Was Code von außen braucht, ist eine <Term id="dependency">Abhängigkeit</Term> (dependency). Du kannst sie als Parameter übergeben, wie hier. Willst du sie im Test austauschen, übergibst du ein Interface (Modul 8). Die nächste Lektion zeigt, wie.
+
+<Quiz id="m14-l09-q3" />
+
+<Quiz id="m14-l09-q6" />
+
+## Gap-Beispiel: aus einer Ausgabe einen Rückgabewert machen
+
+Die Methode `LevelOf` soll den Wert zurückgeben, statt ihn zu drucken. Die Lücken `___` sind der Rückgabetyp und der Parametertyp.
+
+<CodeBlock language="csharp" title="gap-pure.snippet.cs">{gapPure}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Der Rückgabetyp ist `string`, der Parametertyp `int`. Die Methode ist jetzt rein und lässt sich mit `Assert.Equal("high", LevelOf(5))` prüfen.
+
+</details>
+
+## Testabdeckung
+
+Die <Term id="code-coverage">Testabdeckung</Term> (code coverage) misst, wie viel vom Code beim Testlauf ausgeführt wurde: Zeilen, Zweige oder Methoden. Hat Code zwei Zweige und ein Test durchläuft nur einen, meldet die Zweigabdeckung 50 %. Werkzeuge dafür gibt es mehrere, zum Beispiel Coverlet und die Microsoft-Erweiterung `Microsoft.Testing.Extensions.CodeCoverage`. Mit der Microsoft.Testing.Platform schaltest du sie mit `dotnet test --coverage` ein, sobald das Paket im Testprojekt steht.
+
+Die Zahl sagt aber nur, was lief. Sie sagt nicht, ob das Ergebnis stimmt. Das zeigt das Beispiel: Die Regel soll ab 3 Fehlversuchen `medium` melden.
+
+<CodeBlock language="csharp" title="AlarmRule.cs">{alarmRule}</CodeBlock>
+
+<CodeBlock language="csharp" title="AlarmRuleTests.cs">{alarmRuleTests}</CodeBlock>
+
+:::info[Vorhersage]
+Der erste Test führt jede Zeile und jeden Zweig von `Level` aus. Welche der beiden Tests bestehen?
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test">{coverageOutput}</CodeBlock>
+
+1. **Ersten Test lesen:** Er ruft `Level` mit 5, 4 und 0 auf und prüft nichts. Er besteht, weil keine Ausnahme fliegt. Seine Zeilenabdeckung für `Level` ist 100 %.
+2. **Zweiten Test lesen:** Er prüft den Wert für genau 3 Fehlversuche und erwartet `medium`.
+3. **Meldung lesen:** `Actual: "low"`. Die Regel liefert für 3 Fehlversuche `low`, weil sie `> 3` statt `>= 3` prüft.
+4. **Folge:** Bei vollständiger Abdeckung blieb der Fehler unentdeckt. Erst die Assertion hat ihn gefunden.
+
+</details>
+
+<Quiz id="m14-l09-q4" />
+
+<Quiz id="m14-l09-q5" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l08/`) hat ein Testprojekt mit Tests für `FailedLoginRule` und `TimeWindow`. Das Parsen einer Logzeile steckt noch in drei lokalen Funktionen in `Program.cs`. Ein Testprojekt kann sie nicht aufrufen.
+
+**Neue Anforderung:** Die drei Funktionen ziehen in eine `public` statische Klasse `LogParser` in `SecLog.Core`. `Program.cs` ruft sie dort auf, die Ausgabe des Programms bleibt gleich. Tests prüfen den Parser mit gültigen und ungültigen Zeilen aus dem Beispiel-Log.
+
+Der Code vorher:
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (vorher)">{programBefore}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={logParser} title="src/SecLog.Core/Model/LogParser.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (nachher)">{programAfter}</CodeBlock>
+
+<FoldedCode code={logParserTests} title="tests/SecLog.Tests/LogParserTests.cs" />
+
+1. **Funktionen verschieben:** `ParseEventType`, `ParseWithPatterns` und `Parse` wandern in `LogParser`. Sie werden `public static`, weil das Testprojekt sie sonst nicht erreicht. Ein Kommentar mit `///` beschreibt jede Methode.
+2. **Aufrufe ändern:** In `Program.cs` steht jetzt `LogParser.` vor jedem Aufruf. Die lokalen Funktionen sind weg.
+3. **Tests schreiben:** Eine Theory prüft die drei Ereignistypen, eine zweite ungültige Zeilen. Ein Fact prüft eine gültige Zeile aus dem Beispiel-Log, ein weiterer die Fehlermeldung als `LineError`.
+4. **Ausführen:** Die Ausgabe des Programms ist identisch mit der vor der Änderung.
+
+Die neuen Tests:
+
+<CodeBlock language="text" title="Ausgabe">{parserResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l09/`) hat seinen Parser in `SecLog.Core`, getestet mit 8 Testfällen. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l08/` nur durch `LogParser.cs`, `LogParserTests.cs` und die geänderten Aufrufe in `Program.cs`.
+
+<Quiz id="m14-l09-q8" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l09-full-coverage-no-bugs" />
+
+**„100 % Testabdeckung heißt: keine Fehler.“** Das stimmt nicht. Die Abdeckung zählt, welcher Code lief, nicht, ob das Ergebnis richtig ist. Im Beispiel oben führt ein Test jede Zeile aus, und die Regel hat trotzdem einen Fehler. Eine niedrige Zahl zeigt dir Code, den kein Test berührt. Eine hohe Zahl beweist nichts.
+:::
+
+<details>
+<summary>Vertiefung: Abdeckung als Ziel (optional)</summary>
+
+Eine hohe Abdeckung wird oft mit hoher Codequalität verbunden. Die Zahl allein kann die Qualität aber nicht belegen, und ein sehr hohes Ziel kann sogar schaden: Der Aufwand für die letzten Prozent steht schnell in keinem Verhältnis zum Nutzen ([Code coverage and code quality](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#code-coverage-and-code-quality)).
+
+</details>
+
+## Zusammenfassung
+
+Code ist leicht zu testen, wenn seine Logik von Ein- und Ausgabe getrennt ist und seine Eingaben als Parameter ankommen. Eine reine Methode liefert zu denselben Eingaben immer dasselbe Ergebnis und braucht einen Aufruf und eine Prüfung. Konsole, Datei und veränderlicher statischer Zustand erschweren Tests. Ein Testprojekt erreicht nur `public` Typen anderer Projekte, deshalb zieht SecLog den Parser nach `SecLog.Core`. Die Testabdeckung zeigt, welcher Code lief, aber nicht, ob die Ergebnisse stimmen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l09-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l09-q9" />
+
+<Quiz id="m14-l09-q10" />
+
+### Transferfrage
+
+<Quiz id="m14-l09-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)
+- Microsoft Learn: [Use code coverage for unit testing](https://learn.microsoft.com/dotnet/core/testing/unit-testing-code-coverage)
