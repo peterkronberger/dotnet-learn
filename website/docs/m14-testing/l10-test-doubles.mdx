@@ -1,0 +1,182 @@
+---
+title: Test-Doubles
+sidebar_position: 10
+description: Eine Abhängigkeit im Test durch ein selbst geschriebenes Double ersetzen – Stub, Spy und Fake unterscheiden und Aufrufe prüfen.
+lesson_id: m14-l10
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import notifierInterface from '!!raw-loader!@site/examples/_ci/m14-l10-notifier/INotifier.cs';
+import alertService from '!!raw-loader!@site/examples/_ci/m14-l10-notifier/AlertService.cs';
+import doubles from '!!raw-loader!@site/examples/_ci/m14-l10-notifier/Doubles.cs';
+import alertTests from '!!raw-loader!@site/examples/_ci/m14-l10-notifier/AlertServiceTests.cs';
+import alertOutput from '!!raw-loader!@site/examples/_ci/m14-l10-notifier/expected.out.txt';
+import gapSpy from '!!raw-loader!@site/examples/m14/l10/gap-spy.snippet.cs';
+import stubRule from '!!raw-loader!@site/examples/_ci/seclog-m14-l10/tests/SecLog.Tests/Doubles/StubRule.cs';
+import incidentSpy from '!!raw-loader!@site/examples/_ci/seclog-m14-l10/tests/SecLog.Tests/Doubles/IncidentSpy.cs';
+import detectorTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l10/tests/SecLog.Tests/DetectorTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l10/expected.out.txt';
+
+export const detectorResults = seclogOutput.split('\n').filter((line) => line.includes('DetectorTests')).join('\n');
+
+# Test-Doubles
+
+:::note[Lernziele]
+- Du kannst eine Abhängigkeit im Test durch eine selbst geschriebene Klasse ersetzen.
+- Du kannst Stub, Spy und Fake unterscheiden.
+- Du kannst prüfen, ob und wie oft eine Abhängigkeit aufgerufen wurde.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l09-q6" />
+
+<Quiz id="m14-l09-q8" />
+
+<Quiz id="m14-l08-q3" />
+
+## Warum Test-Doubles
+
+In Lektion 9 hast du Eingaben als Parameter übergeben. Manchmal braucht Code aber etwas, das du nicht einfach als Zahl übergibst: das Versenden einer Nachricht, einen Netzwerkzugriff, eine Datei. Solche <Term id="dependency">Abhängigkeiten</Term> sind langsam, nicht immer verfügbar oder lösen etwas aus. Ein Unit-Test soll schnell und wiederholbar sein und nichts auslösen. Darum ersetzt du sie im Test durch ein <Term id="test-double">Test-Double</Term> (test double).
+
+Der Austausch klappt, wenn der Code die Abhängigkeit über ein Interface (Modul 8) bekommt, nicht über eine feste Klasse. Das Double ist dann eine gewöhnliche Klasse, die dasselbe Interface implementiert.
+
+## Stub, Spy, Fake
+
+Die Begriffe sind nicht überall gleich belegt. Im üblichen .NET-Sprachgebrauch ist <Term id="fake">Fake</Term> der Oberbegriff. Ein <Term id="stub">Stub</Term> ist ein kontrollierbarer Ersatz, der feste Antworten liefert. Ein <Term id="mock">Mock</Term> ist ein Fake, gegen das der Test mit `Assert` prüft. Diese Lektion nutzt diese Begriffe und nennt zwei Klassen mit den Namen aus der Testliteratur:
+
+- **Stub:** antwortet mit festen Werten. Damit erzeugst du Fälle auf Knopfdruck, etwa „Senden schlägt fehl“.
+- **Spy:** zeichnet Aufrufe auf. Der Test prüft danach, ob und wie oft die Abhängigkeit aufgerufen wurde. Ein <Term id="spy">Spy</Term>, gegen den du mit `Assert` prüfst, ist in den Begriffen von Microsoft Learn ein Mock.
+- **Fake (im engeren Sinn):** eine einfache, funktionierende Version des Originals, zum Beispiel im Speicher.
+
+Der Code unter Test sendet Warnungen. Er bekommt den Versand über ein Interface:
+
+<CodeBlock language="csharp" title="INotifier.cs">{notifierInterface}</CodeBlock>
+
+<CodeBlock language="csharp" title="AlertService.cs">{alertService}</CodeBlock>
+
+`AlertService` sendet nur, wenn die Fehlversuche die Schwelle erreichen. Der Notifier kommt über den Konstruktor, nicht aus einem festen Aufruf. Das ist die Naht, an der der Test ansetzt.
+
+Die drei Doubles sind kleine Klassen:
+
+<CodeBlock language="csharp" title="Doubles.cs">{doubles}</CodeBlock>
+
+## Tests mit Doubles
+
+:::info[Vorhersage]
+Welche der vier Tests bestehen? Überlege bei jedem Test, welches Double er benutzt und was es dem Test sagt.
+:::
+
+<CodeBlock language="csharp" title="AlertServiceTests.cs">{alertTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test">{alertOutput}</CodeBlock>
+
+1. **Spy lesen:** Die ersten beiden Tests nutzen `SpyNotifier`. Bei 4 Fehlversuchen ist die Liste `Messages` leer. Bei 5 enthält sie genau eine Nachricht mit dem erwarteten Text.
+2. **Stub lesen:** Im dritten Test liefert `StubNotifier(false)` das Ergebnis „nicht zugestellt“. `Alert` gibt es unverändert zurück.
+3. **Fake lesen:** Im vierten Test lehnt `InMemoryNotifier` dieselbe Nachricht beim zweiten Mal ab, wie es ein echter Versand tun könnte. Der Test sieht `true` und danach `false`.
+4. **Ergebnis:** Alle vier bestehen. Keiner hat wirklich etwas versendet.
+
+Was passiert, wenn `AlertService` den Notifier selbst mit `new` anlegt? Dann kann der Test ihn nicht ersetzen, und jeder Test würde wirklich senden.
+
+</details>
+
+<Quiz id="m14-l10-q2" />
+
+<Quiz id="m14-l10-q3" />
+
+<Quiz id="m14-l10-q4" />
+
+## Gap-Beispiel: ein Spy mit Lücken
+
+Der Spy soll jede Nachricht speichern und `true` zurückgeben. Die Lücken `___` fehlen.
+
+<CodeBlock language="csharp" title="gap-spy.snippet.cs">{gapSpy}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die erste Lücke ist `Add`, die zweite `true`. `Messages.Add(message)` speichert den Aufruf, den der Test später prüft.
+
+</details>
+
+## Mocking-Bibliotheken und Augenmaß
+
+Bibliotheken wie Moq, NSubstitute und FakeItEasy erzeugen Doubles zur Laufzeit, sodass du die Klassen nicht von Hand schreibst. Du brauchst sie nicht: Eine Klasse, die das Interface implementiert, genügt. Der Kurs nennt sie nur beim Namen.
+
+Doubles sind ein Werkzeug mit Maß. Ersetze, was langsam, unzuverlässig oder mit Nebenwirkung ist. Nimm alles andere echt: Eine `List<string>` ersetzt du nicht. Wer zu viel ersetzt, testet am Ende die Doubles. Prüfe außerdem das Verhalten nach außen, etwa welche Nachricht rausgeht, und nicht, wie der Code intern arbeitet.
+
+<Quiz id="m14-l10-q5" />
+
+<Quiz id="m14-l10-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l09/`) hat seinen Parser in `SecLog.Core`. Tests gibt es für `FailedLoginRule`, `TimeWindow` und `LogParser`. `Detector` und `IncidentMonitor` sind noch ungetestet. Beide hängen an `IDetectionRule` und an einem Event.
+
+**Neue Anforderung:** Tests prüfen `Detector.CountMatches` und `IncidentMonitor.Check`. Eine Regel liefert dafür feste Antworten: ein Stub `StubRule`. Das Event fängt ein Spy `IncidentSpy` auf. Es braucht kein neues Interface und keine Änderung an `SecLog.Core`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={stubRule} title="tests/SecLog.Tests/Doubles/StubRule.cs" />
+
+<FoldedCode code={incidentSpy} title="tests/SecLog.Tests/Doubles/IncidentSpy.cs" />
+
+<FoldedCode code={detectorTests} title="tests/SecLog.Tests/DetectorTests.cs" />
+
+1. **Stub schreiben:** `StubRule` implementiert `IDetectionRule` und antwortet mit dem Wert aus dem Konstruktor.
+2. **Spy schreiben:** `IncidentSpy.Handle` passt zum Event `IncidentFound` und legt jedes `IncidentFoundEventArgs` in eine Liste.
+3. **Tests schreiben:** `CountMatches` zählt zwei von drei Stub-Regeln. `Check` löst bei keinem Treffer kein Event aus und bei Treffern ein Event je Incident.
+4. **Ausführen:** Die Tests prüfen den Detektor und den Monitor, ohne eine echte Regel zu brauchen.
+
+Die neuen Tests:
+
+<CodeBlock language="text" title="Ausgabe">{detectorResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l10/`) testet auch `Detector` und `IncidentMonitor`, zusammen mit 25 bestandenen Tests. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l09/` nur durch die drei neuen Testdateien.
+
+<Quiz id="m14-l10-q8" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l10-mocking-library-required" />
+
+**„Um Code mit Abhängigkeiten zu testen, brauchst du eine Mocking-Bibliothek.“** Das stimmt nicht. Ein Double ist eine gewöhnliche Klasse, die das Interface implementiert. Du schreibst sie in wenigen Zeilen selbst. Eine Bibliothek spart nur Schreibarbeit, wenn es viele Doubles werden.
+:::
+
+<Quiz id="m14-l10-q6" />
+
+<details>
+<summary>Vertiefung: Begriffe in der Literatur (optional)</summary>
+
+Die Begriffe Fake, Mock und Stub werden uneinheitlich benutzt. Im üblichen .NET-Gebrauch gilt: Fake ist ein Oberbegriff, ein Mock ist ein Fake, gegen den der Test prüft, ein Stub ein kontrollierbarer Ersatz. In der klassischen Literatur (Fowler, Meszaros) bedeutet Stub „liefert Daten“, Mock „prüft Interaktionen“ und Fake „funktionierende Ersatzimplementierung“ ([Unit testing terminology](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#unit-testing-terminology)). Wichtig ist, dass du und dein Team dieselben Wörter für dieselben Dinge benutzen.
+
+</details>
+
+## Zusammenfassung
+
+Ein Test-Double ersetzt im Test eine Abhängigkeit, die langsam, unzuverlässig oder mit Nebenwirkung ist. Der Code bekommt die Abhängigkeit über ein Interface, das Double implementiert es. Ein Stub liefert feste Antworten, ein Spy zeichnet Aufrufe auf, ein Fake ist eine einfache funktionierende Version. Mocking-Bibliotheken wie Moq, NSubstitute und FakeItEasy sind nicht nötig. Ersetze nur, was nötig ist, und prüfe das Verhalten nach außen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l10-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l10-q9" />
+
+### Transferfrage
+
+<Quiz id="m14-l10-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)
+- Microsoft Learn: [Testing in .NET](https://learn.microsoft.com/dotnet/core/testing/)

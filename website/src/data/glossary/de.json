@@ -9775,6 +9775,179 @@
         "title": "Unit testing C# code in .NET using dotnet test and xUnit: Add more tests",
         "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#add-more-tests"
       }
+    },
+    {
+      "id": "testable-code",
+      "term": "Testable Code",
+      "german": "testbarer Code",
+      "category": "course",
+      "definition": "Code, den ein Test mit einem Aufruf und einer Prüfung abdecken kann: Die Logik ist von Ein- und Ausgabe getrennt und bekommt ihre Eingaben als Parameter.",
+      "aliases": [
+        "testbar",
+        "testbarer Code"
+      ],
+      "related": [
+        "pure-method",
+        "dependency",
+        "unit-test"
+      ],
+      "lesson": "m14-l09"
+    },
+    {
+      "id": "pure-method",
+      "term": "Pure Method",
+      "german": "reine Methode",
+      "category": "course",
+      "definition": "Eine Methode, deren Ergebnis nur von ihren Parametern abhängt und die sonst nichts verändert. Gleiche Eingaben liefern immer dasselbe Ergebnis.",
+      "aliases": [
+        "reine Methode",
+        "pure function"
+      ],
+      "related": [
+        "testable-code"
+      ],
+      "lesson": "m14-l09"
+    },
+    {
+      "id": "dependency",
+      "term": "Dependency",
+      "german": "Abhängigkeit",
+      "category": "platform",
+      "definition": "Etwas, das ein Stück Code benutzt und das nicht zu ihm gehört, zum Beispiel eine Datei, das Netzwerk oder ein anderes Objekt. Im Unit-Test ersetzt du langsame oder unsichere Abhängigkeiten.",
+      "aliases": [
+        "Abhängigkeit",
+        "Dependencies"
+      ],
+      "related": [
+        "test-double",
+        "testable-code"
+      ],
+      "lesson": "m14-l09",
+      "source": {
+        "title": "Best practices for writing unit tests: Avoid infrastructure dependencies",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#avoid-infrastructure-dependencies"
+      }
+    },
+    {
+      "id": "code-coverage",
+      "term": "Code Coverage",
+      "german": "Testabdeckung",
+      "category": "platform",
+      "definition": "Das Maß, wie viel vom Code (Zeilen, Zweige oder Methoden) beim Testlauf ausgeführt wurde. Sie sagt nicht, ob die Ergebnisse stimmen.",
+      "aliases": [
+        "Testabdeckung",
+        "Coverage",
+        "Codeabdeckung"
+      ],
+      "related": [
+        "unit-test",
+        "assertion"
+      ],
+      "lesson": "m14-l09",
+      "source": {
+        "title": "Use code coverage for unit testing",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-code-coverage"
+      }
+    },
+    {
+      "id": "test-double",
+      "term": "Test Double",
+      "german": "Test-Double",
+      "category": "platform",
+      "definition": "Ein Ersatz für eine Abhängigkeit im Test, zum Beispiel ein Stub, ein Spy oder ein Fake. Meist eine Klasse, die dasselbe Interface wie das Original implementiert.",
+      "aliases": [
+        "Test-Double",
+        "Test Doubles"
+      ],
+      "related": [
+        "stub",
+        "spy",
+        "fake",
+        "mock",
+        "dependency"
+      ],
+      "lesson": "m14-l10",
+      "source": {
+        "title": "Best practices for writing unit tests: Unit testing terminology",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#unit-testing-terminology"
+      }
+    },
+    {
+      "id": "stub",
+      "term": "Stub",
+      "german": "Stub (Platzhalter mit festen Antworten)",
+      "category": "platform",
+      "definition": "Ein kontrollierbarer Ersatz für eine Abhängigkeit. Er liefert feste Antworten. Der Test prüft nicht gegen ihn.",
+      "aliases": [
+        "Stubs"
+      ],
+      "related": [
+        "test-double",
+        "mock"
+      ],
+      "lesson": "m14-l10",
+      "source": {
+        "title": "Best practices for writing unit tests: Unit testing terminology",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#unit-testing-terminology"
+      }
+    },
+    {
+      "id": "fake",
+      "term": "Fake",
+      "german": "Fake (Ersatzobjekt)",
+      "category": "platform",
+      "definition": "Bei Microsoft Learn ein Oberbegriff für Stub und Mock. Viele Quellen nennen so auch eine einfache, funktionierende Version des Originals, etwa im Speicher.",
+      "aliases": [
+        "Fakes"
+      ],
+      "related": [
+        "test-double",
+        "stub",
+        "mock"
+      ],
+      "lesson": "m14-l10",
+      "source": {
+        "title": "Best practices for writing unit tests: Unit testing terminology",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#unit-testing-terminology"
+      }
+    },
+    {
+      "id": "mock",
+      "term": "Mock",
+      "german": "Mock (Ersatzobjekt, gegen das geprüft wird)",
+      "category": "platform",
+      "definition": "Ein Fake, gegen das der Test mit `Assert` prüft, zum Beispiel ob eine Methode aufgerufen wurde. Ohne Prüfung ist dasselbe Objekt ein Stub.",
+      "aliases": [
+        "Mocks",
+        "Mocking"
+      ],
+      "related": [
+        "test-double",
+        "stub",
+        "fake",
+        "spy"
+      ],
+      "lesson": "m14-l10",
+      "source": {
+        "title": "Best practices for writing unit tests: Unit testing terminology",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#unit-testing-terminology"
+      }
+    },
+    {
+      "id": "spy",
+      "term": "Spy",
+      "german": "Spy (Aufzeichner)",
+      "category": "course",
+      "definition": "Ein Test-Double, das Aufrufe oder Daten aufzeichnet, damit der Test sie danach prüft. In der Terminologie von Microsoft Learn ist es ein Mock, sobald der Test gegen es prüft.",
+      "aliases": [
+        "Spies"
+      ],
+      "related": [
+        "test-double",
+        "mock",
+        "stub"
+      ],
+      "lesson": "m14-l10"
     }
   ]
 }

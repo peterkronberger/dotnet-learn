@@ -1,0 +1,3 @@
+Failures: 3
+Alarm: True
+Alarm with threshold 5: False

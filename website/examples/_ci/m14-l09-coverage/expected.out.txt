@@ -1,0 +1,7 @@
+Passed Alarm.Tests.AlarmRuleTests.Level_AllBranches_RunsWithoutCheck
+Failed Alarm.Tests.AlarmRuleTests.Level_ThreeFailures_ReturnsMedium
+      Assert.Equal() Failure: Strings differ
+                 ↓ (pos 0)
+      Expected: "medium"
+      Actual:   "low"
+                 ↑ (pos 0)

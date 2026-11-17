@@ -1,0 +1,4 @@
+Passed Alerts.Tests.AlertServiceTests.Alert_AtThreshold_SendsOneMessage
+Passed Alerts.Tests.AlertServiceTests.Alert_BelowThreshold_SendsNothing
+Passed Alerts.Tests.AlertServiceTests.Alert_SameAlertTwice_SecondIsNotDelivered
+Passed Alerts.Tests.AlertServiceTests.Alert_SendFails_ReturnsFalse
