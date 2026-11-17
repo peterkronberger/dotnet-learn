@@ -1,0 +1,154 @@
+---
+title: Datengetriebene Tests mit [Theory]
+sidebar_position: 8
+description: Ein Test, viele Datenzeilen – Theory mit InlineData und MemberData, Grenzwerte als Testdaten und die Ausgabe je Zeile.
+lesson_id: m14-l08
+duration_min: 22
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import theoryTests from '!!raw-loader!@site/examples/_ci/m14-l08-theory-rows/PasswordRuleTests.cs';
+import theoryOutput from '!!raw-loader!@site/examples/_ci/m14-l08-theory-rows/expected.out.txt';
+import gapTheory from '!!raw-loader!@site/examples/m14/l08/gap-theory.snippet.cs';
+import seclogTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l08/tests/SecLog.Tests/TimeWindowTests.cs';
+import seclogTimeWindow from '!!raw-loader!@site/examples/_ci/seclog-m14-l08/src/SecLog.Core/Model/TimeWindow.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l08/expected.out.txt';
+
+export const seclogResults = seclogOutput.slice(seclogOutput.indexOf('== Tests ==') + '== Tests ==\n'.length).trim();
+
+# Datengetriebene Tests mit [Theory]
+
+:::note[Lernziele]
+- Du kannst einen `[Theory]`-Test mit `[InlineData]` schreiben.
+- Du kannst Testdaten mit `[MemberData]` aus einem statischen Member bereitstellen.
+- Du kannst Datenzeilen an Grenzwerten wählen.
+- Du kannst sagen, wann eine Theory besser passt als mehrere Facts.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l07-q2" />
+
+<Quiz id="m14-l07-q4" />
+
+<Quiz id="m14-l06-q4" />
+
+## Ein Test, viele Zeilen
+
+In Lektion 7 hat jeder Test einen Fall geprüft. Willst du dieselbe Prüfung mit vielen Werten machen, kopierst du den Test oder du nutzt einen <Term id="data-driven-test">datengetriebenen Test</Term> (data-driven test). Das Test-Framework führt dann dieselbe Methode mehrfach aus, jedes Mal mit anderen Daten. Jede Datenzeile ist ein eigener Testfall.
+
+In xUnit heißt so ein Test <Term id="theory">Theory</Term>. Du markierst die Methode mit `[Theory]` statt mit `[Fact]` und gibst ihr Parameter. Die Datenzeilen liefert ein weiteres Attribut. Der einfachste Weg ist `[InlineData]`: Die Werte einer Zeile stehen direkt im Attribut, in der Reihenfolge der Parameter. Es sind Positionsparameter eines Attributs (Lektion 6), darum dürfen dort nur Werte stehen, die der Compiler selbst kennt, etwa Zahlen, Texte und `true`.
+
+## Grenzwerte als Zeilen
+
+Welche Zeilen wählst du? Fehler stecken oft an Grenzen. Bei der Mindestlänge 8 liegen die Fälle in zwei Klassen: Längen unter 8 sind ungültig, Längen ab 8 sind gültig. Aus jeder Klasse reicht ein Wert in der Mitte, und an der Grenze prüfst du beide Seiten: den letzten ungültigen Wert (7) und den ersten gültigen (8). Ein Fehler wie `>` statt `>=` fällt nur an der Grenze auf.
+
+## InlineData
+
+:::info[Vorhersage]
+Die Theory prüft `PasswordRule` mit der Mindestlänge 8, deren `IsValid` noch den Fehler aus Lektion 7 hat (`>` statt `>=`). Wie viele Testfälle meldet der Lauf, und welche schlagen fehl? Die zweite Theory kommt gleich dran. Lies zuerst nur die erste.
+:::
+
+<CodeBlock language="csharp" title="PasswordRuleTests.cs">{theoryTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test">{theoryOutput}</CodeBlock>
+
+1. **Zeilen zählen:** Die erste Theory hat vier `[InlineData]`-Zeilen und ergibt vier Testfälle. Die zweite hat drei Zeilen. Der Lauf meldet sieben Zeilen.
+2. **Namen lesen:** xUnit schreibt die Parameterwerte in den Namen. So erkennst du jede Zeile.
+3. **Fehlschlag finden:** Die Zeile mit dem Passwort `12345678` und dem erwarteten Wert `True` schlägt fehl. `IsValid` liefert für genau 8 Zeichen `False`.
+4. **Andere Zeilen prüfen:** Die anderen sechs Zeilen bestehen. Ein Fehlschlag stoppt die anderen Zeilen nicht.
+
+Was passiert, wenn du `>` durch `>=` ersetzt? Dann besteht auch die Zeile mit 8 Zeichen. Die Zeile mit 7 Zeichen bleibt grün.
+
+</details>
+
+<Quiz id="m14-l08-q2" />
+
+<Quiz id="m14-l08-q3" />
+
+<Quiz id="m14-l08-q5" />
+
+## MemberData
+
+`[InlineData]` ist praktisch, aber begrenzt: Objekte wie ein `DateTimeOffset` kannst du nicht als Attributargument schreiben. Und stehen dieselben Zeilen in mehreren Tests, kopierst du sie. Für beide Fälle gibt es `[MemberData]`. Das Attribut zeigt auf ein öffentliches statisches Member, das die Zeilen liefert: eine Eigenschaft, eine Methode oder ein Feld.
+
+Den Namen des Members schreibst du mit `nameof(...)`. Der Ausdruck `nameof(FirstProblemRows)` liefert den Namen des Members als Text, hier `"FirstProblemRows"`. Der Compiler prüft, dass es das Member gibt. Ein Tippfehler im Text würde dir erst beim Testlauf auffallen.
+
+Für die Zeilen empfiehlt xUnit v3 den Typ `IEnumerable<TheoryDataRow<…>>`. Die Typargumente passen zu den Parametern der Testmethode. Der Compiler und die xUnit-Analyzer prüfen das. Die Zeilen schreibst du als Collection Expression (Modul 5) mit `new(…)`, wobei der Compiler den Typ der Zeile aus dem Zusammenhang kennt. Die zweite Theory im Beispiel oben nutzt das.
+
+<details>
+<summary>Vertiefung: TheoryData und andere Datenquellen (optional)</summary>
+
+Aus xUnit v2 kennst du vielleicht `TheoryData<…>`. In v3 gilt es nur noch als Altlast für ältere Projekte. Für neue Datenquellen ist `TheoryDataRow<…>` die bevorzugte Wahl, weil es zusätzlich Metadaten pro Zeile erlaubt, zum Beispiel `Skip` ([Theory Data Attributes](https://xunit.net/docs/getting-started/v3/theory-data-attributes)). Mit `[ClassData]` liegen die Zeilen in einer eigenen Klasse, was mehr Aufwand bedeutet.
+
+</details>
+
+<Quiz id="m14-l08-q6" />
+
+<Quiz id="m14-l08-q8" />
+
+## Gap-Beispiel: eine Theory mit Lücken
+
+<CodeBlock language="csharp" title="gap-theory.snippet.cs">{gapTheory}</CodeBlock>
+
+<Quiz id="m14-l08-q4" />
+
+<Quiz id="m14-l08-q7" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l07/`) hat ein Testprojekt `tests/SecLog.Tests` mit vier Tests für `FailedLoginRule`. Das Parsen einer Logzeile ist noch eine lokale Funktion in `Program.cs`. Sie in `SecLog.Core` zu verschieben ist das Thema der nächsten Lektion.
+
+**Neue Anforderung:** Eine Theory prüft `TimeWindow.Contains` an den Grenzen eines Fensters von 10 Minuten ab 08:00:00 Uhr. Eine zweite Theory nutzt `[MemberData]` und prüft Zeitpunkte aus dem Beispiel-Log.
+
+Der Code unter Test:
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/TimeWindow.cs">{seclogTimeWindow}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={seclogTests} title="tests/SecLog.Tests/TimeWindowTests.cs" />
+
+1. **Fenster festlegen:** `Start` und `Length` sind Felder der Testklasse. Beide Theories bauen daraus dasselbe Fenster.
+2. **Grenzen als Zeilen:** `-1` und `601` liegen knapp außerhalb, `0` und `600` genau auf den Rändern, `1` und `599` knapp innen. `Contains` schließt beide Ränder ein.
+3. **Zeilen aus dem Log:** Die Zeilen 2 und 7 liegen im Fenster, Zeile 9 und Zeile 14 nicht. `[MemberData]` liefert sie aus `SampleTimes`.
+4. **Ausführen:** Jede Zeile erscheint in der Ausgabe als eigener Test.
+
+<CodeBlock language="text" title="Ausgabe">{seclogResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l08/`) hat zwei Theories für `TimeWindow.Contains`, zusammen 14 bestandene Tests. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l07/` nur durch die neue Testdatei.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l08-failing-row-stops-theory" />
+
+**„Schlägt eine Datenzeile fehl, bricht die Theory ab und die anderen Zeilen laufen nicht.“** Das stimmt nicht. Jede Zeile ist ein eigener Testfall mit eigenem Ergebnis. Ein Fehlschlag in einer Zeile stoppt die anderen nicht. Im Beispiel oben schlägt eine Zeile fehl, die anderen sechs bestehen.
+:::
+
+## Zusammenfassung
+
+Eine Theory ist ein Test mit Parametern, den xUnit einmal je Datenzeile ausführt. `[InlineData]` schreibt die Werte direkt ins Attribut und erlaubt nur Konstanten. `[MemberData]` liest die Zeilen aus einem öffentlichen statischen Member, am besten vom Typ `IEnumerable<TheoryDataRow<…>>`. Jede Zeile ist ein eigener Testfall, die Parameterwerte stehen im Namen, und ein Fehlschlag stoppt die anderen Zeilen nicht. Gute Zeilen liegen an den Grenzen der Wertebereiche.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l08-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l08-q9" />
+
+### Transferfrage
+
+<Quiz id="m14-l08-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Unit testing C# code in .NET using dotnet test and xUnit](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit)
+- xUnit.net: [Theory Data Attributes (v3)](https://xunit.net/docs/getting-started/v3/theory-data-attributes)

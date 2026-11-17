@@ -1,0 +1,10 @@
+Passed PasswordCheck.Tests.PasswordRuleTests.FirstProblem_ByPassword_ReturnsExpected(password: "a-long-password", expected: null)
+Passed PasswordCheck.Tests.PasswordRuleTests.FirstProblem_ByPassword_ReturnsExpected(password: "abc", expected: "too short")
+Passed PasswordCheck.Tests.PasswordRuleTests.FirstProblem_ByPassword_ReturnsExpected(password: null, expected: "too short")
+Passed PasswordCheck.Tests.PasswordRuleTests.IsValid_ByLength_ReturnsExpected(password: "", expected: False)
+Passed PasswordCheck.Tests.PasswordRuleTests.IsValid_ByLength_ReturnsExpected(password: "1234567", expected: False)
+Failed PasswordCheck.Tests.PasswordRuleTests.IsValid_ByLength_ReturnsExpected(password: "12345678", expected: True)
+      Assert.Equal() Failure: Values differ
+      Expected: True
+      Actual:   False
+Passed PasswordCheck.Tests.PasswordRuleTests.IsValid_ByLength_ReturnsExpected(password: "123456789", expected: True)

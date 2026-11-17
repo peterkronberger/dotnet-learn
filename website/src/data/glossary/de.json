@@ -9609,6 +9609,172 @@
         "title": "C# language specification: Caller-info attributes",
         "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/attributes#2356-caller-info-attributes"
       }
+    },
+    {
+      "id": "unit-test",
+      "term": "Unit Test",
+      "german": "Unit-Test",
+      "category": "platform",
+      "definition": "Ein Test, der ein einzelnes Stück Code prüft, zum Beispiel eine Methode. Er läuft in Millisekunden und braucht weder Datenbank noch Netzwerk. Ein Testlauf meldet ihn als bestanden oder fehlgeschlagen.",
+      "aliases": [
+        "Unit-Test",
+        "Unit-Tests",
+        "Unit Tests",
+        "Einheitentest"
+      ],
+      "related": [
+        "test-framework",
+        "assertion",
+        "arrange-act-assert"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Testing in .NET: Unit tests",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/#unit-tests"
+      }
+    },
+    {
+      "id": "test-framework",
+      "term": "Test Framework",
+      "german": "Testframework",
+      "category": "platform",
+      "definition": "Die Bibliothek, die Attribute und Methoden für Tests bereitstellt, zum Beispiel xUnit.net, NUnit oder MSTest. Sie baut auf einer Testplattform auf.",
+      "aliases": [
+        "Testframework",
+        "xUnit"
+      ],
+      "related": [
+        "test-platform",
+        "unit-test"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Testing in .NET: Test frameworks",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/#test-frameworks"
+      }
+    },
+    {
+      "id": "test-platform",
+      "term": "Test Platform",
+      "german": "Testplattform",
+      "category": "platform",
+      "definition": "Der Motor, der Tests startet und mit Werkzeugen wie der IDE und `dotnet test` spricht. Es gibt VSTest und die neuere Microsoft.Testing.Platform (MTP).",
+      "aliases": [
+        "Testplattform",
+        "MTP",
+        "VSTest",
+        "Microsoft.Testing.Platform"
+      ],
+      "related": [
+        "test-framework",
+        "test-project"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Testing in .NET: Test platforms",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/#test-platforms"
+      }
+    },
+    {
+      "id": "test-project",
+      "term": "Test Project",
+      "german": "Testprojekt",
+      "category": "platform",
+      "definition": "Ein eigenes Projekt, das Tests enthält. Es verweist per Projektverweis auf den Code, den es testet, und läuft mit `dotnet test`. Bei xUnit v3 ist es ein ausführbares Programm.",
+      "aliases": [
+        "Testprojekt",
+        "Testprojekte"
+      ],
+      "related": [
+        "unit-test",
+        "test-framework"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Unit testing C# code in .NET using dotnet test and xUnit: Create the solution",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#create-the-solution"
+      }
+    },
+    {
+      "id": "assertion",
+      "term": "Assertion",
+      "german": "Assertion (Prüfung, Zusicherung)",
+      "category": "platform",
+      "definition": "Eine Prüfung in einem Test, zum Beispiel `Assert.Equal` oder `Assert.True`. Trifft sie nicht zu, schlägt der Test fehl und meldet erwarteten und tatsächlichen Wert.",
+      "aliases": [
+        "Assert",
+        "Assertions",
+        "Zusicherung"
+      ],
+      "related": [
+        "unit-test",
+        "arrange-act-assert"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Unit testing C# code in .NET using dotnet test and xUnit: Create a test",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#create-a-test"
+      }
+    },
+    {
+      "id": "arrange-act-assert",
+      "term": "Arrange-Act-Assert",
+      "german": "Vorbereiten, Ausführen, Prüfen",
+      "category": "platform",
+      "definition": "Ein Aufbau für Tests in drei Schritten: Objekte vorbereiten (Arrange), genau eine Aktion ausführen (Act), das Ergebnis prüfen (Assert).",
+      "aliases": [
+        "AAA",
+        "Arrange Act Assert"
+      ],
+      "related": [
+        "unit-test",
+        "assertion"
+      ],
+      "lesson": "m14-l07",
+      "source": {
+        "title": "Best practices for writing unit tests: Arrange your tests",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices#arrange-your-tests"
+      }
+    },
+    {
+      "id": "data-driven-test",
+      "term": "Data-driven Test",
+      "german": "datengetriebener Test",
+      "category": "platform",
+      "definition": "Ein Test, den das Framework mehrfach mit verschiedenen Daten ausführt. Jede Datenzeile ist ein eigener Testfall.",
+      "aliases": [
+        "datengetriebener Test",
+        "datengetriebene Tests",
+        "parametrisierter Test"
+      ],
+      "related": [
+        "theory"
+      ],
+      "lesson": "m14-l08",
+      "source": {
+        "title": "Unit testing C# code in .NET using dotnet test and xUnit: Add more tests",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#add-more-tests"
+      }
+    },
+    {
+      "id": "theory",
+      "term": "Theory",
+      "german": "Theory (Test mit Datenzeilen)",
+      "category": "platform",
+      "definition": "Das xUnit-Attribut `[Theory]` markiert eine Testmethode mit Parametern. Die Daten kommen aus `[InlineData]`, `[MemberData]` oder einer anderen Datenquelle.",
+      "aliases": [
+        "[Theory]",
+        "InlineData",
+        "MemberData"
+      ],
+      "related": [
+        "data-driven-test"
+      ],
+      "lesson": "m14-l08",
+      "source": {
+        "title": "Unit testing C# code in .NET using dotnet test and xUnit: Add more tests",
+        "url": "https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#add-more-tests"
+      }
     }
   ]
 }

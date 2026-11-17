@@ -1166,6 +1166,421 @@
       "type": "explain",
       "question": "Transferfrage: Wo würdest du in SecLog ein Attribut einsetzen, und welches?",
       "modelAnswer": "Ich markiere eine Methode, die ersetzt wurde, mit `[Obsolete(\"…\")]`, damit der Compiler alle Aufrufer meldet. Eine Hilfsmethode zum Protokollieren bekommt `[CallerMemberName]`, damit sie den Namen des Aufrufers selbst ausgibt. Für Tests nutzt die nächste Lektion `[Fact]`."
+    },
+    {
+      "id": "m14-l07-q1",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Was macht `dotnet test` in einem Ordner mit einem Testprojekt?",
+      "options": [
+        {
+          "text": "Es baut das Testprojekt samt der Projekte, auf die es verweist, und führt die Tests aus.",
+          "correct": true
+        },
+        {
+          "text": "Es führt nur Tests aus, die schon gebaut sind. Gebaut wird nicht.",
+          "feedback": "`dotnet test` baut das Projekt zuerst, sofern du das nicht mit `--no-build` abschaltest."
+        },
+        {
+          "text": "Es veröffentlicht das Testprojekt als Programm.",
+          "feedback": "Veröffentlichen ist `dotnet publish`. `dotnet test` baut und startet die Tests."
+        }
+      ],
+      "explanation": "`dotnet test` baut das Testprojekt und die Projekte, auf die es verweist, und startet danach den Testlauf. Ein fehlgeschlagener Test macht den Befehl zu einem Fehlschlag."
+    },
+    {
+      "id": "m14-l07-q2",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Das Programm zeigt einen Test. Welche Zeile ist der Act-Schritt?",
+      "example": "m14/l07/quiz-aaa.snippet.cs",
+      "options": [
+        {
+          "text": "`var rule = new FailedLoginRule(5);`",
+          "feedback": "Das Anlegen des Objekts ist der Arrange-Schritt."
+        },
+        {
+          "text": "`string text = rule.Describe();`",
+          "correct": true
+        },
+        {
+          "text": "`Assert.Equal(\"Rule: failed logins (threshold 5)\", text);`",
+          "feedback": "Die Prüfung ist der Assert-Schritt."
+        },
+        {
+          "text": "`[Fact]`",
+          "feedback": "`[Fact]` ist ein Attribut. Es markiert die Methode als Test und gehört zu keinem der drei Schritte."
+        }
+      ],
+      "explanation": "Arrange bereitet Objekte vor, Act führt genau die Aktion aus, die du testest, Assert prüft das Ergebnis. Hier ruft `rule.Describe()` den Code unter Test auf."
+    },
+    {
+      "id": "m14-l07-q3",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "`rule.Problems(\"a-long-password\")` soll eine leere Liste liefern. Welche Prüfung passt?",
+      "options": [
+        {
+          "text": "`Assert.Empty(problems);`",
+          "correct": true
+        },
+        {
+          "text": "`Assert.Null(problems);`",
+          "feedback": "Eine leere Liste ist nicht `null`. `Assert.Null` schlägt hier fehl, obwohl der Code richtig arbeitet."
+        },
+        {
+          "text": "`Assert.False(problems);`",
+          "feedback": "`Assert.False` erwartet einen `bool`. Mit einer Liste kompiliert der Aufruf nicht."
+        }
+      ],
+      "explanation": "`Assert.Empty` prüft, dass eine Sammlung kein Element enthält. `Assert.Null` prüft die Referenz, `Assert.False` einen `bool`."
+    },
+    {
+      "id": "m14-l07-q4",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Ein Test meldet `Assert.True() Failure`, darunter `Expected: True` und `Actual: False`. Was bedeutet das?",
+      "options": [
+        {
+          "text": "Der Test lief, aber die geprüfte Bedingung war falsch: Der Code lieferte `False`.",
+          "correct": true
+        },
+        {
+          "text": "Das Testprojekt ließ sich nicht bauen.",
+          "feedback": "Bei einem Build-Fehler läuft kein Test. Die Meldung eines Tests kommt aus einem Lauf."
+        },
+        {
+          "text": "Der Test wurde übersprungen.",
+          "feedback": "Ein übersprungener Test meldet keine erwarteten und tatsächlichen Werte."
+        }
+      ],
+      "explanation": "`Expected` ist der Wert, den der Test verlangt. `Actual` ist der Wert, den der Code geliefert hat. Beide stehen in der Meldung, damit du den Unterschied siehst."
+    },
+    {
+      "id": "m14-l07-q5",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Ergänze die beiden Lücken des Tests im Programm.",
+      "example": "m14/l07/gap-test.snippet.cs",
+      "options": [
+        {
+          "text": "`Fact` und `Empty`",
+          "correct": true
+        },
+        {
+          "text": "`Test` und `Empty`",
+          "feedback": "`[Test]` gehört zu NUnit. xUnit markiert Tests mit `[Fact]`."
+        },
+        {
+          "text": "`Fact` und `Null`",
+          "feedback": "Die Liste ist nicht `null`, sondern leer. `Assert.Null` wäre die falsche Prüfung."
+        }
+      ],
+      "explanation": "Ein Test ohne Parameter ist ein `[Fact]`. Die Liste soll leer sein, also `Assert.Empty`."
+    },
+    {
+      "id": "m14-l07-q6",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Die Projektvorlage legt den Test aus dem Programm an. Er besteht immer. Was folgt daraus?",
+      "example": "m14/l07/template-test.snippet.cs",
+      "options": [
+        {
+          "text": "Er prüft nichts: Er kann nicht fehlschlagen und sagt deshalb nichts über den Code aus.",
+          "correct": true
+        },
+        {
+          "text": "Er ist ein guter Test: Er besteht immer, also ist der Code korrekt.",
+          "feedback": "Ein Test, der nie fehlschlagen kann, beweist nichts. Ein grüner Lauf ist nur dann ein Hinweis auf richtigen Code, wenn die Tests bei einem Fehler rot würden.",
+          "misconception": "m14-l07-never-failing-test-is-good"
+        },
+        {
+          "text": "Er ist ein guter Test, weil grüne Tests Fehler im Code verhindern.",
+          "feedback": "Tests verhindern keine Fehler. Sie zeigen sie, wenn sie fehlschlagen können.",
+          "misconception": "m14-l07-never-failing-test-is-good"
+        },
+        {
+          "text": "Er schlägt fehl, sobald der Code einen Fehler hat.",
+          "feedback": "`Assert.True(true)` hängt nicht vom Code ab. Die Bedingung ist immer wahr."
+        }
+      ],
+      "explanation": "Der Test prüft die Konstante `true`, nicht dein Programm. Ein nützlicher Test hat einen Ausdruck, der vom Code abhängt, und kann deshalb rot werden."
+    },
+    {
+      "id": "m14-l07-q7",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Welcher Testname folgt dem Muster „Methode, Szenario, erwartetes Verhalten“?",
+      "options": [
+        {
+          "text": "`IsValid_Null_ReturnsFalse`",
+          "correct": true
+        },
+        {
+          "text": "`Test1`",
+          "feedback": "Der Name sagt nicht, was geprüft wird. Bei einem Fehlschlag musst du den Code lesen."
+        },
+        {
+          "text": "`NullPasswordTest`",
+          "feedback": "Der Name nennt das Szenario, aber weder die Methode noch das erwartete Verhalten."
+        }
+      ],
+      "explanation": "Der Name besteht aus drei Teilen: der getesteten Methode, dem Szenario und dem erwarteten Verhalten. So erklärt die Liste der Testnamen das Verhalten des Codes."
+    },
+    {
+      "id": "m14-l07-q8",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Welche Aussage über ein xUnit-v3-Testprojekt mit der Vorlage des .NET 11 SDK stimmt?",
+      "options": [
+        {
+          "text": "Es ist ein ausführbares Programm und nutzt standardmäßig Microsoft.Testing.Platform.",
+          "correct": true
+        },
+        {
+          "text": "Es ist eine Klassenbibliothek ohne Einstiegspunkt.",
+          "feedback": "Ein xUnit-v3-Testprojekt wird als ausführbares Programm gebaut (`OutputType` ist `Exe`)."
+        },
+        {
+          "text": "Es läuft nur mit VSTest.",
+          "feedback": "Die Vorlage nutzt standardmäßig Microsoft.Testing.Platform. VSTest lässt sich mit `--test-runner VSTest` wählen."
+        }
+      ],
+      "explanation": "xUnit v3 baut das Testprojekt als ausführbares Programm. Die Vorlage des .NET 11 SDK wählt mit `--xunit-version v3` standardmäßig Microsoft.Testing.Platform."
+    },
+    {
+      "id": "m14-l07-q9",
+      "lesson": "m14-l07",
+      "type": "find-bug",
+      "question": "Eines der beiden Tests im Programm wird nie ausgeführt. Welche Zeile ist die Ursache?",
+      "example": "m14/l07/quiz-missing-fact.snippet.cs",
+      "bugLines": [8],
+      "lineFeedback": {
+        "1": {
+          "feedback": "Hier steht `[Fact]`. Diese Methode läuft als Test."
+        },
+        "8": {
+          "feedback": "Richtig: Der Methode fehlt `[Fact]`. xUnit findet sie nicht und führt sie nicht aus."
+        }
+      },
+      "explanation": "Ohne `[Fact]` ist `IsValid_Empty_ReturnsFalse` eine gewöhnliche Methode. Der Testlauf meldet sie weder als bestanden noch als fehlgeschlagen."
+    },
+    {
+      "id": "m14-l07-q10",
+      "lesson": "m14-l07",
+      "type": "single",
+      "question": "Das Testprojekt verweist auf `SecLog.Core`. `FailedLoginRule` ist dort eine Klasse ohne Zugriffsmodifizierer, also `internal`. Was passiert beim Bauen des Testprojekts?",
+      "options": [
+        {
+          "text": "Der Build scheitert mit CS0122: Der Typ ist `internal` und für das Testprojekt nicht sichtbar.",
+          "correct": true
+        },
+        {
+          "text": "Der Build gelingt, weil das Testprojekt einen Projektverweis hat.",
+          "feedback": "Ein Projektverweis macht nur `public` Typen sichtbar. `internal` gilt innerhalb der Assembly."
+        },
+        {
+          "text": "Der Build gelingt, weil `[Fact]`-Methoden Zugriff auf alle Typen haben.",
+          "feedback": "Ein Attribut ändert die Sichtbarkeit nicht."
+        }
+      ],
+      "explanation": "`internal` gilt innerhalb einer Assembly. Das Testprojekt ist eine andere Assembly. Darum müssen die Typen, die du testest, `public` sein."
+    },
+    {
+      "id": "m14-l07-q11",
+      "lesson": "m14-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein Unit-Test aufgebaut ist und warum er fehlschlagen können muss.",
+      "modelAnswer": "Ein Unit-Test ist eine Methode mit `[Fact]`, die ein kleines Stück Code prüft. Er folgt Arrange-Act-Assert: Objekte vorbereiten, genau eine Aktion ausführen, das Ergebnis mit `Assert` prüfen. Ein Test, der nie fehlschlagen kann, sagt nichts über den Code aus. Erst ein Test, der bei einem Fehler rot wird, schützt vor Fehlern."
+    },
+    {
+      "id": "m14-l07-q12",
+      "lesson": "m14-l07",
+      "type": "explain",
+      "question": "Transferfrage: Welche Methode in SecLog würdest du als Nächstes testen, und welche Fälle prüfst du?",
+      "modelAnswer": "Ich teste `Incident.Add`: ein fehlgeschlagener Login des eigenen Nutzers wird aufgenommen (`true`), ein Login eines anderen Nutzers nicht (`false`), und ein erfolgreicher Login ebenfalls nicht. Jeder Fall ist ein eigener `[Fact]` mit einem Namen nach dem Muster Methode, Szenario, Erwartung."
+    },
+    {
+      "id": "m14-l08-q1",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Wann ist eine `[Theory]` besser als mehrere `[Fact]`-Tests?",
+      "options": [
+        {
+          "text": "Wenn dieselbe Prüfung mit verschiedenen Daten laufen soll.",
+          "correct": true
+        },
+        {
+          "text": "Wenn jeder Fall eine andere Prüfung braucht.",
+          "feedback": "Dann sind getrennte `[Fact]`-Tests klarer. Eine Theory führt immer denselben Testkörper aus."
+        },
+        {
+          "text": "Wenn der Test nie fehlschlagen soll.",
+          "feedback": "Auch eine Theory muss fehlschlagen können."
+        }
+      ],
+      "explanation": "Eine Theory ist ein Test mit Parametern, den xUnit einmal je Datenzeile ausführt. Sie vermeidet kopierten Testcode, wenn sich nur die Daten ändern."
+    },
+    {
+      "id": "m14-l08-q2",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Wie viele Testfälle meldet der Testlauf für das Programm?",
+      "example": "m14/l08/quiz-theory-rows.snippet.cs",
+      "options": [
+        {
+          "text": "3",
+          "correct": true
+        },
+        {
+          "text": "1",
+          "feedback": "Jede `[InlineData]`-Zeile ist ein eigener Testfall."
+        },
+        {
+          "text": "4",
+          "feedback": "Die Methode hat drei `[InlineData]`-Zeilen. `[Theory]` zählt nicht mit."
+        }
+      ],
+      "explanation": "Jede Datenzeile läuft als eigener Test. Drei `[InlineData]`-Attribute ergeben drei Testfälle."
+    },
+    {
+      "id": "m14-l08-q3",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Eine Datenzeile einer Theory schlägt fehl. Was passiert mit den anderen Zeilen?",
+      "options": [
+        {
+          "text": "Sie laufen weiter. Jede Zeile wird einzeln als bestanden oder fehlgeschlagen gemeldet.",
+          "correct": true
+        },
+        {
+          "text": "Die Theory bricht ab. Die restlichen Zeilen laufen nicht.",
+          "feedback": "Jede Zeile ist ein eigener Testfall. Ein Fehlschlag stoppt die anderen nicht.",
+          "misconception": "m14-l08-failing-row-stops-theory"
+        },
+        {
+          "text": "Alle Zeilen gelten dann als fehlgeschlagen.",
+          "feedback": "Der Testlauf meldet jede Zeile mit ihrem eigenen Ergebnis.",
+          "misconception": "m14-l08-failing-row-stops-theory"
+        }
+      ],
+      "explanation": "xUnit führt jede Datenzeile als eigenen Test aus und nennt die Parameterwerte im Testnamen. So erkennst du genau, welche Zeile fehlgeschlagen ist."
+    },
+    {
+      "id": "m14-l08-q4",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Welches Attribut gehört in die Lücke im Programm?",
+      "example": "m14/l08/gap-theory.snippet.cs",
+      "options": [
+        {
+          "text": "`Theory`",
+          "correct": true
+        },
+        {
+          "text": "`Fact`",
+          "feedback": "Ein `[Fact]` hat keine Parameter und keine Datenzeilen."
+        },
+        {
+          "text": "`MemberData`",
+          "feedback": "`[MemberData]` steht zusätzlich zu `[Theory]` und nennt eine Datenquelle. Es ersetzt `[Theory]` nicht."
+        }
+      ],
+      "explanation": "Datenzeilen gehören zu einer `[Theory]`. `[InlineData]` liefert die Zeilen, `[Theory]` markiert die Methode als datengetriebenen Test."
+    },
+    {
+      "id": "m14-l08-q5",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Die Mindestlänge eines Passworts ist 8. Welche Längen prüfen die Grenze am besten?",
+      "options": [
+        {
+          "text": "7 und 8",
+          "correct": true
+        },
+        {
+          "text": "1 und 100",
+          "feedback": "Beide Werte liegen weit von der Grenze entfernt. Ein Fehler wie `>` statt `>=` bleibt unentdeckt."
+        },
+        {
+          "text": "8, 8 und 8",
+          "feedback": "Dreimal derselbe Wert prüft nichts Neues und die Seite unter der Grenze fehlt."
+        }
+      ],
+      "explanation": "Fehler stecken oft an Grenzen. Der letzte ungültige Wert (7) und der erste gültige Wert (8) zeigen, ob die Grenze richtig liegt."
+    },
+    {
+      "id": "m14-l08-q6",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Worauf zeigt `[MemberData(nameof(Rows))]`?",
+      "options": [
+        {
+          "text": "Auf ein öffentliches statisches Member, das die Datenzeilen liefert.",
+          "correct": true
+        },
+        {
+          "text": "Auf eine private Instanzmethode des Testobjekts.",
+          "feedback": "Das Member muss öffentlich und statisch sein."
+        },
+        {
+          "text": "Auf eine Konstante mit einer einzigen Zeile.",
+          "feedback": "`[MemberData]` liefert beliebig viele Zeilen aus einer Eigenschaft, einer Methode oder einem Feld."
+        }
+      ],
+      "explanation": "Das Member darf eine Eigenschaft, eine Methode oder ein Feld sein. Es muss öffentlich und statisch sein und die Zeilen liefern."
+    },
+    {
+      "id": "m14-l08-q7",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Was darfst du als Argument von `[InlineData]` schreiben?",
+      "options": [
+        {
+          "text": "Nur Werte, die der Compiler selbst kennt, etwa Zahlen, Texte und `true`.",
+          "correct": true
+        },
+        {
+          "text": "Jeden Ausdruck, auch `new DateTimeOffset(2026, 3, 2, 8, 0, 0, TimeSpan.Zero)`.",
+          "feedback": "Attributargumente müssen Konstanten sein. Für Objekte wie `DateTimeOffset` nimmst du `[MemberData]` oder einen Text, den der Test parst."
+        }
+      ],
+      "explanation": "`[InlineData]` ist ein Attribut. Seine Argumente sind Attributparameter und dürfen nur Konstanten sein."
+    },
+    {
+      "id": "m14-l08-q8",
+      "lesson": "m14-l08",
+      "type": "single",
+      "question": "Welchen Rückgabetyp empfiehlt xUnit v3 für neue Datenquellen von `[MemberData]`?",
+      "options": [
+        {
+          "text": "`IEnumerable<TheoryDataRow<…>>`",
+          "correct": true
+        },
+        {
+          "text": "`TheoryData<…>`",
+          "feedback": "`TheoryData<…>` stammt aus xUnit v2. Es gilt in v3 nur noch als Altlast für ältere Projekte."
+        },
+        {
+          "text": "`string`",
+          "feedback": "Ein einzelner Text liefert keine Datenzeilen."
+        }
+      ],
+      "explanation": "Zeilen vom Typ `TheoryDataRow<…>` prüft der Compiler gegen die Parametertypen der Testmethode und können Metadaten pro Zeile tragen."
+    },
+    {
+      "id": "m14-l08-q9",
+      "lesson": "m14-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine Theory Daten bekommt und wie du in der Ausgabe erkennst, welche Zeile fehlschlug.",
+      "modelAnswer": "Eine Theory ist ein Test mit Parametern. `[InlineData]` schreibt die Werte einer Zeile direkt an die Methode, `[MemberData]` liest die Zeilen aus einem öffentlichen statischen Member. xUnit führt jede Zeile einzeln aus und schreibt die Parameterwerte in den Testnamen. Eine fehlgeschlagene Zeile erkennst du am Namen, die anderen laufen weiter."
+    },
+    {
+      "id": "m14-l08-q10",
+      "lesson": "m14-l08",
+      "type": "explain",
+      "question": "Transferfrage: Für welche Regel in SecLog wären Datenzeilen nützlich, und welche Zeilen wählst du?",
+      "modelAnswer": "Für die Schwelle von `FailedLoginRule`. Ich teste 4, 5 und 6 Fehlversuche bei einer Schwelle von 5: Die Zeilen liegen um die Grenze herum und zeigen, ob `>=` richtig ist. Alle Zeilen teilen denselben Testkörper, nur die Zahl und das erwartete Ergebnis wechseln."
     }
   ]
 }
