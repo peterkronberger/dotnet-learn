@@ -1,0 +1,11 @@
+Passed PasswordCheck.Tests.PasswordRuleTests.FirstProblem_LongPassword_IsNull
+Passed PasswordCheck.Tests.PasswordRuleTests.FirstProblem_ShortPassword_IsNotNull
+Failed PasswordCheck.Tests.PasswordRuleTests.IsValid_ExactlyMinimumLength_ReturnsTrue
+      Assert.True() Failure
+      Expected: True
+      Actual:   False
+Passed PasswordCheck.Tests.PasswordRuleTests.IsValid_LongerThanMinimum_ReturnsTrue
+Passed PasswordCheck.Tests.PasswordRuleTests.IsValid_Null_ReturnsFalse
+Passed PasswordCheck.Tests.PasswordRuleTests.MinLength_AfterCreation_IsTheGivenValue
+Passed PasswordCheck.Tests.PasswordRuleTests.Problems_LongPassword_IsEmpty
+Passed PasswordCheck.Tests.PasswordRuleTests.Problems_ShortPassword_ContainsTooShort

@@ -1,0 +1,234 @@
+---
+title: Unit-Tests mit xUnit
+sidebar_position: 7
+description: Einen Unit-Test mit xUnit schreiben und ausführen – Fact, Assert, Arrange-Act-Assert und ein fehlschlagender Test, bevor er besteht.
+lesson_id: m14-l07
+duration_min: 23
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import passwordRule from '!!raw-loader!@site/examples/_ci/m14-l07-password-rule/PasswordRule.cs';
+import passwordRuleTests from '!!raw-loader!@site/examples/_ci/m14-l07-password-rule/PasswordRuleTests.cs';
+import passwordRuleProject from '!!raw-loader!@site/examples/_ci/m14-l07-password-rule/PasswordRule.Tests.csproj';
+import passwordRuleOutput from '!!raw-loader!@site/examples/_ci/m14-l07-password-rule/expected.out.txt';
+import passwordRuleFixed from '!!raw-loader!@site/examples/m14/l07/password-rule-fixed.snippet.cs';
+import gapTest from '!!raw-loader!@site/examples/m14/l07/gap-test.snippet.cs';
+import templateTest from '!!raw-loader!@site/examples/m14/l07/template-test.snippet.cs';
+import seclogSolution from '!!raw-loader!@site/examples/_ci/seclog-m14-l07/SecLog.slnx';
+import seclogTestProject from '!!raw-loader!@site/examples/_ci/seclog-m14-l07/tests/SecLog.Tests/SecLog.Tests.csproj';
+import seclogTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l07/tests/SecLog.Tests/FailedLoginRuleTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l07/expected.out.txt';
+
+export const seclogResults = seclogOutput.slice(seclogOutput.indexOf('== Tests ==') + '== Tests ==\n'.length).trim();
+
+# Unit-Tests mit xUnit
+
+:::note[Lernziele]
+- Du kannst ein xUnit-Testprojekt anlegen und mit `dotnet test` ausführen.
+- Du kannst einen Test nach dem Muster Arrange-Act-Assert schreiben und benennen.
+- Du kannst eine passende `Assert`-Methode wählen (`Equal`, `True`/`False`, `Null`/`NotNull`, `Contains`, `Empty`).
+- Du kannst die Ausgabe eines fehlschlagenden Tests lesen und die Ursache finden.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l02-q1" />
+
+<Quiz id="m14-l02-q2" />
+
+<Quiz id="m14-l06-q4" />
+
+## Was ein Unit-Test ist
+
+Bisher hast du ein Programm gestartet und die Ausgabe angesehen. Das prüft nur, was du gerade im Blick hast. Ein <Term id="unit-test">Unit-Test</Term> (unit test) prüft ein einzelnes Stück Code, zum Beispiel eine Methode oder eine Klasse. Er läuft in Millisekunden, braucht keine Datenbank und kein Netzwerk und meldet am Ende selbst, ob er bestanden hat oder fehlgeschlagen ist. Nach jeder Änderung führst du alle Tests aus und siehst sofort, ob etwas kaputtgegangen ist.
+
+Zwei Bausteine laufen dabei zusammen. Ein <Term id="test-framework">Test-Framework</Term> (test framework) liefert die Attribute und Methoden, mit denen du Tests schreibst. In diesem Kurs ist das xUnit.net. NUnit, MSTest und TUnit erfüllen dieselbe Aufgabe und werden hier nur beim Namen genannt. Eine <Term id="test-platform">Testplattform</Term> (test platform) startet die Tests und spricht mit `dotnet test` und der IDE. Sie kommt weiter unten dran.
+
+## Das Testprojekt
+
+Tests liegen in einem eigenen Projekt, dem <Term id="test-project">Testprojekt</Term> (test project). Es verweist per Projektverweis (Lektion 2) auf den Code, den es testet. Das SDK legt es mit einer Vorlage an:
+
+<Since dotnet="11" />
+
+```bash
+dotnet new xunit --xunit-version v3 -o tests/SecLog.Tests
+dotnet reference add src/SecLog.Core --project tests/SecLog.Tests
+dotnet sln add tests/SecLog.Tests
+dotnet test
+```
+
+Die Option `--xunit-version v3` wählt xUnit v3. Die Vorlage legt außerdem die Datei `UnitTest1.cs` an. `dotnet reference add` und `dotnet sln add` kennst du aus Lektion 2. `dotnet test` baut das Testprojekt samt der Projekte, auf die es verweist, und führt die Tests aus.
+
+So sieht die Projektdatei des Beispiels dieser Lektion aus:
+
+<CodeBlock language="xml" title="PasswordRule.Tests.csproj">{passwordRuleProject}</CodeBlock>
+
+Zwei Zeilen sind neu. `OutputType` mit dem Wert `Exe` macht das Testprojekt zu einem ausführbaren Programm: Bei xUnit v3 enthält es seinen Testläufer selbst. Das Paket `xunit.v3.mtp-v2` ist das Test-Framework. Alles andere kennst du aus Lektion 1.
+
+:::tip[Typen müssen public sein]
+Das Testprojekt ist eine eigene Assembly. Es sieht nur die Typen von `SecLog.Core`, die `public` sind (Lektion 2).
+:::
+
+## Ein Test mit Fact und Assert
+
+Ein Test ist eine Methode mit dem Attribut `[Fact]` (Lektion 6). Das Attribut sagt xUnit: Diese Methode ist ein Test. Ein Fact hat keine Parameter und prüft eine Bedingung, die immer gelten soll. Die Prüfung selbst schreibst du mit einer <Term id="assertion">Assertion</Term> (assertion), also einem Aufruf von `Assert`. Trifft sie nicht zu, schlägt der Test fehl.
+
+Die wichtigsten Methoden von `Assert`:
+
+- `Assert.Equal(expected, actual)`: zwei Werte sind gleich. Der erwartete Wert steht zuerst.
+- `Assert.True(condition)` und `Assert.False(condition)`: ein `bool` ist wahr oder falsch.
+- `Assert.Null(value)` und `Assert.NotNull(value)`: ein Verweis ist `null` oder nicht.
+- `Assert.Contains(item, collection)`: die Sammlung enthält das Element.
+- `Assert.Empty(collection)`: die Sammlung ist leer.
+
+Der Code unter Test ist eine kleine Regel für Passwörter. Eine Methode `IsValid` entscheidet, ob ein Passwort lang genug ist. `Problems` sammelt Meldungen, und `FirstProblem` liefert die erste oder `null`:
+
+<CodeBlock language="csharp" title="PasswordRule.cs">{passwordRule}</CodeBlock>
+
+## Arrange-Act-Assert und Namen
+
+Ein Test folgt einem festen Aufbau, <Term id="arrange-act-assert">Arrange-Act-Assert</Term>:
+
+1. **Arrange:** Objekte anlegen und einrichten.
+2. **Act:** genau eine Aktion ausführen, nämlich den Aufruf, den du testest.
+3. **Assert:** das Ergebnis prüfen.
+
+Der Name besteht aus drei Teilen: der getesteten Methode, dem Szenario und dem erwarteten Verhalten, zum Beispiel `IsValid_Null_ReturnsFalse`. Beim Fehlschlag weißt du dann ohne Code zu lesen, was nicht stimmt. Ein Test, der nur zwei Zeilen hat, braucht die Kommentare `// Arrange` und so weiter nicht. Der Aufbau bleibt trotzdem derselbe.
+
+## Rot und grün
+
+Ein Test muss fehlschlagen können. Du siehst das am besten, wenn du ihn einmal fehlschlagen lässt: erst rot (der Test schlägt fehl), dann den Code reparieren, dann grün (der Test besteht).
+
+:::info[Vorhersage]
+Die Tests prüfen `PasswordRule` mit der Mindestlänge 8. Welche der acht Tests bestehen, welcher schlägt fehl, und was steht in der Fehlermeldung? Schau dir dazu `IsValid` in `PasswordRule.cs` genau an.
+:::
+
+<CodeBlock language="csharp" title="PasswordRuleTests.cs">{passwordRuleTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Testlauf gibt eine Zeile je Test aus:
+
+<CodeBlock language="text" title="Ausgabe von dotnet test">{passwordRuleOutput}</CodeBlock>
+
+1. **Tests lesen:** Sieben Tests prüfen Werte, die zu `IsValid` und `Problems` passen. Der Test `IsValid_ExactlyMinimumLength_ReturnsTrue` übergibt ein Passwort mit genau 8 Zeichen.
+2. **Ergebnis jedes Tests ablesen:** `Passed` heißt, die Prüfung traf zu. `Failed` heißt, sie traf nicht zu. Hier schlägt genau ein Test fehl.
+3. **Meldung lesen:** `Expected: True` ist der Wert, den der Test verlangt. `Actual: False` ist der Wert, den `IsValid` geliefert hat.
+4. **Ursache finden:** `IsValid` vergleicht mit `>` statt mit `>=`. Ein Passwort mit genau der Mindestlänge wird abgelehnt. Die anderen Tests fanden den Fehler nicht, weil keiner genau die Grenze prüfte.
+
+So sieht die Methode nach der Reparatur aus:
+
+<CodeBlock language="csharp" title="IsValid nach der Reparatur">{passwordRuleFixed}</CodeBlock>
+
+Was passiert, wenn du den Test löschst, statt den Code zu reparieren? Der Lauf wird grün, aber der Fehler bleibt im Code. Der Test hat ihn gefunden. Das war seine Aufgabe.
+
+</details>
+
+<details>
+<summary>Vertiefung: Test-Driven Development (optional)</summary>
+
+Beim Test-Driven Development (TDD) schreibst du zuerst einen Test, der fehlschlägt, und danach nur so viel Code, dass er besteht. Das Vorgehen wiederholst du Test für Test. Die Anleitung „Unit testing C# code in .NET using dotnet test and xUnit“ auf Microsoft Learn baut ihr Beispiel auf diese Weise auf ([Create a test](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit#create-a-test)).
+
+</details>
+
+<Quiz id="m14-l07-q4" />
+
+<Quiz id="m14-l07-q2" />
+
+<Quiz id="m14-l07-q3" />
+
+## Gap-Beispiel: ein Test mit Lücken
+
+Der Test prüft, dass `Problems` für ein langes Passwort keine Meldung liefert. Die Lücken `___` fehlen. Die Kommentare mit den drei Schritten bleiben stehen.
+
+<CodeBlock language="csharp" title="gap-test.snippet.cs">{gapTest}</CodeBlock>
+
+<Quiz id="m14-l07-q5" />
+
+<Quiz id="m14-l07-q9" />
+
+<Quiz id="m14-l07-q7" />
+
+## Testplattform: VSTest und Microsoft.Testing.Platform
+
+Die Testplattform startet die Tests. Es gibt zwei: VSTest ist die ältere. Die Microsoft.Testing.Platform (MTP) ist ein leichtgewichtiger Ersatz, der direkt im Testprojekt steckt. Bei xUnit v3 arbeitet `dotnet test` mit der MTP, wenn die Datei `global.json` das so einstellt. Die Vorlage des SDK legt das passend an. Mit `--test-runner VSTest` wählst du bei der Vorlage die ältere Plattform.
+
+<Since dotnet="10" />
+
+Die Vorlagen für xUnit v3 und NUnit mit der MTP als Standard gibt es seit dem .NET 11 SDK. Das Test-Framework bestimmt die Attribute und `Assert`-Methoden, die Plattform bestimmt, wie der Lauf abläuft. Beides ist getrennt austauschbar.
+
+<Quiz id="m14-l07-q8" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l06/`) besteht aus `SecLog.Core` (Modell und Regeln) und `SecLog.Cli` (Programm). Tests gibt es noch keine.
+
+**Neue Anforderung:** SecLog bekommt ein Testprojekt `tests/SecLog.Tests`. Es verweist auf `SecLog.Core` und gehört zur Solution. Vier Tests prüfen `FailedLoginRule`: Die Regel trifft bei genau so vielen Fehlversuchen wie die Schwelle, sie trifft nicht darunter, ihre Beschreibung nennt die Schwelle, und ein Incident nimmt nur Fehlversuche seines eigenen Nutzers auf.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="xml" title="SecLog.slnx">{seclogSolution}</CodeBlock>
+
+<CodeBlock language="xml" title="tests/SecLog.Tests/SecLog.Tests.csproj">{seclogTestProject}</CodeBlock>
+
+<FoldedCode code={seclogTests} title="tests/SecLog.Tests/FailedLoginRuleTests.cs" />
+
+1. **Projekt anlegen:** Das Testprojekt ist eine Executable mit `xunit.v3.mtp-v2` und einem Projektverweis auf `SecLog.Core`. Die Solution kennt es.
+2. **Hilfsmethoden schreiben:** `Failure` erzeugt einen fehlgeschlagenen Login, `IncidentWithFailures` legt einen Incident mit der gewünschten Zahl davon an. So bleibt jeder Test kurz.
+3. **Tests schreiben:** Jeder Test hat einen Namen nach dem Muster Methode, Szenario, Erwartung. Der erste zeigt alle drei Schritte, die anderen lassen die Kommentare weg.
+4. **Ausführen:** `dotnet test` auf der Solution gibt für jeden Test eine Zeile aus.
+
+Die Ausgabe der Tests:
+
+<CodeBlock language="text" title="Ausgabe">{seclogResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l07/`) hat ein Testprojekt mit vier bestandenen Tests für `FailedLoginRule`. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l06/` nur durch das Testprojekt, den Eintrag in `SecLog.slnx` und den Aufruf der Tests in `run.sh`.
+
+<Quiz id="m14-l07-q10" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l07-never-failing-test-is-good" />
+
+**„Ein Test, der nie fehlschlägt, ist ein guter Test.“** Das stimmt nicht. Ein Test ist nur dann etwas wert, wenn er bei einem Fehler im Code rot wird. Die Vorlage des SDK legt zum Beispiel diesen Test an:
+
+<CodeBlock language="csharp" title="UnitTest1.cs (Vorlage)">{templateTest}</CodeBlock>
+
+`Assert.True(true)` prüft eine Konstante, keinen Code. Der Test ist immer grün und sagt nichts über dein Programm. Schreib einen Test so, dass du weißt, welche Änderung im Code ihn rot macht.
+:::
+
+<Quiz id="m14-l07-q6" />
+
+<details>
+<summary>Vertiefung: Testplattformen im Vergleich (optional)</summary>
+
+Die Microsoft.Testing.Platform ist Open Source und steckt als Bibliothek im Testprojekt. Deshalb ist ein xUnit-v3-Testprojekt eine Executable. Neben xUnit.net unterstützen sie NUnit und MSTest. TUnit läuft nur auf der MTP ([Microsoft.Testing.Platform overview](https://learn.microsoft.com/dotnet/core/testing/microsoft-testing-platform-intro)). Für `dotnet test` mit der MTP stellt das .NET 11 SDK weitere Optionen bereit, etwa ein Zeitlimit für den ganzen Lauf mit `--timeout` ([What's new in the SDK for .NET 11](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/sdk#dotnet-test-run-level-policy-options)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Unit-Test prüft ein kleines Stück Code und meldet selbst, ob er bestanden hat. Tests liegen in einem Testprojekt, das per Projektverweis auf den Code zeigt, und laufen mit `dotnet test`. Ein Test ist eine Methode mit `[Fact]`, geschrieben nach Arrange-Act-Assert und benannt nach Methode, Szenario und Erwartung. `Assert`-Methoden wie `Equal`, `True`, `Null`, `Contains` und `Empty` prüfen das Ergebnis. Die Meldung eines fehlgeschlagenen Tests nennt den erwarteten und den tatsächlichen Wert. Ein Test muss fehlschlagen können, sonst sagt er nichts aus.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l07-q1" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l07-q11" />
+
+### Transferfrage
+
+<Quiz id="m14-l07-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Unit testing C# code in .NET using dotnet test and xUnit](https://learn.microsoft.com/dotnet/core/testing/unit-testing-csharp-with-xunit)
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)
+- xUnit.net: [Getting started with xUnit.net v3](https://xunit.net/docs/getting-started/v3/getting-started)
