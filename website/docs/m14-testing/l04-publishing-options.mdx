@@ -90,7 +90,7 @@ Zwei Optionen verändern Self-contained: Sie machen den Start schneller oder das
 
 <CodeBlock language="text" title="Ausgabe: ReadyToRun, Befehl dotnet publish -c Release -r linux-x64 --self-contained -p:PublishReadyToRun=true">{modes[4]}</CodeBlock>
 
-**Trimming** lässt ungenutzten Code der Bibliotheken weg. Es gibt es nur bei Self-contained. Der Trimmer entscheidet beim Bauen, was die App braucht. Code, den er nicht sieht, etwa bei Reflection, kann fehlen und zur Laufzeit Fehler auslösen. Deshalb warnt er, wenn er ein Muster nicht auswerten kann.
+**<Term id="trimming">Trimming</Term>** lässt ungenutzten Code der Bibliotheken weg. Es gibt es nur bei Self-contained. Der Trimmer entscheidet beim Bauen, was die App braucht. Code, den er nicht sieht, etwa bei Reflection, kann fehlen und zur Laufzeit Fehler auslösen. Deshalb warnt er, wenn er ein Muster nicht auswerten kann.
 
 <CodeBlock language="text" title="Ausgabe: getrimmt, Befehl dotnet publish -c Release -r linux-x64 --self-contained -p:PublishTrimmed=true">{modes[5]}</CodeBlock>
 
