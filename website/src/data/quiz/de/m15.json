@@ -1,4 +1,224 @@
 {
   "module": "m15",
-  "questions": []
+  "questions": [
+    {
+      "id": "m15-l01-q1",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Welche Abhängigkeit hat die Klasse `AlertService` im Programm?",
+      "example": "m15/l01/tight-coupling.cs",
+      "options": [
+        {
+          "text": "`ConsoleSender`: `AlertService` benutzt die Klasse und erzeugt sie selbst mit `new`.",
+          "correct": true
+        },
+        {
+          "text": "Die Variable `service` in der ersten Zeile.",
+          "feedback": "`service` ist eine Variable des aufrufenden Codes. `AlertService` benutzt sie nicht."
+        },
+        {
+          "text": "Keine: `AlertService` ruft nur Methoden auf, die zu ihm selbst gehören.",
+          "feedback": "`AlertService` ruft `sender.Send(…)` auf. Diese Methode gehört zu `ConsoleSender`, also zu etwas, das nicht zu `AlertService` gehört."
+        }
+      ],
+      "explanation": "Eine Abhängigkeit ist etwas, das ein Stück Code benutzt und das nicht zu ihm gehört. `AlertService` ruft `Send` von `ConsoleSender` auf und erzeugt das Objekt dafür selbst."
+    },
+    {
+      "id": "m15-l01-q2",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Was ist am Feld `private readonly ConsoleSender sender = new();` in `AlertService` ein Nachteil?",
+      "example": "m15/l01/tight-coupling.cs",
+      "options": [
+        {
+          "text": "`AlertService` ist fest an die Klasse `ConsoleSender` gebunden. Ein anderer Sender oder ein Test-Double geht nur, wenn du `AlertService` änderst.",
+          "correct": true
+        },
+        {
+          "text": "`new` ist in einem Feld nicht erlaubt, der Code kompiliert nicht.",
+          "feedback": "Der Code kompiliert und läuft. Das Problem ist die feste Bindung, kein Fehler des Compilers."
+        },
+        {
+          "text": "`readonly` verhindert, dass `Send` aufgerufen wird.",
+          "feedback": "`readonly` verbietet nur, das Feld neu zu belegen. Der Aufruf von `Send` ist erlaubt."
+        }
+      ],
+      "explanation": "Wer die Abhängigkeit mit `new` selbst erzeugt, legt den konkreten Typ fest. Jede Änderung des Typs verlangt eine Änderung der Klasse, und ein Test kann die Abhängigkeit nicht ersetzen."
+    },
+    {
+      "id": "m15-l01-q3",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Wie bekommt `AlertService` seinen Sender im Programm?",
+      "example": "m15/l01/constructor-injection.cs",
+      "options": [
+        {
+          "text": "Als Parameter seines Konstruktors, mit dem Typ des Interfaces `IAlertSender`.",
+          "correct": true
+        },
+        {
+          "text": "Er erzeugt ihn selbst mit `new ConsoleSender()`.",
+          "feedback": "Das tat die Klasse in der ersten Version. Hier steht kein `new` in `AlertService`."
+        },
+        {
+          "text": "Aus einer statischen Variable, die irgendwo im Programm gesetzt wird.",
+          "feedback": "Es gibt keine statische Variable. Der Sender kommt als Konstruktorparameter."
+        }
+      ],
+      "explanation": "Das ist Constructor Injection: Die Klasse nennt ihre Abhängigkeit als Parameter des Konstruktors, und der Code, der das Objekt erzeugt, übergibt sie."
+    },
+    {
+      "id": "m15-l01-q4",
+      "lesson": "m15-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m15/l01/constructor-injection.cs",
+      "explanation": "`first` bekommt den `ConsoleSender`, `second` den `PrefixSender`. Beide Objekte sind vom Typ `AlertService`, nur die übergebene Abhängigkeit unterscheidet sich."
+    },
+    {
+      "id": "m15-l01-q5",
+      "lesson": "m15-l01",
+      "type": "cloze",
+      "question": "Ergänze die Stellen, an denen der Code die Objekte zusammensetzt und der Konstruktor die Abhängigkeit speichert.",
+      "example": "m15/l01/constructor-injection.cs",
+      "blanks": [
+        {
+          "text": "IAlertSender",
+          "hint": "Welcher Typ lässt sich später austauschen?",
+          "wrongAnswers": [
+            {
+              "text": "ConsoleSender",
+              "feedback": "Das läuft auch, bindet die Variable aber an die Klasse. Mit dem Interface bleibt der Typ austauschbar."
+            }
+          ]
+        },
+        {
+          "text": "new(console)",
+          "accept": [
+            "new(console)",
+            "newAlertService(console)"
+          ],
+          "hint": "Der Konstruktor bekommt den Sender als Argument."
+        },
+        {
+          "text": "this.sender",
+          "hint": "Der Konstruktor speichert den Parameter im Feld."
+        }
+      ],
+      "explanation": "Die Variable hat den Typ des Interfaces, das Objekt entsteht mit `new(console)`, und der Konstruktor legt den Parameter im Feld `sender` ab."
+    },
+    {
+      "id": "m15-l01-q6",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Dependency Injection gibt es nur mit einem Framework oder Container.“ Stimmt das?",
+      "options": [
+        {
+          "text": "Ja, ohne Container kann eine Klasse ihre Abhängigkeiten nicht von außen bekommen.",
+          "feedback": "Der Konstruktor von `AlertService` im Beispiel nimmt den Sender ohne jeden Container entgegen. Das ist Dependency Injection von Hand.",
+          "misconception": "m15-l01-di-needs-container"
+        },
+        {
+          "text": "Nein: Wenn dein Code die Abhängigkeit selbst im Konstruktor übergibt, ist das schon Dependency Injection.",
+          "correct": true
+        },
+        {
+          "text": "Nein, aber nur in Tests. Im Programm braucht man immer einen Container.",
+          "feedback": "Auch im Programm geht es von Hand. Ein Container nimmt dir später nur die Arbeit ab, die Objekte zusammenzusetzen.",
+          "misconception": "m15-l01-di-needs-container"
+        }
+      ],
+      "explanation": "Dependency Injection ist ein Entwurfsmuster: Abhängigkeiten kommen von außen, über den Konstruktor. Ein Container ist ein Werkzeug, das diese Arbeit automatisiert. Er kommt in der nächsten Lektion."
+    },
+    {
+      "id": "m15-l01-q7",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "`IAlertSender` hat bisher nur die Implementierung `ConsoleSender`. Warum ist der Interface-Parameter trotzdem sinnvoll?",
+      "options": [
+        {
+          "text": "Ein Interface mit nur einer Implementierung bringt nichts. Es macht den Code nur länger.",
+          "feedback": "Der Nutzen zeigt sich beim Test: Der Test übergibt ein Double statt `ConsoleSender`. Auch eine zweite Implementierung später verlangt dann keine Änderung an `AlertService`.",
+          "misconception": "m15-l01-interface-no-benefit"
+        },
+        {
+          "text": "`AlertService` kennt nur den Vertrag. Ein Test kann ein Double übergeben, und eine zweite Implementierung verlangt später keine Änderung an `AlertService`.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler verlangt für jeden Konstruktorparameter ein Interface.",
+          "feedback": "Ein Konstruktorparameter darf jeden Typ haben. Das Interface ist eine Entscheidung für den Entwurf."
+        }
+      ],
+      "explanation": "Der Aufwand ist ein Interface mit einer Methode und ein Parameter. Dafür hängt die Klasse nur vom Vertrag ab und lässt sich testen, ohne die echte Implementierung zu benutzen."
+    },
+    {
+      "id": "m15-l01-q8",
+      "lesson": "m15-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über den Composition Root stimmen?",
+      "options": [
+        {
+          "text": "Es ist die Stelle im Programm, an der die Objekte erzeugt und verbunden werden, meist am Anfang von `Program.cs`.",
+          "correct": true
+        },
+        {
+          "text": "Klassen wie `AlertService` rufen dort `new` nicht auf. Sie bekommen ihre Abhängigkeiten übergeben.",
+          "correct": true
+        },
+        {
+          "text": "Es ist eine Klasse, die genau `CompositionRoot` heißen muss.",
+          "feedback": "Der Name einer Klasse ist egal. Gemeint ist eine Stelle im Code, kein festgelegter Typ."
+        },
+        {
+          "text": "Jede Klasse braucht ihren eigenen Composition Root.",
+          "feedback": "Es gibt eine einzige Stelle für das ganze Programm."
+        }
+      ],
+      "explanation": "Der Composition Root sammelt alle `new`-Aufrufe der Anwendung an einer Stelle. Die übrigen Klassen kennen nur Interfaces."
+    },
+    {
+      "id": "m15-l01-q9",
+      "lesson": "m15-l01",
+      "type": "single",
+      "question": "Wie prüft ein Test, welche Nachricht `AlertService` gesendet hat, ohne dass etwas auf der Konsole erscheint?",
+      "options": [
+        {
+          "text": "Er übergibt ein Objekt wie `RecordingSender`, das die Nachrichten in einer Liste sammelt, und liest die Liste danach.",
+          "correct": true
+        },
+        {
+          "text": "Er liest die Ausgabe der Konsole mit.",
+          "feedback": "Das geht, ist aber umständlich und von der Konsole abhängig. Mit einem Double entfällt beides."
+        },
+        {
+          "text": "Gar nicht: Ein `AlertService` mit einer Abhängigkeit lässt sich nicht testen.",
+          "feedback": "Gerade durch die Übergabe im Konstruktor lässt sich die Abhängigkeit ersetzen."
+        }
+      ],
+      "explanation": "Weil `AlertService` den Sender im Konstruktor bekommt, übergibt der Test ein Test-Double. Das ist ein Spy: Er merkt sich, was er bekommen hat."
+    },
+    {
+      "id": "m15-l01-q10",
+      "lesson": "m15-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m15/l01/recording-sender.cs",
+      "explanation": "Zwei Aufrufe von `Raise` legen zwei Texte in die Liste. `Messages[0]` ist der erste Text. Auf der Konsole erscheint nur, was das Programm selbst ausgibt."
+    },
+    {
+      "id": "m15-l01-q11",
+      "lesson": "m15-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Constructor Injection ist und warum eine Klasse ihre Abhängigkeit nicht mit `new` erzeugen sollte.",
+      "modelAnswer": "Bei Constructor Injection nennt die Klasse ihre Abhängigkeit als Parameter des Konstruktors, am besten als Interface. Wer das Objekt erzeugt, übergibt die Abhängigkeit.\n\nErzeugt die Klasse sie mit `new` selbst, ist sie an einen konkreten Typ gebunden. Ein anderer Typ oder ein Test-Double geht dann nur, wenn man die Klasse ändert."
+    },
+    {
+      "id": "m15-l01-q12",
+      "lesson": "m15-l01",
+      "type": "explain",
+      "question": "Transferfrage: Welche Klasse in einem eigenen Programm erzeugt heute eine Abhängigkeit selbst mit `new`, und wie würdest du sie umbauen?",
+      "modelAnswer": "Zum Beispiel eine Klasse, die selbst eine Datei öffnet, auf die Konsole schreibt oder die Uhr liest. Ich würde ein kleines Interface für diese Aufgabe schreiben, es als Konstruktorparameter nehmen und die konkrete Klasse nur im Composition Root erzeugen."
+    }
+  ]
 }

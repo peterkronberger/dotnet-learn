@@ -10017,6 +10017,83 @@
         "unit-test"
       ],
       "lesson": "m14-l12"
+    },
+    {
+      "id": "dependency-injection",
+      "term": "Dependency Injection (DI)",
+      "german": "Abhängigkeiten übergeben",
+      "category": "platform",
+      "definition": "Eine Klasse erzeugt ihre Abhängigkeiten nicht selbst, sondern bekommt sie von außen, meist als Interface über den Konstruktor. Dadurch lässt sich eine Abhängigkeit austauschen, ohne die Klasse zu ändern.",
+      "aliases": [
+        "DI",
+        "Dependency-Injection"
+      ],
+      "related": [
+        "dependency",
+        "constructor-injection",
+        "inversion-of-control",
+        "composition-root"
+      ],
+      "lesson": "m15-l01",
+      "source": {
+        "title": "Dependency injection in .NET: The concept",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#the-concept"
+      }
+    },
+    {
+      "id": "constructor-injection",
+      "term": "Constructor Injection",
+      "german": "Übergabe über den Konstruktor",
+      "category": "platform",
+      "definition": "Eine Klasse nennt ihre Abhängigkeiten als Parameter ihres Konstruktors. Wer das Objekt erzeugt, übergibt sie. Das kannst du von Hand tun oder einen DI-Container die Parameter füllen lassen.",
+      "aliases": [
+        "Konstruktor-Injektion"
+      ],
+      "related": [
+        "dependency-injection",
+        "dependency",
+        "composition-root"
+      ],
+      "lesson": "m15-l01",
+      "source": {
+        "title": "Dependency injection in .NET: The concept",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#the-concept"
+      }
+    },
+    {
+      "id": "composition-root",
+      "term": "Composition Root",
+      "german": "Wurzel der Zusammensetzung",
+      "category": "course",
+      "definition": "Die eine Stelle im Programm, an der alle Objekte erzeugt und miteinander verbunden werden, meist ganz am Anfang von `Program.cs`. Alle anderen Klassen erzeugen ihre Abhängigkeiten nicht selbst.",
+      "aliases": [
+        "Kompositionswurzel"
+      ],
+      "related": [
+        "dependency-injection",
+        "constructor-injection"
+      ],
+      "lesson": "m15-l01"
+    },
+    {
+      "id": "inversion-of-control",
+      "term": "Inversion of Control (IoC)",
+      "german": "Umkehr der Steuerung",
+      "category": "platform",
+      "definition": "Die Klasse bestimmt nicht mehr selbst, welche Abhängigkeiten sie benutzt, sondern bekommt sie von außen. Die Kontrolle über die Auswahl liegt beim Code, der das Objekt erzeugt. Dependency Injection ist eine Technik dafür.",
+      "aliases": [
+        "IoC",
+        "Umkehr der Kontrolle"
+      ],
+      "related": [
+        "dependency-injection",
+        "dependency"
+      ],
+      "lesson": "m15-l01",
+      "source": {
+        "title": "Dependency injection in .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview"
+      }
     }
   ]
 }

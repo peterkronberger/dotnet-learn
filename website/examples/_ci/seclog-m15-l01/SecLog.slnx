@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/SecLog.Cli/SecLog.Cli.csproj" />
+  <Project Path="src/SecLog.Core/SecLog.Core.csproj" />
+  <Project Path="tests/SecLog.Tests/SecLog.Tests.csproj" />
+</Solution>
