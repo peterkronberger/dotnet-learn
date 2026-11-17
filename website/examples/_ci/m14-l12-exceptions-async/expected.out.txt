@@ -1,0 +1,11 @@
+Passed Checks.Tests.AsyncTests.CountAsync_CancelledToken_ThrowsCancellation
+Passed Checks.Tests.AsyncTests.CountAsync_ThreeLines_ReturnsTwo
+Passed Checks.Tests.ExceptionTests.Require_Empty_ThrowsArgumentException
+Passed Checks.Tests.ExceptionTests.Require_Null_ThrowsAnyArgumentException
+Passed Checks.Tests.ExceptionTests.Require_Null_ThrowsArgumentNullException
+Failed Checks.Tests.ExceptionTests.Require_Null_ThrowsExactArgumentException
+      Assert.Throws() Failure: Exception type was not an exact match
+      Expected: typeof(System.ArgumentException)
+      Actual:   typeof(System.ArgumentNullException)
+      ---- System.ArgumentNullException : Value cannot be null. (Parameter 'name')
+        ----- Inner Stack Trace -----

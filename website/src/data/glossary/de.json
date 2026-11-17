@@ -9948,6 +9948,75 @@
         "stub"
       ],
       "lesson": "m14-l10"
+    },
+    {
+      "id": "time-provider",
+      "term": "TimeProvider",
+      "german": "Zeitanbieter",
+      "category": "platform",
+      "definition": "Eine abstrakte Klasse (seit .NET 8), die die Zeit als `DateTimeOffset` liefert, etwa mit `GetUtcNow()`. `TimeProvider.System` ist die Systemuhr. Code, der einen `TimeProvider` bekommt, lässt sich mit einer anderen Uhr testen.",
+      "aliases": [
+        "TimeProvider.System"
+      ],
+      "related": [
+        "fake-time-provider",
+        "dependency"
+      ],
+      "lesson": "m14-l11",
+      "source": {
+        "title": "What is the TimeProvider class",
+        "url": "https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview"
+      }
+    },
+    {
+      "id": "fake-time-provider",
+      "term": "FakeTimeProvider",
+      "german": "FakeTimeProvider (steuerbare Uhr)",
+      "category": "platform",
+      "definition": "Ein `TimeProvider` für Tests aus dem Paket `Microsoft.Extensions.TimeProvider.Testing`. Du setzt die Startzeit und lässt die Zeit mit `Advance` vergehen, ohne zu warten.",
+      "aliases": [
+        "Fake-Uhr"
+      ],
+      "related": [
+        "time-provider",
+        "test-double"
+      ],
+      "lesson": "m14-l11",
+      "source": {
+        "title": "What is the TimeProvider class: FakeTimeProvider implementation",
+        "url": "https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview#faketimeprovider-implementation"
+      }
+    },
+    {
+      "id": "exception-assertion",
+      "term": "Exception Assertion",
+      "german": "Exception-Prüfung",
+      "category": "course",
+      "definition": "Eine Prüfung in einem Test, dass Code eine bestimmte Exception wirft, mit `Assert.Throws<T>` (genauer Typ) oder `Assert.ThrowsAny<T>` (auch abgeleitete Typen). Sie gibt die Exception zurück.",
+      "aliases": [
+        "Assert.Throws",
+        "ThrowsAny",
+        "Throws"
+      ],
+      "related": [
+        "assertion"
+      ],
+      "lesson": "m14-l12"
+    },
+    {
+      "id": "async-test",
+      "term": "Async Test",
+      "german": "asynchroner Test",
+      "category": "course",
+      "definition": "Ein Test mit der Signatur `async Task`, der mit `await` auf asynchronen Code wartet. Ein Test mit `async void` ist in xUnit v3 nicht erlaubt.",
+      "aliases": [
+        "async Task Test",
+        "asynchrone Tests"
+      ],
+      "related": [
+        "unit-test"
+      ],
+      "lesson": "m14-l12"
     }
   ]
 }
