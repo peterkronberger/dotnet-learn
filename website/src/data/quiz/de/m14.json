@@ -1581,6 +1581,357 @@
       "type": "explain",
       "question": "Transferfrage: Für welche Regel in SecLog wären Datenzeilen nützlich, und welche Zeilen wählst du?",
       "modelAnswer": "Für die Schwelle von `FailedLoginRule`. Ich teste 4, 5 und 6 Fehlversuche bei einer Schwelle von 5: Die Zeilen liegen um die Grenze herum und zeigen, ob `>=` richtig ist. Alle Zeilen teilen denselben Testkörper, nur die Zahl und das erwartete Ergebnis wechseln."
+    },
+    {
+      "id": "m14-l09-q1",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "Welche Methode lässt sich am einfachsten testen?",
+      "options": [
+        {
+          "text": "`bool IsAlarm(int failures, int threshold)`: Das Ergebnis hängt nur von den Parametern ab.",
+          "correct": true
+        },
+        {
+          "text": "`void Record(string eventType)` mit einem statischen Zähler und `Console.WriteLine`.",
+          "feedback": "Der Zähler lebt zwischen den Aufrufen weiter, und das Ergebnis geht nur auf die Konsole. Ein Test kann beides schlecht prüfen."
+        },
+        {
+          "text": "`int ReadFailures()`, die ihren Wert mit `Console.ReadLine()` holt.",
+          "feedback": "Der Test müsste die Konsole füttern. Die Eingabe sollte als Parameter ankommen."
+        }
+      ],
+      "explanation": "Eine Methode, deren Ergebnis nur von ihren Parametern abhängt und die nichts sonst verändert, prüfst du mit einem Aufruf und einem `Assert`."
+    },
+    {
+      "id": "m14-l09-q2",
+      "lesson": "m14-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l09/hard-to-test.cs",
+      "explanation": "Die ersten beiden Aufrufe erhöhen den Zähler auf 2, der dritte auf 3. Erst dann gilt `failures >= 3` und die Zeile wird gedruckt. Das Ergebnis steckt in der Konsole und im Zustand des statischen Feldes."
+    },
+    {
+      "id": "m14-l09-q3",
+      "lesson": "m14-l09",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m14/l09/testable-version.cs",
+      "explanation": "`CountFailures` zählt drei Einträge, `IsAlarm(3, 3)` ist `true`. Mit der Schwelle 5 ist `3 >= 5` falsch. Beide Methoden geben Werte zurück, die ein Test prüfen kann."
+    },
+    {
+      "id": "m14-l09-q4",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "Der Test im Programm führt jede Zeile von `Level` aus. Die Zeilenabdeckung beträgt 100 %. Was folgt daraus?",
+      "example": "m14/l09/quiz-coverage.snippet.cs",
+      "options": [
+        {
+          "text": "Die Abdeckung sagt nur, dass die Zeilen liefen. Ob die Ergebnisse stimmen, prüft erst eine Assertion.",
+          "correct": true
+        },
+        {
+          "text": "Die Regel enthält keinen Fehler, denn alle Zeilen sind getestet.",
+          "feedback": "Der Test prüft kein Ergebnis. In `Level` steht `> 3` statt `>= 3`, und der Test bleibt grün.",
+          "misconception": "m14-l09-full-coverage-no-bugs"
+        },
+        {
+          "text": "Der Test ist gut, weil er alle Zweige durchläuft.",
+          "feedback": "Durchlaufen ist nicht prüfen. Ein Test ohne `Assert` kann nur an einer Ausnahme scheitern.",
+          "misconception": "m14-l09-full-coverage-no-bugs"
+        }
+      ],
+      "explanation": "Code Coverage misst, welcher Code beim Testlauf ausgeführt wurde. Sie sagt nichts darüber, ob die Ergebnisse richtig sind. Dafür sind die Assertions da."
+    },
+    {
+      "id": "m14-l09-q5",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "Was misst Code Coverage?",
+      "options": [
+        {
+          "text": "Den Anteil des Codes (Zeilen, Zweige oder Methoden), den die Tests ausführen.",
+          "correct": true
+        },
+        {
+          "text": "Die Anzahl der Fehler, die ein Testlauf gefunden hat.",
+          "feedback": "Fehler zeigt nur ein fehlgeschlagener Test. Coverage zählt ausgeführten Code."
+        },
+        {
+          "text": "Den Anteil der Tests, die bestehen.",
+          "feedback": "Das meldet der Testlauf als Ergebnis, nicht die Coverage."
+        }
+      ],
+      "explanation": "Bei zwei Zweigen (a und b) meldet ein Test, der nur Zweig a durchläuft, 50 % Zweigabdeckung. Die Zahl sagt, was lief, nicht, was stimmt."
+    },
+    {
+      "id": "m14-l09-q6",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "`int CountFailuresInFile(string path)` öffnet eine Datei und zählt Fehlversuche. Wie machst du die Zählung leicht testbar?",
+      "options": [
+        {
+          "text": "Eine Methode `CountFailures(IEnumerable<string> lines)` zählt. Das Öffnen der Datei bleibt außerhalb.",
+          "correct": true
+        },
+        {
+          "text": "Der Test legt vor jedem Lauf eine Datei an, die er danach löscht.",
+          "feedback": "Das geht, macht den Test aber langsamer und anfälliger. Die Zählung braucht die Datei nicht."
+        },
+        {
+          "text": "Die Methode wird `static`.",
+          "feedback": "`static` ändert nicht, woher die Eingabe kommt."
+        }
+      ],
+      "explanation": "Trenne die Logik (Zählen) von der Ein- und Ausgabe (Datei). Die Logik bekommt ihre Eingaben als Parameter. Im Test übergibst du ein Array mit Beispielzeilen."
+    },
+    {
+      "id": "m14-l09-q7",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "Warum erschwert ein statischer, veränderlicher Zähler das Testen?",
+      "options": [
+        {
+          "text": "Sein Wert bleibt zwischen Aufrufen erhalten. Das Ergebnis hängt von früheren Aufrufen ab.",
+          "correct": true
+        },
+        {
+          "text": "Statische Felder sind in Testprojekten verboten.",
+          "feedback": "Es gibt kein solches Verbot. Das Problem ist der geteilte Zustand."
+        },
+        {
+          "text": "Statische Klassen lassen sich nicht aufrufen.",
+          "feedback": "Statische Klassen rufst du über ihren Namen auf. Das ist nicht das Problem."
+        }
+      ],
+      "explanation": "Der Zustand lebt, solange das Programm läuft. Ein Test sieht die Spuren früherer Tests und liefert abhängig von der Reihenfolge andere Ergebnisse."
+    },
+    {
+      "id": "m14-l09-q8",
+      "lesson": "m14-l09",
+      "type": "single",
+      "question": "Warum liegt `LogParser` in `SecLog.Core` und nicht mehr als lokale Funktion in `Program.cs`?",
+      "options": [
+        {
+          "text": "Das Testprojekt verweist auf `SecLog.Core` und kann dort `public` Methoden aufrufen. Lokale Funktionen von `Program.cs` sieht es nicht.",
+          "correct": true
+        },
+        {
+          "text": "Lokale Funktionen laufen in Tests langsamer.",
+          "feedback": "Die Geschwindigkeit ist nicht der Grund. Das Testprojekt erreicht sie nicht."
+        },
+        {
+          "text": "`SecLog.Core` ist die einzige Assembly, die `switch` kennt.",
+          "feedback": "Jede Assembly kann `switch` benutzen."
+        }
+      ],
+      "explanation": "Ein Testprojekt ruft nur Typen auf, die ein anderes Projekt als `public` anbietet. Darum zieht die Lektion die Logik in `SecLog.Core`."
+    },
+    {
+      "id": "m14-l09-q9",
+      "lesson": "m14-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, woran du erkennst, dass Code schwer zu testen ist, und wie du ihn änderst.",
+      "modelAnswer": "Code ist schwer zu testen, wenn sein Ergebnis auf der Konsole oder in einer Datei landet, wenn er Eingaben selbst holt oder wenn er veränderlichen statischen Zustand benutzt. Ich trenne die Logik von Ein- und Ausgabe, gebe ihr die Eingaben als Parameter und lasse sie ein Ergebnis zurückgeben. Dann reicht ein Aufruf und ein `Assert`."
+    },
+    {
+      "id": "m14-l09-q10",
+      "lesson": "m14-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was Code Coverage aussagt und was nicht.",
+      "modelAnswer": "Coverage zeigt, welcher Teil des Codes beim Testlauf ausgeführt wurde, etwa als Anteil von Zeilen oder Zweigen. Sie sagt nicht, ob die Ergebnisse stimmen. Ein Test ohne `Assert` kann 100 % erreichen und trotzdem einen Fehler übersehen. Eine niedrige Zahl zeigt aber Code, den kein Test berührt."
+    },
+    {
+      "id": "m14-l09-q11",
+      "lesson": "m14-l09",
+      "type": "explain",
+      "question": "Transferfrage: Welche Logik in deinem Programm steckt noch in `Program.cs` oder in Ausgaben, und wie würdest du sie testbar machen?",
+      "modelAnswer": "Die Auswertung, wie viele Fehlversuche ein Nutzer hat und welche Schwere das ergibt, steckt in Ausgabezeilen. Ich verschiebe sie in eine `public` Methode in `SecLog.Core`, die eine Zahl bekommt und eine `Severity` zurückgibt. `Program.cs` ruft sie auf und druckt das Ergebnis. Im Testprojekt prüfe ich die Grenzen der Schwellen."
+    },
+    {
+      "id": "m14-l10-q1",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Warum ersetzt du im Test eine Abhängigkeit durch ein Test-Double?",
+      "options": [
+        {
+          "text": "Der Test läuft schnell, wiederholbar und ohne Nebenwirkungen wie das Versenden einer Nachricht.",
+          "correct": true
+        },
+        {
+          "text": "Damit der Test mehr Zeilen des Codes ausführt.",
+          "feedback": "Ein Double ersetzt Code, statt ihn auszuführen. Mit Coverage hat das nichts zu tun."
+        },
+        {
+          "text": "Weil xUnit nur Tests mit Doubles zulässt.",
+          "feedback": "xUnit führt auch Tests mit echten Objekten aus."
+        }
+      ],
+      "explanation": "Eine Abhängigkeit, die langsam ist, nicht immer dasselbe liefert oder etwas auslöst (Netzwerk, Nachrichten, Dateien), gehört in einem Unit-Test nicht zum Test. Ein Double ersetzt sie."
+    },
+    {
+      "id": "m14-l10-q2",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Welche Klasse im Programm ist ein Spy?",
+      "example": "m14/l10/doubles.snippet.cs",
+      "options": [
+        {
+          "text": "`SpyNotifier`: Sie merkt sich jede gesendete Nachricht.",
+          "correct": true
+        },
+        {
+          "text": "`StubNotifier`: Sie antwortet mit einem festen Wert.",
+          "feedback": "Das ist ein Stub. Er zeichnet nichts auf."
+        },
+        {
+          "text": "`InMemoryNotifier`: Sie hat eine einfache, funktionierende Logik.",
+          "feedback": "Das ist ein Fake: eine einfache Implementierung, die wie das Original arbeitet."
+        }
+      ],
+      "explanation": "Ein Spy zeichnet Aufrufe auf, damit der Test sie danach prüfen kann."
+    },
+    {
+      "id": "m14-l10-q3",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Der Test soll zeigen, dass bei 4 Fehlversuchen und der Schwelle 5 keine Nachricht gesendet wird. Welches Double passt?",
+      "options": [
+        {
+          "text": "Ein Spy, der die Aufrufe aufzeichnet.",
+          "correct": true
+        },
+        {
+          "text": "Ein Stub, der immer `true` zurückgibt.",
+          "feedback": "Ein Stub zeigt nicht, ob er aufgerufen wurde."
+        },
+        {
+          "text": "Der echte Notifier, der die Nachricht wirklich versendet.",
+          "feedback": "Dann hätte der Test eine Nebenwirkung und liefe langsamer."
+        }
+      ],
+      "explanation": "Um zu prüfen, ob und wie oft eine Abhängigkeit aufgerufen wurde, brauchst du ein Double, das Aufrufe festhält."
+    },
+    {
+      "id": "m14-l10-q4",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Der Test soll zeigen, dass `Alert` `false` liefert, wenn das Senden fehlschlägt. Welches Double passt?",
+      "options": [
+        {
+          "text": "Ein Stub, der `false` zurückgibt.",
+          "correct": true
+        },
+        {
+          "text": "Ein Spy, der die Nachrichten aufzeichnet.",
+          "feedback": "Der Spy liefert immer `true`. Das Senden schlägt damit nie fehl."
+        },
+        {
+          "text": "Gar keins: `Alert` lässt sich nicht ohne echten Notifier testen.",
+          "feedback": "Das Interface erlaubt, den Notifier im Test zu ersetzen."
+        }
+      ],
+      "explanation": "Ein Stub antwortet mit einem festen Wert. So erzeugst du den Fall „Senden schlägt fehl“ auf Knopfdruck."
+    },
+    {
+      "id": "m14-l10-q5",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Für Code mit Abhängigkeiten brauchst du eine Mocking-Bibliothek.“ Stimmt das?",
+      "options": [
+        {
+          "text": "Nein. Eine Klasse, die das Interface implementiert, genügt. Bibliotheken wie Moq, NSubstitute oder FakeItEasy sparen nur Schreibarbeit.",
+          "correct": true
+        },
+        {
+          "text": "Ja. Ohne Bibliothek lässt sich eine Abhängigkeit nicht ersetzen.",
+          "feedback": "Wenn der Code ein Interface verlangt, kannst du es im Test selbst implementieren.",
+          "misconception": "m14-l10-mocking-library-required"
+        },
+        {
+          "text": "Ja. xUnit liefert Doubles nur zusammen mit einer Bibliothek.",
+          "feedback": "xUnit liefert gar keine Doubles. Du schreibst sie selbst oder nimmst eine Bibliothek.",
+          "misconception": "m14-l10-mocking-library-required"
+        }
+      ],
+      "explanation": "Ein Test-Double ist eine gewöhnliche Klasse. Das Interface macht den Austausch möglich. Mocking-Bibliotheken erzeugen solche Klassen für dich."
+    },
+    {
+      "id": "m14-l10-q6",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Nach der Terminologie von Microsoft Learn: Wann ist ein Fake ein Mock?",
+      "options": [
+        {
+          "text": "Wenn der Test mit `Assert` gegen das Objekt prüft.",
+          "correct": true
+        },
+        {
+          "text": "Wenn es feste Werte liefert.",
+          "feedback": "Ein Objekt, das nur feste Werte liefert, ist ein Stub."
+        },
+        {
+          "text": "Wenn es mehr als eine Methode hat.",
+          "feedback": "Die Zahl der Methoden spielt keine Rolle."
+        }
+      ],
+      "explanation": "Fake ist dort ein Oberbegriff. Ein Stub ersetzt eine Abhängigkeit kontrolliert. Ein Mock ist ein Fake, an dem der Test seine `Assert`-Prüfung ausführt."
+    },
+    {
+      "id": "m14-l10-q7",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Welche Abhängigkeit ersetzt du im Unit-Test durch ein Double?",
+      "options": [
+        {
+          "text": "Eine, die langsam oder unzuverlässig ist oder eine Nebenwirkung hat, zum Beispiel das Senden einer Nachricht.",
+          "correct": true
+        },
+        {
+          "text": "Jede Klasse, die der Code benutzt, auch `List<string>`.",
+          "feedback": "`List<string>` ist schnell und liefert immer dasselbe. Ein Double dafür ist unnötig."
+        },
+        {
+          "text": "Den Code unter Test selbst.",
+          "feedback": "Dann würdest du nichts mehr testen."
+        }
+      ],
+      "explanation": "Ersetze, was den Test langsam, unzuverlässig oder gefährlich macht. Alles andere nimmst du echt. Wer zu viel ersetzt, testet die Doubles statt des Codes."
+    },
+    {
+      "id": "m14-l10-q8",
+      "lesson": "m14-l10",
+      "type": "single",
+      "question": "Was merkt sich `IncidentSpy` in den SecLog-Tests?",
+      "options": [
+        {
+          "text": "Die Daten jedes ausgelösten Events: den Incident und die Zahl der Treffer.",
+          "correct": true
+        },
+        {
+          "text": "Alle Incidents, die geprüft wurden, auch ohne Treffer.",
+          "feedback": "Der Spy hängt am Event. Das Event kommt nur bei einem Treffer."
+        },
+        {
+          "text": "Die Namen der Regeln, die nicht getroffen haben.",
+          "feedback": "Der Spy bekommt nur die Event-Daten, nicht die Regeln."
+        }
+      ],
+      "explanation": "`IncidentSpy.Handle` abonniert `IncidentFound` und legt jedes `IncidentFoundEventArgs` in eine Liste. Der Test prüft danach, wie viele Events kamen."
+    },
+    {
+      "id": "m14-l10-q9",
+      "lesson": "m14-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Stub, ein Spy und ein Fake sind und wann du welches brauchst.",
+      "modelAnswer": "Ein Stub antwortet mit festen Werten, damit ich einen Fall wie „Senden schlägt fehl“ erzeuge. Ein Spy zeichnet Aufrufe auf, damit ich prüfe, ob und wie oft eine Abhängigkeit aufgerufen wurde. Ein Fake ist eine einfache, funktionierende Version des Originals, etwa im Speicher. Alle drei sind gewöhnliche Klassen, die dasselbe Interface wie die echte Abhängigkeit implementieren."
+    },
+    {
+      "id": "m14-l10-q10",
+      "lesson": "m14-l10",
+      "type": "explain",
+      "question": "Transferfrage: Welche Abhängigkeit in SecLog würdest du im Test ersetzen, und mit welchem Double?",
+      "modelAnswer": "Das Versenden einer Benachrichtigung für einen Incident. Ich lege ein Interface an und ersetze es im Test durch einen Spy, der die Nachrichten aufzeichnet. Für den Fall, dass das Senden fehlschlägt, nehme ich einen Stub."
     }
   ]
 }
