@@ -26,7 +26,7 @@ XML
   dotnet build "$dir" --nologo -v q 2>&1 \
     | grep -E '(warning|error) CS' \
     | sed -E 's|^.*/Program\.cs|Program.cs|; s| \[[^]]*\.csproj\]$||' \
-    | awk '!seen[$0]++'
+    | awk '!seen[$0]++' || true # the snippets fail to build on purpose
 }
 
 build obsolete-warning.snippet.cs
