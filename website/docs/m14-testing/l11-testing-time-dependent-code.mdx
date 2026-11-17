@@ -1,0 +1,233 @@
+---
+title: Zeitabhängigen Code testen
+sidebar_position: 11
+description: Warum die Uhr Tests unzuverlässig macht, wie TimeProvider die Zeit zur Abhängigkeit macht und wie FakeTimeProvider die Zeit im Test vorspult.
+lesson_id: m14-l11
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import clockDependent from '!!raw-loader!@site/examples/m14/l11/clock-dependent.cs';
+import clockDependentOutput from '!!raw-loader!@site/examples/m14/l11/clock-dependent.out.txt';
+import timeProviderExample from '!!raw-loader!@site/examples/m14/l11/time-provider.cs';
+import timeProviderOutput from '!!raw-loader!@site/examples/m14/l11/time-provider.out.txt';
+import failureTracker from '!!raw-loader!@site/examples/_ci/m14-l11-failure-tracker/FailureTracker.cs';
+import failureTrackerTests from '!!raw-loader!@site/examples/_ci/m14-l11-failure-tracker/FailureTrackerTests.cs';
+import trackerProject from '!!raw-loader!@site/examples/_ci/m14-l11-failure-tracker/Tracker.Tests.csproj';
+import trackerOutput from '!!raw-loader!@site/examples/_ci/m14-l11-failure-tracker/expected.out.txt';
+import gapAdvance from '!!raw-loader!@site/examples/m14/l11/gap-advance.snippet.cs';
+import lastFailure from '!!raw-loader!@site/examples/m14/l11/seclog-incident-last-failure.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m14/l11/seclog-program-block.snippet.cs';
+import incidentActivity from '!!raw-loader!@site/examples/_ci/seclog-m14-l11/src/SecLog.Core/Model/IncidentActivity.cs';
+import fixedTimeProvider from '!!raw-loader!@site/examples/_ci/seclog-m14-l11/src/SecLog.Cli/FixedTimeProvider.cs';
+import activityTests from '!!raw-loader!@site/examples/_ci/seclog-m14-l11/tests/SecLog.Tests/IncidentActivityTests.cs';
+import seclogOutput from '!!raw-loader!@site/examples/_ci/seclog-m14-l11/expected.out.txt';
+
+export const activityResults = seclogOutput.split('\n').filter((line) => line.includes('IncidentActivityTests')).join('\n');
+export const activeLines = seclogOutput.split('\n').filter((line) => line.startsWith('Active after')).join('\n');
+
+# Zeitabhängigen Code testen
+
+:::note[Lernziele]
+- Du erklärst, warum Code, der die Uhr selbst liest, Tests unzuverlässig macht.
+- Du kannst die Zeit als `TimeProvider` übergeben (`TimeProvider.System` im Programm).
+- Du kannst mit `FakeTimeProvider` die Zeit im Test setzen und vorspulen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l10-q7" />
+
+<Quiz id="m14-l10-q4" />
+
+<Quiz id="m14-l08-q5" />
+
+## Das Problem: die Uhr
+
+In Modul 5 hast du gesehen, wie du Zeitpunkte vergleichst. Eine Regel wie „der letzte Fehlversuch liegt höchstens 10 Minuten zurück“ braucht den aktuellen Zeitpunkt. Liest die Methode ihn selbst mit `DateTimeOffset.UtcNow`, hängt ihr Ergebnis von der Uhr ab. Ein Test kann nicht festlegen, wie spät es ist. Er kann die Grenze von genau 10 Minuten nicht treffen, und ein Test, der wirklich 10 Minuten wartet, ist unbrauchbar.
+
+Die echte Uhr ist also eine <Term id="dependency">Abhängigkeit</Term> wie eine Datei oder ein Versand (Lektion 9 und 10). Du übergibst sie von außen.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Und warum lässt sich `IsRecent` nicht auf genau 10 Minuten prüfen?
+:::
+
+<CodeBlock language="csharp" title="clock-dependent.cs">{clockDependent}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{clockDependentOutput}</CodeBlock>
+
+1. **Ablauf lesen:** Beide Aufrufe bilden den Zeitpunkt aus `DateTimeOffset.UtcNow`. `IsRecent` vergleicht ihn mit einer zweiten Abfrage der Uhr.
+2. **Ergebnis ableiten:** Vor 5 Minuten liegt im Fenster, vor 15 nicht.
+3. **Grenze suchen:** Zwischen den beiden Abfragen der Uhr vergeht Zeit. „Genau 10 Minuten“ lässt sich so nicht herstellen.
+4. **Folge:** Die Methode ist nur ungefähr prüfbar.
+
+</details>
+
+<Quiz id="m14-l11-q1" />
+
+<Quiz id="m14-l11-q3" />
+
+## TimeProvider
+
+<Since dotnet="8" />
+
+Ein <Term id="time-provider">TimeProvider</Term> ist eine abstrakte Klasse, die die Zeit als `DateTimeOffset` liefert. Die Methode `GetUtcNow()` gibt die aktuelle Zeit in UTC zurück, `GetLocalNow()` die Ortszeit. `TimeProvider.System` ist die Standardimplementierung: Sie nutzt die Systemuhr. Die Klasse gehört seit .NET 8 zum Framework.
+
+Dein Code bekommt den `TimeProvider` als Parameter oder über den Konstruktor, genau wie jede andere Abhängigkeit. Das Programm übergibt `TimeProvider.System`. Ein Test übergibt eine andere Uhr. Weil `TimeProvider` abstrakt ist (Modul 8), kannst du von ihm erben und `GetUtcNow()` überschreiben:
+
+:::info[Vorhersage]
+Das Programm nutzt zuerst die Systemuhr, dann eine feste Uhr, die immer 08:16:48 Uhr zeigt. Der letzte Fehler war um 08:06:48 Uhr. Was gibt es aus?
+:::
+
+<CodeBlock language="csharp" title="time-provider.cs">{timeProviderExample}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{timeProviderOutput}</CodeBlock>
+
+1. **Systemuhr:** Ein Fehler, der 5 Minuten vor der Systemzeit liegt, ist im Fenster von 10 Minuten.
+2. **Feste Uhr:** `FixedTimeProvider` liefert immer denselben Zeitpunkt. 08:16:48 minus 08:06:48 sind genau 10 Minuten.
+3. **Grenze prüfen:** Wegen `<=` gilt genau 10 Minuten noch als aktuell.
+4. **Eine Sekunde mehr:** Dann sind es 10 Minuten und 1 Sekunde. Der Vergleich ist falsch.
+
+Was passiert, wenn du `<=` durch `<` ersetzt? Der Fall „genau 10 Minuten“ wird `False`. Nur eine Uhr, die du festlegst, zeigt dir das.
+
+</details>
+
+<Quiz id="m14-l11-q2" />
+
+<Quiz id="m14-l11-q4" />
+
+## FakeTimeProvider
+
+Eine eigene Unterklasse ist schnell geschrieben, aber meist musst du die Zeit im Test auch weiterstellen. Dafür gibt es <Term id="fake-time-provider">FakeTimeProvider</Term>. Die Klasse steckt im NuGet-Paket `Microsoft.Extensions.TimeProvider.Testing`, das ins Testprojekt gehört. Sie erbt von `TimeProvider`. Mit `new FakeTimeProvider(start)` legst du die Startzeit fest. `Advance(zeitspanne)` schiebt die Uhr vor, `SetUtcNow(zeitpunkt)` setzt sie auf einen späteren Zeitpunkt. Der Test wartet nie.
+
+<CodeBlock language="xml" title="Tracker.Tests.csproj">{trackerProject}</CodeBlock>
+
+Der Code unter Test merkt sich den Zeitpunkt des letzten Fehlers und sagt, ob er noch im Fenster liegt:
+
+<CodeBlock language="csharp" title="FailureTracker.cs">{failureTracker}</CodeBlock>
+
+:::info[Vorhersage]
+Welche der fünf Tests bestehen? Überlege bei jedem, wie weit die Uhr vorgespult wird.
+:::
+
+<CodeBlock language="csharp" title="FailureTrackerTests.cs">{failureTrackerTests}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test">{trackerOutput}</CodeBlock>
+
+1. **Startzeit setzen:** Jeder Test startet die Uhr bei 08:01:40 Uhr, dem ersten Fehlversuch von bob im Beispiel-Log.
+2. **Zeit vorspulen:** `Advance` verschiebt die Uhr. Nach 5 Minuten und nach genau 10 Minuten ist `IsActive` wahr, nach 10 Minuten und 1 Sekunde falsch.
+3. **Zeit setzen:** Im letzten Test setzt `SetUtcNow` die Uhr auf 08:06:48 Uhr. Der zweite Fehler zählt ab dann. 9 Minuten später ist er noch aktiv.
+4. **Ergebnis:** Alle fünf bestehen in Millisekunden. Kein Test hat gewartet.
+
+</details>
+
+<Quiz id="m14-l11-q5" />
+
+<Quiz id="m14-l11-q6" />
+
+<Quiz id="m14-l11-q7" />
+
+## Gap-Beispiel: die Uhr vorspulen
+
+Der Test soll zeigen, dass eine Sekunde nach dem Ende des Fensters der Fehler nicht mehr aktiv ist. Die Lücken `___` fehlen.
+
+<CodeBlock language="csharp" title="gap-advance.snippet.cs">{gapAdvance}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die erste Lücke ist `FakeTimeProvider`, die zweite `Advance`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m14-l10/`) hat Tests für Regeln, Zeitfenster, Parser, Detektor und Monitor. Ein Incident kennt die Zeit seines letzten Fehlversuchs noch nicht, und keine Prüfung fragt, ob er noch aktiv ist.
+
+**Neue Anforderung:** Ein Incident bekommt die Eigenschaft `LastFailure`. Die neue Klasse `IncidentActivity` in `SecLog.Core` bekommt einen `TimeProvider` und ein Fenster und sagt mit `IsActive`, ob der letzte Fehlversuch höchstens ein Fenster zurückliegt. `Program.cs` übergibt eine feste Uhr, damit die Ausgabe stabil bleibt. Die Tests nutzen `FakeTimeProvider`.
+
+Die neue Eigenschaft von `Incident`:
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/Incident.cs (neue Eigenschaft)">{lastFailure}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={incidentActivity} title="src/SecLog.Core/Model/IncidentActivity.cs" />
+
+<FoldedCode code={fixedTimeProvider} title="src/SecLog.Cli/FixedTimeProvider.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (neuer Block)">{programBlock}</CodeBlock>
+
+<FoldedCode code={activityTests} title="tests/SecLog.Tests/IncidentActivityTests.cs" />
+
+1. **Eigenschaft ergänzen:** `LastFailure` liefert den Zeitpunkt des letzten Eintrags oder `null`. `failures[^1]` ist der letzte Eintrag der Liste.
+2. **Uhr als Parameter:** `IncidentActivity` bekommt den `TimeProvider` im Konstruktor und fragt ihn mit `GetUtcNow()`.
+3. **Feste Uhr im Programm:** `FixedTimeProvider` zeigt immer denselben Zeitpunkt. So bleibt die Ausgabe des Programms bei jedem Lauf gleich.
+4. **Tests schreiben:** Die Tests starten einen `FakeTimeProvider` beim letzten Fehlversuch, spulen vor und prüfen die Grenze mit 599, 600 und 601 Sekunden.
+5. **Testprojekt:** `SecLog.Tests.csproj` bekommt eine zweite Paketreferenz auf `Microsoft.Extensions.TimeProvider.Testing`.
+
+Die neuen Zeilen der Programmausgabe:
+
+<CodeBlock language="text" title="Ausgabe des Programms">{activeLines}</CodeBlock>
+
+Die neuen Tests:
+
+<CodeBlock language="text" title="Ausgabe der Tests">{activityResults}</CodeBlock>
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m14-l11/`) prüft, ob ein Incident noch aktiv ist, und die Tests steuern die Zeit mit einem `FakeTimeProvider`. Das Verzeichnis unterscheidet sich von `_ci/seclog-m14-l10/` nur durch `LastFailure`, `IncidentActivity`, `FixedTimeProvider`, den Block in `Program.cs`, die Paketreferenz und die neue Testdatei.
+
+<Quiz id="m14-l11-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m14-l11-test-must-wait-window" />
+
+**„Um ein Fenster von 10 Minuten zu testen, muss der Test 10 Minuten warten.“** Das stimmt nicht. Der Test übergibt eine Uhr, die er selbst vorspult. `clock.Advance(TimeSpan.FromMinutes(10))` kostet keine Zeit. Wer im Test wirklich wartet, bekommt langsame Tests, die obendrein ungenau sind.
+:::
+
+:::warning[Achtung]
+<Misconception id="m14-l11-fake-time-provider-changes-system-clock" />
+
+**„`FakeTimeProvider` verändert die Systemuhr.“** Das stimmt nicht. Er ist ein gewöhnliches Objekt. Nur Code, der ihn als `TimeProvider` bekommt, sieht seine Zeit. Alles andere, auch `DateTimeOffset.UtcNow` im selben Prozess, zeigt weiter die echte Zeit. Darum musst du den `TimeProvider` an allen Stellen benutzen, die die Zeit brauchen.
+:::
+
+<details>
+<summary>Vertiefung: Weitere Zeitfunktionen (optional)</summary>
+
+Neben `GetUtcNow()` und `GetLocalNow()` kann ein `TimeProvider` Zeitstempel für Messungen und Timer liefern. Einige Methoden der Tasks arbeiten mit ihm zusammen, zum Beispiel `Task.Delay(TimeSpan, TimeProvider)` und `Task.WaitAsync(TimeSpan, TimeProvider)`. Mit einem `FakeTimeProvider` lässt sich so auch eine Wartezeit vorspulen ([TimeProvider im Überblick](https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview#use-with-net)).
+
+</details>
+
+## Zusammenfassung
+
+Code, der die Uhr selbst liest, ist schwer zu testen, weil ein Test die Zeit nicht festlegen kann. `TimeProvider` (seit .NET 8) macht die Zeit zur Abhängigkeit: Der Code ruft `GetUtcNow()` auf, das Programm übergibt `TimeProvider.System`. Im Test übergibst du einen `FakeTimeProvider` aus dem Paket `Microsoft.Extensions.TimeProvider.Testing`, setzt die Startzeit und spulst mit `Advance` vor. Der Test wartet nie, und die Systemuhr bleibt unverändert. Gute Tests prüfen die Grenze des Fensters: genau am Ende und eine Sekunde danach.
+
+## Prüfe dein Wissen
+
+<Quiz id="m14-l11-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m14-l11-q10" />
+
+### Transferfrage
+
+<Quiz id="m14-l11-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [TimeProvider im Überblick (What is the TimeProvider class)](https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview)
+- Microsoft Learn: [FakeTimeProvider (API)](https://learn.microsoft.com/dotnet/api/microsoft.extensions.time.testing.faketimeprovider)

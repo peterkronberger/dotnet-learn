@@ -1,0 +1,3 @@
+System clock, 5 minutes ago: True
+Exactly 10 minutes ago: True
+One second more: False
