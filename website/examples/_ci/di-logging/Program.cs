@@ -37,7 +37,9 @@ class TransientService(ILogger<TransientService> logger)
     public void Greet(string name) => logger.LogWarning("Hello, {Name}!", name);
 }
 
+// @fold-start
 // Minimal provider that writes to the console (the console logging package is not part of the playground).
+// It writes synchronously, so the lines keep their order.
 sealed class ConsoleLoggerProvider : ILoggerProvider
 {
     public ILogger CreateLogger(string categoryName) => new ConsoleLogger(categoryName);
@@ -55,3 +57,4 @@ sealed class ConsoleLoggerProvider : ILoggerProvider
             Console.WriteLine($"{logLevel}: {category}: {formatter(state, exception)}");
     }
 }
+// @fold-end

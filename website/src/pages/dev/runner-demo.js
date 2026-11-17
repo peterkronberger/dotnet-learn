@@ -15,6 +15,8 @@ import referenceTypes from '!!raw-loader!@site/examples/dev/reference-types.cs';
 import foldedDemo from '!!raw-loader!@site/examples/dev/folded-demo.cs';
 import fileIoCheck from '!!raw-loader!@site/examples/dev/file-io-check.cs';
 import fileIoCheckOutput from '!!raw-loader!@site/examples/dev/file-io-check.out.txt';
+import diLogging from '!!raw-loader!@site/examples/_ci/di-logging/Program.cs';
+import diLoggingOutput from '!!raw-loader!@site/examples/_ci/di-logging/expected.out.txt';
 import FoldedCode from '@site/src/components/FoldedCode';
 
 // Technical demo for spike S7, not learning content.
@@ -66,6 +68,15 @@ export default function RunnerDemo() {
           <code>{fileIoCheckOutput}</code>
         </pre>
         <CSharpRunner id="file-io-check" code={fileIoCheck} />
+        <h2>Pakete (DI und Logging)</h2>
+        <p>
+          Der Code ist <code>Program.cs</code> des CI-Projekts <code>_ci/di-logging</code>. Erwartete Ausgabe
+          (CI-Snapshot):
+        </p>
+        <pre>
+          <code>{diLoggingOutput}</code>
+        </pre>
+        <CSharpRunner id="di-logging" code={diLogging} />
         <h2>Entladen weit entfernter Runner</h2>
         <p>
           Runner, die weit außerhalb des Fensters liegen (etwa drei Bildschirmhöhen), werden entladen und beim

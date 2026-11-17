@@ -1,0 +1,4 @@
+AppName (json only): SecLog
+Threshold (json 5, environment 7): 7
+Mode (json, environment, command line): command-line
+Worker: SecLog, threshold 7, mode command-line
