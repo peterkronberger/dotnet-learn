@@ -1,0 +1,202 @@
+---
+title: 'Der DI-Container: ServiceCollection und ServiceProvider'
+sidebar_position: 2
+description: Wie ein Container Services aus einer ServiceCollection registriert, als ServiceProvider baut und Konstruktorparameter selbst auflöst – mit mehreren Implementierungen und Keyed Services.
+lesson_id: m15-l02
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import containerBasics from '!!raw-loader!@site/examples/_ci/m15-l02-container-basics/Program.cs';
+import containerBasicsOutput from '!!raw-loader!@site/examples/_ci/m15-l02-container-basics/expected.out.txt';
+import multipleImplementations from '!!raw-loader!@site/examples/_ci/m15-l02-multiple-implementations/Program.cs';
+import multipleOutput from '!!raw-loader!@site/examples/_ci/m15-l02-multiple-implementations/expected.out.txt';
+import keyedServices from '!!raw-loader!@site/examples/_ci/m15-l02-keyed-services/Program.cs';
+import keyedOutput from '!!raw-loader!@site/examples/_ci/m15-l02-keyed-services/expected.out.txt';
+import gapRegister from '!!raw-loader!@site/examples/m15/l02/gap-register.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l02/seclog-program-block.snippet.cs';
+import logReaderFactory from '!!raw-loader!@site/examples/_ci/seclog-m15-l02/src/SecLog.Cli/LogReaderFactory.cs';
+import cliProject from '!!raw-loader!@site/examples/_ci/seclog-m15-l02/src/SecLog.Cli/SecLog.Cli.csproj';
+
+# Der DI-Container: ServiceCollection und ServiceProvider
+
+:::note[Lernziele]
+- Du kannst Services in einer <Term id="service-collection">`ServiceCollection`</Term> registrieren.
+- Du kannst einen <Term id="service-provider">`ServiceProvider`</Term> bauen und Services mit `GetRequiredService` holen.
+- Du erklärst, wie der Container Konstruktorparameter auflöst.
+- Du kannst mehrere Implementierungen eines Interfaces registrieren und <Term id="keyed-service">Keyed Services</Term> nutzen.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l01-q3" />
+
+<Quiz id="m15-l01-q8" />
+
+<Quiz id="m14-l06-q4" />
+
+<Quiz id="m10-l03-q1" />
+
+## Der Container nimmt dir das Zusammensetzen ab
+
+In der letzten Lektion hast du den Composition Root von Hand geschrieben: erst `ConsoleSender`, dann `AlertService(sender)`. Bei zehn Klassen mit Abhängigkeiten untereinander wird das lang. Ein <Term id="di-container">DI-Container</Term> übernimmt diese Arbeit. Du sagst ihm einmal, welcher Typ für welches Interface erzeugt wird. Danach erzeugt er die Objekte und füllt die Konstruktorparameter selbst.
+
+In .NET gibt es dafür drei Schritte:
+
+1. **Registrieren:** Du trägst jede <Term id="service-registration">Registrierung</Term> in eine `ServiceCollection` ein, zum Beispiel `AddSingleton<IAlertSender, ConsoleSender>()`.
+2. **Bauen:** `BuildServiceProvider()` macht aus der Collection den Container, einen `ServiceProvider`.
+3. **Holen:** `GetRequiredService<T>()` liefert ein Objekt vom Typ `T`.
+
+<Forward concepts={['die Lebensdauern von Services (`AddSingleton`, `AddScoped`, `AddTransient`)']} module="15" />
+
+In dieser Lektion benutzt jedes Beispiel `AddSingleton`. Die Unterschiede zwischen den Methoden folgen in der nächsten Lektion.
+
+Die Pakete `Microsoft.Extensions.DependencyInjection` und `…Abstractions` liefern die Typen. Der Runner hat sie eingebaut.
+
+:::info[Vorhersage]
+`AlertService` verlangt einen `IAlertSender` im Konstruktor. Das Programm registriert beide Typen und holt dann den `AlertService`. Danach fragt es nach einem Typ, der nie registriert wurde, einmal mit `GetService` und einmal mit `GetRequiredService`. Was gibt jede Zeile aus? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={containerBasics} expected={containerBasicsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `SEND: bob failed 5 times`, `GetService: null` und `GetRequiredService: InvalidOperationException`. Die Schritte:
+
+1. **Registrieren:** `AddSingleton<IAlertSender, ConsoleSender>()` legt fest, dass für `IAlertSender` ein `ConsoleSender` entsteht. `AddSingleton<AlertService>()` registriert die Klasse selbst.
+2. **Bauen:** `BuildServiceProvider()` erzeugt den Container. Er ist `IDisposable`, darum steht `using` davor.
+3. **Auflösen:** `GetRequiredService<AlertService>()` erzeugt ein `AlertService`-Objekt. Der Container sieht den Konstruktorparameter `IAlertSender`, erzeugt den `ConsoleSender` und übergibt ihn.
+4. **Fehlender Service:** Für `UnregisteredSender` gibt es keine Registrierung. `GetService<T>()` meldet das mit `null`, `GetRequiredService<T>()` mit einer `InvalidOperationException`.
+
+**Was passiert, wenn …** du `AddSingleton<IAlertSender, ConsoleSender>()` weglässt? Dann kann der Container den Konstruktorparameter von `AlertService` nicht auflösen, und das Holen des `AlertService` scheitert.
+
+</details>
+
+<Quiz id="m15-l02-q1" />
+
+<Quiz id="m15-l02-q2" />
+
+<Quiz id="m15-l02-q8" />
+
+## Mehrere Implementierungen eines Interfaces
+
+Für dasselbe Interface darfst du mehrere Registrierungen eintragen. Der Container behandelt sie nach festen Regeln:
+
+- Eine einzelne Anfrage (`GetRequiredService<IAlertSender>()` oder ein Parameter `IAlertSender`) bekommt die **zuletzt** registrierte Implementierung.
+- Eine Anfrage nach `IEnumerable<IAlertSender>` (oder `GetServices<IAlertSender>()`) bekommt **alle**, in der Reihenfolge der Registrierung.
+- `TryAddSingleton` registriert nur, wenn für das Interface noch nichts eingetragen ist.
+- Eine Lambda (Factory) erzeugt das Objekt selbst. Du brauchst sie, wenn der Konstruktor Argumente verlangt, die der Container nicht kennt, zum Beispiel den Text `"[ALERT]"`.
+
+:::info[Vorhersage]
+Das Programm trägt `ConsoleSender` und danach `PrefixSender` ein (der zweite mit einer Lambda). Danach folgt ein `TryAddSingleton`. Wie viele Zeilen gibt es insgesamt, und welche Sender schreiben sie? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={multipleImplementations} expected={multipleOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Es sind sechs Zeilen. Die Schritte:
+
+1. **Einzelne Anfrage:** `single` ist der zuletzt registrierte `PrefixSender`: `[ALERT] one sender requested`.
+2. **Alle Registrierungen:** `GetServices` liefert `ConsoleSender` und `PrefixSender` in dieser Reihenfolge. Das `TryAddSingleton` hat nichts hinzugefügt, weil schon eine Registrierung existierte.
+3. **Einzelner Parameter:** `AlertService` bekommt im Konstruktor einen `IAlertSender`, also den letzten, den `PrefixSender`: `[ALERT] One: …`.
+4. **`IEnumerable`-Parameter:** `BroadcastService` bekommt alle Sender und ruft beide auf: eine `SEND:`-Zeile und eine `[ALERT]`-Zeile.
+
+</details>
+
+<Quiz id="m15-l02-q3" />
+
+<Quiz id="m15-l02-q4" />
+
+<Quiz id="m15-l02-q5" />
+
+<Quiz id="m15-l02-q9" />
+
+## Keyed Services
+
+<Since dotnet="8" />
+
+Manchmal soll ein Service genau eine bestimmte Implementierung bekommen und nicht die letzte. Dafür gibt es Keyed Services. Du registrierst mit einem Schlüssel (`AddKeyedSingleton<…>("console")`), holst mit `GetRequiredKeyedService<T>("console")` und wählst am Konstruktorparameter mit dem Attribut `[FromKeyedServices("prefix")]`. Das Attribut gehört zu den Attributen aus Modul 14: Es hat als Ziel einen Parameter. Der Schlüssel kann jedes Objekt sein, das `Equals` richtig umsetzt.
+
+<CSharpRunner code={keyedServices} />
+
+<CodeBlock language="text" title="Ausgabe">{keyedOutput}</CodeBlock>
+
+<Quiz id="m15-l02-q6" />
+
+<Quiz id="m15-l02-q7" />
+
+## Gap-Beispiel: Container bauen
+
+Die Lücken `___` fehlen. Setze die Namen der beiden Methoden ein.
+
+<CodeBlock language="csharp" title="gap-register.snippet.cs">{gapRegister}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die erste Lücke ist `AddSingleton`, die zweite `BuildServiceProvider`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l01/`) übergibt dem `LogSourceReader` seinen `IReportWriter` und setzt die Objekte von Hand in einem Composition-Root-Block zusammen.
+
+**Neue Anforderung:** `SecLog.Cli` registriert die Services des Composition Roots in einer `ServiceCollection` und holt den Einstiegsdienst aus dem `ServiceProvider`. Die neue Klasse `LogReaderFactory` bekommt den `IReportWriter` im Konstruktor und erzeugt mit `Create` die Leser. Das Paket `Microsoft.Extensions.DependencyInjection` kommt nur in `SecLog.Cli`. Die Ausgabe des Programms und die Tests bleiben unverändert.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="xml" title="src/SecLog.Cli/SecLog.Cli.csproj">{cliProject}</CodeBlock>
+
+<FoldedCode code={logReaderFactory} title="src/SecLog.Cli/LogReaderFactory.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Paket hinzufügen:** `SecLog.Cli` bekommt die Referenz auf `Microsoft.Extensions.DependencyInjection`. `SecLog.Core` bleibt ohne Paket.
+2. **Einstiegsdienst schreiben:** `LogReaderFactory` verlangt `IReportWriter` im Konstruktor und erzeugt die Leser mit `Create`.
+3. **Registrieren:** Der Block trägt `IReportWriter` mit `ConsoleReportWriter` und `LogReaderFactory` ein.
+4. **Bauen und holen:** `BuildServiceProvider()` erzeugt den Container, `GetRequiredService<LogReaderFactory>()` liefert die Factory mit fertig übergebenem Writer.
+5. **Benutzen:** `Create` ersetzt die beiden `new`-Aufrufe der letzten Lektion.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l02/`) lässt einen Container die Factory samt Writer erzeugen. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l01/` nur durch die Paketreferenz in `SecLog.Cli`, die neue Klasse `LogReaderFactory` und den geänderten Block in `Program.cs`.
+
+<Quiz id="m15-l02-q10" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l02-getservice-throws" />
+
+**„`GetService` wirft eine Exception, wenn nichts registriert ist.“** Das stimmt nicht. `GetService<T>()` gibt in diesem Fall `null` zurück. Eine Exception wirft `GetRequiredService<T>()`. Wenn dein Code den Service unbedingt braucht, nimm `GetRequiredService<T>()`: Der Fehler tritt dann sofort auf und nicht erst später als `NullReferenceException`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l02-container-finds-types" />
+
+**„Der Container findet Implementierungen von selbst.“** Das stimmt nicht. Er kennt nur, was du registriert hast. Gibt es für ein Interface keine Registrierung, hat er nichts zu erzeugen. Darum steht in jedem Beispiel zuerst die Registrierung.
+:::
+
+## Zusammenfassung
+
+Ein DI-Container erzeugt Objekte und löst Konstruktorparameter selbst auf. Du registrierst Services in einer `ServiceCollection`, baust mit `BuildServiceProvider()` den `ServiceProvider` und holst mit `GetRequiredService<T>()` (wirft bei fehlender Registrierung) oder `GetService<T>()` (liefert `null`). Mehrere Registrierungen für ein Interface sind erlaubt: Eine einzelne Anfrage bekommt die letzte, `IEnumerable<T>` bekommt alle, `TryAdd…` registriert nur, wenn noch nichts eingetragen ist. Eine Lambda erzeugt das Objekt selbst. Keyed Services wählen eine Implementierung über einen Schlüssel.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l02-q11" />
+
+### Transferfrage
+
+<Quiz id="m15-l02-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dependency injection (Überblick und Keyed Services)](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview)
+- Microsoft Learn: [Service registration](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-registration)

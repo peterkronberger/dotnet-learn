@@ -10094,6 +10094,108 @@
         "title": "Dependency injection in .NET",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview"
       }
+    },
+    {
+      "id": "di-container",
+      "term": "DI-Container",
+      "german": "Container für Dependency Injection",
+      "category": "platform",
+      "definition": "Ein Objekt, das Services erzeugt und ihre Konstruktorparameter selbst auflöst. Du registrierst vorher, welcher Typ für welches Interface erzeugt wird. In .NET ist der eingebaute Container ein `IServiceProvider`.",
+      "aliases": [
+        "Service-Container",
+        "Service Container"
+      ],
+      "related": [
+        "service-collection",
+        "service-provider",
+        "service-registration",
+        "dependency-injection"
+      ],
+      "lesson": "m15-l02",
+      "source": {
+        "title": "Dependency injection in .NET: The concept",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#the-concept"
+      }
+    },
+    {
+      "id": "service-collection",
+      "term": "ServiceCollection",
+      "category": "platform",
+      "definition": "Die Liste der Registrierungen, die du vor dem Start füllst, zum Beispiel mit `AddSingleton`. Erst `BuildServiceProvider()` macht daraus den Container. Eine `ServiceCollection` selbst erzeugt keine Objekte.",
+      "aliases": [
+        "IServiceCollection"
+      ],
+      "related": [
+        "service-provider",
+        "service-registration",
+        "di-container"
+      ],
+      "lesson": "m15-l02",
+      "source": {
+        "title": "Dependency injection in .NET: The concept",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#the-concept"
+      }
+    },
+    {
+      "id": "service-provider",
+      "term": "ServiceProvider",
+      "category": "platform",
+      "definition": "Der gebaute Container. Mit `GetRequiredService<T>()` oder `GetService<T>()` holst du einen Service, und er erzeugt dabei die Objekte, die dessen Konstruktor braucht. Er implementiert `IServiceProvider`.",
+      "aliases": [
+        "IServiceProvider"
+      ],
+      "related": [
+        "service-collection",
+        "di-container",
+        "service-registration"
+      ],
+      "lesson": "m15-l02",
+      "source": {
+        "title": "Dependency injection in .NET: The concept",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#the-concept"
+      }
+    },
+    {
+      "id": "service-registration",
+      "term": "Service Registration",
+      "german": "Registrierung eines Services",
+      "category": "platform",
+      "definition": "Der Eintrag in der `ServiceCollection`, der festlegt, welcher Typ für einen angefragten Typ erzeugt wird, zum Beispiel `AddSingleton<IAlertSender, ConsoleSender>()`. Mehrere Einträge für dasselbe Interface sind erlaubt.",
+      "aliases": [
+        "Registrierung",
+        "Service registrieren"
+      ],
+      "related": [
+        "service-collection",
+        "di-container",
+        "keyed-service"
+      ],
+      "lesson": "m15-l02",
+      "source": {
+        "title": "Service registration (dependency injection)",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-registration"
+      }
+    },
+    {
+      "id": "keyed-service",
+      "term": "Keyed Service",
+      "german": "Service mit Schlüssel",
+      "category": "platform",
+      "definition": "Ein Service, der mit einem Schlüssel registriert wird, zum Beispiel `AddKeyedSingleton<IAlertSender, ConsoleSender>(\"console\")`. So lassen sich mehrere Implementierungen eines Interfaces gezielt unterscheiden. Neu seit .NET 8.",
+      "aliases": [
+        "Keyed Services",
+        "Keyed DI"
+      ],
+      "related": [
+        "service-registration",
+        "di-container",
+        "attribute"
+      ],
+      "lesson": "m15-l02",
+      "source": {
+        "title": "Dependency injection in .NET: Keyed services",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#keyed-services"
+      }
     }
   ]
 }

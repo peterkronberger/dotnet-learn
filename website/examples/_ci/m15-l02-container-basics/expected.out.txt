@@ -1,0 +1,3 @@
+SEND: bob failed 5 times
+GetService: null
+GetRequiredService: InvalidOperationException
