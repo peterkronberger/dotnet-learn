@@ -111,6 +111,7 @@
       "id": "m15-l01-q6",
       "lesson": "m15-l01",
       "type": "single",
+      "placement": true,
       "question": "Eine Kollegin sagt: „Dependency Injection gibt es nur mit einem Framework oder Container.“ Stimmt das?",
       "options": [
         {
@@ -290,6 +291,7 @@
       "id": "m15-l02-q4",
       "lesson": "m15-l02",
       "type": "single",
+      "placement": true,
       "question": "Wie bekommt ein Konstruktor alle registrierten Implementierungen von `IAlertSender`?",
       "options": [
         {
@@ -478,6 +480,7 @@
       "id": "m15-l03-q2",
       "lesson": "m15-l03",
       "type": "single",
+      "placement": true,
       "question": "Ein Singleton wird in Scope 1 und danach in Scope 2 angefragt. Was stimmt?",
       "options": [
         {
@@ -687,6 +690,7 @@
       "id": "m15-l04-q2",
       "lesson": "m15-l04",
       "type": "single",
+      "placement": true,
       "question": "Warum ist ein Singleton, das einen Scoped-Service im Konstruktor verlangt, ein Fehler?",
       "options": [
         {
@@ -1129,6 +1133,10 @@
       "id": "m15-l06-q4",
       "lesson": "m15-l06",
       "type": "single",
+      "placement": true,
+      "placementLessons": [
+        "m15-l05"
+      ],
       "question": "Das Mindest-Level ist `Warning`. Was passiert bei `logger.LogDebug($\"Item: {item}\")`?",
       "options": [
         {
@@ -1292,6 +1300,7 @@
       "id": "m15-l07-q3",
       "lesson": "m15-l07",
       "type": "single",
+      "placement": true,
       "question": "`appsettings.json` hat `MaxFailures` = 3. Die Umgebungsvariable `Detection__MaxFailures` ist 7. Der Code ruft zuerst `AddJsonFile`, dann `AddEnvironmentVariables` auf. Welchen Wert liefert `configuration[\"Detection:MaxFailures\"]`?",
       "options": [
         {
@@ -1541,6 +1550,7 @@
       "id": "m15-l08-q4",
       "lesson": "m15-l08",
       "type": "single",
+      "placement": true,
       "question": "Ein Singleton-Service soll immer den aktuellen Wert der Einstellungen lesen können. Was injizierst du?",
       "options": [
         {
@@ -1724,6 +1734,7 @@
       "id": "m15-l09-q3",
       "lesson": "m15-l09",
       "type": "single",
+      "placement": true,
       "question": "Wann wird der `stoppingToken` von `ExecuteAsync` abgebrochen?",
       "options": [
         {
