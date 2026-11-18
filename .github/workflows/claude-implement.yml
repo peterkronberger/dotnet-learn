@@ -135,12 +135,19 @@ jobs:
                  If not: `gh pr create --title "<title>" --body "<What, why, how tested. Closes #${{ env.ISSUE }}>"`
                  If yes: the push is enough.
                - Return status=pr_created and pr_url.
-            4. Never merge, never change labels.
-          # Cut the Bash permissions down to your tech stack (the fewer, the safer).
+            4. Shell hints: run commands from the repository root with repo-relative paths
+               (for example `cp -r website/examples/_ci/a website/examples/_ci/b`, or
+               `bash website/examples/_ci/<name>/run.sh`). Do not chain with `cd … &&`
+               and do not use `env`; set variables inside a script instead.
+            5. Never merge, never change labels.
+          # Bash permissions: only what this repo needs (.NET, Node, git, gh). Prefix rules match
+          # the start of the command, so file commands are listed with their common flags and
+          # are limited to website/examples/ (SecLog steps and _ci projects are copied there).
+          # WebFetch is limited to Microsoft Learn (CLAUDE.md rule 7: primary sources).
           claude_args: |
             --model sonnet
-            --max-turns 100
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node:*),Bash(bash tools/check-examples.sh:*),Bash(node tools/check-quiz.mjs:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),Bash(pip:*),Bash(pytest:*),Bash(make:*),Bash(go:*),Bash(cargo:*),Bash(mvn:*),Bash(./gradlew:*),Bash(pnpm:*),Bash(yarn:*),WebFetch(domain:learn.microsoft.com),WebFetch"
+            --max-turns 150
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node tools/:*),Bash(bash tools/:*),Bash(bash website/examples/:*),Bash(cp website/examples/:*),Bash(cp -r website/examples/:*),Bash(cp -a website/examples/:*),Bash(mv website/examples/:*),Bash(rm website/examples/:*),Bash(rm -r website/examples/:*),Bash(rm -rf website/examples/:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),WebFetch(domain:learn.microsoft.com)"
             --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Only for status=needs_human: numbered questions as Markdown"}},"required":["status","reason"]}'
 
       # A script reports the result of the Claude call.
