@@ -1,0 +1,5 @@
+Information: FileImport: [File part-1.log] Reading started
+Information: FileImport: [File part-1.log] Reading finished
+Information: FileImport: [File part-2.log] Reading started
+Information: FileImport: [File part-2.log] Reading finished
+Information: FileImport: All files done

@@ -1,0 +1,209 @@
+---
+title: Logging mit ILogger
+sidebar_position: 5
+description: Wie eine Klasse einen ILogger<T> aus dem Container bekommt, wie Log-Level, Kategorie, Filter und Provider zusammenspielen und wie du eine Exception ins Log schreibst.
+lesson_id: m15-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import levels from '!!raw-loader!@site/examples/_ci/m15-l05-levels/Program.cs';
+import levelsOutput from '!!raw-loader!@site/examples/_ci/m15-l05-levels/expected.out.txt';
+import filter from '!!raw-loader!@site/examples/_ci/m15-l05-filter/Program.cs';
+import filterOutput from '!!raw-loader!@site/examples/_ci/m15-l05-filter/expected.out.txt';
+import loggerByName from '!!raw-loader!@site/examples/m15/l05/logger-by-name.snippet.cs';
+import gapFilter from '!!raw-loader!@site/examples/m15/l05/gap-filter.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l05/seclog-program-block.snippet.cs';
+import incidentMonitor from '!!raw-loader!@site/examples/_ci/seclog-m15-l05/src/SecLog.Core/Model/IncidentMonitor.cs';
+import lineValidator from '!!raw-loader!@site/examples/_ci/seclog-m15-l05/src/SecLog.Core/Model/LineValidator.cs';
+
+# Logging mit ILogger
+
+:::note[Lernziele]
+- Du kannst einen `ILogger<T>` per Konstruktor bekommen und Meldungen mit `LogInformation`, `LogWarning` und `LogError` schreiben.
+- Du ordnest die <Term id="log-level">Log-Levels</Term> von `Trace` bis `Critical` und stellst ein Mindest-Level ein.
+- Du erklärst, was eine <Term id="log-category">Kategorie</Term> und was ein <Term id="logging-provider">Provider</Term> ist.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l01-q3" />
+
+<Quiz id="m15-l02-q2" />
+
+<Quiz id="m15-l03-q3" />
+
+## Meldungen mit einem Level schreiben
+
+Logging schreibt Meldungen über den Ablauf eines Programms. Anders als `Console.WriteLine` legt der Aufruf nur zwei Dinge fest: den Text und das Level. Wohin die Meldung geht und ob sie überhaupt geschrieben wird, entscheidet die Konfiguration.
+
+Eine Klasse bekommt ihren Logger wie jede Abhängigkeit über den Konstruktor (Constructor Injection, `m15-l01`): Sie verlangt einen `ILogger<T>`, wobei `T` die Klasse selbst ist. Der Container liefert ihn, sobald du ihm mit `AddLogging` Logging hinzufügst ([Logging: Get an ILogger from DI](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#get-an-ilogger-from-di)).
+
+Die Levels sind eine Reihenfolge von der niedrigsten zur höchsten Schwere. Jedes Level hat eine Methode:
+
+| Level | Wert | Methode | Wofür |
+| --- | --- | --- | --- |
+| `Trace` | 0 | `LogTrace` | die feinsten Schritte |
+| `Debug` | 1 | `LogDebug` | Information für Entwickler |
+| `Information` | 2 | `LogInformation` | der normale Ablauf |
+| `Warning` | 3 | `LogWarning` | Unerwartetes, das Programm läuft weiter |
+| `Error` | 4 | `LogError` | eine Operation ist fehlgeschlagen |
+| `Critical` | 5 | `LogCritical` | ein Fehler, der sofort Aufmerksamkeit braucht |
+
+`None` (6) ist kein Level für Meldungen, sondern schaltet das Schreiben ganz ab ([Logging: Log level](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-level)).
+
+Das **Mindest-Level** legt fest, ab welchem Level Meldungen geschrieben werden: das Mindest-Level und alle höheren. Du setzt es mit `SetMinimumLevel`. Meldungen darunter gehen nicht an den Provider und erscheinen nirgends. Ohne Einstellung ist das Mindest-Level `Information`.
+
+Im Programm unten schreibt `LoginChecker` auf jedem Level eine Meldung. Das Mindest-Level ist `Information`. Die Hilfsklasse am Ende (eingeklappt) ist ein kleiner Provider, der sofort in die Konsole schreibt, damit die Reihenfolge der Zeilen feststeht. Echte Programme nehmen `AddConsole()` aus dem Paket `Microsoft.Extensions.Logging.Console`. Das hat der Playground nicht.
+
+:::info[Vorhersage]
+`LoginChecker` schreibt sechs Meldungen, von `Trace` bis `Critical`. Welche Zeilen erscheinen, und wie beginnt jede Zeile? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={levels} expected={levelsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Logging einrichten:** `AddLogging` fügt den `ILoggerFactory` und die `ILogger<T>` zum Container hinzu. `SetMinimumLevel(LogLevel.Information)` legt das Mindest-Level fest, `AddProvider` fügt den Provider hinzu.
+2. **Logger bekommen:** `LoginChecker` verlangt `ILogger<LoginChecker>`, und `GetRequiredService<LoginChecker>()` erzeugt die Klasse samt Logger.
+3. **Filtern:** `Trace` und `Debug` liegen unter `Information` und fehlen in der Ausgabe. Vier Zeilen erscheinen: `Information`, `Warning`, `Error` und `Critical`.
+4. **Zeile lesen:** Der Provider schreibt Level, Kategorie und Text. Die Kategorie ist `LoginChecker`.
+
+**Was passiert, wenn …** du `LogLevel.Information` durch `LogLevel.Warning` ersetzt? Dann fällt auch die `Information`-Zeile weg. Mit `LogLevel.Trace` erscheinen alle sechs.
+
+</details>
+
+<Quiz id="m15-l05-q1" />
+
+<Quiz id="m15-l05-q3" />
+
+## Kategorie und Filter
+
+Jede Meldung trägt die **Kategorie** ihres Loggers. Die Kategorie ist eine Zeichenkette, üblich ist der volle Name der Klasse, die loggt. `ILogger<T>` hat genau diesen Namen von `T` als Kategorie: Für `ILogger<Notifier>` in einem Namespace `SecLog.Model` ist es `SecLog.Model.Notifier`. Die Klassen in den Beispielen dieser Lektion haben keinen Namespace, ihre Kategorie ist der Klassenname ([Logging: Log category](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-category)).
+
+Die Kategorie macht Filter möglich. `AddFilter("Notifier", LogLevel.Warning)` gilt für alle Kategorien, die mit `Notifier` beginnen. Passt eine Regel zur Kategorie (die mit dem längsten passenden Anfang), gilt sie statt des Mindest-Levels. Mit dem Filter schreibt man eine Klasse leiser oder lauter als den Rest ([Logging: How filtering rules are applied](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#how-filtering-rules-are-applied)).
+
+Das nächste Programm hat zwei Klassen: `Importer` und `Notifier`. Das Mindest-Level ist `Information`, nur für `Notifier` gilt `Warning`. Der `Notifier` schreibt außerdem eine Exception ins Log. Dazu übergibst du sie als ersten Parameter: `LogError(ex, "…")`. Was der Provider daraus macht, hängt vom Provider ab. Der kleine Provider hier schreibt den Typ und die Meldung der Exception in eine zweite Zeile.
+
+<Forward concepts={['Platzhalter wie `{User}` in der Meldung']} lesson="m15-l06" />
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen? Achte auf die Kategorie jeder Meldung und auf die Zeile zur Exception. Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={filter} expected={filterOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Regel wählen:** Für die Kategorie `Importer` gibt es keine eigene Regel, also gilt das Mindest-Level `Information`. Für `Notifier` gilt die Regel mit `Warning`.
+2. **Importer:** Die `Information`-Meldung des `Importer` erscheint.
+3. **Notifier:** Die `Information`-Meldung („Sending a message …“) liegt unter `Warning` und fehlt. Die `Error`-Meldung erscheint.
+4. **Exception:** `LogError(ex, …)` gibt die Exception an den Provider. Die zweite Zeile mit dem Typ und der Meldung (`InvalidOperationException: mailbox is full`) schreibt unser Provider selbst.
+
+**Was passiert, wenn …** du den Filter entfernst? Dann erscheint auch die `Information`-Zeile des `Notifier`.
+
+</details>
+
+<Quiz id="m15-l05-q2" />
+
+<Quiz id="m15-l05-q5" />
+
+<Quiz id="m15-l05-q7" />
+
+## Provider
+
+Ein **Provider** schreibt die Meldung dorthin, wo sie hingehört. Eingebaut sind `Console`, `Debug` (schreibt über `Debug.WriteLine`, nur mit angehängtem Debugger), `EventSource` und `EventLog` (nur Windows). Mehrere Provider können gleichzeitig aktiv sein ([Logging providers: Built-in logging providers](https://learn.microsoft.com/dotnet/core/extensions/logging/providers#built-in-logging-providers)).
+
+Dein Code ändert sich dafür nicht: Er ruft nur `ILogger<T>` auf. Das ist der Gewinn gegenüber `Console.WriteLine`. Mit einem anderen Provider landet dieselbe Meldung in einer anderen Senke.
+
+Gibt es keine Klasse, deren Name die Kategorie sein soll, fragst du die `ILoggerFactory` nach einem Logger mit einem eigenen Namen:
+
+<CodeBlock language="csharp" title="logger-by-name.snippet.cs">{loggerByName}</CodeBlock>
+
+`ILogger<T>` ist gleichbedeutend mit `CreateLogger` und dem vollen Typnamen von `T`. Gewöhnlich bekommst du den `ILogger<T>` über den Konstruktor.
+
+<Quiz id="m15-l05-q4" />
+
+## Gap-Beispiel: Filter setzen
+
+Die Lücke `___` fehlt. Der `Notifier` soll nur ab `Error` schreiben. Setze das Level ein.
+
+<CodeBlock language="csharp" title="gap-filter.snippet.cs">{gapFilter}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `Error`: `.AddFilter("Notifier", LogLevel.Error)`. Dann schreibt der `Notifier` `Error` und `Critical`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l04/`) holt seine Services aus dem Container und baut den Provider mit `ValidateScopes` und `ValidateOnBuild`. Der `IncidentMonitor` meldet gefundene Incidents nur über ein Event, und fehlerhafte Zeilen löst `LogParser.ParseLine` mit einer Exception aus.
+
+**Neue Anforderung:** `IncidentMonitor` bekommt einen `ILogger<IncidentMonitor>` und schreibt eine `Warning`, wenn er einen Incident findet. Eine neue Klasse `LineValidator` bekommt einen `ILogger<LineValidator>`, liest eine Zeile mit `LogParser.ParseLine` und schreibt eine `Information`, wenn sie die Zeile ablehnt. `SecLog.Cli` registriert Logging mit dem synchronen Provider und dem Mindest-Level `Information`. Die Tests geben `NullLogger<T>.Instance` an die Konstruktoren.
+
+Die Entscheidung der Level: Ein gefundener Incident ist das Ergebnis, das ein Mensch bemerken soll, ohne dass das Programm fehlschlägt: `Warning`. Eine abgelehnte Zeile gehört zum normalen Umgang mit Eingaben und ist erwartbar: `Information`.
+
+`SecLog.Core` braucht für `ILogger<T>` und `NullLogger<T>` keine eigene Paketreferenz: Das Projekt kompiliert mit dem Paket `Microsoft.Extensions.Logging.Abstractions`, das das SDK ohne Referenz mitbringt. `SecLog.Cli` verweist auf `Microsoft.Extensions.Logging` für `AddLogging`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={incidentMonitor} title="src/SecLog.Core/Model/IncidentMonitor.cs" />
+
+<FoldedCode code={lineValidator} title="src/SecLog.Core/Model/LineValidator.cs (neu)" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Blöcke)">{programBlock}</CodeBlock>
+
+1. **Logger verlangen:** `IncidentMonitor` und `LineValidator` verlangen im Konstruktor einen `ILogger<T>`. Der Container liefert ihn.
+2. **Meldungen schreiben:** `IncidentMonitor` schreibt eine `Warning` pro Incident. `LineValidator` fängt die `InvalidLogLineException` und schreibt eine `Information` mit Zeilennummer und Grund. Eine angenommene Zeile schreibt eine `Debug`-Meldung, die beim Mindest-Level `Information` nicht erscheint.
+3. **Registrieren:** `AddLogging` setzt das Mindest-Level und fügt den Provider hinzu. `IncidentMonitor` und `LineValidator` stehen in der `ServiceCollection`.
+4. **Tests:** Sie erzeugen die Klassen mit `new` und geben `NullLogger<T>.Instance` hinein. Kein Container ist nötig, und es erscheint keine Ausgabe.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l05/`) loggt gefundene Incidents und abgelehnte Zeilen. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l04/` nur durch die Logger in `IncidentMonitor` und `LineValidator`, den Provider, die Registrierung in `Program.cs` und die angepassten Tests.
+
+<Quiz id="m15-l05-q8" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l05-debug-always-written" />
+
+**„`Debug`-Meldungen werden immer geschrieben, sie sind ja zum Entwickeln da.“** Das stimmt nicht. Ob eine Meldung erscheint, entscheidet das Level im Vergleich zum Mindest-Level (oder zum Filter der Kategorie). Liegt `Debug` darunter, wird die Meldung verworfen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l05-logging-equals-console-writeline" />
+
+**„Logging ist dasselbe wie `Console.WriteLine`.“** Das stimmt nicht. Der Aufruf legt nur Level und Text fest. Das Ziel bestimmt der Provider, und Mindest-Level und Filter bestimmen, ob die Meldung ankommt. Du änderst das alles, ohne den Aufruf zu ändern.
+:::
+
+<Quiz id="m15-l05-q6" />
+
+## Zusammenfassung
+
+Eine Klasse bekommt einen `ILogger<T>` über den Konstruktor, und `AddLogging` richtet ihn im Container ein. Jede Meldung hat ein Level von `Trace` (0) bis `Critical` (5). Das Mindest-Level lässt Meldungen darunter verschwinden. Die Kategorie ist der volle Typname von `T`, und Filter gelten pro Kategorie. Provider bestimmen, wohin die Meldungen geschrieben werden. Eine Exception übergibst du mit `LogError(ex, …)`.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m15-l05-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Logging in C# and .NET](https://learn.microsoft.com/dotnet/core/extensions/logging/overview)
+- Microsoft Learn: [Logging providers](https://learn.microsoft.com/dotnet/core/extensions/logging/providers)

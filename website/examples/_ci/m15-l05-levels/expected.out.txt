@@ -1,0 +1,4 @@
+Information: LoginChecker: Information: normal progress
+Warning: LoginChecker: Warning: something unexpected, the app goes on
+Error: LoginChecker: Error: an operation failed
+Critical: LoginChecker: Critical: the app cannot go on

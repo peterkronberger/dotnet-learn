@@ -1,0 +1,5 @@
+After interpolation: 1 ToString calls
+After template: 1 ToString calls
+After guarded call: 0 Total calls
+Warning: Report: Item: item
+After warning: 2 ToString calls

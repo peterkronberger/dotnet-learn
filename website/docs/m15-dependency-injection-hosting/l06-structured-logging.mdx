@@ -1,0 +1,208 @@
+---
+title: Strukturiertes Logging
+sidebar_position: 6
+description: Warum eine Message Template mit benannten Platzhaltern die Werte getrennt behält, warum ein interpolierter String in einem Log-Aufruf ein Fehler ist und wie IsEnabled und Log-Scopes helfen.
+lesson_id: m15-l06
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import template from '!!raw-loader!@site/examples/_ci/m15-l06-template/Program.cs';
+import templateOutput from '!!raw-loader!@site/examples/_ci/m15-l06-template/expected.out.txt';
+import cost from '!!raw-loader!@site/examples/_ci/m15-l06-cost/Program.cs';
+import costOutput from '!!raw-loader!@site/examples/_ci/m15-l06-cost/expected.out.txt';
+import scope from '!!raw-loader!@site/examples/_ci/m15-l06-scope/Program.cs';
+import scopeOutput from '!!raw-loader!@site/examples/_ci/m15-l06-scope/expected.out.txt';
+import gapTemplate from '!!raw-loader!@site/examples/m15/l06/gap-template.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l06/seclog-program-block.snippet.cs';
+import incidentMonitor from '!!raw-loader!@site/examples/_ci/seclog-m15-l06/src/SecLog.Core/Model/IncidentMonitor.cs';
+import consoleProvider from '!!raw-loader!@site/examples/_ci/seclog-m15-l06/src/SecLog.Cli/ConsoleLoggerProvider.cs';
+
+# Strukturiertes Logging
+
+:::note[Lernziele]
+- Du kannst eine <Term id="message-template">Message Template</Term> mit benannten Platzhaltern schreiben und sagst voraus, welcher Wert zu welchem Platzhalter gehört.
+- Du erklärst, warum `$"…"` in einem Log-Aufruf ein Fehler ist.
+- Du setzt `IsEnabled` und <Term id="log-scope">Log-Scopes</Term> gezielt ein.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l05-q3" />
+
+<Quiz id="m15-l05-q4" />
+
+<Quiz id="m15-l05-q5" />
+
+## Template statt Text
+
+In `m15-l05` stand schon `LogInformation("Sending a message to {User}", user)`. Hier ist der Hintergrund. Eine **Message Template** ist ein fester Text mit benannten Platzhaltern in geschweiften Klammern. Die Werte gibst du als eigene Argumente mit. Der Logger behält Template und Werte getrennt. Das nennt man <Term id="structured-logging">strukturiertes Logging</Term>: Ein Log-System kann die Werte als Eigenschaften speichern, zum Beispiel `User` und `Failures`, und danach suchen, ohne den Text zu zerlegen ([Logging: Log message template](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-message-template)).
+
+Zwei Regeln gehören dazu:
+
+- **Die Position zählt, nicht der Name.** Der erste Platzhalter bekommt das erste Argument, der zweite das zweite. Die Namen der Platzhalter werden zu den Namen der Eigenschaften. Sie werden nicht mit den Namen deiner Variablen verglichen.
+- **Der Text bleibt fest.** Ein interpolierter String (`$"…"`) oder eine Verkettung mit `+` setzt die Werte schon in den Text, bevor der Logger sie sieht. Der Logger bekommt dann nur noch das Ergebnis, ohne Namen und Werte ([CA2254: Template should be a static expression](https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2254)).
+
+Das Programm unten ruft drei Mal `LogWarning` auf: mit einer Template, mit einer Template, deren Platzhalternamen in anderer Reihenfolge stehen als die Argumente, und mit einem interpolierten String. Der Provider in der eingeklappten Hilfsklasse schreibt zu jeder Meldung auch, was der Logger bekommt: die Eigenschaften (`Name = Wert`) und die Vorlage (`template`).
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen? Achte auf den Wert der Eigenschaft `Ip` in der zweiten Meldung und darauf, welche Eigenschaften die dritte Meldung hat. Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={template} expected={templateOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Template mit Werten:** Die erste Meldung hat drei Eigenschaften: `User = bob`, `Ip = 203.0.113.7` und `Failures = 5`. Die Vorlage bleibt mit den Platzhaltern erhalten.
+2. **Position statt Name:** In der zweiten Meldung steht `{Ip}` zuerst, also bekommt `Ip` das erste Argument (`user`, also `bob`). `User` bekommt `203.0.113.7`. Der Text der Meldung ist dadurch falsch: „Attempts by bob for 203.0.113.7“. Der Logger prüft keine Namen.
+3. **Interpolation:** Die dritte Meldung hat denselben Text wie die erste. Der Logger bekommt aber keine Eigenschaften, nur einen fertigen Text als Vorlage. `User`, `Ip` und `Failures` sind verloren.
+
+**Was passiert, wenn …** du in der zweiten Meldung die Argumente zu `ip, user` vertauschst? Dann stimmen Namen und Werte, und die Meldung ist richtig.
+
+</details>
+
+<Quiz id="m15-l06-q1" />
+
+<Quiz id="m15-l06-q2" />
+
+<Quiz id="m15-l06-q3" />
+
+## Was ein interpolierter String kostet
+
+Ein interpolierter String ist ein Ausdruck, den C# auswertet, bevor die Methode aufgerufen wird. Der Compiler macht daraus einen fertigen `string` ([String interpolation: Compilation of interpolated strings](https://learn.microsoft.com/dotnet/csharp/language-reference/tokens/interpolated#compilation-of-interpolated-strings)). Der Logger sieht nur das Ergebnis. Er kann nicht mehr sparen, auch wenn das Level aus ist.
+
+Bei einer Template sieht es anders aus: Der Aufruf bekommt die Objekte, und der Text wird erst gebaut, wenn eine Meldung geschrieben wird. Ist das Level aus, entfällt das Formatieren.
+
+Wie viel Arbeit am Ende bleibt, zeigt das nächste Programm. Die Klasse `Item` zählt in einer Variablen, wie oft ihre Methode `ToString` und ihre Methode `Total` aufgerufen werden. Das Mindest-Level ist `Warning`, die `Debug`-Aufrufe sind also aus.
+
+Der Block `if (logger.IsEnabled(LogLevel.Debug))` ist die dritte Möglichkeit: `IsEnabled` fragt, ob das Level geschrieben würde. Ist es aus, wird `Log` nicht aufgerufen, und der Code im Block läuft nicht ([High-performance logging: Log-level guarded optimizations](https://learn.microsoft.com/dotnet/core/extensions/logging/high-performance-logging#log-level-guarded-optimizations)).
+
+:::info[Vorhersage]
+Das Programm druckt nach jedem Schritt einen Zählerstand. Welche vier Zählerstände erscheinen? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={cost} expected={costOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Interpolation:** `LogDebug($"Item: {item}")` ruft `item.ToString()` schon beim Bauen des Strings auf (Zähler 1), obwohl `Debug` unter `Warning` liegt. Die Meldung erscheint nicht.
+2. **Template:** `LogDebug("Item: {Item}", item)` bekommt das Objekt. Der Zähler bleibt bei 1, denn der Text wird nur gebaut, wenn die Meldung geschrieben wird.
+3. **IsEnabled:** `IsEnabled(LogLevel.Debug)` ist falsch. Der Block läuft nicht, und `Total` wird nicht aufgerufen (0).
+4. **Warnung:** `LogWarning("Item: {Item}", item)` liegt über dem Mindest-Level. Jetzt wird formatiert, und `ToString` läuft ein weiteres Mal (Zähler 2).
+
+</details>
+
+<Quiz id="m15-l06-q4" />
+
+<Quiz id="m15-l06-q5" />
+
+Die schnellste Form für Log-Aufrufe ist die Quellcode-Generierung mit `[LoggerMessage]`: Der Compiler erzeugt Aufrufe, die das Template schon beim Kompilieren verarbeiten. Das Thema liegt außerhalb dieses Kurses ([High-performance logging](https://learn.microsoft.com/dotnet/core/extensions/logging/high-performance-logging)). Die Aufrufe mit `LogInformation` und Templates, wie in dieser Lektion, reichen für den Einstieg.
+
+## Scopes: Daten für eine Gruppe von Meldungen
+
+Manchmal gehören mehrere Meldungen zu einer Sache, zum Beispiel alle Zeilen einer Datei. Ein **Scope** hängt Daten an alle Meldungen, die in ihm geschrieben werden. `BeginScope` liefert ein `IDisposable`. Der Scope gilt, bis du es freigibst, am einfachsten mit `using` (Modul 7) ([Logging: Log scopes](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-scopes)).
+
+Ob ein Scope sichtbar wird, hängt vom Provider ab: Der Konsolen-Provider unterstützt Scopes (`IncludeScopes`). Der kleine Provider hier schreibt jeden aktiven Scope in eckigen Klammern vor die Meldung.
+
+Im Programm laufen zwei Dateien nacheinander, jede in ihrem Scope. Danach folgt eine Meldung ohne Scope.
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={scope} expected={scopeOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Scope öffnen:** `BeginScope("File {FileName}", file)` erzeugt den Scope mit dem Dateinamen. Er ist selbst eine Template mit einem Platzhalter.
+2. **Meldungen im Block:** Beide Meldungen im `using`-Block tragen `[File part-1.log]` beziehungsweise `[File part-2.log]` vor dem Text.
+3. **Scope schließen:** Am Ende des `using`-Blocks wird der Scope freigegeben. „All files done“ steht darum ohne Klammern.
+
+</details>
+
+<Quiz id="m15-l06-q6" />
+
+Eine Regel zum Schluss: Schreibe keine Geheimnisse ins Log, also keine Passwörter und keine Tokens. Der Logger schreibt jeden Wert, den du übergibst, in die Senke, und Logs werden gespeichert und von vielen gelesen. Die Stufe `Trace` kann besonders sensible Daten enthalten und ist deshalb standardmäßig aus ([Logging: Log level](https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-level)).
+
+<Quiz id="m15-l06-q7" />
+
+## Gap-Beispiel: Werte der Reihe nach
+
+Die Lücken `___` fehlen. Setze die beiden Variablen so ein, dass jeder Platzhalter den passenden Wert bekommt.
+
+<CodeBlock language="csharp" title="gap-template.snippet.cs">{gapTemplate}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücken sind `user` und `ip`, in dieser Reihenfolge: `logger.LogInformation("Login of {User} from {Ip}", user, ip);`. Der erste Platzhalter bekommt das erste Argument.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l05/`) schreibt eine `Warning` für jeden gefundenen Incident und eine `Information` für jede abgelehnte Zeile. Die Aufrufe benutzen schon Templates mit `{User}`, `{Number}` und `{Reason}`.
+
+**Neue Anforderung:** Die Warnung des `IncidentMonitor` bekommt einen zweiten benannten Platzhalter: `{Failures}` mit der Anzahl der fehlgeschlagenen Logins. Der Lauf über eine Log-Datei steckt in einem Scope mit dem Dateinamen. Der Provider in `SecLog.Cli` zeigt aktive Scopes an. Die Ausgabe ändert sich nur dort, wo sich das Format der Log-Zeilen ändert. Ein `Ip`-Platzhalter bleibt weg: Der `Incident` kennt noch keine IP-Adresse.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={incidentMonitor} title="src/SecLog.Core/Model/IncidentMonitor.cs" />
+
+<FoldedCode code={consoleProvider} title="src/SecLog.Cli/ConsoleLoggerProvider.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Platzhalter ergänzen:** Die Template der Warnung nennt `{User}` und `{Failures}`, die Argumente stehen in derselben Reihenfolge: `incident.User`, `incident.FailureCount`.
+2. **Scope öffnen:** `BeginScope("File {FileName}", "sample.log")` in einem `using`-Block. Alle Meldungen darin tragen den Dateinamen.
+3. **Provider erweitern:** Der Provider implementiert `ISupportExternalScope` und bekommt die aktiven Scopes vom Logging-System. Er schreibt sie in eckigen Klammern vor die Meldung.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l06/`) loggt mit benannten Platzhaltern und zeigt die Datei als Scope. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l05/` nur durch den Platzhalter `{Failures}`, den Scope in `Program.cs` und den Provider mit Scope-Unterstützung.
+
+<Quiz id="m15-l06-q8" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l06-interpolation-equals-template" />
+
+**„Logging mit String-Interpolation ist dasselbe wie eine Message Template.“** Das stimmt nicht. Der Text der Meldung sieht gleich aus, aber der Logger bekommt bei `$"…"` nur das fertige Ergebnis. Namen und Werte sind verloren, und der String wird auch dann gebaut, wenn das Level aus ist.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l06-placeholder-names-match" />
+
+**„Die Namen der Platzhalter werden mit den Namen der Variablen verglichen.“** Das stimmt nicht. Nur die Reihenfolge zählt: Der erste Platzhalter bekommt das erste Argument. Stehen sie in anderer Reihenfolge, landen die Werte in den falschen Eigenschaften.
+:::
+
+## Zusammenfassung
+
+Eine Message Template ist ein fester Text mit benannten Platzhaltern, und die Werte kommen als eigene Argumente. Die Position bestimmt, welcher Wert zu welchem Platzhalter gehört, und die Namen werden zu Eigenschaften, nach denen ein Log-System suchen kann. Ein interpolierter String macht daraus einen fertigen Text und verliert Namen und Werte. Er wird außerdem auch bei ausgeschaltetem Level gebaut. `IsEnabled` spart teure Vorarbeit, und ein Scope hängt Daten wie den Dateinamen an alle Meldungen in seinem Block.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l06-q9" />
+
+### Transferfrage
+
+<Quiz id="m15-l06-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Logging in C# and .NET](https://learn.microsoft.com/dotnet/core/extensions/logging/overview)
+- Microsoft Learn: [High-performance logging](https://learn.microsoft.com/dotnet/core/extensions/logging/high-performance-logging)
+- Microsoft Learn: [CA2254: Template should be a static expression](https://learn.microsoft.com/dotnet/fundamentals/code-analysis/quality-rules/ca2254)
