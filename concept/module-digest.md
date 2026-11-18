@@ -2,7 +2,7 @@
 
 Base since #450: C# 15 / .NET 11.
 
-As of 2026-11-17. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-18. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -325,7 +325,6 @@ Each module section has these fields:
 - **Glossary terms:** task, asynchronous-programming, async-method, await-expression, continuation, awaitable, task-type, faulted-task, unobserved-exception, aggregate-exception, task-combinator, timeout, cancellation-token, cancellation-token-source, cooperative-cancellation, async-stream, async-iterator, asynchronous-foreach, async-disposable, asynchronous-using, async-void, sync-over-async, io-bound, cpu-bound, synchronization-context, concurrency, processor-core, scheduler, interleaving, thread-pool, work-item, race-condition, shared-state, read-modify-write, lost-update, check-then-act, non-determinism, mutual-exclusion, critical-section, lock-statement, lock-object, deadlock, lock-ordering, starvation, livelock, atomic-operation, memory-model, visibility, volatile-field, thread-safety, confinement, concurrent-collection, data-parallelism, parallel-loop, plinq, degree-of-parallelism, speedup, producer-consumer, channel, bounded-channel, semaphore
 - **Misconception ids:** m13-l01-async-starts-new-thread, m13-l02-await-blocks-thread, m13-l03-async-exception-lost, m13-l04-sequential-awaits-run-together, m13-l05-cancel-stops-task-immediately, m13-l06-await-foreach-waits-for-all, m13-l07-using-calls-disposeasync, m13-l08-async-void-is-safe, m13-l09-async-is-multithreading, m13-l10-every-task-has-own-thread, m13-l11-increment-is-atomic, m13-l11-passing-runs-prove-no-race, m13-l12-lock-protects-unlocked-access, m13-l13-deadlock-throws-exception, m13-l14-volatile-makes-thread-safe, m13-l15-dotnet-types-are-thread-safe, m13-l16-more-threads-always-faster, m13-l17-unlimited-tasks-are-fastest
 - **Open forward references:**
-  - Singleton service (lifetimes) → M15 (`m13-l15`)
   - Attributes (`m13-l06`) are taught in `m14-l06`.
   - The M6 note (`async`/`await`) and the M10 note (asynchronous event handlers) are closed by `m13-l01`–`l08`.
 - **SecLog end state:** `website/examples/m13/l17/seclog-async-solution.cs` – the M12 end state plus: reading several log sources asynchronously (`Task.WhenAll`, timeout, cancellation, async stream, `await using`), a lock-protected and an `Interlocked` counter, per-source failure counts with a thread-safe collection, parallel analysis, and many log files analyzed by two workers with a bounded `Channel` and a `ConcurrentDictionary` (`Total failures in files`). Chain: `m12/l10` → `m13/l01` → … → `m13/l17`; lessons without a step: `m13-l09`, `m13-l11`, `m13-l13`. M13 milestone reached.
@@ -376,3 +375,25 @@ Each module section has these fields:
   - SecLog is a project folder now (`_ci/seclog-m14-lNN/`, one per lesson with a step); later modules continue from `seclog-m14-l12/` and add their code to `SecLog.Core`/`SecLog.Cli`. Each folder has `run.sh` and `expected.out.txt`.
   - `tools/run-tests.sh [--allow-failures] <csproj|slnx>` prints stable, sorted test results (MTP); test output in lessons comes only from it.
   - Nullable analysis attributes and attributes on lambdas are not taught; mark them with `<Forward>` if a lesson uses them.
+
+## M15 Dependency Injection und Hosting
+
+- **Lessons:**
+  - `m15-l01` Abhängigkeiten über Interfaces – dependency, constructor injection, composition root, inversion of control.
+  - `m15-l02` Der DI-Container – `ServiceCollection`, `ServiceProvider`, `GetService`/`GetRequiredService`, `TryAdd`, `IEnumerable<T>`, keyed services (`<Since dotnet="8" />`).
+  - `m15-l03` Lebensdauern von Services – singleton, scoped, transient, `CreateScope`, disposal by the container.
+  - `m15-l04` Lebensdauern richtig kombinieren – captive dependency, `ValidateScopes`, `ValidateOnBuild`, thread-safe singleton state.
+  - `m15-l05` Logging mit ILogger – `ILogger<T>`, levels, category, filters, providers, `NullLogger`.
+  - `m15-l06` Strukturiertes Logging – message templates, interpolation pitfall, `IsEnabled`, `BeginScope`, no secrets in logs.
+  - `m15-l07` Konfiguration – `ConfigurationBuilder`, JSON, environment variables (`__`), command line, order, environments, user secrets.
+  - `m15-l08` Das Options-Pattern – `Configure<T>`, `IOptions`, `IOptionsSnapshot`, `IOptionsMonitor`, data annotations, `Validate`, `ValidateOnStart`.
+  - `m15-l09` Generic Host und Hintergrunddienste – `Host.CreateApplicationBuilder`, `IHostedService`, `BackgroundService`, `ExecuteAsync`, `stoppingToken`, graceful shutdown.
+- **Constructs/APIs taught:** `AddSingleton`/`AddScoped`/`AddTransient`, `TryAddSingleton`, keyed services, `ValidateScopes`/`ValidateOnBuild`, `ILogger<T>` with `LogDebug`…`LogError`, `AddFilter`, `ConfigurationBuilder`, `GetSection`, `Configure<T>`, `ValidateDataAnnotations`, `ValidateOnStart`, `BackgroundService`, `IHostApplicationLifetime.StopApplication`.
+- **Glossary terms:** dependency-injection, constructor-injection, composition-root, inversion-of-control, di-container, service-collection, service-provider, service-registration, keyed-service, service-lifetime, singleton-lifetime, scoped-lifetime, transient-lifetime, service-scope, captive-dependency, scope-validation, log-level, log-category, logging-provider, structured-logging, message-template, log-scope, configuration-provider, environment-variable, user-secrets, options-pattern, options-validation, generic-host, hosted-service, background-service, graceful-shutdown
+- **Misconception ids:** m15-l01-di-needs-container, m15-l01-interface-no-benefit, m15-l02-getservice-throws, m15-l02-container-finds-types, m15-l03-transient-disposed-immediately, m15-l04-singleton-may-use-scoped, m15-l04-container-makes-singleton-thread-safe, m15-l05-debug-always-written, m15-l05-logging-equals-console-writeline, m15-l06-interpolation-equals-template, m15-l06-placeholder-names-match, m15-l07-json-always-wins, m15-l07-user-secrets-encrypted, m15-l08-options-shows-current-value, m15-l08-invalid-options-fail-at-start, m15-l09-exception-keeps-host-running
+- **Open forward references:** `<Forward>` notes inside M15 point to `m15-l06`, `m15-l09` (closed within the module) and to M17 (web requests as scope).
+- **SecLog end state:** `website/examples/_ci/seclog-m15-l09/` – the M14 solution plus: services created by a DI container with validated lifetimes, `ILogger` with message templates, thresholds from `appsettings.json` (section `Detection`, overridden by `Detection__*` environment variables in `run.sh`) bound to `DetectionOptions` and validated on start, and the generic host with a background service. Chain: `seclog-m14-l12` → `seclog-m15-l01` → … → `l09`. M15 milestone reached.
+- **Notes for later modules:**
+  - Runnable package examples: one `_ci/mXX-lYY-<slug>/` project with only `Program.cs`, playground usings and a synchronous console logger provider (`.claude/rules/examples.md`).
+  - Reference projects: `_ci/di-logging/`, `_ci/config-hosting/`. Host output is stable with `ClearProviders()` and `StopApplication()`.
+  - The `Detection` configuration section (`MaxFailures`, `WindowMinutes`) is SecLog's settings contract; read it through `IOptions<DetectionOptions>`.
