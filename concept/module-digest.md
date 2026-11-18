@@ -19,6 +19,7 @@ Each module section has these fields:
 ## M0 Orientierung
 
 - **Lessons:**
+  - `m00-l00` .NET/C# und die KI-Zeitenwende (first in the sidebar, no code, no SecLog step) – properties of C#/.NET, when to use it and when not, state of AI studies (as of 2026-11-18, from `concept/ai-module.md`). Only AI content outside module 19 besides "Wie dieser Kurs funktioniert" (#591).
   - `m00-l01` Dein erstes Programm – a program is a list of statements that run top to bottom.
   - `m00-l02` C# und .NET: Sprache und Plattform – C# is the language, .NET the platform with runtime and libraries.
   - `m00-l03` Die .NET-Familie – .NET Framework, .NET Core, .NET (5+), Mono and what they are for.

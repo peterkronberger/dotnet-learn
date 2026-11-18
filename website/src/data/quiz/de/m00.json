@@ -2,6 +2,86 @@
   "module": "m00",
   "questions": [
     {
+      "id": "m00-l00-q1",
+      "lesson": "m00-l00",
+      "type": "single",
+      "placement": true,
+      "question": "Welche Aussage über C# stimmt?",
+      "options": [
+        {
+          "text": "C# ist statisch typisiert: Der Übersetzer prüft die Datentypen schon vor dem Start des Programms.",
+          "correct": true
+        },
+        {
+          "text": "C#-Programme laufen nur unter Windows.",
+          "feedback": "C#-Programme laufen auf mehreren Betriebssystemen, nicht nur unter Windows."
+        },
+        {
+          "text": "In C# musst du Speicher selbst freigeben, sonst läuft das Programm nicht.",
+          "feedback": "Die Laufzeitumgebung gibt Speicher automatisch frei, den kein Code mehr braucht."
+        }
+      ],
+      "explanation": "C# ist statisch typisiert. Der Übersetzer meldet falsche Verwendung eines Datentyps vor dem Start. C#-Programme laufen auf mehreren Betriebssystemen, und die Laufzeitumgebung verwaltet den Speicher automatisch."
+    },
+    {
+      "id": "m00-l00-q2",
+      "lesson": "m00-l00",
+      "type": "single",
+      "question": "Ein Team entwickelt eine Seite im Browser, die vollständig mit JavaScript oder TypeScript gebaut wird. Was ist die passende Schlussfolgerung?",
+      "options": [
+        {
+          "text": "C# ist die beste Sprache, also sollte das Team alles in C# neu schreiben.",
+          "feedback": "Welche Sprache passt, hängt von Aufgabe, Team und vorhandenem Code ab. Eine beste Sprache für alles gibt es nicht.",
+          "misconception": "m00-l00-best-language"
+        },
+        {
+          "text": "Für diese Aufgabe ist JavaScript oder TypeScript der übliche Weg. C# passt besser zu anderen Aufgaben, etwa Webdiensten im Hintergrund.",
+          "correct": true
+        },
+        {
+          "text": "C# kann im Browser nie laufen, also ist C# für Webentwicklung ungeeignet.",
+          "feedback": "C# kann im Browser laufen, zum Beispiel mit Blazor. Außerdem passt C# gut zu Webdiensten im Hintergrund. Die Eignung hängt von der Aufgabe ab.",
+          "misconception": "m00-l00-best-language"
+        }
+      ],
+      "explanation": "Jede Sprache setzt Schwerpunkte. Die Wahl hängt von Aufgabe, Team und vorhandenem Code ab."
+    },
+    {
+      "id": "m00-l00-q3",
+      "lesson": "m00-l00",
+      "type": "single",
+      "question": "Eine Studie zeigt, dass Entwickler mit einem KI-Assistenten bei einer Aufgabe 55,8 % schneller waren. Was folgt daraus?",
+      "options": [
+        {
+          "text": "KI-Werkzeuge machen jede Programmieraufgabe um etwa die Hälfte schneller.",
+          "feedback": "Die Studie gilt für eine eng umrissene Aufgabe und eine Werkzeuggeneration. Andere Studien fanden kleinere Gewinne oder sogar Verluste."
+        },
+        {
+          "text": "Das Ergebnis gilt für diese Teilnehmenden, diese Aufgabe und dieses Werkzeug. Andere Studien kamen unter anderen Bedingungen zu anderen Ergebnissen.",
+          "correct": true
+        },
+        {
+          "text": "Wer programmieren lernt, braucht deshalb keine Grundlagen mehr.",
+          "feedback": "Wer KI-Code prüfen soll, muss Sprache und Laufzeitumgebung verstehen. Außerdem zeigt eine Studie schlechteres Verständnis bei Lernenden, die KI beim Lernen nutzten."
+        }
+      ],
+      "explanation": "Jede Studie gilt für bestimmte Teilnehmende, eine Aufgabe und eine Werkzeuggeneration. Eine andere Studie fand bei erfahrenen Entwicklern 19 % längere Bearbeitungszeit."
+    },
+    {
+      "id": "m00-l00-q4",
+      "lesson": "m00-l00",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum Ergebnisse von Studien zu KI-Werkzeugen nicht einfach auf jede Aufgabe übertragbar sind.",
+      "modelAnswer": "Jede Studie untersucht bestimmte Teilnehmende (zum Beispiel erfahrene Entwickler), eine bestimmte Aufgabe und eine bestimmte Werkzeuggeneration. Ändert sich eines davon, kann das Ergebnis anders ausfallen. Darum widersprechen sich Studien zum Teil: Eine fand einen Zeitgewinn, eine andere längere Bearbeitungszeiten."
+    },
+    {
+      "id": "m00-l00-q5",
+      "lesson": "m00-l00",
+      "type": "explain",
+      "question": "Transferfrage: Du sollst für ein Vorhaben eine Sprache wählen. Welche drei Fragen stellst du dir, bevor du dich für C# oder eine andere Sprache entscheidest?",
+      "modelAnswer": "Zum Beispiel: Welche Art von Anwendung ist es (Webdienst, Browser-Seite, Spiel, Datenskript)? Welche Sprache kennt das Team oder nutzt der vorhandene Code? Auf welchen Systemen muss das Programm laufen? Je nach Antwort passt C# gut oder eine andere Sprache besser."
+    },
+    {
       "id": "m00-l01-q1",
       "lesson": "m00-l01",
       "type": "output",
@@ -211,7 +291,6 @@
       "id": "m00-l02-q5",
       "lesson": "m00-l02",
       "type": "single",
-      "placement": true,
       "question": "Du willst wissen, was die Sprache C# für ein neues Feature aus C# 14 genau festlegt. Welche Quelle liest du zuerst?",
       "options": [
         {
