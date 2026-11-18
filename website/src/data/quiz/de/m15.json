@@ -1677,6 +1677,216 @@
       "type": "explain",
       "question": "Transferfrage: Dein Programm hat Einstellungen für einen Dienst: `Address` und `TimeoutSeconds`. Wie machst du daraus eine Options-Klasse, und welche Regel prüfst du?",
       "modelAnswer": "Ich lege eine Klasse `ServiceOptions` mit `public string Address { get; set; } = \"\";` und `public int TimeoutSeconds { get; set; } = 30;` an. Mit `[Required]` auf `Address` und `[Range(1, 300)]` auf `TimeoutSeconds` beschreibe ich die Regeln. Ich binde den Abschnitt mit `AddOptions<ServiceOptions>().Bind(section).ValidateDataAnnotations().ValidateOnStart()`. Die Klasse, die den Dienst aufruft, verlangt `IOptions<ServiceOptions>`."
+    },
+    {
+      "id": "m15-l09-q1",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Was richtet `Host.CreateApplicationBuilder(args)` ohne weitere Angaben ein?",
+      "options": [
+        {
+          "text": "Konfiguration aus `appsettings.json`, Umgebungsvariablen und Kommandozeile, Logging-Provider und einen Container für Services.",
+          "correct": true
+        },
+        {
+          "text": "Nur einen Container. Konfiguration und Logging musst du selbst aufbauen.",
+          "feedback": "Der Builder bringt auch Konfigurationsquellen und Logging-Provider mit."
+        },
+        {
+          "text": "Einen Webserver, der Anfragen beantwortet.",
+          "feedback": "Ein Webserver gehört zu ASP.NET Core (Modul 17). Der Generic Host kennt keinen."
+        }
+      ],
+      "explanation": "Der Builder fasst Konfiguration, Logging und Dependency Injection in einem Objekt zusammen. Aus ihm entsteht mit `Build()` der Host."
+    },
+    {
+      "id": "m15-l09-q2",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Was soll die Methode `ExecuteAsync` eines `BackgroundService` zurückgeben?",
+      "options": [
+        {
+          "text": "Ein `Task`, der die Dauer der langlaufenden Arbeit darstellt.",
+          "correct": true
+        },
+        {
+          "text": "Einen `Task`, der sofort fertig ist. Die Arbeit steht dann außerhalb der Methode.",
+          "feedback": "Der `Task` von `ExecuteAsync` stellt die Arbeit selbst dar. Er soll so lange laufen wie sie."
+        },
+        {
+          "text": "Einen `bool`, der angibt, ob der Dienst weiterlaufen soll.",
+          "feedback": "Die Methode gibt einen `Task` zurück, keinen `bool`."
+        }
+      ],
+      "explanation": "`ExecuteAsync` ist `async` und gibt einen `Task` zurück. Eine Schleife in dieser Methode läuft, bis der Host stoppt, und der Task endet dann mit ihr."
+    },
+    {
+      "id": "m15-l09-q3",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Wann wird der `stoppingToken` von `ExecuteAsync` abgebrochen?",
+      "options": [
+        {
+          "text": "Wenn der Host stoppt, also `StopAsync` aufgerufen wird, zum Beispiel nach Strg+C oder `StopApplication()`.",
+          "correct": true
+        },
+        {
+          "text": "Wenn `ExecuteAsync` zum ersten Mal `await` erreicht.",
+          "feedback": "Das `await` hat mit dem Token nichts zu tun."
+        },
+        {
+          "text": "Nie. Der Token ist nur ein Platzhalter, und der Dienst läuft, bis der Prozess beendet wird.",
+          "feedback": "Der Token zeigt das Stoppen des Hosts an. Der Dienst soll darauf reagieren."
+        }
+      ],
+      "explanation": "Der Token ist das Signal des Hosts an den Dienst: Jetzt aufhören. Wie in `m13-l05` ist der Abbruch kooperativ, der Dienst muss den Token prüfen oder weitergeben."
+    },
+    {
+      "id": "m15-l09-q4",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "In einer Schleife steht `await Task.Delay(1000);` ohne `stoppingToken`. Welche Folge hat das für das Beenden des Hosts?",
+      "options": [
+        {
+          "text": "Die Wartezeit läuft bis zum Ende. Der Dienst reagiert erst danach auf das Stoppen, weil der Token die Wartezeit nicht abbricht.",
+          "correct": true
+        },
+        {
+          "text": "Keine. `Task.Delay` merkt selbst, dass der Host stoppt.",
+          "feedback": "Ohne Token kennt `Task.Delay` das Stoppen nicht (`m13-l05`)."
+        },
+        {
+          "text": "Der Host stoppt sofort, und `Task.Delay` wird einfach abgebrochen.",
+          "feedback": "Abgebrochen wird nur, wenn der Token an `Task.Delay` übergeben wurde."
+        }
+      ],
+      "explanation": "Wie in `m13-l05` bricht ein Task nur ab, wenn er den Token bekommt. Gib `stoppingToken` an `Task.Delay` weiter, dann endet die Wartezeit beim Stoppen sofort."
+    },
+    {
+      "id": "m15-l09-q5",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Ein `BackgroundService` soll eine Aufgabe einmal ausführen. Die Methode `ExecuteAsync` endet, und `StopApplication()` wird nie aufgerufen. Was macht der Host?",
+      "options": [
+        {
+          "text": "Er läuft weiter, bis er gestoppt wird (zum Beispiel mit Strg+C).",
+          "correct": true
+        },
+        {
+          "text": "Er stoppt von selbst, weil kein Dienst mehr arbeitet.",
+          "feedback": "Das Ende von `ExecuteAsync` stoppt den Host nicht. Dafür gibt es `StopApplication()`."
+        },
+        {
+          "text": "Er wirft eine Ausnahme, weil `ExecuteAsync` zu früh fertig war.",
+          "feedback": "Ein Ende ohne Fehler ist erlaubt. Der Host läuft einfach weiter."
+        }
+      ],
+      "explanation": "Ein Dienst, der fertig ist, beendet den Host nicht. Für einen Lauf, der von selbst enden soll, ruft er `IHostApplicationLifetime.StopApplication()` auf."
+    },
+    {
+      "id": "m15-l09-q6",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "In `ExecuteAsync` wirft der Dienst nach einer Weile eine `InvalidOperationException`, die niemand fängt. Was passiert mit einer Standardeinstellung des Hosts?",
+      "options": [
+        {
+          "text": "Die Ausnahme wird gemeldet, und der Host stoppt (`StopHost`).",
+          "correct": true
+        },
+        {
+          "text": "Die Ausnahme geht verloren, und der Host läuft unverändert weiter.",
+          "feedback": "Die Ausnahme geht nicht verloren. Der Host meldet sie und stoppt.",
+          "misconception": "m15-l09-exception-keeps-host-running"
+        },
+        {
+          "text": "Nur der Dienst stoppt. Der Host und die anderen Dienste laufen weiter.",
+          "feedback": "Der Standard stoppt den ganzen Host.",
+          "misconception": "m15-l09-exception-keeps-host-running"
+        },
+        {
+          "text": "Der Host startet den Dienst automatisch neu.",
+          "feedback": "Das Verhalten ist `StopHost` oder `Ignore`. Ein Neustart gehört nicht dazu.",
+          "misconception": "m15-l09-exception-keeps-host-running"
+        }
+      ],
+      "explanation": "`HostOptions.BackgroundServiceExceptionBehavior` steht auf `StopHost`: Der Host meldet die Ausnahme und stoppt. Mit `Ignore` bleibt der Host am Laufen."
+    },
+    {
+      "id": "m15-l09-q7",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Wie unterscheiden sich `IHostedService` und `BackgroundService`?",
+      "options": [
+        {
+          "text": "`IHostedService` hat `StartAsync` und `StopAsync`. `BackgroundService` ist eine abstrakte Klasse, die es implementiert, und die Unterklasse schreibt nur `ExecuteAsync`.",
+          "correct": true
+        },
+        {
+          "text": "`BackgroundService` ist ein Interface, `IHostedService` eine Klasse.",
+          "feedback": "Es ist umgekehrt: `IHostedService` ist das Interface."
+        },
+        {
+          "text": "Beide sind dasselbe, nur der Name ist verschieden.",
+          "feedback": "`BackgroundService` ist eine Klasse mit eigener Logik für `ExecuteAsync`."
+        }
+      ],
+      "explanation": "Jede Implementierung von `IHostedService` kann sich beim Host registrieren. `BackgroundService` nimmt dir die Arbeit mit `StartAsync` und `StopAsync` ab."
+    },
+    {
+      "id": "m15-l09-q8",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Nach Strg+C stoppt der Host. Welche Reihenfolge stimmt?",
+      "options": [
+        {
+          "text": "`ApplicationStopping` wird ausgelöst, dann stoppen die gehosteten Dienste (`StopAsync`), danach folgt `ApplicationStopped`.",
+          "correct": true
+        },
+        {
+          "text": "`StopAsync` der Dienste läuft zuerst, danach wird `ApplicationStopping` ausgelöst.",
+          "feedback": "`ApplicationStopping` meldet den Beginn des Stoppens und kommt zuerst."
+        },
+        {
+          "text": "Der Prozess endet sofort, und kein Dienst bekommt eine Meldung.",
+          "feedback": "Der Host stoppt die Dienste geordnet. Das ist das saubere Beenden (Graceful Shutdown)."
+        }
+      ],
+      "explanation": "Der Host meldet zuerst, dass er stoppt, ruft dann `StopAsync` der Dienste auf und meldet am Ende, dass er gestoppt ist. Die Zeit für `StopAsync` ist begrenzt (`HostOptions.ShutdownTimeout`)."
+    },
+    {
+      "id": "m15-l09-q9",
+      "lesson": "m15-l09",
+      "type": "single",
+      "question": "Die Tests von SecLog erzeugen `FailedLoginRule` mit `new` und `Options.Create(…)`, ohne Host und Container. Warum geht das?",
+      "options": [
+        {
+          "text": "`FailedLoginRule` bekommt ihre Abhängigkeiten über den Konstruktor. Der Host ist nur eine Möglichkeit, sie zusammenzusetzen.",
+          "correct": true
+        },
+        {
+          "text": "Tests dürfen den Host weglassen, im Programm braucht `FailedLoginRule` ihn immer.",
+          "feedback": "`FailedLoginRule` kennt den Host nie. Auch im Programm bekommt sie ihre Abhängigkeiten nur über den Konstruktor."
+        },
+        {
+          "text": "Tests dürfen die Regeln von DI verletzen.",
+          "feedback": "Es wird keine Regel verletzt. Der Konstruktor nimmt jede passende Instanz."
+        }
+      ],
+      "explanation": "Das ist ein Vorteil von Dependency Injection: Die Klasse kennt weder Host noch Container. Wer sie braucht, übergibt die Abhängigkeiten selbst."
+    },
+    {
+      "id": "m15-l09-q10",
+      "lesson": "m15-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was der Generic Host zusammenfasst, wie ein `BackgroundService` arbeitet und was beim Starten und Beenden des Hosts passiert.",
+      "modelAnswer": "Der Generic Host fasst Dependency Injection, Logging und Konfiguration in einem Builder zusammen. `Host.CreateApplicationBuilder(args)` richtet Standardquellen und -provider ein, `Build()` erzeugt den Host, und `RunAsync()` startet ihn.\n\nBeim Start ruft der Host `StartAsync` der registrierten gehosteten Dienste auf. Bei einem `BackgroundService` läuft dann `ExecuteAsync`. Die Methode soll ein `Task` sein, der so lange läuft wie die Arbeit, und auf den `stoppingToken` reagieren.\n\nBeim Beenden, zum Beispiel mit Strg+C oder `StopApplication()`, wird `ApplicationStopping` ausgelöst und der Token abgebrochen. Dann läuft `StopAsync` der Dienste, in begrenzter Zeit, und zuletzt wird `ApplicationStopped` ausgelöst. Eine unbehandelte Ausnahme in `ExecuteAsync` stoppt den Host."
+    },
+    {
+      "id": "m15-l09-q11",
+      "lesson": "m15-l09",
+      "type": "explain",
+      "question": "Transferfrage: Ein Programm soll alle fünf Minuten einen Ordner auf neue Dateien prüfen und dabei Logging und Konfiguration nutzen. Wie baust du es mit dem Generic Host?",
+      "modelAnswer": "Ich lege einen `BackgroundService` an, dessen `ExecuteAsync` in einer Schleife `while (!stoppingToken.IsCancellationRequested)` prüft und danach `await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken)` wartet. Der Dienst verlangt `ILogger<…>` und `IOptions<…>` im Konstruktor. In `Program.cs` erzeuge ich den Builder mit `Host.CreateApplicationBuilder(args)`, registriere den Dienst mit `AddHostedService` und rufe `Build().RunAsync()` auf. Mit Strg+C stoppt der Host geordnet."
     }
   ]
 }

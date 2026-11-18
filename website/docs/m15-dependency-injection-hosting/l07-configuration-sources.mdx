@@ -99,7 +99,7 @@ Dasselbe Programm läuft auf dem Rechner des Entwicklers, in einem Test und in d
 
 Der Host liest `appsettings.json` und danach `appsettings.{Environment}.json` mit dem Namen der Umgebung. Die zweite Datei überschreibt die erste, es gelten also dieselbe Regel und dieselbe Reihenfolge wie oben ([Generic Host: Host builder settings](https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-builder-settings)).
 
-<Forward concepts={['Generic Host (`Host.CreateApplicationBuilder`)']} module="15" />
+<Forward concepts={['Generic Host (`Host.CreateApplicationBuilder`)']} lesson="m15-l09" />
 
 Das Programm benutzt den Host nur, um die Konfiguration und den Namen der Umgebung zu bekommen. Das Skript startet es zwei Mal: ohne `DOTNET_ENVIRONMENT` und mit `Staging`.
 

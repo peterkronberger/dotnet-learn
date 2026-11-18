@@ -1,0 +1,2 @@
+Service: ExecuteAsync starts
+Main: InvalidOperationException: Log source not reachable

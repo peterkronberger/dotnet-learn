@@ -1,0 +1,218 @@
+---
+title: Generic Host und Hintergrunddienste
+sidebar_position: 9
+description: Wie der Generic Host Dependency Injection, Logging und Konfiguration in einem Builder zusammenfasst, wie ein BackgroundService mit ExecuteAsync arbeitet und was beim Starten und Beenden des Hosts passiert.
+lesson_id: m15-l09
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import lifecycleProgram from '!!raw-loader!@site/examples/_ci/m15-l09-lifecycle/Program.cs';
+import lifecycleOutput from '!!raw-loader!@site/examples/_ci/m15-l09-lifecycle/expected.out.txt';
+import failureProgram from '!!raw-loader!@site/examples/_ci/m15-l09-failure/Program.cs';
+import failureOutput from '!!raw-loader!@site/examples/_ci/m15-l09-failure/expected.out.txt';
+import workerLoop from '!!raw-loader!@site/examples/m15/l09/worker-loop.snippet.cs';
+import gapStoppingToken from '!!raw-loader!@site/examples/m15/l09/gap-stopping-token.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l09/seclog-program-block.snippet.cs';
+import analysisService from '!!raw-loader!@site/examples/_ci/seclog-m15-l09/src/SecLog.Cli/AnalysisService.cs';
+import seclogProject from '!!raw-loader!@site/examples/_ci/seclog-m15-l09/src/SecLog.Cli/SecLog.Cli.csproj';
+
+# Generic Host und Hintergrunddienste
+
+:::note[Lernziele]
+- Du kannst mit `Host.CreateApplicationBuilder` eine Anwendung mit Dependency Injection, Logging und Konfiguration aufbauen.
+- Du schreibst einen <Term id="background-service">`BackgroundService`</Term> mit `ExecuteAsync`, der auf das `CancellationToken` reagiert.
+- Du erklärst, was beim Starten und beim Beenden des Hosts passiert.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l04-q2" />
+
+<Quiz id="m13-l05-q2" />
+
+<Quiz id="m15-l08-q9" />
+
+## Ein Host für alles
+
+In den letzten Lektionen hast du drei Dinge einzeln aufgebaut: den Container mit `ServiceCollection` (`m15-l02`), das Logging (`m15-l05`) und die Konfiguration (`m15-l07`). Der <Term id="generic-host">Generic Host</Term> fasst sie in einem Objekt zusammen. Er ist außerdem für den Start und das geordnete Beenden der Anwendung zuständig ([.NET Generic Host](https://learn.microsoft.com/dotnet/core/extensions/generic-host)).
+
+Der Host ist im Paket `Microsoft.Extensions.Hosting`. Du baust ihn in vier Schritten:
+
+1. **Builder erzeugen:** `Host.CreateApplicationBuilder(args)` gibt einen `HostApplicationBuilder` zurück. Die `args` sind die Argumente der Kommandozeile.
+2. **Einstellen:** Der Builder hat die Eigenschaften `Services` (die `IServiceCollection`), `Logging`, `Configuration` und `Environment`. Du registrierst Services, Logging-Provider und Konfigurationsquellen direkt auf ihm.
+3. **Bauen:** `Build()` erzeugt den Host (`IHost`). Dabei entsteht auch der Service-Provider.
+4. **Laufen lassen:** `RunAsync()` startet den Host und gibt erst zurück, wenn er stoppt.
+
+Schon ohne weitere Angaben richtet der Builder einiges ein:
+
+- **Konfiguration** aus `appsettings.json`, `appsettings.{Environment}.json`, den Umgebungsvariablen und der Kommandozeile (`m15-l07`). In der Umgebung `Development` kommt der Secret Manager dazu.
+- **Logging-Provider:** Console, Debug und EventSource, unter Windows auch EventLog (`m15-l05`).
+- **Prüfung der Lebensdauern** (`m15-l04`): In der Umgebung `Development` sind `ValidateScopes` und `ValidateOnBuild` eingeschaltet.
+- **Eigene Services:** `IHostApplicationLifetime`, `IHostLifetime` und `IHostEnvironment` sind automatisch registriert.
+
+Das Stammverzeichnis, aus dem der Host Dateien wie `appsettings.json` liest, ist standardmäßig das aktuelle Arbeitsverzeichnis ([Generic Host: Host builder settings](https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-builder-settings)).
+
+<Quiz id="m15-l09-q1" />
+
+## Dienste im Host
+
+Eine Anwendung auf dem Host tut ihre Arbeit in gehosteten Diensten. Ein <Term id="hosted-service">Hosted Service</Term> ist eine Klasse, die `IHostedService` implementiert. Das Interface hat zwei Methoden: `StartAsync` und `StopAsync`. Der Host ruft `StartAsync` aller registrierten Dienste beim Start und `StopAsync` beim Beenden auf ([Worker Services in .NET](https://learn.microsoft.com/dotnet/core/extensions/workers)).
+
+Meist schreibst du den Dienst nicht von Hand. `BackgroundService` ist eine abstrakte Klasse, die `IHostedService` implementiert. Deine Unterklasse überschreibt eine einzige Methode:
+
+```csharp
+protected override Task ExecuteAsync(CancellationToken stoppingToken)
+```
+
+Die Methode gibt einen `Task` zurück, der die Dauer der langlaufenden Arbeit darstellt. Der `stoppingToken` ist ein `CancellationToken` (`m13-l05`), den der Host abbricht, wenn er stoppt, also wenn `StopAsync` aufgerufen wird.
+
+Ein typischer Dienst läuft in einer Schleife, bis der Token abgebrochen wird. Wie in `m13-l05` ist der Abbruch kooperativ: Der Token muss in der Schleife geprüft und an `Task.Delay` weitergegeben werden.
+
+<CodeBlock language="csharp" title="worker-loop.snippet.cs">{workerLoop}</CodeBlock>
+
+Einen Dienst meldest du mit `AddHostedService<T>()` beim Host an. Weil der Host Dienste aus dem Container erzeugt, können sie `ILogger<T>`, `IOptions<T>` und andere Services im Konstruktor verlangen. Die Vorlage `dotnet new worker` erzeugt genau dieses Gerüst: ein `Program` mit Host und eine Klasse `Worker`.
+
+<Quiz id="m15-l09-q7" />
+
+<Quiz id="m15-l09-q2" />
+
+## Start und Ende im Programm
+
+Das Programm unten ist ein vollständiger Host mit einem Dienst. Die Logging-Provider sind entfernt (`ClearProviders()`), damit der Host keine eigenen Meldungen schreibt und nur die Zeilen des Programms erscheinen. Der Dienst zählt bis drei und bittet den Host dann mit `StopApplication()` zu stoppen. `StartAsync` und `StopAsync` sind überschrieben, damit du den Ablauf siehst. Beide müssen die Methode der Basisklasse aufrufen und abwarten, sonst startet oder stoppt der Dienst nicht richtig.
+
+<CodeBlock language="csharp" title="Program.cs">{lifecycleProgram}</CodeBlock>
+
+:::info[Vorhersage]
+In welcher Reihenfolge druckt das Programm seine Zeilen? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{lifecycleOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Bauen:** `Build()` erzeugt den Host. Noch läuft kein Dienst. Die Zeile „host built“ kommt zuerst.
+2. **Starten:** `RunAsync()` ruft `StartAsync` des Dienstes auf. Die Methode der Basisklasse startet `ExecuteAsync`.
+3. **Arbeiten:** `ExecuteAsync` zählt drei Schritte. Jeder wartet kurz mit `Task.Delay`, und der Token wird weitergegeben.
+4. **Stoppen anfordern:** Nach Schritt 3 ruft der Dienst `StopApplication()` auf. Das ist das Signal an den Host, zu stoppen.
+5. **Stoppen:** Der Host ruft `StopAsync` des Dienstes auf. Danach gibt `RunAsync` zurück, und `Main` druckt „host stopped“.
+
+**Was passiert, wenn …** du die Zeile mit `StopApplication()` löschst? Dann endet `ExecuteAsync` nach Schritt 3, aber der Host läuft weiter, bis du ihn stoppst, zum Beispiel mit Strg+C. Ein Dienst, der fertig ist, beendet den Host nicht von selbst ([Worker Services: Signal completion](https://learn.microsoft.com/dotnet/core/extensions/workers#signal-completion)).
+
+</details>
+
+<Quiz id="m15-l09-q5" />
+
+### Das Beenden mit Strg+C
+
+Im Betrieb endet ein Host meist nicht durch den Dienst selbst, sondern durch ein Signal von außen: Strg+C in der Konsole oder `docker stop`. Der Host reagiert darauf geordnet. Dieses <Term id="graceful-shutdown">geordnete Beenden</Term> läuft so ab:
+
+1. `ApplicationStopping` wird ausgelöst. Der `stoppingToken` der Dienste wird abgebrochen.
+2. Der Host ruft `StopAsync` der Dienste auf.
+3. `ApplicationStopped` wird ausgelöst, und `RunAsync` gibt zurück.
+
+`ApplicationStopping` und `ApplicationStopped` sind Eigenschaften von `IHostApplicationLifetime`. Auch `StopApplication()` ist dort. Du kannst den Dienst also auch von außen bitten zu stoppen, zum Beispiel mit einem Dienst, der fertig ist. Die Zeit, die `StopAsync` hat, ist begrenzt. Sie heißt `HostOptions.ShutdownTimeout` und lässt sich einstellen ([Generic Host: Host shutdown](https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-shutdown)). Ein Dienst, der nicht auf den Token reagiert, hält das Beenden also auf, bis diese Zeit abgelaufen ist.
+
+<Quiz id="m15-l09-q3" />
+
+<Quiz id="m15-l09-q4" />
+
+<Quiz id="m15-l09-q8" />
+
+## Wenn der Dienst scheitert
+
+Was passiert, wenn `ExecuteAsync` eine Ausnahme wirft, die niemand fängt? Der Host meldet die Ausnahme und stoppt. Das Verhalten steht in `HostOptions.BackgroundServiceExceptionBehavior`: Der Standard ist `StopHost`, mit `Ignore` läuft der Host weiter ([Exception handling in hosting](https://learn.microsoft.com/dotnet/core/compatibility/core-libraries/6.0/hosting-exception-handling)).
+
+<CodeBlock language="csharp" title="Program.cs">{failureProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Der Dienst wirft nach der ersten Wartezeit eine Ausnahme. Welche Zeilen druckt das Programm? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{failureOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Starten:** `ExecuteAsync` beginnt und druckt die erste Zeile.
+2. **Scheitern:** Nach der Wartezeit wirft der Dienst die Ausnahme. Niemand im Dienst fängt sie.
+3. **Stoppen:** Der Host stoppt, das ist der Standard `StopHost`. Es gibt keine Zeile „RunAsync returned“. In diesem Programm kommt die Ausnahme bei `RunAsync` an, und `catch` in `Main` druckt sie.
+
+Für den Dienst heißt das: Fange Ausnahmen in `ExecuteAsync`, wenn der Dienst weiterlaufen soll. Lass sie unbehandelt, wenn ein Fehler die Anwendung beenden soll.
+
+</details>
+
+<Quiz id="m15-l09-q6" />
+
+## Gap-Beispiel: Auf das Stoppen reagieren
+
+Die Lücke `___` fehlt. Die Wartezeit soll enden, sobald der Host stoppt. Setze den Namen des Parameters ein.
+
+<CodeBlock language="csharp" title="gap-stopping-token.snippet.cs">{gapStoppingToken}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `stoppingToken`: `await Task.Delay(1000, stoppingToken);`. Der Token bricht die Wartezeit ab, wenn der Host stoppt. Die Prüfung `!stoppingToken.IsCancellationRequested` beendet danach die Schleife.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l08/`) bekommt seine Services, das Logging und die Schwellen als Optionen aus einem `ServiceCollection`, einem `ConfigurationBuilder` und einem selbst gebauten Provider. Die Analyse läuft direkt in `Program.cs`.
+
+**Neue Anforderung:** `SecLog.Cli` läuft auf dem Generic Host. Die Registrierungen, das Logging und die Optionen `Detection` wandern in den Builder. Die Analyse läuft in einem `BackgroundService` und stoppt die Anwendung, wenn sie fertig ist. Die Ausgabe bleibt unverändert, der Host schreibt keine eigenen Meldungen. Die Tests bleiben unverändert.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={analysisService} title="src/SecLog.Cli/AnalysisService.cs (neu)" />
+
+<CodeBlock language="xml" title="src/SecLog.Cli/SecLog.Cli.csproj">{seclogProject}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Blöcke)">{programBlock}</CodeBlock>
+
+1. **Builder erzeugen:** `Host.CreateApplicationBuilder` ersetzt den `ConfigurationBuilder`. `builder.Configuration` liefert dieselben Quellen wie vorher, die Umgebungsvariable gewinnt weiter gegen `appsettings.json`. Das Stammverzeichnis ist das Verzeichnis des Programms (`AppContext.BaseDirectory`), weil `run.sh` das Programm aus einem anderen Arbeitsverzeichnis startet.
+2. **Registrieren:** `ServiceCollection` wird durch `builder.Services` ersetzt. Die Registrierungen bleiben dieselben.
+3. **Logging:** `ClearProviders()` entfernt die Standardprovider, dann kommt der eigene Provider dazu. `AddFilter("Microsoft.Hosting", LogLevel.Warning)` hält die Meldungen des Hosts aus der Ausgabe.
+4. **Prüfen:** `ValidateOnStart()` ersetzt die Zeile, die `.Value` einmal las. `ConfigureContainer` schaltet `ValidateScopes` und `ValidateOnBuild` ein, weil das Programm nicht in der Umgebung `Development` läuft.
+5. **Dienst anmelden:** `AnalysisService` ist ein `BackgroundService`. Er bekommt die Analyse als Funktion und führt sie in `ExecuteAsync` aus. `finally` ruft `StopApplication()` auf, auch wenn die Analyse scheitert.
+6. **Analyse verschieben:** Der Teil von `Program.cs` nach der Registrierung steht jetzt in der lokalen Funktion `RunAnalysisAsync`. Er ist dafür um eine Stufe eingerückt, sonst ist er gleich. Die Tests sind unverändert und erzeugen ihre Klassen weiter mit `new`, ohne Host.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l09/`) läuft auf dem Generic Host: Der Builder hält Services, Logging und Optionen zusammen, ein `BackgroundService` führt die Analyse aus und stoppt die Anwendung. Das ist der Endstand von Modul 15, auf dem Modul 16 und 17 aufbauen.
+
+<Quiz id="m15-l09-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l09-exception-keeps-host-running" />
+
+**„Eine Ausnahme in `ExecuteAsync` geht verloren, und der Host läuft weiter.“** Der Host meldet die Ausnahme und stoppt, das ist der Standard `StopHost`. Nur mit `BackgroundServiceExceptionBehavior.Ignore` bleibt der Host am Laufen.
+:::
+
+## Zusammenfassung
+
+Der Generic Host fasst Dependency Injection, Logging und Konfiguration zusammen. `Host.CreateApplicationBuilder` richtet Standardquellen und -provider ein, `Build()` erzeugt den Host und `RunAsync()` lässt ihn laufen. Gehostete Dienste implementieren `IHostedService`, ein `BackgroundService` schreibt nur `ExecuteAsync` und reagiert auf den `stoppingToken`. Beim Beenden löst der Host `ApplicationStopping` aus, ruft `StopAsync` der Dienste auf und löst `ApplicationStopped` aus. Eine unbehandelte Ausnahme in `ExecuteAsync` stoppt den Host, und `StopApplication()` beendet ihn von innen.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l09-q10" />
+
+### Transferfrage
+
+<Quiz id="m15-l09-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [.NET Generic Host](https://learn.microsoft.com/dotnet/core/extensions/generic-host)
+- Microsoft Learn: [Worker Services in .NET](https://learn.microsoft.com/dotnet/core/extensions/workers)
