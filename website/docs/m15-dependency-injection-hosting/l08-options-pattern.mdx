@@ -1,0 +1,218 @@
+---
+title: Das Options-Pattern
+sidebar_position: 8
+description: Wie ein Konfigurationsabschnitt an eine Options-Klasse gebunden wird, worin sich IOptions, IOptionsSnapshot und IOptionsMonitor unterscheiden und wie Optionen beim Start validiert werden.
+lesson_id: m15-l08
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import optionsProgram from '!!raw-loader!@site/examples/_ci/m15-l08-options/Program.cs';
+import optionsOutput from '!!raw-loader!@site/examples/_ci/m15-l08-options/expected.out.txt';
+import validationProgram from '!!raw-loader!@site/examples/_ci/m15-l08-validation/Program.cs';
+import validationOutput from '!!raw-loader!@site/examples/_ci/m15-l08-validation/expected.out.txt';
+import configurationIgnore from '!!raw-loader!@site/examples/m15/l08/configuration-ignore.snippet.cs';
+import gapValidation from '!!raw-loader!@site/examples/m15/l08/gap-validation.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l08/seclog-program-block.snippet.cs';
+import detectionOptions from '!!raw-loader!@site/examples/_ci/seclog-m15-l08/src/SecLog.Core/Model/DetectionOptions.cs';
+import failedLoginRule from '!!raw-loader!@site/examples/_ci/seclog-m15-l08/src/SecLog.Core/Model/FailedLoginRule.cs';
+
+# Das Options-Pattern
+
+:::note[Lernziele]
+- Du kannst einen Konfigurationsabschnitt an eine Options-Klasse binden und als `IOptions<T>` injizieren.
+- Du unterscheidest `IOptions<T>`, `IOptionsSnapshot<T>` und `IOptionsMonitor<T>` nach Lebensdauer und Aktualisierung.
+- Du validierst Optionen mit Attributen und einem Lambda und prüfst sie beim Start.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l07-q2" />
+
+<Quiz id="m15-l04-q2" />
+
+<Quiz id="m15-l03-q3" />
+
+## Eine Klasse für zusammengehörige Einstellungen
+
+In `m15-l07` hat SecLog seine Schwellen mit `GetValue<int>("Detection:MaxFailures")` gelesen. Das funktioniert, aber der Schlüssel steht als Text im Code, und jede Stelle, die den Wert braucht, muss ihn selbst lesen. Das <Term id="options-pattern">Options-Pattern</Term> löst das mit einer Klasse: Sie steht für eine Gruppe zusammengehöriger Einstellungen, und eine Klasse, die diese Einstellungen braucht, verlangt nur diese Klasse ([Options pattern in .NET](https://learn.microsoft.com/dotnet/core/extensions/options)).
+
+Eine Options-Klasse hat feste Regeln: Sie ist nicht abstrakt, hat einen öffentlichen Konstruktor ohne Parameter, und ihre Einstellungen sind öffentliche Eigenschaften mit `get` und `set`. Felder werden nicht gebunden. Standardwerte setzt du im Initialisierer der Eigenschaft (`m06-l06`).
+
+Zwei Schritte machen aus einem Konfigurationsabschnitt eine Instanz:
+
+1. **Binden:** `services.Configure<DetectionOptions>(configuration.GetSection("Detection"))` verbindet den Abschnitt mit der Klasse. Der Name des Abschnitts muss nicht der Name der Klasse sein.
+2. **Injizieren:** Eine Klasse verlangt im Konstruktor `IOptions<DetectionOptions>` und liest die Einstellungen mit `.Value`. Das Objekt entsteht erst beim ersten Zugriff auf `Value`.
+
+Ab .NET 11 kannst du eine Eigenschaft vom Binden ausnehmen, mit dem Attribut `[ConfigurationIgnore]` (Attribute: `m14-l06`):
+
+<Since dotnet="11" />
+
+<CodeBlock language="csharp" title="configuration-ignore.snippet.cs">{configurationIgnore}</CodeBlock>
+
+Der Binder setzt dann `Endpoint` und lässt `RuntimeValue` unverändert ([Configuration in .NET: Exclude properties from binding](https://learn.microsoft.com/dotnet/core/extensions/configuration#exclude-properties-from-binding)).
+
+<Quiz id="m15-l08-q1" />
+
+<Quiz id="m15-l08-q5" />
+
+## Drei Interfaces, drei Lebensdauern
+
+Der Container liefert die Optionen über drei Interfaces. Sie unterscheiden sich in Lebensdauer und Aktualisierung:
+
+| Interface | Lebensdauer | Neue Werte nach dem Start |
+| --- | --- | --- |
+| `IOptions<T>` | Singleton | nein, die Werte werden einmal gelesen |
+| `IOptionsSnapshot<T>` | Scoped | ja, für jeden Scope neu berechnet |
+| `IOptionsMonitor<T>` | Singleton | ja, `CurrentValue` ist immer aktuell, mit Änderungsmeldungen |
+
+Die Lebensdauern sind dieselben wie in `m15-l03` und `m15-l04`: Ein Singleton darf keinen Scoped-Service verlangen, also darf es auch keinen `IOptionsSnapshot<T>` verlangen. Ein Singleton, das neue Werte braucht, nimmt `IOptionsMonitor<T>` ([Options pattern in .NET: Options interfaces](https://learn.microsoft.com/dotnet/core/extensions/options#options-interfaces)).
+
+Neue Werte entstehen in einer echten App, wenn sich eine Konfigurationsquelle ändert, zum Beispiel eine JSON-Datei, die mit `reloadOnChange: true` geladen wurde. Das Programm unten ändert den Wert selbst und lässt die Konfiguration mit `Reload()` neu lesen. Das ersetzt hier die Änderung der Datei.
+
+<Forward concepts={['Generic Host (`Host.CreateApplicationBuilder`)']} module="15" />
+
+<CodeBlock language="csharp" title="Program.cs">{optionsProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Das Programm druckt fünf Zeilen. Welche Werte stehen darin? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{optionsOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Binden:** `Configure<DetectionOptions>` bindet den Abschnitt `Detection`. Am Anfang ist `MaxFailures` 5.
+2. **Ändern:** Das Programm setzt den Wert auf 9 und lässt die Konfiguration neu lesen.
+3. **`IOptions<T>`:** Gibt weiter 5 aus. Es hat die Einstellungen beim ersten Zugriff gelesen und nicht mehr.
+4. **`IOptionsSnapshot<T>`:** Der neue Scope berechnet die Optionen neu und bekommt 9.
+5. **`IOptionsMonitor<T>`:** `CurrentValue` ist der aktuelle Wert, 9.
+
+**Was passiert, wenn …** du `IOptions<T>` erst nach der Änderung zum ersten Mal liest? Dann liest es die Einstellungen jetzt zum ersten Mal und bekommt 9. „Einmal lesen“ heißt: beim ersten Zugriff.
+
+</details>
+
+<Quiz id="m15-l08-q2" />
+
+<Quiz id="m15-l08-q3" />
+
+<Quiz id="m15-l08-q4" />
+
+## Optionen validieren
+
+Falsche Werte in der Konfiguration (eine Schwelle von 0, ein Zeitfenster von −5 Minuten) sind ein typischer Fehler. Die <Term id="options-validation">Validierung</Term> prüft die Werte einer Options-Klasse:
+
+- **Attribute** (`m14-l06`): `[Range(1, int.MaxValue)]` auf einer Eigenschaft beschreibt die erlaubten Werte. `ValidateDataAnnotations()` schaltet die Prüfung ein.
+- **Lambda** (`m10`): `Validate(o => …, "Meldung")` prüft eine eigene Regel. Liefert das Lambda `false`, ist die Meldung der Fehler.
+- **Fehler:** Eine fehlgeschlagene Prüfung wirft eine `OptionsValidationException`. Ihre Eigenschaft `Failures` enthält alle Meldungen.
+
+Wann die Prüfung läuft, ist eine Frage der Wahl. Ohne weitere Angabe läuft sie, wenn die Optionen zum ersten Mal gebraucht werden. Mit `ValidateOnStart()` läuft sie beim Start des Hosts. Der Fehler fällt dann sofort auf und nicht erst mitten im Betrieb ([Options pattern in .NET: Options validation](https://learn.microsoft.com/dotnet/core/extensions/options#options-validation)).
+
+Das Programm startet zwei Mal einen Host mit denselben ungültigen Werten (`MaxFailures` = 0, `WindowMinutes` = 100): ohne und mit `ValidateOnStart`. Der Host hier ist nur das Mittel, um den Start zu zeigen.
+
+<CodeBlock language="csharp" title="Program.cs">{validationProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Zeilen druckt das Programm in den beiden Läufen? Achte darauf, ob die Zeile „Host started“ erscheint, und auf die Fehlermeldungen. Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{validationOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Ohne `ValidateOnStart`:** Der Host startet ohne Fehler („Host started“). Der Fehler tritt erst beim Zugriff auf `Value` auf.
+2. **Mit `ValidateOnStart`:** `host.Start()` wirft schon beim Start. „Host started“ erscheint nicht.
+3. **Die Meldungen:** Zwei Fehler. Das Attribut `[Range]` meldet `MaxFailures`, das Lambda meldet `WindowMinutes`. Beide stehen in `Failures`.
+
+**Was passiert, wenn …** du `MaxFailures` auf 5 und `WindowMinutes` auf 10 setzt? Dann gibt es keinen Fehler, in beiden Läufen.
+
+</details>
+
+<Quiz id="m15-l08-q6" />
+
+<Quiz id="m15-l08-q7" />
+
+<Quiz id="m15-l08-q8" />
+
+Seit .NET 11 lassen sich Optionen auch asynchron validieren, zum Beispiel mit einer Prüfung, die im Netz nachfragt. Dafür gibt es `IAsyncStartupValidator`, und `IStartupValidator` ist veraltet. Außerdem gibt es eine `Validate`-Überladung, die einen Typ nimmt, der `IValidateOptions<T>` implementiert. Beides wird hier nur genannt ([What's new in .NET 11 libraries](https://learn.microsoft.com/dotnet/core/whats-new/dotnet-11/libraries)).
+
+<Since dotnet="11" />
+
+## Gap-Beispiel: Beim Start prüfen
+
+Die Lücke `___` fehlt. Die Optionen sollen schon beim Start geprüft werden. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-validation.snippet.cs">{gapValidation}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `ValidateOnStart`: `.ValidateOnStart()` steht am Ende der Kette.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l07/`) liest die Schwellen mit `GetValue<int>` aus `appsettings.json` und den Umgebungsvariablen und gibt sie als Zahlen weiter.
+
+**Neue Anforderung:** Die Schwellen sind an eine Options-Klasse `DetectionOptions` in `SecLog.Core` gebunden (`MaxFailures` und `WindowMinutes`). Beide Werte müssen positiv sein, das prüfen Attribute. `SecLog.Cli` registriert die Optionen mit Validierung. `FailedLoginRule` bekommt `IOptions<DetectionOptions>` im Konstruktor. `SecLog.Core` braucht dafür keine Paketreferenz, das SDK bringt `Microsoft.Extensions.Options` mit. Die Tests erzeugen die Optionen mit `Options.Create(new DetectionOptions { … })`, ohne Container. Die Ausgabe des Programms bleibt unverändert.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={detectionOptions} title="src/SecLog.Core/Model/DetectionOptions.cs (neu)" />
+
+<FoldedCode code={failedLoginRule} title="src/SecLog.Core/Model/FailedLoginRule.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Blöcke)">{programBlock}</CodeBlock>
+
+1. **Klasse anlegen:** `DetectionOptions` hat zwei Eigenschaften mit Standardwerten und `[Range(1, int.MaxValue)]` auf beiden.
+2. **Regel ändern:** `FailedLoginRule` verlangt `IOptions<DetectionOptions>` und liest `options.Value.MaxFailures`.
+3. **Registrieren:** `AddOptions<DetectionOptions>().Bind(…).ValidateDataAnnotations()` bindet den Abschnitt und schaltet die Prüfung ein.
+4. **Beim Start prüfen:** Ein Zugriff auf `.Value` direkt nach dem Bauen des Providers erzeugt die Optionen und löst die Prüfung aus. `ValidateOnStart` setzt einen Host voraus (`m15-l09`).
+5. **Tests:** Sie erzeugen die Regel mit `Options.Create(…)`. Neue Tests prüfen, dass die Standardwerte gültig und 0 oder negative Werte ungültig sind.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l08/`) bindet seine Schwellen an eine geprüfte Options-Klasse. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l07/` nur durch `DetectionOptions`, die geänderte `FailedLoginRule`, die Registrierung in `Program.cs` und `SecLog.Cli.csproj` sowie die angepassten und neuen Tests.
+
+<Quiz id="m15-l08-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l08-options-shows-current-value" />
+
+**„`IOptions<T>` zeigt immer den aktuellen Wert der Datei.“** Das stimmt nicht. `IOptions<T>` ist ein Singleton und liest die Einstellungen einmal. Änderungen nach dem Start sieht es nicht. Dafür gibt es `IOptionsSnapshot<T>` (pro Scope) und `IOptionsMonitor<T>` (Singleton).
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l08-invalid-options-fail-at-start" />
+
+**„Ungültige Optionen lassen das Programm schon beim Start scheitern.“** Das stimmt nur mit `ValidateOnStart`. Ohne es läuft die Prüfung erst beim ersten Zugriff auf `Value`. Das Programm startet dann ohne Fehler und scheitert später.
+:::
+
+## Zusammenfassung
+
+Eine Options-Klasse hat einen Konstruktor ohne Parameter und öffentliche Eigenschaften. `Configure<T>` bindet einen Konfigurationsabschnitt an sie, und eine andere Klasse verlangt `IOptions<T>`. `IOptions<T>` ist ein Singleton und liest einmal, `IOptionsSnapshot<T>` ist Scoped und rechnet pro Scope neu, `IOptionsMonitor<T>` ist ein Singleton mit dem aktuellen Wert. Attribute und `Validate` prüfen die Werte, eine Verletzung wirft eine `OptionsValidationException`. `ValidateOnStart` zieht die Prüfung auf den Start vor.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l08-q10" />
+
+### Transferfrage
+
+<Quiz id="m15-l08-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Options pattern in .NET](https://learn.microsoft.com/dotnet/core/extensions/options)
+- Microsoft Learn: [Configuration in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration)

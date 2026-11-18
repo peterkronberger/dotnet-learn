@@ -1,0 +1,5 @@
+IOptions at start: 5
+IOptionsMonitor at start: 5
+IOptions after change: 5
+IOptionsSnapshot in a new scope: 9
+IOptionsMonitor current value: 9

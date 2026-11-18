@@ -1,0 +1,228 @@
+---
+title: "Konfiguration: Quellen und Reihenfolge"
+sidebar_position: 7
+description: Wie ein Programm Einstellungen aus JSON-Dateien, Umgebungsvariablen und Kommandozeile liest, welche Quelle gewinnt, was die Umgebung ändert und warum Geheimnisse nicht in den Quellcode gehören.
+lesson_id: m15-l07
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import sources from '!!raw-loader!@site/examples/_ci/m15-l07-sources/Program.cs';
+import sourcesSettings from '!!raw-loader!@site/examples/_ci/m15-l07-sources/appsettings.json';
+import sourcesRun from '!!raw-loader!@site/examples/_ci/m15-l07-sources/run.sh';
+import sourcesOutput from '!!raw-loader!@site/examples/_ci/m15-l07-sources/expected.out.txt';
+import environment from '!!raw-loader!@site/examples/_ci/m15-l07-environment/Program.cs';
+import environmentBase from '!!raw-loader!@site/examples/_ci/m15-l07-environment/appsettings.json';
+import environmentStaging from '!!raw-loader!@site/examples/_ci/m15-l07-environment/appsettings.Staging.json';
+import environmentOutput from '!!raw-loader!@site/examples/_ci/m15-l07-environment/expected.out.txt';
+import gapSources from '!!raw-loader!@site/examples/m15/l07/gap-sources.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l07/seclog-program-block.snippet.cs';
+import seclogSettings from '!!raw-loader!@site/examples/_ci/seclog-m15-l07/src/SecLog.Cli/appsettings.json';
+import seclogRun from '!!raw-loader!@site/examples/_ci/seclog-m15-l07/run.sh';
+
+# Konfiguration: Quellen und Reihenfolge
+
+:::note[Lernziele]
+- Du kannst Werte aus `IConfiguration` mit Schlüsseln wie `Detection:MaxFailures` lesen.
+- Du sagst voraus, welcher Wert gilt, wenn derselbe Schlüssel in mehreren <Term id="configuration-provider">Konfigurationsquellen</Term> steht.
+- Du erklärst, was `appsettings.{Environment}.json` und `DOTNET_ENVIRONMENT` bewirken.
+- Du begründest, warum Geheimnisse nicht in den Quellcode oder in `appsettings.json` gehören.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l02-q10" />
+
+<Quiz id="m15-l04-q4" />
+
+<Quiz id="m15-l06-q7" />
+
+## Einstellungen aus mehreren Quellen
+
+Bisher stehen in SecLog Werte wie die Schwelle „5 fehlgeschlagene Logins“ fest im Code. Ändert sich die Schwelle, muss jemand den Code ändern, neu bauen und neu ausliefern. Besser ist es, solche Werte außerhalb des Codes abzulegen. Das nennt man Konfiguration.
+
+Die Konfiguration in .NET besteht aus Schlüssel-Wert-Paaren. Ein `ConfigurationBuilder` sammelt Quellen. Jede Quelle liest ihre Paare aus einer JSON-Datei, den Umgebungsvariablen, der Kommandozeile und anderen Orten. `Build()` macht daraus ein `IConfiguration`, eine einzige Sicht auf alle Quellen. Die Konfiguration ist nur lesbar ([Configuration in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration)).
+
+Die Schlüssel haben Ebenen, getrennt durch einen Doppelpunkt. Die JSON-Datei unten enthält den Schlüssel `Detection:MaxFailures` mit dem Wert 3. Jede Quelle kommt aus einem eigenen NuGet-Paket (`m14-l02`): `Microsoft.Extensions.Configuration.Json`, `.EnvironmentVariables` und `.CommandLine`. `GetValue<T>` kommt aus `Microsoft.Extensions.Configuration.Binder`.
+
+<CodeBlock language="json" title="appsettings.json">{sourcesSettings}</CodeBlock>
+
+Das Programm baut die Konfiguration aus drei Quellen und liest die Werte: den Wert eines Schlüssels mit dem Indexer (`configuration["…"]`, ein `string?`), mit `GetValue<int>` als Zahl und alle Werte eines Abschnitts mit `GetSection` und `GetChildren`.
+
+<CodeBlock language="csharp" title="Program.cs">{sources}</CodeBlock>
+
+## Die Reihenfolge entscheidet
+
+Die Reihenfolge der Quellen bestimmt, welcher Wert gilt: Steht ein Schlüssel in mehreren Quellen, gewinnt die zuletzt hinzugefügte. Das Programm oben fügt die JSON-Datei zuerst hinzu, dann die Umgebungsvariablen und zuletzt die Kommandozeile ([Configuration providers in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration-providers)).
+
+Für Umgebungsvariablen gilt eine Regel für die Namen: Der Doppelpunkt geht nicht auf allen Plattformen. Der doppelte Unterstrich ersetzt ihn, `Detection__MaxFailures` ist also der Schlüssel `Detection:MaxFailures`. Auf der Kommandozeile geben `--Detection:Mode=command-line` oder `Detection:Mode=command-line` einen Wert an.
+
+Das Skript, das das Programm startet, setzt zwei Umgebungsvariablen und einen Kommandozeilenparameter:
+
+<CodeBlock language="bash" title="run.sh">{sourcesRun}</CodeBlock>
+
+:::info[Vorhersage]
+Die Datei hat `MaxFailures` = 3, `WindowMinutes` = 15 und `Mode` = `file`. Welche Werte druckt das Programm für die drei Schlüssel, für den fehlenden Schlüssel und für den Abschnitt? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{sourcesOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Quellen in Reihenfolge:** Datei, dann Umgebung, dann Kommandozeile.
+2. **`Mode`:** In allen drei Quellen gesetzt. Die Kommandozeile gewinnt: `command-line`.
+3. **`MaxFailures`:** In der Datei und der Umgebung gesetzt. Die Umgebung gewinnt: 5.
+4. **`WindowMinutes`:** Nur in der Datei: 15.
+5. **Fehlender Schlüssel:** Der Indexer gibt `null` zurück (das Programm druckt dafür `(null)`). `GetValue<int>` gibt 0 zurück.
+6. **Abschnitt:** `GetChildren` liefert die Einträge von `Detection` mit ihren endgültigen Werten, nach Namen sortiert.
+
+**Was passiert, wenn …** du `AddCommandLine(args)` vor `AddEnvironmentVariables()` aufrufst? Dann gewinnt die Umgebung gegen die Kommandozeile, und `Mode` ist `environment`.
+
+</details>
+
+<Quiz id="m15-l07-q1" />
+
+<Quiz id="m15-l07-q2" />
+
+<Quiz id="m15-l07-q3" />
+
+<Quiz id="m15-l07-q4" />
+
+<Quiz id="m15-l07-q5" />
+
+## Die Umgebung wählt zusätzliche Dateien
+
+Dasselbe Programm läuft auf dem Rechner des Entwicklers, in einem Test und in der Produktion, und jede Umgebung braucht andere Werte. Die Umgebung hat einen Namen: üblich sind `Development`, `Staging` und `Production`. Du setzt den Namen mit der Umgebungsvariablen `DOTNET_ENVIRONMENT`. Ist sie nicht gesetzt, heißt die Umgebung `Production`.
+
+Der Host liest `appsettings.json` und danach `appsettings.{Environment}.json` mit dem Namen der Umgebung. Die zweite Datei überschreibt die erste, es gelten also dieselbe Regel und dieselbe Reihenfolge wie oben ([Generic Host: Host builder settings](https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-builder-settings)).
+
+<Forward concepts={['Generic Host (`Host.CreateApplicationBuilder`)']} module="15" />
+
+Das Programm benutzt den Host nur, um die Konfiguration und den Namen der Umgebung zu bekommen. Das Skript startet es zwei Mal: ohne `DOTNET_ENVIRONMENT` und mit `Staging`.
+
+<CodeBlock language="json" title="appsettings.json">{environmentBase}</CodeBlock>
+
+<CodeBlock language="json" title="appsettings.Staging.json">{environmentStaging}</CodeBlock>
+
+<CodeBlock language="csharp" title="Program.cs">{environment}</CodeBlock>
+
+:::info[Vorhersage]
+Welchen Namen und welche Werte druckt das Programm im ersten Lauf, welche im zweiten? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{environmentOutput}</CodeBlock>
+
+Die Schritte:
+
+1. **Ohne Variable:** Die Umgebung ist `Production`. Es gibt keine Datei `appsettings.Production.json`, also gilt nur `appsettings.json`.
+2. **Mit `Staging`:** `appsettings.Staging.json` kommt dazu. `MaxFailures` wird 3.
+3. **Nicht überschrieben:** `WindowMinutes` steht nur in der Basis-Datei und bleibt 10.
+
+</details>
+
+<Quiz id="m15-l07-q6" />
+
+<Quiz id="m15-l07-q7" />
+
+Die Umgebung `Development` hat eine Besonderheit: Der Host nimmt dann zusätzlich die User Secrets als Quelle dazu, siehe unten.
+
+## Geheimnisse gehören nicht in den Quellcode
+
+Ein Passwort oder ein Token ist ein Geheimnis. Niemals gehört es in den Quellcode oder in eine Konfigurationsdatei wie `appsettings.json`: Beide landen oft in der Versionsverwaltung und sind dann für alle sichtbar, die das Repository lesen. Auch ein Wert, der später gelöscht wird, bleibt in der Historie ([Safe storage of app secrets in development](https://learn.microsoft.com/aspnet/core/security/app-secrets)).
+
+Wohin dann? Zwei Wege:
+
+- **Umgebungsvariablen:** Sie halten Geheimnisse aus dem Code. Sie sind aber Klartext. Wer den Rechner oder den Prozess kontrolliert, kann sie lesen.
+- **<Term id="user-secrets">User Secrets</Term>:** Ein Werkzeug für die Entwicklung. Es legt die Werte in einer Datei im Benutzerprofil ab, außerhalb des Projektordners, damit sie nicht in die Versionsverwaltung kommen. Die Werte sind nicht verschlüsselt, und das Werkzeug ist nur für die Entwicklung gedacht.
+
+Die beiden Befehle richten ein Geheimnis ein:
+
+```bash
+dotnet user-secrets init
+dotnet user-secrets set "Service:ApiKey" "<secret value>"
+```
+
+In der Produktion braucht ein Geheimnis einen kontrollierten Speicher. Ein Beispiel ist Azure Key Vault. Mehr dazu liegt außerhalb dieses Kurses.
+
+<Quiz id="m15-l07-q8" />
+
+<Quiz id="m15-l07-q9" />
+
+## Gap-Beispiel: Quellen in der richtigen Reihenfolge
+
+Die Lücke `___` fehlt. Die Umgebungsvariablen sollen die Datei überschreiben, und die Kommandozeile soll beide überschreiben. Setze den Namen der fehlenden Methode ein.
+
+<CodeBlock language="csharp" title="gap-sources.snippet.cs">{gapSources}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `AddEnvironmentVariables`. Sie steht nach `AddJsonFile` und vor `AddCommandLine`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l06/`) holt seine Services aus dem Container und loggt gefundene Incidents und abgelehnte Zeilen. Die Schwellen der Regel stehen als Zahlen im Code: 5 Fehlversuche in 10 Minuten.
+
+**Neue Anforderung:** Die Schwellen stehen nicht mehr im Code. `SecLog.Cli` liest sie aus `appsettings.json` (wird in das Ausgabeverzeichnis kopiert) mit `IConfiguration` und gibt sie an die Regel weiter. In der Datei stehen andere Werte als die, die gelten sollen. `run.sh` überschreibt sie mit Umgebungsvariablen, so dass man die Reihenfolge sieht. Das Ergebnis der Erkennung bleibt gleich. Eine Zeile mit den gelesenen Werten kommt zur Ausgabe dazu.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="json" title="src/SecLog.Cli/appsettings.json (neu)">{seclogSettings}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Blöcke)">{programBlock}</CodeBlock>
+
+<CodeBlock language="bash" title="run.sh">{seclogRun}</CodeBlock>
+
+1. **Datei anlegen:** `appsettings.json` hat die Werte 3 und 15. Die Projektdatei kopiert sie mit `CopyToOutputDirectory` in das Ausgabeverzeichnis.
+2. **Konfiguration bauen:** `AddJsonFile` zuerst, dann `AddEnvironmentVariables`. Die Umgebung gewinnt.
+3. **Werte lesen:** `GetValue<int>("Detection:MaxFailures")` und `GetValue<int>("Detection:WindowMinutes")`. Beide gehen als Zahl an die Regel und das Zeitfenster.
+4. **Reihenfolge sichtbar machen:** `run.sh` setzt `Detection__MaxFailures=5` und `Detection__WindowMinutes=10`. Das sind die Werte von vorher, das Ergebnis bleibt also gleich.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l07/`) liest die Schwellen aus der Konfiguration. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l06/` nur durch `appsettings.json`, die Projektdatei, den Block in `Program.cs`, die Umgebungsvariablen in `run.sh` und die neue Ausgabezeile.
+
+<Quiz id="m15-l07-q10" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l07-json-always-wins" />
+
+**„Die JSON-Datei gewinnt immer gegen Umgebungsvariablen.“** Das stimmt nicht. Es gibt keinen festen Vorrang. Die Reihenfolge, in der die Quellen hinzugefügt werden, entscheidet: Die zuletzt hinzugefügte Quelle gewinnt. Beim Host stehen die Umgebungsvariablen und die Kommandozeile nach den Dateien.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l07-user-secrets-encrypted" />
+
+**„User Secrets sind verschlüsselt und deshalb auch für die Produktion sicher.“** Das stimmt nicht. Die Werte liegen unverschlüsselt in einer Datei im Benutzerprofil. User Secrets halten Geheimnisse aus dem Quellcode, sind aber nur für die Entwicklung gedacht.
+:::
+
+## Zusammenfassung
+
+Konfiguration besteht aus Schlüssel-Wert-Paaren, deren Ebenen ein Doppelpunkt trennt. Ein `ConfigurationBuilder` sammelt Quellen: JSON-Dateien, Umgebungsvariablen (mit `__` statt `:`) und Kommandozeile. Steht ein Schlüssel in mehreren Quellen, gewinnt die zuletzt hinzugefügte. Die Umgebung (`DOTNET_ENVIRONMENT`, sonst `Production`) wählt eine zusätzliche Datei `appsettings.{Environment}.json`. Geheimnisse gehören nicht in den Quellcode oder in `appsettings.json`: In der Entwicklung helfen User Secrets (unverschlüsselt), in der Produktion ein kontrollierter Speicher.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l07-q11" />
+
+### Transferfrage
+
+<Quiz id="m15-l07-q12" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Configuration in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration)
+- Microsoft Learn: [Configuration providers in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration-providers)
+- Microsoft Learn: [Safe storage of app secrets in development](https://learn.microsoft.com/aspnet/core/security/app-secrets)

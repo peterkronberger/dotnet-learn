@@ -1,0 +1,8 @@
+Mode: command-line
+MaxFailures: 5
+WindowMinutes: 15
+Missing: (null)
+Missing as int: 0
+MaxFailures = 5
+Mode = command-line
+WindowMinutes = 15
