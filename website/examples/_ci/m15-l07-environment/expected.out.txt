@@ -1,0 +1,8 @@
+== no environment variable ==
+Environment: Production
+MaxFailures: 5
+WindowMinutes: 10
+== DOTNET_ENVIRONMENT=Staging ==
+Environment: Staging
+MaxFailures: 3
+WindowMinutes: 10

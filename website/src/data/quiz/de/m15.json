@@ -1244,6 +1244,439 @@
       "type": "explain",
       "question": "Transferfrage: Du loggst in einem eigenen Programm, wie viele Artikel ein Benutzer bestellt hat. Wie schreibst du den Aufruf, und was gewinnst du gegenüber einem interpolierten String?",
       "modelAnswer": "`logger.LogInformation(\"User {User} ordered {Count} items\", user, count);`\n\nDas Log-System bekommt `User` und `Count` als eigene Daten. Ich kann nach allen Bestellungen eines Benutzers suchen oder die Zahlen auswerten, ohne den Text zu zerlegen. Außerdem wird der Text nur formatiert, wenn die Meldung geschrieben wird."
+    },
+    {
+      "id": "m15-l07-q1",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Die Datei `appsettings.json` enthält `{ \"Detection\": { \"MaxFailures\": 5 } }`. Mit welchem Schlüssel liest du den Wert aus `IConfiguration`?",
+      "options": [
+        {
+          "text": "`configuration[\"Detection:MaxFailures\"]`",
+          "correct": true
+        },
+        {
+          "text": "`configuration[\"Detection.MaxFailures\"]`",
+          "feedback": "Die Ebenen trennt ein Doppelpunkt, kein Punkt."
+        },
+        {
+          "text": "`configuration[\"MaxFailures\"]`",
+          "feedback": "Ohne den Abschnitt `Detection` findet die Konfiguration den Wert nicht."
+        }
+      ],
+      "explanation": "Hierarchische Schlüssel trennt ein Doppelpunkt (`:`)."
+    },
+    {
+      "id": "m15-l07-q2",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Ein `ConfigurationBuilder` bekommt in dieser Reihenfolge `AddJsonFile`, `AddEnvironmentVariables` und `AddCommandLine`. Derselbe Schlüssel steht in allen drei Quellen. Welcher Wert gilt?",
+      "options": [
+        {
+          "text": "Der Wert aus der Kommandozeile, denn die zuletzt hinzugefügte Quelle gewinnt.",
+          "correct": true
+        },
+        {
+          "text": "Der Wert aus der JSON-Datei, denn sie wurde zuerst gelesen.",
+          "feedback": "Eine spätere Quelle überschreibt eine frühere, nicht umgekehrt.",
+          "misconception": "m15-l07-json-always-wins"
+        },
+        {
+          "text": "Der Wert aus der Umgebungsvariablen, denn sie steht in der Mitte.",
+          "feedback": "Die Quelle am Ende der Reihe hat den Vorrang."
+        }
+      ],
+      "explanation": "Der Schlüssel wird in der Reihenfolge der Quellen überschrieben: Die zuletzt hinzugefügte Quelle gewinnt."
+    },
+    {
+      "id": "m15-l07-q3",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "`appsettings.json` hat `MaxFailures` = 3. Die Umgebungsvariable `Detection__MaxFailures` ist 7. Der Code ruft zuerst `AddJsonFile`, dann `AddEnvironmentVariables` auf. Welchen Wert liefert `configuration[\"Detection:MaxFailures\"]`?",
+      "options": [
+        {
+          "text": "`7`",
+          "correct": true
+        },
+        {
+          "text": "`3`, denn Einstellungen in Dateien haben immer Vorrang.",
+          "feedback": "Es gibt keinen festen Vorrang der Datei. Die Reihenfolge der Quellen entscheidet.",
+          "misconception": "m15-l07-json-always-wins"
+        },
+        {
+          "text": "`null`, denn der Schlüssel ist doppelt vorhanden.",
+          "feedback": "Ein doppelter Schlüssel ist kein Fehler. Die spätere Quelle überschreibt die frühere."
+        }
+      ],
+      "explanation": "Die Umgebungsvariable wurde nach der Datei hinzugefügt und überschreibt ihren Wert."
+    },
+    {
+      "id": "m15-l07-q4",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Warum heißt die Umgebungsvariable für `Detection:MaxFailures` `Detection__MaxFailures`?",
+      "options": [
+        {
+          "text": "Der Doppelpunkt geht in Umgebungsvariablen nicht auf allen Plattformen. Der doppelte Unterstrich ersetzt ihn.",
+          "correct": true
+        },
+        {
+          "text": "Der doppelte Unterstrich ist ein Schlüsselwort von C#.",
+          "feedback": "Das ist eine Regel der Konfiguration, kein C#-Schlüsselwort."
+        },
+        {
+          "text": "Umgebungsvariablen dürfen nur Großbuchstaben haben.",
+          "feedback": "Das ist keine Regel der Konfiguration. Schlüssel sind nicht von Groß- und Kleinschreibung abhängig."
+        }
+      ],
+      "explanation": "`__` wird von der Konfiguration automatisch in `:` umgewandelt und funktioniert auf allen Plattformen."
+    },
+    {
+      "id": "m15-l07-q5",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Was liefert `configuration[\"Detection:Missing\"]`, wenn der Schlüssel in keiner Quelle steht?",
+      "options": [
+        {
+          "text": "`null`",
+          "correct": true
+        },
+        {
+          "text": "Eine `KeyNotFoundException`",
+          "feedback": "Der Indexer wirft keine Exception für einen fehlenden Schlüssel."
+        },
+        {
+          "text": "Den leeren Text `\"\"`",
+          "feedback": "Ein fehlender Schlüssel ergibt `null`, nicht einen leeren Text."
+        }
+      ],
+      "explanation": "Der Indexer gibt `string?` zurück: `null`, wenn kein Wert da ist. Das Beispiel druckt dafür `(null)`."
+    },
+    {
+      "id": "m15-l07-q6",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Die Umgebung heißt `Staging`. Welche JSON-Dateien liest der Host, und in welcher Reihenfolge?",
+      "options": [
+        {
+          "text": "Erst `appsettings.json`, dann `appsettings.Staging.json`. Die zweite überschreibt die erste.",
+          "correct": true
+        },
+        {
+          "text": "Nur `appsettings.Staging.json`.",
+          "feedback": "`appsettings.json` wird immer gelesen und ist die Basis."
+        },
+        {
+          "text": "Erst `appsettings.Staging.json`, dann `appsettings.json`.",
+          "feedback": "Die Datei der Umgebung kommt zuletzt und überschreibt die Basis."
+        }
+      ],
+      "explanation": "Die Datei der Umgebung kommt nach `appsettings.json` und überschreibt deren Werte."
+    },
+    {
+      "id": "m15-l07-q7",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Welche Umgebung hat der Host, wenn `DOTNET_ENVIRONMENT` nicht gesetzt ist?",
+      "options": [
+        {
+          "text": "`Production`",
+          "correct": true
+        },
+        {
+          "text": "`Development`",
+          "feedback": "`Development` gilt nur, wenn du die Variable darauf setzt."
+        },
+        {
+          "text": "Keine. Der Host startet dann nicht.",
+          "feedback": "Der Host startet und wählt `Production`."
+        }
+      ],
+      "explanation": "Ohne `DOTNET_ENVIRONMENT` ist der Name `Production`. Das Beispiel druckt ihn."
+    },
+    {
+      "id": "m15-l07-q8",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Was stimmt über User Secrets (`dotnet user-secrets`)?",
+      "options": [
+        {
+          "text": "Sie liegen unverschlüsselt in einer Datei im Benutzerprofil und sind nur für die Entwicklung gedacht.",
+          "correct": true
+        },
+        {
+          "text": "Sie sind verschlüsselt und deshalb auch für die Produktion geeignet.",
+          "feedback": "Die Werte sind nicht verschlüsselt. Für die Produktion braucht es einen kontrollierten Speicher.",
+          "misconception": "m15-l07-user-secrets-encrypted"
+        },
+        {
+          "text": "Sie werden im Projektordner gespeichert und mit eingecheckt.",
+          "feedback": "Sie liegen außerhalb des Projektordners und kommen nicht in die Versionsverwaltung."
+        }
+      ],
+      "explanation": "User Secrets halten Geheimnisse aus dem Quellcode heraus. Sie sind ein Hilfsmittel für die Entwicklung und kein sicherer Speicher."
+    },
+    {
+      "id": "m15-l07-q9",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "Wohin gehört ein Passwort für eine Datenbank nicht?",
+      "options": [
+        {
+          "text": "In den Quellcode oder in `appsettings.json`",
+          "correct": true
+        },
+        {
+          "text": "In eine Umgebungsvariable",
+          "feedback": "Umgebungsvariablen halten Geheimnisse aus dem Quellcode. Sie sind aber Klartext und kein vollständiger Schutz."
+        },
+        {
+          "text": "In User Secrets während der Entwicklung",
+          "feedback": "Dafür sind User Secrets da, nur nicht für die Produktion."
+        }
+      ],
+      "explanation": "Konfigurationsdateien landen oft in der Versionsverwaltung. Geheimnisse gehören nicht hinein."
+    },
+    {
+      "id": "m15-l07-q10",
+      "lesson": "m15-l07",
+      "type": "single",
+      "question": "In SecLog steht `MaxFailures` in `appsettings.json` auf 3. `run.sh` setzt `Detection__MaxFailures=5`. Welchen Wert benutzt das Programm?",
+      "options": [
+        {
+          "text": "`5`, denn die Umgebungsvariable wird nach der Datei gelesen.",
+          "correct": true
+        },
+        {
+          "text": "`3`, denn die Datei ist die Standard-Quelle.",
+          "feedback": "Die Datei ist die erste Quelle und wird überschrieben.",
+          "misconception": "m15-l07-json-always-wins"
+        },
+        {
+          "text": "`8`, denn die Werte werden addiert.",
+          "feedback": "Konfiguration addiert nicht. Ein Schlüssel hat am Ende genau einen Wert."
+        }
+      ],
+      "explanation": "SecLog liest zuerst die Datei und dann die Umgebung. Der Wert der Umgebung gewinnt."
+    },
+    {
+      "id": "m15-l07-q11",
+      "lesson": "m15-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein Programm seine Einstellungen aus mehreren Quellen bekommt, welche Quelle gewinnt, und warum ein Passwort nicht in `appsettings.json` steht.",
+      "modelAnswer": "Ein `ConfigurationBuilder` bekommt mehrere Quellen, zum Beispiel eine JSON-Datei, die Umgebungsvariablen und die Kommandozeile. Jede Quelle liefert Schlüssel-Wert-Paare, und die Schlüssel haben Ebenen mit `:`. Steht ein Schlüssel in mehreren Quellen, gewinnt die zuletzt hinzugefügte.\n\nEine Datei wie `appsettings.json` wird oft mit dem Quellcode eingecheckt. Ein Passwort darin wäre für alle sichtbar, die das Repository lesen. Darum kommen Geheimnisse aus der Umgebung, aus User Secrets in der Entwicklung oder aus einem kontrollierten Speicher in der Produktion."
+    },
+    {
+      "id": "m15-l07-q12",
+      "lesson": "m15-l07",
+      "type": "explain",
+      "question": "Transferfrage: Dein Programm braucht eine Adresse und ein Zeitlimit für einen Dienst. Zu Hause soll es einen anderen Wert geben als in der Produktion. Wie legst du die Werte ab, und wie überschreibst du sie in der Produktion?",
+      "modelAnswer": "Ich lege die Standardwerte in `appsettings.json` ab, zum Beispiel `Service:Address` und `Service:TimeoutSeconds`. Für die Produktion setze ich Umgebungsvariablen wie `Service__Address`, die den Wert aus der Datei überschreiben. Alternativ lege ich eine Datei `appsettings.Production.json` an, wenn die Umgebung `Production` heißt. Ein Passwort für den Dienst käme nicht in die Datei, sondern in die Umgebung oder in einen kontrollierten Speicher."
+    },
+    {
+      "id": "m15-l08-q1",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Welche Klasse lässt sich als Options-Klasse an einen Konfigurationsabschnitt binden?",
+      "options": [
+        {
+          "text": "Eine Klasse, die nicht abstrakt ist, einen öffentlichen Konstruktor ohne Parameter und öffentliche Eigenschaften mit `get` und `set` hat.",
+          "correct": true
+        },
+        {
+          "text": "Eine Klasse mit öffentlichen Feldern wie `public int MaxFailures;`.",
+          "feedback": "Felder werden nicht gebunden. Die Werte müssen in Eigenschaften mit `get` und `set` stehen."
+        },
+        {
+          "text": "Eine abstrakte Klasse mit Eigenschaften.",
+          "feedback": "Der Binder muss eine Instanz erzeugen. Das geht bei einer abstrakten Klasse nicht."
+        }
+      ],
+      "explanation": "Der Binder erzeugt die Klasse mit ihrem Konstruktor ohne Parameter und setzt dann die öffentlichen Eigenschaften."
+    },
+    {
+      "id": "m15-l08-q2",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Die Datei ändert sich, während das Programm läuft. Welchen Wert zeigt `IOptions<DetectionOptions>.Value` danach?",
+      "options": [
+        {
+          "text": "Den Wert vom ersten Lesen. `IOptions<T>` liest die Einstellungen nur einmal.",
+          "correct": true
+        },
+        {
+          "text": "Den neuen Wert, denn `IOptions<T>` zeigt immer den aktuellen Stand der Datei.",
+          "feedback": "`IOptions<T>` ist ein Singleton und liest nach dem Start nicht mehr neu. Für neue Werte gibt es `IOptionsSnapshot<T>` und `IOptionsMonitor<T>`.",
+          "misconception": "m15-l08-options-shows-current-value"
+        },
+        {
+          "text": "`null`, denn der Wert ist veraltet.",
+          "feedback": "Der Wert wird nicht ungültig. Er bleibt der Wert vom ersten Lesen."
+        }
+      ],
+      "explanation": "`IOptions<T>` unterstützt kein Lesen der Konfiguration nach dem Start. Das Beispiel druckt vor und nach der Änderung 5."
+    },
+    {
+      "id": "m15-l08-q3",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Welche Lebensdauer hat `IOptionsSnapshot<T>`, und was folgt daraus?",
+      "options": [
+        {
+          "text": "Scoped. Er wird für jeden Scope neu berechnet und darf nicht in ein Singleton injiziert werden.",
+          "correct": true
+        },
+        {
+          "text": "Singleton. Er darf in jeden Service injiziert werden.",
+          "feedback": "Das gilt für `IOptions<T>` und `IOptionsMonitor<T>`. `IOptionsSnapshot<T>` ist Scoped."
+        },
+        {
+          "text": "Transient. Er liest bei jedem Aufruf von `Value` neu.",
+          "feedback": "Er ist Scoped: Innerhalb eines Scopes bleibt der Wert gleich."
+        }
+      ],
+      "explanation": "Ein Singleton, das einen `IOptionsSnapshot<T>` verlangt, wäre eine Captive Dependency (`m15-l04`)."
+    },
+    {
+      "id": "m15-l08-q4",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Ein Singleton-Service soll immer den aktuellen Wert der Einstellungen lesen können. Was injizierst du?",
+      "options": [
+        {
+          "text": "`IOptionsMonitor<T>` und liest `CurrentValue`.",
+          "correct": true
+        },
+        {
+          "text": "`IOptionsSnapshot<T>`",
+          "feedback": "Er ist Scoped und darf nicht in ein Singleton injiziert werden."
+        },
+        {
+          "text": "`IOptions<T>`",
+          "feedback": "Er liest nach dem Start nicht mehr neu."
+        }
+      ],
+      "explanation": "`IOptionsMonitor<T>` ist ein Singleton. Er liefert den aktuellen Wert und meldet Änderungen."
+    },
+    {
+      "id": "m15-l08-q5",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Was bewirkt `services.Configure<DetectionOptions>(configuration.GetSection(\"Detection\"))`?",
+      "options": [
+        {
+          "text": "Der Abschnitt `Detection` wird an `DetectionOptions` gebunden, und der Container liefert ihn als `IOptions<DetectionOptions>`.",
+          "correct": true
+        },
+        {
+          "text": "Der Container erzeugt sofort ein `DetectionOptions`-Objekt und registriert es als Singleton.",
+          "feedback": "Das Objekt entsteht erst, wenn jemand `Value` liest."
+        },
+        {
+          "text": "Die Datei `appsettings.json` wird neu geladen.",
+          "feedback": "Die Methode lädt keine Datei. Sie bindet einen Abschnitt, der schon geladen ist."
+        }
+      ],
+      "explanation": "Der Wert entsteht erst beim Zugriff auf `IOptions<T>.Value`."
+    },
+    {
+      "id": "m15-l08-q6",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "`MaxFailures` hat `[Range(1, int.MaxValue)]`, in der Konfiguration steht 0, und `ValidateDataAnnotations()` ist gesetzt. Was passiert beim Lesen von `IOptions<DetectionOptions>.Value`?",
+      "options": [
+        {
+          "text": "Eine `OptionsValidationException`, deren `Failures` die Meldung zum Attribut enthalten.",
+          "correct": true
+        },
+        {
+          "text": "Es wird ein `DetectionOptions` mit `MaxFailures` = 1 geliefert.",
+          "feedback": "Die Validierung korrigiert keine Werte. Sie meldet den Fehler."
+        },
+        {
+          "text": "Es wird ein `DetectionOptions` mit `MaxFailures` = 0 geliefert.",
+          "feedback": "Mit `ValidateDataAnnotations()` wird der Wert geprüft, bevor er geliefert wird."
+        }
+      ],
+      "explanation": "Die Validierung läuft beim Erzeugen der Options-Instanz. Schlägt sie fehl, wirft der Zugriff eine `OptionsValidationException`."
+    },
+    {
+      "id": "m15-l08-q7",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Die Optionen sind ungültig, und `ValidateOnStart` ist nicht gesetzt. Wann meldet das Programm den Fehler?",
+      "options": [
+        {
+          "text": "Erst beim ersten Zugriff auf `Value`. Der Start verläuft ohne Fehler.",
+          "correct": true
+        },
+        {
+          "text": "Schon beim Start des Programms, denn Validierung läuft immer beim Start.",
+          "feedback": "Ohne `ValidateOnStart` läuft die Validierung erst bei der Nutzung. Das erste Beispiel druckt „Host started“ und danach den Fehler.",
+          "misconception": "m15-l08-invalid-options-fail-at-start"
+        },
+        {
+          "text": "Gar nicht, denn ohne `ValidateOnStart` wird nicht validiert.",
+          "feedback": "Die Validierung ist eingeschaltet, sie läuft nur später: beim ersten Zugriff."
+        }
+      ],
+      "explanation": "`ValidateOnStart` verschiebt die Prüfung nach vorn: Der Fehler tritt beim Start auf und nicht erst mitten im Betrieb."
+    },
+    {
+      "id": "m15-l08-q8",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "Wofür dient `.Validate(o => o.WindowMinutes <= 60, \"WindowMinutes must be at most 60.\")`?",
+      "options": [
+        {
+          "text": "Für eine eigene Regel als Lambda. Liefert sie `false`, steht die Meldung in den `Failures`.",
+          "correct": true
+        },
+        {
+          "text": "Es setzt `WindowMinutes` auf 60, wenn der Wert größer ist.",
+          "feedback": "Eine Validierung ändert keine Werte. Sie meldet nur."
+        },
+        {
+          "text": "Es prüft die Attribute der Klasse.",
+          "feedback": "Die Attribute prüft `ValidateDataAnnotations()`."
+        }
+      ],
+      "explanation": "Das Lambda ist ein `Func<TOptions, bool>` (`m10`). Die Zeichenkette ist die Fehlermeldung."
+    },
+    {
+      "id": "m15-l08-q9",
+      "lesson": "m15-l08",
+      "type": "single",
+      "question": "In SecLog steht nach dem Bauen des Providers die Zeile `_ = provider.GetRequiredService<IOptions<DetectionOptions>>().Value;`. Wozu?",
+      "options": [
+        {
+          "text": "Sie erzeugt die Optionen einmal und prüft sie. Ungültige Einstellungen fallen so gleich beim Start auf.",
+          "correct": true
+        },
+        {
+          "text": "Sie speichert den Wert in einer Variablen für später.",
+          "feedback": "Der Wert wird verworfen (`_`). Die Zeile hat nur die Prüfung zur Folge."
+        },
+        {
+          "text": "Sie lädt `appsettings.json` neu.",
+          "feedback": "Die Datei wird nicht gelesen. Der Abschnitt ist schon geladen."
+        }
+      ],
+      "explanation": "Die Validierung läuft erst beim Zugriff auf `Value`. Den Zugriff gleich zu Beginn zu erzwingen, schützt vor Fehlern mitten im Lauf."
+    },
+    {
+      "id": "m15-l08-q10",
+      "lesson": "m15-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein Konfigurationsabschnitt zu einer Options-Klasse wird, worin sich `IOptions<T>`, `IOptionsSnapshot<T>` und `IOptionsMonitor<T>` unterscheiden und wie du Optionen beim Start prüfst.",
+      "modelAnswer": "Eine Options-Klasse hat einen Konstruktor ohne Parameter und öffentliche Eigenschaften. `Configure<T>(section)` oder `AddOptions<T>().Bind(section)` bindet den Abschnitt an sie, und eine andere Klasse verlangt im Konstruktor `IOptions<T>`.\n\n`IOptions<T>` ist ein Singleton und liest die Werte einmal. `IOptionsSnapshot<T>` ist Scoped und rechnet für jeden Scope neu, darf also nicht in ein Singleton. `IOptionsMonitor<T>` ist ein Singleton mit dem aktuellen Wert und Änderungsmeldungen.\n\nMit `ValidateDataAnnotations()` und `Validate(lambda)` prüfe ich die Werte. `ValidateOnStart()` zieht die Prüfung auf den Start vor, damit ungültige Werte nicht erst später auffallen."
+    },
+    {
+      "id": "m15-l08-q11",
+      "lesson": "m15-l08",
+      "type": "explain",
+      "question": "Transferfrage: Dein Programm hat Einstellungen für einen Dienst: `Address` und `TimeoutSeconds`. Wie machst du daraus eine Options-Klasse, und welche Regel prüfst du?",
+      "modelAnswer": "Ich lege eine Klasse `ServiceOptions` mit `public string Address { get; set; } = \"\";` und `public int TimeoutSeconds { get; set; } = 30;` an. Mit `[Required]` auf `Address` und `[Range(1, 300)]` auf `TimeoutSeconds` beschreibe ich die Regeln. Ich binde den Abschnitt mit `AddOptions<ServiceOptions>().Bind(section).ValidateDataAnnotations().ValidateOnStart()`. Die Klasse, die den Dienst aufruft, verlangt `IOptions<ServiceOptions>`."
     }
   ]
 }

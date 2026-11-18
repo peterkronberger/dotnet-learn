@@ -10431,6 +10431,87 @@
         "title": "Logging in C# and .NET: Log scopes",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-scopes"
       }
+    },
+    {
+      "id": "configuration-provider",
+      "term": "Configuration Provider",
+      "german": "Konfigurationsquelle",
+      "category": "platform",
+      "definition": "Liest Einstellungen aus einer Quelle, zum Beispiel einer JSON-Datei, den Umgebungsvariablen oder der Kommandozeile. Hat ein Schlüssel in mehreren Quellen einen Wert, gilt der der zuletzt hinzugefügten.",
+      "related": [
+        "environment-variable",
+        "user-secrets"
+      ],
+      "lesson": "m15-l07",
+      "source": {
+        "title": "Configuration providers in .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/configuration-providers"
+      }
+    },
+    {
+      "id": "environment-variable",
+      "term": "Environment Variable",
+      "german": "Umgebungsvariable",
+      "category": "platform",
+      "definition": "Ein Name-Wert-Paar, das das Betriebssystem an einen Prozess gibt. In der Konfiguration ersetzt `__` den Doppelpunkt: `Detection__MaxFailures` ist der Schlüssel `Detection:MaxFailures`.",
+      "related": [
+        "configuration-provider",
+        "user-secrets"
+      ],
+      "lesson": "m15-l07",
+      "source": {
+        "title": "Configuration providers in .NET: Environment variable configuration provider",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/configuration-providers#environment-variable-configuration-provider"
+      }
+    },
+    {
+      "id": "user-secrets",
+      "term": "User Secrets",
+      "german": "User Secrets",
+      "category": "platform",
+      "definition": "Ein Werkzeug (`dotnet user-secrets`), das Geheimnisse außerhalb des Projektordners ablegt. Die Werte sind nicht verschlüsselt und nur für die Entwicklung gedacht.",
+      "related": [
+        "configuration-provider",
+        "environment-variable"
+      ],
+      "lesson": "m15-l07",
+      "source": {
+        "title": "Safe storage of app secrets in development: Secret Manager",
+        "url": "https://learn.microsoft.com/aspnet/core/security/app-secrets#use-the-secret-manager-tool"
+      }
+    },
+    {
+      "id": "options-pattern",
+      "term": "Options Pattern",
+      "german": "Options-Muster",
+      "category": "platform",
+      "definition": "Eine Klasse mit Eigenschaften steht für eine Gruppe zusammengehöriger Einstellungen. Ein Konfigurationsabschnitt wird an sie gebunden, und eine andere Klasse verlangt sie als `IOptions<T>`, `IOptionsSnapshot<T>` oder `IOptionsMonitor<T>`.",
+      "related": [
+        "configuration-provider",
+        "service-lifetime",
+        "options-validation"
+      ],
+      "lesson": "m15-l08",
+      "source": {
+        "title": "Options pattern in .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/options"
+      }
+    },
+    {
+      "id": "options-validation",
+      "term": "Options Validation",
+      "german": "Options-Validierung",
+      "category": "platform",
+      "definition": "Prüft die Werte einer Options-Klasse mit Attributen (`ValidateDataAnnotations`) oder einem Lambda (`Validate`). Ein Fehler ist eine `OptionsValidationException`. `ValidateOnStart` zieht die Prüfung auf den Start vor.",
+      "related": [
+        "options-pattern",
+        "configuration-provider"
+      ],
+      "lesson": "m15-l08",
+      "source": {
+        "title": "Options pattern in .NET: Options validation",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/options#options-validation"
+      }
     }
   ]
 }

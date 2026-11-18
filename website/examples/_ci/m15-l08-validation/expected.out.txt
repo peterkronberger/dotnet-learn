@@ -1,0 +1,9 @@
+== ValidateOnStart: False
+Host started
+OptionsValidationException: 2 failures
+  DataAnnotation validation failed for 'DetectionOptions' members: 'MaxFailures' with the error: 'The field MaxFailures must be between 1 and 2147483647.'.
+  WindowMinutes must be at most 60.
+== ValidateOnStart: True
+OptionsValidationException: 2 failures
+  DataAnnotation validation failed for 'DetectionOptions' members: 'MaxFailures' with the error: 'The field MaxFailures must be between 1 and 2147483647.'.
+  WindowMinutes must be at most 60.
