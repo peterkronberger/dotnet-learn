@@ -1,0 +1,4 @@
+Scope 1: RequestInfo 1, Dashboard uses RequestInfo 2
+Scope 2: RequestInfo 3, Dashboard uses RequestInfo 2
+AggregateException
+Some services are not able to be constructed (Error while validating the service descriptor 'ServiceType: Dashboard Lifetime: Singleton ImplementationType: Dashboard': Cannot consume scoped service 'RequestInfo' from singleton 'Dashboard'.)

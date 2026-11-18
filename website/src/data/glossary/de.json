@@ -10196,6 +10196,142 @@
         "title": "Dependency injection in .NET: Keyed services",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#keyed-services"
       }
+    },
+    {
+      "id": "service-lifetime",
+      "term": "Service Lifetime",
+      "german": "Lebensdauer eines Services",
+      "category": "platform",
+      "definition": "Legt fest, wie lange eine Instanz lebt und wann der Container eine neue erzeugt: Singleton, Scoped oder Transient. Du wählst sie bei der Registrierung.",
+      "aliases": [
+        "Lifetime"
+      ],
+      "related": [
+        "singleton-lifetime",
+        "scoped-lifetime",
+        "transient-lifetime",
+        "service-registration"
+      ],
+      "lesson": "m15-l03",
+      "source": {
+        "title": "Service lifetimes",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes"
+      }
+    },
+    {
+      "id": "singleton-lifetime",
+      "term": "Singleton",
+      "category": "platform",
+      "definition": "Lebensdauer mit einer Instanz pro Provider. Der Container erzeugt sie bei der ersten Anfrage und gibt sie danach an alle Aufrufer weiter. Registrierung: `AddSingleton`.",
+      "aliases": [
+        "Singleton-Dienst"
+      ],
+      "related": [
+        "service-lifetime",
+        "scoped-lifetime",
+        "transient-lifetime",
+        "thread-safety"
+      ],
+      "lesson": "m15-l03",
+      "source": {
+        "title": "Service lifetimes: Singleton",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes#singleton"
+      }
+    },
+    {
+      "id": "scoped-lifetime",
+      "term": "Scoped",
+      "category": "platform",
+      "definition": "Lebensdauer mit einer Instanz pro Scope. Wer im selben Scope anfragt, bekommt dasselbe Objekt, ein neuer Scope bekommt ein neues. Registrierung: `AddScoped`.",
+      "related": [
+        "service-lifetime",
+        "service-scope",
+        "singleton-lifetime",
+        "transient-lifetime"
+      ],
+      "lesson": "m15-l03",
+      "source": {
+        "title": "Service lifetimes: Scoped",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes#scoped"
+      }
+    },
+    {
+      "id": "transient-lifetime",
+      "term": "Transient",
+      "category": "platform",
+      "definition": "Lebensdauer, bei der der Container bei jeder Anfrage ein neues Objekt erzeugt. Registrierung: `AddTransient`.",
+      "related": [
+        "service-lifetime",
+        "scoped-lifetime",
+        "singleton-lifetime"
+      ],
+      "lesson": "m15-l03",
+      "source": {
+        "title": "Service lifetimes: Transient",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/service-lifetimes#transient"
+      }
+    },
+    {
+      "id": "service-scope",
+      "term": "Service Scope",
+      "german": "Gültigkeitsbereich für Services",
+      "category": "platform",
+      "definition": "Eine Arbeitseinheit, die du mit `provider.CreateScope()` anlegst. Scoped-Services leben so lange wie ihr Scope. Beim Entsorgen des Scopes entsorgt der Container die Scoped- und Transient-Objekte, die er darin erzeugt hat.",
+      "aliases": [
+        "Scope",
+        "IServiceScope",
+        "CreateScope"
+      ],
+      "related": [
+        "scoped-lifetime",
+        "service-provider",
+        "service-lifetime"
+      ],
+      "lesson": "m15-l03",
+      "source": {
+        "title": "Dependency injection guidelines: Disposal of services",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#disposal-of-services"
+      }
+    },
+    {
+      "id": "captive-dependency",
+      "term": "Captive Dependency",
+      "category": "platform",
+      "definition": "Ein Service mit langer Lebensdauer hält einen Service mit kürzerer Lebensdauer fest, zum Beispiel ein Singleton mit einem Scoped-Service. Der kurzlebige Service lebt dann so lange wie der langlebige.",
+      "aliases": [
+        "Captive Dependencies"
+      ],
+      "related": [
+        "service-lifetime",
+        "scope-validation",
+        "singleton-lifetime"
+      ],
+      "lesson": "m15-l04",
+      "source": {
+        "title": "Dependency injection guidelines: Captive dependency",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#captive-dependency"
+      }
+    },
+    {
+      "id": "scope-validation",
+      "term": "Scope Validation",
+      "german": "Scope-Validierung",
+      "category": "platform",
+      "definition": "Prüfung des Containers auf Lebensdauer-Fehler. `ValidateScopes` meldet einen Scoped-Service aus dem Root-Provider oder in einem Singleton, `ValidateOnBuild` prüft schon beim Bauen. Die Meldung ist eine `InvalidOperationException`.",
+      "aliases": [
+        "ValidateScopes",
+        "ValidateOnBuild"
+      ],
+      "related": [
+        "captive-dependency",
+        "service-scope",
+        "service-provider"
+      ],
+      "lesson": "m15-l04",
+      "source": {
+        "title": "Dependency injection: Scope validation",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#scope-validation"
+      }
     }
   ]
 }

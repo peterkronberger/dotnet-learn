@@ -1,0 +1,188 @@
+---
+title: Lebensdauern richtig kombinieren
+sidebar_position: 4
+description: Warum ein Service keinen Service mit kürzerer Lebensdauer festhalten darf, wie die Scope-Validierung das findet und warum der Zustand eines Singletons threadsicher sein muss.
+lesson_id: m15-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import captive from '!!raw-loader!@site/examples/_ci/m15-l04-captive/Program.cs';
+import captiveOutput from '!!raw-loader!@site/examples/_ci/m15-l04-captive/expected.out.txt';
+import sharedSingleton from '!!raw-loader!@site/examples/_ci/m15-l04-shared-singleton/Program.cs';
+import sharedOutput from '!!raw-loader!@site/examples/_ci/m15-l04-shared-singleton/expected.out.txt';
+import unsafeCounter from '!!raw-loader!@site/examples/m15/l04/unsafe-counter.snippet.cs';
+import gapValidation from '!!raw-loader!@site/examples/m15/l04/gap-validation.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m15/l04/seclog-program-block.snippet.cs';
+import failureCounter from '!!raw-loader!@site/examples/_ci/seclog-m15-l04/src/SecLog.Cli/FailureCounter.cs';
+
+# Lebensdauern richtig kombinieren
+
+:::note[Lernziele]
+- Du erkennst eine <Term id="captive-dependency">Captive Dependency</Term> und erklärst, warum sie ein Fehler ist.
+- Du kannst die <Term id="scope-validation">Scope-Validierung</Term> (`ValidateScopes`, `ValidateOnBuild`) einschalten und ihre Fehlermeldung lesen.
+- Du begründest, warum der Zustand eines Singletons threadsicher sein muss.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l03-q3" />
+
+<Quiz id="m15-l03-q7" />
+
+<Quiz id="m13-l11-q2" />
+
+<Quiz id="m13-l12-q1" />
+
+## Ein Service darf keinen kürzeren Service festhalten
+
+Services hängen voneinander ab, und jeder hat eine Lebensdauer. Die Regel für die Kombination: Ein Service darf nur von Services abhängen, die mindestens so lange leben wie er selbst.
+
+- Erlaubt: Ein Scoped-Service oder ein Transient-Service verlangt ein Singleton. Das Singleton lebt länger.
+- Fehler: Ein Singleton verlangt einen Scoped-Service. Das Singleton erzeugt seine Abhängigkeit einmal und behält sie, solange es lebt. Der Scoped-Service lebt dann so lange wie das Singleton und gehört nicht mehr zu seinem Scope. Dieser Fehler heißt Captive Dependency (der langlebige Service hält den kurzlebigen gefangen).
+
+Das Gefährliche daran: Der Container meldet den Fehler nicht von selbst. Das Programm läuft, nur mit falschem Zustand ([Dependency injection guidelines: Captive dependency](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#captive-dependency)).
+
+:::info[Vorhersage]
+`RequestInfo` ist Scoped, `Dashboard` ist ein Singleton und verlangt einen `RequestInfo` im Konstruktor. Das Programm legt zwei Scopes an und druckt die Nummer des `RequestInfo` aus dem Scope und die Nummer, die das `Dashboard` benutzt. Danach baut es den Provider mit Validierung. Welche Zeilen erwartest du? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={captive} expected={captiveOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Schritte:
+
+1. **Ohne Validierung:** Beide Scopes bekommen ihren eigenen `RequestInfo` (Nummer 1 und 3). Das `Dashboard` benutzt in beiden Scopes die Nummer 2. Der Container hat das Singleton aus dem Root-Provider erzeugt, also hat es einen eigenen `RequestInfo` bekommen, der zu keinem der beiden Scopes gehört. Er bleibt für die ganze Lebensdauer des Singletons derselbe.
+2. **Mit Validierung:** Der Container wirft schon beim Bauen des Providers eine Exception. In der Meldung steht, welcher Service (`Dashboard`) welchen Service (`RequestInfo`) nicht benutzen darf. Die Exception heißt hier `AggregateException`, weil der Container alle gefundenen Fehler sammelt (Modul 13). Die Meldung kommt aus `ex.Message`.
+
+**Was passiert, wenn …** du `AddScoped<RequestInfo>()` durch `AddSingleton<RequestInfo>()` ersetzt? Dann gibt es keinen Fehler mehr: Beide leben gleich lang.
+
+</details>
+
+<Quiz id="m15-l04-q1" />
+
+<Quiz id="m15-l04-q2" />
+
+<Quiz id="m15-l04-q3" />
+
+## Scope-Validierung einschalten
+
+Die Scope-Validierung prüft die Lebensdauern. Du schaltest sie über `ServiceProviderOptions` ein und übergibst die Optionen an `BuildServiceProvider`:
+
+- `ValidateScopes = true`: Der Container wirft eine `InvalidOperationException`, wenn ein Scoped-Service aus dem Root-Provider aufgelöst oder in ein Singleton eingefügt wird. Die Prüfung läuft beim Auflösen.
+- `ValidateOnBuild = true`: Der Container prüft beim Bauen alle Registrierungen, auch Services, die nie angefragt werden. Das Beispiel oben zeigt diese Prüfung.
+
+Beide Optionen kosten Zeit und gehören vor allem in die Entwicklung. Der Generic Host schaltet die Validierung in der Umgebung `Development` selbst ein ([Dependency injection: Scope validation](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#scope-validation)).
+
+<Forward concepts={['Generic Host', 'die Umgebung `Development`']} module="15" />
+
+<Quiz id="m15-l04-q4" />
+
+<Quiz id="m15-l04-q5" />
+
+## Ein Singleton wird von allen gleichzeitig benutzt
+
+Ein Singleton ist für alle Aufrufer dieselbe Instanz. Laufen mehrere Aufrufer gleichzeitig (Tasks, später viele Anfragen), benutzen sie die Instanz gleichzeitig. Hat sie veränderlichen Zustand, ist das eine Race Condition (Modul 13): Ein `total++` liest, erhöht und schreibt in drei Schritten, und ein anderer Thread kann dazwischen schreiben.
+
+<CodeBlock language="csharp" title="unsafe-counter.snippet.cs">{unsafeCounter}</CodeBlock>
+
+Der Container macht das nicht sicher. Seine eigene Arbeit, das Erzeugen und Auflösen, ist threadsicher. Die Services, die er liefert, sind es nicht von selbst. Der Zustand eines Singletons braucht die Werkzeuge aus Modul 13: `lock` (`m13-l12`), `Interlocked` (`m13-l14`) oder threadsichere Sammlungen (`m13-l15`) ([Dependency injection guidelines: Thread safety](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines#thread-safety)).
+
+Wie das aussieht, zeigt das nächste Beispiel. Vier Worker laufen mit `Task.Run`, jeder in seinem eigenen Scope. Sie teilen den `FailureCounter`, der als Singleton registriert ist und mit `Interlocked.Increment` zählt.
+
+:::info[Vorhersage]
+Jeder der vier Worker ruft 1000-mal `Add()` auf. Welche Summe druckt das Programm? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner predict code={sharedSingleton} expected={sharedOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Total: 4000`. Die Schritte:
+
+1. **Ein Zähler für alle:** Das Singleton gehört zum Provider, nicht zu einem Scope. Alle vier Worker sehen dieselbe Instanz.
+2. **Atomar zählen:** `Interlocked.Increment` führt Lesen, Erhöhen und Schreiben als eine unteilbare Operation aus. Keine Erhöhung geht verloren, auch wenn die Worker gleichzeitig laufen.
+3. **Ergebnis lesen:** Nach `await Task.WhenAll(tasks)` sind alle Worker fertig, und `Total` zeigt die Summe.
+4. **Validierung:** Der Provider ist mit `ValidateScopes` und `ValidateOnBuild` gebaut. Das Singleton hat keine Scoped-Abhängigkeit, darum läuft alles ohne Fehler.
+
+Mit `total++` statt `Interlocked.Increment` wäre das Ergebnis nicht festgelegt: Es könnte kleiner als 4000 sein, und es wäre bei jedem Lauf ein anderes. Darum steht dieses Beispiel nicht als Programm im Runner.
+
+</details>
+
+<Quiz id="m15-l04-q6" />
+
+<Quiz id="m15-l04-q7" />
+
+<Quiz id="m15-l04-q8" />
+
+## Gap-Beispiel: Validierung einschalten
+
+Die Lücke `___` fehlt. Setze den Namen der Option ein, die Scoped-Services aus dem Root-Provider und in Singletons findet.
+
+<CodeBlock language="csharp" title="gap-validation.snippet.cs">{gapValidation}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `ValidateScopes`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l03/`) wählt für jede Registrierung eine Lebensdauer: `FailureCounter` und `TimeProvider` als Singleton, `AnalysisRun` als Scoped und `FailureMatcher` als Transient.
+
+**Neue Anforderung:** SecLog baut seinen Provider mit `ValidateScopes` und `ValidateOnBuild`. Außerdem prüfst du, ob das Singleton `FailureCounter`, in das mehrere Worker zählen, threadsicher ist. Der Code ändert sich nur, wenn er es nicht ist. Die Ausgabe des Programms und die Tests bleiben unverändert.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+<FoldedCode code={failureCounter} title="src/SecLog.Cli/FailureCounter.cs (unverändert)" />
+
+1. **Optionen anlegen:** `ServiceProviderOptions` bekommt `ValidateScopes = true` und `ValidateOnBuild = true`.
+2. **Provider bauen:** `BuildServiceProvider(providerOptions)` prüft alle Registrierungen. Die Prüfung findet keinen Fehler: Das Singleton `FailureCounter` hat keine Scoped-Abhängigkeit, und der `AnalysisRun` (Scoped) holt sich nur ein Singleton und einen Transient-Helfer.
+3. **Threadsicherheit prüfen:** `FailureCounter` zählt mit `Interlocked.Add`, also atomar. Der Code muss sich nicht ändern.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m15-l04/`) prüft seine Lebensdauern beim Bauen des Providers. Das Verzeichnis unterscheidet sich von `_ci/seclog-m15-l03/` nur durch die Optionen und den geänderten `BuildServiceProvider`-Aufruf in `Program.cs`.
+
+<Quiz id="m15-l04-q9" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m15-l04-singleton-may-use-scoped" />
+
+**„Ein Singleton darf einen Scoped-Service benutzen, der Container erzeugt ihn ja richtig.“** Das stimmt nicht. Das Erzeugen ist nicht das Problem, sondern die Dauer: Das Singleton behält den Service, solange es lebt, und der Service gehört nicht mehr zu seinem Scope. Ohne Validierung merkst du das nicht. Schalte `ValidateScopes` und `ValidateOnBuild` ein.
+:::
+
+:::warning[Achtung]
+<Misconception id="m15-l04-container-makes-singleton-thread-safe" />
+
+**„Der Container macht Singletons threadsicher.“** Das stimmt nicht. Der Container erzeugt und löst threadsicher auf, aber der Zustand deiner Services gehört dir. Greifen mehrere Aufrufer gleichzeitig auf veränderlichen Zustand eines Singletons zu, schützt du ihn selbst mit `lock`, `Interlocked` oder einer threadsicheren Sammlung.
+:::
+
+## Zusammenfassung
+
+Ein Service darf nur von Services abhängen, die mindestens so lange leben wie er. Hält ein Singleton einen Scoped-Service, ist das eine Captive Dependency: Der Scoped-Service lebt so lange wie das Singleton. Mit `ValidateScopes` und `ValidateOnBuild` in den `ServiceProviderOptions` findet der Container diesen Fehler und wirft eine Exception, deren Meldung beide Services nennt. Ein Singleton wird von allen Aufrufern gleichzeitig benutzt. Sein veränderlicher Zustand muss mit `lock`, `Interlocked` oder threadsicheren Sammlungen geschützt sein.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m15-l04-q10" />
+
+### Transferfrage
+
+<Quiz id="m15-l04-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dependency injection guidelines](https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/guidelines)
+- Microsoft Learn: [ServiceProviderOptions](https://learn.microsoft.com/dotnet/api/microsoft.extensions.dependencyinjection.serviceprovideroptions)
