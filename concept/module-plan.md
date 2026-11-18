@@ -500,16 +500,21 @@ Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.
 Fill rule: the module review of each covered module adds its part (4–6 concepts with `lesson_id`, 3–5 misconception ids), as in W1. `Module W<N>` can only start when all parts are filled (`issue-blueprint.md`, section 5).
 
 ### M15 Dependency Injection und Hosting ▶
-Dependencies through interfaces · `ServiceCollection` · lifetimes · logging · configuration/options. Runnable for DI and logging. Configuration/options and hosting cannot run (missing in the playground, see S6).
-- *(new)* Captive dependencies and scope validation (a singleton must not hold a scoped service).
-- *(new)* Lifetimes and thread safety: a singleton is shared by all callers at the same time, so its state must be thread safe (link M13 part B).
-- *(new)* Structured logging (message templates, log levels, categories).
-- *(new)* Configuration sources and their order (JSON files, environment variables, command line), environments; secrets do not go into source code (user secrets / environment variables).
-- *(new)* Generic host and background services (◻, short).
+Dependencies through interfaces · `ServiceCollection` · lifetimes · logging · configuration/options. Runnable for DI and logging (isolated `_ci/m15-lYY-*` projects). Configuration/options and hosting cannot run (missing in the playground, see S6) and are code blocks.
+Lessons as built:
+- `m15-l01` Abhängigkeiten über Interfaces (constructor injection, composition root).
+- `m15-l02` Der DI-Container (`ServiceCollection`, `ServiceProvider`, several implementations, keyed services).
+- `m15-l03` Lebensdauern von Services (singleton, scoped, transient, scopes, disposal).
+- `m15-l04` Lebensdauern richtig kombinieren (captive dependencies, scope validation, thread-safe singleton state).
+- `m15-l05` Logging mit `ILogger` (levels, categories, filters, providers).
+- `m15-l06` Strukturiertes Logging (message templates, interpolation pitfall, `IsEnabled`, log scopes).
+- `m15-l07` Konfiguration: Quellen und Reihenfolge (JSON, environment variables, command line, environments, user secrets).
+- `m15-l08` Das Options-Pattern (`IOptions`, `IOptionsSnapshot`, `IOptionsMonitor`, validation).
+- `m15-l09` Generic Host und Hintergrunddienste (`BackgroundService`, start and shutdown).
 - **Spec:** no new language content; uses interfaces (M8), generics (M9) and lambdas (M10).
-- **Library (not spec):** `Microsoft.Extensions.DependencyInjection` (service lifetimes, constructor injection, service provider), `Microsoft.Extensions.Logging`, `Microsoft.Extensions.Configuration`, options pattern (`IOptions<T>` and its variants), `Microsoft.Extensions.Hosting`.
-- **Badge:** keyed services (.NET 8 – check on Microsoft Learn when writing).
-- More misconceptions: transient means "disposed right away"; logging with string interpolation is the same as a message template.
+- **Library (not spec):** `Microsoft.Extensions.DependencyInjection` (l01–l04), `Microsoft.Extensions.Logging` (l05, l06), `Microsoft.Extensions.Configuration` (l07), options pattern (l08), `Microsoft.Extensions.Hosting` (l09).
+- **Badge:** keyed services `<Since dotnet="8" />` (l02).
+- Misconceptions: `m15-l03-transient-disposed-immediately`, `m15-l06-interpolation-equals-template` and the others listed in `concept/module-digest.md`.
 
 ### M16 EF Core ◻
 `DbContext`, model, relations (1:n, n:m) · LINQ → SQL (shown SQL comes from a CI run) · change tracking · migrations.
@@ -610,6 +615,5 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 - dotnet/core, .NET releases overview (checked 2026-10-28): https://github.com/dotnet/core/blob/main/releases.md
 
 Open questions from the review:
-- Keyed services in .NET 8: only checked in secondary sources; check on Microsoft Learn before writing M15.
 - Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
 - M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.

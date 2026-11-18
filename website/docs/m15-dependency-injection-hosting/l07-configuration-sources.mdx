@@ -41,7 +41,7 @@ import seclogRun from '!!raw-loader!@site/examples/_ci/seclog-m15-l07/run.sh';
 
 Bisher stehen in SecLog Werte wie die Schwelle „5 fehlgeschlagene Logins“ fest im Code. Ändert sich die Schwelle, muss jemand den Code ändern, neu bauen und neu ausliefern. Besser ist es, solche Werte außerhalb des Codes abzulegen. Das nennt man Konfiguration.
 
-Die Konfiguration in .NET besteht aus Schlüssel-Wert-Paaren. Ein `ConfigurationBuilder` sammelt Quellen. Jede Quelle liest ihre Paare aus einer JSON-Datei, den Umgebungsvariablen, der Kommandozeile und anderen Orten. `Build()` macht daraus ein `IConfiguration`, eine einzige Sicht auf alle Quellen. Die Konfiguration ist nur lesbar ([Configuration in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration)).
+Die Konfiguration in .NET besteht aus Schlüssel-Wert-Paaren. Ein `ConfigurationBuilder` sammelt Quellen. Jede Quelle liest ihre Paare aus einer JSON-Datei, den <Term id="environment-variable">Umgebungsvariablen</Term>, der Kommandozeile und anderen Orten. `Build()` macht daraus ein `IConfiguration`, eine einzige Sicht auf alle Quellen. Die Konfiguration ist nur lesbar ([Configuration in .NET](https://learn.microsoft.com/dotnet/core/extensions/configuration)).
 
 Die Schlüssel haben Ebenen, getrennt durch einen Doppelpunkt. Die JSON-Datei unten enthält den Schlüssel `Detection:MaxFailures` mit dem Wert 3. Jede Quelle kommt aus einem eigenen NuGet-Paket (`m14-l02`): `Microsoft.Extensions.Configuration.Json`, `.EnvironmentVariables` und `.CommandLine`. `GetValue<T>` kommt aus `Microsoft.Extensions.Configuration.Binder`.
 
