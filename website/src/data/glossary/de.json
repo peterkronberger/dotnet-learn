@@ -10332,6 +10332,105 @@
         "title": "Dependency injection: Scope validation",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/dependency-injection/overview#scope-validation"
       }
+    },
+    {
+      "id": "log-level",
+      "term": "Log Level",
+      "german": "Log-Level",
+      "category": "platform",
+      "definition": "Die Schwere einer Meldung: `Trace`, `Debug`, `Information`, `Warning`, `Error` und `Critical` (0 bis 5). `None` (6) schaltet das Schreiben ab. Das Mindest-Level legt fest, ab welchem Level Meldungen geschrieben werden.",
+      "related": [
+        "log-category",
+        "logging-provider"
+      ],
+      "lesson": "m15-l05",
+      "source": {
+        "title": "Logging in C# and .NET: Log level",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-level"
+      }
+    },
+    {
+      "id": "log-category",
+      "term": "Log Category",
+      "german": "Log-Kategorie",
+      "category": "platform",
+      "definition": "Eine Zeichenkette, die jede Meldung eines Loggers begleitet. Üblich ist der volle Typname. `ILogger<T>` hat den vollen Namen von `T` als Kategorie. Filter wählen Meldungen nach der Kategorie.",
+      "related": [
+        "log-level",
+        "logging-provider"
+      ],
+      "lesson": "m15-l05",
+      "source": {
+        "title": "Logging in C# and .NET: Log category",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-category"
+      }
+    },
+    {
+      "id": "logging-provider",
+      "term": "Logging Provider",
+      "german": "Logging-Provider",
+      "category": "platform",
+      "definition": "Der Teil, der eine Meldung schreibt, zum Beispiel in die Konsole. Eingebaut sind `Console`, `Debug`, `EventSource` und `EventLog`. Mehrere Provider können gleichzeitig aktiv sein.",
+      "related": [
+        "log-level",
+        "log-category"
+      ],
+      "lesson": "m15-l05",
+      "source": {
+        "title": "Logging providers",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/providers"
+      }
+    },
+    {
+      "id": "structured-logging",
+      "term": "Structured Logging",
+      "german": "Strukturiertes Logging",
+      "category": "platform",
+      "definition": "Logging, das Text und Werte getrennt behält: Der Logger bekommt eine Message Template und die Werte als eigene Daten. Ein Log-System kann die Werte als Eigenschaften speichern und durchsuchen.",
+      "related": [
+        "message-template",
+        "log-scope",
+        "log-level"
+      ],
+      "lesson": "m15-l06",
+      "source": {
+        "title": "Logging in C# and .NET: Log message template",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-message-template"
+      }
+    },
+    {
+      "id": "message-template",
+      "term": "Message Template",
+      "german": "Meldungsvorlage",
+      "category": "platform",
+      "definition": "Ein fester Text mit benannten Platzhaltern, zum Beispiel `\"User {User} failed\"`. Die Platzhalter bekommen die Argumente der Reihe nach, und die Namen werden zu Namen von Eigenschaften.",
+      "related": [
+        "structured-logging",
+        "log-scope",
+        "string-interpolation"
+      ],
+      "lesson": "m15-l06",
+      "source": {
+        "title": "Logging in C# and .NET: Log message template",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-message-template"
+      }
+    },
+    {
+      "id": "log-scope",
+      "term": "Log Scope",
+      "german": "Log-Scope",
+      "category": "platform",
+      "definition": "Eine Gruppe von Meldungen mit gemeinsamen Daten. `BeginScope` liefert ein `IDisposable`, und der Scope gilt, bis es freigegeben wird. Der Provider muss Scopes unterstützen.",
+      "related": [
+        "structured-logging",
+        "message-template",
+        "logging-provider"
+      ],
+      "lesson": "m15-l06",
+      "source": {
+        "title": "Logging in C# and .NET: Log scopes",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/logging/overview#log-scopes"
+      }
     }
   ]
 }

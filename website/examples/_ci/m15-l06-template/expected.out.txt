@@ -1,0 +1,11 @@
+Warning: LoginAudit: User bob from 203.0.113.7 failed 5 times
+  User = bob
+  Ip = 203.0.113.7
+  Failures = 5
+  template: User {User} from {Ip} failed {Failures} times
+Warning: LoginAudit: Attempts by bob for 203.0.113.7
+  Ip = bob
+  User = 203.0.113.7
+  template: Attempts by {Ip} for {User}
+Warning: LoginAudit: User bob from 203.0.113.7 failed 5 times
+  template: User bob from 203.0.113.7 failed 5 times

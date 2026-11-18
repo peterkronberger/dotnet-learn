@@ -874,6 +874,376 @@
       "type": "explain",
       "question": "Transferfrage: Ein Singleton-Service speichert die zuletzt gesehenen Benutzernamen in einer `List<string>`, und viele Anfragen laufen gleichzeitig. Was ist das Problem, und wie löst du es?",
       "modelAnswer": "Alle Anfragen teilen dieselbe Instanz, und `List<string>` ist nicht threadsicher. Gleichzeitiges Hinzufügen kann Daten verlieren oder die Liste beschädigen.\n\nIch schütze den Zugriff mit `lock` oder nehme eine threadsichere Sammlung wie `ConcurrentQueue<string>`."
+    },
+    {
+      "id": "m15-l05-q1",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Welche Reihenfolge der Log-Levels stimmt, vom niedrigsten zum höchsten?",
+      "options": [
+        {
+          "text": "`Trace`, `Debug`, `Information`, `Warning`, `Error`, `Critical`",
+          "correct": true
+        },
+        {
+          "text": "`Debug`, `Trace`, `Information`, `Error`, `Warning`, `Critical`",
+          "feedback": "`Trace` ist das niedrigste Level, und `Warning` liegt unter `Error`."
+        },
+        {
+          "text": "`Information`, `Debug`, `Trace`, `Warning`, `Error`, `Critical`",
+          "feedback": "`Trace` und `Debug` liegen unter `Information`."
+        }
+      ],
+      "explanation": "Die Werte sind `Trace` = 0, `Debug` = 1, `Information` = 2, `Warning` = 3, `Error` = 4 und `Critical` = 5. `None` = 6 schaltet alles ab."
+    },
+    {
+      "id": "m15-l05-q2",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Die Klasse `Notifier` liegt im Namespace `SecLog.Model` und bekommt einen `ILogger<Notifier>`. Welche Kategorie hat dieser Logger?",
+      "options": [
+        {
+          "text": "`SecLog.Model.Notifier`, der volle Typname von `T`",
+          "correct": true
+        },
+        {
+          "text": "`Notifier`, immer nur der kurze Klassenname",
+          "feedback": "Die Kategorie ist der volle Name mit Namespace. Nur bei einer Klasse ohne Namespace sind beide gleich, wie in den Beispielen dieser Lektion."
+        },
+        {
+          "text": "`ILogger`, der Name des Interfaces",
+          "feedback": "Der Typparameter `T` bestimmt die Kategorie, nicht das Interface."
+        }
+      ],
+      "explanation": "`ILogger<T>` ist gleichbedeutend mit einem Logger, dessen Kategorie der volle Typname von `T` ist."
+    },
+    {
+      "id": "m15-l05-q3",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Das Mindest-Level steht auf `Information`. Was passiert mit einem Aufruf von `logger.LogDebug(...)`?",
+      "options": [
+        {
+          "text": "Die Meldung liegt unter dem Mindest-Level und wird nicht geschrieben.",
+          "correct": true
+        },
+        {
+          "text": "Die Meldung wird geschrieben, weil `Debug` zum Entwickeln gehört.",
+          "feedback": "Ob eine Meldung erscheint, entscheidet das Level im Vergleich zum Mindest-Level, nicht die Art des Aufrufs.",
+          "misconception": "m15-l05-debug-always-written"
+        },
+        {
+          "text": "Der Aufruf wirft eine Exception, weil das Level nicht erlaubt ist.",
+          "feedback": "Ein Aufruf unter dem Mindest-Level ist kein Fehler. Die Meldung wird einfach verworfen."
+        }
+      ],
+      "explanation": "Meldungen unter dem Mindest-Level gehen nicht an den Provider und erscheinen nirgends."
+    },
+    {
+      "id": "m15-l05-q4",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Welche Aufgabe hat ein Logging-Provider?",
+      "options": [
+        {
+          "text": "Er entscheidet, wohin die Meldungen geschrieben werden, zum Beispiel in die Konsole.",
+          "correct": true
+        },
+        {
+          "text": "Er entscheidet, welches Level eine Meldung hat.",
+          "feedback": "Das Level legt der Aufruf fest (`LogInformation`, `LogWarning` und so weiter)."
+        },
+        {
+          "text": "Er erzeugt den `ILogger<T>` mit der Kategorie von `T`.",
+          "feedback": "Das macht die `ILoggerFactory` aus dem Container. Der Provider bekommt die Meldungen erst danach."
+        }
+      ],
+      "explanation": "Der Code ruft nur den `ILogger<T>` auf. Die Provider (Konsole, Debug, EventSource) bestimmen das Ziel. Mehrere Provider können gleichzeitig aktiv sein."
+    },
+    {
+      "id": "m15-l05-q5",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Das Mindest-Level ist `Information`, und `.AddFilter(\"Notifier\", LogLevel.Warning)` ist gesetzt. Welche Meldungen schreibt der Logger der Kategorie `Notifier`?",
+      "options": [
+        {
+          "text": "Nur `Warning`, `Error` und `Critical`",
+          "correct": true
+        },
+        {
+          "text": "`Information`, `Warning`, `Error` und `Critical`",
+          "feedback": "Das wäre das Mindest-Level. Für die Kategorie `Notifier` gilt die spezifischere Regel."
+        },
+        {
+          "text": "Nur `Warning`",
+          "feedback": "Ein Level gilt für sich und alles darüber: auch `Error` und `Critical` kommen durch."
+        }
+      ],
+      "explanation": "Für jede Kategorie gilt die Regel mit dem längsten passenden Kategorie-Präfix. Gibt es keine, gilt das Mindest-Level."
+    },
+    {
+      "id": "m15-l05-q6",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Was unterscheidet `logger.LogWarning(...)` von `Console.WriteLine(...)`?",
+      "options": [
+        {
+          "text": "Der Aufruf nennt nur Level und Text. Ziel, Mindest-Level und Filter lassen sich ändern, ohne den Aufruf zu ändern.",
+          "correct": true
+        },
+        {
+          "text": "Es gibt keinen Unterschied, beide schreiben in die Konsole.",
+          "feedback": "Der Logger schreibt nur dorthin, wohin der Provider schreibt. Mit einem anderen Provider landet dieselbe Meldung zum Beispiel in einer Datei.",
+          "misconception": "m15-l05-logging-equals-console-writeline"
+        },
+        {
+          "text": "`LogWarning` ist schneller, weil es asynchron schreibt.",
+          "feedback": "`ILogger.Log` ist synchron. Schnell ist das Logging, weil nicht benötigte Meldungen früh verworfen werden."
+        }
+      ],
+      "explanation": "Level, Kategorie, Mindest-Level, Filter und Provider trennen den Aufruf vom Ergebnis. `Console.WriteLine` kennt nichts davon."
+    },
+    {
+      "id": "m15-l05-q7",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Wie schreibst du die Exception `ex` zusammen mit einer Meldung ins Log?",
+      "options": [
+        {
+          "text": "`logger.LogError(ex, \"Sending failed\")`",
+          "correct": true
+        },
+        {
+          "text": "`logger.LogError(\"Sending failed\" + ex)`",
+          "feedback": "Der Text enthält die Exception dann nur als Zeichenkette. Der Logger bekommt sie nicht als eigenes Objekt."
+        },
+        {
+          "text": "Der Container schreibt jede Exception automatisch ins Log.",
+          "feedback": "Der Container schreibt nichts von selbst. Du übergibst die Exception beim Aufruf."
+        }
+      ],
+      "explanation": "Die Überladungen der `Log…`-Methoden nehmen die Exception als eigenen Parameter. Was der Provider daraus schreibt, hängt vom Provider ab."
+    },
+    {
+      "id": "m15-l05-q8",
+      "lesson": "m15-l05",
+      "type": "single",
+      "question": "Warum reichen die Tests von SecLog `NullLogger<IncidentMonitor>.Instance` an den Konstruktor?",
+      "options": [
+        {
+          "text": "Die Tests prüfen nur das Ergebnis. `NullLogger<T>` verwirft jede Meldung, und kein Container ist nötig.",
+          "correct": true
+        },
+        {
+          "text": "Ohne `NullLogger` wirft der Konstruktor eine `ArgumentNullException`.",
+          "feedback": "Das gilt nur, wenn der Konstruktor so geschrieben ist. Der Punkt ist, dass der Test keine Ausgabe braucht."
+        },
+        {
+          "text": "Der Test braucht einen Container, der den Logger liefert.",
+          "feedback": "Gerade das ist ein Vorteil von Constructor Injection: Der Test erzeugt die Klasse mit `new` und gibt den Logger selbst hinein."
+        }
+      ],
+      "explanation": "`NullLogger<T>.Instance` ist ein Logger, der nichts tut. Er steht in `Microsoft.Extensions.Logging.Abstractions`."
+    },
+    {
+      "id": "m15-l05-q9",
+      "lesson": "m15-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine Klasse zu ihrem `ILogger<T>` kommt und wie Level, Kategorie, Filter und Provider zusammenspielen, bis eine Meldung auf der Konsole steht.",
+      "modelAnswer": "Die Klasse verlangt im Konstruktor einen `ILogger<T>`, und der Container liefert ihn. Die Kategorie ist der volle Typname von `T`.\n\nRuft die Klasse zum Beispiel `LogWarning` auf, vergleicht der Logger das Level mit der Regel, die zur Kategorie passt (Filter), sonst mit dem Mindest-Level. Liegt das Level darunter, wird die Meldung verworfen. Sonst geht sie an die Provider, und der Provider entscheidet, wohin sie geschrieben wird, zum Beispiel in die Konsole."
+    },
+    {
+      "id": "m15-l05-q10",
+      "lesson": "m15-l05",
+      "type": "explain",
+      "question": "Transferfrage: Wo in einem eigenen Programm würdest du `Information` und wo `Warning` loggen, und welches Mindest-Level stellst du für die Entwicklung und für den Betrieb ein?",
+      "modelAnswer": "`Information` für den normalen Ablauf, zum Beispiel „Import fertig“. `Warning` für Unerwartetes, bei dem das Programm weiterläuft, zum Beispiel eine Zeile, die sich nicht lesen lässt, und `Error` für eine fehlgeschlagene Operation.\n\nIn der Entwicklung darf das Mindest-Level niedriger sein (zum Beispiel `Debug`), im Betrieb höher (zum Beispiel `Information` oder `Warning`), damit weniger Meldungen entstehen."
+    },
+    {
+      "id": "m15-l06-q1",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Welcher Aufruf benutzt eine Message Template?",
+      "options": [
+        {
+          "text": "`logger.LogWarning(\"User {User} failed {Failures} times\", user, failures)`",
+          "correct": true
+        },
+        {
+          "text": "`logger.LogWarning($\"User {user} failed {failures} times\")`",
+          "feedback": "Das ist ein interpolierter String. Er ist schon fertig gebaut, wenn `LogWarning` ihn bekommt. Der Logger sieht weder Namen noch Werte.",
+          "misconception": "m15-l06-interpolation-equals-template"
+        },
+        {
+          "text": "`logger.LogWarning(\"User \" + user + \" failed \" + failures + \" times\")`",
+          "feedback": "Die Zeichenketten sind schon zusammengesetzt. Der Logger bekommt nur ein fertiges Ergebnis."
+        }
+      ],
+      "explanation": "Eine Message Template ist ein fester Text mit benannten Platzhaltern. Die Werte kommen als eigene Argumente."
+    },
+    {
+      "id": "m15-l06-q2",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Was geht bei `logger.LogWarning($\"User {user} from {ip}\")` im Vergleich zu einer Message Template verloren?",
+      "options": [
+        {
+          "text": "Die Werte stehen nur noch im fertigen Text. Ein Log-System kann `User` und `Ip` nicht als getrennte Daten speichern.",
+          "correct": true
+        },
+        {
+          "text": "Nichts: Der Text im Log ist gleich, also ist auch die Information gleich.",
+          "feedback": "Der Text ist gleich, aber der Logger bekommt keine benannten Werte. Er kann sie nicht einzeln speichern oder danach suchen.",
+          "misconception": "m15-l06-interpolation-equals-template"
+        },
+        {
+          "text": "Die Meldung wird nie geschrieben, weil `$` in Log-Aufrufen verboten ist.",
+          "feedback": "Der Aufruf läuft und schreibt die Meldung. Er verliert nur die Struktur."
+        }
+      ],
+      "explanation": "Bei einer Template bekommt der Logger den Text mit Platzhaltern und die Werte getrennt. Bei einem interpolierten String bekommt er nur das Ergebnis."
+    },
+    {
+      "id": "m15-l06-q3",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "`user` ist `\"bob\"` und `ip` ist `\"203.0.113.7\"`. Der Code ruft `logger.LogWarning(\"Attempts by {Ip} for {User}\", user, ip)` auf. Welchen Wert hat die Eigenschaft `Ip`?",
+      "options": [
+        {
+          "text": "`bob`, denn die Platzhalter bekommen die Argumente der Reihe nach.",
+          "correct": true
+        },
+        {
+          "text": "`203.0.113.7`, denn der Name `Ip` passt zur Variablen `ip`.",
+          "feedback": "Die Namen der Platzhalter und der Variablen werden nicht verglichen. Der erste Platzhalter bekommt das erste Argument.",
+          "misconception": "m15-l06-placeholder-names-match"
+        },
+        {
+          "text": "Der Aufruf wirft eine Exception, weil die Namen nicht passen.",
+          "feedback": "Es gibt keine Prüfung der Namen. Der Aufruf läuft und ordnet die Werte nach Position zu."
+        }
+      ],
+      "explanation": "Die Reihenfolge der Platzhalter bestimmt, welches Argument zu welchem Platzhalter gehört. Die Namen werden zu den Namen der Eigenschaften."
+    },
+    {
+      "id": "m15-l06-q4",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Das Mindest-Level ist `Warning`. Was passiert bei `logger.LogDebug($\"Item: {item}\")`?",
+      "options": [
+        {
+          "text": "Der String wird gebaut (und ruft dabei `item.ToString()` auf), aber die Meldung wird nicht geschrieben.",
+          "correct": true
+        },
+        {
+          "text": "Weder wird der String gebaut noch geschrieben, weil das Level aus ist.",
+          "feedback": "Das Argument ist ein fertiger String, und der wird vor dem Aufruf gebaut. Das Level wird erst in `LogDebug` geprüft.",
+          "misconception": "m15-l06-interpolation-equals-template"
+        },
+        {
+          "text": "Die Meldung wird geschrieben, weil `$` das Mindest-Level überschreibt.",
+          "feedback": "Das Mindest-Level gilt immer. Meldungen darunter werden nicht geschrieben."
+        }
+      ],
+      "explanation": "Der interpolierte String ist ein Argument und wird zuerst ausgewertet. Bei einer Template mit Platzhaltern bekommt der Aufruf das Objekt, und es wird erst formatiert, wenn die Meldung geschrieben wird."
+    },
+    {
+      "id": "m15-l06-q5",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Wozu dient `logger.IsEnabled(LogLevel.Debug)` vor einem `LogDebug`-Aufruf?",
+      "options": [
+        {
+          "text": "Es zeigt, ob eine `Debug`-Meldung geschrieben würde. Teure Vorarbeit kann der Code überspringen, wenn nicht.",
+          "correct": true
+        },
+        {
+          "text": "Es schaltet das Level `Debug` für diesen Logger ein.",
+          "feedback": "`IsEnabled` fragt nur ab. Eingestellt wird das Level mit `SetMinimumLevel` oder einem Filter."
+        },
+        {
+          "text": "Es ist nötig, damit `LogDebug` die Werte der Platzhalter findet.",
+          "feedback": "Die Platzhalter funktionieren ohne `IsEnabled`. Die Abfrage spart nur Arbeit."
+        }
+      ],
+      "explanation": "Ist das Level nicht eingeschaltet, wird `Log` nicht aufgerufen. Boxing von Werten und das Argument-Array entfallen, und teure Berechnungen im Block laufen nicht."
+    },
+    {
+      "id": "m15-l06-q6",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Was bewirkt `using (logger.BeginScope(\"File {FileName}\", file)) { … }`?",
+      "options": [
+        {
+          "text": "Meldungen im Block tragen den Scope mit dem Dateinamen, bis der Block endet. Der Provider muss Scopes anzeigen.",
+          "correct": true
+        },
+        {
+          "text": "Der Block läuft in einem eigenen Thread, und `file` ist nur dort sichtbar.",
+          "feedback": "Ein Scope hat nichts mit Threads oder Sichtbarkeit zu tun. Er hängt Daten an Meldungen."
+        },
+        {
+          "text": "Der Scope gilt für den Rest des Programms.",
+          "feedback": "Ein Scope gilt, bis das `IDisposable` von `BeginScope` freigegeben wird. Im `using`-Block ist das am Ende des Blocks."
+        }
+      ],
+      "explanation": "Ein Scope ist ein `IDisposable`, das `BeginScope` liefert. Er gruppiert zusammengehörige Meldungen, etwa alle zu einer Datei."
+    },
+    {
+      "id": "m15-l06-q7",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "Warum gehören Passwörter und Tokens nicht in Log-Meldungen?",
+      "options": [
+        {
+          "text": "Logs werden gespeichert und von vielen gelesen. Ein Geheimnis im Log ist nicht mehr geheim.",
+          "correct": true
+        },
+        {
+          "text": "Weil Platzhalter nur Zahlen aufnehmen können.",
+          "feedback": "Platzhalter nehmen jeden Wert auf. Gerade darum musst du entscheiden, was hineingehört."
+        },
+        {
+          "text": "Weil `LogError` Zeichenketten über 20 Zeichen abschneidet.",
+          "feedback": "Es gibt keine solche Kürzung. Das Problem ist der Inhalt, nicht die Länge."
+        }
+      ],
+      "explanation": "Der Logger schreibt jeden Wert, den du ihm gibst, in die Senke. Gib nur Daten aus, die dort liegen dürfen."
+    },
+    {
+      "id": "m15-l06-q8",
+      "lesson": "m15-l06",
+      "type": "single",
+      "question": "In SecLog steht `LogWarning(\"Incident found for {User} with {Failures} failed logins\", incident.User, incident.FailureCount)`. Welchen Wert hat die Eigenschaft `Failures` im Log-System?",
+      "options": [
+        {
+          "text": "Den Wert von `incident.FailureCount`, denn er ist das zweite Argument.",
+          "correct": true
+        },
+        {
+          "text": "Den Wert von `incident.User`, denn er steht zuerst im Aufruf.",
+          "feedback": "Das erste Argument gehört zum ersten Platzhalter (`User`), das zweite zum zweiten (`Failures`)."
+        },
+        {
+          "text": "Keinen, denn `Failures` ist nur Text.",
+          "feedback": "Ein Platzhalter in geschweiften Klammern wird zu einer Eigenschaft mit dem Wert des passenden Arguments."
+        }
+      ],
+      "explanation": "Die Platzhalter werden der Reihe nach mit den Argumenten verbunden."
+    },
+    {
+      "id": "m15-l06-q9",
+      "lesson": "m15-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was eine Message Template ist, warum `$\"…\"` in einem Log-Aufruf ein Fehler ist und wie IsEnabled und Scopes helfen.",
+      "modelAnswer": "Eine Message Template ist ein fester Text mit benannten Platzhaltern wie `{User}`. Die Werte werden als eigene Argumente übergeben, der Reihe nach, nicht nach Namen. Der Logger behält Template und Werte getrennt, und ein Log-System kann die Werte als Eigenschaften speichern und durchsuchen.\n\nEin interpolierter String ist schon ein fertiger Text, wenn der Logger ihn bekommt. Namen und Werte sind verloren, und der Text wird auch dann gebaut, wenn das Level aus ist.\n\n`IsEnabled` fragt ab, ob das Level geschrieben würde, und spart teure Vorarbeit. Ein Scope hängt Daten wie den Dateinamen an alle Meldungen im Block."
+    },
+    {
+      "id": "m15-l06-q10",
+      "lesson": "m15-l06",
+      "type": "explain",
+      "question": "Transferfrage: Du loggst in einem eigenen Programm, wie viele Artikel ein Benutzer bestellt hat. Wie schreibst du den Aufruf, und was gewinnst du gegenüber einem interpolierten String?",
+      "modelAnswer": "`logger.LogInformation(\"User {User} ordered {Count} items\", user, count);`\n\nDas Log-System bekommt `User` und `Count` als eigene Daten. Ich kann nach allen Bestellungen eines Benutzers suchen oder die Zahlen auswerten, ohne den Text zu zerlegen. Außerdem wird der Text nur formatiert, wenn die Meldung geschrieben wird."
     }
   ]
 }
