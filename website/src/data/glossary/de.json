@@ -10512,6 +10512,74 @@
         "title": "Options pattern in .NET: Options validation",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/options#options-validation"
       }
+    },
+    {
+      "id": "generic-host",
+      "term": "Generic Host",
+      "german": "Generischer Host",
+      "category": "platform",
+      "definition": "Ein Objekt, das DI, Logging, Konfiguration und gehostete Dienste zusammenfasst und für Start und geordnetes Beenden einer Anwendung zuständig ist. Es entsteht mit `Host.CreateApplicationBuilder`.",
+      "related": [
+        "hosted-service",
+        "background-service",
+        "graceful-shutdown",
+        "dependency-injection"
+      ],
+      "lesson": "m15-l09",
+      "source": {
+        "title": ".NET Generic Host",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/generic-host"
+      }
+    },
+    {
+      "id": "hosted-service",
+      "term": "Hosted Service",
+      "german": "Gehosteter Dienst",
+      "category": "platform",
+      "definition": "Eine Klasse, die `IHostedService` implementiert (`StartAsync`, `StopAsync`) und sich beim Host registriert. Der Host ruft beim Start `StartAsync` und beim Beenden `StopAsync` auf.",
+      "related": [
+        "generic-host",
+        "background-service"
+      ],
+      "lesson": "m15-l09",
+      "source": {
+        "title": "Worker Services in .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/workers"
+      }
+    },
+    {
+      "id": "background-service",
+      "term": "Background Service",
+      "german": "Hintergrunddienst",
+      "category": "platform",
+      "definition": "Eine abstrakte Klasse, die `IHostedService` implementiert. Die Unterklasse schreibt `ExecuteAsync(CancellationToken stoppingToken)`, einen `Task` für die langlaufende Arbeit.",
+      "related": [
+        "hosted-service",
+        "generic-host",
+        "cancellation-token"
+      ],
+      "lesson": "m15-l09",
+      "source": {
+        "title": "Worker Services in .NET",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/workers"
+      }
+    },
+    {
+      "id": "graceful-shutdown",
+      "term": "Graceful Shutdown",
+      "german": "geordnetes Beenden",
+      "category": "platform",
+      "definition": "Der Host meldet das Stoppen, bricht den `stoppingToken` ab und ruft `StopAsync` der Dienste auf, bevor der Prozess endet. Das geschieht zum Beispiel bei Strg+C oder `StopApplication()`.",
+      "related": [
+        "generic-host",
+        "background-service",
+        "cancellation-token"
+      ],
+      "lesson": "m15-l09",
+      "source": {
+        "title": ".NET Generic Host: Host shutdown",
+        "url": "https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-shutdown"
+      }
     }
   ]
 }

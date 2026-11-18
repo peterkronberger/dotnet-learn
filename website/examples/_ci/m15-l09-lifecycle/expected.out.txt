@@ -1,0 +1,8 @@
+Main: host built
+Service: StartAsync
+Service: ExecuteAsync starts
+Service: step 1
+Service: step 2
+Service: step 3
+Service: StopAsync
+Main: host stopped
