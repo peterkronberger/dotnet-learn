@@ -64,7 +64,7 @@ Before every commit: run both build checks. If one fails, do not commit.
 8. **Lesson = 15–25 min, one core concept.** Longer → split.
 9. **Accessibility WCAG 2.2 AA**: keyboard use for all interactions, contrast in light and dark mode, text alternative for diagrams.
 10. **No tracking**, no accounts. Learning progress only local (localStorage/IndexedDB) with JSON export/import.
-11. **No AI content outside module 19** – only exception: one paragraph on the page "Wie dieser Kurs funktioniert" (How this course works).
+11. **No AI content outside module 19** – only exceptions: one paragraph on the page "Wie dieser Kurs funktioniert" (How this course works), and the lesson `m00-l00` ".NET/C# und die KI-Zeitenwende" (decided in #591).
 
 ## Definition of Done – lesson
 

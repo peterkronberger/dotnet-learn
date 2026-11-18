@@ -1,0 +1,6 @@
+Resources used, scope still open
+  disposed: transient
+  disposed: scoped
+Scope closed
+  disposed: singleton
+Provider disposed

@@ -1,0 +1,113 @@
+---
+title: ".NET/C# und die KI-Zeitenwende"
+sidebar_position: 0
+description: Was .NET und C# ausmacht, wann sie die richtige Wahl sind und wann nicht, und was Studien über KI-gestützte Softwareentwicklung zeigen.
+lesson_id: m00-l00
+duration_min: 15
+---
+
+# .NET/C# und die KI-Zeitenwende
+
+:::note[Lernziele]
+- Du nennst drei Eigenschaften von C# und .NET, zum Beispiel plattformübergreifend, statisch typisiert und mit automatischer Speicherverwaltung.
+- Du begründest für ein Vorhaben, ob C# und .NET dafür passen, und nennst ein Beispiel, wo eine andere Sprache besser passt.
+- Du erklärst, warum Studien zu KI-Werkzeugen nicht einfach auf jede Aufgabe übertragbar sind.
+:::
+
+Diese Lektion ist der Einstieg in den Kurs. Sie braucht kein Vorwissen und enthält keinen Code zum Ausführen. Drei kurze Abschnitte beantworten drei Fragen: Was ist das? Wofür taugt es? Lohnt sich das Lernen, wenn KI Code schreiben kann?
+
+## Was sind .NET und C#?
+
+C# ist eine Programmiersprache, .NET ist die Plattform, die C#-Programme ausführt. Die Plattform ist kostenlos, quelloffen und plattformübergreifend: Dieselben Programme laufen auf mehreren Betriebssystemen und Prozessorarchitekturen ([Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)). Den Unterschied zwischen Sprache und Plattform lernst du in der Lektion „C# und .NET: Sprache und Plattform“.
+
+Vier Eigenschaften prägen C#:
+
+1. **Objektorientiert:** C# beruht auf objektorientierten Prinzipien, übernimmt aber auch Ideen aus anderen Stilen, etwa der funktionalen Programmierung. Was Objekte sind, lernst du in Modul 6.
+2. **Statisch typisiert:** Jede Variable hat einen Typ, der schon beim Übersetzen feststeht. Der Compiler (das Übersetzerprogramm) meldet falsche Verwendung, bevor das Programm läuft.
+3. **Automatische Speicherverwaltung:** Ein Hilfsprogramm der Laufzeitumgebung, der Garbage Collector (Speicherbereinigung), gibt Speicher frei, den kein Code mehr braucht. Du musst das nicht selbst tun.
+4. **Breite Bibliothek:** Die Standardbibliothek bringt Bausteine für viele Aufgaben mit. Weitere Pakete kommen aus dem Paketmanager NuGet.
+
+<Forward concepts={['Typen', 'Variablen', 'Objekte']} module="1" />
+
+Mit C# baust du Webanwendungen und Schnittstellen, Desktop- und Mobil-Apps, Cloud-Dienste, Spiele (zum Beispiel mit der Engine Unity) und Programme für kleine Geräte ([What you can build with C#](https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/what-you-can-build)). Die Syntax gehört zur C-Familie. Wer Java, JavaScript oder C++ kennt, erkennt vieles wieder.
+
+## Wann C#, wann etwas anderes?
+
+Keine Sprache ist überall die beste Wahl. Die Entscheidung hängt von Aufgabe, Team und vorhandenem Code ab.
+
+**C# und .NET passen gut, wenn …**
+
+- du Webdienste, Schnittstellen oder Hintergrunddienste baust, die über Jahre laufen und gewartet werden. Feste Typen helfen, wenn viele Menschen am selben Code arbeiten.
+- du dieselbe Codebasis für mehrere Systeme nutzen willst, zum Beispiel Windows, Linux und macOS.
+- du ein Spiel mit Unity baust.
+- du die Fehlermeldungen des Compilers als Sicherheitsnetz schätzt.
+
+**Etwas anderes passt oft besser, wenn …**
+
+- du eine Seite im Browser gestalten willst, die nur mit JavaScript oder TypeScript auskommt. C# kann im Browser laufen (Blazor, wie in diesem Kurs), aber der übliche Weg ist JavaScript.
+- ein Team oder Projekt schon vollständig auf eine andere Sprache setzt. Der Aufwand, zwei Welten zu pflegen, wiegt dann oft schwerer als die Vorteile von C#.
+- du Daten in kleinen Skripten auswertest. Dafür ist Python weit verbreitet. C# ist hier möglich (ML.NET), aber nicht der übliche Einstieg.
+- du jedes Byte Speicher selbst steuern musst. C und C++ lassen dir diese Kontrolle. In C# gibt es dafür besondere Funktionen, der Normalfall ist aber die automatische Verwaltung.
+
+### Vergleich mit Python
+
+Beide Sprachen sind objektorientiert, plattformübergreifend und räumen Speicher automatisch auf. Der größte Unterschied: C# ist statisch typisiert, Python dynamisch typisiert. Weist du in C# einer Variablen später einen Wert anderen Typs zu, meldet der Compiler einen Fehler. In Python ändert sich dann einfach der Typ ([Tips for Python developers](https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/tips-for-python-developers)).
+
+:::warning[Achtung]
+<Misconception id="m00-l00-best-language" />
+
+**„Es gibt eine beste Sprache.“** Sprachen setzen verschiedene Schwerpunkte. Welche passt, hängt von Aufgabe, Team und vorhandenem Code ab. Das gilt auch für C#.
+:::
+
+## Lohnt sich C# im Zeitalter der KI?
+
+KI-Assistenten schlagen Code vor, beantworten Fragen und erledigen kleine Aufgaben selbstständig. Die Frage ist, was Studien dazu zeigen. Jede Studie gilt für eine bestimmte Gruppe, Aufgabe und Werkzeuggeneration. Die Ergebnisse sind kein Naturgesetz.
+
+**Stärken (Studienbefunde):**
+
+- In einem Experiment mit einer eng umrissenen Aufgabe, einem HTTP-Server in JavaScript, war die Gruppe mit Assistent 55,8 % schneller (95 %-Konfidenzintervall 21–89 %). Zu den Autoren gehören Beschäftigte von Microsoft Research und GitHub ([Peng et al., 2023](https://arxiv.org/abs/2302.06590)).
+- In einer Studie mit 96 Ingenieurinnen und Ingenieuren bei Google lag der Zeitgewinn bei einer größeren Aufgabe bei etwa 21 %, mit breitem Konfidenzintervall. Die Autoren halten die Übertragung auf andere Werkzeuge und Zeiten für nicht einfach ([Paradis et al., 2025](https://arxiv.org/abs/2410.12944)).
+
+**Schwächen (Studienbefunde):**
+
+- 16 erfahrene Entwickler arbeiteten in ihren eigenen großen Open-Source-Projekten und brauchten mit Werkzeugen von Anfang 2025 19 % länger. Vorher hatten sie +24 % Zeitgewinn erwartet, nachher schätzten sie +20 %. Die Stichprobe ist klein, und die Autoren erwarten bei neueren Werkzeugen andere Ergebnisse ([METR, 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)).
+- Bei sicherheitsrelevanten Aufgaben schrieben Teilnehmende mit einem Assistenten (Modell von 2022) in 4 von 5 Aufgaben unsicherere Lösungen und hielten sie öfter für sicher ([Perry et al., 2023](https://doi.org/10.1145/3576915.3623157)).
+- In einem Experiment mit 52 Ingenieuren, die eine unbekannte Python-Bibliothek lernten, schnitten die Teilnehmenden mit KI im Verständnistest schlechter ab. Wer die KI zum Nachfragen und Verstehen nutzte, schnitt besser ab. Die Autoren arbeiten bei Anthropic ([Shen und Tamkin, 2026](https://arxiv.org/abs/2601.20245)).
+
+Die Ergebnisse widersprechen sich zum Teil. Der Effekt hängt also von Aufgabe, Erfahrung, Codebasis und Werkzeug ab. Außerdem war die eigene Zeitschätzung in der METR-Studie unzuverlässig.
+
+**Warum Grundlagen weiter zählen (Folgerung, kein Studienbefund):** Wer KI-Code prüfen soll, muss ihn lesen, vorhersagen und testen können. Das setzt voraus, dass du Sprache und Plattform verstehst. Der Kurs übt dieses Vorhersagen in jeder Lektion.
+
+**Ausblick (Spekulation):** Möglich ist, dass Werkzeuge zuverlässiger werden und mehr Aufgaben übernehmen. Möglich ist ebenso, dass Prüfen, Entwerfen und Verantwortung wichtiger werden. Es kann auch anders kommen. Niemand kann das heute belegen.
+
+*Stand: 2026-11-18. Die Studien beziehen sich auf Werkzeuggenerationen von 2022 bis 2025.*
+
+## Zusammenfassung
+
+C# ist eine objektorientierte, statisch typisierte Sprache mit automatischer Speicherverwaltung. .NET führt sie plattformübergreifend aus. Es passt gut für langlebige Dienste, mehrere Zielsysteme und Spiele mit Unity. Für Browser-Seiten, kleine Datenskripte oder Speicherkontrolle auf Byte-Ebene setzen viele andere Sprachen ein. Studien zu KI-Werkzeugen zeigen je nach Gruppe, Aufgabe und Zeit Gewinne und Verluste. Verstehen und Prüfen bleibt deine Aufgabe.
+
+## Prüfe dein Wissen
+
+<Quiz id="m00-l00-q1" />
+
+<Quiz id="m00-l00-q2" />
+
+<Quiz id="m00-l00-q3" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m00-l00-q4" />
+
+### Transferfrage
+
+<Quiz id="m00-l00-q5" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil sie nur einordnet und noch kein SecLog-Code existiert. Mit der Lektion „Dein erstes Programm“ beginnt SecLog.
+
+## Weiterlesen
+
+- Microsoft Learn: [Introduction to .NET](https://learn.microsoft.com/dotnet/core/introduction)
+- Microsoft Learn: [A tour of C#](https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/overview)
+- Microsoft Learn: [What you can build with C#](https://learn.microsoft.com/dotnet/csharp/tour-of-csharp/what-you-can-build)
