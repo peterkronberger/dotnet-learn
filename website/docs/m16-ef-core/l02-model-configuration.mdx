@@ -1,0 +1,187 @@
+---
+title: Das Modell konfigurieren
+sidebar_position: 2
+description: Wie EF Core das Modell aus Konventionen, Data Annotations und der Fluent API aufbaut, welche Konfiguration gewinnt und wie du Schlüssel, Pflichtangaben, Längen und Indizes festlegst.
+lesson_id: m16-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import conventions from '!!raw-loader!@site/examples/_ci/m16-l02-conventions/Program.cs';
+import conventionsOutput from '!!raw-loader!@site/examples/_ci/m16-l02-conventions/expected.out.txt';
+import priority from '!!raw-loader!@site/examples/_ci/m16-l02-priority/Program.cs';
+import priorityOutput from '!!raw-loader!@site/examples/_ci/m16-l02-priority/expected.out.txt';
+import gapFluent from '!!raw-loader!@site/examples/m16/l02/gap-fluent.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l02/seclog-program-block.snippet.cs';
+import dbContext from '!!raw-loader!@site/examples/_ci/seclog-m16-l02/src/SecLog.Data/SecLogDbContext.cs';
+
+# Das Modell konfigurieren
+
+:::note[Lernziele]
+- Du sagst voraus, welche Eigenschaft EF Core per Konvention als Schlüssel nimmt und welche Spalten `NULL` erlauben.
+- Du konfigurierst eine Eigenschaft mit einer Data Annotation und mit der Fluent API.
+- Du erklärst, welche Konfiguration gewinnt, wenn beide dasselbe festlegen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l06-q1" />
+
+<Quiz id="m04-l04-q6" />
+
+<Quiz id="m16-l01-q2" />
+
+## Konventionen: EF Core rät mit
+
+In der letzten Lektion hast du eine Klasse `Incident` mit `Id` und einem `DbContext` geschrieben und keine Zeile Konfiguration. Trotzdem hat EF Core eine passende Tabelle angelegt. Das Wissen darüber, wie Klassen, Tabellen, Spalten und Schlüssel zusammengehören, heißt <Term id="ef-core-model">Modell</Term>. EF Core baut es aus der Klasse, und ohne weitere Angaben gelten die <Term id="ef-core-convention">Konventionen</Term> ([Creating and configuring a model](https://learn.microsoft.com/ef/core/modeling/)). Die wichtigsten:
+
+- **Tabellenname:** der Name der `DbSet`-Eigenschaft, hier `Incidents`.
+- **Schlüssel:** eine Eigenschaft mit dem Namen `Id` oder `<Typname>Id` ist der Primärschlüssel. Hat sie den Typ `int`, vergibt die Datenbank die Werte ([Keys](https://learn.microsoft.com/ef/core/modeling/keys)).
+- **Pflicht oder optional:** Bei aktivierten Nullable Reference Types ist eine Eigenschaft vom Typ `string` Pflicht, `string?` ist optional. Ein Werttyp wie `int` ist Pflicht ([Required and optional properties](https://learn.microsoft.com/ef/core/modeling/entity-properties#required-and-optional-properties)).
+
+Das folgende Programm druckt den Befehl, den EF Core für die Klasse erzeugt.
+
+<CodeBlock language="csharp" title="Program.cs">{conventions}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Spalten hat die Tabelle, welche ist der Schlüssel, und welche Spalten erlauben `NULL`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="sql" title="Ausgabe">{conventionsOutput}</CodeBlock>
+
+Der Befehl ist SQL. `CREATE TABLE` legt eine Tabelle an. In den Klammern steht je Spalte ein Name, ein Typ und eine Regel:
+
+1. **Name:** Die Tabelle heißt wie die `DbSet`-Eigenschaft: `Incidents`.
+2. **Schlüssel:** `PRIMARY KEY` kennzeichnet `Id` als Primärschlüssel. `AUTOINCREMENT` heißt: Die Datenbank zählt die Werte selbst hoch.
+3. **Pflicht:** `NOT NULL` heißt, der Wert darf nicht fehlen. Das gilt für `User` (`string`) und `FailureCount` (`int`).
+4. **Optional:** `NULL` heißt, der Wert darf fehlen. `Note` ist `string?`.
+
+**Was passiert, wenn …** du `required` bei `User` entfernst und `string User { get; set; } = "";` schreibst? Die Spalte bleibt `NOT NULL`, denn der Typ `string` ohne `?` entscheidet, nicht das Schlüsselwort `required`.
+
+</details>
+
+<Quiz id="m16-l02-q1" />
+
+<Quiz id="m16-l02-q2" />
+
+## Data Annotations und Fluent API
+
+Die Konventionen passen nicht immer. Dann konfigurierst du das Modell selbst, auf zwei Wegen:
+
+1. **<Term id="data-annotation">Data Annotations</Term>:** Attribute (`m14-l06`) an der Klasse oder Eigenschaft. Aus dem Namespace `System.ComponentModel.DataAnnotations` kommen zum Beispiel `[Key]`, `[Required]` und `[MaxLength(64)]`. `[Table("…")]` und `[Column("…")]` ändern den Namen von Tabelle und Spalte.
+2. **<Term id="fluent-api">Fluent API</Term>:** Aufrufe in der Methode `OnModelCreating`, die du im `DbContext` überschreibst. Der `ModelBuilder` hat dafür Methoden wie `Entity<T>()`, `HasKey`, `Property(…).IsRequired()`, `HasMaxLength` und `HasIndex`.
+
+Die Fluent API kann alles, was die Annotations können, und mehr. Für größere Modelle lässt sich die Konfiguration je Entity-Klasse in eine Klasse auslagern, die `IEntityTypeConfiguration<T>` implementiert. Sie wird hier nur genannt, denn die Lektionen dieses Moduls brauchen sie nicht.
+
+Ein <Term id="composite-key">zusammengesetzter Schlüssel</Term> besteht aus mehr als einer Eigenschaft. Dafür gibt es nur die Fluent API: `HasKey(x => new { x.A, x.B })`. Ein <Term id="database-index">Index</Term> hilft der Datenbank, Zeilen nach einer Spalte schnell zu finden, ohne jede Zeile zu prüfen. Du legst ihn mit `HasIndex` fest ([Indexes](https://learn.microsoft.com/ef/core/modeling/indexes)).
+
+<Quiz id="m16-l02-q4" />
+
+<Quiz id="m16-l02-q6" />
+
+<Quiz id="m16-l02-q7" />
+
+## Wer gewinnt?
+
+Legen mehrere Wege dasselbe fest, gilt eine feste Reihenfolge: Die **Fluent API** gewinnt gegen die **Data Annotations**, und diese gewinnen gegen die **Konventionen** ([Creating and configuring a model](https://learn.microsoft.com/ef/core/modeling/#use-the-fluent-api-to-configure-a-model)).
+
+Im folgenden Programm hat `User` zwei Angaben zur Länge. Die Annotation sagt 20, die Fluent API sagt 64. Das Programm druckt auch den Schlüssel `Number`, den Index und den zusammengesetzten Schlüssel der Klasse `Assignment`.
+
+<CodeBlock language="csharp" title="Program.cs">{priority}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Länge gilt für `User`, welche für `Source`? Wie heißen die Schlüssel der beiden Tabellen? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{priorityOutput}</CodeBlock>
+
+1. **Schlüssel:** `Incident` hat kein `Id`, aber `[Key]` an `Number`. Darum ist `Number` der Schlüssel. Die Tabelle `Assignments` hat zwei Spalten im Schlüssel: `PRIMARY KEY ("IncidentId", "AnalystId")`.
+2. **Länge:** `User` hat `[MaxLength(20)]` und `HasMaxLength(64)`. Die Fluent API gewinnt: 64. `Source` hat nur die Annotation: 20.
+3. **Index:** `CREATE INDEX` legt den Index auf `User` an.
+
+Das Script zeigt die Länge nicht, weil SQLite sie nicht in der Tabelle festlegt. Darum fragt das Programm das Modell von EF Core direkt ([Maximum length](https://learn.microsoft.com/ef/core/modeling/entity-properties#maximum-length)).
+
+**Was passiert, wenn …** du `[Required]` an `User` entfernst? Nichts ändert sich, denn die Eigenschaft `User` ist ein `string` ohne `?`, und die Konvention macht sie schon zur Pflicht.
+
+</details>
+
+<Quiz id="m16-l02-q3" />
+
+<Quiz id="m16-l02-q5" />
+
+## Gap-Beispiel: Die Länge mit der Fluent API
+
+Die Lücke `___` fehlt. Die Eigenschaft `Source` soll höchstens 32 Zeichen lang sein. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-fluent.snippet.cs">{gapFluent}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `HasMaxLength`: `.HasMaxLength(32);`. `Property(i => i.Source)` wählt die Eigenschaft, `HasMaxLength` legt die Länge fest.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l01/`) speichert die Vorfälle in einer SQLite-Datenbank. Die Klasse `StoredIncident` und der `SecLogDbContext` kommen ohne Konfiguration aus.
+
+**Neue Anforderung:** Das Datenbankschema von SecLog legt fest: Der Benutzer ist Pflicht und höchstens 64 Zeichen lang, und nach dem Benutzer kann schnell gesucht werden. Konfiguriere `StoredIncident` dafür in `OnModelCreating` des `SecLogDbContext`. Das Programm druckt unter `== Database ==` zuerst das Script zum Anlegen der Tabelle und danach die gespeicherten Vorfälle.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={dbContext} title="src/SecLog.Data/SecLogDbContext.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Entity wählen:** `modelBuilder.Entity<StoredIncident>(…)` öffnet die Konfiguration der Klasse.
+2. **Eigenschaft konfigurieren:** `Property(i => i.User)` mit `IsRequired()` und `HasMaxLength(64)` legt Pflicht und Länge fest.
+3. **Index:** `HasIndex(i => i.User)` legt den Index für die Suche an. Er heißt nach der Konvention `IX_Incidents_User`.
+4. **Ausgeben:** `GenerateCreateScript()` liefert den SQL-Text, und das Programm druckt ihn vor den Zeilen.
+
+Beim Vergleich der Ausgabe fällt auf: Das Script zeigt den Index (`CREATE INDEX`), aber keine Länge, denn SQLite legt sie nicht fest. Die Konfiguration gilt trotzdem im Modell von EF Core.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l02/`) hat ein konfiguriertes Schema mit Pflichtangabe, Länge und Index für den Benutzer und druckt das Script zum Anlegen der Tabelle.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l02-key-needs-attribute" />
+
+**„Ohne `[Key]` hat eine Entität keinen Primärschlüssel.“** Die Konvention findet eine Eigenschaft `Id` oder `<Typname>Id` selbst. `[Key]` oder `HasKey` brauchst du nur, wenn der Name anders ist oder der Schlüssel aus mehreren Eigenschaften besteht.
+:::
+
+:::warning[Achtung]
+<Misconception id="m16-l02-annotation-beats-fluent-api" />
+
+**„Die Annotation steht direkt an der Eigenschaft, also gewinnt sie.“** Die Position im Code zählt nicht. Die Fluent API überschreibt die Data Annotation, und diese überschreibt die Konvention.
+:::
+
+## Zusammenfassung
+
+EF Core baut das Modell aus Konventionen: Der Tabellenname kommt vom `DbSet`, `Id` ist der Schlüssel, und der Nullable-Typ entscheidet über Pflicht und optional. Data Annotations und die Fluent API in `OnModelCreating` überschreiben das. Bei einem Widerspruch gewinnt die Fluent API vor den Annotations und diese vor den Konventionen. Zusammengesetzte Schlüssel und Indizes legst du mit `HasKey` und `HasIndex` fest. `GenerateCreateScript()` zeigt das Ergebnis als SQL.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m16-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Creating and configuring a model](https://learn.microsoft.com/ef/core/modeling/)
+- Microsoft Learn: [Keys](https://learn.microsoft.com/ef/core/modeling/keys)
+- Microsoft Learn: [Entity properties](https://learn.microsoft.com/ef/core/modeling/entity-properties)

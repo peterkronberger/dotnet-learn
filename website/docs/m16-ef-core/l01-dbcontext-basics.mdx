@@ -1,0 +1,227 @@
+---
+title: Datenbanken und der DbContext
+sidebar_position: 1
+description: Wie eine relationale Datenbank Daten in Tabellen speichert und wie ein DbContext mit DbSet-Eigenschaften C#-Objekte darauf abbildet, speichert und mit LINQ wieder liest.
+lesson_id: m16-l01
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import firstContext from '!!raw-loader!@site/examples/_ci/m16-l01-first-context/Program.cs';
+import firstContextOutput from '!!raw-loader!@site/examples/_ci/m16-l01-first-context/expected.out.txt';
+import queryRoot from '!!raw-loader!@site/examples/_ci/m16-l01-query-root/Program.cs';
+import queryRootOutput from '!!raw-loader!@site/examples/_ci/m16-l01-query-root/expected.out.txt';
+import gapDbSet from '!!raw-loader!@site/examples/m16/l01/gap-dbset.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l01/seclog-program-block.snippet.cs';
+import storedIncident from '!!raw-loader!@site/examples/_ci/seclog-m16-l01/src/SecLog.Data/Entities/StoredIncident.cs';
+import dbContext from '!!raw-loader!@site/examples/_ci/seclog-m16-l01/src/SecLog.Data/SecLogDbContext.cs';
+import dataProject from '!!raw-loader!@site/examples/_ci/seclog-m16-l01/src/SecLog.Data/SecLog.Data.csproj';
+import appSettings from '!!raw-loader!@site/examples/_ci/seclog-m16-l01/src/SecLog.Cli/appsettings.json';
+import runScript from '!!raw-loader!@site/examples/_ci/seclog-m16-l01/run.sh';
+
+# Datenbanken und der DbContext
+
+:::note[Lernziele]
+- Du erklärst Tabelle, Zeile, Spalte und Primärschlüssel an einem Beispiel.
+- Du schreibst einen `DbContext` mit einem `DbSet<T>` für eine Entity-Klasse und verbindest ihn mit SQLite.
+- Du speicherst Objekte mit `Add` und `SaveChanges` und liest sie mit einer LINQ-Abfrage wieder.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- Gefundene Vorfälle und ihre Ereignisse in einer SQLite-Datenbank speichern
+- Gespeicherte Daten mit LINQ abfragen – EF Core übersetzt die Abfrage in SQL
+- Den Status eines Vorfalls ändern und das Datenbankschema mit Migrationen weiterentwickeln
+- Sicher nach einem Benutzer suchen und asynchron auf die Datenbank zugreifen
+:::
+
+## Rückblick
+
+<Quiz id="m14-l02-q1" />
+
+<Quiz id="m11-l03-q1" />
+
+## Daten, die den Neustart überleben
+
+Bisher lebten alle Daten von SecLog im Speicher: Wenn das Programm endet, sind die Vorfälle weg. Eine <Term id="relational-database">relationale Datenbank</Term> speichert Daten dauerhaft. Sie ordnet sie in Tabellen an. Eine <Term id="database-table">Tabelle</Term> besteht aus:
+
+- **Spalten:** Jede Spalte hat einen Namen und einen Typ, zum Beispiel `User` (Text) und `FailureCount` (Ganzzahl).
+- **Zeilen:** Jede Zeile ist ein einzelner Eintrag, hier ein Vorfall. Sie hat für jede Spalte einen Wert.
+
+| Id | User | FailureCount |
+| --- | --- | --- |
+| 1 | bob | 5 |
+| 2 | dave | 1 |
+
+Damit man jede Zeile eindeutig ansprechen kann, hat die Tabelle einen <Term id="primary-key">Primärschlüssel</Term>: eine Spalte, deren Wert in jeder Zeile anders ist. Hier ist es `Id`.
+
+Mit einer Datenbank sprichst du in <Term id="sql">SQL</Term>. Das ist die Sprache der Datenbank, zum Beispiel `SELECT` zum Lesen und `INSERT` zum Anlegen einer Zeile. In dieser Lektion schreibst du kein SQL selbst. Du arbeitest mit C#-Objekten, und eine Bibliothek übersetzt sie in SQL.
+
+<Quiz id="m16-l01-q1" />
+
+<Quiz id="m16-l01-q7" />
+
+## Entity Framework Core
+
+<Term id="ef-core">Entity Framework Core</Term> ist ein <Term id="orm">O/RM</Term> (objektrelationaler Mapper): Es bildet Klassen auf Tabellen ab. Ein Objekt entspricht einer Zeile, eine Eigenschaft einer Spalte. Du schreibst C# und LINQ, EF Core erzeugt das SQL und baut aus den Zeilen wieder Objekte ([Overview of Entity Framework Core](https://learn.microsoft.com/ef/core/)).
+
+EF Core kommt als NuGet-Paket (`m14-l02`). Welche Datenbank dahinter steckt, bestimmt ein <Term id="database-provider">Database Provider</Term>, ebenfalls ein Paket. Es gibt Provider zum Beispiel für SQL Server, PostgreSQL und SQLite. Dieses Modul benutzt SQLite: Die ganze Datenbank ist eine Datei, und es braucht keinen Server. Dafür verweist ein Projekt auf das Paket `Microsoft.EntityFrameworkCore.Sqlite`.
+
+Die Datenbank findet das Programm über einen <Term id="connection-string">Connection String</Term>. Bei SQLite ist das der Dateiname: `Data Source=seclog.db`.
+
+## Entity-Klasse und DbContext
+
+Zwei Dinge beschreiben dein Modell:
+
+1. Eine <Term id="entity-type">Entity-Klasse</Term> ist eine gewöhnliche Klasse mit Eigenschaften. Eine Eigenschaft `Id` ist der Primärschlüssel.
+2. Ein <Term id="dbcontext">`DbContext`</Term> ist die Sitzung mit der Datenbank. Du schreibst eine Klasse, die von `DbContext` erbt. Für jede Tabelle hat sie eine <Term id="dbset">`DbSet<T>`</Term>-Eigenschaft.
+
+Den Context bekommt seine Einstellungen als `DbContextOptions<T>` im Konstruktor. Die Optionen baust du mit `DbContextOptionsBuilder<T>`, und `UseSqlite(…)` wählt den Provider und gibt den Connection String an ([DbContext Lifetime, Configuration, and Initialization](https://learn.microsoft.com/ef/core/dbcontext-configuration/)).
+
+Das folgende Programm legt eine Datenbank an, speichert zwei Vorfälle und liest den schweren davon wieder.
+
+<Forward concepts={['`using` und `try`/`finally` für Dateien']} module="7" />
+
+<CodeBlock language="csharp" title="Program.cs">{firstContext}</CodeBlock>
+
+Die Schritte im Programm:
+
+1. **Datenbank bereitstellen:** `EnsureCreated()` legt die Datenbank mit den Tabellen für das Modell an, falls es sie noch nicht gibt. Das ist der einfache Start. Später ersetzen Migrationen diesen Weg (`m16-l08`).
+2. **Objekte vormerken:** `Add` und `AddRange` melden dem Context neue Objekte. Es geschieht noch nichts in der Datenbank.
+3. **Speichern:** `SaveChanges()` schickt die Befehle an die Datenbank. Die Datenbank vergibt den Schlüssel, und EF Core schreibt ihn ins Objekt zurück.
+4. **Lesen:** Eine LINQ-Abfrage auf dem `DbSet` mit `Where` und `ToList()` holt die passenden Zeilen als Objekte.
+
+:::info[Vorhersage]
+Welche Zeilen druckt das Programm? Achte auf die `Id` vor und nach `SaveChanges` und darauf, welche Vorfälle die Abfrage findet. Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{firstContextOutput}</CodeBlock>
+
+1. **Vor dem Speichern:** Das Objekt `bob` ist nur ein C#-Objekt. Seine `Id` hat den Standardwert `0`.
+2. **Nach `SaveChanges`:** Die Datenbank hat `1` für bob und `2` für dave vergeben. Bei einem Schlüssel vom Typ `int` zählt sie nach oben.
+3. **Abfrage:** `Where(i => i.FailureCount >= 3)` trifft nur bob (5 Fehlversuche). dave hat nur 1.
+
+Die Abfrage läuft in einem zweiten Context. Das zeigt: Die Daten stehen in der Datenbank und nicht mehr in den Objekten des ersten Contexts.
+
+**Was passiert, wenn …** du `SaveChanges()` weglässt? Dann bleibt die Datenbank leer. `Add` merkt die Objekte nur vor, die Abfrage findet nichts, und die Ausgabe hat keine Zeile `1 bob`.
+
+</details>
+
+<Quiz id="m16-l01-q3" />
+
+<Quiz id="m16-l01-q4" />
+
+<details>
+<summary>Vertiefung: Wie kommt das SQL zustande? (optional)</summary>
+
+Aus `Where(i => i.FailureCount >= 3).ToList()` erzeugt EF Core einen `SELECT`-Befehl mit einer `WHERE`-Bedingung. Wie die Übersetzung genau arbeitet und wie du das SQL ansiehst, zeigt `m16-l04`. Für diese Lektion genügt: Die Bedingung läuft in der Datenbank, nicht im Speicher von C#.
+
+Welche Eigenschaften zu Spalten werden und welche Typen sie bekommen, regelt das Modell. Es wird aus der Klasse abgeleitet ([Creating and configuring a model](https://learn.microsoft.com/ef/core/modeling/)). `m16-l02` zeigt, wie du es steuerst.
+
+</details>
+
+## Das DbSet ist der Start einer Abfrage
+
+Ein `DbSet<T>` sieht aus wie eine Liste, ist aber keine. Es hält keine Zeilen im Speicher. Es ist der Ausgangspunkt für Abfragen und für `Add`. Erst wenn eine Abfrage ausgelesen wird, liest EF Core Zeilen. Das kennst du von LINQ im Speicher: Die Abfrage läuft erst beim Auslesen (`m11-l05`).
+
+<Forward concepts={['`IQueryable<T>`']} module="16" />
+
+<CodeBlock language="csharp" title="Program.cs">{queryRoot}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Zeilen druckt das Programm? Notiere deinen Tipp, besonders für die Zahl der Zeilen in der zweiten Zeile mit `Count()`, und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{queryRootOutput}</CodeBlock>
+
+1. **Abfrage anlegen:** `IQueryable<Incident> all = db.Incidents;` liest keine Zeile. Die Variable beschreibt nur die Abfrage.
+2. **Erste Ausführung:** `Count()` fragt die Datenbank: 2 Zeilen.
+3. **Zeile ergänzen:** Ein dritter Vorfall wird gespeichert.
+4. **Zweite Ausführung:** Dieselbe Variable `all` liefert jetzt 3. Die Abfrage läuft bei jedem Auslesen neu.
+
+</details>
+
+<Quiz id="m16-l01-q2" />
+
+<Quiz id="m16-l01-q5" />
+
+## Gap-Beispiel: Die Tabelle im Context
+
+Die Lücke `___` fehlt. Der Context soll eine Tabelle `Incidents` für die Entity-Klasse `Incident` anbieten. Setze den Typ ein.
+
+<CodeBlock language="csharp" title="gap-dbset.snippet.cs">{gapDbSet}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `DbSet`: `public DbSet<Incident> Incidents => Set<Incident>();`. Die Eigenschaft steht für die Tabelle. `Set<Incident>()` liefert das `DbSet`, das der Context verwaltet.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m15-l09/`) läuft auf dem Generic Host. Services, Logging und Optionen kommen aus dem Builder, ein `BackgroundService` führt die Analyse aus. Die gefundenen Vorfälle (`Incident`) leben nur im Speicher.
+
+**Neue Anforderung:** SecLog speichert die gefundenen Vorfälle in einer Datenbank. Dafür kommt ein neues Projekt `src/SecLog.Data/` dazu. Es hat die Entity-Klasse `StoredIncident`, den `SecLogDbContext` und eine Methode, die aus einem `Incident` ein `StoredIncident` macht. `SecLog.Cli` verweist auf das neue Projekt und liest den Connection String `ConnectionStrings:SecLog` aus der Konfiguration. Nach der Analyse legt das Programm die Datenbank an, speichert die Vorfälle der Analyse, liest sie nach `Id` sortiert zurück und druckt sie unter `== Database ==`. Die Klasse `Incident` im Projekt `SecLog.Core` bleibt unverändert.
+
+Die Lektion zeigt nur geänderte und neue Dateien. Die Kommentare in den Blöcken nennen den Ort.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={storedIncident} title="src/SecLog.Data/Entities/StoredIncident.cs (neu)" />
+
+<FoldedCode code={dbContext} title="src/SecLog.Data/SecLogDbContext.cs (neu)" />
+
+<CodeBlock language="xml" title="src/SecLog.Data/SecLog.Data.csproj (neu)">{dataProject}</CodeBlock>
+
+<CodeBlock language="json" title="src/SecLog.Cli/appsettings.json">{appSettings}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (neuer Block am Ende von RunAnalysisAsync)">{programBlock}</CodeBlock>
+
+<CodeBlock language="bash" title="run.sh">{runScript}</CodeBlock>
+
+1. **Eigene Entity-Klasse:** `Incident` hat einen statischen Zähler und get-only-Eigenschaften. Darum hat `SecLog.Data` die Klasse `StoredIncident` mit einem `int Id` und setzbaren Eigenschaften. `StoredIncident.From` kopiert die Daten. `SecLog.Core` braucht dadurch keinen Verweis auf EF Core.
+2. **Context:** `SecLogDbContext` bekommt die Optionen im Konstruktor und hat ein `DbSet<StoredIncident>` mit dem Namen `Incidents`.
+3. **Verbinden:** Das Projekt `SecLog.Data` verweist auf `SecLog.Core` und auf das Paket für SQLite. `SecLog.Cli` und `SecLog.slnx` kennen das neue Projekt.
+4. **Connection String:** `appsettings.json` hat den Standard `Data Source=seclog.db`. `run.sh` setzt für den Testlauf die Umgebungsvariable `ConnectionStrings__SecLog` auf eine Datei in einem frischen temporären Verzeichnis. Die Umgebungsvariable gewinnt wie in `m15-l07` gegen die Datei. So beginnt jeder Lauf mit einer leeren Datenbank, und die Ids sind stabil.
+5. **Speichern und lesen:** `EnsureCreated`, `AddRange`, `SaveChanges` und eine Abfrage mit `OrderBy(i => i.Id).ToList()`. Der Context steht in einem `using`-Block, der die Sitzung am Ende schließt.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l01/`) speichert die Vorfälle der Analyse in einer SQLite-Datenbank und liest sie wieder. Die Ausgabe unter `== Database ==` zeigt zwei gespeicherte Vorfälle.
+
+<Quiz id="m16-l01-q6" />
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l01-dbset-holds-all-rows" />
+
+**„Ein `DbSet<T>` ist eine Liste, die alle Zeilen der Tabelle im Speicher hält.“** Ein `DbSet<T>` ist der Start einer Abfrage. Zeilen kommen erst in den Speicher, wenn eine Abfrage ausgelesen wird, zum Beispiel mit `ToList()`. Das gilt auch für jede weitere Abfrage: Sie läuft bei jedem Auslesen neu in der Datenbank.
+:::
+
+## Zusammenfassung
+
+Eine relationale Datenbank speichert Daten in Tabellen mit Spalten und Zeilen. Der Primärschlüssel kennzeichnet jede Zeile eindeutig. EF Core bildet Klassen auf Tabellen ab: Ein `DbContext` mit `DbSet<T>`-Eigenschaften beschreibt das Modell, ein Database Provider und ein Connection String legen die Datenbank fest. `Add` merkt Objekte vor, `SaveChanges` schreibt sie, und die Datenbank vergibt den Schlüssel. Eine LINQ-Abfrage auf dem `DbSet` läuft beim Auslesen in der Datenbank. Das `DbSet` selbst hält keine Zeilen.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l01-q8" />
+
+### Transferfrage
+
+<Quiz id="m16-l01-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Overview of Entity Framework Core](https://learn.microsoft.com/ef/core/)
+- Microsoft Learn: [Getting started with EF Core](https://learn.microsoft.com/ef/core/get-started/overview/first-app)
+- Microsoft Learn: [DbContext Lifetime, Configuration, and Initialization](https://learn.microsoft.com/ef/core/dbcontext-configuration/)

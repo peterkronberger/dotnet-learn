@@ -1,0 +1,4 @@
+Id before SaveChanges: 0
+Id after SaveChanges: 1
+Id of dave: 2
+1 bob
