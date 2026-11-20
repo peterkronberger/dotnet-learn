@@ -14,7 +14,7 @@ This document is binding for all work in the repo – for humans and for Claude 
 | `website/src/data/quiz/` | Quiz questions per language and module (`de/mXX.json`), format in its `README.md` |
 | `website/plugins/` | Local Docusaurus plugins (`lesson-index.js`) |
 | `playground/` | Blazor WebAssembly + Roslyn; published under `/runner/` and embedded by iframe |
-| `tools/` | `check-examples.sh` (S2), `run-tests.sh` (stable, sorted test results for `_ci` test projects), `check-seclog.mjs` (fold markers, SecLog chain), `check-quiz.mjs` (quiz data, links and wording) |
+| `tools/` | `check-examples.sh` (S2), `run-tests.sh` (stable, sorted test results for `_ci` test projects), `copy-example.sh` (copies a `_ci` example folder without `bin/`/`obj/`; the way to start a SecLog step, `cp -r` is denied in the implement workflow), `check-seclog.mjs` (fold markers, SecLog chain), `check-quiz.mjs` (quiz data, links and wording) |
 | `concept/` | Learning concept and module digest (read on demand, see below) |
 | `.claude/rules/` | Path-scoped rules for lessons, examples and the playground |
 | `.github/workflows/` | `pages.yml` (build + deploy), `examples.yml` (example check), `claude-*.yml` (issue automation) |
