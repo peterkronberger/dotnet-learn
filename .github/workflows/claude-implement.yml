@@ -144,14 +144,16 @@ jobs:
                It leaves out bin/, obj/ and TestResults/. Do NOT use `cp -r`, `cp -a`, `rsync`
                or the Write tool for each file: `cp` with flags is denied (manual approval).
             5. Never merge, never change labels.
-          # Bash permissions: only what this repo needs (.NET, Node, git, gh). Prefix rules match
-          # the start of the command, so file commands are listed with their common flags and
-          # are limited to website/examples/ (SecLog steps and _ci projects are copied there).
+          # Bash permissions: only what this repo needs (.NET, Node, git, gh). File commands are
+          # limited to website/examples/ and tools/.
+          # Rule syntax (Claude Code permissions doc): the suffix ":*" is the same as " *" and needs
+          # a space after the prefix. So "Bash(bash tools/:*)" never matched "bash tools/x.sh"
+          # (run 44814639930: "requires approval"). Write "Bash(bash tools/*)": no space before "*".
           # WebFetch is limited to Microsoft Learn (CLAUDE.md rule 7: primary sources).
           claude_args: |
             --model sonnet
             --max-turns 150
-            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node tools/:*),Bash(bash tools/:*),Bash(bash website/examples/:*),Bash(cp website/examples/:*),Bash(cp -r website/examples/:*),Bash(cp -a website/examples/:*),Bash(mv website/examples/:*),Bash(rm website/examples/:*),Bash(rm -r website/examples/:*),Bash(rm -rf website/examples/:*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),WebFetch(domain:learn.microsoft.com)"
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(git:*),Bash(gh issue view:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh pr list:*),Bash(npm:*),Bash(npx:*),Bash(node tools/*),Bash(bash tools/*),Bash(bash website/examples/*),Bash(cp website/examples/*),Bash(cp -r website/examples/*),Bash(cp -a website/examples/*),Bash(mv website/examples/*),Bash(rm website/examples/*),Bash(rm -r website/examples/*),Bash(rm -rf website/examples/*),Bash(mkdir:*),Bash(cd:*),Bash(ls:*),Bash(dotnet:*),Bash(python:*),Bash(python3:*),WebFetch(domain:learn.microsoft.com)"
             --json-schema '{"type":"object","properties":{"status":{"type":"string","enum":["pr_created","needs_human","failed"]},"pr_url":{"type":"string"},"reason":{"type":"string"},"questions":{"type":"string","description":"Only for status=needs_human: numbered questions as Markdown"}},"required":["status","reason"]}'
 
       # A script reports the result of the Claude call.
