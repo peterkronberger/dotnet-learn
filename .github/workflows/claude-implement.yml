@@ -136,9 +136,13 @@ jobs:
                  If yes: the push is enough.
                - Return status=pr_created and pr_url.
             4. Shell hints: run commands from the repository root with repo-relative paths
-               (for example `cp -r website/examples/_ci/a website/examples/_ci/b`, or
-               `bash website/examples/_ci/<name>/run.sh`). Do not chain with `cd … &&`
-               and do not use `env`; set variables inside a script instead.
+               (for example `bash website/examples/_ci/<name>/run.sh`). Do not chain with
+               `cd … &&` and do not use `env`; set variables inside a script instead.
+               To copy an example folder (for example the previous SecLog step), use
+               `bash tools/copy-example.sh <source-name> <new-name>` with folder names under
+               `website/examples/_ci/` (example: `bash tools/copy-example.sh seclog-m15-l09 seclog-m16-l01`).
+               It leaves out bin/, obj/ and TestResults/. Do NOT use `cp -r`, `cp -a`, `rsync`
+               or the Write tool for each file: `cp` with flags is denied (manual approval).
             5. Never merge, never change labels.
           # Bash permissions: only what this repo needs (.NET, Node, git, gh). Prefix rules match
           # the start of the command, so file commands are listed with their common flags and
