@@ -1,4 +1,215 @@
 {
   "module": "m16",
-  "questions": []
+  "questions": [
+    {
+      "id": "m16-l01-q1",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "Eine Tabelle `Incidents` hat die Spalten `Id`, `User` und `FailureCount`. Was ist eine Zeile dieser Tabelle?",
+      "options": [
+        { "text": "Ein Datensatz, zum Beispiel ein einzelner Vorfall mit seiner `Id`, seinem `User` und seiner `FailureCount`", "correct": true, "feedback": "Eine Zeile enthält für jede Spalte einen Wert und beschreibt einen Eintrag." },
+        { "text": "Die Menge aller `User`-Werte in der Tabelle", "feedback": "Das wäre eine Spalte: ein Merkmal, das jede Zeile hat." },
+        { "text": "Der Name der Tabelle", "feedback": "Der Name gehört zur ganzen Tabelle. Eine Zeile ist ein einzelner Eintrag darin." },
+        { "text": "Die Regel, welche Werte erlaubt sind", "feedback": "Regeln sind Teil der Tabellendefinition, nicht der Daten. Eine Zeile enthält Daten." }
+      ],
+      "explanation": "Eine Tabelle besteht aus Spalten (die Merkmale, jede mit einem Namen und einem Typ) und Zeilen (die einzelnen Einträge). Jede Zeile hat für jede Spalte einen Wert."
+    },
+    {
+      "id": "m16-l01-q2",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "`db.Incidents` ist eine Eigenschaft vom Typ `DbSet<Incident>`. Was stimmt?",
+      "options": [
+        { "text": "Das `DbSet<Incident>` ist eine Liste, die alle Zeilen der Tabelle im Speicher hält.", "misconception": "m16-l01-dbset-holds-all-rows", "feedback": "Ein `DbSet<T>` hält keine Zeilen. Es ist der Ausgangspunkt für Abfragen und für `Add`. Zeilen kommen erst in den Speicher, wenn eine Abfrage läuft." },
+        { "text": "Das `DbSet<Incident>` steht für die Tabelle: Es ist der Ausgangspunkt für Abfragen und nimmt neue Objekte mit `Add` an.", "correct": true, "feedback": "Eine LINQ-Abfrage auf dem `DbSet` wird erst beim Auslesen ausgeführt, dann liest EF Core die passenden Zeilen." },
+        { "text": "Das `DbSet<Incident>` wird beim Erzeugen des Contexts mit allen Zeilen gefüllt.", "misconception": "m16-l01-dbset-holds-all-rows", "feedback": "Beim Erzeugen des Contexts liest EF Core noch keine Zeile." },
+        { "text": "Das `DbSet<Incident>` ist die Verbindung zur Datenbank.", "feedback": "Die Verbindung gehört zum Context und zu seinen Optionen (`UseSqlite`). Das `DbSet` steht für eine Tabelle." }
+      ],
+      "explanation": "Das `DbSet<T>` ist der Einstieg in eine Tabelle: Du startest damit eine Abfrage oder fügst mit `Add` neue Objekte hinzu. Es enthält die Zeilen nicht. Erst wenn eine Abfrage ausgelesen wird (zum Beispiel mit `ToList`), führt EF Core sie aus."
+    },
+    {
+      "id": "m16-l01-q3",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "Ein neues Objekt `Incident` hat `Id` gleich `0`. Du rufst `db.Incidents.Add(incident)` und danach `db.SaveChanges()` auf. Welchen Wert hat `incident.Id` danach, wenn die Tabelle leer war?",
+      "options": [
+        { "text": "`1`: Die Datenbank hat den Schlüssel vergeben, EF Core hat ihn ins Objekt geschrieben.", "correct": true, "feedback": "Bei einem Schlüssel vom Typ `int` vergibt die Datenbank den Wert beim Einfügen. EF Core liest ihn zurück." },
+        { "text": "`0`: Die Eigenschaft ändert sich nie.", "feedback": "EF Core schreibt den von der Datenbank vergebenen Schlüssel in die Eigenschaft." },
+        { "text": "Schon nach `Add` ist die `Id` `1`.", "feedback": "`Add` merkt das Objekt nur vor. Erst `SaveChanges` schickt es an die Datenbank, die den Schlüssel vergibt." },
+        { "text": "`null`", "feedback": "`Id` ist ein `int` und kann nicht `null` sein." }
+      ],
+      "explanation": "`Add` merkt das Objekt nur vor. `SaveChanges` schickt den Einfüge-Befehl an die Datenbank. Die Datenbank vergibt den Primärschlüssel, und EF Core schreibt ihn in die Eigenschaft `Id` zurück."
+    },
+    {
+      "id": "m16-l01-q4",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "Was bewirkt `db.Database.EnsureCreated()`?",
+      "options": [
+        { "text": "Es legt die Datenbank mit den Tabellen für das Modell an, wenn sie noch nicht existiert.", "correct": true, "feedback": "Für den Start reicht das. Später ersetzen Migrationen diesen Weg." },
+        { "text": "Es speichert alle geänderten Objekte.", "feedback": "Das macht `SaveChanges`." },
+        { "text": "Es liest alle Zeilen aller Tabellen.", "feedback": "Lesen geschieht nur durch Abfragen." },
+        { "text": "Es löscht die Datenbank und legt sie neu an.", "feedback": "Existiert die Datenbank schon, lässt `EnsureCreated` sie unverändert." }
+      ],
+      "explanation": "`EnsureCreated` legt Datenbank und Tabellen an, falls es sie noch nicht gibt. Gespeichert wird erst mit `SaveChanges`."
+    },
+    {
+      "id": "m16-l01-q5",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "Du schreibst `List<Incident> severe = db.Incidents.Where(i => i.FailureCount >= 3).ToList();`. Wann kommen Zeilen aus der Datenbank in den Speicher?",
+      "options": [
+        { "text": "Beim Aufruf von `ToList()`. `Where` baut nur die Abfrage.", "correct": true, "feedback": "Wie bei LINQ im Speicher (`m11-l05`) führt erst das Auslesen die Abfrage aus." },
+        { "text": "Schon beim Aufruf von `db.Incidents`.", "misconception": "m16-l01-dbset-holds-all-rows", "feedback": "`db.Incidents` startet nur eine Abfrage. Es liest keine Zeile." },
+        { "text": "Beim Erzeugen des Contexts mit `new`.", "misconception": "m16-l01-dbset-holds-all-rows", "feedback": "Der Context öffnet höchstens eine Verbindung, wenn er sie braucht. Er lädt keine Tabelle." },
+        { "text": "Nie, `ToList()` kopiert nur die Liste im Speicher.", "feedback": "`ToList()` ist das Auslesen: Dabei läuft die Abfrage in der Datenbank." }
+      ],
+      "explanation": "`Where` auf dem `DbSet` beschreibt nur die Abfrage. `ToList()` führt sie aus: EF Core schickt einen SQL-Befehl an die Datenbank und baut aus den Zeilen Objekte."
+    },
+    {
+      "id": "m16-l01-q6",
+      "lesson": "m16-l01",
+      "type": "single",
+      "question": "SecLog hat die Klasse `Incident` mit einem statischen Zähler und get-only-Eigenschaften. Warum legt das Projekt dafür die eigene Klasse `StoredIncident` an?",
+      "options": [
+        { "text": "Die Klasse für die Datenbank hat einfache, setzbare Eigenschaften und einen `int Id`. Das Modell in `SecLog.Core` bleibt frei von EF Core.", "correct": true, "feedback": "Die Zuordnung übernimmt eine kleine Methode, die aus einem `Incident` ein `StoredIncident` macht." },
+        { "text": "EF Core kann nur Klassen speichern, deren Name mit `Stored` beginnt.", "feedback": "Der Name ist beliebig. Wichtig ist die Form der Klasse." },
+        { "text": "Eine Datenbank kann keine Klassen aus anderen Projekten speichern.", "feedback": "Das Projekt, in dem eine Klasse steht, spielt keine Rolle." },
+        { "text": "`StoredIncident` ist schneller als `Incident`.", "feedback": "Es geht nicht um Geschwindigkeit, sondern um die Trennung der Aufgaben." }
+      ],
+      "explanation": "Die Datenbank-Klasse beschreibt eine Zeile: setzbare Eigenschaften und ein Schlüssel. Das Fachmodell mit Zähler und Regeln bleibt unverändert, und `SecLog.Core` braucht keinen Verweis auf EF Core."
+    },
+    {
+      "id": "m16-l01-q7",
+      "lesson": "m16-l01",
+      "type": "multi",
+      "question": "Welche Aussagen über Primärschlüssel stimmen?",
+      "options": [
+        { "text": "Der Primärschlüssel unterscheidet jede Zeile einer Tabelle von allen anderen.", "correct": true, "feedback": "Darum kommt jeder Wert höchstens einmal vor." },
+        { "text": "Eine Tabelle hat höchstens einen Primärschlüssel.", "correct": true, "feedback": "Er kann aber aus mehr als einer Spalte bestehen (`m16-l02`)." },
+        { "text": "Eine Zeile mit dem Wert `5` im Schlüssel kann eindeutig angesprochen werden.", "correct": true, "feedback": "Dafür ist der Schlüssel da: Zeilen eindeutig finden." },
+        { "text": "Zwei Zeilen dürfen denselben Primärschlüssel haben, wenn sie sonst verschieden sind.", "feedback": "Die Datenbank lehnt das ab." }
+      ],
+      "explanation": "Ein Primärschlüssel identifiziert eine Zeile eindeutig. Die Datenbank erlaubt keine zwei Zeilen mit demselben Schlüssel."
+    },
+    {
+      "id": "m16-l01-q8",
+      "lesson": "m16-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, welche Aufgabe ein `DbContext` hat und wie ein Objekt in die Datenbank und wieder zurück in dein Programm kommt.",
+      "modelAnswer": "Der `DbContext` ist die Sitzung mit der Datenbank. Er kennt das Modell (die Entity-Klassen und ihre `DbSet`-Eigenschaften) und die Verbindung (Provider und Connection String).\n\nZum Speichern erzeugst du ein Objekt, übergibst es mit `Add` an das `DbSet` und rufst `SaveChanges` auf. EF Core übersetzt das in einen SQL-Befehl, die Datenbank legt die Zeile an und vergibt den Schlüssel. Zum Lesen schreibst du eine LINQ-Abfrage auf dem `DbSet`. Beim Auslesen schickt EF Core SQL an die Datenbank und baut aus den Zeilen wieder Objekte."
+    },
+    {
+      "id": "m16-l01-q9",
+      "lesson": "m16-l01",
+      "type": "explain",
+      "question": "Wo in einem eigenen Programm würdest du eine Datenbank statt einer Liste im Speicher einsetzen? Nenne ein Beispiel und einen Grund.",
+      "modelAnswer": "Ein Beispiel ist eine Liste von Vorfällen, die ein Neustart des Programms überstehen soll. Eine Liste im Speicher ist beim Beenden weg, die Datenbank bleibt bestehen.\n\nWeitere Gründe: Mehrere Programme oder Nutzer greifen auf dieselben Daten zu, oder die Datenmenge ist zu groß, um sie ganz in den Speicher zu laden."
+    },
+    {
+      "id": "m16-l02-q1",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Die Klasse `Incident` hat die Eigenschaften `Number`, `Id` und `User`. Keine Konfiguration ist vorhanden. Welche Eigenschaft nimmt EF Core als Primärschlüssel?",
+      "options": [
+        { "text": "`Id`", "correct": true, "feedback": "Die Konvention: Eine Eigenschaft `Id` oder `<Typname>Id` ist der Schlüssel." },
+        { "text": "`Number`, weil sie als erste steht", "feedback": "Die Reihenfolge der Eigenschaften spielt keine Rolle." },
+        { "text": "`User`, weil sie ein Text ist", "feedback": "Der Typ entscheidet nicht. Der Name entscheidet." },
+        { "text": "Keine: Ohne Konfiguration gibt es keinen Schlüssel.", "misconception": "m16-l02-key-needs-attribute", "feedback": "Die Konvention findet `Id` ohne `[Key]` und ohne Fluent API." }
+      ],
+      "explanation": "Nach der Konvention ist eine Eigenschaft mit dem Namen `Id` oder `<Typname>Id` (hier `IncidentId`) der Primärschlüssel. `Number` ist dann eine gewöhnliche Spalte."
+    },
+    {
+      "id": "m16-l02-q2",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Die Entity hat `public required string User { get; set; }` und `public string? Note { get; set; }`. Wie sehen die Spalten nach den Konventionen aus?",
+      "options": [
+        { "text": "`User` ist `NOT NULL`, `Note` erlaubt `NULL`.", "correct": true, "feedback": "Bei aktivierten Nullable Reference Types entscheidet der Typ: `string` ist Pflicht, `string?` ist optional." },
+        { "text": "Beide Spalten erlauben `NULL`.", "feedback": "Bei `string` ohne Fragezeichen erzeugt EF Core eine Pflichtspalte." },
+        { "text": "Beide Spalten sind `NOT NULL`.", "feedback": "`string?` ist optional, die Spalte erlaubt `NULL`." },
+        { "text": "Das hängt von der Datenbank ab und lässt sich nicht vorhersagen.", "feedback": "Die Regel steht im Code: der Nullable-Typ der Eigenschaft." }
+      ],
+      "explanation": "EF Core liest die Nullable-Annotation der Eigenschaft. Ein Verweistyp ohne `?` wird zur Pflichtspalte (`NOT NULL`), mit `?` erlaubt die Spalte `NULL`."
+    },
+    {
+      "id": "m16-l02-q3",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Eine Eigenschaft trägt `[MaxLength(20)]`. In `OnModelCreating` steht für dieselbe Eigenschaft `HasMaxLength(64)`. Welche Länge gilt?",
+      "options": [
+        { "text": "`64`, die Fluent API hat Vorrang vor der Data Annotation.", "correct": true, "feedback": "Die Reihenfolge: Fluent API vor Data Annotations vor Konventionen." },
+        { "text": "`20`, die Data Annotation steht näher an der Eigenschaft.", "misconception": "m16-l02-annotation-beats-fluent-api", "feedback": "Die Position im Code zählt nicht. Die Fluent API gewinnt." },
+        { "text": "Der kleinere Wert, also `20`.", "misconception": "m16-l02-annotation-beats-fluent-api", "feedback": "EF Core vergleicht die Werte nicht. Die Quelle der Konfiguration entscheidet." },
+        { "text": "EF Core meldet beim Start einen Fehler.", "feedback": "Ein Widerspruch ist kein Fehler: die Fluent API überschreibt." }
+      ],
+      "explanation": "Die Konfiguration mit der Fluent API überschreibt Data Annotations, und diese überschreiben die Konventionen. Hier gilt `64`."
+    },
+    {
+      "id": "m16-l02-q4",
+      "lesson": "m16-l02",
+      "type": "multi",
+      "question": "Welche Wege gibt es, das Modell von EF Core zu beeinflussen?",
+      "options": [
+        { "text": "Konventionen: EF Core leitet Schlüssel, Namen und Pflichtangaben aus den Klassen ab.", "correct": true, "feedback": "Das ist der Standard, wenn nichts konfiguriert ist." },
+        { "text": "Data Annotations: Attribute wie `[Required]` an Klasse und Eigenschaft.", "correct": true, "feedback": "Attribute kennst du aus `m14-l06`." },
+        { "text": "Fluent API: Aufrufe in `OnModelCreating`.", "correct": true, "feedback": "Sie kann alles, was die Annotations können, und mehr." },
+        { "text": "Kommentare über der Eigenschaft.", "feedback": "Kommentare lesen weder der Compiler noch EF Core." }
+      ],
+      "explanation": "Es gibt drei Wege: Konventionen, Data Annotations und die Fluent API. Kommentare haben keine Wirkung."
+    },
+    {
+      "id": "m16-l02-q5",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Die Klasse `Incident` hat die Eigenschaft `int Id` und kein `[Key]`. Was stimmt?",
+      "options": [
+        { "text": "Ohne `[Key]` hat die Entität keinen Primärschlüssel.", "misconception": "m16-l02-key-needs-attribute", "feedback": "`Id` ist nach der Konvention ein Schlüssel. Das Attribut ist nur nötig, wenn der Name abweicht." },
+        { "text": "`Id` ist der Primärschlüssel, und weil sie ein `int` ist, vergibt die Datenbank die Werte.", "correct": true, "feedback": "Beides folgt aus den Konventionen." },
+        { "text": "EF Core wirft eine Ausnahme, weil der Schlüssel nicht konfiguriert ist.", "misconception": "m16-l02-key-needs-attribute", "feedback": "Eine Ausnahme gibt es nur, wenn EF Core keinen Schlüssel finden kann." },
+        { "text": "Die Tabelle bekommt eine zusätzliche Spalte `Key`.", "feedback": "EF Core ergänzt keine zusätzliche Schlüsselspalte." }
+      ],
+      "explanation": "Nach der Konvention ist `Id` der Primärschlüssel. Ein Schlüssel vom Typ `int` bekommt seine Werte von der Datenbank. `[Key]` oder `HasKey` brauchst du nur, wenn die Eigenschaft anders heißt oder der Schlüssel aus mehreren Eigenschaften besteht."
+    },
+    {
+      "id": "m16-l02-q6",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Eine Zuordnung wird durch das Paar `IncidentId` und `AnalystId` bestimmt. Wie konfigurierst du das?",
+      "options": [
+        { "text": "`modelBuilder.Entity<Assignment>().HasKey(a => new { a.IncidentId, a.AnalystId });` in `OnModelCreating`", "correct": true, "feedback": "Ein zusammengesetzter Schlüssel lässt sich mit der Fluent API festlegen." },
+        { "text": "`[Key]` an beide Eigenschaften, ohne weitere Konfiguration", "feedback": "Bei einem zusammengesetzten Schlüssel reicht das Attribut nicht. Er wird in `OnModelCreating` mit `HasKey` festgelegt." },
+        { "text": "Gar nicht: Ein Schlüssel besteht immer aus einer Spalte.", "feedback": "Ein Primärschlüssel kann aus mehreren Spalten bestehen." },
+        { "text": "Mit `HasIndex(a => a.IncidentId)`", "feedback": "Ein Index beschleunigt die Suche, er legt keinen Schlüssel fest." }
+      ],
+      "explanation": "Ein zusammengesetzter Schlüssel (Composite Key) besteht aus mehreren Eigenschaften. Du legst ihn in `OnModelCreating` mit `HasKey` fest, indem du ein anonymes Objekt mit den Eigenschaften übergibst."
+    },
+    {
+      "id": "m16-l02-q7",
+      "lesson": "m16-l02",
+      "type": "single",
+      "question": "Wozu legst du mit `HasIndex(i => i.User)` einen Index an?",
+      "options": [
+        { "text": "Die Datenbank findet Zeilen nach `User` schneller, ohne jede Zeile zu prüfen.", "correct": true, "feedback": "Ein Index ist eine zusätzliche Struktur für das schnelle Suchen." },
+        { "text": "`User` wird dadurch zum Primärschlüssel.", "feedback": "Ein Index ändert den Schlüssel nicht." },
+        { "text": "`User` darf danach nicht mehr `NULL` sein.", "feedback": "Pflichtangaben legst du mit `IsRequired` oder dem Typ fest." },
+        { "text": "Die Zeilen werden ihrem Namen nach sortiert ausgegeben.", "feedback": "Die Reihenfolge einer Ausgabe bestimmt nur `OrderBy`." }
+      ],
+      "explanation": "Ein Index beschleunigt die Suche nach einer Spalte. Er ändert weder den Schlüssel noch die Pflichtangabe."
+    },
+    {
+      "id": "m16-l02-q8",
+      "lesson": "m16-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie EF Core aus einer Klasse eine Tabelle macht und was passiert, wenn Data Annotation und Fluent API dasselbe festlegen.",
+      "modelAnswer": "EF Core baut ein Modell aus der Klasse. Zuerst gelten die Konventionen: Der Tabellenname kommt vom `DbSet`, `Id` ist der Schlüssel, und Nullable-Typen entscheiden über Pflicht und optional. Data Annotations und die Fluent API überschreiben das.\n\nLegen Data Annotation und Fluent API dasselbe fest, gewinnt die Fluent API. Die Reihenfolge ist: Fluent API vor Data Annotations vor Konventionen."
+    },
+    {
+      "id": "m16-l02-q9",
+      "lesson": "m16-l02",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du einen Index anlegen? Nenne eine Spalte und begründe es.",
+      "modelAnswer": "Ein Index passt zu einer Spalte, nach der oft gesucht wird, zum Beispiel der Benutzername in einer Tabelle von Vorfällen. Ohne Index muss die Datenbank jede Zeile prüfen, mit Index findet sie die Zeilen schneller. Für Spalten, nach denen nie gesucht wird, lohnt sich ein Index nicht."
+    }
+  ]
 }

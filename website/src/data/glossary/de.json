@@ -10580,6 +10580,219 @@
         "title": ".NET Generic Host: Host shutdown",
         "url": "https://learn.microsoft.com/dotnet/core/extensions/generic-host#host-shutdown"
       }
+    },
+    {
+      "id": "relational-database",
+      "term": "Relational Database",
+      "german": "relationale Datenbank",
+      "category": "platform",
+      "definition": "Eine Datenbank, die Daten in Tabellen mit Zeilen und Spalten speichert. Du fragst sie mit SQL ab.",
+      "aliases": ["relationale Datenbank"],
+      "related": ["database-table", "primary-key", "sql"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Overview of Entity Framework Core",
+        "url": "https://learn.microsoft.com/ef/core/"
+      }
+    },
+    {
+      "id": "database-table",
+      "term": "Database Table",
+      "german": "Datenbanktabelle",
+      "category": "platform",
+      "definition": "Eine Tabelle besteht aus Spalten (Name und Typ eines Merkmals) und Zeilen (ein einzelner Eintrag mit einem Wert je Spalte).",
+      "related": ["relational-database", "primary-key"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Creating and configuring a model",
+        "url": "https://learn.microsoft.com/ef/core/modeling/"
+      }
+    },
+    {
+      "id": "primary-key",
+      "term": "Primary Key",
+      "german": "Primärschlüssel",
+      "category": "platform",
+      "definition": "Eine Spalte (oder mehrere), deren Wert jede Zeile einer Tabelle eindeutig kennzeichnet.",
+      "aliases": ["Primärschlüssel"],
+      "related": ["database-table", "composite-key"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Keys",
+        "url": "https://learn.microsoft.com/ef/core/modeling/keys"
+      }
+    },
+    {
+      "id": "sql",
+      "term": "SQL",
+      "category": "platform",
+      "definition": "Die Sprache, in der du eine relationale Datenbank abfragst und änderst, zum Beispiel mit `SELECT` und `INSERT`. EF Core erzeugt SQL aus deinen LINQ-Abfragen.",
+      "related": ["relational-database", "orm"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Overview of Entity Framework Core",
+        "url": "https://learn.microsoft.com/ef/core/"
+      }
+    },
+    {
+      "id": "orm",
+      "term": "O/RM",
+      "german": "objektrelationaler Mapper",
+      "category": "platform",
+      "definition": "Eine Bibliothek, die Objekte einer Programmiersprache auf Tabellen einer relationalen Datenbank abbildet. EF Core ist ein O/RM für .NET.",
+      "aliases": ["ORM", "Object-Relational Mapper"],
+      "related": ["ef-core", "sql"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Overview of Entity Framework Core",
+        "url": "https://learn.microsoft.com/ef/core/"
+      }
+    },
+    {
+      "id": "database-provider",
+      "term": "Database Provider",
+      "german": "Datenbankanbieter",
+      "category": "platform",
+      "definition": "Ein NuGet-Paket, das EF Core für eine bestimmte Datenbank anpasst, zum Beispiel `Microsoft.EntityFrameworkCore.Sqlite` für SQLite.",
+      "related": ["ef-core", "dbcontext"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Database Providers",
+        "url": "https://learn.microsoft.com/ef/core/providers/"
+      }
+    },
+    {
+      "id": "dbcontext",
+      "term": "DbContext",
+      "category": "platform",
+      "definition": "Die Klasse von EF Core für eine Sitzung mit der Datenbank. Du leitest eine eigene Klasse davon ab, sie hat je Tabelle eine `DbSet<T>`-Eigenschaft.",
+      "related": ["dbset", "entity-type"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "DbContext Lifetime, Configuration, and Initialization",
+        "url": "https://learn.microsoft.com/ef/core/dbcontext-configuration/"
+      }
+    },
+    {
+      "id": "dbset",
+      "term": "DbSet<T>",
+      "category": "platform",
+      "definition": "Die Eigenschaft eines `DbContext`, die für eine Tabelle steht. Von ihr aus startest du Abfragen und fügst mit `Add` Objekte hinzu. Sie hält keine Zeilen im Speicher.",
+      "aliases": ["DbSet"],
+      "related": ["dbcontext", "entity-type"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Getting started with EF Core",
+        "url": "https://learn.microsoft.com/ef/core/get-started/overview/first-app"
+      }
+    },
+    {
+      "id": "entity-type",
+      "term": "Entity Type",
+      "german": "Entitätstyp",
+      "category": "platform",
+      "definition": "Eine Klasse, die EF Core auf eine Tabelle abbildet. Ein Objekt der Klasse entspricht einer Zeile.",
+      "aliases": ["Entity-Klasse"],
+      "related": ["dbset", "primary-key"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Entity types",
+        "url": "https://learn.microsoft.com/ef/core/modeling/entity-types"
+      }
+    },
+    {
+      "id": "connection-string",
+      "term": "Connection String",
+      "german": "Verbindungszeichenfolge",
+      "category": "platform",
+      "definition": "Ein Text mit den Angaben, wie sich ein Programm mit einer Datenbank verbindet. Bei SQLite ist es der Dateiname: `Data Source=seclog.db`.",
+      "related": ["database-provider", "dbcontext"],
+      "lesson": "m16-l01",
+      "source": {
+        "title": "Connection Strings",
+        "url": "https://learn.microsoft.com/ef/core/miscellaneous/connection-strings"
+      }
+    },
+    {
+      "id": "ef-core-model",
+      "term": "EF Core Model",
+      "german": "Modell (EF Core)",
+      "category": "platform",
+      "definition": "Das Bild, das EF Core von den Entity-Klassen und ihrer Abbildung auf Tabellen, Spalten und Schlüssel hat. Es entsteht beim ersten Gebrauch des Contexts.",
+      "aliases": ["EF Core Modell"],
+      "related": ["ef-core-convention", "data-annotation", "fluent-api"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Creating and configuring a model",
+        "url": "https://learn.microsoft.com/ef/core/modeling/"
+      }
+    },
+    {
+      "id": "ef-core-convention",
+      "term": "Convention",
+      "german": "Konvention (EF Core)",
+      "category": "platform",
+      "definition": "Eine Regel, nach der EF Core das Modell ohne Konfiguration ableitet, zum Beispiel: Die Eigenschaft `Id` ist der Primärschlüssel.",
+      "aliases": ["Konventionen"],
+      "related": ["ef-core-model", "data-annotation", "fluent-api"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Creating and configuring a model",
+        "url": "https://learn.microsoft.com/ef/core/modeling/"
+      }
+    },
+    {
+      "id": "data-annotation",
+      "term": "Data Annotation",
+      "german": "Datenanmerkung",
+      "category": "platform",
+      "definition": "Ein Attribut an einer Entity-Klasse oder Eigenschaft, das das Modell festlegt, zum Beispiel `[Required]` oder `[MaxLength(64)]`.",
+      "aliases": ["Data Annotations"],
+      "related": ["attribute", "fluent-api", "ef-core-convention"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Creating and configuring a model",
+        "url": "https://learn.microsoft.com/ef/core/modeling/#use-data-annotations-to-configure-a-model"
+      }
+    },
+    {
+      "id": "fluent-api",
+      "term": "Fluent API",
+      "category": "platform",
+      "definition": "Die Konfiguration des Modells mit Methodenaufrufen in `OnModelCreating`. Sie gewinnt gegen Data Annotations und Konventionen.",
+      "related": ["data-annotation", "ef-core-convention", "ef-core-model"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Creating and configuring a model",
+        "url": "https://learn.microsoft.com/ef/core/modeling/#use-the-fluent-api-to-configure-a-model"
+      }
+    },
+    {
+      "id": "composite-key",
+      "term": "Composite Key",
+      "german": "zusammengesetzter Schlüssel",
+      "category": "platform",
+      "definition": "Ein Primärschlüssel aus mehr als einer Eigenschaft. Du legst ihn mit `HasKey(x => new { x.A, x.B })` fest.",
+      "aliases": ["zusammengesetzter Schlüssel"],
+      "related": ["primary-key"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Keys",
+        "url": "https://learn.microsoft.com/ef/core/modeling/keys#configuring-a-primary-key"
+      }
+    },
+    {
+      "id": "database-index",
+      "term": "Database Index",
+      "german": "Datenbankindex",
+      "category": "platform",
+      "definition": "Eine zusätzliche Struktur der Datenbank, mit der sie Zeilen nach einer Spalte schnell findet. Du legst ihn mit `HasIndex` fest.",
+      "related": ["primary-key", "fluent-api"],
+      "lesson": "m16-l02",
+      "source": {
+        "title": "Indexes",
+        "url": "https://learn.microsoft.com/ef/core/modeling/indexes"
+      }
     }
   ]
 }

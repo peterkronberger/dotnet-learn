@@ -1,0 +1,20 @@
+CREATE TABLE "Assignments" (
+    "IncidentId" INTEGER NOT NULL,
+    "AnalystId" INTEGER NOT NULL,
+    CONSTRAINT "PK_Assignments" PRIMARY KEY ("IncidentId", "AnalystId")
+);
+
+
+CREATE TABLE "Incidents" (
+    "Number" INTEGER NOT NULL CONSTRAINT "PK_Incidents" PRIMARY KEY AUTOINCREMENT,
+    "User" TEXT NOT NULL,
+    "Source" TEXT NOT NULL
+);
+
+
+CREATE INDEX "IX_Incidents_User" ON "Incidents" ("User");
+
+
+
+User: 64
+Source: 20

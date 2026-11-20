@@ -1,0 +1,6 @@
+CREATE TABLE "Incidents" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Incidents" PRIMARY KEY AUTOINCREMENT,
+    "User" TEXT NOT NULL,
+    "Note" TEXT NULL,
+    "FailureCount" INTEGER NOT NULL
+);
