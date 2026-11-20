@@ -210,6 +210,190 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du einen Index anlegen? Nenne eine Spalte und begründe es.",
       "modelAnswer": "Ein Index passt zu einer Spalte, nach der oft gesucht wird, zum Beispiel der Benutzername in einer Tabelle von Vorfällen. Ohne Index muss die Datenbank jede Zeile prüfen, mit Index findet sie die Zeilen schneller. Für Spalten, nach denen nie gesucht wird, lohnt sich ein Index nicht."
+    },
+    {
+      "id": "m16-l03-q1",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "Die Klasse `Event` hat die Eigenschaften `Id`, `IncidentId` und `Incident`. `Incident` hat `Id` und `List<Event> Events`. Welche Eigenschaft wird in der Tabelle `Events` zum Fremdschlüssel?",
+      "options": [
+        { "text": "`IncidentId`", "correct": true, "feedback": "Die Konvention: Der Name der Navigation plus `Id` wird zur Fremdschlüssel-Spalte. Sie zeigt auf den Primärschlüssel der Tabelle `Incidents`." },
+        { "text": "`Id` der Klasse `Event`", "feedback": "Das ist der Primärschlüssel der Tabelle `Events`. Er zeigt auf keine andere Tabelle." },
+        { "text": "`Events` der Klasse `Incident`", "feedback": "Das ist eine Navigationseigenschaft. Sie ist keine Spalte der Tabelle." },
+        { "text": "`Incident` der Klasse `Event`", "feedback": "Das ist eine Navigationseigenschaft im Objekt. Die Spalte in der Tabelle heißt `IncidentId`." }
+      ],
+      "explanation": "Ein Fremdschlüssel ist eine Spalte, die auf den Primärschlüssel einer anderen Tabelle zeigt. Navigationseigenschaften gibt es nur im Objektmodell, die Datenbank kennt nur die Spalte `IncidentId`."
+    },
+    {
+      "id": "m16-l03-q2",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "In einer 1:n-Beziehung zwischen `Incident` und `Event`: Welche Klasse ist die abhängige Seite (Dependent), also die mit dem Fremdschlüssel?",
+      "options": [
+        { "text": "`Event`: Jedes Event gehört zu einem Vorfall und trägt dessen Schlüssel.", "correct": true, "feedback": "Die Seite „n“ trägt den Fremdschlüssel." },
+        { "text": "`Incident`: Der Vorfall trägt die Schlüssel all seiner Events.", "feedback": "Eine Spalte kann nur einen Wert pro Zeile halten. Die Liste der Events steht darum nicht im Vorfall, sondern jedes Event verweist auf seinen Vorfall." },
+        { "text": "Beide Klassen tragen einen Fremdschlüssel.", "feedback": "Bei 1:n trägt nur die Seite „n“ den Fremdschlüssel." },
+        { "text": "Keine, die Navigationseigenschaften reichen aus.", "feedback": "Navigationen sind nur das Abbild im Objektmodell. Die Datenbank braucht die Fremdschlüssel-Spalte." }
+      ],
+      "explanation": "Die Prinzipal-Seite (Principal) ist die Tabelle, auf deren Schlüssel verwiesen wird: `Incidents`. Die abhängige Seite (Dependent) hat die Fremdschlüssel-Spalte: `Events`."
+    },
+    {
+      "id": "m16-l03-q3",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "Die Klasse `Event` hat `public int? IncidentId { get; set; }` und `public Incident? Incident { get; set; }`. Was bedeutet das für die Beziehung?",
+      "options": [
+        { "text": "Sie ist optional: Ein Event darf ohne Vorfall existieren, die Spalte erlaubt `NULL`.", "correct": true, "feedback": "Ein Fremdschlüssel vom Typ `int?` erlaubt `NULL`. Das ergibt eine optionale Beziehung." },
+        { "text": "Sie ist Pflicht, denn die Navigation existiert.", "feedback": "Die Navigation allein entscheidet nicht. Der Typ des Fremdschlüssels entscheidet: `int` ist Pflicht, `int?` ist optional." },
+        { "text": "Die Beziehung ist n:m.", "feedback": "n:m braucht auf beiden Seiten eine Collection-Navigation." },
+        { "text": "EF Core kann die Beziehung nicht anlegen.", "feedback": "Das geht. Die Spalte ist dann nullable." }
+      ],
+      "explanation": "Pflicht oder optional folgt aus dem Fremdschlüssel: Ein Wert, der nicht fehlen darf (`int`), macht die Beziehung zur Pflicht. Ein nullable Wert (`int?`) macht sie optional."
+    },
+    {
+      "id": "m16-l03-q4",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "`Incident` hat `List<Analyst> Analysts`, `Analyst` hat `List<Incident> Incidents`. Es gibt keine weitere Klasse. Wie viele Tabellen legt EF Core an?",
+      "options": [
+        { "text": "Drei: `Incidents`, `Analysts` und eine Verbindungstabelle mit zwei Fremdschlüsseln", "correct": true, "feedback": "Die Verbindungstabelle (Join Table) enthält eine Zeile je Zuordnung. Ihr Primärschlüssel besteht aus beiden Fremdschlüsseln." },
+        { "text": "Zwei: Die Listen werden als Spalte in der Tabelle gespeichert.", "feedback": "Eine Spalte hält nur einen einfachen Wert, keine Liste von Zeilen." },
+        { "text": "Eine: EF Core führt beide Klassen in einer Tabelle zusammen.", "feedback": "Jede Entity-Klasse bekommt ihre eigene Tabelle." },
+        { "text": "Keine: Ohne Verbindungsklasse legt EF Core nichts an.", "misconception": "m16-l03-many-to-many-needs-join-class", "feedback": "EF Core legt die Verbindungstabelle selbst an. Du brauchst keine Klasse dafür." }
+      ],
+      "explanation": "Zwei Collection-Navigationen, die aufeinander zeigen, bilden eine n:m-Beziehung. EF Core ergänzt eine Verbindungstabelle, die nur aus den beiden Fremdschlüsseln besteht."
+    },
+    {
+      "id": "m16-l03-q5",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "Du willst Vorfälle und Analysten n:m verbinden. Was musst du tun, damit EF Core die Beziehung kennt?",
+      "options": [
+        { "text": "Auf beiden Seiten eine Collection-Navigation anlegen. Die Verbindungstabelle erzeugt EF Core selbst.", "correct": true, "feedback": "Die Verbindungstabelle ist dann ein Teil des Modells, ohne dass eine Klasse dafür existiert." },
+        { "text": "Immer eine eigene Verbindungsklasse mit zwei Fremdschlüsseln schreiben.", "misconception": "m16-l03-many-to-many-needs-join-class", "feedback": "Das ist nur nötig, wenn die Zuordnung eigene Daten trägt, zum Beispiel einen Zeitpunkt. Sonst nicht." },
+        { "text": "Die Fremdschlüssel von Hand in eine Liste von `int` schreiben.", "feedback": "Eine Liste von `int` ist keine Beziehung. EF Core braucht Navigationen." },
+        { "text": "Beide Klassen erben von einer gemeinsamen Basisklasse.", "feedback": "Vererbung bildet keine Beziehung zwischen Tabellen." }
+      ],
+      "explanation": "Ohne eigene Daten an der Zuordnung genügen zwei Collection-Navigationen. Eine eigene Verbindungsklasse brauchst du nur, wenn die Zuordnung selbst Eigenschaften hat."
+    },
+    {
+      "id": "m16-l03-q6",
+      "lesson": "m16-l03",
+      "type": "single",
+      "question": "Im SQL steht `FOREIGN KEY (\"IncidentId\") REFERENCES \"Incidents\" (\"Id\")`. Was bedeutet das?",
+      "options": [
+        { "text": "Jeder Wert in `IncidentId` muss als `Id` in der Tabelle `Incidents` vorkommen.", "correct": true, "feedback": "Die Datenbank lehnt eine Zeile ab, deren Fremdschlüssel auf keine Zeile der anderen Tabelle zeigt." },
+        { "text": "Die Tabelle `Incidents` kopiert alle Zeilen von `Events`.", "feedback": "Nichts wird kopiert. Es ist eine Regel für die Werte." },
+        { "text": "Die Spalte `IncidentId` ist der Primärschlüssel.", "feedback": "Der Primärschlüssel steht hinter `PRIMARY KEY`." },
+        { "text": "Die Spalte `Id` wird gelöscht.", "feedback": "`REFERENCES` löscht nichts. Es nennt die Spalte, auf die der Fremdschlüssel zeigt." }
+      ],
+      "explanation": "`FOREIGN KEY` nennt die Spalte, `REFERENCES` die Spalte der anderen Tabelle, auf die sie zeigt. Die Datenbank prüft die Regel bei jedem Einfügen."
+    },
+    {
+      "id": "m16-l03-q7",
+      "lesson": "m16-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie EF Core eine 1:n-Beziehung und eine n:m-Beziehung in Tabellen abbildet.",
+      "modelAnswer": "Bei 1:n hat die Klasse auf der Seite „n“ eine Eigenschaft für den Fremdschlüssel und eine Navigation zum Vorfall. Die Klasse auf der Seite „1“ hat eine Collection-Navigation. In der Datenbank gibt es nur die Fremdschlüssel-Spalte in der Tabelle der Seite „n“.\n\nBei n:m haben beide Klassen eine Collection-Navigation. EF Core legt eine Verbindungstabelle mit zwei Fremdschlüsseln an, ohne dass du eine Klasse dafür schreibst."
+    },
+    {
+      "id": "m16-l03-q8",
+      "lesson": "m16-l03",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du eine 1:n-Beziehung und wo eine n:m-Beziehung einsetzen? Nenne je ein Beispiel.",
+      "modelAnswer": "1:n passt, wenn ein Eintrag zu genau einem anderen gehört, zum Beispiel ein Kommentar zu einem Beitrag. n:m passt, wenn beide Seiten mehrere haben können, zum Beispiel Beiträge und Schlagwörter: Ein Beitrag hat mehrere Schlagwörter, ein Schlagwort gehört zu mehreren Beiträgen."
+    },
+    {
+      "id": "m16-l04-q1",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Eine Abfrage lautet `db.Incidents.Where(i => i.FailureCount >= 5).OrderByDescending(i => i.FailureCount).Select(i => i.User)`. Welche Teile landen im SQL?",
+      "options": [
+        { "text": "Alle drei: `WHERE`, `ORDER BY` und die Auswahl der Spalte `User` im `SELECT`", "correct": true, "feedback": "EF Core übersetzt die ganze Abfrage in eine einzige SQL-Anweisung." },
+        { "text": "Nur das `Where`; sortiert und ausgewählt wird danach in C#.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "EF Core übersetzt alle drei Operatoren. Es bleibt kein Teil für C# übrig." },
+        { "text": "Keiner: EF Core lädt alle Zeilen und führt die Lambdas in C# aus.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Die Lambdas werden nicht ausgeführt, sondern übersetzt." },
+        { "text": "Nur `OrderByDescending`; Filter und Auswahl macht C#.", "feedback": "Auch `Where` und `Select` werden übersetzt." }
+      ],
+      "explanation": "Eine Abfrage auf einem `DbSet` ist ein Bauplan. EF Core übersetzt `Where` in `WHERE`, `OrderByDescending` in `ORDER BY ... DESC` und `Select` in die Spaltenliste von `SELECT`."
+    },
+    {
+      "id": "m16-l04-q2",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Wann schickt EF Core bei `var query = db.Incidents.Where(i => i.FailureCount >= 5);` den SQL-Befehl an die Datenbank?",
+      "options": [
+        { "text": "Erst wenn die Abfrage ausgelesen wird, zum Beispiel mit `foreach`, `ToList()` oder `First()`.", "correct": true, "feedback": "Das ist die verzögerte Ausführung aus dem LINQ-Modul. Sie gilt auch für EF Core." },
+        { "text": "Sofort in der Zeile mit `Where`.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "`Where` baut nur die Abfrage. Es sendet nichts." },
+        { "text": "Beim Erzeugen des `DbContext`.", "feedback": "Der Context liest beim Erzeugen noch keine Zeilen." },
+        { "text": "Bei `ToQueryString()`.", "feedback": "`ToQueryString()` erzeugt nur den Text des SQL und führt ihn nicht aus." }
+      ],
+      "explanation": "Die Abfrage läuft beim Auslesen. Davor ist sie nur eine Beschreibung. Das gilt für `foreach`, `ToList`, `First`, `Count` und `Any`."
+    },
+    {
+      "id": "m16-l04-q3",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Ein Kollege sagt: „`db.Incidents.Where(i => i.User == \"bob\").ToList()` lädt zuerst die ganze Tabelle `Incidents` und filtert dann in C#.“ Was stimmt?",
+      "options": [
+        { "text": "Das stimmt nicht: Der Filter wird zu `WHERE \"i\".\"User\" = 'bob'` übersetzt, und die Datenbank liefert nur die passenden Zeilen.", "correct": true, "feedback": "Das Lambda wird als Baum übersetzt. Es wird nicht für jede Zeile in C# aufgerufen." },
+        { "text": "Das stimmt: Erst `ToList()` lässt die Datenbank filtern.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Der Filter steht schon im SQL, das `ToList()` auslöst." },
+        { "text": "Das stimmt, aber nur bei SQLite.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Die Übersetzung nach `WHERE` gilt für alle Datenbank-Provider." },
+        { "text": "Es wird nichts geladen, weil `Where` nichts tut.", "feedback": "`ToList()` löst die Abfrage aus. Es wird geladen, aber nur das Gefilterte." }
+      ],
+      "explanation": "EF Core filtert in der Datenbank. Nur die Zeilen, die zum `WHERE` passen, kommen ins Programm."
+    },
+    {
+      "id": "m16-l04-q4",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.Count(i => i.FailureCount >= 5)`. Wo wird gezählt?",
+      "options": [
+        { "text": "In der Datenbank: EF Core erzeugt `SELECT COUNT(*) ... WHERE ...` und liest nur eine Zahl.", "correct": true, "feedback": "Aggregate wie `Count`, `Any` oder `Max` laufen in der Datenbank." },
+        { "text": "In C#: Alle Zeilen werden geladen und dort gezählt.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Es wird nur das Ergebnis der Zählung übertragen." },
+        { "text": "Gar nicht: `Count` ist mit EF Core nicht erlaubt.", "feedback": "Es ist erlaubt und wird übersetzt." },
+        { "text": "Erst beim nächsten `SaveChanges()`.", "feedback": "`SaveChanges` schreibt Änderungen und hat mit Abfragen nichts zu tun." }
+      ],
+      "explanation": "Ein Aggregat wie `Count` löst die Abfrage sofort aus und läuft in der Datenbank. Übertragen wird nur das Ergebnis."
+    },
+    {
+      "id": "m16-l04-q5",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Du schreibst `from i in db.Incidents where i.FailureCount >= 5 select i.User`. Wie wird der Ausdruck verarbeitet?",
+      "options": [
+        { "text": "Der Compiler übersetzt ihn zuerst in Aufrufe von `Queryable.Where` und `Queryable.Select`. EF Core übersetzt diese danach in SQL.", "correct": true, "feedback": "Die Abfrage-Syntax ist nur eine andere Schreibweise für dieselben Methodenaufrufe." },
+        { "text": "EF Core versteht die Abfrage-Syntax direkt als SQL.", "feedback": "Die Übersetzung nach SQL beginnt erst bei den Methodenaufrufen." },
+        { "text": "Die Abfrage-Syntax läuft in C# und lädt alle Zeilen.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Es ist dieselbe Abfrage wie in der Methoden-Syntax und wird zu SQL." },
+        { "text": "Der Ausdruck erzeugt anderes SQL als die Methoden-Syntax.", "feedback": "Beide ergeben denselben SQL-Text." }
+      ],
+      "explanation": "Ein Abfrageausdruck wird in Methodenaufrufe übersetzt. Auf einem `IQueryable<T>` sind das die `Queryable`-Methoden. Danach übersetzt EF Core wie bei der Methoden-Syntax."
+    },
+    {
+      "id": "m16-l04-q6",
+      "lesson": "m16-l04",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.Select(i => new { i.User, i.FailureCount })`. Welche Spalten stehen im `SELECT`?",
+      "options": [
+        { "text": "Nur `User` und `FailureCount`", "correct": true, "feedback": "Die Projektion bestimmt die Spalten." },
+        { "text": "Alle Spalten der Tabelle, die Auswahl macht danach C#.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "EF Core übersetzt auch das `Select` und liest nur die benötigten Spalten." },
+        { "text": "Nur `Id`", "feedback": "`Id` wird nicht gebraucht und steht nicht im `SELECT`." },
+        { "text": "Keine: Ein `Select` mit einem anonymen Typ ist nicht übersetzbar.", "feedback": "Das ist übersetzbar." }
+      ],
+      "explanation": "Mit `Select` liest die Datenbank nur die Spalten, die das Ergebnis braucht."
+    },
+    {
+      "id": "m16-l04-q7",
+      "lesson": "m16-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was mit einer LINQ-Abfrage auf einem `DbSet` passiert, vom Schreiben bis zum Ergebnis.",
+      "modelAnswer": "Beim Schreiben wird die Abfrage nur beschrieben, es geht nichts an die Datenbank. Beim Auslesen (`foreach`, `ToList`, `First`, `Count`) übersetzt EF Core die ganze Abfrage in eine SQL-Anweisung: `Where` wird zu `WHERE`, `OrderBy` zu `ORDER BY`, `Select` zur Spaltenliste.\n\nDie Datenbank führt die Anweisung aus und liefert nur die passenden Zeilen. EF Core baut daraus die Objekte. Mit `ToQueryString()` siehst du das SQL, ohne die Abfrage auszuführen."
+    },
+    {
+      "id": "m16-l04-q8",
+      "lesson": "m16-l04",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du `ToQueryString()` einsetzen? Nenne ein Beispiel und einen Grund.",
+      "modelAnswer": "Wenn eine Abfrage langsam ist oder zu viele Zeilen liefert, zeigt `ToQueryString()` das SQL, das die Datenbank bekommt. So prüfst du, ob `WHERE` und die Spalten so ankommen, wie du es erwartest, ohne die Abfrage auszuführen."
     }
   ]
 }

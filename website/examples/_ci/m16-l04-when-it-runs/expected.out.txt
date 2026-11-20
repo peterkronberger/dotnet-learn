@@ -1,0 +1,17 @@
+Build the query
+Enumerate it
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 5
+Found bob
+Count
+SELECT COUNT(*)
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 5
+1
+Any
+SELECT EXISTS (
+    SELECT 1
+    FROM "Incidents" AS "i"
+    WHERE "i"."FailureCount" >= 9)
+False

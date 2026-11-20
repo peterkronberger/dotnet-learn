@@ -1,0 +1,26 @@
+CREATE TABLE "Analysts" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Analysts" PRIMARY KEY AUTOINCREMENT,
+    "Name" TEXT NOT NULL
+);
+
+
+CREATE TABLE "Incidents" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Incidents" PRIMARY KEY AUTOINCREMENT,
+    "User" TEXT NOT NULL
+);
+
+
+CREATE TABLE "AnalystIncident" (
+    "AnalystsId" INTEGER NOT NULL,
+    "IncidentsId" INTEGER NOT NULL,
+    CONSTRAINT "PK_AnalystIncident" PRIMARY KEY ("AnalystsId", "IncidentsId"),
+    CONSTRAINT "FK_AnalystIncident_Analysts_AnalystsId" FOREIGN KEY ("AnalystsId") REFERENCES "Analysts" ("Id") ON DELETE CASCADE,
+    CONSTRAINT "FK_AnalystIncident_Incidents_IncidentsId" FOREIGN KEY ("IncidentsId") REFERENCES "Incidents" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE INDEX "IX_AnalystIncident_IncidentsId" ON "AnalystIncident" ("IncidentsId");
+
+
+
+alice: 2

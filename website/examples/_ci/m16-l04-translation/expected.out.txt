@@ -1,0 +1,13 @@
+SELECT "i"."User", "i"."FailureCount"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 5
+ORDER BY "i"."FailureCount" DESC
+
+Same SQL: True
+
+.param set @p 1
+
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+ORDER BY "i"."Id"
+LIMIT @p

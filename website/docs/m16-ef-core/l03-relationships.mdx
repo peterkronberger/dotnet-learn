@@ -1,0 +1,183 @@
+---
+title: Beziehungen zwischen Entitäten
+sidebar_position: 3
+description: Wie du mit Navigationseigenschaften und Fremdschlüsseln 1:n- und n:m-Beziehungen modellierst und welche Tabellen EF Core dafür anlegt.
+lesson_id: m16-l03
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import oneToMany from '!!raw-loader!@site/examples/_ci/m16-l03-one-to-many/Program.cs';
+import oneToManyOutput from '!!raw-loader!@site/examples/_ci/m16-l03-one-to-many/expected.out.txt';
+import manyToMany from '!!raw-loader!@site/examples/_ci/m16-l03-many-to-many/Program.cs';
+import manyToManyOutput from '!!raw-loader!@site/examples/_ci/m16-l03-many-to-many/expected.out.txt';
+import gapFluent from '!!raw-loader!@site/examples/m16/l03/gap-fluent.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l03/seclog-program-block.snippet.cs';
+import storedEvent from '!!raw-loader!@site/examples/_ci/seclog-m16-l03/src/SecLog.Data/Entities/StoredEvent.cs';
+import storedIncident from '!!raw-loader!@site/examples/_ci/seclog-m16-l03/src/SecLog.Data/Entities/StoredIncident.cs';
+
+# Beziehungen zwischen Entitäten
+
+:::note[Lernziele]
+- Du modellierst eine 1:n-Beziehung mit Navigationseigenschaften und Fremdschlüssel.
+- Du modellierst eine n:m-Beziehung ohne eigene Verbindungsklasse und nennst die Tabellen, die entstehen.
+- Du erklärst, wann eine Beziehung Pflicht oder optional ist.
+:::
+
+## Rückblick
+
+<Quiz id="m16-l01-q2" />
+
+<Quiz id="m16-l02-q1" />
+
+<Quiz id="m05-l04-q1" />
+
+## Ein Fremdschlüssel verbindet zwei Tabellen
+
+Ein Vorfall besteht aus mehreren fehlgeschlagenen Anmeldungen. Mit einer Tabelle allein geht das nicht: Eine Spalte hält pro Zeile nur einen einfachen Wert, keine Liste. Die Datenbank löst das mit zwei Tabellen. Die Tabelle `Events` bekommt eine Spalte, die den Schlüssel des Vorfalls enthält. Eine solche Spalte heißt <Term id="foreign-key">Fremdschlüssel</Term>: Sie zeigt auf den Primärschlüssel einer anderen Tabelle ([Introduction to relationships](https://learn.microsoft.com/ef/core/modeling/relationships)).
+
+Die Tabelle, auf die gezeigt wird, ist die **Prinzipal-Seite** (principal): `Incidents`. Die Tabelle mit dem Fremdschlüssel ist die **abhängige Seite** (dependent): `Events`.
+
+In den Klassen bildest du das mit <Term id="navigation-property">Navigationseigenschaften</Term> ab:
+
+- Eine **Referenz-Navigation** zeigt auf ein Objekt: `Event.Incident`.
+- Eine **Collection-Navigation** zeigt auf eine Liste: `Incident.Events`.
+
+Heißt der Fremdschlüssel `<Navigation>Id`, hier `IncidentId`, erkennt EF Core die <Term id="one-to-many-relationship">1:n-Beziehung</Term> per Konvention, ohne weitere Konfiguration ([One-to-many relationships](https://learn.microsoft.com/ef/core/modeling/relationships/one-to-many)).
+
+Das folgende Programm druckt die Tabellen, speichert zwei Vorfälle mit ihren Events und zählt die Events je Vorfall. Die Zählung braucht keine zusätzliche Anweisung zum Laden: Die Datenbank zählt selbst.
+
+<Forward concepts={['die Übersetzung einer Abfrage in SQL']} lesson="m16-l04" />
+
+<CodeBlock language="csharp" title="Program.cs">{oneToMany}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Spalten hat die Tabelle `Events`? Welche Spalte ist der Fremdschlüssel, und worauf zeigt sie? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="sql" title="Ausgabe">{oneToManyOutput}</CodeBlock>
+
+1. **Spalte:** `IncidentId` ist `INTEGER NOT NULL` und die Spalte für den Fremdschlüssel.
+2. **Regel:** `FOREIGN KEY ("IncidentId") REFERENCES "Incidents" ("Id")` heißt: Jeder Wert in `IncidentId` muss als `Id` in `Incidents` vorkommen. `FOREIGN KEY` nennt die Spalte, `REFERENCES` die Spalte der anderen Tabelle.
+3. **Index:** EF Core legt für den Fremdschlüssel einen Index an, damit die Events eines Vorfalls schnell gefunden werden.
+4. **Pflicht:** `NOT NULL` macht die Beziehung zur Pflicht: Ein Event ohne Vorfall gibt es nicht.
+
+`ON DELETE CASCADE` heißt: Wird ein Vorfall gelöscht, löscht die Datenbank seine Events mit (Cascade Delete, [Cascade delete](https://learn.microsoft.com/ef/core/saving/cascade-delete)).
+
+**Was passiert, wenn …** du `IncidentId` als `int?` und `Incident` als `Incident?` schreibst? Dann ist die Spalte `NULL`-fähig und die Beziehung optional: Ein Event darf ohne Vorfall existieren.
+
+</details>
+
+<Quiz id="m16-l03-q1" />
+
+<Quiz id="m16-l03-q2" />
+
+<Quiz id="m16-l03-q6" />
+
+Pflicht oder optional folgt aus dem Typ des Fremdschlüssels: `int` ist Pflicht, `int?` ist optional.
+
+<Quiz id="m16-l03-q3" />
+
+## Die Fluent API für Beziehungen
+
+Passt die Konvention nicht, legst du die Beziehung in `OnModelCreating` fest. `HasOne` wählt die Referenz-Navigation, `WithMany` die Collection-Navigation der Gegenseite, `HasForeignKey` den Fremdschlüssel. Eine 1:1-Beziehung gibt es auch (`HasOne` mit `WithOne`). Sie kommt in diesem Kurs nicht weiter vor.
+
+## n:m ohne eigene Klasse
+
+Ein Vorfall wird von mehreren Analysten bearbeitet, und ein Analyst bearbeitet mehrere Vorfälle. Das ist eine <Term id="many-to-many-relationship">n:m-Beziehung</Term>. Eine einzelne Fremdschlüssel-Spalte reicht dafür nicht. In EF Core bekommen beide Klassen eine Collection-Navigation auf die andere. Eine <Term id="join-table">Verbindungstabelle</Term> mit je einer Zeile pro Zuordnung legt EF Core selbst an ([Many-to-many relationships](https://learn.microsoft.com/ef/core/modeling/relationships/many-to-many)).
+
+<CodeBlock language="csharp" title="Program.cs">{manyToMany}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Tabellen legt EF Core an, und welche Spalten hat die Tabelle, die in keiner der beiden Klassen vorkommt? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="sql" title="Ausgabe">{manyToManyOutput}</CodeBlock>
+
+1. **Tabellen:** `Analysts` und `Incidents` für die Klassen, dazu `AnalystIncident` für die Zuordnung.
+2. **Spalten:** `AnalystIncident` hat nur zwei Spalten, `AnalystsId` und `IncidentsId`. Beide sind Fremdschlüssel.
+3. **Schlüssel:** Der Primärschlüssel besteht aus beiden Spalten. Dieselbe Zuordnung kann es darum nur einmal geben.
+4. **Ergebnis:** Der Analyst `alice` ist mit zwei Vorfällen verbunden, `alice: 2`.
+
+Die Navigationen, die EF Core für die Verbindungstabelle benutzt, heißen Skip-Navigationen: Du gehst über die Tabelle hinweg, ohne sie zu sehen.
+
+**Was passiert, wenn …** die Zuordnung eigene Daten tragen soll, zum Beispiel den Zeitpunkt der Zuweisung? Dann schreibst du eine eigene Verbindungsklasse mit den beiden Fremdschlüsseln und dieser Eigenschaft.
+
+</details>
+
+<Quiz id="m16-l03-q4" />
+
+<Quiz id="m16-l03-q5" />
+
+## Gap-Beispiel: Den Fremdschlüssel festlegen
+
+Die Lücke `___` fehlt. Die Eigenschaft `IncidentId` soll der Fremdschlüssel sein. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-fluent.snippet.cs">{gapFluent}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `HasForeignKey`: `.HasForeignKey(e => e.IncidentId);`. `HasOne(e => e.Incident)` wählt die Referenz-Navigation, `WithMany(i => i.Events)` die Collection-Navigation, `HasForeignKey` den Fremdschlüssel.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l02/`) speichert die Vorfälle in einer SQLite-Datenbank mit konfiguriertem Schema. Die Fehlversuche selbst werden noch nicht gespeichert.
+
+**Neue Anforderung:** SecLog speichert zu jedem Vorfall auch die fehlgeschlagenen Anmeldungen, aus denen er besteht. Lege dafür die Klasse `StoredEvent` mit dem Fremdschlüssel `StoredIncidentId` an, ergänze die Collection-Navigation `Events` in `StoredIncident` und gib unter `== Database ==` die Zahl der gespeicherten Events je Vorfall aus. Die Klasse `Incident` im Kern von SecLog gibt dafür ihre Fehlversuche schreibgeschützt frei: `Failures` ist eine `IReadOnlyList<LogEvent>`, eine kleine Änderung ohne Auswirkung auf das übrige Programm.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={storedEvent} title="src/SecLog.Data/Entities/StoredEvent.cs" />
+
+<FoldedCode code={storedIncident} title="src/SecLog.Data/Entities/StoredIncident.cs" />
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Abhängige Seite:** `StoredEvent` hat `StoredIncidentId` als Fremdschlüssel und die Referenz-Navigation `StoredIncident`.
+2. **Prinzipal-Seite:** `StoredIncident.Events` ist die Collection-Navigation. Beide Namen folgen der Konvention, darum braucht das Modell keine weitere Konfiguration.
+3. **Speichern:** Die Methode `From` kopiert die Fehlversuche des Vorfalls in `StoredEvent`-Objekte. EF Core speichert sie mit dem Vorfall und setzt den Fremdschlüssel selbst.
+4. **Zählen:** `i.Events.Count` im `Select` übersetzt EF Core in eine Zählung in der Datenbank. Die Events müssen dafür nicht geladen werden.
+
+Das Programm druckt `Stored events of bob: 5` und `Stored events of dave: 1`.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l03/`) speichert die Vorfälle zusammen mit ihren Fehlversuchen und zählt sie je Vorfall in der Datenbank. Die n:m-Beziehung bleibt im isolierten Beispiel, SecLog braucht sie jetzt nicht.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l03-many-to-many-needs-join-class" />
+
+**„Für eine n:m-Beziehung muss ich immer eine eigene Verbindungsklasse schreiben.“** Zwei Collection-Navigationen genügen. EF Core legt die Verbindungstabelle selbst an. Eine eigene Klasse brauchst du nur, wenn die Zuordnung eigene Daten hat.
+:::
+
+## Zusammenfassung
+
+Ein Fremdschlüssel ist eine Spalte, die auf den Primärschlüssel einer anderen Tabelle zeigt. Bei einer 1:n-Beziehung trägt die Seite „n“ den Fremdschlüssel. In den Klassen stehen eine Referenz-Navigation dort und eine Collection-Navigation auf der Gegenseite. Ein nullable Fremdschlüssel macht die Beziehung optional. Bei n:m genügen zwei Collection-Navigationen, und EF Core legt eine Verbindungstabelle mit zwei Fremdschlüsseln an. `GenerateCreateScript()` zeigt das Ergebnis.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m16-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Introduction to relationships](https://learn.microsoft.com/ef/core/modeling/relationships)
+- Microsoft Learn: [One-to-many relationships](https://learn.microsoft.com/ef/core/modeling/relationships/one-to-many)
+- Microsoft Learn: [Many-to-many relationships](https://learn.microsoft.com/ef/core/modeling/relationships/many-to-many)
