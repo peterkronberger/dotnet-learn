@@ -11088,6 +11088,90 @@
         "title": "Tracking vs. No-Tracking Queries",
         "url": "https://learn.microsoft.com/ef/core/querying/tracking"
       }
+    },
+    {
+      "id": "migration",
+      "term": "Migration",
+      "german": "Schemamigration",
+      "category": "platform",
+      "definition": "Eine versionierte Schemaänderung als Klasse mit `Up` (anwenden) und `Down` (zurücknehmen). `Migrate` wendet die fehlenden an.",
+      "related": [
+        "database-schema",
+        "model-snapshot",
+        "ef-core-tools"
+      ],
+      "lesson": "m16-l08",
+      "source": {
+        "title": "Migrations Overview",
+        "url": "https://learn.microsoft.com/ef/core/managing-schemas/migrations/"
+      }
+    },
+    {
+      "id": "database-schema",
+      "term": "Database Schema",
+      "german": "Datenbankschema",
+      "category": "platform",
+      "definition": "Der Aufbau der Datenbank: Tabellen, Spalten, Schlüssel und Indizes.",
+      "aliases": [
+        "Schema"
+      ],
+      "related": [
+        "migration"
+      ],
+      "lesson": "m16-l08",
+      "source": {
+        "title": "Managing Database Schemas",
+        "url": "https://learn.microsoft.com/ef/core/managing-schemas/"
+      }
+    },
+    {
+      "id": "model-snapshot",
+      "term": "Model Snapshot",
+      "german": "Modell-Snapshot",
+      "category": "platform",
+      "definition": "Die Datei `<Context>ModelSnapshot.cs` mit dem Modellstand nach der letzten Migration. Mit ihr erkennt `migrations add` die Änderungen.",
+      "related": [
+        "migration"
+      ],
+      "lesson": "m16-l08",
+      "source": {
+        "title": "Managing Migrations",
+        "url": "https://learn.microsoft.com/ef/core/managing-schemas/migrations/managing"
+      }
+    },
+    {
+      "id": "ef-core-tools",
+      "term": "EF Core Tools",
+      "german": "EF-Core-Werkzeuge",
+      "category": "platform",
+      "definition": "Das Befehlszeilenwerkzeug `dotnet ef` mit Befehlen wie `migrations add` und `database update`. Es braucht das Paket `Microsoft.EntityFrameworkCore.Design`.",
+      "aliases": [
+        "dotnet ef"
+      ],
+      "related": [
+        "migration"
+      ],
+      "lesson": "m16-l08",
+      "source": {
+        "title": "EF Core Tools Reference (.NET CLI)",
+        "url": "https://learn.microsoft.com/ef/core/cli/dotnet"
+      }
+    },
+    {
+      "id": "design-time-factory",
+      "term": "Design-Time Factory",
+      "german": "Fabrik für die Entwurfszeit",
+      "category": "platform",
+      "definition": "Eine Klasse mit `IDesignTimeDbContextFactory<T>`, die den Context für das Werkzeug `dotnet ef` erzeugt.",
+      "related": [
+        "ef-core-tools",
+        "dbcontext"
+      ],
+      "lesson": "m16-l08",
+      "source": {
+        "title": "Design-time DbContext Creation",
+        "url": "https://learn.microsoft.com/ef/core/cli/dbcontext-creation"
+      }
     }
   ]
 }
