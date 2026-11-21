@@ -1,0 +1,18 @@
+1. IQueryable
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 5
+Rows loaded: 1
+2. IEnumerable
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+Rows kept: 1
+3. AsEnumerable
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 1
+Rows kept: 1
+4. ToList too early
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+Rows kept: 1

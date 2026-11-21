@@ -1,0 +1,8 @@
+bob: 2 events
+alice: 1 events
+dave: 1 events
+1. Loop: 4 commands
+bob: 2 events
+alice: 1 events
+dave: 1 events
+2. Include: 1 commands
