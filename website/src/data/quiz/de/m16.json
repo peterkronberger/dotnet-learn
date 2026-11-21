@@ -552,6 +552,180 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du `Include` einsetzen? Nenne ein Beispiel und einen Grund.",
       "modelAnswer": "Wenn eine Seite Bestellungen mit ihren Positionen anzeigt, lädst du beides mit `Include(o => o.Items)`. So geht ein Befehl an die Datenbank, statt einer pro Bestellung."
+    },
+    {
+      "id": "m16-l07-q1",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du erzeugst `var carol = new Incident { User = \"carol\" };` und rufst noch nichts am Context auf. Welchen Zustand hat `db.Entry(carol).State`?",
+      "options": [
+        {
+          "text": "`Detached`: Der Context kennt das Objekt nicht.",
+          "correct": true,
+          "feedback": "Ein neues Objekt ist dem Context unbekannt, bis du es hinzufügst."
+        },
+        {
+          "text": "`Added`: Das Objekt ist neu.",
+          "feedback": "`Added` gilt erst nach `db.Incidents.Add(carol)`."
+        },
+        {
+          "text": "`Unchanged`: Es gibt noch keine Änderung.",
+          "feedback": "`Unchanged` gilt für Entitäten, die der Context kennt und die nicht geändert sind."
+        },
+        {
+          "text": "`Modified`: Alle Eigenschaften sind gesetzt.",
+          "feedback": "`Modified` gilt für bekannte Entitäten mit geänderten Werten."
+        }
+      ],
+      "explanation": "Der Context verfolgt nur Objekte, die er geladen oder die du ihm mit `Add` übergeben hast. Ein neues Objekt ist `Detached`."
+    },
+    {
+      "id": "m16-l07-q2",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `Incident bob = db.Incidents.Single(i => i.User == \"bob\");` und schreibst `bob.Status = \"investigating\";`. Du rufst `SaveChanges` noch nicht auf. Was steht in der Datenbank?",
+      "options": [
+        {
+          "text": "Noch der alte Status: Erst `SaveChanges` schreibt die Änderung.",
+          "correct": true,
+          "feedback": "Die Eigenschaft ändert nur das Objekt im Speicher."
+        },
+        {
+          "text": "Der neue Status: Die Zuweisung schreibt sofort in die Datenbank.",
+          "misconception": "m16-l07-property-change-saved-immediately",
+          "feedback": "Eine Zuweisung an eine Eigenschaft kennt die Datenbank nicht."
+        },
+        {
+          "text": "Der neue Status, aber erst nach dem Ende des `using`-Blocks.",
+          "misconception": "m16-l07-property-change-saved-immediately",
+          "feedback": "Das Ende des Blocks gibt den Context frei und speichert nichts."
+        },
+        {
+          "text": "Die Zeile ist gelöscht, bis du speicherst.",
+          "feedback": "Eine Änderung sperrt oder löscht keine Zeile."
+        }
+      ],
+      "explanation": "Die Eigenschaft ändert das Objekt im Speicher. Der Change Tracker merkt sich die Änderung, und `SaveChanges` schreibt sie in die Datenbank."
+    },
+    {
+      "id": "m16-l07-q3",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `bob` mit einer normalen Abfrage, änderst `bob.Status` und rufst `db.SaveChanges()` auf, ohne `Update` zu nennen. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "`SaveChanges` erkennt die Änderung und schreibt sie: Die Zeile wird mit einem `UPDATE` angepasst.",
+          "correct": true,
+          "feedback": "Der Context hat den Stand beim Laden gemerkt und vergleicht ihn beim Speichern."
+        },
+        {
+          "text": "Es wird nichts gespeichert, weil `Update` fehlt.",
+          "feedback": "Für geladene Entitäten ist kein `Update` nötig."
+        },
+        {
+          "text": "Es wird eine zweite Zeile mit dem neuen Status eingefügt.",
+          "feedback": "Der Schlüssel ist gleich, daher wird die vorhandene Zeile geändert."
+        },
+        {
+          "text": "Es kommt zu einer Ausnahme, weil die Entität nicht `Added` ist.",
+          "feedback": "`Added` gilt nur für neue Zeilen."
+        }
+      ],
+      "explanation": "Beim Laden merkt sich der Context die Werte. `SaveChanges` vergleicht sie mit den aktuellen Werten und schreibt die Unterschiede. Der Zustand wechselt von `Unchanged` zu `Modified` und nach dem Speichern wieder zu `Unchanged`."
+    },
+    {
+      "id": "m16-l07-q4",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `dave` mit `db.Incidents.AsNoTracking().Single(…)`, änderst `dave.Status` und rufst `db.SaveChanges()` auf. Was ist das Ergebnis?",
+      "options": [
+        {
+          "text": "0 Zeilen geschrieben: Der Context verfolgt `dave` nicht.",
+          "correct": true,
+          "feedback": "Eine Abfrage ohne Tracking übergibt dem Change Tracker nichts."
+        },
+        {
+          "text": "1 Zeile geschrieben: Die Änderung wird gespeichert wie sonst.",
+          "misconception": "m16-l07-no-tracking-changes-saved",
+          "feedback": "Ohne Tracking kennt der Context die Entität nicht."
+        },
+        {
+          "text": "1 Zeile geschrieben, aber nur, wenn du `Update` vergessen hast.",
+          "misconception": "m16-l07-no-tracking-changes-saved",
+          "feedback": "Auch mit `Update` hängt das nicht von vergessenen Aufrufen ab. Hier wird nichts verfolgt."
+        },
+        {
+          "text": "Eine Ausnahme: `AsNoTracking` sperrt die Entität.",
+          "feedback": "`SaveChanges` läuft ohne Fehler und schreibt nichts."
+        }
+      ],
+      "explanation": "Entitäten aus einer Abfrage mit `AsNoTracking()` sind `Detached`. `SaveChanges` sieht keine Änderung und schreibt 0 Zeilen. Solche Abfragen passen für Daten, die du nur liest."
+    },
+    {
+      "id": "m16-l07-q5",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du rufst zweimal `db.Incidents.Add(…)` auf. Beim `SaveChanges` verletzt der zweite Vorfall einen eindeutigen Index. Wie viele der beiden Zeilen stehen danach in der Datenbank?",
+      "options": [
+        {
+          "text": "Keine: Ein `SaveChanges`-Aufruf wirkt ganz oder gar nicht.",
+          "correct": true,
+          "feedback": "Alle Änderungen eines Aufrufs laufen in einer Transaktion."
+        },
+        {
+          "text": "Eine: der erste Vorfall, der zweite scheitert.",
+          "feedback": "Der Aufruf wird bei einem Fehler zurückgerollt."
+        },
+        {
+          "text": "Beide: Der Index prüft erst später.",
+          "feedback": "Der Index wird beim Schreiben geprüft, und der Fehler bricht den Aufruf ab."
+        },
+        {
+          "text": "Das hängt von der Reihenfolge der `Add`-Aufrufe ab.",
+          "feedback": "Die Reihenfolge ändert nichts am Ergebnis."
+        }
+      ],
+      "explanation": "Ein `SaveChanges`-Aufruf ist eine Arbeitseinheit in einer Datenbanktransaktion. Entweder gelingen alle Änderungen oder keine."
+    },
+    {
+      "id": "m16-l07-q6",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du öffnest `using var transaction = db.Database.BeginTransaction();`, rufst zweimal `SaveChanges` auf und verlässt den Block, ohne `Commit` aufzurufen. Was steht danach in der Datenbank?",
+      "options": [
+        {
+          "text": "Keine der beiden Änderungen: Ohne `Commit` wird die Transaktion zurückgerollt.",
+          "correct": true,
+          "feedback": "Erst `Commit` macht die Änderungen fest."
+        },
+        {
+          "text": "Beide Änderungen: Jedes `SaveChanges` speichert endgültig.",
+          "feedback": "In einer expliziten Transaktion sind die Aufrufe erst nach `Commit` endgültig."
+        },
+        {
+          "text": "Nur die erste Änderung.",
+          "feedback": "Die Transaktion umfasst beide Aufrufe."
+        },
+        {
+          "text": "Nur die zweite Änderung.",
+          "feedback": "Die Transaktion umfasst beide Aufrufe."
+        }
+      ],
+      "explanation": "Die explizite Transaktion fasst mehrere `SaveChanges`-Aufrufe zusammen. Ohne `Commit` verwirft die Datenbank alles beim Freigeben der Transaktion."
+    },
+    {
+      "id": "m16-l07-q7",
+      "lesson": "m16-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum du eine geladene Entität ändern und speichern kannst, ohne `Update` aufzurufen.",
+      "modelAnswer": "Der Context merkt sich beim Laden die Werte jeder Entität. Wenn du eine Eigenschaft änderst, vergleicht `SaveChanges` die aktuellen Werte mit dem gemerkten Stand und erkennt, dass die Entität `Modified` ist. Dann schreibt es genau diese Änderung in die Datenbank, und die Entität ist danach wieder `Unchanged`."
+    },
+    {
+      "id": "m16-l07-q8",
+      "lesson": "m16-l07",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du `AsNoTracking()` einsetzen, und wo nicht? Nenne je ein Beispiel.",
+      "modelAnswer": "Bei einem Bericht oder einer Liste, die ich nur anzeige, nehme ich `AsNoTracking()`: Der Context muss sich keine Änderungen merken. Wenn ich einen Datensatz lade, um ihn zu ändern und zu speichern, brauche ich Tracking."
     }
   ]
 }

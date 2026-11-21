@@ -456,6 +456,11 @@ Failures of bob:
   2026-03-02T08:06:48Z
 Failures of dave:
   2026-03-02T09:10:09Z
+State: Unchanged → Modified → Unchanged
+Rows written: 1
+Report: #1 bob investigating
+Report: #2 dave investigating
+Report: #3 carol investigating
 
 == Tests ==
 Passed SecLog.Tests.DetectionOptionsTests.Defaults_AreValid

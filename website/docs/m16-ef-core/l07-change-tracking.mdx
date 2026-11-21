@@ -1,0 +1,198 @@
+---
+title: Change Tracking und Speichern
+sidebar_position: 7
+description: Wie der Context Änderungen an Entitäten erkennt, warum SaveChanges alles oder nichts schreibt und wann AsNoTracking passt.
+lesson_id: m16-l07
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import statesProgram from '!!raw-loader!@site/examples/_ci/m16-l07-states/Program.cs';
+import statesOutput from '!!raw-loader!@site/examples/_ci/m16-l07-states/expected.out.txt';
+import noTrackingProgram from '!!raw-loader!@site/examples/_ci/m16-l07-no-tracking/Program.cs';
+import noTrackingOutput from '!!raw-loader!@site/examples/_ci/m16-l07-no-tracking/expected.out.txt';
+import allOrNothingProgram from '!!raw-loader!@site/examples/_ci/m16-l07-all-or-nothing/Program.cs';
+import allOrNothingOutput from '!!raw-loader!@site/examples/_ci/m16-l07-all-or-nothing/expected.out.txt';
+import gapNoTracking from '!!raw-loader!@site/examples/m16/l07/gap-no-tracking.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l07/seclog-program-block.snippet.cs';
+
+# Change Tracking und Speichern
+
+:::note[Lernziele]
+- Du sagst den Zustand einer Entität (`Added`, `Unchanged`, `Modified`, `Deleted`, `Detached`) an einer Stelle im Code voraus.
+- Du änderst eine geladene Entität, speicherst sie und erklärst, warum dafür kein `Update` nötig ist.
+- Du begründest, wann `AsNoTracking()` passt, und erklärst, dass `SaveChanges` alle Änderungen gemeinsam oder gar nicht schreibt.
+:::
+
+## Rückblick
+
+<Quiz id="m16-l01-q2" />
+
+<Quiz id="m12-l07-q1" />
+
+## Der Context merkt sich Entitäten
+
+Ein <Term id="dbcontext">DbContext</Term> ist eine kurze Arbeitssitzung mit der Datenbank. Jede Entität, die eine Abfrage liefert, nimmt der Context in seine Liste auf und merkt sich ihre Werte vom Zeitpunkt des Ladens. Diese Buchführung heißt <Term id="change-tracking">Change Tracking</Term> ([Change Tracking in EF Core](https://learn.microsoft.com/ef/core/change-tracking/)).
+
+Jede Entität hat dabei einen <Term id="entity-state">Zustand</Term>:
+
+| Zustand | Bedeutung | Was `SaveChanges` tut |
+| --- | --- | --- |
+| `Detached` | Der Context kennt die Entität nicht. | nichts |
+| `Added` | Neu, noch nicht in der Datenbank. | `INSERT` |
+| `Unchanged` | Geladen und nicht geändert. | nichts |
+| `Modified` | Geladen und mindestens eine Eigenschaft geändert. | `UPDATE` |
+| `Deleted` | In der Datenbank vorhanden, zum Löschen markiert. | `DELETE` |
+
+`SaveChanges` vergleicht die aktuellen Werte mit den gemerkten Werten, erkennt so die geänderten Entitäten und schreibt alle Änderungen. Der Rückgabewert ist die Zahl der geschriebenen Zeilen. Den Zustand einer Entität liest du mit `db.Entry(entity).State`.
+
+Das folgende Programm zeigt die Zustände. Jeder Abschnitt benutzt denselben Context, der Datensatz `bob` steht schon in der Datenbank.
+
+<CodeBlock language="csharp" title="Program.cs">{statesProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Welchen Zustand hat `carol` vor und nach `Add`? Welchen Zustand hat `bob` nach der Änderung von `Status` und welchen nach `SaveChanges`? Wie viele Zeilen schreibt das letzte `SaveChanges` in Abschnitt 4? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{statesOutput}</CodeBlock>
+
+1. **Neues Objekt:** `carol` ist `Detached`, bis `Add` sie dem Context übergibt (`Added`). Nach `SaveChanges` steht die Zeile in der Datenbank, und die Entität ist `Unchanged`.
+2. **Geladene Entität ändern:** `bob` ist nach dem Laden `Unchanged`. Die Zuweisung an `Status` ändert das Objekt im Speicher. Der Context erkennt die Abweichung vom gemerkten Wert, und `bob` ist `Modified`. Es gibt kein `Update`, denn `SaveChanges` schreibt die erkannte Änderung als `UPDATE`.
+3. **Entfernen:** `Remove` markiert die Entität als `Deleted`. `SaveChanges` löscht die Zeile, danach ist die Entität `Detached`.
+4. **Keine Änderung:** Ohne Änderung schreibt `SaveChanges` 0 Zeilen.
+
+**Was passiert, wenn …** du `Status` auf den Wert setzt, den die Eigenschaft schon hat? Dann stimmt der Wert mit dem gemerkten überein, und die Entität bleibt `Unchanged`.
+
+</details>
+
+<Quiz id="m16-l07-q1" />
+
+<Quiz id="m16-l07-q2" />
+
+<Quiz id="m16-l07-q3" />
+
+Mit `ExecuteUpdate` und `ExecuteDelete` änderst oder löschst du viele Zeilen mit einem Befehl. Diese Methoden umgehen den Change Tracker: Sie wirken sofort und der Context merkt davon nichts ([ExecuteUpdate and ExecuteDelete](https://learn.microsoft.com/ef/core/saving/execute-insert-update-delete)). Das ist hier eine Randnotiz.
+
+## Abfragen ohne Tracking
+
+Eine normale Abfrage verfolgt ihre Ergebnisse. Das kostet Arbeit und Speicher, und bei Daten, die du nur liest, bringt es nichts. Mit `AsNoTracking()` lädt die Abfrage Entitäten, die der Context nicht verfolgt ([Tracking vs. No-Tracking Queries](https://learn.microsoft.com/ef/core/querying/tracking)). Eine solche <Term id="no-tracking-query">Abfrage ohne Tracking</Term> passt für Berichte und Listen. Weil der Context die Entität nicht kennt, speichert `SaveChanges` keine Änderung an ihr.
+
+<CodeBlock language="csharp" title="Program.cs">{noTrackingProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Welchen Zustand haben `bob` in Abschnitt 1 und `dave` in Abschnitt 2? Wie viele Zeilen schreibt jedes `SaveChanges`? Welchen Status hat `dave` am Ende? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{noTrackingOutput}</CodeBlock>
+
+1. **Mit Tracking:** `bob` ist nach der Änderung `Modified`, und `SaveChanges` schreibt 1 Zeile.
+2. **Ohne Tracking:** `dave` ist `Detached`. Der Context sieht keine Änderung und schreibt 0 Zeilen. Es gibt keinen Fehler und keine Warnung.
+3. **Ergebnis:** In der Datenbank steht für `dave` weiterhin `open`.
+
+**Was passiert, wenn …** du `dave` danach mit `db.Incidents.Update(dave)` an den Context übergibst? Dann ist die Entität `Modified`, und `SaveChanges` schreibt sie. Für einen Datensatz, den du ändern willst, ist aber die normale Abfrage der einfachere Weg.
+
+</details>
+
+<Quiz id="m16-l07-q4" />
+
+## Alles oder nichts
+
+Ein `SaveChanges`-Aufruf ist eine <Term id="unit-of-work">Unit of Work</Term> (zusammengehörige Änderungen): Alle Änderungen des Aufrufs laufen in einer <Term id="database-transaction">Datenbanktransaktion</Term>. Scheitert eine Änderung, rollt die Datenbank alle zurück ([Transactions](https://learn.microsoft.com/ef/core/saving/transactions)). Eine Transaktion fasst Schreibvorgänge zusammen: Mit `Commit` gelten alle, sonst keiner.
+
+Willst du mehrere `SaveChanges`-Aufrufe zusammenfassen, startest du selbst eine Transaktion mit `db.Database.BeginTransaction()`. Erst `Commit()` macht die Änderungen endgültig. Verlässt der Code den `using`-Block ohne `Commit`, verwirft die Datenbank alles.
+
+Im folgenden Programm hat die Tabelle einen eindeutigen Index auf `User`: Zwei Zeilen mit demselben Wert sind nicht erlaubt. Die Verletzung löst eine `DbUpdateException` aus.
+
+<CodeBlock language="csharp" title="Program.cs">{allOrNothingProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Vorfälle stehen nach Abschnitt 1, 2 und 3 in der Datenbank? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{allOrNothingOutput}</CodeBlock>
+
+1. **Ein Aufruf:** `carol` wäre gültig, der zweite Eintrag für `bob` verletzt den Index. Der Aufruf schlägt fehl, und auch `carol` steht nicht in der Datenbank: 1 Vorfall (der Ausgangsstand).
+2. **Zwei Aufrufe ohne `Commit`:** Beide Aufrufe laufen ohne Fehler, aber die Transaktion wird nie bestätigt. Nach dem Block steht weiter 1 Vorfall in der Datenbank.
+3. **Mit `Commit`:** Beide Änderungen gelten: 3 Vorfälle.
+
+</details>
+
+<Quiz id="m16-l07-q5" />
+
+<Quiz id="m16-l07-q6" />
+
+## Gap-Beispiel: Ein Bericht ohne Tracking
+
+Die Lücke `___` fehlt. Der Bericht soll die Vorfälle nur lesen, der Context muss sie nicht verfolgen. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-no-tracking.snippet.cs">{gapNoTracking}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `AsNoTracking`: `.AsNoTracking()`. Die Methode steht vor `OrderBy`, und die Abfrage liefert Entitäten, die der Context nicht verfolgt.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l06/`) speichert Vorfälle mit ihren Fehlversuchen und liest sie mit einer einzigen Abfrage samt Events.
+
+**Neue Anforderung:** SecLog setzt den Status eines gespeicherten Vorfalls von `open` auf `investigating` und speichert die Änderung. Der Bericht danach liest ohne Tracking. Das Programm druckt unter `== Database ==` den Zustand vor der Änderung, nach der Änderung und nach `SaveChanges` (zum Beispiel `State: Unchanged → Modified → Unchanged`) und danach den Bericht.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Neuer Vorfall:** Die beiden gespeicherten Vorfälle haben schon den Status `investigating`. Das Programm speichert deshalb einen neuen Vorfall für `carol` mit dem Status `open`.
+2. **Laden und ändern:** `Single` lädt `carol` mit Tracking (`Unchanged`). Die Zuweisung an `Status` macht die Entität `Modified`. Ein `Update`-Aufruf ist nicht nötig.
+3. **Speichern:** `SaveChanges` schreibt 1 Zeile, und die Entität ist wieder `Unchanged`.
+4. **Bericht:** `AsNoTracking()` liest die Vorfälle, ohne dass der Context sie verfolgt. Die Ausgabe zeigt für alle drei den Status `investigating`.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l07/`) ändert den Status eines gespeicherten Vorfalls und liest den Bericht ohne Tracking.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l07-property-change-saved-immediately" />
+
+**„Sobald ich eine Eigenschaft ändere, steht der neue Wert in der Datenbank.“** Die Zuweisung ändert nur das Objekt im Speicher. Der Context merkt sich die Änderung, und erst `SaveChanges` schreibt sie in die Datenbank. Ohne den Aufruf bleibt die Zeile, wie sie war.
+:::
+
+:::warning[Achtung]
+<Misconception id="m16-l07-no-tracking-changes-saved" />
+
+**„Änderungen an Entitäten aus einer `AsNoTracking()`-Abfrage werden mit `SaveChanges` gespeichert.“** Der Context kennt solche Entitäten nicht. `SaveChanges` schreibt 0 Zeilen und meldet keinen Fehler. Willst du ändern, lädst du mit Tracking.
+:::
+
+## Zusammenfassung
+
+Der Context verfolgt geladene Entitäten und merkt sich ihre Werte. Jede Entität hat einen Zustand (`Added`, `Unchanged`, `Modified`, `Deleted`, `Detached`). `SaveChanges` erkennt Änderungen durch Vergleich, schreibt sie und gibt die Zahl der geschriebenen Zeilen zurück. Alle Änderungen eines Aufrufs gelingen gemeinsam oder gar nicht. Für Daten, die du nur liest, spart `AsNoTracking()` die Buchführung, und Änderungen an solchen Entitäten werden nicht gespeichert.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m16-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Change Tracking in EF Core](https://learn.microsoft.com/ef/core/change-tracking/)
+- Microsoft Learn: [Tracking vs. No-Tracking Queries](https://learn.microsoft.com/ef/core/querying/tracking)
+- Microsoft Learn: [Transactions](https://learn.microsoft.com/ef/core/saving/transactions)

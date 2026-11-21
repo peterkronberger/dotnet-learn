@@ -11002,6 +11002,92 @@
         "title": "Single vs. Split Queries",
         "url": "https://learn.microsoft.com/ef/core/querying/single-split-queries"
       }
+    },
+    {
+      "id": "change-tracking",
+      "term": "Change Tracking",
+      "german": "Änderungsverfolgung",
+      "category": "platform",
+      "definition": "Der Context merkt sich die geladenen Entitäten mit ihren Werten und erkennt beim Speichern, was sich geändert hat.",
+      "aliases": [
+        "Change Tracker"
+      ],
+      "related": [
+        "entity-state",
+        "unit-of-work",
+        "dbcontext"
+      ],
+      "lesson": "m16-l07",
+      "source": {
+        "title": "Change Tracking in EF Core",
+        "url": "https://learn.microsoft.com/ef/core/change-tracking/overview"
+      }
+    },
+    {
+      "id": "entity-state",
+      "term": "Entity State",
+      "german": "Entitätszustand",
+      "category": "platform",
+      "definition": "Der Zustand einer Entität im Context: `Detached`, `Added`, `Unchanged`, `Modified` oder `Deleted`. `SaveChanges` richtet sich danach.",
+      "related": [
+        "change-tracking",
+        "no-tracking-query"
+      ],
+      "lesson": "m16-l07",
+      "source": {
+        "title": "Accessing Tracked Entities",
+        "url": "https://learn.microsoft.com/ef/core/change-tracking/entity-entry"
+      }
+    },
+    {
+      "id": "unit-of-work",
+      "term": "Unit of Work",
+      "german": "zusammengehörige Änderungen",
+      "category": "platform",
+      "definition": "Alle Änderungen, die ein `SaveChanges`-Aufruf schreibt, gehören zusammen und gelingen ganz oder gar nicht.",
+      "related": [
+        "database-transaction",
+        "change-tracking"
+      ],
+      "lesson": "m16-l07",
+      "source": {
+        "title": "Basic SaveChanges",
+        "url": "https://learn.microsoft.com/ef/core/saving/basic"
+      }
+    },
+    {
+      "id": "database-transaction",
+      "term": "Database Transaction",
+      "german": "Datenbanktransaktion",
+      "category": "platform",
+      "definition": "Mehrere Schreibvorgänge, die die Datenbank als Einheit behandelt: Mit `Commit` gelten alle, ohne `Commit` wird alles zurückgerollt.",
+      "aliases": [
+        "Transaktion"
+      ],
+      "related": [
+        "unit-of-work"
+      ],
+      "lesson": "m16-l07",
+      "source": {
+        "title": "Transactions",
+        "url": "https://learn.microsoft.com/ef/core/saving/transactions"
+      }
+    },
+    {
+      "id": "no-tracking-query",
+      "term": "No-Tracking Query",
+      "german": "Abfrage ohne Verfolgung",
+      "category": "platform",
+      "definition": "Eine Abfrage mit `AsNoTracking()`: Der Context verfolgt die Ergebnisse nicht. Das passt für Daten, die du nur liest.",
+      "related": [
+        "change-tracking",
+        "entity-state"
+      ],
+      "lesson": "m16-l07",
+      "source": {
+        "title": "Tracking vs. No-Tracking Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/tracking"
+      }
     }
   ]
 }
