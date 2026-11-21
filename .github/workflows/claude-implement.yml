@@ -128,18 +128,20 @@ jobs:
                  * If it does not exist: `git checkout -b claude/issue-${{ env.ISSUE }} origin/${{ github.event.repository.default_branch }}`
                - Implement it, including tests for the acceptance criteria. Change only what the issue asks for.
                - Checkpoints: the runner is temporary, so unpushed work is lost if the run
-                 ends early (timeout, max turns, cancel). After every finished part (one example
-                 project, one lesson, one SecLog step) run `git add`, `git commit` and
-                 `git push -u origin HEAD` at once, even if checks are still open (WIP commit is
-                 fine). Push before you start a long check such as `bash tools/check-examples.sh`.
-                 Open a draft PR after the first push.
-               - Run tests/linters (commands in CLAUDE.md) and fix errors.
-                 If it still fails after several tries: status=failed with a reason.
-               - Commit, then `git push -u origin HEAD` (no force push – so earlier
-                 commits and fixes are kept).
-               - Check with `gh pr list --head claude/issue-${{ env.ISSUE }} --state open` whether a PR already exists.
-                 If not: `gh pr create --title "<title>" --body "<What, why, how tested. Closes #${{ env.ISSUE }}>"`
-                 If yes: the push is enough.
+                 ends early (timeout, max turns, cancel). After EVERY finished change (one example
+                 project, one lesson file, one quiz or glossary change, one SecLog step) run
+                 `git add`, `git commit` and `git push -u origin HEAD` at once, even if checks
+                 are still open (WIP commit is fine). Do not open a PR yet: a PR means
+                 "all changes are done".
+               - While working, check only the single project or file you changed
+                 (commands in CLAUDE.md). Fix errors. If it still fails after several tries:
+                 status=failed with a reason.
+               - When ALL changes are committed and pushed, check with
+                 `gh pr list --head claude/issue-${{ env.ISSUE }} --state open` whether a PR already exists.
+                 If not: `gh pr create --title "<title>" --body "<What, why, how tested, what the full check still has to confirm. Closes #${{ env.ISSUE }}>"`
+                 This comes BEFORE the full `bash tools/check-examples.sh` (it runs long; CI runs it on the PR too).
+               - Then run the full checks (`bash tools/check-examples.sh`, `npm run build`),
+                 fix problems in further commits and push them (no force push).
                - Return status=pr_created and pr_url.
             4. Shell hints: run commands from the repository root with repo-relative paths
                (for example `bash website/examples/_ci/<name>/run.sh`). Do not chain with
