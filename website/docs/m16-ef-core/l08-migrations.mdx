@@ -1,0 +1,212 @@
+---
+title: Migrationen
+sidebar_position: 8
+description: Wie Migrationen Modelländerungen als versionierte Schemaänderungen auf eine bestehende Datenbank bringen und warum EnsureCreated das nicht kann.
+lesson_id: m16-l08
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import ensureProgram from '!!raw-loader!@site/examples/_ci/m16-l08-ensure-created/Program.cs';
+import ensureOutput from '!!raw-loader!@site/examples/_ci/m16-l08-ensure-created/expected.out.txt';
+import initialCreate from '!!raw-loader!@site/examples/_ci/m16-l08-migrations/Migrations/20261121181642_InitialCreate.cs';
+import addSeverity from '!!raw-loader!@site/examples/_ci/m16-l08-migrations/Migrations/20261121181648_AddSeverity.cs';
+import migrationsProgram from '!!raw-loader!@site/examples/_ci/m16-l08-migrations/Program.cs';
+import migrationsOutput from '!!raw-loader!@site/examples/_ci/m16-l08-migrations/expected.out.txt';
+import gapMigrate from '!!raw-loader!@site/examples/m16/l08/gap-migrate.snippet.cs';
+import factoryFile from '!!raw-loader!@site/examples/_ci/seclog-m16-l08/src/SecLog.Cli/SecLogDbContextFactory.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l08/seclog-program-block.snippet.cs';
+
+# Migrationen
+
+:::note[Lernziele]
+- Du erklärst, warum `EnsureCreated` ein bestehendes Schema nicht weiterentwickelt.
+- Du erstellst mit `dotnet ef migrations add` und `dotnet ef database update` eine Migration, wendest sie an und liest die erzeugten Dateien (`Up`, `Down`, Modell-Snapshot).
+- Du fügst eine Modelländerung als zweite Migration hinzu.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l01-q3" />
+
+<Quiz id="m16-l02-q2" />
+
+## Das Modell wächst, die Datenbank nicht
+
+Bisher hat `EnsureCreated()` die Tabellen angelegt. Das <Term id="database-schema">Schema</Term> der Datenbank, also Tabellen, Spalten und Schlüssel, entsteht aus dem Modell. Ein Modell ändert sich aber: Eine Klasse bekommt eine neue Eigenschaft, und die Datenbank soll eine neue Spalte bekommen, ohne dass die vorhandenen Zeilen verloren gehen.
+
+`EnsureCreated` legt das Schema nur an, wenn die Datenbank noch keine Tabellen hat. Sonst tut es nichts ([Create and Drop APIs](https://learn.microsoft.com/ef/core/managing-schemas/ensure-created)). Das folgende Programm zeigt das mit zwei Contexts auf dieselbe Datenbankdatei: Der zweite kennt die zusätzliche Eigenschaft `Severity`.
+
+<CodeBlock language="csharp" title="Program.cs">{ensureProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Was gibt `EnsureCreated` in Abschnitt 1 und in Abschnitt 2 zurück? Gelingt die Abfrage nach `Severity`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{ensureOutput}</CodeBlock>
+
+1. **Erstes Modell:** Die Datenbank ist leer, `EnsureCreated` legt die Tabelle an und gibt `True` zurück.
+2. **Zweites Modell:** Die Tabelle `Incidents` gibt es schon, daher gibt `EnsureCreated` `False` zurück und ändert nichts. Das Zählen funktioniert, denn es braucht die Spalte nicht. Die Abfrage, die `Severity` liest, scheitert, weil die Spalte fehlt.
+
+**Was passiert, wenn …** du die Datenbankdatei löschst? Dann legt `EnsureCreated` die Tabelle mit der Spalte neu an, aber alle Daten sind weg. Für Prototypen und Tests ist das in Ordnung, für echte Daten nicht.
+
+</details>
+
+<Quiz id="m16-l08-q1" />
+
+## Migrationen bringen das Schema voran
+
+Eine <Term id="migration">Migration</Term> ist eine versionierte Schemaänderung. Sie ist eine Klasse mit zwei Methoden: `Up` wendet die Änderung an, `Down` nimmt sie zurück. EF Core erzeugt sie, indem es das aktuelle Modell mit dem Stand der letzten Migration vergleicht ([Migrations Overview](https://learn.microsoft.com/ef/core/managing-schemas/migrations/)).
+
+Dafür brauchst du die <Term id="ef-core-tools">EF Core Tools</Term>: das Werkzeug `dotnet-ef` und im Projekt das Paket `Microsoft.EntityFrameworkCore.Design`. Das Werkzeug installierst du einmal, global oder über ein Manifest für das Repository:
+
+```bash
+dotnet tool install --global dotnet-ef
+```
+
+Das Paket kommt mit `PrivateAssets` auf `all` in die Projektdatei, denn nur das Werkzeug braucht es und es soll nicht in die Ausgabe gelangen:
+
+```xml
+<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="11.0.*">
+  <PrivateAssets>all</PrivateAssets>
+</PackageReference>
+```
+
+Zum Entwurf braucht das Werkzeug eine Instanz deines Contexts. Es sucht sie in dieser Reihenfolge: eine <Term id="design-time-factory">Fabrik für die Entwurfszeit</Term> (eine Klasse mit `IDesignTimeDbContextFactory<T>`), sonst den Context aus dem Host der Anwendung, sonst einen Konstruktor ohne Parameter ([Design-time DbContext Creation](https://learn.microsoft.com/ef/core/cli/dbcontext-creation)). Eine Fabrik ist der klarste Weg, wenn dein Programm den Context von Hand erzeugt. Du findest sie unten im Projektschritt und am Ende der folgenden Beispielprogramme.
+
+Die erste Migration erzeugst du, nachdem das Modell steht:
+
+```bash
+dotnet ef migrations add InitialCreate
+```
+
+Der Name wirkt wie eine Commit-Nachricht. Der Befehl schreibt drei Dateien in den Ordner `Migrations`. Die Migrationsklasse enthält `Up` und `Down`:
+
+<CodeBlock language="csharp" title="Migrations/…_InitialCreate.cs (erzeugt)">{initialCreate}</CodeBlock>
+
+Die zweite Datei (`….Designer.cs`) enthält Metadaten für EF Core. Die dritte ist der <Term id="model-snapshot">Modell-Snapshot</Term> `DemoContextModelSnapshot.cs`. Er hält das Modell nach der letzten Migration fest, damit der nächste Befehl erkennt, was sich geändert hat ([Managing Migrations](https://learn.microsoft.com/ef/core/managing-schemas/migrations/managing)). Die Dateien sind erzeugter Code. Du liest und prüfst sie, du schreibst sie nicht von Hand.
+
+Nun bekommt `Incident` die Eigenschaft `Severity`. Ein weiterer Befehl erzeugt die zweite Migration:
+
+```bash
+dotnet ef migrations add AddSeverity
+```
+
+<CodeBlock language="csharp" title="Migrations/…_AddSeverity.cs (erzeugt)">{addSeverity}</CodeBlock>
+
+`Up` ergänzt die Spalte mit dem Standardwert `0`, damit vorhandene Zeilen gültig bleiben. `Down` entfernt sie wieder.
+
+<Quiz id="m16-l08-q2" />
+
+<Quiz id="m16-l08-q3" />
+
+<Quiz id="m16-l08-q4" />
+
+## Migrationen anwenden
+
+Auf die Datenbank wendest du Migrationen an, indem du den Befehl `dotnet ef database update` ausführst oder im Programm `Database.Migrate()` aufrufst. Beide wenden nur die Migrationen an, die in der Tabelle `__EFMigrationsHistory` der Datenbank noch fehlen.
+
+```bash
+dotnet ef database update
+```
+
+Das folgende Programm simuliert eine ältere Version der Anwendung: Es wendet nur die erste Migration an und speichert eine Zeile. Danach ruft es `Migrate()` auf. Die Namen der Migrationen druckt es ohne Zeitstempel.
+
+<CodeBlock language="csharp" title="Program.cs">{migrationsProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Migrationen sind nach Schritt 2 angewendet und welche nach Schritt 3? Welchen Wert hat `Severity` der Zeile von `bob`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{migrationsOutput}</CodeBlock>
+
+1. **Im Code:** `GetMigrations` listet die beiden Migrationsklassen der Anwendung.
+2. **Ältere Version:** Die Datenbank kennt nur `InitialCreate`. Die Zeile von `bob` hat noch keine Spalte `Severity`.
+3. **Migrate:** `Migrate()` sieht in der Verlaufstabelle, dass `AddSeverity` fehlt, und wendet sie an.
+4. **Ergebnis:** Die Zeile von `bob` ist noch da, und die neue Spalte hat den Standardwert `0`.
+
+**Was passiert, wenn …** du `Migrate()` ein zweites Mal aufrufst? Dann fehlt keine Migration mehr, und nichts passiert.
+
+</details>
+
+Mit `Migrate()` beim Start der Anwendung ist es einfach, hat aber Nachteile. Die Anwendung braucht dann Rechte, das Schema zu ändern, und niemand prüft das SQL vorher. Für automatisierte Bereitstellungen sind Migrationspakete (`dotnet ef migrations bundle`) gedacht. Wenn das SQL geprüft werden muss, erzeugt `dotnet ef migrations script` ein SQL-Skript, auf Wunsch mit `--idempotent`, das selbst prüft, welche Migrationen schon angewendet sind ([Applying Migrations](https://learn.microsoft.com/ef/core/managing-schemas/migrations/applying)).
+Kombiniere `EnsureCreated` nicht mit Migrationen: `EnsureCreated` legt das Schema an, ohne die Verlaufstabelle zu füllen, und `Migrate` scheitert danach. Eine Migration, die du noch nicht angewendet hast, nimmst du mit `dotnet ef migrations remove` zurück.
+
+<Quiz id="m16-l08-q5" />
+
+<Quiz id="m16-l08-q6" />
+
+<Quiz id="m16-l08-q7" />
+
+## Gap-Beispiel: Migrationen anwenden
+
+Die Lücke `___` fehlt. Der Aufruf soll alle fehlenden Migrationen anwenden. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-migrate.snippet.cs">{gapMigrate}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `Migrate`: `db.Database.Migrate();`. Danach listet `GetAppliedMigrations` die Einträge der Tabelle `__EFMigrationsHistory`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l07/`) speichert Vorfälle, ändert ihren Status und legt die Datenbank mit `EnsureCreated()` an.
+
+**Neue Anforderung:** SecLog legt seine Datenbank mit Migrationen an, damit spätere Modelländerungen eine bestehende Datenbank anpassen können. Das Projekt `SecLog.Cli` bekommt das Paket `Microsoft.EntityFrameworkCore.Design` und eine Fabrik für die Entwurfszeit. Der Befehl erzeugt `InitialCreate` im Ordner `src/SecLog.Data/Migrations/`, und das Programm ruft `Migrate()` statt `EnsureCreated()` auf. Es druckt die angewendeten Migrationen unter `== Database ==`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+```bash
+dotnet ef migrations add InitialCreate --project src/SecLog.Data --startup-project src/SecLog.Cli
+```
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/SecLogDbContextFactory.cs">{factoryFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Werkzeug vorbereiten:** Das Paket `Microsoft.EntityFrameworkCore.Design` steht in `SecLog.Cli`, dem Startprojekt. Die Fabrik erzeugt den Context, weil das Programm ihn von Hand baut.
+2. **Migration erzeugen:** Der Befehl schreibt die erzeugten Dateien nach `SecLog.Data/Migrations/`, in das Projekt mit dem Context (`--project`). Sie liegen im Repository.
+3. **Anwenden:** `Migrate()` ersetzt `EnsureCreated()` und legt die Tabellen über `InitialCreate` an.
+4. **Ausgeben:** Die Schleife druckt die angewendeten Migrationen ohne Zeitstempel.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l08/`) legt seine Datenbank mit der Migration `InitialCreate` an. Ab jetzt braucht jede Modelländerung eine neue, erzeugte Migration.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l08-ensurecreated-updates-schema" />
+
+**„`EnsureCreated` passt eine bestehende Datenbank an mein geändertes Modell an.“** `EnsureCreated` legt das Schema nur an, wenn noch keine Tabellen existieren. Bei einer bestehenden Datenbank ändert es nichts, und neue Spalten fehlen. Für ein wachsendes Modell brauchst du Migrationen.
+:::
+
+## Zusammenfassung
+
+`EnsureCreated` entwickelt ein bestehendes Schema nicht weiter. Eine Migration ist eine versionierte Schemaänderung mit `Up` und `Down`. `dotnet ef migrations add` erzeugt sie anhand des Modell-Snapshots, `dotnet ef database update` oder `Migrate()` wenden die fehlenden an und tragen sie in `__EFMigrationsHistory` ein. Die Daten bleiben erhalten. Für die Produktion eignen sich Migrationspakete und SQL-Skripte besser als `Migrate()` beim Start.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l08-q8" />
+
+### Transferfrage
+
+<Quiz id="m16-l08-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Migrations Overview](https://learn.microsoft.com/ef/core/managing-schemas/migrations/)
+- Microsoft Learn: [Applying Migrations](https://learn.microsoft.com/ef/core/managing-schemas/migrations/applying)
+- Microsoft Learn: [Design-time DbContext Creation](https://learn.microsoft.com/ef/core/cli/dbcontext-creation)

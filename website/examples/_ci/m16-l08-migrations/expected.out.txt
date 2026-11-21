@@ -1,0 +1,9 @@
+1. Migrations in the code
+   InitialCreate
+   AddSeverity
+2. Applied so far
+   InitialCreate
+3. Applied after Migrate
+   InitialCreate
+   AddSeverity
+4. bob: Severity 0

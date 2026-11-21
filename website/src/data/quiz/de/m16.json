@@ -552,6 +552,378 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du `Include` einsetzen? Nenne ein Beispiel und einen Grund.",
       "modelAnswer": "Wenn eine Seite Bestellungen mit ihren Positionen anzeigt, lädst du beides mit `Include(o => o.Items)`. So geht ein Befehl an die Datenbank, statt einer pro Bestellung."
+    },
+    {
+      "id": "m16-l07-q1",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du erzeugst `var carol = new Incident { User = \"carol\" };` und rufst noch nichts am Context auf. Welchen Zustand hat `db.Entry(carol).State`?",
+      "options": [
+        {
+          "text": "`Detached`: Der Context kennt das Objekt nicht.",
+          "correct": true,
+          "feedback": "Ein neues Objekt ist dem Context unbekannt, bis du es hinzufügst."
+        },
+        {
+          "text": "`Added`: Das Objekt ist neu.",
+          "feedback": "`Added` gilt erst nach `db.Incidents.Add(carol)`."
+        },
+        {
+          "text": "`Unchanged`: Es gibt noch keine Änderung.",
+          "feedback": "`Unchanged` gilt für Entitäten, die der Context kennt und die nicht geändert sind."
+        },
+        {
+          "text": "`Modified`: Alle Eigenschaften sind gesetzt.",
+          "feedback": "`Modified` gilt für bekannte Entitäten mit geänderten Werten."
+        }
+      ],
+      "explanation": "Der Context verfolgt nur Objekte, die er geladen oder die du ihm mit `Add` übergeben hast. Ein neues Objekt ist `Detached`."
+    },
+    {
+      "id": "m16-l07-q2",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `Incident bob = db.Incidents.Single(i => i.User == \"bob\");` und schreibst `bob.Status = \"investigating\";`. Du rufst `SaveChanges` noch nicht auf. Was steht in der Datenbank?",
+      "options": [
+        {
+          "text": "Noch der alte Status: Erst `SaveChanges` schreibt die Änderung.",
+          "correct": true,
+          "feedback": "Die Eigenschaft ändert nur das Objekt im Speicher."
+        },
+        {
+          "text": "Der neue Status: Die Zuweisung schreibt sofort in die Datenbank.",
+          "misconception": "m16-l07-property-change-saved-immediately",
+          "feedback": "Eine Zuweisung an eine Eigenschaft kennt die Datenbank nicht."
+        },
+        {
+          "text": "Der neue Status, aber erst nach dem Ende des `using`-Blocks.",
+          "misconception": "m16-l07-property-change-saved-immediately",
+          "feedback": "Das Ende des Blocks gibt den Context frei und speichert nichts."
+        },
+        {
+          "text": "Die Zeile ist gelöscht, bis du speicherst.",
+          "feedback": "Eine Änderung sperrt oder löscht keine Zeile."
+        }
+      ],
+      "explanation": "Die Eigenschaft ändert das Objekt im Speicher. Der Change Tracker merkt sich die Änderung, und `SaveChanges` schreibt sie in die Datenbank."
+    },
+    {
+      "id": "m16-l07-q3",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `bob` mit einer normalen Abfrage, änderst `bob.Status` und rufst `db.SaveChanges()` auf, ohne `Update` zu nennen. Welche Aussage stimmt?",
+      "options": [
+        {
+          "text": "`SaveChanges` erkennt die Änderung und schreibt sie: Die Zeile wird mit einem `UPDATE` angepasst.",
+          "correct": true,
+          "feedback": "Der Context hat den Stand beim Laden gemerkt und vergleicht ihn beim Speichern."
+        },
+        {
+          "text": "Es wird nichts gespeichert, weil `Update` fehlt.",
+          "feedback": "Für geladene Entitäten ist kein `Update` nötig."
+        },
+        {
+          "text": "Es wird eine zweite Zeile mit dem neuen Status eingefügt.",
+          "feedback": "Der Schlüssel ist gleich, daher wird die vorhandene Zeile geändert."
+        },
+        {
+          "text": "Es kommt zu einer Ausnahme, weil die Entität nicht `Added` ist.",
+          "feedback": "`Added` gilt nur für neue Zeilen."
+        }
+      ],
+      "explanation": "Beim Laden merkt sich der Context die Werte. `SaveChanges` vergleicht sie mit den aktuellen Werten und schreibt die Unterschiede. Der Zustand wechselt von `Unchanged` zu `Modified` und nach dem Speichern wieder zu `Unchanged`."
+    },
+    {
+      "id": "m16-l07-q4",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du lädst `dave` mit `db.Incidents.AsNoTracking().Single(…)`, änderst `dave.Status` und rufst `db.SaveChanges()` auf. Was ist das Ergebnis?",
+      "options": [
+        {
+          "text": "0 Zeilen geschrieben: Der Context verfolgt `dave` nicht.",
+          "correct": true,
+          "feedback": "Eine Abfrage ohne Tracking übergibt dem Change Tracker nichts."
+        },
+        {
+          "text": "1 Zeile geschrieben: Die Änderung wird gespeichert wie sonst.",
+          "misconception": "m16-l07-no-tracking-changes-saved",
+          "feedback": "Ohne Tracking kennt der Context die Entität nicht."
+        },
+        {
+          "text": "1 Zeile geschrieben, aber nur, wenn du `Update` vergessen hast.",
+          "misconception": "m16-l07-no-tracking-changes-saved",
+          "feedback": "Auch mit `Update` hängt das nicht von vergessenen Aufrufen ab. Hier wird nichts verfolgt."
+        },
+        {
+          "text": "Eine Ausnahme: `AsNoTracking` sperrt die Entität.",
+          "feedback": "`SaveChanges` läuft ohne Fehler und schreibt nichts."
+        }
+      ],
+      "explanation": "Entitäten aus einer Abfrage mit `AsNoTracking()` sind `Detached`. `SaveChanges` sieht keine Änderung und schreibt 0 Zeilen. Solche Abfragen passen für Daten, die du nur liest."
+    },
+    {
+      "id": "m16-l07-q5",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du rufst zweimal `db.Incidents.Add(…)` auf. Beim `SaveChanges` verletzt der zweite Vorfall einen eindeutigen Index. Wie viele der beiden Zeilen stehen danach in der Datenbank?",
+      "options": [
+        {
+          "text": "Keine: Ein `SaveChanges`-Aufruf wirkt ganz oder gar nicht.",
+          "correct": true,
+          "feedback": "Alle Änderungen eines Aufrufs laufen in einer Transaktion."
+        },
+        {
+          "text": "Eine: der erste Vorfall, der zweite scheitert.",
+          "feedback": "Der Aufruf wird bei einem Fehler zurückgerollt."
+        },
+        {
+          "text": "Beide: Der Index prüft erst später.",
+          "feedback": "Der Index wird beim Schreiben geprüft, und der Fehler bricht den Aufruf ab."
+        },
+        {
+          "text": "Das hängt von der Reihenfolge der `Add`-Aufrufe ab.",
+          "feedback": "Die Reihenfolge ändert nichts am Ergebnis."
+        }
+      ],
+      "explanation": "Ein `SaveChanges`-Aufruf ist eine Arbeitseinheit in einer Datenbanktransaktion. Entweder gelingen alle Änderungen oder keine."
+    },
+    {
+      "id": "m16-l07-q6",
+      "lesson": "m16-l07",
+      "type": "single",
+      "question": "Du öffnest `using var transaction = db.Database.BeginTransaction();`, rufst zweimal `SaveChanges` auf und verlässt den Block, ohne `Commit` aufzurufen. Was steht danach in der Datenbank?",
+      "options": [
+        {
+          "text": "Keine der beiden Änderungen: Ohne `Commit` wird die Transaktion zurückgerollt.",
+          "correct": true,
+          "feedback": "Erst `Commit` macht die Änderungen fest."
+        },
+        {
+          "text": "Beide Änderungen: Jedes `SaveChanges` speichert endgültig.",
+          "feedback": "In einer expliziten Transaktion sind die Aufrufe erst nach `Commit` endgültig."
+        },
+        {
+          "text": "Nur die erste Änderung.",
+          "feedback": "Die Transaktion umfasst beide Aufrufe."
+        },
+        {
+          "text": "Nur die zweite Änderung.",
+          "feedback": "Die Transaktion umfasst beide Aufrufe."
+        }
+      ],
+      "explanation": "Die explizite Transaktion fasst mehrere `SaveChanges`-Aufrufe zusammen. Ohne `Commit` verwirft die Datenbank alles beim Freigeben der Transaktion."
+    },
+    {
+      "id": "m16-l07-q7",
+      "lesson": "m16-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum du eine geladene Entität ändern und speichern kannst, ohne `Update` aufzurufen.",
+      "modelAnswer": "Der Context merkt sich beim Laden die Werte jeder Entität. Wenn du eine Eigenschaft änderst, vergleicht `SaveChanges` die aktuellen Werte mit dem gemerkten Stand und erkennt, dass die Entität `Modified` ist. Dann schreibt es genau diese Änderung in die Datenbank, und die Entität ist danach wieder `Unchanged`."
+    },
+    {
+      "id": "m16-l07-q8",
+      "lesson": "m16-l07",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du `AsNoTracking()` einsetzen, und wo nicht? Nenne je ein Beispiel.",
+      "modelAnswer": "Bei einem Bericht oder einer Liste, die ich nur anzeige, nehme ich `AsNoTracking()`: Der Context muss sich keine Änderungen merken. Wenn ich einen Datensatz lade, um ihn zu ändern und zu speichern, brauche ich Tracking."
+    },
+    {
+      "id": "m16-l08-q1",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Die Datenbank hat schon die Tabelle `Incidents`. Du fügst der Klasse `Incident` die Eigenschaft `Severity` hinzu und startest das Programm mit `db.Database.EnsureCreated()`. Was passiert mit der Tabelle?",
+      "options": [
+        {
+          "text": "Nichts: `EnsureCreated` legt nur ein Schema an, wenn noch keine Tabellen existieren. Die Spalte fehlt weiter.",
+          "correct": true,
+          "feedback": "Die Methode gibt `false` zurück und lässt die Tabelle, wie sie ist."
+        },
+        {
+          "text": "Die Spalte `Severity` wird ergänzt, die vorhandenen Zeilen bleiben.",
+          "misconception": "m16-l08-ensurecreated-updates-schema",
+          "feedback": "`EnsureCreated` verändert kein bestehendes Schema."
+        },
+        {
+          "text": "Die Tabelle wird gelöscht und mit der neuen Spalte neu angelegt.",
+          "misconception": "m16-l08-ensurecreated-updates-schema",
+          "feedback": "`EnsureCreated` löscht nichts. Dafür gäbe es `EnsureDeleted`."
+        },
+        {
+          "text": "Es kommt sofort eine Ausnahme, weil das Modell nicht zur Tabelle passt.",
+          "feedback": "Der Aufruf selbst läuft ohne Fehler. Erst eine Abfrage, die `Severity` braucht, scheitert."
+        }
+      ],
+      "explanation": "`EnsureCreated` legt Tabellen nur an, wenn die Datenbank noch keine hat. Ein bestehendes Schema entwickelt es nicht weiter. Dafür sind Migrationen da."
+    },
+    {
+      "id": "m16-l08-q2",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Eine Migrationsklasse hat die Methoden `Up` und `Down`. Was tun sie?",
+      "options": [
+        {
+          "text": "`Up` wendet die Schemaänderung an, `Down` macht sie rückgängig.",
+          "correct": true,
+          "feedback": "So lässt sich die Datenbank vor und zurück zwischen Versionen bewegen."
+        },
+        {
+          "text": "`Up` lädt Daten in den Context, `Down` speichert sie.",
+          "feedback": "Das Laden und Speichern von Daten gehört zu Abfragen und `SaveChanges`."
+        },
+        {
+          "text": "`Up` startet die Datenbank, `Down` beendet sie.",
+          "feedback": "Eine Migration startet keinen Datenbankserver."
+        },
+        {
+          "text": "`Up` ist für neue Zeilen, `Down` für gelöschte Zeilen.",
+          "feedback": "Migrationen ändern das Schema, nicht die Zeilen."
+        }
+      ],
+      "explanation": "`Up` beschreibt die Änderung am Schema (zum Beispiel eine neue Spalte), `Down` beschreibt, wie du sie zurücknimmst."
+    },
+    {
+      "id": "m16-l08-q3",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Du hast `Severity` zur Klasse `Incident` hinzugefügt. Welcher Befehl erzeugt die Migration dafür?",
+      "options": [
+        {
+          "text": "`dotnet ef migrations add AddSeverity`",
+          "correct": true,
+          "feedback": "Der Befehl vergleicht das Modell mit dem Snapshot und schreibt die Migrationsdateien."
+        },
+        {
+          "text": "`dotnet ef database update`",
+          "feedback": "Dieser Befehl wendet vorhandene Migrationen auf die Datenbank an, er erzeugt keine."
+        },
+        {
+          "text": "`dotnet ef migrations remove`",
+          "feedback": "Dieser Befehl entfernt die letzte Migration."
+        },
+        {
+          "text": "`dotnet tool install dotnet-ef`",
+          "feedback": "Das installiert nur das Werkzeug."
+        }
+      ],
+      "explanation": "`migrations add` erzeugt die Dateien, `database update` wendet sie an."
+    },
+    {
+      "id": "m16-l08-q4",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Welche Aufgabe hat der Modell-Snapshot (`<Context>ModelSnapshot.cs`)?",
+      "options": [
+        {
+          "text": "Er hält den Modellstand der letzten Migration fest. Mit ihm erkennt `migrations add`, was sich seitdem geändert hat.",
+          "correct": true,
+          "feedback": "Der Snapshot ist der Vergleichsstand für die nächste Migration."
+        },
+        {
+          "text": "Er enthält eine Sicherungskopie der Daten.",
+          "feedback": "Der Snapshot enthält keine Daten, nur das Modell."
+        },
+        {
+          "text": "Er speichert, welche Migrationen schon in der Datenbank sind.",
+          "feedback": "Das steht in der Tabelle `__EFMigrationsHistory` der Datenbank."
+        },
+        {
+          "text": "Er ersetzt die Migrationsklassen, wenn du sie löschst.",
+          "feedback": "Der Snapshot erzeugt keine Migrationen."
+        }
+      ],
+      "explanation": "Der Snapshot beschreibt das Modell nach der letzten Migration. Beim nächsten `migrations add` vergleicht EF Core das aktuelle Modell damit."
+    },
+    {
+      "id": "m16-l08-q5",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Die Datenbank enthält eine Zeile und wurde mit `InitialCreate` angelegt. Du rufst `db.Database.Migrate()` auf, und die Migration `AddSeverity` fehlt noch. Was passiert mit der Zeile?",
+      "options": [
+        {
+          "text": "Sie bleibt erhalten. Die Spalte `Severity` kommt dazu und hat den Standardwert.",
+          "correct": true,
+          "feedback": "Die Migration ergänzt die Spalte mit `ALTER TABLE`, vorhandene Zeilen bleiben."
+        },
+        {
+          "text": "Die Zeile wird gelöscht, weil sich das Schema ändert.",
+          "feedback": "Eine Migration löscht Daten nur, wenn ihr Code das vorsieht."
+        },
+        {
+          "text": "Die Zeile bleibt, aber `Migrate` führt auch `InitialCreate` noch einmal aus.",
+          "feedback": "Angewendete Migrationen stehen in `__EFMigrationsHistory` und laufen nicht noch einmal."
+        },
+        {
+          "text": "`Migrate` bricht ab, weil die Datenbank schon Daten hat.",
+          "feedback": "`Migrate` ist genau dafür gedacht."
+        }
+      ],
+      "explanation": "`Migrate` wendet nur die Migrationen an, die in `__EFMigrationsHistory` fehlen. Die vorhandenen Daten bleiben."
+    },
+    {
+      "id": "m16-l08-q6",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Das Werkzeug `dotnet ef` kann deinen `DbContext` nicht selbst erzeugen, weil die Anwendung ihn von Hand mit `new` baut. Was hilft?",
+      "options": [
+        {
+          "text": "Eine Klasse, die `IDesignTimeDbContextFactory<T>` implementiert und den Context erzeugt.",
+          "correct": true,
+          "feedback": "Das Werkzeug benutzt diese Fabrik, wenn es sie findet."
+        },
+        {
+          "text": "Ein zweiter Aufruf von `EnsureCreated`.",
+          "feedback": "`EnsureCreated` löst das Problem nicht und passt nicht zu Migrationen."
+        },
+        {
+          "text": "Eine zusätzliche `Down`-Methode.",
+          "feedback": "`Down` hat mit der Erzeugung des Contexts nichts zu tun."
+        },
+        {
+          "text": "Nichts, Migrationen gehen nur mit einem Webhost.",
+          "feedback": "Eine Fabrik für die Entwurfszeit reicht."
+        }
+      ],
+      "explanation": "Das Werkzeug braucht zur Entwurfszeit eine Instanz des Contexts. Findet es eine Klasse mit `IDesignTimeDbContextFactory<T>`, nimmt es diese."
+    },
+    {
+      "id": "m16-l08-q7",
+      "lesson": "m16-l08",
+      "type": "single",
+      "question": "Ein Team wendet Migrationen automatisiert bei der Bereitstellung an. Ein anderes Team muss das erzeugte SQL vorher prüfen lassen. Was passt jeweils?",
+      "options": [
+        {
+          "text": "Für die Automatisierung ein Migrationspaket (Bundle), für die Prüfung ein SQL-Skript (`migrations script`).",
+          "correct": true,
+          "feedback": "So ist es im Überblick zum Anwenden von Migrationen beschrieben."
+        },
+        {
+          "text": "Immer `EnsureCreated`, weil es am schnellsten geht.",
+          "feedback": "`EnsureCreated` passt nicht zu Migrationen."
+        },
+        {
+          "text": "Immer das Werkzeug `dotnet ef` auf dem Produktionsserver.",
+          "feedback": "Dafür müssten SDK und Quelltext auf dem Server liegen."
+        },
+        {
+          "text": "Das Modell ändern und den Snapshot von Hand löschen.",
+          "feedback": "Der Snapshot ist kein Weg, Migrationen anzuwenden."
+        }
+      ],
+      "explanation": "Ein Bundle ist ein Artefakt, das ohne SDK läuft. Ein SQL-Skript lässt sich vorher prüfen, ändern und archivieren."
+    },
+    {
+      "id": "m16-l08-q8",
+      "lesson": "m16-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `EnsureCreated` ein bestehendes Schema nicht weiterentwickelt und was Migrationen anders machen.",
+      "modelAnswer": "`EnsureCreated` legt das Schema nur an, wenn die Datenbank noch keine Tabellen hat. Existiert sie schon, tut es nichts, und eine neue Spalte im Modell fehlt in der Datenbank.\n\nMigrationen halten jede Schemaänderung als eigene, versionierte Klasse mit `Up` und `Down` fest. `Migrate` wendet nur die fehlenden an und merkt sich die angewendeten in `__EFMigrationsHistory`. So passt sich eine bestehende Datenbank an, und die Daten bleiben."
+    },
+    {
+      "id": "m16-l08-q9",
+      "lesson": "m16-l08",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du Migrationen einsetzen, und wo reicht `EnsureCreated`? Nenne je ein Beispiel.",
+      "modelAnswer": "Bei einer Anwendung mit echten Nutzerdaten brauche ich Migrationen, damit neue Spalten ankommen, ohne dass Daten verloren gehen. Für einen Test mit einer frischen Datenbank oder einen Prototyp, den ich jederzeit wegwerfen kann, reicht `EnsureCreated`."
     }
   ]
 }
