@@ -10877,6 +10877,131 @@
         "title": "How queries work",
         "url": "https://learn.microsoft.com/ef/core/querying/how-query-works"
       }
+    },
+    {
+      "id": "expression-tree",
+      "term": "Expression Tree",
+      "german": "Ausdrucksbaum",
+      "category": "language",
+      "definition": "Eine Datenstruktur, die den Aufbau eines Lambdas beschreibt. Ein Lambda wird zum Ausdrucksbaum, wenn der Zieltyp `Expression<TDelegate>` ist.",
+      "aliases": ["Ausdrucksbäume", "Expression Trees"],
+      "related": ["lambda-expression", "iqueryable"],
+      "lesson": "m16-l05",
+      "source": {
+        "title": "Expression trees",
+        "url": "https://learn.microsoft.com/dotnet/csharp/advanced-topics/expression-trees/"
+      }
+    },
+    {
+      "id": "iqueryable",
+      "term": "IQueryable<T>",
+      "category": "platform",
+      "definition": "Eine Abfrage, die als Ausdrucksbaum vorliegt. Ein Provider wie EF Core kann sie in die Abfragesprache der Datenquelle übersetzen, zum Beispiel in SQL.",
+      "aliases": ["IQueryable"],
+      "related": ["expression-tree", "query-provider", "enumerable"],
+      "lesson": "m16-l05",
+      "source": {
+        "title": "IQueryable<T> Interface",
+        "url": "https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1"
+      }
+    },
+    {
+      "id": "query-provider",
+      "term": "Query Provider",
+      "german": "Abfrage-Provider",
+      "category": "platform",
+      "definition": "Das Objekt, das den Ausdrucksbaum eines `IQueryable<T>` ausliest und ausführt. Bei EF Core übersetzt es ihn in SQL.",
+      "aliases": ["Abfrage-Provider"],
+      "related": ["iqueryable", "query-translation"],
+      "lesson": "m16-l05",
+      "source": {
+        "title": "IQueryProvider Interface",
+        "url": "https://learn.microsoft.com/dotnet/api/system.linq.iqueryprovider"
+      }
+    },
+    {
+      "id": "client-evaluation",
+      "term": "Client Evaluation",
+      "german": "Client-Auswertung",
+      "category": "platform",
+      "definition": "Ein Teil einer EF-Core-Abfrage läuft im Programm statt in der Datenbank. Erlaubt ist das für die oberste Projektion, also das letzte `Select`, und nach `AsEnumerable()`.",
+      "aliases": ["Clientseitige Auswertung"],
+      "related": ["query-translation", "iqueryable"],
+      "lesson": "m16-l05",
+      "source": {
+        "title": "Client vs. Server Evaluation",
+        "url": "https://learn.microsoft.com/ef/core/querying/client-eval"
+      }
+    },
+    {
+      "id": "eager-loading",
+      "term": "Eager Loading",
+      "german": "Vorab-Laden",
+      "category": "platform",
+      "definition": "Verwandte Daten werden in derselben Abfrage mit `Include` und `ThenInclude` geladen, sodass die Navigationen danach gefüllt sind.",
+      "aliases": ["Vorab-Laden"],
+      "related": ["navigation-property", "explicit-loading", "n-plus-one-problem"],
+      "lesson": "m16-l06",
+      "source": {
+        "title": "Eager Loading of Related Data",
+        "url": "https://learn.microsoft.com/ef/core/querying/related-data/eager"
+      }
+    },
+    {
+      "id": "explicit-loading",
+      "term": "Explicit Loading",
+      "german": "Explizites Nachladen",
+      "category": "platform",
+      "definition": "Eine Navigation wird nach der ersten Abfrage mit einem eigenen Befehl geladen, zum Beispiel mit `Entry(x).Collection(…).Load()`.",
+      "aliases": ["Explizites Laden"],
+      "related": ["navigation-property", "eager-loading"],
+      "lesson": "m16-l06",
+      "source": {
+        "title": "Explicit Loading of Related Data",
+        "url": "https://learn.microsoft.com/ef/core/querying/related-data/explicit"
+      }
+    },
+    {
+      "id": "lazy-loading",
+      "term": "Lazy Loading",
+      "german": "Verzögertes Laden",
+      "category": "platform",
+      "definition": "Eine Navigation wird beim ersten Zugriff automatisch geladen. Sie braucht zusätzliche Einrichtung und macht das N+1-Problem leicht unsichtbar.",
+      "aliases": ["Verzögertes Laden"],
+      "related": ["eager-loading", "n-plus-one-problem"],
+      "lesson": "m16-l06",
+      "source": {
+        "title": "Lazy Loading of Related Data",
+        "url": "https://learn.microsoft.com/ef/core/querying/related-data/lazy"
+      }
+    },
+    {
+      "id": "n-plus-one-problem",
+      "term": "N+1 Problem",
+      "german": "N+1-Problem",
+      "category": "platform",
+      "definition": "Ein Befehl lädt N Zeilen, dann schickt eine Schleife für jede Zeile einen weiteren Befehl. Es sind 1 + N Wege zur Datenbank statt einer.",
+      "aliases": ["N+1"],
+      "related": ["eager-loading", "explicit-loading"],
+      "lesson": "m16-l06",
+      "source": {
+        "title": "Efficient Querying",
+        "url": "https://learn.microsoft.com/ef/core/performance/efficient-querying#beware-of-lazy-loading"
+      }
+    },
+    {
+      "id": "split-query",
+      "term": "Split Query",
+      "german": "Geteilte Abfrage",
+      "category": "platform",
+      "definition": "Mit `AsSplitQuery()` lädt EF Core jede Include-Collection mit einem eigenen Befehl statt mit `JOIN`. So vermeidet es die kartesische Explosion, bei der der `JOIN` die Zeilen vervielfacht.",
+      "aliases": ["AsSplitQuery", "Kartesische Explosion"],
+      "related": ["eager-loading"],
+      "lesson": "m16-l06",
+      "source": {
+        "title": "Single vs. Split Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/single-split-queries"
+      }
     }
   ]
 }

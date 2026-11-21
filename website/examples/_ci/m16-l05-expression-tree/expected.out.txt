@@ -1,0 +1,6 @@
+Delegate result: True
+Tree text: i => (i.FailureCount >= 5)
+Parameter: i
+Body: (i.FailureCount >= 5)
+Kind of body: GreaterThanOrEqual
+Compiled result: True

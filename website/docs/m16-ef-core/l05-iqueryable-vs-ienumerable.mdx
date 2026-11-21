@@ -1,0 +1,194 @@
+---
+title: IQueryable und IEnumerable
+sidebar_position: 5
+description: Warum dasselbe Lambda Code oder Daten sein kann, und warum ein Where mal in der Datenbank und mal im Speicher läuft.
+lesson_id: m16-l05
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import expressionTree from '!!raw-loader!@site/examples/_ci/m16-l05-expression-tree/Program.cs';
+import expressionTreeOutput from '!!raw-loader!@site/examples/_ci/m16-l05-expression-tree/expected.out.txt';
+import whereLocation from '!!raw-loader!@site/examples/_ci/m16-l05-where-location/Program.cs';
+import whereLocationOutput from '!!raw-loader!@site/examples/_ci/m16-l05-where-location/expected.out.txt';
+import untranslatable from '!!raw-loader!@site/examples/_ci/m16-l05-untranslatable/Program.cs';
+import untranslatableOutput from '!!raw-loader!@site/examples/_ci/m16-l05-untranslatable/expected.out.txt';
+import gapQueryable from '!!raw-loader!@site/examples/m16/l05/gap-queryable.snippet.cs';
+import filterFile from '!!raw-loader!@site/examples/_ci/seclog-m16-l05/src/SecLog.Data/IncidentFilters.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l05/seclog-program-block.snippet.cs';
+
+# IQueryable und IEnumerable
+
+:::note[Lernziele]
+- Du erklärst, warum dasselbe Lambda einmal als Delegat und einmal als Ausdrucksbaum vorliegen kann.
+- Du sagst voraus, ob ein `Where` in der Datenbank oder im Speicher läuft (`IQueryable<T>`, `IEnumerable<T>`, `AsEnumerable`).
+- Du erkennst, warum eine Abfrage mit einer eigenen C#-Methode nicht übersetzt werden kann, und baust sie um.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l03-q1" />
+
+<Quiz id="m11-l05-q1" />
+
+<Quiz id="m16-l04-q2" />
+
+## Dasselbe Lambda, zwei Umwandlungen
+
+In `m16-l04` hat EF Core Lambdas wie `i => i.FailureCount >= 5` nicht aufgerufen, sondern gelesen. Das geht, weil ein Lambda auf zwei Arten umgewandelt werden kann. Es passt zu einem Delegaten-Typ wie `Func<Incident, bool>`: Dann ist es ausführbarer Code. Es passt auch zu `Expression<Func<Incident, bool>>`: Dann ist es ein <Term id="expression-tree">Ausdrucksbaum</Term>, also eine Datenstruktur, die den Aufbau des Lambdas beschreibt ([Expression tree types, §8.6](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/types#86-expression-tree-types)). Welche Umwandlung gilt, bestimmt der Typ, dem das Lambda zugewiesen wird.
+
+Das folgende Programm wandelt dasselbe Lambda auf beide Arten um. Es braucht kein Paket und keine Datenbank.
+
+<CodeBlock language="csharp" title="Program.cs">{expressionTree}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Zeilen kann das Programm für den Ausdrucksbaum ausgeben, die für den Delegaten nicht möglich sind? Was liefert der Baum, wenn du ihn mit `Compile()` umwandelst? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{expressionTreeOutput}</CodeBlock>
+
+1. **Aufrufen:** Der Delegat lässt sich nur aufrufen: `asDelegate(bob)` ergibt `True`. Wie er aufgebaut ist, kann das Programm nicht fragen.
+2. **Lesen:** Der Baum ist Daten. `ToString()` gibt das Lambda als Text aus, `Parameters` nennt den Parameter `i`, `Body` den Rumpf, und `NodeType` zeigt die Art des obersten Knotens: `GreaterThanOrEqual` ist der Vergleich `>=`.
+3. **Umwandeln:** `Compile()` baut aus den Daten einen Delegaten. Erst dann läuft der Code, und das Ergebnis ist wieder `True`.
+
+**Was passiert, wenn …** du dem Lambda einen Block mit `{ … }` gibst? Dann lässt es sich nicht mehr in einen Ausdrucksbaum umwandeln: Nur Ausdrucks-Lambdas (`x => ausdruck`) gehen, Anweisungs-Lambdas nicht ([Anonymous function conversions, §10.7.3](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#1073-evaluation-of-lambda-expression-conversions-to-expression-tree-types)). Auch `async` und eine Zuweisung im Lambda gehen nicht.
+
+</details>
+
+<Quiz id="m16-l05-q1" />
+
+## IQueryable sammelt, IEnumerable führt aus
+
+<Term id="iqueryable">`IQueryable<T>`</Term> ist eine Abfrage, die als Ausdrucksbaum vorliegt. Ihre Eigenschaft `Expression` hält diesen Baum, und `Provider` ist der <Term id="query-provider">Abfrage-Provider</Term>, der den Baum auslesen kann. Bei EF Core ist das der Datenbank-Provider, der den Baum in SQL übersetzt. Ein `DbSet<T>` ist ein `IQueryable<T>`.
+
+Die Methoden unterscheiden sich im Parameter. `Queryable.Where` nimmt einen `Expression<Func<T, bool>>`: Das Lambda bleibt Daten und wird an den Baum angehängt. `Enumerable.Where` nimmt einen `Func<T, bool>`: Das Lambda ist Code und läuft für jedes Element im Speicher. Welche der beiden Methoden der Compiler wählt, hängt vom Typ links vom Punkt ab ([`IQueryable<T>`](https://learn.microsoft.com/dotnet/api/system.linq.iqueryable-1)).
+
+Das folgende Programm filtert viermal dasselbe, aber mit anderen Typen. Es druckt jeden Befehl, der an die Datenbank geht. Die Hilfsklasse am Ende ist eingeklappt.
+
+<CodeBlock language="csharp" title="Program.cs">{whereLocation}</CodeBlock>
+
+:::info[Vorhersage]
+Bei welchen der vier Abschnitte steht `WHERE` im SQL? Bei welchen lädt die Datenbank alle drei Zeilen? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{whereLocationOutput}</CodeBlock>
+
+1. **`IQueryable`:** `db.Incidents` ist ein `IQueryable<Incident>`. `Where` ist `Queryable.Where`, der Filter steht als `WHERE` im SQL, und nur eine Zeile kommt an.
+2. **`IEnumerable`:** Die Variable hat den Typ `IEnumerable<Incident>`. Damit ist `Where` die Methode `Enumerable.Where`: Das SQL hat kein `WHERE`, alle Zeilen werden geladen, und das Programm filtert danach.
+3. **`AsEnumerable`:** Der Teil vor `AsEnumerable()` wird übersetzt (`WHERE … >= 1`). Alles danach läuft im Speicher. Die Bedingung `i.User.Length == 3` steht deshalb nicht im SQL.
+4. **`ToList` zu früh:** `ToList()` führt die Abfrage sofort aus und lädt alle Zeilen. Das spätere `Where` arbeitet auf einer Liste, nicht auf der Datenbank.
+
+In allen vier Fällen ist das Ergebnis dasselbe: eine Zeile bleibt übrig. Der Unterschied liegt darin, wo gefiltert wird. Mit 3 Zeilen merkst du ihn nicht, mit Millionen Zeilen schon.
+
+**Was passiert, wenn …** du das `ToList()` am Ende von Abschnitt 1 weglässt? Dann geht der Befehl erst beim Auslesen los. Der Filter steht trotzdem im SQL, denn er hängt am `IQueryable<T>`.
+
+</details>
+
+<Quiz id="m16-l05-q2" />
+
+<Quiz id="m16-l05-q5" />
+
+## Was EF Core nicht übersetzen kann
+
+EF Core kann einen Ausdrucksbaum nur übersetzen, wenn es für jeden Teil SQL kennt. Eine eigene C#-Methode kennt es nicht: Im Baum steht nur ihr Aufruf, nicht ihr Rumpf. Steht sie in `Where`, löst EF Core eine `InvalidOperationException` aus. Nur in der letzten `Select`-Projektion erlaubt EF Core Code, den es nicht übersetzen kann: Es liest die nötigen Spalten aus der Datenbank und ruft die Methode danach im Programm auf. Dieses Auswerten im Programm heißt <Term id="client-evaluation">Client-Auswertung</Term> ([Client vs. server evaluation](https://learn.microsoft.com/ef/core/querying/client-eval)).
+
+<CodeBlock language="csharp" title="Program.cs">{untranslatable}</CodeBlock>
+
+:::info[Vorhersage]
+Was passiert in Abschnitt 1? Was steht im SQL von Abschnitt 3: die Spalten, die `Describe` braucht, oder nur `User`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{untranslatableOutput}</CodeBlock>
+
+1. **Scheitern:** `Rules.IsSevere(i)` steckt im `Where`. EF Core wirft eine `InvalidOperationException`, deren Text sagt, dass der Ausdruck nicht übersetzt werden konnte. Es lädt nicht still alle Zeilen, um im Programm zu filtern.
+2. **Umbauen:** Die Bedingung steht jetzt direkt im Lambda. EF Core übersetzt sie zu `WHERE … >= 5`.
+3. **Letztes `Select`:** `FailureCount` steht im SQL, `Describe` nicht. Die Datenbank liefert `User` und `FailureCount`, und `Describe` läuft im Programm für jede Zeile.
+
+**Was passiert, wenn …** du `Describe` in ein `Where` statt in das letzte `Select` setzt? Dann gilt wieder Abschnitt 1: Es ist keine Projektion, und EF Core wirft die Ausnahme.
+
+</details>
+
+<Quiz id="m16-l05-q3" />
+
+<Quiz id="m16-l05-q4" />
+
+Eigene Ausdrücke, Filter oder Methoden, die mit EF Core zusammenarbeiten sollen, schreibst du als `Expression<Func<…>>`. Einen Ausdrucksbaum von Hand mit `Expression.Lambda` und weiteren Methoden zu bauen, ist hier nur ein Name: Du brauchst es für diese Lektion nicht.
+
+## Gap-Beispiel: Der Typ der Variable
+
+Die Lücke `___` fehlt. Der Filter soll in der Datenbank laufen, wie der SQL-Kommentar zeigt. Setze den Namen des Typs ein, ohne die Typangabe `<StoredIncident>`.
+
+<CodeBlock language="csharp" title="gap-queryable.snippet.cs">{gapQueryable}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `IQueryable`: `IQueryable<StoredIncident> incidents = db.Incidents;`. Mit `IEnumerable<StoredIncident>` wäre `Where` die Methode `Enumerable.Where`, und das SQL hätte kein `WHERE`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l04/`) speichert Vorfälle in der Datenbank und fragt die kritischen Vorfälle mit einer Abfrage ab, deren Filter direkt im Lambda steht.
+
+**Neue Anforderung:** Der Filter für kritische Vorfälle läuft in der Datenbank, nicht im Speicher, und ist wiederverwendbar. SecLog bekommt dafür in `SecLog.Data` die Methode `IncidentFilters.AtLeastFailures`. Sie gibt einen `Expression<Func<StoredIncident, bool>>` zurück, und die Abfrage unter `== Database ==` benutzt sie. Das SQL kommt weiter von `ToQueryString()`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Data/IncidentFilters.cs (neu)">{filterFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Filter als Baum:** Der Rückgabetyp `Expression<Func<StoredIncident, bool>>` macht aus dem Lambda Daten. Der Wert von `threshold` kommt als Parameter ins SQL.
+2. **Benutzen:** `Where(IncidentFilters.AtLeastFailures(maxFailures))` hängt den Baum an die Abfrage. Wäre der Rückgabetyp `Func<StoredIncident, bool>`, würde `Where` nur noch `Enumerable.Where` passen, und die Zeilen kämen vor dem Filter ins Programm.
+3. **Prüfen:** Das gedruckte SQL hat weiter `WHERE "i"."FailureCount" >= @threshold`. Nur der Name des Parameters ändert sich von `@maxFailures` zu `@threshold`.
+
+Das Programm druckt weiter `Severe: bob 5`.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l05/`) filtert kritische Vorfälle mit einem wiederverwendbaren Ausdrucksbaum in der Datenbank.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l05-tolist-at-end-changes-nothing" />
+
+**„`ToList()` am Ende einer Abfrage ändert nichts.“** `ToList()` führt die Abfrage aus. Und die Stelle bestimmt, was in der Datenbank läuft: Alles vor `ToList()` kann in SQL übersetzt werden, alles danach läuft im Speicher auf den schon geladenen Zeilen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m16-l05-ef-translates-every-method" />
+
+**„EF Core schickt jede LINQ-Methode und jede C#-Methode an die Datenbank.“** EF Core übersetzt nur, wofür es SQL kennt. Eine eigene Methode in `Where` löst eine `InvalidOperationException` aus. Nur in der letzten `Select`-Projektion läuft sie im Programm.
+:::
+
+## Zusammenfassung
+
+Ein Lambda ist je nach Zieltyp Code (`Func<…>`) oder Daten (`Expression<Func<…>>`). `IQueryable<T>` sammelt diese Daten, damit der Provider sie in SQL übersetzen kann, und `Queryable.Where` nimmt einen Ausdrucksbaum. `IEnumerable<T>` führt das Lambda im Speicher aus, und `AsEnumerable()` wechselt bewusst dorthin. Eigene C#-Methoden in `Where` lassen sich nicht übersetzen. Nur im letzten `Select` läuft Code im Programm.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m16-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Expression trees](https://learn.microsoft.com/dotnet/csharp/advanced-topics/expression-trees/)
+- Microsoft Learn: [Client vs. server evaluation](https://learn.microsoft.com/ef/core/querying/client-eval)
+- Microsoft Learn: [Anonymous function conversions (C#-Spezifikation)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/conversions#107-anonymous-function-conversions)

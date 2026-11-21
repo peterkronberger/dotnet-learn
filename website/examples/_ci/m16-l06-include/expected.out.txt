@@ -1,0 +1,11 @@
+1. No Include
+Events of bob: 0
+2. Include
+SELECT "i"."Id", "i"."User", "e"."Id", "e"."EventType", "e"."IncidentId", "e"."SourceId"
+FROM "Incidents" AS "i"
+LEFT JOIN "Event" AS "e" ON "i"."Id" = "e"."IncidentId"
+ORDER BY "i"."Id"
+Events of bob: 2
+Source of an event: null
+3. ThenInclude
+Source of an event: auth-01

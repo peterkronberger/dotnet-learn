@@ -1,0 +1,15 @@
+1. Where with own method
+Exception: InvalidOperationException
+Not translated: True
+2. Condition in the lambda
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= 5
+Rows: 1
+3. Own method in the last Select
+SELECT "i"."User", "i"."FailureCount"
+FROM "Incidents" AS "i"
+ORDER BY "i"."Id"
+bob: severe
+alice: minor
+dave: minor

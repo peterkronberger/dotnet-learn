@@ -366,7 +366,7 @@
         { "text": "Die Abfrage-Syntax läuft in C# und lädt alle Zeilen.", "misconception": "m16-l04-query-loads-whole-table", "feedback": "Es ist dieselbe Abfrage wie in der Methoden-Syntax und wird zu SQL." },
         { "text": "Der Ausdruck erzeugt anderes SQL als die Methoden-Syntax.", "feedback": "Beide ergeben denselben SQL-Text." }
       ],
-      "explanation": "Ein Abfrageausdruck wird in Methodenaufrufe übersetzt. Auf einem `IQueryable<T>` sind das die `Queryable`-Methoden. Danach übersetzt EF Core wie bei der Methoden-Syntax."
+      "explanation": "Ein Abfrageausdruck wird in Methodenaufrufe übersetzt. Auf einem `DbSet` sind das die `Queryable`-Methoden. Danach übersetzt EF Core wie bei der Methoden-Syntax."
     },
     {
       "id": "m16-l04-q6",
@@ -394,6 +394,164 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du `ToQueryString()` einsetzen? Nenne ein Beispiel und einen Grund.",
       "modelAnswer": "Wenn eine Abfrage langsam ist oder zu viele Zeilen liefert, zeigt `ToQueryString()` das SQL, das die Datenbank bekommt. So prüfst du, ob `WHERE` und die Spalten so ankommen, wie du es erwartest, ohne die Abfrage auszuführen."
+    },
+    {
+      "id": "m16-l05-q1",
+      "lesson": "m16-l05",
+      "type": "single",
+      "question": "Du schreibst `Expression<Func<Incident, bool>> f = i => i.FailureCount >= 5;`. Was ist `f`?",
+      "options": [
+        { "text": "Ein Ausdrucksbaum: Daten, die den Aufbau des Lambdas beschreiben. Ausgeführt wird erst nach `Compile()`.", "correct": true, "feedback": "Der Zieltyp `Expression<…>` macht aus dem Lambda eine Datenstruktur." },
+        { "text": "Ein Delegat, den du direkt mit `f(incident)` aufrufen kannst.", "feedback": "Ein Ausdrucksbaum hat keine Aufruf-Syntax. Du brauchst erst `Compile()`." },
+        { "text": "Ein Text mit dem Quellcode des Lambdas.", "feedback": "Der Baum ist keine Zeichenkette, sondern eine Struktur mit Knoten wie `Body` und `Parameters`." },
+        { "text": "Das Ergebnis des Vergleichs, also `true` oder `false`.", "feedback": "Es wurde nichts ausgewertet. Es gibt noch kein `Incident`, das verglichen werden könnte." }
+      ],
+      "explanation": "Dasselbe Lambda wird zu Code, wenn der Zieltyp ein Delegat wie `Func<Incident, bool>` ist, und zu Daten, wenn der Zieltyp `Expression<Func<Incident, bool>>` ist. Aus den Daten wird mit `Compile()` wieder ein Delegat."
+    },
+    {
+      "id": "m16-l05-q2",
+      "lesson": "m16-l05",
+      "type": "single",
+      "question": "`db.Incidents` ist ein `DbSet<Incident>`. Bei welcher Zeile fehlt `WHERE` im SQL, sodass alle Zeilen geladen werden?",
+      "options": [
+        { "text": "`IEnumerable<Incident> all = db.Incidents; all.Where(i => i.FailureCount >= 5).ToList();`", "correct": true, "feedback": "Der Typ `IEnumerable<Incident>` wählt `Enumerable.Where`. Das Lambda ist Code und läuft im Programm." },
+        { "text": "`db.Incidents.Where(i => i.FailureCount >= 5).ToList();`", "misconception": "m16-l05-tolist-at-end-changes-nothing", "feedback": "Hier ist `Where` die Methode `Queryable.Where`. Der Filter steht im SQL, `ToList()` löst die Abfrage nur aus." },
+        { "text": "`db.Incidents.Where(i => i.FailureCount >= 5).AsEnumerable().ToList();`", "feedback": "Das `Where` steht vor `AsEnumerable()` und wird übersetzt." },
+        { "text": "`db.Incidents.Where(i => i.FailureCount >= 5).Count();`", "feedback": "`Count` läuft in der Datenbank. Der Filter steht im SQL." }
+      ],
+      "explanation": "Entscheidend ist der Typ links vom `Where`. Auf einem `IQueryable<T>` nimmt `Where` einen Ausdrucksbaum, den EF Core übersetzt. Auf einem `IEnumerable<T>` nimmt `Where` einen Delegaten und filtert die schon geladenen Zeilen."
+    },
+    {
+      "id": "m16-l05-q3",
+      "lesson": "m16-l05",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.Where(i => Rules.IsSevere(i)).ToList()`, wobei `IsSevere` eine eigene C#-Methode ist. Was passiert?",
+      "options": [
+        { "text": "EF Core wirft eine `InvalidOperationException`, weil es den Aufruf nicht in SQL übersetzen kann.", "correct": true, "feedback": "Im Ausdrucksbaum steht nur der Aufruf, nicht der Rumpf der Methode." },
+        { "text": "EF Core lädt alle Zeilen und ruft `IsSevere` im Programm auf.", "misconception": "m16-l05-ef-translates-every-method", "feedback": "Das macht EF Core in einem `Where` nicht. Es würde unbemerkt sehr viele Zeilen laden." },
+        { "text": "EF Core übersetzt den Rumpf von `IsSevere` in SQL.", "misconception": "m16-l05-ef-translates-every-method", "feedback": "EF Core sieht den Rumpf einer Methode nicht, nur ihren Aufruf." },
+        { "text": "Der Code kompiliert nicht, weil `Where` keine Methode aufrufen darf.", "feedback": "Der Code kompiliert. Der Fehler tritt erst beim Ausführen der Abfrage auf." }
+      ],
+      "explanation": "EF Core übersetzt nur, wofür es SQL kennt. Eine eigene Methode im `Where` ist ein Laufzeitfehler. Du schreibst die Bedingung direkt ins Lambda oder in einen `Expression<Func<…>>`."
+    },
+    {
+      "id": "m16-l05-q4",
+      "lesson": "m16-l05",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.Select(i => new { i.User, Label = Describe(i.FailureCount) })`, wobei `Describe` eine eigene C#-Methode ist. Was passiert?",
+      "options": [
+        { "text": "Es funktioniert: Die Datenbank liefert `User` und `FailureCount`, und `Describe` läuft im Programm für jede Zeile.", "correct": true, "feedback": "Im letzten `Select` erlaubt EF Core diese Client-Auswertung." },
+        { "text": "Es wirft eine Ausnahme, weil eigene Methoden nie erlaubt sind.", "misconception": "m16-l05-ef-translates-every-method", "feedback": "Im letzten `Select` sind sie erlaubt. In `Where` nicht." },
+        { "text": "Die Datenbank führt `Describe` aus.", "misconception": "m16-l05-ef-translates-every-method", "feedback": "Die Datenbank kennt die C#-Methode nicht." },
+        { "text": "EF Core lädt dafür immer die ganze Zeile mit allen Spalten.", "feedback": "Es liest nur die Spalten, die das Ergebnis braucht." }
+      ],
+      "explanation": "Nur die oberste Projektion, also das letzte `Select`, darf Code enthalten, den EF Core nicht übersetzen kann. Die Datenbank liefert die nötigen Spalten, den Rest erledigt das Programm."
+    },
+    {
+      "id": "m16-l05-q5",
+      "lesson": "m16-l05",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.ToList().Where(i => i.FailureCount >= 5).ToList()`. Wo wird gefiltert?",
+      "options": [
+        { "text": "Im Programm: Das erste `ToList()` lädt alle Zeilen, danach filtert `Enumerable.Where` die Liste.", "correct": true, "feedback": "Das frühe `ToList()` beendet den übersetzten Teil der Abfrage." },
+        { "text": "In der Datenbank: Das `ToList()` ändert nichts an der Übersetzung.", "misconception": "m16-l05-tolist-at-end-changes-nothing", "feedback": "`ToList()` führt die Abfrage aus, und danach gibt es nur noch eine Liste im Speicher." },
+        { "text": "In der Datenbank, aber erst beim zweiten `ToList()`.", "misconception": "m16-l05-tolist-at-end-changes-nothing", "feedback": "Das `Where` steht nicht in dem Teil, der an die Datenbank geht." },
+        { "text": "Gar nicht: Die Abfrage ist ungültig.", "feedback": "Sie ist gültig und liefert das gefilterte Ergebnis, aber nach dem Laden aller Zeilen." }
+      ],
+      "explanation": "Die Stelle von `ToList()` bestimmt, was in der Datenbank läuft. Alles vor `ToList()` kann übersetzt werden, alles danach arbeitet auf Objekten im Speicher."
+    },
+    {
+      "id": "m16-l05-q7",
+      "lesson": "m16-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen `IQueryable<T>` und `IEnumerable<T>` bei einem `Where`.",
+      "modelAnswer": "Bei `IQueryable<T>` nimmt `Where` einen Ausdrucksbaum. Das Lambda bleibt Daten, die der Provider von EF Core in SQL übersetzt, und die Datenbank filtert.\n\nBei `IEnumerable<T>` nimmt `Where` einen Delegaten. Das Lambda ist Code und läuft für jedes Element im Speicher, sodass vorher alle Zeilen geladen sein müssen. Mit `AsEnumerable()` wechselst du bewusst von der ersten in die zweite Art."
+    },
+    {
+      "id": "m16-l05-q8",
+      "lesson": "m16-l05",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du einen Filter als `Expression<Func<…>>` schreiben? Nenne ein Beispiel und einen Grund.",
+      "modelAnswer": "Wenn derselbe Filter in mehreren Abfragen auf eine Datenbank gebraucht wird, zum Beispiel „aktive Benutzer“. Als `Expression<Func<User, bool>>` steht er an einer Stelle und wird trotzdem in jeder Abfrage in SQL übersetzt, sodass die Datenbank filtert und nicht das Programm."
+    },
+    {
+      "id": "m16-l06-q1",
+      "lesson": "m16-l06",
+      "type": "single",
+      "question": "Du lädst `Incident bob = db.Incidents.Single(i => i.User == \"bob\");`. In der Datenbank hat `bob` zwei Events. Was ist `bob.Events.Count` direkt danach?",
+      "options": [
+        { "text": "0: Die Navigation wurde nicht geladen, die Liste ist leer.", "correct": true, "feedback": "Die Abfrage liest nur die Zeile aus `Incidents`." },
+        { "text": "2: EF Core lädt die Events beim ersten Zugriff.", "misconception": "m16-l06-navigation-loaded-automatically", "feedback": "Der Zugriff auf die Eigenschaft lädt nichts. Du bekommst, was im Objekt steht." },
+        { "text": "2: EF Core lädt die Events immer gleich mit.", "misconception": "m16-l06-navigation-loaded-automatically", "feedback": "Ohne `Include` oder Explicit Loading bleibt die Navigation leer." },
+        { "text": "Es gibt eine Ausnahme, weil `Events` nicht geladen ist.", "feedback": "Es gibt keine Ausnahme. Die Liste ist leer." }
+      ],
+      "explanation": "Eine Abfrage lädt nur die abgefragte Tabelle. Navigationen füllst du mit `Include`, `ThenInclude` oder Explicit Loading."
+    },
+    {
+      "id": "m16-l06-q2",
+      "lesson": "m16-l06",
+      "type": "single",
+      "question": "Welche Abfrage lädt die Vorfälle zusammen mit ihren Events in einem Befehl?",
+      "options": [
+        { "text": "`db.Incidents.Include(i => i.Events).ToList()`", "correct": true, "feedback": "`Include` gibt EF Core vor, die Events per `LEFT JOIN` mitzulesen." },
+        { "text": "`db.Incidents.ToList()`", "misconception": "m16-l06-navigation-loaded-automatically", "feedback": "Das lädt nur die Vorfälle. Die Events bleiben leer." },
+        { "text": "`db.Incidents.Select(i => i.Id).ToList()`", "feedback": "Das lädt nur die Ids." },
+        { "text": "`db.Incidents.Where(i => i.Events != null).ToList()`", "misconception": "m16-l06-navigation-loaded-automatically", "feedback": "Ein Filter lädt keine Navigation. Er ändert nur, welche Vorfälle kommen." }
+      ],
+      "explanation": "`Include` ist Eager Loading: Du sagst in der Abfrage, welche Navigation mitkommen soll. Die Datenbank verbindet die Tabellen mit einem `LEFT JOIN`."
+    },
+    {
+      "id": "m16-l06-q3",
+      "lesson": "m16-l06",
+      "type": "single",
+      "question": "Du lädst 10 Vorfälle mit `ToList()` und rufst in einer Schleife für jeden `Entry(incident).Collection(i => i.Events).Load()` auf. Wie viele Befehle gehen an die Datenbank?",
+      "options": [
+        { "text": "11: einer für die Vorfälle und je einer für jeden Vorfall.", "correct": true, "feedback": "Das ist das N+1-Problem mit N = 10." },
+        { "text": "1: EF Core fasst alle Befehle zusammen.", "feedback": "Jedes `Load()` ist ein eigener Befehl." },
+        { "text": "10: Die Vorfälle werden nicht extra gelesen.", "feedback": "Die Vorfälle selbst kosten einen Befehl, daher 11." },
+        { "text": "2: einer für die Vorfälle und einer für alle Events.", "feedback": "Das wäre die Ausgabe von `Include`, nicht der Schleife." }
+      ],
+      "explanation": "1 Befehl für die Vorfälle plus N Befehle für die Events: 1 + N. Mit `Include` wäre es 1 Befehl."
+    },
+    {
+      "id": "m16-l06-q4",
+      "lesson": "m16-l06",
+      "type": "single",
+      "question": "Wie behebst du das N+1-Problem in der Schleife, wenn du die Events aller Vorfälle brauchst?",
+      "options": [
+        { "text": "Du lädst die Events mit `Include(i => i.Events)` schon in der Abfrage der Vorfälle.", "correct": true, "feedback": "So holt ein einziger Befehl Vorfälle und Events." },
+        { "text": "Du rufst `ToList()` in der Schleife zusätzlich auf.", "feedback": "Das ändert die Zahl der Befehle nicht." },
+        { "text": "Du machst die Schleife schneller, indem du `foreach` durch `for` ersetzt.", "feedback": "Die Befehle kommen von der Datenbank, nicht von der Schleifenart." },
+        { "text": "Du benutzt `AsEnumerable()` vor der Schleife.", "feedback": "`AsEnumerable()` wechselt in den Speicher und lädt keine Navigationen." }
+      ],
+      "explanation": "Du lädst die verwandten Daten vor der Schleife: mit `Include`, oder mit einer Projektion über `Select`, wenn du nur einzelne Werte brauchst."
+    },
+    {
+      "id": "m16-l06-q5",
+      "lesson": "m16-l06",
+      "type": "single",
+      "question": "Im SQL steht `LEFT JOIN \"Event\" AS \"e\" ON \"i\".\"Id\" = \"e\".\"IncidentId\"`. Was bewirkt das für einen Vorfall ohne Events?",
+      "options": [
+        { "text": "Der Vorfall bleibt im Ergebnis, die Spalten des Events sind leer.", "correct": true, "feedback": "Das unterscheidet `LEFT JOIN` von einem `JOIN`, der nur Paare behält." },
+        { "text": "Der Vorfall fällt aus dem Ergebnis.", "feedback": "Das wäre bei einem einfachen `JOIN` so." },
+        { "text": "Die Datenbank legt ein leeres Event an.", "feedback": "Eine Abfrage legt keine Zeilen an." },
+        { "text": "Die Abfrage bricht mit einem Fehler ab.", "feedback": "Ein Vorfall ohne Events ist kein Fehler." }
+      ],
+      "explanation": "`JOIN` verbindet Zeilen zweier Tabellen über die Bedingung nach `ON`. Beim `LEFT JOIN` bleiben alle Zeilen der linken Tabelle (hier die Vorfälle), auch ohne Partner."
+    },
+    {
+      "id": "m16-l06-q7",
+      "lesson": "m16-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was das N+1-Problem ist und wie du es behebst.",
+      "modelAnswer": "Du lädst die Vorfälle mit einem Befehl und holst dann in einer Schleife die Events jedes Vorfalls nach, mit einem Befehl pro Vorfall. Bei N Vorfällen sind das 1 + N Befehle, und jeder ist ein eigener Weg zur Datenbank.\n\nDu behebst es, indem du die verwandten Daten schon in der ersten Abfrage mit `Include` lädst, oder mit `Select` nur die Werte holst, die du brauchst. Dann geht ein einziger Befehl an die Datenbank."
+    },
+    {
+      "id": "m16-l06-q8",
+      "lesson": "m16-l06",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt würdest du `Include` einsetzen? Nenne ein Beispiel und einen Grund.",
+      "modelAnswer": "Wenn eine Seite Bestellungen mit ihren Positionen anzeigt, lädst du beides mit `Include(o => o.Items)`. So geht ein Befehl an die Datenbank, statt einer pro Bestellung."
     }
   ]
 }

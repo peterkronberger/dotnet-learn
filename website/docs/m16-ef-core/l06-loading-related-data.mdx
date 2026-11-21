@@ -1,0 +1,158 @@
+---
+title: Verwandte Daten laden
+sidebar_position: 6
+description: Warum eine Navigationseigenschaft nach einer Abfrage leer sein kann, wie Include sie füllt und woran du das N+1-Problem erkennst.
+lesson_id: m16-l06
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import includeProgram from '!!raw-loader!@site/examples/_ci/m16-l06-include/Program.cs';
+import includeOutput from '!!raw-loader!@site/examples/_ci/m16-l06-include/expected.out.txt';
+import nPlusOne from '!!raw-loader!@site/examples/_ci/m16-l06-n-plus-one/Program.cs';
+import nPlusOneOutput from '!!raw-loader!@site/examples/_ci/m16-l06-n-plus-one/expected.out.txt';
+import gapInclude from '!!raw-loader!@site/examples/m16/l06/gap-include.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l06/seclog-program-block.snippet.cs';
+
+# Verwandte Daten laden
+
+:::note[Lernziele]
+- Du sagst voraus, ob eine Navigationseigenschaft nach einer Abfrage gefüllt ist.
+- Du lädst verwandte Daten mit `Include` und `ThenInclude`.
+- Du erkennst das N+1-Problem in einem Codebeispiel und behebst es.
+:::
+
+## Rückblick
+
+<Quiz id="m16-l03-q1" />
+
+<Quiz id="m11-l09-q2" />
+
+## Navigationen sind nicht von selbst gefüllt
+
+Eine Abfrage auf `Incidents` liest die Zeilen der Tabelle `Incidents`. Die <Term id="navigation-property">Navigationseigenschaft</Term> `Events` gehört zu einer anderen Tabelle, und EF Core liest diese Zeilen nicht mit. Die Collection-Navigation bleibt leer (hier eine leere Liste), eine Referenz-Navigation bleibt `null`.
+
+Es gibt zwei Wege, sie zu füllen. Beim <Term id="eager-loading">Eager Loading</Term> sagst du in der Abfrage, was mitkommen soll: `Include(i => i.Events)` lädt die Events der Vorfälle, `ThenInclude` geht eine Ebene tiefer. Beim <Term id="explicit-loading">Explicit Loading</Term> lädst du eine Navigation später mit einem eigenen Befehl nach: `Entry(incident).Collection(i => i.Events).Load()` ([Loading related data](https://learn.microsoft.com/ef/core/querying/related-data/)).
+
+Das folgende Programm benutzt ein kleines Modell: Ein Vorfall hat Events, und jedes Event hat eine Quelle (`LogSource`). Jeder Abschnitt öffnet einen neuen Context, damit nichts vom Abschnitt davor schon geladen ist.
+
+<CodeBlock language="csharp" title="Program.cs">{includeProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Events hat `bob` in Abschnitt 1, 2 und 3? Welchen Wert hat `Source` in Abschnitt 2 und in Abschnitt 3? Was steht im SQL von Abschnitt 2? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{includeOutput}</CodeBlock>
+
+1. **Ohne `Include`:** `bob` hat 0 Events in der Liste, obwohl 2 in der Datenbank stehen. Die Navigation wurde nicht geladen.
+2. **Mit `Include`:** `Include(i => i.Events)` lädt die Events mit. Im SQL steht ein `LEFT JOIN`. Ein `JOIN` verbindet die Zeilen zweier Tabellen: `ON` nennt die Bedingung, hier gleiche Werte in `Id` und `IncidentId`. Beim `LEFT JOIN` bleiben auch Vorfälle ohne Event in der Ausgabe, mit leeren Spalten. `Source` ist `null`, weil nur die Events, nicht ihre Quellen geladen wurden.
+3. **Mit `ThenInclude`:** `ThenInclude(e => e.Source)` lädt die Quelle der Events, auf die das vorherige `Include` zeigt. Jetzt steht `auth-01` dort.
+
+**Was passiert, wenn …** du `Include` für `Events` weglässt und nur `ThenInclude` schreibst? Das geht nicht: `ThenInclude` setzt auf einem `Include` auf.
+
+</details>
+
+<Quiz id="m16-l06-q1" />
+
+<Quiz id="m16-l06-q2" />
+
+<Quiz id="m16-l06-q5" />
+
+Ein `Include` kann Zeilen auch einschränken: `Include(i => i.Events.Where(…))` lädt nur die passenden Events. Erlaubt sind dort `Where`, `OrderBy`, `ThenBy`, `Skip` und `Take` ([Eager loading of related data](https://learn.microsoft.com/ef/core/querying/related-data/eager#filtered-include)). Das ist hier eine Randnotiz.
+
+Eine dritte Art, <Term id="lazy-loading">Lazy Loading</Term>, lädt eine Navigation beim ersten Zugriff automatisch. Sie braucht zusätzliche Einrichtung und ist in diesem Kurs nicht Thema. Sie macht das Problem des nächsten Abschnitts leicht unsichtbar.
+
+## Das N+1-Problem
+
+Du lädst alle Vorfälle (1 Befehl) und holst dann in einer Schleife die Events jedes Vorfalls nach (je 1 Befehl). Bei N Vorfällen sind das 1 + N Befehle. Das ist das <Term id="n-plus-one-problem">N+1-Problem</Term>. Jeder Befehl ist ein eigener Weg zur Datenbank, und bei vielen Vorfällen summieren sich die Wege ([Efficient querying](https://learn.microsoft.com/ef/core/performance/efficient-querying#beware-of-lazy-loading)).
+
+Das folgende Programm zählt die Befehle, die an die Datenbank gehen. Die Zählerklasse am Ende ist eingeklappt.
+
+<CodeBlock language="csharp" title="Program.cs">{nPlusOne}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Befehle gehen in Abschnitt 1 an die Datenbank, wie viele in Abschnitt 2? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{nPlusOneOutput}</CodeBlock>
+
+1. **Schleife:** Ein Befehl liest die 3 Vorfälle, und `Load()` schickt für jeden Vorfall einen weiteren Befehl: 1 + 3 = 4 Befehle.
+2. **Behebung:** `Include(i => i.Events)` holt Vorfälle und Events in einem Befehl: 1 Befehl. Die Ausgabe der Zeilen ist gleich.
+
+Der Fehler fällt bei 3 Vorfällen nicht auf. Bei 1000 Vorfällen wären es 1001 Befehle statt einer.
+
+**Was passiert, wenn …** du in Abschnitt 2 nur Benutzer und Anzahl der Events brauchst? Dann reicht eine Projektion mit `Select(i => new { i.User, Count = i.Events.Count })`: Die Datenbank zählt, und die Events selbst werden nicht geladen.
+
+</details>
+
+<Quiz id="m16-l06-q3" />
+
+<Quiz id="m16-l06-q4" />
+
+Laden mehrere Collection-Navigationen auf derselben Ebene per `Include` gleichzeitig, vervielfacht der `JOIN` die Zeilen: Hat ein Vorfall 10 Events und 10 Kommentare, kommen 100 Zeilen zurück. Das heißt <Term id="split-query">Kartesische Explosion</Term>. `AsSplitQuery()` teilt die Abfrage dann in mehrere Befehle, einen je Collection ([Single vs. split queries](https://learn.microsoft.com/ef/core/querying/single-split-queries)). Dafür nimmst du mehrere Befehle in Kauf. Das ist hier nur eine Randnotiz.
+
+## Gap-Beispiel: Die Navigation laden
+
+Die Lücke `___` fehlt. Die Abfrage soll die Events mitladen, wie der SQL-Kommentar zeigt. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-include.snippet.cs">{gapInclude}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `Include`: `.Include(i => i.Events)`. Das `LEFT JOIN` im SQL kommt von dieser Methode.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l05/`) speichert Vorfälle mit ihren Fehlversuchen und fragt die kritischen Vorfälle mit einem Ausdrucksbaum als Filter in der Datenbank ab.
+
+**Neue Anforderung:** SecLog gibt für jeden gespeicherten Vorfall die Zeitpunkte seiner Fehlversuche aus, mit einer einzigen Abfrage. Das Programm druckt unter `== Database ==` das SQL und danach pro Vorfall die Zeitpunkte, sortiert nach Zeitpunkt.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Laden:** `Include(i => i.Events)` lädt die Fehlversuche mit den Vorfällen. Das gedruckte SQL zeigt eine einzige Anweisung mit `LEFT JOIN`.
+2. **Ordnen:** `OrderBy(i => i.Id)` hält die Vorfälle stabil. Die Events sortiert das Programm mit `OrderBy(e => e.Timestamp)`, denn die Reihenfolge der Events einer Navigation ist nicht festgelegt.
+3. **Ausgeben:** Die geschachtelte Schleife druckt je Vorfall die Zeitpunkte. Die Navigation ist gefüllt, ohne dass ein weiterer Befehl nötig ist.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l06/`) liest Vorfälle samt Fehlversuchen mit einer einzigen Abfrage.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l06-navigation-loaded-automatically" />
+
+**„Eine Navigationseigenschaft wird automatisch geladen, sobald ich darauf zugreife.“** Der Zugriff auf `bob.Events` lädt nichts: Du bekommst die Liste, die gerade im Objekt steht, und das ist ohne `Include` oder Explicit Loading eine leere Liste. Du musst die Navigation laden.
+:::
+
+## Zusammenfassung
+
+Eine Abfrage lädt nur die Zeilen der abgefragten Tabelle. Navigationen bleiben leer, bis du sie mit `Include` und `ThenInclude` (Eager Loading) oder mit `Entry(…).Collection(…).Load()` (Explicit Loading) lädst. Wer in einer Schleife je Vorfall nachlädt, schickt 1 + N Befehle: das N+1-Problem. `Include` oder eine Projektion mit `Select` holen die Daten mit einem Befehl.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m16-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Eager loading of related data](https://learn.microsoft.com/ef/core/querying/related-data/eager)
+- Microsoft Learn: [Explicit loading of related data](https://learn.microsoft.com/ef/core/querying/related-data/explicit)
+- Microsoft Learn: [Efficient querying](https://learn.microsoft.com/ef/core/performance/efficient-querying)
