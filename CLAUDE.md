@@ -96,6 +96,7 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 - A new module starts with one issue `Module <N>` (label `claude:auto-architect`); the architect derives all lessons and issues from `concept/module-plan.md` as described in `concept/issue-blueprint.md`.
 - Changes to `.github/workflows/` need a human (set in `claude-implement.yml`).
 - Pull requests (title and description) and commit messages are written in English.
+- **Checkpoints in automated runs.** The runner is temporary: everything not pushed is lost when a run ends (timeout, `--max-turns`, cancel; see #602, three runs lost all work). So after every finished part (one CI example project, one lesson, one SecLog step) commit and `git push -u origin HEAD` at once, even if checks are still open (a WIP commit is fine; fix it in a later commit, no force push). Push before you start a long check. Run `tools/check-examples.sh` in the foreground and only after the push; while building examples, run the single project (`bash website/examples/_ci/<name>/run.sh`) instead of the full check. Open the PR as soon as the first push exists (draft is fine) and list in its description what is still open.
 - Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
 ## Context budget (module work)
