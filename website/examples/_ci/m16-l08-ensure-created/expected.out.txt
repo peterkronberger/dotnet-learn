@@ -1,0 +1,4 @@
+1. Created: True
+2. Created: False
+   Incidents: 1
+   The query failed: the table has no column Severity
