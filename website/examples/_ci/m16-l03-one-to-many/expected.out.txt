@@ -1,0 +1,20 @@
+CREATE TABLE "Incidents" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Incidents" PRIMARY KEY AUTOINCREMENT,
+    "User" TEXT NOT NULL
+);
+
+
+CREATE TABLE "Events" (
+    "Id" INTEGER NOT NULL CONSTRAINT "PK_Events" PRIMARY KEY AUTOINCREMENT,
+    "EventType" TEXT NOT NULL,
+    "IncidentId" INTEGER NOT NULL,
+    CONSTRAINT "FK_Events_Incidents_IncidentId" FOREIGN KEY ("IncidentId") REFERENCES "Incidents" ("Id") ON DELETE CASCADE
+);
+
+
+CREATE INDEX "IX_Events_IncidentId" ON "Events" ("IncidentId");
+
+
+
+bob: 2
+dave: 1

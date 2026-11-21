@@ -1,0 +1,171 @@
+---
+title: Von LINQ zu SQL
+sidebar_position: 4
+description: Wie EF Core eine LINQ-Abfrage auf einem DbSet in eine SQL-Anweisung übersetzt, wann sie läuft und wie du das SQL mit ToQueryString anzeigst.
+lesson_id: m16-l04
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import translation from '!!raw-loader!@site/examples/_ci/m16-l04-translation/Program.cs';
+import translationOutput from '!!raw-loader!@site/examples/_ci/m16-l04-translation/expected.out.txt';
+import whenItRuns from '!!raw-loader!@site/examples/_ci/m16-l04-when-it-runs/Program.cs';
+import whenItRunsOutput from '!!raw-loader!@site/examples/_ci/m16-l04-when-it-runs/expected.out.txt';
+import gapQuery from '!!raw-loader!@site/examples/m16/l04/gap-query.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l04/seclog-program-block.snippet.cs';
+
+# Von LINQ zu SQL
+
+:::note[Lernziele]
+- Du sagst für eine LINQ-Abfrage auf einem `DbSet` voraus, welche Teile im SQL landen (`WHERE`, `ORDER BY`, Projektion).
+- Du zeigst das erzeugte SQL mit `ToQueryString()` an.
+- Du erklärst, wann die Abfrage an die Datenbank geht.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l05-q1" />
+
+<Quiz id="m11-l10-q1" />
+
+<Quiz id="m16-l01-q2" />
+
+## Eine Abfrage wird zu einer SQL-Anweisung
+
+Eine LINQ-Abfrage auf einem `DbSet` läuft nicht in C#. EF Core liest den Aufbau der Abfrage und erzeugt daraus eine einzige SQL-Anweisung, die die Datenbank ausführt ([How queries work](https://learn.microsoft.com/ef/core/querying/how-query-works)). Das ist die <Term id="query-translation">Abfrageübersetzung</Term>. Die Lambdas wie `i => i.FailureCount >= 5` werden dabei nicht aufgerufen, sondern gelesen und übersetzt.
+
+`ToQueryString()` zeigt dir das SQL, ohne die Abfrage auszuführen. Das folgende Programm schreibt dieselbe Abfrage zweimal: in Methoden-Syntax und in Abfrage-Syntax.
+
+<CodeBlock language="csharp" title="Program.cs">{translation}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Teile der Abfrage stehen im SQL, und in welcher Reihenfolge? Ist das SQL der Abfrage-Syntax gleich dem der Methoden-Syntax? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="sql" title="Ausgabe">{translationOutput}</CodeBlock>
+
+Das SQL hat eine feste Reihenfolge von Teilen. Jedes Schlüsselwort entspricht einem LINQ-Operator:
+
+1. **`SELECT`:** Die Spaltenliste. Sie kommt aus `Select`. Nur `User` und `FailureCount` stehen darin, weil nur diese gebraucht werden.
+2. **`FROM`:** Die Tabelle, aus der gelesen wird: `Incidents`. `AS "i"` gibt ihr den Kurznamen `i`, wie die Lambda-Variable.
+3. **`WHERE`:** Die Bedingung aus `Where`.
+4. **`ORDER BY`:** Die Sortierung aus `OrderByDescending`. `DESC` heißt absteigend.
+5. **`LIMIT`:** Die Höchstzahl der Zeilen aus `Take`.
+
+Bei `Take(1)` steht der Wert nicht im Text, sondern als Parameter: `.param set @p 1` legt den Wert fest, und `@p` im SQL ist der Platzhalter dafür. Ein Parameter ist ein Platzhalter, den die Datenbank beim Ausführen mit dem Wert füllt. So steht ein Wert aus deinem Programm nie als Text im SQL.
+
+`Same SQL: True` zeigt: Beide Schreibweisen ergeben dieselbe Anweisung.
+
+**Was passiert, wenn …** du `OrderByDescending` durch `OrderBy` ersetzt? Dann steht `ORDER BY "i"."FailureCount"` ohne `DESC` im SQL.
+
+</details>
+
+<Quiz id="m16-l04-q1" />
+
+<Quiz id="m16-l04-q6" />
+
+## Abfrage-Syntax wird zuerst zu Methodenaufrufen
+
+Die Abfrage-Syntax (`from … where … select`) kennt EF Core nicht selbst. Der Compiler übersetzt sie zuerst in Methodenaufrufe. Auf einer Quelle vom Typ `IQueryable<T>`, wie sie ein `DbSet` ist, sind das die Methoden der Klasse `Queryable`: `where` wird zu `Queryable.Where`, `select` zu `Queryable.Select` ([Query expression translation (§12.20.3)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12203-query-expression-translation)). Erst diese Aufrufe übersetzt EF Core in SQL. Darum ist das Ergebnis oben gleich.
+
+<Forward concepts={['`IQueryable<T>`']} module="16" />
+
+<Quiz id="m16-l04-q5" />
+
+## Wann läuft die Abfrage?
+
+Wie bei LINQ auf Listen (verzögerte Ausführung, `m11-l05`) tut das Schreiben der Abfrage nichts. Die Abfrage geht an die Datenbank, wenn du sie ausliest: mit `foreach`, `ToList()` oder `First()`. Aggregate wie `Count` und `Any` laufen sofort und in der Datenbank ([Querying data](https://learn.microsoft.com/ef/core/querying/)).
+
+Das folgende Programm druckt jeden Befehl, der an die Datenbank geht. Die Hilfsklasse am Ende ist eingeklappt: Sie ist nur Werkzeug, nicht das Thema.
+
+<CodeBlock language="csharp" title="Program.cs">{whenItRuns}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Befehle gehen an die Datenbank, und nach welcher Zeile des Programms? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{whenItRunsOutput}</CodeBlock>
+
+1. **Bauen:** Nach `Build the query` kommt kein SQL. `Where` beschreibt nur.
+2. **Auslesen:** Erst `foreach` schickt ein `SELECT` mit `WHERE`. Danach kommt `Found bob`. Nur eine Zeile kommt aus der Datenbank, nicht die ganze Tabelle.
+3. **Zählen:** `Count` ergibt `SELECT COUNT(*)`. Die Datenbank zählt und liefert eine Zahl.
+4. **Prüfen:** `Any` ergibt `SELECT EXISTS (…)`. Die Datenbank prüft, ob mindestens eine Zeile passt, und liefert `False`.
+
+**Was passiert, wenn …** du `query` zweimal mit `foreach` ausliest? Dann geht der Befehl zweimal an die Datenbank. Wie bei LINQ auf Listen läuft die Abfrage bei jedem Auslesen neu.
+
+</details>
+
+<Quiz id="m16-l04-q2" />
+
+<Quiz id="m16-l04-q4" />
+
+Eine Abfrage, die über Navigationen auf eine zweite Tabelle zugreift, übersetzt EF Core in einen `JOIN`: Die Datenbank verbindet die Zeilen der beiden Tabellen über den Fremdschlüssel. Das ist hier nur eine Randnotiz.
+
+## Gap-Beispiel: Die Sortierung
+
+Die Lücke `___` fehlt. Die Abfrage soll nach `FailureCount` absteigend sortieren, wie der SQL-Kommentar zeigt. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-query.snippet.cs">{gapQuery}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `OrderByDescending`: `.OrderByDescending(i => i.FailureCount)`. `DESC` im SQL heißt absteigend, und die Methode mit dem Zusatz `Descending` erzeugt es.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l03/`) speichert Vorfälle mit ihren Fehlversuchen in der Datenbank und zählt die Events je Vorfall.
+
+**Neue Anforderung:** SecLog fragt die Datenbank ab: alle Vorfälle mit mindestens 5 Fehlversuchen, sortiert nach Anzahl absteigend, nur Benutzer und Anzahl. Der Schwellenwert kommt aus `DetectionOptions.MaxFailures`, im Programm als `maxFailures`. Das Programm druckt unter `== Database ==` das SQL mit `ToQueryString()` und das Ergebnis.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderter Block)">{programBlock}</CodeBlock>
+
+1. **Filtern:** `Where(i => i.FailureCount >= maxFailures)` wird zu `WHERE`. Der Wert von `maxFailures` steht im SQL als Parameter.
+2. **Sortieren:** `OrderByDescending` wird zu `ORDER BY … DESC`.
+3. **Projizieren:** `Select(i => new { i.User, i.FailureCount })` begrenzt die Spalten auf diese beiden.
+4. **Ausführen:** `ToQueryString()` druckt das SQL, ohne etwas auszuführen. Erst das `foreach` schickt die Anweisung an die Datenbank.
+
+Das Programm druckt nur `Severe: bob 5`, denn `dave` hat einen Fehlversuch und liegt unter dem Schwellenwert.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l04/`) fragt die Datenbank gezielt ab und zeigt das erzeugte SQL.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l04-query-loads-whole-table" />
+
+**„EF Core lädt erst die ganze Tabelle und filtert dann in C#.“** `Where`, `OrderBy` und `Select` werden in SQL übersetzt, und die Datenbank liefert nur die passenden Zeilen und Spalten. Das gilt für Code, den EF Core übersetzen kann. Was es nicht übersetzen kann, folgt in einer späteren Lektion.
+:::
+
+## Zusammenfassung
+
+EF Core übersetzt eine LINQ-Abfrage auf einem `DbSet` in eine SQL-Anweisung: `Where` wird zu `WHERE`, `OrderBy` zu `ORDER BY`, `Select` zur Spaltenliste, `Take` zu `LIMIT`. Die Abfrage-Syntax wird vom Compiler zuerst in `Queryable`-Aufrufe umgeschrieben. Das Schreiben der Abfrage sendet nichts, erst das Auslesen (`foreach`, `ToList`, `First`) und Aggregate wie `Count` und `Any`. `ToQueryString()` zeigt das SQL, ohne es auszuführen.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l04-q7" />
+
+### Transferfrage
+
+<Quiz id="m16-l04-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [How queries work](https://learn.microsoft.com/ef/core/querying/how-query-works)
+- Microsoft Learn: [Querying data](https://learn.microsoft.com/ef/core/querying/)
+- Microsoft Learn: [Query expression translation (C#-Spezifikation)](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#12203-query-expression-translation)

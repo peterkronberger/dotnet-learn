@@ -10793,6 +10793,90 @@
         "title": "Indexes",
         "url": "https://learn.microsoft.com/ef/core/modeling/indexes"
       }
+    },
+    {
+      "id": "foreign-key",
+      "term": "Foreign Key",
+      "german": "Fremdschlüssel",
+      "category": "platform",
+      "definition": "Eine Spalte, die auf den Primärschlüssel einer anderen Tabelle zeigt. So verbindet die Datenbank Zeilen miteinander.",
+      "aliases": ["Fremdschlüssel"],
+      "related": ["primary-key", "navigation-property"],
+      "lesson": "m16-l03",
+      "source": {
+        "title": "Introduction to relationships",
+        "url": "https://learn.microsoft.com/ef/core/modeling/relationships"
+      }
+    },
+    {
+      "id": "navigation-property",
+      "term": "Navigation Property",
+      "german": "Navigationseigenschaft",
+      "category": "platform",
+      "definition": "Eine Eigenschaft einer Entity-Klasse, die auf ein anderes Objekt (Referenz-Navigation) oder auf eine Liste von Objekten (Collection-Navigation) zeigt.",
+      "aliases": ["Navigationseigenschaften", "Navigation"],
+      "related": ["foreign-key", "one-to-many-relationship"],
+      "lesson": "m16-l03",
+      "source": {
+        "title": "Introduction to relationships",
+        "url": "https://learn.microsoft.com/ef/core/modeling/relationships"
+      }
+    },
+    {
+      "id": "one-to-many-relationship",
+      "term": "One-to-many Relationship",
+      "german": "1:n-Beziehung",
+      "category": "platform",
+      "definition": "Ein Objekt hat mehrere zugehörige Objekte, jedes davon gehört zu genau einem. Die Tabelle der Seite „n“ trägt den Fremdschlüssel.",
+      "aliases": ["1:n-Beziehung"],
+      "related": ["foreign-key", "navigation-property", "many-to-many-relationship"],
+      "lesson": "m16-l03",
+      "source": {
+        "title": "One-to-many relationships",
+        "url": "https://learn.microsoft.com/ef/core/modeling/relationships/one-to-many"
+      }
+    },
+    {
+      "id": "many-to-many-relationship",
+      "term": "Many-to-many Relationship",
+      "german": "n:m-Beziehung",
+      "category": "platform",
+      "definition": "Beide Seiten haben mehrere zugehörige Objekte. In EF Core genügen zwei Collection-Navigationen, die Verbindungstabelle legt EF Core selbst an.",
+      "aliases": ["n:m-Beziehung"],
+      "related": ["join-table", "one-to-many-relationship"],
+      "lesson": "m16-l03",
+      "source": {
+        "title": "Many-to-many relationships",
+        "url": "https://learn.microsoft.com/ef/core/modeling/relationships/many-to-many"
+      }
+    },
+    {
+      "id": "join-table",
+      "term": "Join Table",
+      "german": "Verbindungstabelle",
+      "category": "platform",
+      "definition": "Eine Tabelle, die bei einer n:m-Beziehung je Zuordnung eine Zeile mit den beiden Fremdschlüsseln speichert.",
+      "aliases": ["Verbindungstabelle"],
+      "related": ["many-to-many-relationship", "foreign-key"],
+      "lesson": "m16-l03",
+      "source": {
+        "title": "Many-to-many relationships",
+        "url": "https://learn.microsoft.com/ef/core/modeling/relationships/many-to-many"
+      }
+    },
+    {
+      "id": "query-translation",
+      "term": "Query Translation",
+      "german": "Abfrageübersetzung",
+      "category": "platform",
+      "definition": "EF Core übersetzt eine LINQ-Abfrage auf einem `DbSet` beim Auslesen in eine SQL-Anweisung, die die Datenbank ausführt.",
+      "aliases": ["Übersetzung der Abfrage"],
+      "related": ["sql", "deferred-execution"],
+      "lesson": "m16-l04",
+      "source": {
+        "title": "How queries work",
+        "url": "https://learn.microsoft.com/ef/core/querying/how-query-works"
+      }
     }
   ]
 }
