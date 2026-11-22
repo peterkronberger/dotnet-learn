@@ -1,0 +1,15 @@
+Concatenated, FromSqlRaw:
+SELECT * FROM Incidents WHERE User = 'x' OR '1'='1'
+
+Rows: 3
+
+Interpolated, FromSqlRaw rows: 3
+
+Interpolated, FromSql:
+.param set p0 'x'' OR ''1''=''1'
+
+SELECT * FROM Incidents WHERE User = @p0
+
+Rows: 0
+
+Explicit parameter, FromSqlRaw rows: 0
