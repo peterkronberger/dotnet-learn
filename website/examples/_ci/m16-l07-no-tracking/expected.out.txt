@@ -1,0 +1,7 @@
+1. Tracking: Modified
+   Rows written: 1
+2. AsNoTracking: Detached
+   Rows written: 0
+3. In the database now
+   bob: investigating
+   dave: open
