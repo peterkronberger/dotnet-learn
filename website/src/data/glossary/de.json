@@ -11631,9 +11631,6 @@
       "german": "Handler einer Route",
       "category": "platform",
       "definition": "Die Methode oder das Lambda, das läuft, wenn eine Route passt. Der Rückgabewert wird zur HTTP-Antwort.",
-      "aliases": [
-        "Handler"
-      ],
       "related": [
         "endpoint",
         "minimal-api"

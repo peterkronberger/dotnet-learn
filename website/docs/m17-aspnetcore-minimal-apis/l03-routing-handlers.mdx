@@ -1,0 +1,211 @@
+---
+title: Routing und Handler
+sidebar_position: 3
+description: Wie eine Minimal API Methode und Pfad einem Handler zuordnet, welche Route bei mehreren Treffern gewinnt und wie der Rückgabewert zur Antwort wird.
+lesson_id: m17-l03
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import handlers from '!!raw-loader!@site/examples/_ci/m17-l03-handlers/Program.cs';
+import handlersOutput from '!!raw-loader!@site/examples/_ci/m17-l03-handlers/expected.out.txt';
+import matching from '!!raw-loader!@site/examples/_ci/m17-l03-matching/Program.cs';
+import matchingOutput from '!!raw-loader!@site/examples/_ci/m17-l03-matching/expected.out.txt';
+import gapConstraint from '!!raw-loader!@site/examples/m17/l03/gap-route-constraint.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l03/src/SecLog.Api/Program.cs';
+import apiEndpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l03/src/SecLog.Api/IncidentEndpoints.cs';
+import apiCsproj from '!!raw-loader!@site/examples/_ci/seclog-m17-l03/src/SecLog.Api/SecLog.Api.csproj';
+import apiSettings from '!!raw-loader!@site/examples/_ci/seclog-m17-l03/src/SecLog.Api/appsettings.json';
+
+# Routing und Handler
+
+:::note[Lernziele]
+- Du schreibst mit `WebApplication.CreateBuilder`, `MapGet` und `Run` eine kleine API.
+- Du sagst voraus, welcher Endpoint zu einer Anfrage passt, auch mit Routenparametern und Einschränkungen wie `{id:int}`.
+- Du bündelst Endpoints mit `MapGroup` unter einem gemeinsamen Präfix.
+:::
+
+## Rückblick
+
+<Quiz id="m17-l01-q1" />
+
+<Quiz id="m10-l03-q1" />
+
+## Eine Web-App in wenigen Zeilen
+
+<Term id="asp-net-core">ASP.NET Core</Term> ist das Framework von .NET für Web-Anwendungen. Es baut auf dem generischen Host aus Modul 15 auf: Die App wird mit einem Builder zusammengesetzt, gebaut und gestartet. Eine <Term id="minimal-api">Minimal API</Term> ist die Art, mit sehr wenig Code eine HTTP-API zu schreiben. Das Grundgerüst hat vier Schritte:
+
+1. `WebApplication.CreateBuilder(args)` erzeugt den Builder. Er nimmt Konfiguration und Services auf, wie du es aus Modul 15 kennst.
+2. `builder.Build()` baut daraus die `WebApplication`.
+3. Mit Aufrufen wie `app.MapGet(…)` legst du <Term id="endpoint">Endpoints</Term> an.
+4. `app.Run()` startet die App. Sie wartet dann auf Anfragen.
+
+Ein Webserver, der die Anfragen entgegennimmt, gehört dazu. Er heißt Kestrel und läuft ohne dein Zutun mit. Lektion 12 erklärt ihn.
+
+Ein Endpoint verbindet drei Dinge: eine HTTP-Methode (Lektion 1), eine <Term id="route-template">Routenvorlage</Term> für den Pfad und einen <Term id="route-handler">Handler</Term>. Der Handler ist die Methode oder das Lambda, das läuft, wenn beide passen. Für die Methoden gibt es `MapGet`, `MapPost`, `MapPut` und `MapDelete`. Das <Term id="routing">Routing</Term> sucht zu jeder Anfrage den passenden Endpoint.
+
+Der Rückgabewert des Handlers wird zur Antwort:
+
+- Ein `string` wird Text mit dem Inhaltstyp `text/plain`.
+- Ein Objekt, ein Record oder eine Liste wird mit den Web-Einstellungen aus Lektion 2 zu JSON (camelCase).
+- Ein asynchroner Handler gibt `Task<T>` zurück. Die Antwort enthält den Wert `T`.
+
+Ein Handler ist ein Lambda (Modul 10) oder eine benannte Methode. Beide gibst du `MapGet` als zweites Argument.
+
+Das Programm legt sechs Endpoints an und schickt Anfragen daran. Der Teil, der den Server im Speicher startet und die Anfragen sendet, ist ausgeblendet. Er läuft mit, und die Ausgabe zeigt je Anfrage die Zeile `> GET …`, die Antwort (`< 200 OK`), den Inhaltstyp und den Body.
+
+:::info[Vorhersage]
+Welchen Status, welchen Inhaltstyp und welchen Body liefert jede Anfrage? Was passiert bei `/incidents/abc`, bei `/incidents/99` und bei `/nothing`? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={handlers} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{handlersOutput}</CodeBlock>
+
+1. **Text:** Der Handler von `/` gibt einen `string` zurück: `text/plain`.
+2. **Objekte:** Die Liste und der einzelne Record sind JSON mit camelCase-Namen (`failureCount`).
+3. **Routenparameter:** `{id:int}` und `{name}` nehmen den Pfadteil und übergeben ihn dem Parameter mit demselben Namen. Der Wert ist hier schon eine `int`.
+4. **Einschränkung:** `/incidents/abc` passt nicht zu `{id:int}`. Keine andere Route passt: `404 Not Found`, und der Handler läuft nicht.
+5. **`null`:** Für `/incidents/99` passt die Route, `FirstOrDefault` findet nichts und der Handler gibt `null` zurück. Die Antwort ist `200 OK` mit dem Body `null`. Lektion 6 ersetzt das durch einen passenden Statuscode.
+6. **Benannt und asynchron:** `CountIncidents` ist eine benannte Methode. Der `async`-Handler gibt `Task<int>` zurück, die Antwort enthält die Zahl.
+7. **Keine Route:** `/nothing` hat keinen Endpoint: `404 Not Found`.
+
+**Was passiert, wenn …** du `MapGet("/count", CountIncidents)` durch `MapPost` ersetzt? Dann passt `GET /count` nicht mehr, denn die Methode gehört zum Endpoint.
+
+</details>
+
+<Quiz id="m17-l03-q1" />
+
+<Quiz id="m17-l03-q4" />
+
+## Routenvorlagen, Parameter und Einschränkungen
+
+Eine Routenvorlage ist ein Muster für den Pfad. Text steht für sich selbst. Ein Teil in geschweiften Klammern ist ein <Term id="route-parameter">Routenparameter</Term>: Er passt auf einen beliebigen Pfadteil, und der Wert geht an den Handler-Parameter mit demselben Namen. Ist der Parameter ein `int`, wandelt ASP.NET Core den Text um.
+
+Eine <Term id="route-constraint">Routeneinschränkung</Term> steht hinter einem Doppelpunkt: `{id:int}` passt nur auf ganze Zahlen, `{name:alpha}` nur auf Buchstaben von `a` bis `z`. Eine Einschränkung wählt aus, welche Route passt. Sie prüft keine Eingabe: Passt der Wert nicht, passt die Route nicht, und ohne weitere Route kommt `404`. Fehlerantworten für ungültige Eingaben (`400`) sind das Thema der nächsten Lektionen.
+
+Passen mehrere Routen zu einer Anfrage, entscheidet nicht die Reihenfolge der `Map…`-Aufrufe. Das Routing nimmt die spezifischste Vorlage:
+
+- Eine Vorlage mit mehr Teilen ist spezifischer.
+- Ein Teil aus festem Text ist spezifischer als ein Parameter.
+- Ein Parameter mit Einschränkung ist spezifischer als einer ohne.
+
+Gäbe es zwei gleich spezifische Treffer, wäre die Anfrage mehrdeutig, und die App meldet einen Fehler.
+
+Mit einer <Term id="route-group">Routengruppe</Term> (`MapGroup`) fasst du Endpoints mit gemeinsamem Präfix zusammen. Die Gruppe stellt ihr Präfix jeder Vorlage voran und hat selbst `MapGet` und die anderen Methoden.
+
+:::info[Vorhersage]
+Die drei `/incidents`-Routen sind absichtlich in dieser Reihenfolge angelegt: zuerst die allgemeine, zuletzt die spezifische. Welcher Handler antwortet auf `/incidents/latest`, `/incidents/7` und `/incidents/bob`? Was antwortet `/users/42`? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={matching} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{matchingOutput}</CodeBlock>
+
+1. **Text schlägt Parameter:** `/incidents/latest` passt auf `{name}` und auf `latest`. `{id:int}` entfällt, weil `latest` keine Zahl ist. Die Vorlage mit festem Text `latest` ist spezifischer als `{name}`. Obwohl `{name}` zuerst angelegt wurde, gewinnt sie nicht.
+2. **Einschränkung schlägt Parameter:** `/incidents/7` passt auf `{name}` und auf `{id:int}`. Die Vorlage mit Einschränkung ist spezifischer.
+3. **Rest:** `bob` ist keine Zahl, `{id:int}` entfällt, `{name}` bleibt.
+4. **Gruppe:** `users.MapGet("/", …)` hat die Vorlage `/users`, `users.MapGet("/{name:alpha}", …)` die Vorlage `/users/{name:alpha}`.
+5. **Einschränkung `alpha`:** `42` besteht aus Ziffern. Die Route passt nicht: `404 Not Found`.
+
+**Was passiert, wenn …** du die Aufrufe tauschst und `/incidents/latest` zuerst anlegst? Das Ergebnis bleibt gleich. Die Reihenfolge entscheidet nicht.
+
+</details>
+
+<Quiz id="m17-l03-q2" />
+
+<Quiz id="m17-l03-q3" />
+
+<Quiz id="m17-l03-q5" />
+
+## Gap-Beispiel: die Einschränkung
+
+Die Lücke `___` fehlt. Nur ganze Zahlen sollen auf `{id}` passen. Setze die Einschränkung ein, die du in dieser Lektion gesehen hast.
+
+<CodeBlock language="csharp" title="gap-route-constraint.snippet.cs">{gapConstraint}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `int`: `{id:int}`. Der Handler-Parameter hat denselben Namen und den Typ `int`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l02/`) speichert Vorfälle in einer Datenbank und gibt sie auf der Konsole aus, auch als JSON in der Form von `IncidentSummary`. Ein Web-Projekt gibt es noch nicht.
+
+**Neue Anforderung:** SecLog bietet eine API: `GET /incidents` liefert alle gespeicherten Vorfälle, `GET /incidents/{id}` einen Vorfall, jeweils als JSON. Dafür kommt das Projekt `src/SecLog.Api/` dazu. Es steht in `SecLog.slnx` und verweist auf `SecLog.Core` und `SecLog.Data`. Die Endpoints liegen als Erweiterungsmethode `MapIncidentEndpoints` in einer eigenen Datei. Die Handler bekommen den `SecLogDbContext` als Parameter, lesen mit `AsNoTracking()` und geben `IncidentSummary` zurück. Für eine unbekannte Id gibt der Handler vorerst `null` zurück.
+
+Ein Handler-Parameter, dessen Typ ein registrierter Service ist, wird aus der Dependency Injection gefüllt. Das gilt hier für den `SecLogDbContext`, den `AddDbContext` in `Program.cs` registriert (Modul 16). Wie ASP.NET Core die übrigen Parameter bindet, zeigt Lektion 5. Wie lange der Context lebt, zeigt Lektion 9.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="xml" title="src/SecLog.Api/SecLog.Api.csproj (neu)">{apiCsproj}</CodeBlock>
+
+<CodeBlock language="json" title="src/SecLog.Api/appsettings.json (neu)">{apiSettings}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (neu)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (neu)">{apiEndpoints}</CodeBlock>
+
+1. **Projekt anlegen:** Das Web-SDK (`Microsoft.NET.Sdk.Web`) bringt ASP.NET Core mit. In `SecLog.slnx` kommt eine Zeile für das Projekt dazu.
+2. **App zusammensetzen:** `Program.cs` ist die Stelle, an der die App entsteht: Builder, Context mit der Verbindung aus `appsettings.json`, `Build`, `MapIncidentEndpoints`, `Run`.
+3. **Gruppe und Endpoints:** `MapGroup("/incidents")` legt das Präfix fest. `GetAll` hat die Vorlage `/incidents`, `GetById` die Vorlage `/incidents/{id:int}`.
+4. **Lesen:** `AsNoTracking()`, `OrderBy(i => i.Id)` und `ToListAsync()` oder `FirstOrDefaultAsync` lesen die Zeilen. `IncidentSummary.From` macht daraus die JSON-Form.
+
+Die API läuft in CI nicht auf einem Port. Lektion 4 ergänzt Tests, die sie aufrufen. Die Lösung baut als Teil von `SecLog.slnx`, die Ausgabe von `expected.out.txt` ändert sich nicht.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l03/`) hat die API mit zwei Endpoints. Sie ist Teil der Solution und wird mit ihr gebaut.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l03-route-order-decides" />
+
+**„Die Reihenfolge der `Map…`-Aufrufe entscheidet, welcher Endpoint passt.“** Das Routing betrachtet alle Endpoints gleichzeitig und nimmt die spezifischste Vorlage. Fester Text schlägt einen Parameter, ein Parameter mit Einschränkung schlägt einen ohne.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l03-constraint-validates-input" />
+
+**„Mit `{id:int}` prüft ASP.NET Core die Eingabe und meldet einen Fehler.“** Die Einschränkung entscheidet nur, ob die Route passt. Bei `/incidents/abc` gibt es ohne andere Route die Antwort 404, keine Fehlermeldung mit 400.
+:::
+
+<details>
+<summary>Vertiefung: Wenn zwei Routen gleich spezifisch sind (optional)</summary>
+
+Die Rangfolge der Vorlagen steht im Abschnitt zur Routenpriorität von [Routing in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/routing). Haben zwei Endpoints dieselbe Priorität und passen beide, wirft das Routing eine Ausnahme wegen einer mehrdeutigen Übereinstimmung. Eine Reihenfolge, die das auflöst, gibt es für Minimal APIs nicht. Du machst dann eine der Vorlagen spezifischer oder änderst eine Route.
+
+</details>
+
+## Zusammenfassung
+
+Eine Minimal API entsteht aus `WebApplication.CreateBuilder`, `Build`, den `Map…`-Aufrufen und `Run`. Ein Endpoint verbindet eine Methode, eine Routenvorlage und einen Handler. Der Rückgabewert des Handlers wird zur Antwort: Text als `text/plain`, Objekte als JSON. Routenparameter liefern Pfadteile, Einschränkungen wie `int` entscheiden, ob die Route passt. Bei mehreren Treffern gewinnt die spezifischste Vorlage, nicht der erste Aufruf. `MapGroup` stellt allen Endpoints ein Präfix voran.
+
+## Prüfe dein Wissen
+
+<Quiz id="m17-l03-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l03-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l03-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Route handlers in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/route-handlers)
+- Microsoft Learn: [Routing in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/routing)
+- Microsoft Learn: [Tutorial: Create a minimal API with ASP.NET Core](https://learn.microsoft.com/aspnet/core/tutorials/min-web-api)
