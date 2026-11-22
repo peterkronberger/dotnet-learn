@@ -18,6 +18,7 @@
       "id": "m16-l01-q2",
       "lesson": "m16-l01",
       "type": "single",
+      "placement": true,
       "question": "`db.Incidents` ist eine Eigenschaft vom Typ `DbSet<Incident>`. Was stimmt?",
       "options": [
         { "text": "Das `DbSet<Incident>` ist eine Liste, die alle Zeilen der Tabelle im Speicher hält.", "misconception": "m16-l01-dbset-holds-all-rows", "feedback": "Ein `DbSet<T>` hält keine Zeilen. Es ist der Ausgangspunkt für Abfragen und für `Add`. Zeilen kommen erst in den Speicher, wenn eine Abfrage läuft." },
@@ -215,6 +216,8 @@
       "id": "m16-l03-q1",
       "lesson": "m16-l03",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m16-l02"],
       "question": "Die Klasse `Event` hat die Eigenschaften `Id`, `IncidentId` und `Incident`. `Incident` hat `Id` und `List<Event> Events`. Welche Eigenschaft wird in der Tabelle `Events` zum Fremdschlüssel?",
       "options": [
         { "text": "`IncidentId`", "correct": true, "feedback": "Die Konvention: Der Name der Navigation plus `Id` wird zur Fremdschlüssel-Spalte. Sie zeigt auf den Primärschlüssel der Tabelle `Incidents`." },
@@ -425,6 +428,8 @@
       "id": "m16-l05-q3",
       "lesson": "m16-l05",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m16-l04"],
       "question": "Du schreibst `db.Incidents.Where(i => Rules.IsSevere(i)).ToList()`, wobei `IsSevere` eine eigene C#-Methode ist. Was passiert?",
       "options": [
         { "text": "EF Core wirft eine `InvalidOperationException`, weil es den Aufruf nicht in SQL übersetzen kann.", "correct": true, "feedback": "Im Ausdrucksbaum steht nur der Aufruf, nicht der Rumpf der Methode." },
@@ -517,6 +522,7 @@
       "id": "m16-l06-q4",
       "lesson": "m16-l06",
       "type": "single",
+      "placement": true,
       "question": "Wie behebst du das N+1-Problem in der Schleife, wenn du die Events aller Vorfälle brauchst?",
       "options": [
         { "text": "Du lädst die Events mit `Include(i => i.Events)` schon in der Abfrage der Vorfälle.", "correct": true, "feedback": "So holt ein einziger Befehl Vorfälle und Events." },
@@ -611,6 +617,7 @@
       "id": "m16-l07-q3",
       "lesson": "m16-l07",
       "type": "single",
+      "placement": true,
       "question": "Du lädst `bob` mit einer normalen Abfrage, änderst `bob.Status` und rufst `db.SaveChanges()` auf, ohne `Update` zu nennen. Welche Aussage stimmt?",
       "options": [
         {
@@ -731,6 +738,7 @@
       "id": "m16-l08-q1",
       "lesson": "m16-l08",
       "type": "single",
+      "placement": true,
       "question": "Die Datenbank hat schon die Tabelle `Incidents`. Du fügst der Klasse `Incident` die Eigenschaft `Severity` hinzu und startest das Programm mit `db.Database.EnsureCreated()`. Was passiert mit der Tabelle?",
       "options": [
         {
@@ -957,6 +965,7 @@
       "id": "m16-l09-q2",
       "lesson": "m16-l09",
       "type": "single",
+      "placement": true,
       "question": "Der Code lautet `db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + user + \"'\")`. Der Wert von `user` ist `x' OR '1'='1`. Was passiert?",
       "options": [
         {
@@ -1217,6 +1226,7 @@
       "id": "m16-l10-q4",
       "lesson": "m16-l10",
       "type": "single",
+      "placement": true,
       "question": "Ein Kollege registriert `SecLogDbContext` als Singleton, „weil das Erzeugen teuer ist“. Was stimmt?",
       "options": [
         {
