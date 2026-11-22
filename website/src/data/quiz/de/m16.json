@@ -924,6 +924,214 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du Migrationen einsetzen, und wo reicht `EnsureCreated`? Nenne je ein Beispiel.",
       "modelAnswer": "Bei einer Anwendung mit echten Nutzerdaten brauche ich Migrationen, damit neue Spalten ankommen, ohne dass Daten verloren gehen. Für einen Test mit einer frischen Datenbank oder einen Prototyp, den ich jederzeit wegwerfen kann, reicht `EnsureCreated`."
+    },
+    {
+      "id": "m16-l09-q1",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Der Wert `user` kommt aus einem Eingabefeld. Der Code lautet `db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE User = {user}\")`. Ist das eine Lücke für SQL-Injection?",
+      "options": [
+        {
+          "text": "Nein: `FromSql` nimmt den interpolierten String als Vorlage und sendet `user` als Parameter. Der Wert wird nie zu SQL-Text.",
+          "correct": true,
+          "feedback": "Der Parameter `@p0` steht im SQL-Text, der Wert geht getrennt an die Datenbank."
+        },
+        {
+          "text": "Ja: Ein interpolierter String setzt den Wert immer in den SQL-Text ein.",
+          "misconception": "m16-l09-interpolated-sql-is-unsafe",
+          "feedback": "Bei `FromSql` ist die Interpolation nur die Schreibweise. EF Core macht aus jedem Platzhalter einen Parameter."
+        },
+        {
+          "text": "Ja, aber nur wenn `user` Anführungszeichen enthält.",
+          "misconception": "m16-l09-interpolated-sql-is-unsafe",
+          "feedback": "Auch mit Anführungszeichen bleibt der Wert ein Wert. Er kann die Abfrage nicht ändern."
+        },
+        {
+          "text": "Das hängt davon ab, ob die Datenbank SQLite oder ein anderes System ist.",
+          "feedback": "`FromSql` parametrisiert für jeden Anbieter."
+        }
+      ],
+      "explanation": "`FromSql` erwartet einen `FormattableString`: Vorlage und Werte bleiben getrennt. EF Core ersetzt jeden Platzhalter durch einen SQL-Parameter. Der Text sieht wie String-Interpolation aus, wirkt aber wie eine Message Template aus dem Logging."
+    },
+    {
+      "id": "m16-l09-q2",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Der Code lautet `db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + user + \"'\")`. Der Wert von `user` ist `x' OR '1'='1`. Was passiert?",
+      "options": [
+        {
+          "text": "Das Anführungszeichen beendet den Text, der Rest `OR '1'='1'` wird SQL. Die Bedingung ist immer wahr, die Abfrage liefert alle Zeilen.",
+          "correct": true,
+          "feedback": "Die Eingabe ändert die Bedeutung der Abfrage. Das ist SQL-Injection."
+        },
+        {
+          "text": "`FromSqlRaw` maskiert das Anführungszeichen. Es gibt keine Zeile, weil kein Benutzer so heißt.",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "`FromSqlRaw` bekommt den fertigen Text und prüft ihn nicht."
+        },
+        {
+          "text": "Es kommt eine Ausnahme, weil `x' OR '1'='1` kein gültiger Benutzername ist.",
+          "feedback": "Die Datenbank sieht gültiges SQL und führt es aus."
+        },
+        {
+          "text": "Es kommt genau die Zeile von `bob`, weil `User` zuerst geprüft wird.",
+          "feedback": "Die Bedingung `OR '1'='1'` ist für jede Zeile wahr."
+        }
+      ],
+      "explanation": "Beim Verketten ist die Eingabe Teil des SQL-Texts. Die Datenbank kann nicht mehr unterscheiden, was der Programmierer und was der Benutzer geschrieben hat. Mit Parametern bleibt die Eingabe ein Wert."
+    },
+    {
+      "id": "m16-l09-q3",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du gibst `query.ToQueryString()` einer `FromSql`-Abfrage mit dem Wert `bob` aus. Woran erkennst du, dass die Abfrage sicher parametrisiert ist?",
+      "options": [
+        {
+          "text": "Im SQL-Text steht ein Platzhalter wie `@p0`, der Wert `'bob'` steht getrennt davon in der Zeile `.param set`.",
+          "correct": true,
+          "feedback": "Der Text bleibt für jeden Wert gleich, nur der Parameter ändert sich."
+        },
+        {
+          "text": "Im SQL-Text steht `'bob'` in Anführungszeichen direkt hinter `User =`.",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Dann steckt der Wert im SQL-Text. Das ist das Zeichen für verkettetes SQL."
+        },
+        {
+          "text": "Im SQL-Text steht das Wort `SELECT`.",
+          "feedback": "Jede Abfrage enthält `SELECT`. Das sagt nichts über Parameter."
+        },
+        {
+          "text": "Die Ausgabe enthält keine Zeile mit `.param`.",
+          "feedback": "Ohne Parameter steckt der Wert im Text, nicht umgekehrt."
+        }
+      ],
+      "explanation": "Eine parametrisierte Abfrage trennt SQL-Text und Werte. Im Text steht nur der Platzhalter."
+    },
+    {
+      "id": "m16-l09-q4",
+      "lesson": "m16-l09",
+      "type": "multi",
+      "question": "Eine Eingabe `input` kommt von außen. Welche Aufrufe senden `input` als Parameter?",
+      "options": [
+        {
+          "text": "`db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE User = {input}\")`",
+          "correct": true,
+          "feedback": "Jeder Platzhalter wird ein Parameter."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = {0}\", input)`",
+          "correct": true,
+          "feedback": "Der Platzhalter `{0}` mit einem Argument wird ebenfalls ein Parameter."
+        },
+        {
+          "text": "`db.Database.ExecuteSql($\"UPDATE Incidents SET Status = 'closed' WHERE User = {input}\")`",
+          "correct": true,
+          "feedback": "`ExecuteSql` parametrisiert wie `FromSql`."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw($\"SELECT * FROM Incidents WHERE User = '{input}'\")`",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Die Interpolation ist fertig, bevor `FromSqlRaw` den Text sieht. Der Wert steckt im SQL-Text."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + input + \"'\")`",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Das Verketten macht die Eingabe zum SQL-Text."
+        }
+      ],
+      "explanation": "Sicher ist, was Vorlage und Werte getrennt übergibt: `FromSql`/`ExecuteSql` mit Interpolation oder `…Raw` mit `{0}` und Argumenten. Unsicher ist, was den Text vorher zusammenbaut, egal ob mit `+` oder mit `$`."
+    },
+    {
+      "id": "m16-l09-q5",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du willst mit eigenem SQL nur eine Zahl lesen, zum Beispiel die Anzahl der Vorfälle mit mindestens 2 Fehlversuchen. Welche Methode passt?",
+      "options": [
+        {
+          "text": "`db.Database.SqlQuery<int>(…)`",
+          "correct": true,
+          "feedback": "`SqlQuery<T>` liefert Werte, die keine Entität sind, zum Beispiel `int`."
+        },
+        {
+          "text": "`db.Incidents.FromSql(…)`",
+          "feedback": "`FromSql` liefert Entitäten und braucht alle Spalten der Entität."
+        },
+        {
+          "text": "`db.Database.ExecuteSql(…)`",
+          "feedback": "`ExecuteSql` führt einen Befehl aus und gibt nur die Zahl der geänderten Zeilen zurück."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(…)`",
+          "feedback": "Auch `FromSqlRaw` liefert Entitäten."
+        }
+      ],
+      "explanation": "`FromSql` für Entitäten, `SqlQuery<T>` für Werte ohne Entität, `ExecuteSql` für Befehle ohne Ergebnismenge."
+    },
+    {
+      "id": "m16-l09-q6",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "`int changed = db.Database.ExecuteSql($\"UPDATE Incidents SET Status = {status} WHERE User = {user}\");` ändert genau eine Zeile. Welchen Wert hat `changed`?",
+      "options": [
+        {
+          "text": "`1`: die Zahl der geänderten Zeilen.",
+          "correct": true,
+          "feedback": "`ExecuteSql` gibt die Zahl der betroffenen Zeilen zurück."
+        },
+        {
+          "text": "Die geänderte Zeile als `Incident`.",
+          "feedback": "`ExecuteSql` liefert keine Zeilen. Dafür gibt es `FromSql`."
+        },
+        {
+          "text": "`true`, weil der Befehl gelungen ist.",
+          "feedback": "Der Rückgabetyp ist `int`."
+        },
+        {
+          "text": "`0`, weil `ExecuteSql` nur liest.",
+          "feedback": "`ExecuteSql` ist für Befehle gedacht, die Daten ändern."
+        }
+      ],
+      "explanation": "`UPDATE` ändert Zeilen. `ExecuteSql` gibt zurück, wie viele es waren."
+    },
+    {
+      "id": "m16-l09-q7",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE FailureCount >= {n}\").OrderBy(i => i.User)`. Was macht EF Core mit dem eigenen SQL?",
+      "options": [
+        {
+          "text": "Es behandelt es als Unterabfrage und setzt die Sortierung außen darum. Die Datenbank sortiert.",
+          "correct": true,
+          "feedback": "Die Ausgabe zeigt `FROM ( SELECT * … ) AS \"i\"` und `ORDER BY` außen."
+        },
+        {
+          "text": "Es lädt alle Zeilen und sortiert in C#.",
+          "feedback": "Die Sortierung wird zu SQL und läuft in der Datenbank."
+        },
+        {
+          "text": "Es verwirft das eigene SQL und erzeugt eine neue Abfrage aus LINQ.",
+          "feedback": "Das eigene SQL bleibt Teil der Abfrage."
+        },
+        {
+          "text": "Es wirft eine Ausnahme, weil LINQ nicht auf `FromSql` folgen darf.",
+          "feedback": "LINQ darf folgen, solange das SQL mit `SELECT` beginnt und als Unterabfrage taugt."
+        }
+      ],
+      "explanation": "Eigenes SQL und LINQ lassen sich verbinden: EF Core macht das SQL zur Unterabfrage. Die Parameter bleiben dabei Parameter."
+    },
+    {
+      "id": "m16-l09-q8",
+      "lesson": "m16-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum eine verkettete SQL-Abfrage durch eine Eingabe ihre Bedeutung ändern kann und warum `FromSql` mit Interpolation das nicht tut.",
+      "modelAnswer": "Beim Verketten wird die Eingabe Teil des SQL-Texts. Enthält sie ein Anführungszeichen, endet der Text-Wert dort, und der Rest wird als SQL gelesen. So kann eine Eingabe die Bedingung ändern, zum Beispiel immer wahr machen.\n\n`FromSql` bekommt den interpolierten String als Vorlage mit getrennten Werten. EF Core setzt für jeden Platzhalter einen Parameter in den Text und sendet den Wert getrennt. Die Datenbank liest den Wert nie als SQL."
+    },
+    {
+      "id": "m16-l09-q9",
+      "lesson": "m16-l09",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt kommen Werte von außen in eine Abfrage? Wie stellst du sicher, dass sie als Parameter gesendet werden?",
+      "modelAnswer": "Zum Beispiel ein Suchfeld, ein Parameter der Befehlszeile oder ein Wert aus der Konfiguration, den ich in einer Abfrage nach einem Benutzernamen verwende. Ich nehme LINQ oder `FromSql` mit Interpolation und prüfe mit `ToQueryString()`, dass im SQL-Text nur ein Platzhalter steht und der Wert in der Parameterzeile."
     }
   ]
 }
