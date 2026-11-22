@@ -2,7 +2,7 @@
 
 Base since #450: C# 15 / .NET 11.
 
-As of 2026-11-18. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-22. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -248,7 +248,7 @@ Each module section has these fields:
 - **Glossary terms:** see the `"lesson": "m10-l…"` fields: method-group, method-group-conversion, delegate-invocation, callback, func-delegate, action-delegate, predicate-delegate, lambda-expression, anonymous-function, expression-lambda, statement-lambda, anonymous-function-conversion, natural-type, discard-parameter, closure, captured-variable, static-anonymous-function, multicast-delegate, invocation-list, delegate-combination, event, field-like-event, event-accessor, publisher, subscriber, event-args, event-handler, standard-event-pattern
 - **Misconception ids:** m10-l01-method-group-calls-method, m10-l02-func-last-type-is-parameter, m10-l03-lambda-runs-when-defined, m10-l04-lambda-has-no-type, m10-l05-lambda-captures-value, m10-l06-multicast-returns-all-results, m10-l07-event-raised-from-outside, m10-l08-subscribers-removed-automatically
 - **Open forward references:**
-  - Attributes on lambdas (not taught in `m14-l06`), expression trees → M16 (not marked in a lesson; not taught)
+  - Attributes on lambdas (not taught in `m14-l06`), expression trees are taught in `m16-l05` (closed)
 - **SecLog end state:** `website/examples/m10/l08/seclog-delegates-solution.cs` – the M9 end state plus: `delegate bool IncidentCheck(Incident)`, `FuncRule : IDetectionRule` (name plus `Func<Incident, bool>`), rules written as lambdas, `FailuresAtLeast(int)` returning a lambda (closure), alert chain with a multicast `Action`, `IncidentMonitor` with `event EventHandler<IncidentFoundEventArgs>? IncidentFound`, `IncidentFoundEventArgs : EventArgs`. Chain: `m09/l06` → `m10/l01` → … → `m10/l08`. M10 milestone reached.
 - **Notes for later modules:**
   - `FuncRule` is the place for rules written as lambdas.
@@ -271,7 +271,7 @@ Each module section has these fields:
 - **Constructs taught:** extension method with `this` (`m11-l01`), `extension(…)` block, extension property, static extension member (`m11-l02`), `Where`, `Select`, `OrderBy`, `OrderByDescending`, `ThenBy`, `Take`, `Skip`, `ToList`, `ToArray` (`m11-l03`), `yield return`, `yield break`, iterator method (`m11-l04`), `Count()`, `ToDictionary`, deferred vs. immediate (`m11-l05`), `new { … }` anonymous object (`m11-l06`), `GroupBy`, `IGrouping<TKey, TElement>`, `Sum`, `Min`, `Max`, `Average`, `MinBy`, `MaxBy`, `Aggregate`, `CountBy`, `AggregateBy` (`m11-l07`), `First`, `Single`, `Last`, `ElementAt`, `…OrDefault`, `Any`, `All`, `Contains` (`m11-l08`), `Join`, `GroupJoin`, `Distinct`, `DistinctBy`, `Union`, `Intersect`, `Except`, `Concat` (`m11-l09`), query expression clauses, `SequenceEqual` (`m11-l10`).
 - **Glossary terms:** see the `"lesson": "m11-l…"` fields: extension-method, extension-member, extension-block, linq, method-syntax, query-operator, key-selector, iterator, iterator-block, yield-statement, deferred-execution, immediate-execution, multiple-enumeration, anonymous-type, projection, grouping, aggregate-operator, element-operator, quantifier, join, query-expression, query-syntax
 - **Misconception ids:** m11-l01-extension-beats-instance-method, m11-l02-extension-property-stores-data, m11-l03-where-changes-source, m11-l04-yield-return-ends-method, m11-l05-query-runs-when-defined, m11-l05-query-result-is-copy, m11-l06-anonymous-type-is-writable, m11-l07-average-of-empty-is-zero, m11-l08-first-returns-null, m11-l09-union-keeps-duplicates, m11-l10-query-syntax-differs
-- **Open forward references:** none. All `<Forward>` notes of M11 point to lessons inside M11. `IAsyncEnumerable<T>`, PLINQ, `IQueryable<T>` and expression trees are not marked in a lesson and not taught.
+- **Open forward references:** none. All `<Forward>` notes of M11 point to lessons inside M11. `IAsyncEnumerable<T>` and PLINQ are not marked in a lesson and not taught. `IQueryable<T>` and expression trees are taught in `m16-l05`.
 - **SecLog end state:** `website/examples/m11/l10/seclog-linq-solution.cs` – the M10 end state plus: `LogEventExtensions` (`IsFailure()`, `IsFrom(user)`), `IncidentExtensions` (extension blocks with properties and a static member), `LinesOfUser` (iterator), failures per hour, top IP addresses, `IsPossiblePhishing` message rating (`reportedMessages`, `signalWords`), user set comparison, query and method syntax side by side. Chain: `m10/l08` → `m11/l01` → … → `m11/l10`. M11 milestone reached.
 - **Notes for later modules:**
   - `IsFailure()` and `IsFrom(user)` are the extension methods for log events; new log-event helpers belong in `LogEventExtensions`.
@@ -397,3 +397,26 @@ Each module section has these fields:
   - Runnable package examples: one `_ci/mXX-lYY-<slug>/` project with only `Program.cs`, playground usings and a synchronous console logger provider (`.claude/rules/examples.md`).
   - Reference projects: `_ci/di-logging/`, `_ci/config-hosting/`. Host output is stable with `ClearProviders()` and `StopApplication()`.
   - The `Detection` configuration section (`MaxFailures`, `WindowMinutes`) is SecLog's settings contract; read it through `IOptions<DetectionOptions>`.
+
+## M16 EF Core
+
+- **Lessons:**
+  - `m16-l01` Datenbanken und der DbContext – relational database, table, primary key, `DbContext`, `DbSet<T>`, connection string, `EnsureCreated`.
+  - `m16-l02` Das Modell konfigurieren – conventions, data annotations, fluent API (`OnModelCreating`), priority, composite key, index.
+  - `m16-l03` Beziehungen zwischen Entitäten – foreign key, navigation properties, 1:n, n:m with skip navigations and join table.
+  - `m16-l04` Von LINQ zu SQL – query translation, deferred execution against a database, query syntax is translated first, `ToQueryString`.
+  - `m16-l05` IQueryable und IEnumerable – lambda as `Expression<Func<…>>` (data, not code), `IQueryable<T>`, `Queryable` vs. `Enumerable`, untranslatable methods, `AsEnumerable`.
+  - `m16-l06` Verwandte Daten laden – `Include`, explicit loading, lazy loading by name only, N+1 problem, split query.
+  - `m16-l07` Change Tracking und Speichern – entity states, `SaveChanges` as unit of work, `AsNoTracking`, `BeginTransaction`.
+  - `m16-l08` Migrationen – `dotnet ef migrations add`, `Up`/`Down`, model snapshot, `Migrate` vs. `EnsureCreated`, design-time factory.
+  - `m16-l09` Raw SQL sicher verwenden – `FromSql` (interpolated, parameterized), `FromSqlRaw`, SQL injection, `SqlQuery<T>`, `ExecuteSql`.
+  - `m16-l10` Asynchrone Abfragen und Kontext-Lebensdauer – `ToListAsync`, `SaveChangesAsync`, cancellation token, scoped context, `IDbContextFactory<T>`, no parallel use of one context.
+- **Constructs/APIs taught:** `DbContext`, `DbSet<T>`, `UseSqlite`, `Add`, `SaveChanges`, `EnsureCreated` (`m16-l01`), `OnModelCreating`, `HasKey`, `HasMaxLength`, `HasIndex`, `[Key]`, `[MaxLength]` (`m16-l02`), `HasOne`, foreign key property and navigations (`m16-l03`), `ToQueryString` (`m16-l04`), `Expression<Func<T, bool>>`, `IQueryable<T>`, `AsEnumerable` (`m16-l05`), `Include`, `Entry(…).Collection(…).Load()`, `AsSplitQuery` (`m16-l06`), `Entry(…).State`, `AsNoTracking`, `BeginTransaction` (`m16-l07`), `Migrate`, `IDesignTimeDbContextFactory<T>` (`m16-l08`), `FromSql`, `FromSqlRaw`, `SqlQuery<T>`, `ExecuteSql` (`m16-l09`), `ToListAsync`, `SaveChangesAsync`, `AddDbContext`, `AddDbContextFactory`, `IDbContextFactory<T>`, `CreateAsyncScope` (`m16-l10`).
+- **Glossary terms:** relational-database, database-table, primary-key, sql, orm, database-provider, dbcontext, dbset, entity-type, connection-string, ef-core-model, ef-core-convention, data-annotation, fluent-api, composite-key, database-index, foreign-key, navigation-property, one-to-many-relationship, many-to-many-relationship, join-table, query-translation, expression-tree, iqueryable, query-provider, client-evaluation, eager-loading, explicit-loading, lazy-loading, n-plus-one-problem, split-query, change-tracking, entity-state, unit-of-work, database-transaction, no-tracking-query, migration, database-schema, model-snapshot, ef-core-tools, design-time-factory, raw-sql, sql-injection, sql-parameter, parameterized-query, async-query, dbcontext-factory
+- **Misconception ids:** m16-l01-dbset-holds-all-rows, m16-l02-key-needs-attribute, m16-l02-annotation-beats-fluent-api, m16-l03-many-to-many-needs-join-class, m16-l04-query-loads-whole-table, m16-l05-tolist-at-end-changes-nothing, m16-l05-ef-translates-every-method, m16-l06-navigation-loaded-automatically, m16-l07-property-change-saved-immediately, m16-l07-no-tracking-changes-saved, m16-l08-ensurecreated-updates-schema, m16-l09-interpolated-sql-is-unsafe, m16-l09-raw-escapes-input, m16-l10-dbcontext-as-singleton, m16-l10-parallel-queries-one-context
+- **Open forward references:** none. `<Forward>` notes point to M7 (`using`, earlier module) and to `m16-l04`/`m16-l05` (closed inside M16).
+- **SecLog end state:** `website/examples/_ci/seclog-m16-l10/` – the M15 solution plus the project `src/SecLog.Data/` (`SecLogDbContext`, entities `StoredIncident`/`StoredEvent`, `IncidentFilters`, committed migrations), connection string `ConnectionStrings:SecLog` (`run.sh` uses a fresh temporary SQLite file), incidents and events stored and queried, parameterized search by user name, and the background service reading through a scoped context with async calls. Chain: `seclog-m15-l09` → `seclog-m16-l01` → … → `l10`. M16 milestone reached.
+- **Notes for later modules:**
+  - In M17 the web request is the scope of the context (`AddDbContext`, scoped); handlers use async calls and the request's cancellation token.
+  - 8 placement questions in `de/m16.json`; `placementLessons` covers `m16-l02` and `m16-l04`.
+  - Not taught (see "Deliberately not covered"): lazy loading, concurrency tokens, other providers, compiled models, inheritance mapping, owned types, EF Core 10/11 features.

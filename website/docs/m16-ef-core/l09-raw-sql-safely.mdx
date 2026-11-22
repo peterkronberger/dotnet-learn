@@ -1,0 +1,176 @@
+---
+title: Raw SQL sicher verwenden
+sidebar_position: 9
+description: Wie FromSql und ExecuteSql Werte als Parameter senden, warum verkettetes SQL eine Eingabe zum Teil des Befehls macht und woran du eine sichere Abfrage erkennst.
+lesson_id: m16-l09
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import parametersProgram from '!!raw-loader!@site/examples/_ci/m16-l09-parameters/Program.cs';
+import parametersOutput from '!!raw-loader!@site/examples/_ci/m16-l09-parameters/expected.out.txt';
+import injectionProgram from '!!raw-loader!@site/examples/_ci/m16-l09-injection/Program.cs';
+import injectionOutput from '!!raw-loader!@site/examples/_ci/m16-l09-injection/expected.out.txt';
+import gapFromSql from '!!raw-loader!@site/examples/m16/l09/gap-from-sql.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l09/seclog-program-block.snippet.cs';
+
+# Raw SQL sicher verwenden
+
+:::note[Lernziele]
+- Du erklärst, wie bei einem verketteten SQL-Text eine Eingabe die Bedeutung der Abfrage ändert.
+- Du schreibst eine Abfrage mit `FromSql` und interpolierten Werten so, dass die Werte als Parameter gesendet werden.
+- Du erkennst an einem Codebeispiel und an der Ausgabe von `ToQueryString()`, ob eine SQL-Abfrage sicher parametrisiert ist.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l06-q2" />
+
+<Quiz id="m16-l04-q3" />
+
+## Wann eigenes SQL?
+
+LINQ ist der Normalfall: EF Core erzeugt das SQL und setzt Werte immer als Parameter ein. Manchmal reicht LINQ nicht, zum Beispiel wenn eine Abfrage ein Datenbankmerkmal nutzt, das EF Core nicht kennt, oder wenn das erzeugte SQL zu langsam ist. Dann schreibst du das <Term id="sql">SQL</Term> selbst: <Term id="raw-sql">Raw SQL</Term>. Das ist die Ausnahme, und jede Zeile davon ist Text, den die Datenbank so ausführt, wie er ankommt ([SQL Queries](https://learn.microsoft.com/ef/core/querying/sql-queries)).
+
+Ein Wort zu der Schreibweise in den Beispielen: `SELECT * FROM Incidents` holt alle Spalten (`*`) aller Zeilen der Tabelle `Incidents`. `WHERE User = …` behält nur Zeilen, deren Spalte `User` zum Wert passt.
+
+## FromSql sendet Werte als Parameter
+
+`FromSql` beginnt eine LINQ-Abfrage mit eigenem SQL. Du übergibst einen interpolierten String. Er sieht aus wie die String-Interpolation aus Modul 1, wirkt aber anders: `FromSql` erwartet einen `FormattableString`, also einen Text mit den Löchern `{…}` und den Werten getrennt voneinander. EF Core macht aus jedem Loch einen <Term id="sql-parameter">SQL-Parameter</Term>. Der SQL-Text enthält nur den Platzhalter, der Wert geht getrennt an die Datenbank. Das ist dieselbe Form wie bei einer Message Template im Logging (`m15-l06`), mit anderer Wirkung.
+
+Eine solche <Term id="parameterized-query">parametrisierte Abfrage</Term> hat vier Formen. `FromSql` liefert Entitäten und lässt sich mit LINQ weiterführen: EF Core behandelt das eigene SQL dann als Unterabfrage. `SqlQuery<T>` liefert Werte, die keine Entität sind. Wenn du LINQ danach anhängst, muss die Spalte `Value` heißen. `ExecuteSql` führt einen Befehl aus und gibt die Zahl der geänderten Zeilen zurück. Der Befehl `UPDATE … SET …` ändert Zeilen, die `WHERE` auswählt.
+
+<CodeBlock language="csharp" title="Program.cs">{parametersProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Wie sieht der SQL-Text der ersten Abfrage aus, und wo steht der Wert `bob`? Welche Namen liefert Abschnitt 2? Wie viele Zeilen ändert Abschnitt 4? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{parametersOutput}</CodeBlock>
+
+1. **Parameter statt Text:** Der SQL-Text enthält `@p0`. Der Wert `'bob'` steht in der Zeile `.param set`. `ToQueryString()` zeigt beides getrennt.
+2. **Unterabfrage:** Das eigene SQL steht in einer inneren Abfrage, `ORDER BY` und `SELECT` kommen von außen. Alle drei Benutzer erfüllen `FailureCount >= 1`.
+3. **Wert ohne Entität:** `SqlQuery<int>` liefert die Zahl, hier einen Vorfall (bob mit 5 Versuchen).
+4. **Befehl:** `ExecuteSql` ändert die Zeile von `bob` und gibt `1` zurück.
+
+**Was passiert, wenn …** `user` den Wert `"dave"` hat? Der SQL-Text bleibt gleich, nur der Parameter ändert sich.
+
+</details>
+
+<Quiz id="m16-l09-q1" />
+
+<Quiz id="m16-l09-q3" />
+
+<Quiz id="m16-l09-q5" />
+
+<Quiz id="m16-l09-q6" />
+
+<Quiz id="m16-l09-q7" />
+
+## Verkettetes SQL ändert die Abfrage
+
+`FromSqlRaw` nimmt einen fertigen `string`. Wenn du den Text zuvor mit `+` oder mit `$"…"` zusammenbaust, ist die Eingabe Teil des SQL-Texts, bevor EF Core ihn sieht. Das nennt man <Term id="sql-injection">SQL Injection</Term> (SQL-Einschleusung): Die Eingabe ändert die Bedeutung der Abfrage.
+
+Das folgende Programm zeigt das auf der lokalen Demo-Datenbank im Speicher mit einer einzigen, erfundenen Eingabe. Das Anführungszeichen beendet den Text-Wert, und der Rest `OR '1'='1'` ist eine Bedingung, die für jede Zeile wahr ist. Mehr als die Zahl der Zeilen zeigt der Versuch nicht.
+
+<CodeBlock language="csharp" title="Program.cs">{injectionProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Zeilen liefert jede der vier Abfragen für die Eingabe `x' OR '1'='1`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{injectionOutput}</CodeBlock>
+
+1. **Verkettet:** Der SQL-Text enthält die Eingabe. Aus `User = 'x'` wird `User = 'x' OR '1'='1'`, und alle drei Zeilen passen.
+2. **Interpoliert mit `FromSqlRaw`:** Die Interpolation ist fertig, bevor `FromSqlRaw` aufgerufen wird. Der Effekt ist derselbe, wieder drei Zeilen.
+3. **`FromSql`:** Der Wert steht in einem Parameter. Die Datenbank sucht einen Benutzer, der genau `x' OR '1'='1` heißt, und findet keinen: null Zeilen.
+4. **`FromSqlRaw` mit `{0}` und Argument:** Auch hier wird der Wert zum Parameter. `FromSqlRaw` ist also nicht grundsätzlich unsicher, sondern nur, wenn du den Text selbst zusammenbaust.
+
+**Was passiert, wenn …** die Eingabe kein Anführungszeichen enthält? Dann geschieht bei der verketteten Abfrage nichts Auffälliges. Das ist die Gefahr: Der Fehler zeigt sich nur bei Eingaben, an die du beim Testen nicht gedacht hast.
+
+</details>
+
+<Since dotnet="10" /> Ein Analyzer warnt, wenn innerhalb eines Aufrufs von `FromSqlRaw` Text verkettet oder interpoliert wird ([What's new in EF Core 10](https://learn.microsoft.com/ef/core/what-is-new/ef-core-10.0/whatsnew)). Das Projekt dieses Beispiels schaltet die Warnungen aus, weil die unsichere Form hier das Thema ist. Im eigenen Code nimmst du die Warnung ernst. Die Regel dahinter: Was von außen kommt, geht als Parameter in die Abfrage und nie in den SQL-Text.
+
+<Quiz id="m16-l09-q2" />
+
+<Quiz id="m16-l09-q4" />
+
+## Gap-Beispiel: sicher parametrisieren
+
+Die Lücke `___` fehlt. Der Aufruf soll den Wert von `user` als Parameter senden. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-from-sql.snippet.cs">{gapFromSql}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `FromSql`: `db.Incidents.FromSql($"SELECT * FROM Incidents WHERE User = {user}")`. `ToQueryString()` zeigt dann `@p0` im Text und den Wert in der Zeile `.param set`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l08/`) speichert Vorfälle in einer SQLite-Datenbank, legt sie mit Migrationen an und fragt sie mit LINQ ab.
+
+**Neue Anforderung:** SecLog sucht gespeicherte Vorfälle zu einem Benutzernamen, der von außen kommt, sicher parametrisiert. Der Name kommt aus der Konfiguration (`Search:User`, in `appsettings.json` und per Umgebungsvariable überschrieben) und geht mit Interpolation durch `FromSql`. Das Programm druckt das SQL mit dem Parameter und das Ergebnis unter `== Database ==`. Das Modell ändert sich nicht, es gibt keine neue Migration.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (neuer Block im Datenbankteil)">{programBlock}</CodeBlock>
+
+1. **Wert lesen:** `configuration["Search:User"]` liest den Namen. Die Umgebungsvariable `Search__User` schlägt `appsettings.json` (`m15-l07`).
+2. **Parametrisieren:** `FromSql` mit dem interpolierten `searchUser` sendet den Namen als Parameter.
+3. **Verknüpfen:** `OrderBy` setzt das eigene SQL als Unterabfrage fort.
+4. **Ausgeben:** `ToQueryString()` zeigt den Platzhalter `@p0` im Text und den Wert `'bob'` in der Parameterzeile. Danach folgt das Ergebnis.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l09/`) sucht Vorfälle zu einem Namen von außen. Der Name steht nie im SQL-Text.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l09-interpolated-sql-is-unsafe" />
+
+**„Ein interpolierter String in `FromSql` ist immer eine SQL-Injection-Lücke.“** `FromSql` bekommt Vorlage und Werte getrennt und sendet jeden Wert als Parameter. Die Schreibweise ist nur Komfort.
+:::
+
+:::warning[Achtung]
+<Misconception id="m16-l09-raw-escapes-input" />
+
+**„`FromSqlRaw` maskiert eingefügte Werte automatisch.“** `FromSqlRaw` bekommt einen fertigen Text und prüft ihn nicht. Was du vorher einfügst, wird SQL. Sicher ist `FromSqlRaw` nur mit `{0}` und einem Argument.
+:::
+
+<details>
+<summary>Vertiefung: Wenn ein Spaltenname von außen kommt (optional)</summary>
+
+Datenbanken erlauben keine Parameter für Spaltennamen oder andere Teile des Schemas. Eine Abfrage wie `WHERE {propertyName} = {value}` mit `FromSql` funktioniert deshalb nicht. Besser sind zwei feste Abfragen für zwei erlaubte Spalten. Wer den Text wirklich dynamisch bauen muss, nimmt `FromSqlRaw` und prüft den Namen selbst gegen eine feste Liste. Den Wert sendet er weiter als Parameter ([SQL Queries](https://learn.microsoft.com/ef/core/querying/sql-queries)).
+
+</details>
+
+## Zusammenfassung
+
+Raw SQL ist die Ausnahme. `FromSql`, `SqlQuery<T>` und `ExecuteSql` mit interpolierten Werten senden jeden Wert als Parameter, der SQL-Text enthält nur Platzhalter. `FromSqlRaw` mit verketteter oder vorher interpolierter Eingabe macht die Eingabe zum SQL-Text und erlaubt SQL Injection. Mit `ToQueryString()` prüfst du, ob im Text nur ein Platzhalter steht.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l09-q8" />
+
+### Transferfrage
+
+<Quiz id="m16-l09-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [SQL Queries](https://learn.microsoft.com/ef/core/querying/sql-queries)
+- Microsoft Learn: [What's new in EF Core 10](https://learn.microsoft.com/ef/core/what-is-new/ef-core-10.0/whatsnew)

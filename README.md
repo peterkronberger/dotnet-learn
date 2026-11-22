@@ -33,6 +33,7 @@ Checks to run before a commit (the first two are the build checks from `CLAUDE.m
 cd website && npm run build                # learning site
 dotnet build playground/Playground.csproj  # playground
 bash tools/check-examples.sh               # compile all examples, compare outputs
+bash tools/check-examples.sh --module m16  # only one module (also: 16, w01)
 node tools/check-quiz.mjs                  # quiz data, links and wording
 ```
 

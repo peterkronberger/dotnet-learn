@@ -1,0 +1,6 @@
+1. SaveChanges failed
+   Incidents in the database: 1
+2. Two SaveChanges calls done, no Commit yet
+   Incidents in the database: 1
+3. Committed
+   Incidents in the database: 3
