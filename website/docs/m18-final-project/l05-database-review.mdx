@@ -1,0 +1,189 @@
+---
+title: "Datenbankcode prüfen: Welches SQL entsteht?"
+sidebar_position: 5
+description: Ein Review von EF-Core-Code liest das SQL, das eine Abfrage erzeugt, und prüft die Datenbankpunkte der Checkliste. Ein Test sichert den wichtigen Teil des SQL ab. Gezeigt an der Suche nach Vorfällen in SecLog.
+lesson_id: m18-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import sqlReview from '!!raw-loader!@site/examples/_ci/m18-l05-sql-review/Program.cs';
+import sqlReviewOutput from '!!raw-loader!@site/examples/_ci/m18-l05-sql-review/expected.out.txt';
+import reader from '!!raw-loader!@site/examples/m18/l05/review-incident-reader.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m18/l05/search-gaps.snippet.cs';
+import serviceBefore from '!!raw-loader!@site/examples/_ci/seclog-m18-l04/src/SecLog.Api/IncidentService.cs';
+import serviceAfter from '!!raw-loader!@site/examples/_ci/seclog-m18-l05/src/SecLog.Api/IncidentService.cs';
+import filtersAfter from '!!raw-loader!@site/examples/_ci/seclog-m18-l05/src/SecLog.Data/IncidentFilters.cs';
+import queryTests from '!!raw-loader!@site/examples/_ci/seclog-m18-l05/tests/SecLog.Api.Tests/IncidentQueryTests.cs';
+
+# Datenbankcode prüfen: Welches SQL entsteht?
+
+:::note[Lernziele]
+- Du sagst für eine LINQ-Abfrage auf einem `DbSet` voraus, welches SQL ungefähr entsteht, und prüfst es mit `ToQueryString()`.
+- Du findest in Datenbankcode Probleme aus der Checkliste: SQL Injection, synchrone Aufrufe ohne Token, falsche Lebensdauer des Contexts und N+1.
+- Du sicherst ein Review-Ergebnis mit einem Test ab.
+:::
+
+## Rückblick
+
+<Quiz id="m16-l04-q2" />
+
+<Quiz id="m16-l09-q3" />
+
+<Quiz id="m16-l10-q1" />
+
+## Das SQL lesen
+
+Bei EF-Core-Code reicht das Lesen von C# nicht aus. Die Abfrage `db.Incidents.Where(…)` sagt nicht, was die Datenbank bekommt. Ein Review fragt deshalb zuerst: Welches SQL entsteht? Die Antwort zeigt, ob die Datenbank filtert, ob ein Wert als <Term id="sql-parameter">Parameter</Term> ankommt und wie viele Befehle gehen.
+
+`ToQueryString()` zeigt das SQL einer Abfrage, ohne sie auszuführen (Lektion [Von LINQ zu SQL](../m16-ef-core/l04-linq-to-sql)). Es gehört zum Handwerkszeug des Reviews. Dazu kommt die Frage aus der Lektion [IQueryable und IEnumerable](../m16-ef-core/l05-iqueryable-vs-ienumerable): Was wird übersetzt, und was läuft im Speicher? Der Teil vor `AsEnumerable()` wird zu SQL, alles danach läuft in C#.
+
+Die Datenbankpunkte der Checkliste aus Lektion 1 ([Code-Review mit einer Checkliste](./l01-review-checklist)) sind:
+
+- **Punkt 4, async:** `ToList()` oder `.Result` in einer `async`-Methode und ein fehlender `CancellationToken` ([Stolperfallen bei async](../m13-async-concurrency/l08-async-pitfalls), [Asynchrone Abfragen und Kontext-Lebensdauer](../m16-ef-core/l10-async-and-context-lifetime)).
+- **Punkt 5, Lebensdauer:** Ein `DbContext` in einem Singleton oder einem statischen Feld ([Lebensdauern richtig kombinieren](../m15-dependency-injection-hosting/l04-combining-lifetimes)).
+- **Punkt 6, SQL Injection:** Wird ein Wert Teil des SQL-Textes ([Raw SQL sicher verwenden](../m16-ef-core/l09-raw-sql-safely))?
+- **Zusätzlich:** Das <Term id="n-plus-one-problem">N+1-Problem</Term> ([Verwandte Daten laden](../m16-ef-core/l06-loading-related-data)).
+
+## Vorhersage: Welches SQL entsteht?
+
+:::info[Vorhersage]
+Das Programm gibt `ToQueryString()` für vier Abfragen aus. Der Benutzername ist `bob`. Notiere für jede Abfrage: Gibt es ein `WHERE`? Steht `bob` im SQL-Text oder in einer Parameterzeile?
+:::
+
+<CodeBlock language="csharp" title="Program.cs">{sqlReview}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{sqlReviewOutput}</CodeBlock>
+
+1. **Übersetzte Abfrage:** `Where`, `OrderBy` und `Select` werden zu `WHERE`, `ORDER BY` und einer Spaltenliste. Der Wert der Variablen `user` geht als Parameter `@user` an die Datenbank, steht also nicht im SQL-Text.
+2. **`FromSql` mit Interpolation:** Der eingesetzte Wert wird zum Parameter `@p0`. Die Schreibweise sieht nach Textverkettung aus, ist aber keine.
+3. **`FromSqlRaw` mit Verkettung:** Das `+` läuft in C#, bevor `FromSqlRaw` den Text bekommt. `bob` steht im SQL-Text, und es gibt keinen Parameter ([SQL Queries](https://learn.microsoft.com/ef/core/querying/sql-queries)). Mit einem harmlosen Namen merkt man nichts. Das Problem zeigt sich erst, wenn ein Wert mit SQL-Zeichen kommt (Lektion [Raw SQL sicher verwenden](../m16-ef-core/l09-raw-sql-safely)).
+4. **Filter nach `AsEnumerable()`:** Der Teil vor `AsEnumerable()` hat kein `WHERE`. Die Datenbank liefert alle Zeilen, und C# filtert danach.
+
+**Was passiert, wenn …?** … die Tabelle eine Million Vorfälle hat? Bei Abfrage 1 kommen nur die Zeilen von `bob` an. Bei Abfrage 4 kommen alle Zeilen an, und C# wirft die meisten weg.
+
+</details>
+
+## Befunde aus der Checkliste
+
+Die vier Befunde stehen als Beispiele nebeneinander:
+
+1. **SQL Injection (Punkt 6):** `FromSqlRaw` mit `+` oder mit interpolierten Werten macht eine Eingabe zum Teil des Befehls. `FromSql` mit Interpolation sendet jeden Wert als Parameter. Die Warnung EF1003 des Compilers meldet verkettetes `FromSqlRaw`. Nimm sie ernst, auch wenn der Name harmlos ist.
+2. **Blockieren statt `await` (Punkt 4):** `ToList()` in einer `async`-Methode hält den Thread, bis die Datenbank antwortet. `ToListAsync(cancellationToken)` gibt ihn frei und bricht mit der Anfrage ab.
+3. **Lebensdauer des Contexts (Punkt 5):** Ein `DbContext` ist für eine Unit of Work gedacht. Ein statisches Feld oder ein Singleton teilt ihn mit allen Aufrufen, und er ist nicht für parallele Zugriffe gebaut ([DbContext Lifetime](https://learn.microsoft.com/ef/core/dbcontext-configuration/)).
+4. **N+1:** Eine Schleife, die pro Zeile eine Abfrage stellt, sendet 1 + N Befehle. `Include` oder eine Projektion lädt dasselbe mit einem Befehl ([Efficient Querying](https://learn.microsoft.com/ef/core/performance/efficient-querying)).
+
+## Code-Review: Finde die Probleme
+
+Die Klasse `IncidentReader` ist ein Beispiel für fehlerhaften Code. Sie wird nie übersetzt und gehört nicht zu SecLog. Sie hat fünf Probleme aus der Checkliste. Lies sie so, wie ein Reviewer es tut, und markiere die Zeilen.
+
+<CodeBlock language="csharp" title="review-incident-reader.snippet.cs" showLineNumbers>{reader}</CodeBlock>
+
+<Quiz id="m18-l05-q8" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zeile 5:** Das statische Feld teilt einen `SecLogDbContext` mit allen Aufrufen (Punkt 5).
+2. **Zeile 7:** Die Methode nimmt keinen `CancellationToken` an (Punkt 4).
+3. **Zeile 10:** Der Name wird in den SQL-Text verkettet (Punkt 6).
+4. **Zeile 11:** `ToList()` blockiert in einer `async`-Methode (Punkt 4).
+5. **Zeile 13:** Die Schleife stellt pro Vorfall eine Abfrage (N+1).
+
+**Befund formulieren:** Ein gutes Review nennt Zeile, Problem und Vorschlag, zum Beispiel: „Zeile 10: Der Name wird in den SQL-Text verkettet. Vorschlag: `FromSql` mit Interpolation oder eine LINQ-Abfrage mit `Where`.“
+
+</details>
+
+## Lückenbeispiel
+
+Die Methode `Search` baut die Abfrage nach Benutzername. Die Teilziele: „1. Ohne Tracking beginnen → 2. Optional nach Benutzer filtern → 3. Sortieren“. Setze die zwei Lücken ein: Der Filter ist der Ausdruck `IncidentFilters.ForUser(user)`, die Sortierung geht nach der Id.
+
+<CodeBlock language="csharp" title="search-gaps.snippet.cs">{gaps}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Lücke 1:** `IncidentFilters.ForUser(user)` ist ein Ausdrucksbaum. EF Core übersetzt ihn zu `WHERE`, und der Wert geht als Parameter.
+2. **Lücke 2:** `OrderBy(i => i.Id)` sortiert in der Datenbank. Eine feste Reihenfolge macht den Aufruf und den Test stabil.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** In SecLog (`_ci/seclog-m18-l04/`) baut `IncidentService.GetAllAsync` die Abfrage für die Vorfallsliste selbst: `AsNoTracking`, optional `Where(ForUser(user))` und `OrderBy`. Ein Test kann diese Abfrage nicht einzeln prüfen, weil sie in der Methode steckt.
+
+**Neue Anforderung:** „Die Suche nach Vorfällen ist an einer Stelle gebaut, und ein Test zeigt: Mit Benutzername filtert die Datenbank (`WHERE`) und der Name steht als Parameter im SQL, nicht als Text; ohne Benutzername gibt es kein `WHERE`.“ Schreibe die Methode `Search` in `IncidentFilters` und rufe sie in `GetAllAsync` auf. Eine Projektdatei und ein Datenbank-Context laufen nicht im Playground, darum steht hier der Code vor und nach der Änderung.
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentService.cs (vorher)">{serviceBefore}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Data/IncidentFilters.cs (geändert)">{filtersAfter}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentService.cs (geändert)">{serviceAfter}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentQueryTests.cs (neu)">{queryTests}</CodeBlock>
+
+1. **Abfrage verlagern:** `Search` enthält die Abfrage von `GetAllAsync`, unverändert: `AsNoTracking`, optional `Where(ForUser(user))`, `OrderBy(i => i.Id)`. Sie gibt ein `IQueryable` zurück, die Abfrage läuft also noch nicht.
+2. **Aufrufen:** `GetAllAsync` ruft `Search(db.Incidents, user)` auf und behält `ToListAsync(cancellationToken)`. Das Verhalten bleibt gleich, alle bisherigen API-Tests bleiben grün.
+3. **Test mit Benutzer:** `ToQueryString()` beginnt mit der Parameterzeile. Der Test sieht sich deshalb nur den SQL-Text ab `SELECT` an: Er enthält `WHERE` und `@user`, aber nicht `bob`.
+4. **Test ohne Benutzer:** Bei `null` gibt es kein `WHERE`.
+5. **Grenze des Tests:** Er prüft die Form des SQL. Ob die richtigen Zeilen zurückkommen, prüfen die Endpunkt-Tests, die die Abfrage ausführen.
+6. **Ausgabe:** Die Konsolenausgabe bleibt gleich. In `expected.out.txt` kommen nur die zwei neuen Testzeilen dazu.
+
+</details>
+
+**Neuer Stand:** In SecLog (`_ci/seclog-m18-l05/`) steht die Vorfallssuche an einer Stelle, und zwei Tests sichern ab, dass die Datenbank filtert und der Name als Parameter ankommt. Das gehört zu den Punkten 6 („SQL Injection“) und 9 („Tests“) der Checkliste.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l05-same-result-same-sql" />
+
+**„Zwei Abfragen mit gleichem Ergebnis schicken dasselbe SQL an die Datenbank.“** Das Ergebnis sagt nichts über den Weg. Mit `AsEnumerable()` vor dem `Where` lädt die Datenbank alle Zeilen, und C# filtert. Das Ergebnis ist dasselbe, der Aufwand nicht. Ein Review liest deshalb das SQL.
+:::
+
+<details>
+<summary>Vertiefung: Was `ToQueryString()` nicht zeigt (optional)</summary>
+
+`ToQueryString()` zeigt das SQL einer einzelnen Abfrage, ohne sie auszuführen. Es zeigt nicht, wie oft eine Abfrage läuft: Ein N+1 in einer Schleife fällt erst auf, wenn man die Befehle zählt, wie in Lektion [Verwandte Daten laden](../m16-ef-core/l06-loading-related-data). Das protokollierte SQL aus dem Logging zeigt dagegen auch die Befehle, die wirklich laufen ([Simple Logging](https://learn.microsoft.com/ef/core/logging-events-diagnostics/simple-logging)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Review von EF-Core-Code liest das SQL: Mit `ToQueryString()` sieht man, ob die Datenbank filtert, ob ein Wert als Parameter ankommt und was nach `AsEnumerable()` im Speicher läuft. Aus der Checkliste gehören vier Befunde dazu: verkettetes `FromSqlRaw`, blockierende Aufrufe ohne Token in `async`-Methoden, ein geteilter `DbContext` und N+1. Ein Test sichert die Form des SQL ab. In SecLog ist das die Methode `Search` mit zwei Tests.
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l05-q1" />
+
+<Quiz id="m18-l05-q2" />
+
+<Quiz id="m18-l05-q3" />
+
+<Quiz id="m18-l05-q4" />
+
+<Quiz id="m18-l05-q5" />
+
+<Quiz id="m18-l05-q6" />
+
+<Quiz id="m18-l05-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l05-q9" />
+
+### Transferfrage
+
+<Quiz id="m18-l05-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [SQL Queries](https://learn.microsoft.com/ef/core/querying/sql-queries)
+- Microsoft Learn: [Efficient Querying](https://learn.microsoft.com/ef/core/performance/efficient-querying)
+- Microsoft Learn: [DbContext Lifetime, Configuration, and Initialization](https://learn.microsoft.com/ef/core/dbcontext-configuration/)
