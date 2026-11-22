@@ -1,0 +1,545 @@
+SecLog project profile
+Purpose: find suspicious logins in made-up login logs
+Language: C#
+Platform: .NET
+Variant: .NET (Linux server and Windows laptops)
+Version: .NET 11 (STS)
+End of support: 2028-11-14
+Execution model: Native AOT
+Build: Release
+
+First event:
+2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+User: bob
+IP: 203.0.113.7
+Event type: login-failed
+Failure rate (%): 50
+Failed logins of bob: 5
+Share of bob (%): 71.43
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Failure rate: 50.0 %
+Success share, cut off (%): 35
+Success share, rounded (%): 36
+Failure rate from input (%): 35.7
+Second text worked: False
+Second text number: 0
+Alert: many failed logins
+Suspicious: True
+Suspicious for login-success: False
+5 failed attempts
+5 failed attempts
+Severity: high
+Severity of bob: high
+Action: count the failure
+Failure streak: 5
+Attempt 1
+Attempt 2
+Attempt 3
+Attempt 4
+Attempt 5
+Dots in IP: 3
+203.0.113.7 has 3 dots
+Date: 2026-03-02
+Digits in IP: 8
+Failures: 7
+Failure rate (%): 50.0
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:42:11Z logout user=carol ip=unknown
+Failed in sample: 7
+User from line: bob
+Line ok: False
+User and IP: bob 203.0.113.7
+alice |#
+bob |#####
+carol |
+dave |#
+all |#######
+Findings: bob: 5 failed attempts; alice: 1 failed attempt; 
+User of sample line: bob
+User of broken line is missing: True
+Failures from input: 5
+Number in "many": False
+Sum with a missing number is null: True
+Shown user: unknown
+Length of user: 3
+Last IP: unknown
+Raw user: [  Bob ]
+Clean user: [bob]
+Is bob: True
+Equals bob: True
+Same findings object: True
+Lines in the sample log: 14
+First line: 2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+Last line: 2026-03-02T09:30:00Z logout user=alice ip=192.0.2.10
+User of line 2: bob
+alice | hour 8: 1 | hour 9: 0
+bob | hour 8: 5 | hour 9: 0
+carol | hour 8: 0 | hour 9: 0
+dave | hour 8: 0 | hour 9: 1
+Last line again: 2026-03-02T09:30:00Z logout user=alice ip=192.0.2.10
+Lines 2 to 7: 6
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:02:05Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:03:31Z login-success user=carol ip=198.51.100.23
+2026-03-02T08:04:02Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:05:15Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:06:48Z login-failed user=bob ip=203.0.113.7
+Last three lines: 3
+Date of line 1: 2026-03-02
+Failed lines: 7
+First failed line: 2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Failed lines of bob: 5
+Failed lines in total: 7
+alice: 1
+bob: 5
+carol: 0
+dave: 1
+Distinct IP addresses: 4
+Repeated IP addresses: 10
+Contains 203.0.113.7: True
+192.0.2.10
+203.0.113.7
+198.51.100.23
+198.51.100.8
+Watch bob: 5
+Watch dave: 1
+Alert: 2026-03-02T08:01:40Z
+Alert: 2026-03-02T08:02:05Z
+Alert: 2026-03-02T08:04:02Z
+Alert: 2026-03-02T08:05:15Z
+Alert: 2026-03-02T08:06:48Z
+login-success: 5
+login-failed: 7
+logout: 2
+Watch list: bob, dave
+Line 2 is LOGIN-FAILED, ignoring case: True
+Detection settings: 5 failures in 10 minutes
+bob: 5 failed logins within 10 minutes (08:01:40 to 08:06:48)
+Time span: 00:05:08
+2026-03-02 08:01 login-failed bob
+Events: 14
+2026-03-02 09:30 logout alice
+Incident #1 bob: 5 failed logins (sample log)
+Rejected events: 9
+Status: investigating
+Unknown status: unknown
+Status: investigating
+Incident #2 dave: 1 failed logins (sample log)
+Status: investigating
+Source of bob: sample log
+Source of dave: sample log
+User of bob: bob
+User of dave: dave
+Incidents: 2
+SecLog.Model.LogEvent
+Analyzed log: sample log
+Failure count: 7
+Not a number: seven
+The input string 'seven' was not in a correct format.
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+No line 15 in the sample log
+Not a line number: two
+Rejected: broken line
+Processed: 2, rejected: 1
+Rejected event: The value cannot be an empty string. (Parameter 'eventType')
+2026-03-02 08:01 login-failed bob
+Line 2 rejected: expected 4 parts, found 2
+Line 3 rejected: invalid timestamp
+Cause: FormatException
+Accepted lines: 1
+Good lines: 2, bad lines: 2
+Lines read: 14, events: 14
+Events from sample.log: 14
+File not found: missing.log
+Rule: failed logins (threshold 5)
+Threshold: 5
+failed logins
+Rule: failed logins (threshold 5)
+As text: Rule: failed logins (threshold 5)
+failed logins / bob: True
+failed logins / dave: False
+watch list / bob: False
+watch list / dave: True
+FailedLoginRule sealed: True
+WatchListRule sealed: True
+DetectionRule sealed: False
+bob: 2 of 3 rules match
+dave: 2 of 3 rules match
+failed logins: threshold 5
+Rules from DetectionRule: 2 of 3
+Event type: LoginFailed
+Severity of bob: High
+Severity of dave: Low
+Number of High: 3
+Medium parsed: True (Medium)
+Critical parsed: False (None)
+In the window: 5 of 5
+Copy has the same start: True
+Same reference with ==: False
+Same values with Equals: True
+Distinct events: 2
+As record: SecurityEvent { Timestamp = 03/02/2026 08:01:40 +00:00, Type = LoginFailed, User = bob }
+Records equal with ==: True
+bob: LoginFailed
+Incident #1 bob: 5 failed logins (sample log)
+Incident #2 dave: 1 failed logins (sample log)
+Severity of the first: High
+login-failed texts: 7
+LoginFailed values: 7
+Same events: 1
+Stored events: 14
+Stored incidents: 2
+Stored rules: 3
+Last event: 2026-03-02 09:30 logout alice
+First incident: Incident #1 bob: 5 failed logins (sample log)
+First rule: failed logins
+alice: 1
+bob: 5
+dave: 1
+192.0.2.10: 1
+198.51.100.8: 1
+203.0.113.7: 5
+Failures of carol: 0
+Event 99: (none)
+Count 99: 0
+TryGet 1: True, 5
+TryGet 99: False, null: True
+Watch list
+- bob
+- dave
+First lines
+- 2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+- 2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+Distinct IPs
+- 192.0.2.10
+- 198.51.100.23
+- 198.51.100.8
+- 203.0.113.7
+Failure counts
+- 1
+- 5
+- 1
+Interface count: 2
+Events as objects
+- SecurityEvent { Timestamp = 03/02/2026 08:00:12 +00:00, Type = LoginSuccess, User = alice }
+- SecurityEvent { Timestamp = 03/02/2026 08:01:40 +00:00, Type = LoginFailed, User = bob }
+bob has many failures: True
+dave has many failures: False
+Many failures: 1
+Under investigation: 2
+many failures: Incident #1 bob: 5 failed logins (sample log)
+bob: 3 matches
+dave: 3 matches
+bob: 2 lambda matches
+dave: 2 lambda matches
+Incident #1 bob: 5 failed logins (sample log)
+Incident #2 dave: 1 failed logins (sample log)
+[ALERT] Incident #1 bob: 5 failed logins (sample log)
+[INFO] Incident #2 dave: 1 failed logins (sample log)
+at least 2 / dave: False
+at least 2 / bob: True
+at least 5 / dave: False
+at least 5 / bob: True
+no failures / dave: False
+Checked incidents: 2
+ALERT: Incident #1 bob: 5 failed logins (sample log)
+Severity: High
+Targets: 3
+ALERT: Incident #2 dave: 1 failed logins (sample log)
+Targets: 2
+Alerts counted: 2
+Incident #1 bob: 5 failed logins (sample log) (2 rules)
+Incident #2 dave: 1 failed logins (sample log) (2 rules)
+Found: 2
+Found: 4
+Failed events: 7
+Event 2 is from bob: True
+Static form: True
+Number | User | Failures | Severe
+1 | bob | 5 | True
+2 | dave | 1 | False
+Failed logins, newest first
+- 2026-03-02 09:10 login-failed dave
+- 2026-03-02 08:15 login-failed alice
+- 2026-03-02 08:06 login-failed bob
+- 2026-03-02 08:05 login-failed bob
+- 2026-03-02 08:04 login-failed bob
+- 2026-03-02 08:02 login-failed bob
+- 2026-03-02 08:01 login-failed bob
+First 3 events by user
+- 2026-03-02 08:00 login-success alice
+- 2026-03-02 08:15 login-failed alice
+- 2026-03-02 08:15 login-success alice
+Events in the log: 14
+2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:02:05Z login-failed user=bob ip=203.0.113.7
+2026-03-02T08:04:02Z login-failed user=bob ip=203.0.113.7
+Lines of alice
+- 2026-03-02T08:00:12Z login-success user=alice ip=192.0.2.10
+- 2026-03-02T08:15:03Z login-failed user=alice ip=192.0.2.10
+- 2026-03-02T08:15:30Z login-success user=alice ip=192.0.2.10
+- 2026-03-02T09:30:00Z logout user=alice ip=192.0.2.10
+Failed logins in the query: 2
+Failed logins after adding a line: 3
+Failed logins in the snapshot: 3
+Failed logins in the query now: 4
+{ User = bob, Hour = 8 }
+{ User = bob, Hour = 8 }
+{ User = bob, Hour = 8 }
+{ User = bob, Hour = 8 }
+{ User = bob, Hour = 8 }
+{ User = alice, Hour = 8 }
+{ User = dave, Hour = 9 }
+Same rows: True
+08:00 6 failures
+09:00 1 failures
+203.0.113.7 5
+192.0.2.10 4
+198.51.100.8 3
+Incident #1 bob: 5 failed logins (sample log)
+Message 1: possible phishing
+Message 2: possible phishing
+Message 3: possible phishing
+Message 4: harmless
+Message 5: harmless
+Message 6: harmless
+All messages have text: True
+First harmless message: 4
+no logout of bob
+Log events per incident
+- bob 5
+- dave 3
+Failed and logged in
+- alice
+- dave
+Failed, never logged in
+- bob
+All users with a login
+- bob
+- alice
+- dave
+- carol
+08:00 6 failures
+09:00 1 failures
+Same rows as method syntax: True
+log event: 2026-03-02 08:00 login-success alice
+security event of bob
+raw line: 2026-03-02T08:02:05Z login-failed user=bob ip=203.0.113.7
+missing
+unknown item
+mixedItems[2] is string: True
+mixedItems[3] is string: False
+Failures between 08:00 and 08:59: 6
+Lines that are neither success nor logout: 7
+Failed logins of bob: 5
+Events in the hour 09:00 to 09:59: 3
+Incident #1 bob: 5 failed logins (sample log)
+Time: 2026-03-02 08:01
+Type: login-failed
+User: bob
+Lines from 203.0.113.7: 5
+Failed logins with a user: 7
+Lines parsed with list patterns: 14
+invalid
+invalid
+login-failed of bob: lock account
+login-failed of bob: lock account
+login-failed of bob: lock account
+login-failed of bob: lock account
+login-failed of bob: lock account
+IncidentState { Number = 1, User = bob, FailureCount = 5, Severity = High, Status = open }
+IncidentState { Number = 1, User = bob, FailureCount = 5, Severity = High, Status = investigating }
+IncidentState { Number = 1, User = bob, FailureCount = 5, Severity = High, Status = closed }
+Status of the first state: open
+Same state: False
+Same after an empty with: True
+event: LoginFailed of bob
+error: not a valid log line
+error: not a valid log line
+open: waiting for an analyst
+investigating: analyst-1
+resolved: false alarm
+Needs attention (OpenStatus): True
+Needs attention (InvestigatingStatus): False
+Needs attention (ResolvedStatus): False
+bob: 3 of 4 rules match
+dave: 2 of 4 rules match
+Loaded web: 7 lines
+Loading vpn
+Call returned, completed: False
+Failures in vpn: 2
+Source backup failed: KeyNotFoundException
+Faulted: True
+Sources loaded: 2, lines: 14
+Slow source: timeout
+Loading web: canceled (TaskCanceledException)
+Slow source: canceled
+Failures in all sources: 7
+Information: SecLog.Model.LineValidator: [File sample.log] Line 3 rejected: expected 4 parts, found 2
+Information: SecLog.Model.LineValidator: [File sample.log] Line 4 rejected: unknown event type reboot
+Information: SecLog.Run: [File sample.log] Validation finished
+Failures in web: 5
+Reader closed: web
+Failures in vpn: 2
+End of the block
+Reader closed: vpn
+After the blocks
+Warning: SecLog.Model.IncidentMonitor: Incident found for bob with 5 failed logins
+Warning: SecLog.Model.IncidentMonitor: Incident found for dave with 1 failed logins
+Notifications sent: 2
+Failures per source: 5, 2
+Shared failure count: 7
+Atomic failure count: 7
+alice: 1
+bob: 5
+dave: 1
+Failures (PLINQ): 7
+vpn: 2
+web: 5
+part-1.log: 2
+part-2.log: 3
+part-3.log: 1
+part-4.log: 1
+Total failures in files: 7
+[CountFailures] 7 failed logins in 14 lines
+[CountUsers] 4 users appear in the log
+Active after 3 minutes: True
+Active after 11 minutes: False
+== Database ==
+Applied migration: InitialCreate
+Stored incidents: 2
+#1 bob: 5 failed logins, investigating (sample log)
+#2 dave: 1 failed logins, investigating (sample log)
+Stored events of bob: 5
+Stored events of dave: 1
+.param set @threshold 5
+
+SELECT "i"."User", "i"."FailureCount"
+FROM "Incidents" AS "i"
+WHERE "i"."FailureCount" >= @threshold
+ORDER BY "i"."FailureCount" DESC
+Severe: bob 5
+SELECT "i"."Id", "i"."FailureCount", "i"."Source", "i"."Status", "i"."User", "e"."Id", "e"."EventType", "e"."StoredIncidentId", "e"."Timestamp", "e"."User"
+FROM "Incidents" AS "i"
+LEFT JOIN "Events" AS "e" ON "i"."Id" = "e"."StoredIncidentId"
+ORDER BY "i"."Id"
+Failures of bob:
+  2026-03-02T08:01:40Z
+  2026-03-02T08:02:05Z
+  2026-03-02T08:04:02Z
+  2026-03-02T08:05:15Z
+  2026-03-02T08:06:48Z
+Failures of dave:
+  2026-03-02T09:10:09Z
+State: Unchanged → Modified → Unchanged
+Rows written: 1
+Report: #1 bob investigating
+Report: #2 dave investigating
+Report: #3 carol investigating
+.param set p0 'bob'
+
+SELECT "s"."Id", "s"."FailureCount", "s"."Source", "s"."Status", "s"."User"
+FROM (
+    SELECT * FROM Incidents WHERE User = @p0
+) AS "s"
+ORDER BY "s"."Id"
+Found: #1 bob 5
+== JSON ==
+[
+  {
+    "id": 1,
+    "user": "bob",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 5
+  },
+  {
+    "id": 2,
+    "user": "dave",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 1
+  },
+  {
+    "id": 3,
+    "user": "carol",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 1
+  }
+]
+
+== Tests ==
+Passed SecLog.Api.Tests.AuthorizationTests.ChangeStatus_NoUser_ReturnsUnauthorized
+Passed SecLog.Api.Tests.AuthorizationTests.ChangeStatus_Responder_ReturnsNoContent
+Passed SecLog.Api.Tests.AuthorizationTests.ChangeStatus_UserWithoutRole_ReturnsForbidden
+Passed SecLog.Api.Tests.AuthorizationTests.GetIncidents_NoUser_ReturnsUnauthorized
+Passed SecLog.Api.Tests.AuthorizationTests.GetIncidents_UserWithoutRole_ReturnsOk
+Passed SecLog.Api.Tests.ForwardedHeadersTests.Options_Always_ForwardClientAddressAndScheme
+Passed SecLog.Api.Tests.IncidentEndpointsTests.GetIncident_KnownId_ReturnsIncident
+Passed SecLog.Api.Tests.IncidentEndpointsTests.GetIncident_UnknownId_ReturnsNotFound
+Passed SecLog.Api.Tests.IncidentEndpointsTests.GetIncidents_SeededDatabase_ReturnsAll
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{\"status\":\"\"}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{\"status\":\"archived\"}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_UnknownId_ReturnsNotFound
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_ValidStatus_ReturnsNoContent
+Passed SecLog.Api.Tests.IncidentInputTests.GetIncidents_FilterByUser_ReturnsOnlyThatUser
+Passed SecLog.Api.Tests.IncidentInputTests.GetIncidents_UserTooLong_ReturnsBadRequest
+Passed SecLog.Api.Tests.IncidentServiceTests.ChangeStatusAsync_CancelledToken_KeepsStatus
+Passed SecLog.Api.Tests.IncidentServiceTests.GetAllAsync_CancelledToken_ThrowsCancellation
+Passed SecLog.Api.Tests.IncidentServiceTests.Services_TwoScopes_GetDifferentInstances
+Passed SecLog.Api.Tests.OpenApiTests.Document_Always_ContainsTheIncidentPaths
+Passed SecLog.Api.Tests.OpenApiTests.Document_EveryOperation_HasNameAndSummary
+Passed SecLog.Api.Tests.OpenApiTests.Document_GetIncident_DescribesTheNotFoundResponse
+Passed SecLog.Api.Tests.OpenApiTests.Document_ProductionEnvironment_ReturnsNotFound
+Passed SecLog.Api.Tests.ProblemDetailsTests.ChangeStatus_InvalidStatus_ReturnsErrorsForStatus
+Passed SecLog.Api.Tests.ProblemDetailsTests.GetIncident_UnknownId_ReturnsProblemDetails
+Passed SecLog.Api.Tests.ProblemDetailsTests.GetIncidents_DatabaseFails_ReturnsProblemWithoutDetails
+Passed SecLog.Api.Tests.SecurityHeaderTests.GetIncident_UnknownId_ProblemResponseHasNoSniffHeader
+Passed SecLog.Api.Tests.SecurityHeaderTests.GetIncidents_DatabaseFails_ErrorResponseHasNoSniffHeader
+Passed SecLog.Api.Tests.SecurityHeaderTests.GetIncidents_OkResponse_HasNoSniffHeader
+Passed SecLog.Tests.DetectionOptionsTests.Defaults_AreValid
+Passed SecLog.Tests.DetectionOptionsTests.NotPositiveValue_IsInvalid(maxFailures: -1, windowMinutes: -1)
+Passed SecLog.Tests.DetectionOptionsTests.NotPositiveValue_IsInvalid(maxFailures: 0, windowMinutes: 10)
+Passed SecLog.Tests.DetectionOptionsTests.NotPositiveValue_IsInvalid(maxFailures: 5, windowMinutes: 0)
+Passed SecLog.Tests.DetectorTests.Check_NoRuleMatches_RaisesNoEvent
+Passed SecLog.Tests.DetectorTests.Check_RuleMatches_RaisesOneEventPerIncident
+Passed SecLog.Tests.DetectorTests.CountMatches_TwoMatchingOneNot_ReturnsTwo
+Passed SecLog.Tests.FailedLoginRuleTests.Add_OtherUser_IsIgnored
+Passed SecLog.Tests.FailedLoginRuleTests.Describe_ContainsThreshold
+Passed SecLog.Tests.FailedLoginRuleTests.IsMatch_FailuresBelowThreshold_ReturnsFalse
+Passed SecLog.Tests.FailedLoginRuleTests.IsMatch_FailuresEqualThreshold_ReturnsTrue
+Passed SecLog.Tests.IncidentActivityTests.IsActive_ClockCrossesTheBorder_ChangesToFalse
+Passed SecLog.Tests.IncidentActivityTests.IsActive_JustAfterLastFailure_ReturnsTrue
+Passed SecLog.Tests.IncidentActivityTests.IsActive_NoFailures_ReturnsFalse
+Passed SecLog.Tests.IncidentActivityTests.IsActive_SecondsAfterLastFailure_ReturnsExpected(seconds: 599, expected: True)
+Passed SecLog.Tests.IncidentActivityTests.IsActive_SecondsAfterLastFailure_ReturnsExpected(seconds: 600, expected: True)
+Passed SecLog.Tests.IncidentActivityTests.IsActive_SecondsAfterLastFailure_ReturnsExpected(seconds: 601, expected: False)
+Passed SecLog.Tests.LineValidatorTests.TryParse_BrokenLine_ReturnsNull
+Passed SecLog.Tests.LineValidatorTests.TryParse_ValidLine_ReturnsEvent
+Passed SecLog.Tests.LogParserTests.ParseEventType_KnownText_ReturnsType(text: "login-failed", expected: LoginFailed)
+Passed SecLog.Tests.LogParserTests.ParseEventType_KnownText_ReturnsType(text: "login-success", expected: LoginSuccess)
+Passed SecLog.Tests.LogParserTests.ParseEventType_KnownText_ReturnsType(text: "logout", expected: Logout)
+Passed SecLog.Tests.LogParserTests.ParseWithPatterns_InvalidLine_ReturnsNull(line: "")
+Passed SecLog.Tests.LogParserTests.ParseWithPatterns_InvalidLine_ReturnsNull(line: "2026-03-02T08:01:40Z login-denied user=bob ip=203."···)
+Passed SecLog.Tests.LogParserTests.ParseWithPatterns_InvalidLine_ReturnsNull(line: "not a log line")
+Passed SecLog.Tests.LogParserTests.ParseWithPatterns_ValidLine_ReturnsEvent
+Passed SecLog.Tests.LogParserTests.Parse_InvalidLine_ReturnsLineError
+Passed SecLog.Tests.LogSourceReaderTests.CountFailuresAsync_CancelledToken_ThrowsCancellation
+Passed SecLog.Tests.LogSourceReaderTests.CountFailuresAsync_SampleLines_ReturnsTwo
+Passed SecLog.Tests.LogSourceReaderTests.DisposeAsync_Always_WritesClosedMessage
+Passed SecLog.Tests.ParseLineTests.ParseLine_BadTimestamp_KeepsTheCauseAsInnerException
+Passed SecLog.Tests.ParseLineTests.ParseLine_UnknownEventType_NamesTheType
+Passed SecLog.Tests.ParseLineTests.ParseLine_ValidLine_ReturnsEvent
+Passed SecLog.Tests.ParseLineTests.ParseLine_WrongNumberOfParts_ThrowsWithLineNumber
+Passed SecLog.Tests.TimeWindowTests.Contains_SampleLogTime_ReturnsExpected(timestamp: "2026-03-02T08:01:40Z", expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SampleLogTime_ReturnsExpected(timestamp: "2026-03-02T08:06:48Z", expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SampleLogTime_ReturnsExpected(timestamp: "2026-03-02T08:15:03Z", expected: False)
+Passed SecLog.Tests.TimeWindowTests.Contains_SampleLogTime_ReturnsExpected(timestamp: "2026-03-02T09:30:00Z", expected: False)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: -1, expected: False)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: 0, expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: 1, expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: 599, expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: 600, expected: True)
+Passed SecLog.Tests.TimeWindowTests.Contains_SecondsAfterStart_ReturnsExpected(seconds: 601, expected: False)
