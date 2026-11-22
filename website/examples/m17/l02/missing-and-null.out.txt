@@ -1,0 +1,5 @@
+1: 3 dave -
+2: user is null: True
+3: JsonException for user = null
+4: JsonException, id is missing
+5: JsonException, invalid JSON

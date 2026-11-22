@@ -1,0 +1,3 @@
+{"Id":7,"User":"bob","Status":"open","FailureCount":5}
+Incident { Id = 7, User = bob, Status = open, FailureCount = 5 }
+True

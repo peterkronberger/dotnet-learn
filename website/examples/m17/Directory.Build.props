@@ -1,0 +1,12 @@
+<Project>
+
+  <!--
+    File-based apps (dotnet run file.cs) publish for Native AOT by default,
+    which turns reflection-based System.Text.Json off. The playground has
+    reflection on (trimming is off), so CI must match it.
+  -->
+  <PropertyGroup>
+    <PublishAot>false</PublishAot>
+  </PropertyGroup>
+
+</Project>
