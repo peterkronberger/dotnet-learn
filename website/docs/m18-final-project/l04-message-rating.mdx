@@ -1,0 +1,175 @@
+---
+title: Die Meldungsbewertung im Kern
+sidebar_position: 4
+description: Eine öffentliche Klasse prüft ihre Eingaben am Rand, weil Nullable-Annotationen nur eine Hilfe beim Kompilieren sind, und ein datengetriebener Test sichert die Regel mit allen Beispielmeldungen. Gezeigt an der Meldungsbewertung von SecLog.
+lesson_id: m18-l04
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import ratingCase from '!!raw-loader!@site/examples/m18/l04/rating-case.cs';
+import ratingCaseOutput from '!!raw-loader!@site/examples/m18/l04/rating-case.out.txt';
+import gaps from '!!raw-loader!@site/examples/m18/l04/rating-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m18/l04/core-rating-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m18/l04/core-rating-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m18/l04/core-rating-solution.cs';
+import ratingFile from '!!raw-loader!@site/examples/_ci/seclog-m18-l04/src/SecLog.Core/Model/MessageRating.cs';
+import ratingTests from '!!raw-loader!@site/examples/_ci/seclog-m18-l04/tests/SecLog.Tests/MessageRatingTests.cs';
+
+# Die Meldungsbewertung im Kern
+
+:::note[Lernziele]
+- Du kannst die Meldungsbewertung als Klasse im Kern schreiben, die ihre Eingaben prüft.
+- Du erklärst, warum ein Parameter vom Typ `string` zur Laufzeit trotzdem `null` sein kann.
+- Du prüfst eine Regel datengetrieben mit allen Beispielmeldungen.
+:::
+
+## Rückblick
+
+<Quiz id="m11-l08-q1" />
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m14-l08-q1" />
+
+## Eine Regel mit Eingaben von außen
+
+Die <Term id="message-rating">Meldungsbewertung</Term> von SecLog stuft den Text einer gemeldeten Nachricht ein: „möglicherweise Phishing“ bei einem Link mit `http://` und mindestens einem Signalwort, sonst „harmlos“. Sie ist eine Vereinfachung für den Kurs und keine zuverlässige Erkennung von Phishing. Echte Angriffe nutzen andere Links, andere Wörter und mehr Kontext.
+
+In der Konsolenanwendung ist die Regel eine lokale Funktion mit einem Array von Signalwörtern. Als Klasse im Kern hat sie mehr Aufrufer: Konsole, API und Tests. Jeder von ihnen kann ihr etwas Falsches übergeben. Eine öffentliche Klasse prüft deshalb ihre Eingaben am Rand, bevor sie damit rechnet (Punkt 7 der Checkliste aus Lektion 1, <Term id="input-validation">Eingabevalidierung</Term>).
+
+:::info[Vorhersage]
+Das Programm bewertet drei erfundene Nachrichten mit den Signalwörtern `click`, `password` und `verify`. Die Regel vergleicht den Link mit `StringComparison.Ordinal` und die Wörter mit `StringComparison.OrdinalIgnoreCase`. Welche Bewertung gibt es für jede Nachricht? Beachte die Großbuchstaben.
+:::
+
+<CSharpRunner id="m18-l04-case" code={ratingCase} predict expected={ratingCaseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `possible phishing`, `harmless` und `harmless`.
+
+1. **Nachricht 1:** `http://` kommt vor, und `PASSWORD` passt zu `password`, weil `OrdinalIgnoreCase` die Groß- und Kleinschreibung übergeht ([String.Contains](https://learn.microsoft.com/dotnet/api/system.string.contains)).
+2. **Nachricht 2:** `HTTP://` ist für den Vergleich mit `Ordinal` nicht `http://`. Es gibt keinen Link, also `harmless`.
+3. **Nachricht 3:** Das Signalwort `verify` ist da, aber es gibt keinen Link.
+4. **Befund:** Die Regel ist eine Vereinfachung. Ein Link in Großbuchstaben bleibt unentdeckt.
+
+**Was passiert, wenn …?** … man die Regel für zuverlässig hält? Dann wird eine Nachricht mit `HTTP://` als harmlos übernommen. Die Bewertung sagt nur, ob die Lehrregel einen Treffer fand.
+
+</details>
+
+## Eingaben am Rand prüfen
+
+Der Parameter `string message` trägt kein `?`. Der Compiler warnt, wenn ein Aufrufer `null` übergibt. Zur Laufzeit gibt es diese Prüfung nicht: Nullable-Annotationen steuern nur die Analyse beim Kompilieren ([Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references)). Ein Aufrufer ohne <Term id="nullable-context">Nullable-Kontext</Term> bekommt keine Warnung, und mit dem Operator `!` schaltet er sie bewusst ab. In beiden Fällen kommt `null` in die Methode (Lektion „null und Nullable-Verweistypen“).
+
+Darum prüft die öffentliche Klasse selbst, mit <Term id="guard-clause">Guard Clauses</Term>:
+
+- **Konstruktor:** `ArgumentNullException.ThrowIfNull` für die Liste der Signalwörter ([ThrowIfNull](https://learn.microsoft.com/dotnet/api/system.argumentnullexception.throwifnull)). Eine leere Liste ist ein Fehler des Aufrufers: Ohne Signalwort wäre jede Nachricht harmlos. Das meldet eine `ArgumentException`. Ein leeres Wort oder ein Wort aus Leerzeichen weist `ArgumentException.ThrowIfNullOrWhiteSpace` zurück.
+- **Methode:** `ArgumentNullException.ThrowIfNull` für die Nachricht. Eine leere Nachricht ist dagegen gültig und harmlos.
+
+Der Konstruktor speichert eine Kopie der Wörter (`[.. signalWords]`). Der Aufrufer übergibt eine `IReadOnlyList<string>`, hinter der eine Liste stecken kann, die er später ändert. Mit der Kopie bleibt die Regel gleich.
+
+## Datengetriebener Test
+
+Alle sechs Beispielmeldungen mit ihrer erwarteten Bewertung sind Testdaten. Eine `[Theory]` mit `[MemberData]` (Lektion „Datengetriebene Tests mit [Theory]“) liest sie aus einer Eigenschaft der Testklasse. Das ist für längere Texte lesbarer als `[InlineData]`. Weitere Tests prüfen ein Signalwort in Großbuchstaben, die `null`-Nachricht, die leere Wortliste und das leere Wort.
+
+## Lückenbeispiel
+
+Die Klasse `SignalWords` speichert die Wörter einer Regel. Die Teilziele: „1. null prüfen → 2. Inhalt prüfen → 3. Werte speichern“. Das Programm soll `ArgumentNullException`, `ArgumentException`, `ArgumentException` und `ok: 2` ausgeben. Bisher prüft der Konstruktor nichts.
+
+<CSharpRunner id="m18-l04-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **null prüfen:** `ArgumentNullException.ThrowIfNull(words);`
+2. **Inhalt prüfen:** Bei `words.Count == 0` löst `throw new ArgumentException(…)` aus. In einer `foreach`-Schleife prüft `ArgumentException.ThrowIfNullOrWhiteSpace(word)` jedes Wort.
+3. **Werte speichern:** `this.words = [.. words];` kommt erst nach den Prüfungen, damit nie ein halb gültiger Zustand entsteht.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m18-l03/`) bewertet die Meldungen in der Konsolenanwendung mit der lokalen Funktion `IsPossiblePhishing` und einem Array `signalWords`. Der Kern kennt die Regel nicht.
+
+Im Runner siehst du nur die Klasse `MessageRating` und ein Programm, das die sechs Beispielmeldungen bewertet (die Texte sind eingeklappt). Dieser Ausschnitt ist keine Kopie einer früheren Datei, denn die Klasse ist neu: Er zeigt die Regel aus Modul 11 in Klassenform, noch ohne Prüfungen.
+
+**Neue Anforderung:** „Die Meldungsbewertung ist eine Klasse im Kern. Sie prüft ihre Eingaben: ohne Signalwörter oder ohne Meldung (`null`) wirft sie eine Ausnahme.“ Ergänze die Prüfungen in Konstruktor und Methode.
+
+<CSharpRunner id="m18-l04-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="core-rating-solution.cs" />
+
+Im Projekt `_ci/seclog-m18-l04/` sind die Typen dieselben Dateien wie im Kern. Eine Datei im Kern und eine Testdatei sind neu, und die Konsolenanwendung benutzt die Klasse statt der lokalen Funktion:
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/MessageRating.cs (neu)">{ratingFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Tests/MessageRatingTests.cs (neu)">{ratingTests}</CodeBlock>
+
+1. **null prüfen:** `ThrowIfNull` für die Liste im Konstruktor und für die Nachricht in der Methode.
+2. **Inhalt prüfen:** leere Liste und leeres Wort lösen eine `ArgumentException` aus.
+3. **Werte speichern:** `[.. signalWords]` ist die eigene Kopie. `DefaultSignalWords` enthält die sieben Wörter der Konsolenanwendung.
+4. **Tests:** Die `[Theory]` mit `[MemberData]` prüft die sechs Beispielmeldungen. Weitere Tests prüfen Großbuchstaben, `null`, die leere Wortliste, das leere Wort und die Kopie.
+5. **Aufruf:** In `src/SecLog.Cli/Program.cs` erzeugt `new MessageRating(MessageRating.DefaultSignalWords)` die Regel. Die lokale Funktion `IsPossiblePhishing` und das Array `signalWords` sind entfernt. Die Ausgabe `Message 1: possible phishing` bis `Message 6: harmless` bleibt gleich. In `expected.out.txt` kommen nur die 13 neuen Testzeilen dazu.
+
+</details>
+
+**Neuer Stand:** Die Meldungsbewertung ist eine getestete Klasse in `SecLog.Core`, die ihre Eingaben prüft. Das gehört zu den Punkten 7 („Eingabevalidierung“) und 1 („Nullability“) der Checkliste.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l04-non-nullable-never-null" />
+
+**„Ein Parameter vom Typ `string` (ohne `?`) kann zur Laufzeit nie `null` sein.“** Die Annotation steuert nur die Warnungen des Compilers. Ein Aufrufer ohne Nullable-Kontext oder mit `!` übergibt trotzdem `null`. Eine öffentliche Methode prüft deshalb selbst.
+:::
+
+:::warning[Achtung]
+<Misconception id="m18-l04-rating-detects-phishing" />
+
+**„Die Meldungsbewertung erkennt Phishing zuverlässig.“** Die Regel sucht einen Link mit `http://` und ein Signalwort. Sie ist eine Vereinfachung für den Kurs: Ein Link in Großbuchstaben, ein anderes Wort oder ein anderer Weg bleiben unentdeckt.
+:::
+
+<details>
+<summary>Vertiefung: Wann ist die Prüfung eine Ausnahme wert? (optional)</summary>
+
+Die Guard Clauses gelten für Fehler des Aufrufers, die im Programm nicht vorkommen sollten. Eingaben von außen, bei denen Fehler normal sind, prüft man mit einem Rückgabewert, wie beim Muster `TryParse`. Welche der beiden Formen passt, hängt davon ab, ob ein falscher Wert ein Programmfehler oder ein erwarteter Fall ist ([Exception-Handling](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)).
+
+</details>
+
+## Zusammenfassung
+
+Eine öffentliche Klasse prüft ihre Eingaben am Rand, weil Nullable-Annotationen nur den Compiler leiten und `null` zur Laufzeit trotzdem ankommen kann. Der Konstruktor von `MessageRating` weist `null`, eine leere Liste und ein leeres Wort zurück, die Methode weist eine `null`-Nachricht zurück. Eine Kopie der Wörter schützt die Regel vor späteren Änderungen. Eine `[Theory]` mit `[MemberData]` prüft alle Beispielmeldungen. Die Regel bleibt eine Vereinfachung für den Kurs. In SecLog ist das `MessageRating`, Punkte 7 und 1 der Checkliste aus Lektion 1.
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l04-q1" />
+
+<Quiz id="m18-l04-q2" />
+
+<Quiz id="m18-l04-q3" />
+
+<Quiz id="m18-l04-q4" />
+
+<Quiz id="m18-l04-q5" />
+
+<Quiz id="m18-l04-q6" />
+
+<Quiz id="m18-l04-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l04-q8" />
+
+### Transferfrage
+
+<Quiz id="m18-l04-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references)
+- Microsoft Learn: [ArgumentNullException.ThrowIfNull](https://learn.microsoft.com/dotnet/api/system.argumentnullexception.throwifnull)
+- Checkliste: [Code-Review mit einer Checkliste](./l01-review-checklist)
