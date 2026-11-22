@@ -1,0 +1,15 @@
+Environment: Production (requested: nothing)
+  IsDevelopment: False
+  GET /openapi/v1.json: 404
+  GET /fail: 500
+  exception message in body: False
+Environment: Development (requested: Development)
+  IsDevelopment: True
+  GET /openapi/v1.json: 200
+  GET /fail: 500
+  exception message in body: True
+Environment: Production (requested: Production)
+  IsDevelopment: False
+  GET /openapi/v1.json: 404
+  GET /fail: 500
+  exception message in body: False
