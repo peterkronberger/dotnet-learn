@@ -43,6 +43,7 @@ dotnet run --project playground               # run locally
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
 bash tools/check-examples.sh --module m16   # only one module (examples/m16 and _ci/m16-*, _ci/seclog-m16-*); use this while building a module
+bash tools/check-examples.sh --lesson m16-l07   # only one lesson (examples/m16/l07, _ci/m16-l07-*, _ci/seclog-m16-l07)
 
 # Check fold markers and the SecLog continuity chain (also run by check-examples.sh)
 node tools/check-seclog.mjs
@@ -51,7 +52,7 @@ node tools/check-seclog.mjs
 node tools/check-quiz.mjs
 ```
 
-Before every commit: run both build checks (for module work, `check-examples.sh --module mNN` is enough while building; CI runs the full check on the PR). If one fails, do not commit.
+Before every commit: run both build checks (run `check-examples.sh` only for what you changed: `--lesson mNN-lYY` for every affected lesson, `--module mNN` if a whole module is affected; CI runs the full check on the PR). If one fails, do not commit.
 
 ## Non-negotiable rules
 
@@ -97,7 +98,7 @@ In addition: `npm run build` passes, no dead links, new technical terms are in t
 - A new module starts with one issue `Module <N>` (label `claude:auto-architect`); the architect derives all lessons and issues from `concept/module-plan.md` as described in `concept/issue-blueprint.md`.
 - Changes to `.github/workflows/` need a human (set in `claude-implement.yml`).
 - Pull requests (title and description) and commit messages are written in English.
-- **Checkpoints in automated runs.** The runner is temporary: everything not pushed is lost when a run ends (timeout, `--max-turns`, cancel; see #602, three runs lost all work). So commit and `git push -u origin HEAD` right after every change that is finished (one example project, one lesson file, one quiz or glossary change, one SecLog step), even if checks are still open (a WIP commit is fine; fix it in a later commit, no force push). Do not open a PR in between: a PR means "all changes are done". While building, check only the single project you work on (`bash website/examples/_ci/<name>/run.sh`, `node tools/check-quiz.mjs`). When all changes are committed and pushed, open the PR **before** the final checks. Then run `bash tools/check-examples.sh --module mNN` for the module you built (and `npm run build`), fix problems in further commits and push them. Do not run the full `bash tools/check-examples.sh` in module work: CI runs it on every PR and checks all examples. Outside module work (tools, components, playground), the full check is still run. The PR description lists what CI still has to confirm.
+- **Checkpoints in automated runs.** The runner is temporary: everything not pushed is lost when a run ends (timeout, `--max-turns`, cancel; see #602, three runs lost all work). So commit and `git push -u origin HEAD` right after every change that is finished (one example project, one lesson file, one quiz or glossary change, one SecLog step), even if checks are still open (a WIP commit is fine; fix it in a later commit, no force push). Do not open a PR in between: a PR means "all changes are done". While building, check only the single project you work on (`bash website/examples/_ci/<name>/run.sh`, `node tools/check-quiz.mjs`). When all changes are committed and pushed, run the checks **before** you open the PR: `bash tools/check-examples.sh --lesson mNN-lYY` once for every lesson you implemented or changed (only these lessons, not the whole module), `node tools/check-quiz.mjs` and `npm run build`. Fix problems in further commits and push them (no force push). Open the PR only when the checks pass. Run `check-examples.sh` only for the lessons or modules that your change really affects (`--lesson`, or `--module` when a whole module is affected). Never run the full `bash tools/check-examples.sh` yourself: CI runs it on every PR. If a change affects no lesson or module (for example a component or a workflow), skip it. The PR description lists the checks that were run and what CI still has to confirm.
 - Half-yearly review (next: 2027-04) about new C#/.NET features, AI module (state of studies, links), dead links.
 
 ## Context budget (module work)

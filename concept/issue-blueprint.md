@@ -76,7 +76,7 @@ Use the sections that `claude-architect.yml` requires. Fill them only with value
 - **Implementation steps**: "Follow `concept/lesson-template.md` steps 1–10."
 - **Review lessons**: the Context names the concepts and misconception ids of this lesson (from `### W<N>`), the task forms, and "no project step". The Acceptance criteria point to `concept/lesson-template.md`, "Review lesson" instead of DoD 1–17.
 - **Acceptance criteria**: "For every lesson of this issue: Definition of Done 1–17 and rules 1–11 of `CLAUDE.md`, ticked off in the PR; the PR contains the \"Verification\" table (`concept/sources.md`, level 0); every spec item of this issue is taught and its source linked."
-- **Tests**: `bash tools/check-examples.sh --module m<N>` (only this module; CI runs the full check on the PR), `node tools/check-quiz.mjs`, `cd website && npm run build`.
+- **Tests**: `bash tools/check-examples.sh --lesson m<N>-l<YY>` once for every lesson of this issue (only these lessons; run before the PR is opened, CI runs the full check on the PR), `node tools/check-quiz.mjs`, `cd website && npm run build`.
 - **Not part of this issue**: lessons of other issues, components, playground.
 
 ## 5. Stop and ask (status `needs_human`)

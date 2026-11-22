@@ -136,12 +136,18 @@ jobs:
                - While working, check only the single project or file you changed
                  (commands in CLAUDE.md). Fix errors. If it still fails after several tries:
                  status=failed with a reason.
-               - When ALL changes are committed and pushed, check with
+               - When ALL changes are committed and pushed, run the checks BEFORE you open the PR.
+                 For lesson work: `bash tools/check-examples.sh --lesson <mNN-lYY>` once for every
+                 lesson you implemented (only these lessons, not the whole module and not the full
+                 check; CI runs the full check on the PR), `node tools/check-quiz.mjs` and
+                 `npm run build`. Run `check-examples.sh` only for the lessons or modules that
+                 your change really affects (`--lesson`, or `--module` when a whole module is
+                 affected). Never run the full check yourself. If the change affects no lesson
+                 or module, skip it. Fix problems in further commits and push them
+                 (no force push).
+               - When the checks pass, check with
                  `gh pr list --head claude/issue-${{ env.ISSUE }} --state open` whether a PR already exists.
-                 If not: `gh pr create --title "<title>" --body "<What, why, how tested, what the full check still has to confirm. Closes #${{ env.ISSUE }}>"`
-                 This comes BEFORE the full `bash tools/check-examples.sh` (it runs long; CI runs it on the PR too).
-               - Then run the full checks (`bash tools/check-examples.sh`, `npm run build`),
-                 fix problems in further commits and push them (no force push).
+                 If not: `gh pr create --title "<title>" --body "<What, why, which checks were run, what CI still has to confirm. Closes #${{ env.ISSUE }}>"`
                - Return status=pr_created and pr_url.
             4. Shell hints: run commands from the repository root with repo-relative paths
                (for example `bash website/examples/_ci/<name>/run.sh`). Do not chain with

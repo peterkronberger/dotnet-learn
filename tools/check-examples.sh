@@ -5,6 +5,8 @@
 #   tools/check-examples.sh --update   rewrite the snapshots from the actual run
 #   tools/check-examples.sh --module m16     only one module (also: 16, w01); combinable with --update
 #                                            checks examples/m16/ and _ci/m16-* and _ci/seclog-m16-*
+#   tools/check-examples.sh --lesson m16-l07 only one lesson (also: 16-7, m16/l07, or --module m16 --lesson l07)
+#                                            checks examples/m16/l07/ and _ci/m16-l07-* and _ci/seclog-m16-l07
 #
 # Kinds of examples:
 #   *.cs            file-based app (`dotnet run file.cs`), output must match <name>.out.txt.
@@ -20,6 +22,7 @@ root="$(cd "$(dirname "$0")/.." && pwd)"
 examples="$root/website/examples"
 update=false
 module=""
+lesson=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --update) update=true ;;
@@ -29,15 +32,37 @@ while [[ $# -gt 0 ]]; do
       shift
       ;;
     --module=*) module="${1#--module=}" ;;
+    --lesson)
+      [[ $# -ge 2 ]] || { echo "--lesson needs a value (for example m16-l07)" >&2; exit 2; }
+      lesson="$2"
+      shift
+      ;;
+    --lesson=*) lesson="${1#--lesson=}" ;;
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
   shift
 done
+if [[ -n "$lesson" ]]; then
+  lesson="$(printf '%s' "$lesson" | tr 'A-Z' 'a-z')"
+  if [[ "$lesson" =~ ^([mw]?[0-9]+)[-/_]l?([0-9]+)$ ]]; then # m16-l07, 16-7, m16/l07
+    module="${BASH_REMATCH[1]}"
+    lesson="l$(printf '%02d' "$((10#${BASH_REMATCH[2]}))")"
+  elif [[ "$lesson" =~ ^l?([0-9]+)$ && -n "$module" ]]; then # l07 together with --module
+    lesson="l$(printf '%02d' "$((10#${BASH_REMATCH[1]}))")"
+  else
+    echo "Unknown lesson: $lesson (use m16-l07, or --module m16 --lesson l07)" >&2
+    exit 2
+  fi
+fi
 if [[ -n "$module" ]]; then
   [[ "$module" =~ ^[0-9]+$ ]] && module="m$(printf '%02d' "$((10#$module))")"
   module="$(printf '%s' "$module" | tr 'A-Z' 'a-z')"
   if [[ ! "$module" =~ ^[mw][0-9]{2}$ || ! -d "$root/website/examples/$module" ]]; then
     echo "Unknown module: $module (no folder website/examples/$module)" >&2
+    exit 2
+  fi
+  if [[ -n "$lesson" && ! -d "$root/website/examples/$module/$lesson" && -z "$(compgen -G "$root/website/examples/_ci/$module-$lesson-*")$(compgen -G "$root/website/examples/_ci/seclog-$module-$lesson")" ]]; then
+    echo "Unknown lesson: $module-$lesson (no examples found)" >&2
     exit 2
   fi
 fi
@@ -92,6 +117,7 @@ compile_only() { # <label> <file>
 while IFS= read -r -d '' file; do
   rel="${file#"$examples"/}"
   [[ -z "$module" || "$rel" == "$module"/* ]] || continue
+  [[ -z "$lesson" || "$rel" == "$module/$lesson"/* ]] || continue
   case "$rel" in
     _ci/*) continue ;;
     *.snippet.cs) echo "SKIP  $rel (snippet)"; continue ;;
@@ -107,6 +133,9 @@ for dir in "$examples"/_ci/*/; do
   [[ -f "$dir/run.sh" ]] || continue
   base="$(basename "$dir")"
   if [[ -n "$module" && "$base" != "$module"-* && "$base" != "seclog-$module"-* ]]; then
+    continue
+  fi
+  if [[ -n "$lesson" && "$base" != "$module-$lesson"-* && "$base" != "seclog-$module-$lesson" ]]; then
     continue
   fi
   name="_ci/$base"
