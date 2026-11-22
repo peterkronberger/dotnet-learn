@@ -1,0 +1,172 @@
+---
+title: "Endpunkte prüfen: Finde 3 Probleme"
+sidebar_position: 6
+description: Ein Review eines Minimal-API-Endpunkts prüft die Web-Punkte der Checkliste. Ein Test über alle Endpunkte hält eine Regel für jeden künftigen Endpunkt fest. Damit erreicht SecLog den Endstand.
+lesson_id: m18-l06
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import fixedEndpoint from '!!raw-loader!@site/examples/_ci/m18-l06-endpoint-review/Program.cs';
+import fixedOutput from '!!raw-loader!@site/examples/_ci/m18-l06-endpoint-review/expected.out.txt';
+import faulty from '!!raw-loader!@site/examples/m18/l06/faulty-endpoint.snippet.cs';
+import gaps from '!!raw-loader!@site/examples/m18/l06/endpoint-gaps.snippet.cs';
+import rulesTests from '!!raw-loader!@site/examples/_ci/seclog-m18-l06/tests/SecLog.Api.Tests/EndpointRulesTests.cs';
+
+# Endpunkte prüfen: Finde 3 Probleme
+
+:::note[Lernziele]
+- Du findest in einem Endpunkt mindestens drei Probleme aus der Checkliste und begründest jedes mit dem Risiko.
+- Du behebst die Probleme mit den Mitteln aus Modul 17.
+- Du sicherst eine Regel für alle Endpunkte mit einem Test ab.
+:::
+
+## Rückblick
+
+<Quiz id="m17-l05-q2" />
+
+<Quiz id="m17-l07-q1" />
+
+<Quiz id="m17-l11-q1" />
+
+## Ein Endpunkt im Review
+
+Ein <Term id="endpoint">Endpunkt</Term> nimmt Eingaben von außen an. Darum sind die Web-Punkte der Checkliste aus Lektion 1 ([Code-Review mit einer Checkliste](./l01-review-checklist)) hier besonders wichtig:
+
+- **Autorisierung:** Wer darf den Endpunkt aufrufen? Es fehlt `RequireAuthorization` ([Wer darf den Endpunkt aufrufen?](../m17-aspnetcore-minimal-apis/l11-authentication-authorization)).
+- **Punkt 7, Eingabevalidierung:** Prüft die App die Eingabe, bevor der Handler läuft? ([Parameterbindung und Validierung](../m17-aspnetcore-minimal-apis/l05-binding-validation)).
+- **Punkt 4, async:** Es gibt einen `CancellationToken`, und nichts blockiert mit `.Result` ([Services und Abbruch in Endpunkten](../m17-aspnetcore-minimal-apis/l09-di-cancellation), [Stolperfallen bei async](../m13-async-concurrency/l08-async-pitfalls)).
+- **Fehlerantworten:** Die Antwort enthält keine Details der Exception, sondern <Term id="problem-details">Problem Details</Term> ([Fehler als Problem Details](../m17-aspnetcore-minimal-apis/l07-problem-details)).
+- **Punkt 6, SQL Injection:** Kein Wert wird in den SQL-Text verkettet ([Raw SQL sicher verwenden](../m16-ef-core/l09-raw-sql-safely)).
+- **Punkt 5, Lebensdauer:** Ein Service mit kurzer Lebensdauer wird nicht von einem Singleton festgehalten ([Lebensdauern richtig kombinieren](../m15-dependency-injection-hosting/l04-combining-lifetimes)).
+
+Jeder Befund nennt die Stelle, das Risiko und den Vorschlag.
+
+## Vorhersage: Finde 3 Probleme
+
+:::info[Vorhersage]
+Der Endpunkt sucht Vorfälle nach Benutzername. Er wurde nie übersetzt und gehört nicht zu SecLog. Er hat sechs Probleme. Notiere mindestens drei: Zeile, Punkt der Checkliste, Risiko.
+:::
+
+<CodeBlock language="csharp" title="faulty-endpoint.snippet.cs" showLineNumbers>{faulty}</CodeBlock>
+
+<Quiz id="m18-l06-q7" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+1. **Zeile 4, Autorisierung:** Der Endpunkt hängt direkt an `app`. Jeder, auch ohne Anmeldung, kann ihn aufrufen. Lösung: eine Gruppe mit `RequireAuthorization()`.
+2. **Zeile 6, async:** Es gibt keinen `CancellationToken`. Bricht der Client ab, läuft die Abfrage weiter. Lösung: Parameter `CancellationToken` und Weitergabe an `ToListAsync`.
+3. **Zeile 11, SQL Injection:** Der Name wird in den SQL-Text verkettet. Lösung: `FromSql` mit Interpolation, der Wert geht als Parameter.
+4. **Zeile 16, async:** `.Result` blockiert den Thread. Lösung: `async` und `await`.
+5. **Zeile 22, Fehlerantwort:** `ex.ToString()` gibt Stack Trace und interne Namen an den Aufrufer. Lösung: die Exception nicht fangen und `UseExceptionHandler` mit Problem Details nutzen. Das Log bekommt die Details.
+6. **Zeile 26, Eingabevalidierung:** `User` hat keine Attribute, und die Validierung ist nicht angemeldet. Lösung: `[Required]`, `[StringLength(64)]` und `AddValidation()`.
+
+**Was passiert, wenn …?** … du nur drei findest? Die Aufgabe verlangt drei, aber ein echtes Review hört nicht auf. Jeder übersehene Punkt bleibt im Code.
+
+</details>
+
+## Der korrigierte Endpunkt
+
+Das Programm zeigt den korrigierten Endpunkt. Es läuft in einem Testserver im Speicher und sendet drei Anfragen: ohne Benutzer, mit ungültigem Body und gültig. Der Testserver und die Hilfsfunktion `Send` stehen eingeklappt im Code, sie sind nicht das Thema.
+
+<CodeBlock language="csharp" title="Program.cs">{fixedEndpoint}</CodeBlock>
+
+<CodeBlock language="text" title="Ausgabe">{fixedOutput}</CodeBlock>
+
+1. **Ohne Benutzer:** 401. Die Gruppe verlangt eine Anmeldung ([Authentication and authorization in minimal APIs](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security)).
+2. **Ungültiger Body:** 400 mit Problem Details. Die Validierung läuft, bevor der Handler startet, und der Fehler nennt das Feld ([Validation in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding#validation-support-in-minimal-apis)).
+3. **Gültig:** 200. `FromSql` sendet `bob` als Parameter, und `ToListAsync` bekommt den Token ([Parameter binding](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding#cancellationtoken)).
+
+## Lückenbeispiel
+
+Die Teilziele: „1. Die Gruppe absichern → 2. Den Abbruch annehmen → 3. Den Wert als Parameter senden“. Setze die drei Lücken `___1___`, `___2___` und `___3___` ein.
+
+<CodeBlock language="csharp" title="endpoint-gaps.snippet.cs">{gaps}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Lücke 1:** `RequireAuthorization`. Die Regel gilt für jeden Endpunkt der Gruppe.
+2. **Lücke 2:** `CancellationToken`. ASP.NET Core bindet ihn an den Abbruch der Anfrage.
+3. **Lücke 3:** `FromSql`. Die Interpolation wird zum Parameter. `FromSqlRaw` mit Verkettung wäre der Befund.
+
+</details>
+
+## Eine Regel für alle Endpunkte
+
+Ein Review prüft den Code von heute. Ein neuer Endpunkt von morgen wird nicht mehr geprüft, wenn niemand hinsieht. Ein Test kann die Regel „jeder Endpunkt unter `/incidents` verlangt eine Anmeldung“ für alle Endpunkte festhalten.
+
+Dazu fragt der Test die App nach ihren Endpunkten. Die <Term id="endpoint-data-source">EndpointDataSource</Term> kennt jeden Endpunkt als `RouteEndpoint` mit der Routenvorlage und den <Term id="endpoint-metadata">Metadaten</Term>. `RequireAuthorization()` legt an jeden Endpunkt eine Metadaten-Angabe `IAuthorizeData` ([EndpointDataSource](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.routing.endpointdatasource), [Routing in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/routing)). Fehlt sie, ist der Endpunkt offen.
+
+## Projektschritt
+
+**Stand bisher:** In SecLog (`_ci/seclog-m18-l05/`) steht die Gruppe `/incidents` mit `RequireAuthorization()`. Einzelne Tests prüfen den Zugriff ohne Anmeldung, aber keiner prüft alle Endpunkte.
+
+**Neue Anforderung:** „Ein Test prüft alle Endpunkte unter `/incidents`: Jeder verlangt eine Anmeldung. Kommt später ein Endpunkt ohne `RequireAuthorization` dazu, schlägt der Test fehl.“ Schreibe `EndpointRulesTests` mit der `SecLogApiFactory`. Ein Web-Projekt läuft nicht im Playground, darum steht hier nur die Musterlösung.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/EndpointRulesTests.cs (neu)">{rulesTests}</CodeBlock>
+
+1. **App bauen:** `factory.CreateClient()` baut und startet die App im Testserver. Erst danach sind die Endpunkte samt Gruppenregeln in der `EndpointDataSource`. Darum steht der Aufruf vor der Abfrage.
+2. **Endpunkte holen:** Die `EndpointDataSource` kommt aus `factory.Services`. `OfType<RouteEndpoint>()` behält die Endpunkte mit Routenvorlage, `Where` die unter `/incidents`.
+3. **Nicht leer:** `Assert.NotEmpty` verhindert, dass der Test besteht, weil er nichts gefunden hat.
+4. **Regel prüfen:** Jeder Endpunkt braucht Metadaten vom Typ `IAuthorizeData`. Die Meldung nennt die Route des fehlenden Endpunkts.
+5. **Produktionscode:** Das Review fand in `src/SecLog.Api/` kein Problem. Es ändert sich nur der Test.
+6. **Ausgabe:** Die Konsolenausgabe bleibt gleich. In `expected.out.txt` kommt nur eine Testzeile dazu.
+
+</details>
+
+**Neuer Stand:** In SecLog (`_ci/seclog-m18-l06/`) sichert ein Test ab, dass jeder Endpunkt unter `/incidents` eine Anmeldung verlangt. Damit hat SecLog den Endstand des Kursprojekts erreicht (Vision in `concept/project-seclog.md`).
+
+### Rückblick auf SecLog
+
+SecLog ist über den ganzen Kurs gewachsen: Es liest und prüft Logzeilen, zählt Fehlversuche, verwaltet Vorfälle, bewertet Meldungen, speichert in einer Datenbank, bietet eine API an und hat Tests für seine Regeln. Die Checkliste aus Lektion 1 hilft dir, solchen Code zu prüfen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l06-green-tests-secure-endpoint" />
+
+**„Wenn alle Tests grün sind, hat ein Endpunkt keine Sicherheitsprobleme.“** Tests prüfen nur die Fälle, die jemand geschrieben hat. Ein Endpunkt ohne `RequireAuthorization` besteht jeden Test, der nicht nach der Anmeldung fragt. Darum gibt es das Review, und darum gibt es Regeltests wie `EndpointRulesTests`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m18-l06-one-finding-enough" />
+
+**„Ein Review ist fertig, sobald man ein Problem gefunden hat.“** Der Endpunkt dieser Lektion hat sechs Probleme. Ein Review geht die ganze Checkliste durch.
+:::
+
+## Zusammenfassung
+
+Ein Review eines Endpunkts prüft Autorisierung, Eingabevalidierung, `CancellationToken`, Fehlerantworten und SQL. Jeder Befund bekommt Stelle, Risiko und Lösung. Grüne Tests beweisen keine Sicherheit. Ein Test über die `EndpointDataSource` hält die Regel „jeder Endpunkt verlangt eine Anmeldung“ für alle Endpunkte fest, auch für künftige.
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l06-q1" />
+
+<Quiz id="m18-l06-q2" />
+
+<Quiz id="m18-l06-q3" />
+
+<Quiz id="m18-l06-q4" />
+
+<Quiz id="m18-l06-q5" />
+
+<Quiz id="m18-l06-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l06-q8" />
+
+### Transferfrage
+
+<Quiz id="m18-l06-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Authentication and authorization in minimal APIs](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security)
+- Microsoft Learn: [Routing in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/routing)
+- Microsoft Learn: [EndpointDataSource](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.routing.endpointdatasource)

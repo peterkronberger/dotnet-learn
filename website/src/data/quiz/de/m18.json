@@ -49,11 +49,26 @@
       "type": "match",
       "question": "Ordne jedem Punkt der Checkliste das Modul zu, in dem der Kurs ihn eingeführt hat.",
       "pairs": [
-        { "left": "Nullability-Warnungen", "right": "Modul 4" },
-        { "left": "Ausnahmebehandlung", "right": "Modul 7" },
-        { "left": "Zeitzonen und UTC", "right": "Modul 5" },
-        { "left": "Lebensdauern im DI-Container", "right": "Modul 15" },
-        { "left": "SQL Injection", "right": "Modul 16" }
+        {
+          "left": "Nullability-Warnungen",
+          "right": "Modul 4"
+        },
+        {
+          "left": "Ausnahmebehandlung",
+          "right": "Modul 7"
+        },
+        {
+          "left": "Zeitzonen und UTC",
+          "right": "Modul 5"
+        },
+        {
+          "left": "Lebensdauern im DI-Container",
+          "right": "Modul 15"
+        },
+        {
+          "left": "SQL Injection",
+          "right": "Modul 16"
+        }
       ],
       "explanation": "Nullable-Verweistypen kamen in Modul 4, Exceptions in Modul 7. Datum, Uhrzeit und UTC stehen in Modul 5. Lebensdauern gehören zur Dependency Injection (Modul 15), und SQL Injection gehört zu EF Core (Modul 16)."
     },
@@ -126,9 +141,13 @@
       "type": "find-bug",
       "question": "Welche Zeile erzeugt die Compiler-Warnung?",
       "example": "m18/l01/nullable-warning.snippet.cs",
-      "bugLines": [4],
+      "bugLines": [
+        4
+      ],
       "lineFeedback": {
-        "1": { "feedback": "Die Zeile darf `null` liefern. Das ist durch `string?` erlaubt." }
+        "1": {
+          "feedback": "Die Zeile darf `null` liefern. Das ist durch `string?` erlaubt."
+        }
       },
       "explanation": "`name` kann `null` sein. In Zeile 4 greift `name.Length` darauf zu, ohne zu prüfen. Der Compiler meldet CS8602. Die Lösung ist eine Prüfung, nicht das Abschalten der Warnung mit `!`."
     },
@@ -407,10 +426,22 @@
       "type": "match",
       "question": "Ordne jeden Schritt der Auswertung dem LINQ-Operator zu.",
       "pairs": [
-        { "left": "Nur Fehlversuche behalten", "right": "`Where`" },
-        { "left": "Nach der Stunde in UTC zusammenfassen", "right": "`GroupBy`" },
-        { "left": "Jede Gruppe in einen `HourCount` verwandeln", "right": "`Select`" },
-        { "left": "Das Ergebnis jetzt berechnen und speichern", "right": "`ToList`" }
+        {
+          "left": "Nur Fehlversuche behalten",
+          "right": "`Where`"
+        },
+        {
+          "left": "Nach der Stunde in UTC zusammenfassen",
+          "right": "`GroupBy`"
+        },
+        {
+          "left": "Jede Gruppe in einen `HourCount` verwandeln",
+          "right": "`Select`"
+        },
+        {
+          "left": "Das Ergebnis jetzt berechnen und speichern",
+          "right": "`ToList`"
+        }
       ],
       "explanation": "`Where` filtert, `GroupBy` bildet Gruppen, `Select` projiziert jede Gruppe in einen neuen Wert und `ToList` führt die Abfrage aus und liefert eine fertige Liste."
     },
@@ -801,6 +832,184 @@
       "type": "explain",
       "question": "Transfer: Du bekommst in einem Pull Request eine neue Methode `FindByIp(string ip)` von SecLog, die EF Core benutzt. Worauf achtest du, und wie sicherst du dein Ergebnis ab?",
       "modelAnswer": "Ich lese das SQL mit `ToQueryString()`: Steht ein `WHERE` darin, und kommt die IP als Parameter an? Ich prüfe, ob `FromSqlRaw` mit Verkettung vorkommt, ob `ToListAsync` mit Token benutzt wird, ob der Context pro Anfrage lebt und ob eine Schleife Abfragen stellt. Einen Test mit `ToQueryString()` und Prüfungen auf `WHERE` und den Parameter schreibe ich dazu."
+    },
+    {
+      "id": "m18-l06-q1",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Ein Review findet in einem Endpunkt das Problem „kein `RequireAuthorization`“. Zu welchem Punkt der Checkliste gehört es, und was ist das Risiko?",
+      "options": [
+        {
+          "text": "Autorisierung: Jeder, auch ohne Anmeldung, kann den Endpunkt aufrufen.",
+          "correct": true
+        },
+        {
+          "text": "Zeitzonen: Die Uhrzeit der Anfrage ist falsch.",
+          "feedback": "Zeit kommt hier nicht vor."
+        },
+        {
+          "text": "Disposal: Eine Ressource wird nicht freigegeben.",
+          "feedback": "Es geht um den Zugang, nicht um Ressourcen."
+        }
+      ],
+      "explanation": "Ohne `RequireAuthorization` prüft kein Schritt der Pipeline, ob der Aufrufer den Endpunkt nutzen darf. Ein Review nennt Problem und Risiko."
+    },
+    {
+      "id": "m18-l06-q2",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Ein Endpunkt fängt eine Exception und gibt `ex.ToString()` als `detail` in der Antwort zurück. Warum ist das ein Befund?",
+      "options": [
+        {
+          "text": "Die Antwort verrät Aufrufern interne Details wie Stack Trace und Pfade.",
+          "correct": true
+        },
+        {
+          "text": "`ToString()` darf bei Exceptions nicht aufgerufen werden.",
+          "feedback": "Der Aufruf ist erlaubt. Das Problem ist, wohin der Text geht."
+        },
+        {
+          "text": "Problem Details dürfen kein `detail`-Feld haben.",
+          "feedback": "Das Feld gibt es. Es soll nur keine internen Details enthalten."
+        }
+      ],
+      "explanation": "Interne Details gehören ins Log, nicht in die Antwort. Eine Antwort mit Problem Details nennt nur, was der Aufrufer wissen darf."
+    },
+    {
+      "id": "m18-l06-q3",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Ein Endpunkt ruft `db.Incidents.ToListAsync().Result` auf. Welche Befunde gehören dazu?",
+      "options": [
+        {
+          "text": "Er blockiert den Thread, und ohne `CancellationToken` lässt sich die Abfrage nicht abbrechen.",
+          "correct": true
+        },
+        {
+          "text": "`ToListAsync` gibt es nur synchron.",
+          "feedback": "Es ist eine asynchrone Methode, die man mit `await` aufruft."
+        },
+        {
+          "text": "Es gibt keinen Befund, `.Result` ist die übliche Schreibweise.",
+          "feedback": "`.Result` blockiert und ist ein Befund aus Punkt 4."
+        }
+      ],
+      "explanation": "Richtig ist `await db.Incidents.ToListAsync(cancellationToken)` in einem `async`-Handler mit `CancellationToken`-Parameter."
+    },
+    {
+      "id": "m18-l06-q4",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Der Test `EndpointRulesTests` findet keinen einzigen Endpunkt unter `/incidents`. Welche Zeile des Tests verhindert, dass er trotzdem grün wird?",
+      "options": [
+        {
+          "text": "`Assert.NotEmpty(endpoints)`",
+          "correct": true
+        },
+        {
+          "text": "`factory.CreateClient()`",
+          "feedback": "Sie baut die App, prüft aber nicht, ob etwas gefunden wurde."
+        },
+        {
+          "text": "`OfType<RouteEndpoint>()`",
+          "feedback": "Das filtert nach Typ. Eine leere Liste bleibt leer."
+        }
+      ],
+      "explanation": "Eine Schleife über eine leere Liste besteht ohne eine einzige Prüfung. Darum steht vorher die Prüfung, dass die Liste nicht leer ist."
+    },
+    {
+      "id": "m18-l06-q5",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Alle Tests eines Projekts sind grün. Was folgt daraus für einen Endpunkt?",
+      "options": [
+        {
+          "text": "Er hat keine Sicherheitsprobleme.",
+          "feedback": "Tests prüfen nur, was jemand geschrieben hat.",
+          "misconception": "m18-l06-green-tests-secure-endpoint"
+        },
+        {
+          "text": "Nichts Sicheres: Probleme ohne Test bleiben unbemerkt, ein Review prüft die Checkliste.",
+          "correct": true
+        },
+        {
+          "text": "Er ist sicher, wenn auch die Integrationstests grün sind.",
+          "feedback": "Auch Integrationstests prüfen nur die Fälle, die geschrieben wurden.",
+          "misconception": "m18-l06-green-tests-secure-endpoint"
+        }
+      ],
+      "explanation": "Grüne Tests zeigen, dass die geprüften Fälle laufen. Ein fehlender Test fällt nicht auf. Das Review geht die Checkliste durch, und ein Test hält eine Regel für alle Endpunkte fest."
+    },
+    {
+      "id": "m18-l06-q6",
+      "lesson": "m18-l06",
+      "type": "single",
+      "question": "Du hast in einem Endpunkt ein Problem gefunden und beendest das Review. Was stimmt?",
+      "options": [
+        {
+          "text": "Das Review ist fertig, ein Problem genügt.",
+          "feedback": "Es kann mehrere geben, und jeder Punkt der Checkliste wird geprüft.",
+          "misconception": "m18-l06-one-finding-enough"
+        },
+        {
+          "text": "Das Review geht weiter: Alle Punkte der Checkliste werden geprüft, und jeder Befund bekommt Risiko und Lösung.",
+          "correct": true
+        }
+      ],
+      "explanation": "Ein Review prüft die ganze Checkliste. Im Beispiel dieser Lektion gibt es sechs Probleme, und jedes ist ein eigener Befund."
+    },
+    {
+      "id": "m18-l06-q7",
+      "lesson": "m18-l06",
+      "type": "find-bug",
+      "question": "Welche Zeilen sind Befunde aus der Checkliste? Wähle alle sechs.",
+      "example": "m18/l06/faulty-endpoint.snippet.cs",
+      "bugLines": [
+        4,
+        6,
+        11,
+        16,
+        22,
+        26
+      ],
+      "lineFeedback": {
+        "4": {
+          "feedback": "Der Endpunkt hängt direkt an `app`, ohne `RequireAuthorization`."
+        },
+        "6": {
+          "feedback": "Es gibt keinen `CancellationToken`-Parameter."
+        },
+        "10": {
+          "feedback": "Der Befund ist die Verkettung in der Zeile danach."
+        },
+        "11": {
+          "feedback": "Der Name wird in den SQL-Text verkettet."
+        },
+        "16": {
+          "feedback": "`.Result` blockiert den Thread."
+        },
+        "22": {
+          "feedback": "`ex.ToString()` gibt interne Details in der Antwort preis."
+        },
+        "26": {
+          "feedback": "`User` hat keine Validierungsattribute."
+        }
+      },
+      "explanation": "Sechs Befunde: keine Autorisierung (Zeile 4), kein Token (6), SQL-Verkettung (11), `.Result` (16), Exception-Details in der Antwort (22) und keine Validierung (26)."
+    },
+    {
+      "id": "m18-l06-q8",
+      "lesson": "m18-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ein Test über alle Endpunkte unter `/incidents` dafür sorgt, dass später kein Endpunkt ohne Anmeldung dazukommt.",
+      "modelAnswer": "Der Test liest alle Endpunkte aus `EndpointDataSource` und nimmt die, deren Route mit `/incidents` beginnt. Er prüft, dass die Liste nicht leer ist und dass jeder Endpunkt Autorisierungs-Metadaten hat. Kommt ein neuer Endpunkt ohne `RequireAuthorization` dazu, fehlen ihm diese Metadaten, und der Test schlägt fehl."
+    },
+    {
+      "id": "m18-l06-q9",
+      "lesson": "m18-l06",
+      "type": "explain",
+      "question": "Transfer: Du prüfst einen neuen Endpunkt `DELETE /incidents/{id}` in einem Pull Request. Welche Punkte der Checkliste liest du, und welche Regel sicherst du als Test für alle Endpunkte ab?",
+      "modelAnswer": "Ich prüfe Autorisierung (`RequireAuthorization`), Validierung der Eingabe, `CancellationToken`, kein blockierendes `.Result`, keinen verketteten SQL-Text und keine Exception-Details in der Antwort. Als Test für alle Endpunkte eignet sich die Regel, dass jeder Endpunkt unter `/incidents` eine Anmeldung verlangt."
     }
   ]
 }

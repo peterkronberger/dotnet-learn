@@ -12064,6 +12064,23 @@
       }
     },
     {
+      "id": "endpoint-data-source",
+      "term": "EndpointDataSource",
+      "german": "Endpunkt-Datenquelle",
+      "category": "platform",
+      "definition": "Der Dienst von ASP.NET Core, der alle Endpoints der App kennt. Ein Test kann ihn abfragen, um jeden Endpoint samt Metadaten zu prüfen.",
+      "related": [
+        "endpoint",
+        "endpoint-metadata",
+        "authorization"
+      ],
+      "lesson": "m18-l06",
+      "source": {
+        "title": "EndpointDataSource Class",
+        "url": "https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.routing.endpointdatasource"
+      }
+    },
+    {
       "id": "authentication",
       "term": "Authentication",
       "german": "Authentifizierung",

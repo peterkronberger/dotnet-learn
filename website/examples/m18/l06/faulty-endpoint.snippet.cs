@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 
 // Faulty on purpose: never compiled, not part of SecLog.
-app.MapPost("/incidents/search", (SearchRequest request, SecLogDbContext db) =>
+app.MapPost("/incidents/search", (
+    SearchRequest request,
+    SecLogDbContext db) =>
 {
     try
     {
