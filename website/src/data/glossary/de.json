@@ -11440,7 +11440,6 @@
         "serialization",
         "deserialization"
       ],
-      "lesson": "m17-l02",
       "source": {
         "title": "Serialize and deserialize JSON using C#",
         "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/overview"

@@ -1,0 +1,243 @@
+---
+title: JSON mit System.Text.Json
+sidebar_position: 2
+description: Wie JsonSerializer Objekte in JSON-Text verwandelt und zurückliest, was Optionen an den Namen ändern und was bei fehlenden oder null-Werten passiert.
+lesson_id: m17-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import jsonSyntax from '!!raw-loader!@site/examples/m17/l02/json-syntax.cs';
+import jsonSyntaxOutput from '!!raw-loader!@site/examples/m17/l02/json-syntax.out.txt';
+import roundTrip from '!!raw-loader!@site/examples/m17/l02/json-round-trip.cs';
+import roundTripOutput from '!!raw-loader!@site/examples/m17/l02/json-round-trip.out.txt';
+import webDefaults from '!!raw-loader!@site/examples/m17/l02/web-defaults.cs';
+import webDefaultsOutput from '!!raw-loader!@site/examples/m17/l02/web-defaults.out.txt';
+import missingAndNull from '!!raw-loader!@site/examples/m17/l02/missing-and-null.cs';
+import missingAndNullOutput from '!!raw-loader!@site/examples/m17/l02/missing-and-null.out.txt';
+import gapWebOptions from '!!raw-loader!@site/examples/m17/l02/gap-web-options.snippet.cs';
+import incidentSummary from '!!raw-loader!@site/examples/_ci/seclog-m17-l02/src/SecLog.Data/IncidentSummary.cs';
+import programBlock from '!!raw-loader!@site/examples/m17/l02/seclog-program-block.snippet.cs';
+
+# JSON mit System.Text.Json
+
+:::note[Lernziele]
+- Du wandelst ein Objekt mit `JsonSerializer.Serialize` in JSON um und liest es mit `Deserialize<T>` zurück.
+- Du sagst voraus, wie Eigenschaftsnamen mit den Web-Einstellungen (camelCase) im JSON aussehen.
+- Du erklärst, was beim Einlesen mit fehlenden oder `null`-Werten passiert.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m08-l10-q1" />
+
+## JSON: Daten als Text
+
+Eine HTTP-Antwort aus Lektion 1 hatte einen Body mit Text wie `{"id":1,"status":"open"}`. Dieses Format heißt <Term id="json">JSON</Term>. Es kennt sieben Arten von Werten:
+
+- **Objekt:** Paare aus Name und Wert in `{ }`, getrennt durch Kommas. Der Name steht in doppelten Anführungszeichen, ein Doppelpunkt trennt ihn vom Wert.
+- **Array:** eine Liste von Werten in `[ ]`.
+- **String:** Text in doppelten Anführungszeichen.
+- **Zahl:** `7` oder `2.5`.
+- **`true` und `false`.**
+- **`null`:** kein Wert.
+
+Das Programm liest einen JSON-Text mit allen Arten und gibt zu jedem Namen die Art des Wertes aus. Dazu nutzt es `JsonDocument`: Es zerlegt einen JSON-Text, ohne dass du einen C#-Typ dafür brauchst. `ValueKind` nennt die Art eines Wertes.
+
+:::info[Vorhersage]
+Welche Art hat jeder Wert: `Number`, `String`, `True`, `False`, `Null`, `Array` oder `Object`? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m17-l02-json-syntax" code={jsonSyntax} predict expected={jsonSyntaxOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{jsonSyntaxOutput}</CodeBlock>
+
+1. **Zahlen:** `7` und `2.5` sind beide `Number`. JSON unterscheidet keine ganzen und gebrochenen Zahlen.
+2. **Text und Wahrheitswerte:** `"bob"` ist ein `String`. `false` steht ohne Anführungszeichen und ist ein Wahrheitswert.
+3. **Null:** `note` hat den Wert `null`. Der Name ist da, der Wert fehlt.
+4. **Verschachtelt:** `ips` ist ein `Array` aus Strings, `owner` ist ein `Object` in einem Objekt.
+
+**Was passiert, wenn …** du `"resolved": "false"` schreibst? Mit Anführungszeichen ist es ein `String` und kein Wahrheitswert.
+
+</details>
+
+## Objekte in JSON umwandeln und zurück
+
+Die Aufgabe, ein Objekt in Text zu verwandeln, den man speichern oder senden kann, heißt <Term id="serialization">Serialisierung</Term>. Die Gegenrichtung, aus Text wieder ein Objekt zu bauen, heißt <Term id="deserialization">Deserialisierung</Term>. `JsonSerializer` im Namensraum `System.Text.Json` kann beides:
+
+- `JsonSerializer.Serialize(objekt)` liefert den JSON-Text.
+- `JsonSerializer.Deserialize<T>(text)` liefert ein Objekt vom Typ `T`. Das Ergebnis kann `null` sein, wenn der Text `null` ist. Darum hat der Rückgabetyp ein `?`.
+
+Der Serializer schreibt die öffentlichen Eigenschaften. Ein Record (Modul 8) ist dafür eine gute Form: Seine Eigenschaften stehen in einer Zeile. Ein positionaler Record wird über seinen Konstruktor gefüllt, der Serializer findet ihn selbst.
+
+:::info[Vorhersage]
+Wie sieht der JSON-Text aus, und was gibt der Vergleich `copy == incident` aus? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m17-l02-round-trip" code={roundTrip} predict expected={roundTripOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{roundTripOutput}</CodeBlock>
+
+1. **Serialisieren:** Jede Eigenschaft wird ein Paar. Der Name ist der C#-Name, auch mit Großbuchstaben am Anfang.
+2. **Deserialisieren:** `Deserialize<Incident>` baut aus dem Text einen neuen `Incident`. Weil es ein Record ist, gibt `WriteLine` alle Werte aus.
+3. **Vergleichen:** Records vergleichen ihre Werte. Das Objekt ist eine Kopie, aber gleich: `True`.
+
+**Was passiert, wenn …** du `Deserialize<Incident>` den Text `null` gibst? Das Ergebnis ist `null`. Darum der Typ `Incident?`.
+
+</details>
+
+<Quiz id="m17-l02-q1" />
+
+<Quiz id="m17-l02-q3" />
+
+## Optionen: Namen und Einrückung
+
+Im ersten Lauf stimmten die JSON-Namen mit den C#-Namen überein, mit großem Anfangsbuchstaben. Das ist die Voreinstellung. Webschnittstellen schreiben Namen meist in camelCase: erster Buchstabe klein, spätere Wörter groß, also `failureCount`. Mit `JsonSerializerOptions` änderst du das. Eine <Term id="naming-policy">Namensrichtlinie</Term> wandelt alle C#-Namen um: `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`.
+
+Die Optionen `JsonSerializerDefaults.Web` setzen die Einstellungen, die ASP.NET Core für Web-Anwendungen verwendet: camelCase beim Schreiben, Groß- und Kleinschreibung der Namen ist beim Lesen egal, und Zahlen dürfen auch als Text im JSON stehen. Du übergibst sie dem Konstruktor und setzt weitere Optionen in geschweiften Klammern dahinter, zum Beispiel `WriteIndented = true` für eingerückte Ausgabe. <Since dotnet="9" /> Das Singleton `JsonSerializerOptions.Web` liefert diese Einstellungen fertig ([Instantiate JsonSerializerOptions](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/configure-options)).
+
+Ein einzelner Name lässt sich mit dem Attribut `[JsonPropertyName("…")]` festlegen (Attribute, Modul 14). Er gilt in beide Richtungen und hat Vorrang vor der Namensrichtlinie. Bei einem positionalen Record sitzt das Attribut mit dem Ziel `property:` am Parameter, damit es an der Eigenschaft landet.
+
+:::info[Vorhersage]
+Wie heißen die Namen in den vier Ausgaben? Was liefert das Einlesen von `ID`, `USER` und `status` mit den Web-Optionen und mit den Standardoptionen? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m17-l02-web-defaults" code={webDefaults} predict expected={webDefaultsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{webDefaultsOutput}</CodeBlock>
+
+1. **Standardoptionen:** Die Namen sind die C#-Namen. Der Name `sourceIp` kommt aus dem Attribut.
+2. **Web-Optionen:** camelCase und eingerückt. Das Attribut gilt weiter: `sourceIp` steht schon in camelCase.
+3. **Einlesen mit Web-Optionen:** `ID` und `USER` passen trotz anderer Schreibweise auf `Id` und `User`, `status` auf `Status`. `FailureCount` fehlt und bleibt 0, `Source` fehlt und bleibt `null` (die Ausgabe ist leer).
+4. **Einlesen mit Standardoptionen:** Die Namen müssen genau stimmen. Kein Name passt, also bleibt jeder Wert beim Startwert.
+
+**Was passiert, wenn …** du `PropertyNameCaseInsensitive` nicht kennst? Dann wundert dich, warum ein Client mit `ID` bei dir ankommt und ein anderer nicht. Die Web-Optionen entscheiden das.
+
+</details>
+
+<Quiz id="m17-l02-q2" />
+
+<Quiz id="m17-l02-q7" />
+
+<Quiz id="m17-l02-q8" />
+
+## Fehlende und null-Werte
+
+Beim Einlesen setzt der Serializer nur, was im JSON steht. Fehlt ein Name, bleibt die Eigenschaft beim Startwert, den der Typ ihr gibt: 0, `null` oder ein eigener Initialisierer wie `"unknown"`. Steht `null` im JSON, setzt der Serializer `null`. Das gilt auch für ein `string` ohne `?`: Die Nullbarkeit von Referenztypen prüft der Compiler, zur Laufzeit gibt es sie nicht.
+
+<Since dotnet="9" /> Wer das nicht möchte, schaltet `RespectNullableAnnotations = true` ein. Dann löst ein `null` im JSON für eine nicht nullable Eigenschaft eine `JsonException` aus. Ein fehlender Name löst auch dann keine aus ([Respect nullable annotations](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/nullable-annotations)). Eine Pflicht für das Vorhandensein erzwingt das Schlüsselwort `required` (Modul 6): Fehlt die Eigenschaft im JSON, gibt es eine `JsonException` ([Require properties](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/required-properties)). Dasselbe für Konstruktorparameter erreicht <Since dotnet="9" /> `RespectRequiredConstructorParameters`. Text, der gar kein JSON ist, löst ebenfalls eine `JsonException` aus. Wie jede Ausnahme (Modul 7) fängst du sie mit `try`/`catch`.
+
+:::info[Vorhersage]
+Welche der fünf Abschnitte enden mit einer `JsonException`, welcher hat `user` gleich `null` ohne Fehler? Notiere deinen Tipp und führe den Code dann aus.
+:::
+
+<CSharpRunner id="m17-l02-missing-and-null" code={missingAndNull} predict expected={missingAndNullOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{missingAndNullOutput}</CodeBlock>
+
+1. **Fehlt:** `user` fehlt im Text und bleibt `"unknown"`, `note` bleibt `null` (die Ausgabe zeigt `-`).
+2. **Null im Text:** `user` ist `null`, obwohl der Typ `string` ohne `?` ist. Es gibt keinen Fehler.
+3. **Mit Option:** Dasselbe `null` löst jetzt eine `JsonException` aus. `note` ist `string?` und darf `null` sein.
+4. **Pflicht:** `id` ist `required` und fehlt: `JsonException`.
+5. **Kein JSON:** `{id: 3}` hat den Namen ohne Anführungszeichen: `JsonException`.
+
+**Was passiert, wenn …** im dritten Abschnitt der Name `user` ganz fehlt? Dann gibt es auch mit der Option keinen Fehler: Fehlen und `null` sind zwei verschiedene Fälle.
+
+</details>
+
+<Quiz id="m17-l02-q4" />
+
+<Quiz id="m17-l02-q5" />
+
+<Quiz id="m17-l02-q6" />
+
+<Quiz id="m17-l02-q11" />
+
+## Gap-Beispiel: die Web-Optionen
+
+Die Lücke `___` fehlt. Die Optionen sollen die Web-Einstellungen verwenden. Setze den Namen des Wertes aus `JsonSerializerDefaults` ein.
+
+<CodeBlock language="csharp" title="gap-web-options.snippet.cs">{gapWebOptions}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `Web`: `JsonSerializerDefaults.Web`. Der Konstruktor übernimmt damit camelCase und das Einlesen ohne Beachtung der Groß- und Kleinschreibung.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l10/`) speichert Vorfälle in einer Datenbank und gibt sie im Abschnitt `== Database ==` aus. Es hat noch keine Klasse für die JSON-Form eines Vorfalls.
+
+**Neue Anforderung:** SecLog gibt die gespeicherten Vorfälle zusätzlich als JSON aus – im Format, das später auch die API liefert. Dazu kommt der Record `IncidentSummary` in `src/SecLog.Data/IncidentSummary.cs`. Er hat die Eigenschaften `Id`, `User`, `Source`, `Status` und `FailureCount` und eine statische Methode `From`, die aus einem gespeicherten Vorfall eine Zusammenfassung baut. Die Konsolen-Anwendung liest nach der bisherigen Datenbank-Ausgabe die Vorfälle sortiert nach `Id`, bildet sie auf `IncidentSummary` ab und gibt `== JSON ==` und danach das serialisierte JSON aus, mit den Web-Einstellungen und eingerückt.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Data/IncidentSummary.cs (neu)">{incidentSummary}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (neuer Block am Ende der Datenbank-Ausgabe, dazu using System.Text.Json;)">{programBlock}</CodeBlock>
+
+1. **Form festlegen:** `IncidentSummary` hat nur die Werte, die ein Client braucht. Die Navigation `Events` ist nicht dabei.
+2. **Abbilden:** `From` kopiert die Werte eines `StoredIncident`. `Select(IncidentSummary.From)` wendet das auf jede Zeile an.
+3. **Serialisieren:** `JsonSerializerDefaults.Web` liefert camelCase, `WriteIndented` die Einrückung. Das Ergebnis passt zum Format, das die API ab Lektion 3 liefert.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l02/`) gibt die Vorfälle zusätzlich als JSON aus. Die Ausgabe steht in `expected.out.txt` des Projekts.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l02-json-names-match-csharp" />
+
+**„JSON-Namen sind immer genau die C#-Eigenschaftsnamen.“** Das gilt nur für die Voreinstellung. Eine Namensrichtlinie (die Web-Einstellungen nutzen camelCase) oder `[JsonPropertyName]` ändert die Namen. Beim Einlesen müssen die Namen dann zu dieser Regel passen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l02-nullable-checked-on-read" />
+
+**„Ein `string` ohne `?` garantiert beim Einlesen, dass der Wert nicht `null` ist.“** Ohne `RespectNullableAnnotations` prüft der Serializer die Nullbarkeit nicht. Ein `null` im JSON ergibt `null` in der Eigenschaft. Auch mit der Option bleibt ein fehlender Name erlaubt. Ein Pflichtfeld erzwingst du mit `required`.
+:::
+
+<details>
+<summary>Vertiefung: Quellgenerator und Native AOT (optional)</summary>
+
+Die Beispiele dieser Lektion nutzen Reflexion: Der Serializer liest die Form der Typen zur Laufzeit. Als Alternative erzeugt ein Quellgenerator diese Informationen beim Übersetzen. Das spart Speicher und Start und ist für Native AOT und Trimming nötig. Dabei nimmst du eine von `JsonSerializerContext` abgeleitete Klasse. Die Lektion nennt den Weg nur. Einzelheiten stehen bei [Reflection versus source generation](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/reflection-vs-source-generation).
+
+</details>
+
+## Zusammenfassung
+
+JSON ist ein Textformat aus Objekten, Arrays, Strings, Zahlen, `true`/`false` und `null`. `JsonSerializer.Serialize` macht aus einem Objekt Text, `Deserialize<T>` liest es zurück. Optionen bestimmen die Namen: `JsonSerializerDefaults.Web` schreibt camelCase und liest ohne Beachtung der Schreibweise, `[JsonPropertyName]` setzt einen Namen fest. Fehlende Namen lassen den Startwert stehen, `null` wird übernommen. `required` und `RespectNullableAnnotations` verschärfen das, ungültiger Text löst eine `JsonException` aus.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l02-q9" />
+
+### Transferfrage
+
+<Quiz id="m17-l02-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Serialize and deserialize JSON using C#](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/overview)
+- Microsoft Learn: [Customize property names and values](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/customize-properties)
+- Microsoft Learn: [Require properties for deserialization](https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/required-properties)
