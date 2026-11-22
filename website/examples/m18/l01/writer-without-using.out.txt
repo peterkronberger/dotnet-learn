@@ -1,0 +1,2 @@
+Bytes in the file: 0
+After Dispose: 15

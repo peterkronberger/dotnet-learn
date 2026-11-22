@@ -12226,6 +12226,46 @@
         "title": "ASP.NET Core runtime environments",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/environments"
       }
+    },
+    {
+      "id": "code-review",
+      "term": "Code-Review",
+      "category": "course",
+      "definition": "Das Lesen von Code durch eine zweite Person (den Reviewer), bevor der Code übernommen wird. Ziel ist, Probleme vor den Nutzern zu finden. Die Befunde betreffen den Code, nicht die Person.",
+      "aliases": ["Review", "Reviewer"],
+      "related": ["review-checklist", "compiler-warning"],
+      "lesson": "m18-l01"
+    },
+    {
+      "id": "review-checklist",
+      "term": "Review-Checkliste",
+      "category": "course",
+      "definition": "Eine feste Liste bekannter Risiken, die ein Code-Review Punkt für Punkt prüft. Sie ist eine Gedächtnisstütze und ersetzt das Lesen des Codes nicht.",
+      "aliases": ["Checkliste"],
+      "related": ["code-review"],
+      "lesson": "m18-l01"
+    },
+    {
+      "id": "compiler-warning",
+      "term": "Compiler Warning",
+      "german": "Compiler-Warnung",
+      "category": "language",
+      "definition": "Ein Hinweis des Compilers auf ein mögliches Problem im Code, zum Beispiel CS8602 (möglicher Zugriff auf `null`). Das Programm lässt sich übersetzen. Mit `TreatWarningsAsErrors` bricht der Build bei einer Warnung ab.",
+      "aliases": ["Compiler-Warnungen"],
+      "related": ["code-review", "null-forgiving-operator"],
+      "lesson": "m18-l01",
+      "source": {
+        "title": "Compiler options - errors and warnings",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/errors-warnings"
+      }
+    },
+    {
+      "id": "boundary-value",
+      "term": "Boundary Value",
+      "category": "course",
+      "definition": "Ein Wert direkt an der Grenze zwischen zwei Fällen einer Regel, zum Beispiel 4 und 5 bei der Grenze „ab 5“. Tests an diesen Werten finden Fehler wie `<` statt `<=`.",
+      "related": ["business-rule"],
+      "lesson": "m18-l02"
     }
   ]
 }

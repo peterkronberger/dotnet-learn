@@ -1,4 +1,289 @@
 {
   "module": "m18",
-  "questions": []
+  "questions": [
+    {
+      "id": "m18-l01-q1",
+      "lesson": "m18-l01",
+      "type": "single",
+      "question": "Was ist ein Code-Review?",
+      "options": [
+        {
+          "text": "Eine zweite Person liest den Code, bevor er übernommen wird, und sucht Probleme.",
+          "correct": true
+        },
+        {
+          "text": "Der Compiler übersetzt den Code und meldet alle Fehler.",
+          "feedback": "Der Compiler prüft nur, was er prüfen kann. Ein Review ist die Prüfung durch Menschen, oft mit Hilfe des Compilers."
+        },
+        {
+          "text": "Der Autor bewertet, wie gut er selbst programmiert hat.",
+          "feedback": "Ein Review prüft den Code, nicht die Person. Die Prüfung macht ein Reviewer, nicht der Autor allein."
+        }
+      ],
+      "explanation": "Beim Code-Review liest ein Reviewer den Code des Autors, bevor er in das Projekt kommt. Das Ziel ist, Probleme vor den Nutzern zu finden. Die Befunde betreffen den Code, nicht die Person."
+    },
+    {
+      "id": "m18-l01-q2",
+      "lesson": "m18-l01",
+      "type": "single",
+      "question": "Wozu dient eine Review-Checkliste?",
+      "options": [
+        {
+          "text": "Sie erinnert an bekannte Risiken, damit nicht nur auffällt, was gerade ins Auge springt.",
+          "correct": true
+        },
+        {
+          "text": "Sie ersetzt das Lesen des Codes.",
+          "feedback": "Die Checkliste lenkt das Lesen. Der Code muss weiterhin gelesen und verstanden werden."
+        },
+        {
+          "text": "Sie beweist, dass der Code fehlerfrei ist.",
+          "feedback": "Eine abgehakte Liste zeigt nur, dass die bekannten Risiken geprüft wurden. Andere Fehler sind weiterhin möglich."
+        }
+      ],
+      "explanation": "Ohne Liste hängt ein Review davon ab, was dem Reviewer zufällig auffällt. Die Checkliste nennt bekannte Risiken und dient als Gedächtnisstütze."
+    },
+    {
+      "id": "m18-l01-q3",
+      "lesson": "m18-l01",
+      "type": "match",
+      "question": "Ordne jedem Punkt der Checkliste das Modul zu, in dem der Kurs ihn eingeführt hat.",
+      "pairs": [
+        { "left": "Nullability-Warnungen", "right": "Modul 4" },
+        { "left": "Ausnahmebehandlung", "right": "Modul 7" },
+        { "left": "Zeitzonen und UTC", "right": "Modul 5" },
+        { "left": "Lebensdauern im DI-Container", "right": "Modul 15" },
+        { "left": "SQL Injection", "right": "Modul 16" }
+      ],
+      "explanation": "Nullable-Verweistypen kamen in Modul 4, Exceptions in Modul 7. Datum, Uhrzeit und UTC stehen in Modul 5. Lebensdauern gehören zur Dependency Injection (Modul 15), und SQL Injection gehört zu EF Core (Modul 16)."
+    },
+    {
+      "id": "m18-l01-q4",
+      "lesson": "m18-l01",
+      "type": "single",
+      "question": "Der Compiler meldet für ein Projekt keine einzige Warnung. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Der Compiler hat keine der Warnungen gefunden, für die er Regeln hat. Andere Fehler sind weiter möglich.",
+          "correct": true
+        },
+        {
+          "text": "Der Code enthält keine Fehler.",
+          "feedback": "Der Compiler kennt nur bestimmte Muster. Ein falscher Schwellenwert oder ein vergessenes `using` bei einem Typ ohne Hinweis fällt ihm nicht auf.",
+          "misconception": "m18-l01-no-warnings-no-bugs"
+        },
+        {
+          "text": "Das Review kann entfallen.",
+          "feedback": "Der Compiler ist der erste Reviewer, nicht der einzige.",
+          "misconception": "m18-l01-no-warnings-no-bugs"
+        }
+      ],
+      "explanation": "Warnungen zeigen Probleme, die der Compiler erkennt. Logikfehler, fehlende Prüfungen und Fehler beim Freigeben bleiben ihm oft verborgen. Dafür gibt es das Review."
+    },
+    {
+      "id": "m18-l01-q5",
+      "lesson": "m18-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m18/l01/null-forgiving.cs",
+      "explanation": "Das `!` schaltet nur die Warnung ab. Für \"alice\" findet `FindUser` einen Namen, und die Länge ist 5. Für \"eve\" liefert `FindUser` `null`, und `.Length` löst zur Laufzeit eine `NullReferenceException` aus, die der `catch`-Block meldet."
+    },
+    {
+      "id": "m18-l01-q6",
+      "lesson": "m18-l01",
+      "type": "single",
+      "question": "Was ist an der Methode `ReadFailures` im Programm das Problem?",
+      "example": "m18/l01/empty-catch.cs",
+      "options": [
+        {
+          "text": "Der Aufrufer kann „0 Fehlversuche“ nicht von „Text nicht lesbar“ unterscheiden.",
+          "correct": true
+        },
+        {
+          "text": "Das Programm stürzt bei dem Text `5x` ab.",
+          "feedback": "Es stürzt nicht ab. Der leere `catch`-Block fängt die Exception und gibt 0 zurück. Genau das ist das Problem.",
+          "misconception": "m18-l01-empty-catch-is-safe"
+        },
+        {
+          "text": "Der leere `catch`-Block macht das Programm sicherer, aber langsamer.",
+          "feedback": "Ein leerer `catch`-Block versteckt den Fehler. Sicherer wird dadurch nichts, denn das Ergebnis 0 ist falsch.",
+          "misconception": "m18-l01-empty-catch-is-safe"
+        }
+      ],
+      "explanation": "Der leere `catch`-Block verschluckt die `FormatException`, und die Methode gibt 0 zurück. Beide Aufrufe liefern dieselbe Ausgabe, obwohl der zweite Text keine Zahl ist. Besser ist `int.TryParse` mit einem Ergebnis, das den Fehler zeigt."
+    },
+    {
+      "id": "m18-l01-q7",
+      "lesson": "m18-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m18/l01/writer-without-using.cs",
+      "explanation": "Der `StreamWriter` sammelt den Text zuerst in einem Puffer. Vor `Dispose` stehen noch 0 Bytes in der Datei. `Dispose` schreibt den Puffer und schließt die Datei, danach sind es 15 Bytes. Ein `using` ruft `Dispose` am Ende des Blocks automatisch auf."
+    },
+    {
+      "id": "m18-l01-q8",
+      "lesson": "m18-l01",
+      "type": "find-bug",
+      "question": "Welche Zeile erzeugt die Compiler-Warnung?",
+      "example": "m18/l01/nullable-warning.snippet.cs",
+      "bugLines": [4],
+      "lineFeedback": {
+        "1": { "feedback": "Die Zeile darf `null` liefern. Das ist durch `string?` erlaubt." }
+      },
+      "explanation": "`name` kann `null` sein. In Zeile 4 greift `name.Length` darauf zu, ohne zu prüfen. Der Compiler meldet CS8602. Die Lösung ist eine Prüfung, nicht das Abschalten der Warnung mit `!`."
+    },
+    {
+      "id": "m18-l01-q9",
+      "lesson": "m18-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Code-Review mit einer Checkliste verlässlicher ist als ein Review ohne Liste. Nenne zwei Punkte der Checkliste.",
+      "modelAnswer": "Ohne Liste hängt das Ergebnis davon ab, was dem Reviewer zufällig auffällt. Die Liste erinnert an bekannte Risiken, und jeder Punkt wird bewusst geprüft. Beispiele: Nullability-Warnungen (wird `!` nur benutzt, um eine Warnung zu verstecken?) und Freigabe von Ressourcen (hat jeder `StreamWriter` ein `using`?)."
+    },
+    {
+      "id": "m18-l01-q10",
+      "lesson": "m18-l01",
+      "type": "explain",
+      "question": "Transfer: Du bekommst ein fremdes Programm, das Dateien schreibt und Zahlen aus Text liest. Welche zwei Punkte der Checkliste prüfst du als Erstes, und woran erkennst du ein Problem?",
+      "modelAnswer": "Freigabe von Ressourcen: Jeder `StreamWriter` oder `StreamReader` braucht ein `using`, sonst kann Text noch im Puffer fehlen. Ausnahmebehandlung: Ein leerer `catch`-Block oder ein `catch` ohne Typ versteckt Fehler. Besser sind `TryParse` oder ein `catch` mit konkretem Typ, der etwas sinnvoll tut."
+    },
+    {
+      "id": "m18-l02-q1",
+      "lesson": "m18-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m18/l02/relational-switch.cs",
+      "explanation": "Der Wert -1 passt nicht auf `0`, aber auf `< 3`. Darum ist das Ergebnis `Low`. Das Muster `< 3` hat keine Untergrenze. 0 passt auf die erste Zeile, 2 auf `< 3`, 3 auf `< 5` und 5 auf den Rest."
+    },
+    {
+      "id": "m18-l02-q2",
+      "lesson": "m18-l02",
+      "type": "single",
+      "question": "Welche ganzen Zahlen passen auf das Muster `< 3`, wenn keine Zeile davor sie schon abfängt?",
+      "options": [
+        {
+          "text": "Alle Zahlen kleiner als 3, auch negative.",
+          "correct": true
+        },
+        {
+          "text": "Nur 0, 1 und 2.",
+          "feedback": "Das Muster vergleicht nur mit 3. Es kennt keine Untergrenze, also passen auch -1 und -100.",
+          "misconception": "m18-l02-relational-pattern-excludes-negative"
+        },
+        {
+          "text": "Nur die positiven Zahlen kleiner als 3.",
+          "feedback": "Ob eine Zahl positiv ist, prüft das Muster nicht. Es prüft nur `< 3`.",
+          "misconception": "m18-l02-relational-pattern-excludes-negative"
+        }
+      ],
+      "explanation": "Ein relationales Muster vergleicht den Wert mit einer Konstanten. Für `< 3` ist der Vergleich auch bei -1 wahr. Wer negative Zahlen ausschließen will, prüft sie vorher mit einer Guard Clause oder schreibt `>= 1 and < 3`."
+    },
+    {
+      "id": "m18-l02-q3",
+      "lesson": "m18-l02",
+      "type": "single",
+      "question": "Warum steht die Einstufung der Schwere im Kern und nicht in der Konsolenanwendung?",
+      "options": [
+        {
+          "text": "Sie gilt an einer Stelle und lässt sich ohne Konsole und ohne Datenbank testen.",
+          "correct": true
+        },
+        {
+          "text": "Der Kern läuft schneller als die Konsolenanwendung.",
+          "feedback": "Die Geschwindigkeit ist nicht der Grund. Es geht um eine einzige Stelle und um Tests."
+        },
+        {
+          "text": "Die Konsolenanwendung darf keine `switch`-Ausdrücke enthalten.",
+          "feedback": "Auch die Konsolenanwendung darf `switch` benutzen. Es geht um die Aufteilung der Verantwortung."
+        }
+      ],
+      "explanation": "Eine Fachregel gehört an eine Stelle, die Konsole und API gemeinsam nutzen. Im Kern ist sie eine kleine Methode ohne Abhängigkeiten, und ein Test ruft sie direkt auf."
+    },
+    {
+      "id": "m18-l02-q4",
+      "lesson": "m18-l02",
+      "type": "single",
+      "question": "Was tut `ArgumentOutOfRangeException.ThrowIfNegative(failureCount)` am Anfang einer Methode?",
+      "options": [
+        {
+          "text": "Sie löst eine `ArgumentOutOfRangeException` aus, wenn `failureCount` kleiner als 0 ist, sonst läuft die Methode weiter.",
+          "correct": true
+        },
+        {
+          "text": "Sie ersetzt eine negative Zahl durch 0.",
+          "feedback": "Der Wert wird nicht verändert. Die Methode weist ihn mit einer Exception zurück."
+        },
+        {
+          "text": "Sie gibt `true` zurück, wenn die Zahl negativ ist.",
+          "feedback": "`ThrowIfNegative` hat keinen Rückgabewert. Sie löst die Exception selbst aus."
+        }
+      ],
+      "explanation": "Die Methode ist eine Guard Clause: Ungültige Eingaben werden sofort zurückgewiesen, bevor die Regel selbst läuft. Bei 0 und bei positiven Zahlen passiert nichts."
+    },
+    {
+      "id": "m18-l02-q5",
+      "lesson": "m18-l02",
+      "type": "single",
+      "question": "Die Regel gibt für 0–2 `Low`, für 3–4 `Medium` und ab 5 `High` zurück. Welche Werte testest du an den Grenzen zwischen `Medium` und `High`?",
+      "options": [
+        {
+          "text": "4 und 5.",
+          "correct": true
+        },
+        {
+          "text": "1 und 100.",
+          "feedback": "Das sind Werte weit weg von den Grenzen. Ein Fehler wie `< 5` statt `<= 5` bliebe unentdeckt."
+        },
+        {
+          "text": "Nur 5.",
+          "feedback": "Mit 5 allein siehst du nicht, ob die Grenze an der richtigen Stelle liegt. Du brauchst auch den letzten Wert davor."
+        }
+      ],
+      "explanation": "Grenzwerte liegen direkt an der Grenze: der letzte Wert der unteren Stufe (4) und der erste Wert der oberen Stufe (5). Dort machen Vergleiche die meisten Fehler."
+    },
+    {
+      "id": "m18-l02-q6",
+      "lesson": "m18-l02",
+      "type": "single",
+      "question": "Ein Entwickler sagt: „Die Fachregel ist getestet, denn die Programmausgabe stimmt.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Die Ausgabe prüft nur die Werte, die das Programm gerade benutzt. Ein Test prüft gezielt auch Grenzen und ungültige Eingaben.",
+          "correct": true
+        },
+        {
+          "text": "Das reicht, weil die Ausgabe alle möglichen Eingaben abdeckt.",
+          "feedback": "Eine Ausgabe zeigt nur die Eingaben dieses einen Laufs, zum Beispiel 5, 1 und 0.",
+          "misconception": "m18-l02-output-check-is-test"
+        },
+        {
+          "text": "Das reicht, solange der Compiler keine Warnung meldet.",
+          "feedback": "Der Compiler kennt die Fachregel nicht und kann falsche Schwellenwerte nicht erkennen.",
+          "misconception": "m18-l02-output-check-is-test"
+        }
+      ],
+      "explanation": "Die Programmausgabe nutzt nur einige Werte. Der Wert -1 kommt in den Beispieldaten nicht vor, und trotzdem liefert die alte Regel für ihn `Low`. Erst Tests für die Grenzen und für ungültige Werte zeigen so etwas."
+    },
+    {
+      "id": "m18-l02-q7",
+      "lesson": "m18-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m18/l02/threshold-solution.cs",
+      "explanation": "9 ist kleiner als 10 und damit `Quiet`. 10 ist nicht kleiner als 10, aber kleiner als 100, also `Busy`. 100 landet im Rest `Flooded`. Die Grenzen 10 und 100 gehören zur oberen Stufe."
+    },
+    {
+      "id": "m18-l02-q8",
+      "lesson": "m18-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine Fachregel im Kern aufgebaut ist: Was prüft die Guard Clause, was der `switch`-Ausdruck, und welche Tests schreibst du?",
+      "modelAnswer": "Die Guard Clause weist ungültige Eingaben (zum Beispiel negative Zahlen) sofort mit einer `ArgumentOutOfRangeException` zurück. Der `switch`-Ausdruck ordnet die gültigen Werte den Stufen zu, von klein nach groß. Die Tests prüfen jede Grenze mit dem letzten Wert der unteren und dem ersten Wert der oberen Stufe und zusätzlich einen ungültigen Wert, der eine Exception auslösen muss."
+    },
+    {
+      "id": "m18-l02-q9",
+      "lesson": "m18-l02",
+      "type": "explain",
+      "question": "Transfer: In SecLog soll eine Regel sagen, wie viele Anmeldungen pro Minute „auffällig viel“ sind. Wohin kommt sie, und welche Werte testest du?",
+      "modelAnswer": "Die Regel kommt als kleine, reine Methode in den Kern (`SecLog.Core`), damit Konsole und API sie gemeinsam nutzen und ein Test sie ohne Datenbank aufrufen kann. Getestet werden die Grenzwerte (der letzte Wert unter und der erste Wert über der Schwelle), 0 und ein ungültiger Wert wie -1, der eine Exception auslösen muss."
+    }
+  ]
 }

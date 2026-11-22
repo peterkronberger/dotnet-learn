@@ -1,0 +1,4 @@
+bob: High
+alice: Low
+dave: Low
+carol: None

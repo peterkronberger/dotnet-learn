@@ -1,0 +1,253 @@
+---
+title: Code-Review mit einer Checkliste
+sidebar_position: 1
+description: Ein Code-Review prüft Code gegen eine feste Liste bekannter Risiken. Die neun Punkte der Checkliste des Kurses, und der Compiler als erster Reviewer.
+lesson_id: m18-l01
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import nullForgiving from '!!raw-loader!@site/examples/m18/l01/null-forgiving.cs';
+import nullForgivingOutput from '!!raw-loader!@site/examples/m18/l01/null-forgiving.out.txt';
+import nullChecked from '!!raw-loader!@site/examples/m18/l01/null-checked.cs';
+import nullableWarning from '!!raw-loader!@site/examples/m18/l01/nullable-warning.snippet.cs';
+import emptyCatch from '!!raw-loader!@site/examples/m18/l01/empty-catch.cs';
+import emptyCatchOutput from '!!raw-loader!@site/examples/m18/l01/empty-catch.out.txt';
+import tryParse from '!!raw-loader!@site/examples/m18/l01/try-parse.cs';
+import writerWithout from '!!raw-loader!@site/examples/m18/l01/writer-without-using.cs';
+import writerWithoutOutput from '!!raw-loader!@site/examples/m18/l01/writer-without-using.out.txt';
+import writerWith from '!!raw-loader!@site/examples/m18/l01/writer-with-using.cs';
+import gaps from '!!raw-loader!@site/examples/m18/l01/parse-gaps.cs';
+import testsBefore from '!!raw-loader!@site/examples/_ci/seclog-m17-l12/tests/SecLog.Tests/SecLog.Tests.csproj';
+import testsAfter from '!!raw-loader!@site/examples/_ci/seclog-m18-l01/tests/SecLog.Tests/SecLog.Tests.csproj';
+import apiTestsAfter from '!!raw-loader!@site/examples/_ci/seclog-m18-l01/tests/SecLog.Api.Tests/SecLog.Api.Tests.csproj';
+
+# Code-Review mit einer Checkliste
+
+:::note[Lernziele]
+- Du kannst erklären, was ein <Term id="code-review">Code-Review</Term> ist und wozu eine <Term id="review-checklist">Checkliste</Term> dabei dient.
+- Du kannst die neun Punkte der Checkliste nennen und je einer Lektion des Kurses zuordnen.
+- Du findest in kleinen Programmen Probleme bei Nullability-Warnungen, Ausnahmebehandlung und Freigabe von Ressourcen.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog ist vollständig: Fachlogik, LINQ-Auswertung und Meldungsbewertung liegen getestet im Kern.
+- Du prüfst SecLog mit einer Review-Checkliste, die den ganzen Kurs abdeckt.
+- Datenbank- und API-Code von SecLog prüfst du in Code-Reviews und sicherst die Ergebnisse mit Tests ab.
+:::
+
+## Rückblick
+
+<Quiz id="m04-l04-q1" />
+
+<Quiz id="m07-l08-q1" />
+
+<Quiz id="m14-l07-q1" />
+
+## Was ein Code-Review ist
+
+Bei einem Code-Review liest eine zweite Person den Code, bevor er in das Projekt übernommen wird. Die Person, die den Code geschrieben hat, ist der Autor. Die Person, die ihn liest, ist der Reviewer. Das Ziel: Probleme finden, bevor sie bei den Nutzern ankommen. Die Befunde betreffen den Code, nicht die Person, die ihn geschrieben hat.
+
+Ein Review ohne feste Liste hängt davon ab, was dem Reviewer zufällig auffällt. Eine Checkliste nennt bekannte Risiken und erinnert an sie. Sie ist eine Gedächtnisstütze, die das Lesen des Codes lenkt. Sie ersetzt es nicht: Ein abgehakter Punkt sagt nur, dass dieses Risiko geprüft wurde.
+
+## Die Checkliste des Kurses
+
+In diesem Kurs hast du neun Risiken kennengelernt. Zusammen bilden sie die Checkliste für SecLog. Jeder Punkt führt zu der Lektion, die ihn erklärt hat:
+
+1. **Nullability-Warnungen:** Wird ein Wert, der `null` sein kann, ohne Prüfung benutzt? ([null und Nullable-Verweistypen](../m04-type-system-basics/l04-null-and-nullable-reference-types), [Vom Playground zum Projekt](../m14-testing/l01-from-playground-to-project))
+2. **Ausnahmebehandlung:** Fängt ein `catch` nur, was es behandeln kann, und verschluckt keinen Fehler? ([Exception oder nicht?](../m07-exceptions/l07-exception-or-not))
+3. **Freigabe von Ressourcen:** Hat jedes Objekt, das Ressourcen hält, ein `using`? ([Ressourcen freigeben](../m07-exceptions/l08-using-and-idisposable), [Lebensdauern von Services](../m15-dependency-injection-hosting/l03-service-lifetimes))
+4. **Stolperfallen bei async:** Gibt es `async void`, blockierendes `.Result` oder `.Wait()` oder ein fehlendes `CancellationToken`? ([Stolperfallen bei async](../m13-async-concurrency/l08-async-pitfalls), [Exceptions und asynchronen Code testen](../m14-testing/l12-testing-exceptions-and-async-code))
+5. **Lebensdauern im DI-Container:** Hält ein Singleton einen Scoped-Service fest? ([Lebensdauern richtig kombinieren](../m15-dependency-injection-hosting/l04-combining-lifetimes))
+6. **SQL Injection:** Wird Eingabe zu einem Teil des SQL-Textes? ([Raw SQL sicher verwenden](../m16-ef-core/l09-raw-sql-safely))
+7. **Eingabevalidierung:** Wird jede Eingabe geprüft, bevor sie benutzt wird? ([Parameterbindung und Validierung](../m17-aspnetcore-minimal-apis/l05-binding-validation))
+8. **Zeitzonen:** Werden Zeiten in UTC gespeichert und verglichen, mit `DateTimeOffset`? ([Datum und Uhrzeit](../m05-arrays-strings-collections/l11-date-and-time))
+9. **Tests für Fachregeln:** Hat jede Fachregel Tests, auch für die Grenzen? ([Datengetriebene Tests mit \[Theory\]](../m14-testing/l08-data-driven-tests), [Testbarer Code](../m14-testing/l09-testable-code))
+
+Die folgenden Lektionen wenden jeweils einen oder mehrere Punkte an und verweisen auf diese Liste. Diese Lektion übt die Punkte 1 bis 3.
+
+## Der Compiler ist der erste Reviewer
+
+Bevor ein Mensch liest, hat der Compiler schon geprüft. Eine <Term id="compiler-warning">Compiler-Warnung</Term> ist ein Hinweis auf ein mögliches Problem. Das Programm lässt sich trotzdem übersetzen. Im Projekt gibt es zwei Hilfen:
+
+- Die Nullable-Prüfung (Lektion „null und Nullable-Verweistypen“) warnt zum Beispiel mit CS8602, wenn du etwas benutzt, das `null` sein kann.
+- Die Projekteigenschaft `TreatWarningsAsErrors` (Lektion „Vom Playground zum Projekt“) macht jede Warnung zu einem Fehler. Der Build bricht dann ab ([Compiler options – errors and warnings](https://learn.microsoft.com/dotnet/csharp/language-reference/compiler-options/errors-warnings)).
+
+<CodeBlock language="csharp" title="nullable-warning.snippet.cs">{nullableWarning}</CodeBlock>
+
+Das `!` hinter einem Ausdruck (<Term id="null-forgiving-operator">Null-Forgiving Operator</Term>) schaltet die Warnung für diesen Ausdruck ab. Zur Laufzeit macht es nichts: Ist der Wert `null`, stürzt das Programm trotzdem ab ([Null-forgiving operator](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/null-forgiving)). Ein `!` im Code ist darum ein Fall für das Review: Stimmt die Behauptung „das ist nicht `null`“ wirklich?
+
+## Punkt 1: Nullability
+
+:::info[Vorhersage]
+`FindUser` gibt `null` zurück, wenn der Name nicht in der Liste steht. Der Aufruf benutzt `!`. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m18-l01-null" code={nullForgiving} predict expected={nullForgivingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `alice: 5 characters` und `eve: NullReferenceException`.
+
+1. **Warnung gesucht:** `FindUser` hat den Rückgabetyp `string?`. Ohne `!` würde der Compiler beim Zugriff auf `.Length` warnen.
+2. **`!` gefunden:** Das `!` schaltet die Warnung ab. Es prüft nichts.
+3. **Folge:** Für „eve“ ist das Ergebnis `null`. `.Length` löst die `NullReferenceException` aus, die der `catch`-Block meldet.
+4. **Sichere Fassung:** Prüfe das Ergebnis und behandle den Fall `null`:
+
+<CSharpRunner id="m18-l01-null-checked" code={nullChecked} />
+
+Jetzt gibt das Programm für „eve“ `unknown user` aus, ohne `!` und ohne Absturz.
+
+**Was passiert, wenn …?** … du das `!` entfernst? Dann meldet der Compiler CS8602, und mit `TreatWarningsAsErrors` bricht der Build ab. Der Fehler fällt vor dem Start auf.
+
+</details>
+
+## Punkt 2: Ausnahmebehandlung
+
+Ein `catch`-Block, der nichts tut, versteckt einen Fehler. Das Programm stürzt nicht ab, aber das Ergebnis ist falsch. Nur Exceptions fangen, die der Code behandeln kann. Für Eingaben, die häufig falsch sind, gibt es `Try`-Methoden wie `int.TryParse`, die keine Exception auslösen ([Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)).
+
+:::info[Vorhersage]
+`ReadFailures` liest eine Zahl aus Text. Welche zwei Zeilen gibt das Programm aus?
+:::
+
+<CSharpRunner id="m18-l01-catch" code={emptyCatch} predict expected={emptyCatchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist zweimal `Failures: 0`.
+
+1. **Leeren `catch` gefunden:** Der Block nach `catch` ist leer.
+2. **Folge:** `int.Parse("5x")` löst eine `FormatException` aus. Der leere Block fängt sie, und die Methode gibt 0 zurück.
+3. **Was dem Aufrufer fehlt:** Er sieht für „0“ und für „5x“ dasselbe. Ein unlesbarer Text sieht aus wie null Fehlversuche, und eine Auswertung von SecLog würde einen Angriff übersehen.
+4. **Bessere Fassung:** `int.TryParse` und ein Ergebnis, das den Fehler zeigt:
+
+<CSharpRunner id="m18-l01-tryparse" code={tryParse} />
+
+Der Rückgabetyp `int?` unterscheidet jetzt „0“ von „unlesbar“.
+
+</details>
+
+## Punkt 3: Freigabe von Ressourcen
+
+Ein `StreamWriter` sammelt Text in einem Puffer. Erst `Dispose` schreibt den Rest in die Datei und schließt sie. Ein `using` ruft `Dispose` am Ende des Blocks auf, auch wenn eine Exception auftritt ([using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/using)).
+
+:::info[Vorhersage]
+Das Programm schreibt 15 Zeichen in eine Datei in einem frischen temporären Ordner und fragt zweimal die Größe der Datei ab. Welche zwei Zeilen gibt es aus?
+:::
+
+<CSharpRunner id="m18-l01-writer" code={writerWithout} predict expected={writerWithoutOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Bytes in the file: 0` und `After Dispose: 15`.
+
+1. **Ressource gefunden:** `writer` ist ein `StreamWriter`, also ein Objekt mit `Dispose`.
+2. **Kein `using`:** Der Text liegt noch im Puffer, die Datei hat 0 Bytes.
+3. **Nach `Dispose`:** Der Puffer ist geschrieben, die Datei hat 15 Bytes.
+4. **Sichere Fassung:** Ein `using`-Block gibt den Writer am Ende frei:
+
+<CodeBlock language="csharp" title="writer-with-using.cs">{writerWith}</CodeBlock>
+
+**Was passiert, wenn …?** … im `using`-Block eine Exception auftritt? Dann wird der Writer trotzdem freigegeben, bevor die Exception weiterläuft.
+
+</details>
+
+## Lückenbeispiel
+
+`ReadFailures` soll nicht mehr 0 für jeden Text liefern. Es soll eine Zahl lesen und bei einem Fehler `null` zurückgeben. Die Teilziele: „1. Parsen mit `TryParse` → 2. Fehlerfall als `null` → 3. Aufrufer zeigt `unreadable`“.
+
+<CSharpRunner id="m18-l01-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Parsen:** `if (int.TryParse(text, out int failures))`.
+2. **Ergebnis:** In der Bedingung `return failures;`, danach `return null;`.
+3. **Aufrufer:** Die beiden Zeilen im Programm schreiben `?? "unreadable"` statt `?? ""`. Dann gibt das Programm `5` und `unreadable` aus.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l12/`) besteht aus vier Projekten unter `src/` und zwei Testprojekten unter `tests/`. Nur die Projekte in `src/` setzen `TreatWarningsAsErrors`.
+
+**Neue Anforderung:** „Jedes Projekt der Solution behandelt Warnungen als Fehler, auch die beiden Testprojekte.“
+
+In `tests/SecLog.Tests/SecLog.Tests.csproj` und `tests/SecLog.Api.Tests/SecLog.Api.Tests.csproj` kommt `<TreatWarningsAsErrors>true</TreatWarningsAsErrors>` neben `<Nullable>enable</Nullable>`. Beide Projekte hatten `Nullable` schon. Eine Projektdatei läuft nicht im Playground, darum steht hier die Datei vor und nach der Änderung.
+
+<CodeBlock language="xml" title="tests/SecLog.Tests/SecLog.Tests.csproj (vorher)">{testsBefore}</CodeBlock>
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="xml" title="tests/SecLog.Tests/SecLog.Tests.csproj (geändert)">{testsAfter}</CodeBlock>
+
+<CodeBlock language="xml" title="tests/SecLog.Api.Tests/SecLog.Api.Tests.csproj (geändert)">{apiTestsAfter}</CodeBlock>
+
+1. **Eigenschaft ergänzen:** Die Zeile steht in beiden Testprojekten in der `PropertyGroup`.
+2. **Bauen:** Der Build der ganzen Solution läuft ohne Warnung durch. Es musste kein Code angepasst werden.
+3. **Ausgabe:** `expected.out.txt` bleibt unverändert.
+
+</details>
+
+**Neuer Stand:** In SecLog (`_ci/seclog-m18-l01/`) bricht der Build in jedem der sechs Projekte bei einer Warnung ab. Der Compiler prüft so auch die Tests als erster Reviewer.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l01-no-warnings-no-bugs" />
+
+**„Wenn der Compiler keine Warnung meldet, ist der Code fehlerfrei.“** Der Compiler erkennt nur Muster, für die er Regeln hat. Ein falscher Schwellenwert, ein leerer `catch`-Block oder ein vergessenes `using` bleiben ihm oft verborgen. Keine Warnung heißt: Der Compiler hat nichts gefunden. Das Review bleibt nötig.
+:::
+
+:::warning[Achtung]
+<Misconception id="m18-l01-empty-catch-is-safe" />
+
+**„Ein leerer catch-Block macht ein Programm sicherer, weil es nicht mehr abstürzt.“** Der Absturz ist weg, der Fehler nicht. Das Programm läuft mit einem falschen Ergebnis weiter, und niemand erfährt es.
+:::
+
+<details>
+<summary>Vertiefung: Was `!` im Code bewirkt (optional)</summary>
+
+Der Null-Forgiving Operator ändert nur die Analyse des Compilers: Der Ausdruck `x!` hat zur Laufzeit denselben Wert wie `x` ([§12.8.9 Null-forgiving expressions](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1289-null-forgiving-expressions)). Sinnvoll ist `!` zum Beispiel in einem Test, der absichtlich `null` übergibt, um eine Prüfung der Argumente zu testen.
+
+</details>
+
+## Zusammenfassung
+
+Ein Code-Review prüft Code gegen eine feste Liste bekannter Risiken. Die Checkliste des Kurses hat neun Punkte und verweist auf die Lektionen, die sie erklärt haben. Der Compiler ist der erste Reviewer: Nullable-Warnungen und `TreatWarningsAsErrors` finden manches vor dem Start. Ein `!` versteckt nur eine Warnung, ein leerer `catch` versteckt einen Fehler, und ein fehlendes `using` lässt Text im Puffer. In SecLog behandeln jetzt alle sechs Projekte Warnungen als Fehler.
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l01-q1" />
+
+<Quiz id="m18-l01-q2" />
+
+<Quiz id="m18-l01-q3" />
+
+<Quiz id="m18-l01-q4" />
+
+<Quiz id="m18-l01-q5" />
+
+<Quiz id="m18-l01-q6" />
+
+<Quiz id="m18-l01-q7" />
+
+<Quiz id="m18-l01-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l01-q9" />
+
+### Transferfrage
+
+<Quiz id="m18-l01-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Nullable reference types](https://learn.microsoft.com/dotnet/csharp/nullable-references)
+- Microsoft Learn: [Best practices for exceptions](https://learn.microsoft.com/dotnet/standard/exceptions/best-practices-for-exceptions)
+- C#-Referenz: [using statement](https://learn.microsoft.com/dotnet/csharp/language-reference/statements/using)
