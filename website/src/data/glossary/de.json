@@ -11268,6 +11268,243 @@
         "title": "SQL Queries",
         "url": "https://learn.microsoft.com/ef/core/querying/sql-queries"
       }
+    },
+    {
+      "id": "client-server",
+      "term": "Client und Server",
+      "category": "platform",
+      "definition": "Der Client schickt eine Anfrage, der Server beantwortet sie. Beide laufen oft auf verschiedenen Rechnern und sprechen über ein Protokoll wie HTTP miteinander.",
+      "related": [
+        "http",
+        "http-request",
+        "http-response"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "http",
+      "term": "HTTP",
+      "german": "Hypertext-Übertragungsprotokoll",
+      "category": "platform",
+      "definition": "Das Protokoll, mit dem ein Client eine Anfrage an einen Server schickt und eine Antwort bekommt. Es ist zustandslos: Jede Anfrage steht für sich.",
+      "aliases": [
+        "HTTPS"
+      ],
+      "related": [
+        "http-request",
+        "http-response",
+        "client-server"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "http-request",
+      "term": "HTTP Request",
+      "german": "HTTP-Anfrage",
+      "category": "platform",
+      "definition": "Die Nachricht des Clients: Anfragezeile mit Methode und Pfad, Header und optional ein Body.",
+      "aliases": [
+        "Anfrage"
+      ],
+      "related": [
+        "http-method",
+        "http-header",
+        "url"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "http-response",
+      "term": "HTTP Response",
+      "german": "HTTP-Antwort",
+      "category": "platform",
+      "definition": "Die Nachricht des Servers: Statuszeile mit Statuscode, Header und optional ein Body.",
+      "aliases": [
+        "Antwort"
+      ],
+      "related": [
+        "http-status-code",
+        "http-header"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "http-method",
+      "term": "HTTP Method",
+      "german": "HTTP-Methode",
+      "category": "platform",
+      "definition": "Das Verb einer Anfrage, zum Beispiel `GET`, `POST`, `PUT` oder `DELETE`. Es sagt, was der Server mit der Ressource tun soll.",
+      "aliases": [
+        "HTTP-Verb"
+      ],
+      "related": [
+        "http-request",
+        "idempotency"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "http-status-code",
+      "term": "HTTP Status Code",
+      "german": "HTTP-Statuscode",
+      "category": "platform",
+      "definition": "Die dreistellige Zahl in einer Antwort, die das Ergebnis nennt, zum Beispiel `200` oder `404`. Die erste Ziffer gibt die Klasse an: 1xx bis 5xx.",
+      "aliases": [
+        "Statuscode"
+      ],
+      "related": [
+        "http-response"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "HttpStatusCode Enum",
+        "url": "https://learn.microsoft.com/dotnet/api/system.net.httpstatuscode"
+      }
+    },
+    {
+      "id": "http-header",
+      "term": "HTTP Header",
+      "german": "HTTP-Kopfzeile",
+      "category": "platform",
+      "definition": "Eine Zeile `Name: Wert` in einer Anfrage oder Antwort mit Zusatzangaben, zum Beispiel `Content-Type` für das Format des Bodys.",
+      "aliases": [
+        "Header"
+      ],
+      "related": [
+        "http-request",
+        "http-response"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "HttpHeaders Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.net.http.headers.httpheaders"
+      }
+    },
+    {
+      "id": "idempotency",
+      "term": "Idempotency",
+      "german": "Idempotenz",
+      "category": "platform",
+      "definition": "Eine Methode ist idempotent, wenn mehrfaches Senden derselben Anfrage den Zustand des Servers so verändert wie ein einziges Senden. `PUT` und `DELETE` sind idempotent, `POST` nicht.",
+      "aliases": [
+        "idempotent"
+      ],
+      "related": [
+        "http-method"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
+    },
+    {
+      "id": "url",
+      "term": "URL",
+      "german": "Adresse einer Ressource",
+      "category": "platform",
+      "definition": "Die Adresse einer Ressource, zum Beispiel `https://example.com/incidents?user=bob`. Sie besteht aus Schema, Host, Pfad und optional einer Query.",
+      "aliases": [
+        "URI"
+      ],
+      "related": [
+        "http-request"
+      ],
+      "lesson": "m17-l01",
+      "source": {
+        "title": "Uri Class",
+        "url": "https://learn.microsoft.com/dotnet/api/system.uri"
+      }
+    },
+    {
+      "id": "json",
+      "term": "JSON",
+      "german": "JavaScript Object Notation",
+      "category": "platform",
+      "definition": "Ein Textformat für Daten aus Objekten, Arrays, Zeichenketten, Zahlen, `true`/`false` und `null`. Es ist das übliche Format für HTTP-Bodys.",
+      "related": [
+        "serialization",
+        "deserialization"
+      ],
+      "lesson": "m17-l02",
+      "source": {
+        "title": "Serialize and deserialize JSON using C#",
+        "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/overview"
+      }
+    },
+    {
+      "id": "serialization",
+      "term": "Serialization",
+      "german": "Serialisierung",
+      "category": "platform",
+      "definition": "Das Umwandeln eines Objekts in Text oder Bytes, die man speichern oder senden kann. `JsonSerializer.Serialize` erzeugt JSON-Text.",
+      "aliases": [
+        "serialisieren"
+      ],
+      "related": [
+        "deserialization",
+        "json"
+      ],
+      "lesson": "m17-l02",
+      "source": {
+        "title": "Serialize and deserialize JSON using C#",
+        "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/overview"
+      }
+    },
+    {
+      "id": "deserialization",
+      "term": "Deserialization",
+      "german": "Deserialisierung",
+      "category": "platform",
+      "definition": "Das Zurücklesen eines Objekts aus seiner serialisierten Form. `JsonSerializer.Deserialize<T>` baut aus JSON-Text ein Objekt vom Typ `T`.",
+      "aliases": [
+        "deserialisieren"
+      ],
+      "related": [
+        "serialization",
+        "json"
+      ],
+      "lesson": "m17-l02",
+      "source": {
+        "title": "Serialize and deserialize JSON using C#",
+        "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/overview"
+      }
+    },
+    {
+      "id": "naming-policy",
+      "term": "Naming Policy",
+      "german": "Namensrichtlinie",
+      "category": "platform",
+      "definition": "Eine Regel, die C#-Namen in JSON-Namen umwandelt, zum Beispiel `JsonNamingPolicy.CamelCase`: aus `FailureCount` wird `failureCount`. `[JsonPropertyName]` hat Vorrang.",
+      "related": [
+        "json",
+        "serialization"
+      ],
+      "lesson": "m17-l02",
+      "source": {
+        "title": "How to customize property names and values with System.Text.Json",
+        "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/customize-properties"
+      }
     }
   ]
 }
