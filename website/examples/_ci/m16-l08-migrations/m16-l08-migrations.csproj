@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
+    <!-- The EF Core Design package pulls in Roslyn resources with locales .NET does not know (NETSDK1188). -->
+    <NoWarn>$(NoWarn);NETSDK1188</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
