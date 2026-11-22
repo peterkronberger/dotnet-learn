@@ -472,6 +472,12 @@ Found: #1 bob 5
 == Tests ==
 Passed SecLog.Api.Tests.IncidentEndpointsTests.GetIncident_KnownId_ReturnsIncident
 Passed SecLog.Api.Tests.IncidentEndpointsTests.GetIncidents_SeededDatabase_ReturnsAll
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{\"status\":\"\"}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{\"status\":\"archived\"}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_InvalidStatus_ReturnsBadRequest(json: "{}")
+Passed SecLog.Api.Tests.IncidentInputTests.ChangeStatus_ValidStatus_ReturnsUpdatedIncident
+Passed SecLog.Api.Tests.IncidentInputTests.GetIncidents_FilterByUser_ReturnsOnlyThatUser
+Passed SecLog.Api.Tests.IncidentInputTests.GetIncidents_UserTooLong_ReturnsBadRequest
 Passed SecLog.Tests.DetectionOptionsTests.Defaults_AreValid
 Passed SecLog.Tests.DetectionOptionsTests.NotPositiveValue_IsInvalid(maxFailures: -1, windowMinutes: -1)
 Passed SecLog.Tests.DetectionOptionsTests.NotPositiveValue_IsInvalid(maxFailures: 0, windowMinutes: 10)

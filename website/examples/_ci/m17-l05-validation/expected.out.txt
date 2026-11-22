@@ -1,0 +1,24 @@
+== 1. Without AddValidation ==
+> POST /incidents
+< 200 OK
+< body: accepted  (-1)
+
+== 2. With AddValidation: valid body ==
+> POST /incidents
+< 200 OK
+< body: accepted bob (5)
+
+== 3. With AddValidation: invalid body ==
+> POST /incidents
+< 400 Bad Request
+< body: {"title":"One or more validation errors occurred.","status":400,"errors":{"User":["The User field is required."],"FailureCount":["The field FailureCount must be between 0 and 1000."]}}
+
+== 4. With AddValidation: query parameter ==
+> GET /search?user=xxxxxxxxxxxxxxxxx...
+< 400 Bad Request
+< body: {"title":"One or more validation errors occurred.","status":400,"errors":{"user":["The field user must be a string or array type with a maximum length of '64'."]}}
+
+== 5. With AddValidation: rule over two properties ==
+> POST /incidents
+< 400 Bad Request
+< body: {"title":"One or more validation errors occurred.","status":400,"errors":{"Status":["A closed incident needs at least one failed login."],"FailureCount":["A closed incident needs at least one failed login."]}}
