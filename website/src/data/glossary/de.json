@@ -11222,6 +11222,38 @@
       }
     },
     {
+      "id": "async-query",
+      "term": "Async Query",
+      "german": "asynchrone Abfrage",
+      "category": "platform",
+      "definition": "Ein EF-Core-Aufruf mit Endung `Async`, der die Datenbank anspricht, ohne einen Thread zu blockieren, zum Beispiel `ToListAsync` oder `SaveChangesAsync`. Du wartest ihn mit `await` ab.",
+      "related": [
+        "async-method",
+        "cancellation-token"
+      ],
+      "lesson": "m16-l10",
+      "source": {
+        "title": "Asynchronous Programming",
+        "url": "https://learn.microsoft.com/ef/core/miscellaneous/async"
+      }
+    },
+    {
+      "id": "dbcontext-factory",
+      "term": "DbContext Factory",
+      "german": "DbContext-Fabrik",
+      "category": "platform",
+      "definition": "`IDbContextFactory<T>` erzeugt bei jedem Aufruf einen neuen `DbContext`. Du gibst ihn selbst frei. Sie passt, wenn ein Dienst kein Scope pro Arbeitseinheit hat.",
+      "related": [
+        "dbcontext",
+        "scope"
+      ],
+      "lesson": "m16-l10",
+      "source": {
+        "title": "DbContext Lifetime, Configuration, and Initialization",
+        "url": "https://learn.microsoft.com/ef/core/dbcontext-configuration/"
+      }
+    },
+    {
       "id": "parameterized-query",
       "term": "Parameterized Query",
       "german": "parametrisierte Abfrage",

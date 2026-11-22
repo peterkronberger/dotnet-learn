@@ -1132,6 +1132,218 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt kommen Werte von außen in eine Abfrage? Wie stellst du sicher, dass sie als Parameter gesendet werden?",
       "modelAnswer": "Zum Beispiel ein Suchfeld, ein Parameter der Befehlszeile oder ein Wert aus der Konfiguration, den ich in einer Abfrage nach einem Benutzernamen verwende. Ich nehme LINQ oder `FromSql` mit Interpolation und prüfe mit `ToQueryString()`, dass im SQL-Text nur ein Platzhalter steht und der Wert in der Parameterzeile."
+    },
+    {
+      "id": "m16-l10-q1",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Warum schreibst du in einer `async`-Methode `await db.Incidents.ToListAsync()` statt `db.Incidents.ToList()`?",
+      "options": [
+        {
+          "text": "Der Datenbankaufruf ist Ein-/Ausgabe. Mit `ToListAsync` blockiert der Thread nicht, während die Datenbank arbeitet.",
+          "correct": true,
+          "feedback": "So bleibt der Thread für andere Arbeit frei, zum Beispiel für andere Anfragen."
+        },
+        {
+          "text": "`ToListAsync` ist schneller, weil die Datenbank die Abfrage dann schneller ausführt.",
+          "feedback": "Die Datenbank arbeitet gleich schnell. Nur der wartende Thread wird frei."
+        },
+        {
+          "text": "`ToListAsync` führt die Abfrage parallel zu den nächsten Zeilen des Programms aus, ohne `await`.",
+          "feedback": "Ohne `await` läuft die nächste Zeile zu früh. Auf demselben Context ist das sogar ein Fehler."
+        },
+        {
+          "text": "Nur `ToListAsync` kann die Abfrage in SQL umwandeln.",
+          "feedback": "Beide Methoden führen dieselbe Abfrage aus. Die Übersetzung in SQL ist gleich."
+        }
+      ],
+      "explanation": "Datenbankaufrufe warten auf eine andere Stelle. Die `Async`-Varianten geben den Thread währenddessen frei. Du wartest sie mit `await` ab."
+    },
+    {
+      "id": "m16-l10-q2",
+      "lesson": "m16-l10",
+      "type": "multi",
+      "question": "Welche Aufrufe führen die Abfrage aus und haben deshalb eine `Async`-Version?",
+      "options": [
+        {
+          "text": "`ToListAsync`",
+          "correct": true,
+          "feedback": "Es holt alle Zeilen aus der Datenbank."
+        },
+        {
+          "text": "`FirstOrDefaultAsync`",
+          "correct": true,
+          "feedback": "Es führt die Abfrage aus und liefert die erste Zeile oder `null`."
+        },
+        {
+          "text": "`CountAsync`",
+          "correct": true,
+          "feedback": "Es führt eine Zählabfrage aus."
+        },
+        {
+          "text": "`Where` und `OrderBy`",
+          "feedback": "Sie bauen nur die Abfrage auf, es gibt keine Datenbankarbeit. Darum gibt es kein `WhereAsync`."
+        }
+      ],
+      "explanation": "Nur Operatoren, die die Abfrage ausführen, sind Ein-/Ausgabe und haben eine `Async`-Version. `Where`, `Select` und `OrderBy` ergänzen nur den Ausdrucksbaum."
+    },
+    {
+      "id": "m16-l10-q3",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Du rufst `await db.SaveChangesAsync(stoppingToken)` auf, und der Token wird abgebrochen, bevor der Aufruf beginnt. Was passiert?",
+      "options": [
+        {
+          "text": "Der Aufruf bricht mit einer `OperationCanceledException` ab. Ob eine schon laufende Anweisung sofort stoppt, hängt vom Datenbankanbieter ab.",
+          "correct": true,
+          "feedback": "EF Core reicht den Token an den Anbieter weiter."
+        },
+        {
+          "text": "Nichts: der Token wird von `SaveChangesAsync` ignoriert.",
+          "feedback": "Der Token wird ausgewertet. Ein schon abgebrochener Token bricht den Aufruf ab."
+        },
+        {
+          "text": "Die Änderungen werden gespeichert und danach wird der Token geprüft.",
+          "feedback": "Der abgebrochene Aufruf löst eine Ausnahme aus, statt weiterzumachen."
+        },
+        {
+          "text": "Der `DbContext` wird automatisch freigegeben.",
+          "feedback": "Freigeben musst du den Context über `using` oder den Scope."
+        }
+      ],
+      "explanation": "Der `CancellationToken` ist der Weg, laufende Arbeit zu beenden, zum Beispiel beim Stoppen des Hosts. Der Abbruch zeigt sich als `OperationCanceledException`."
+    },
+    {
+      "id": "m16-l10-q4",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein Kollege registriert `SecLogDbContext` als Singleton, „weil das Erzeugen teuer ist“. Was stimmt?",
+      "options": [
+        {
+          "text": "Ein `DbContext` ist für eine kurze Arbeitseinheit gedacht und nicht thread-sicher. `AddDbContext` registriert ihn deshalb als Scoped-Service.",
+          "correct": true,
+          "feedback": "Ein Scope pro Arbeitseinheit gibt jedem Durchlauf einen eigenen Context."
+        },
+        {
+          "text": "Das ist richtig: Ein Singleton spart die Erzeugung, und der Context lebt so lange wie die Anwendung.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein langlebiger Context sammelt verfolgte Objekte an und wird von mehreren Threads genutzt. Beides ist fehleranfällig."
+        },
+        {
+          "text": "Das geht, wenn man vor jeder Abfrage `Dispose()` aufruft.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein freigegebener Context ist nicht mehr nutzbar."
+        },
+        {
+          "text": "Das ist egal: Der Lebenszyklus ändert nur die Geschwindigkeit.",
+          "feedback": "Er ändert die Korrektheit: verfolgte Objekte und Nebenläufigkeit."
+        }
+      ],
+      "explanation": "Ein Context ist billig zu erzeugen und trägt Zustand, nämlich die verfolgten Objekte. Er gehört in eine kurze Arbeitseinheit. `AddDbContext` registriert ihn als Scoped-Service."
+    },
+    {
+      "id": "m16-l10-q5",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "`await Task.WhenAll(db.Incidents.CountAsync(), db.Incidents.AnyAsync());` läuft auf einem einzigen Context. Was ist zu erwarten?",
+      "options": [
+        {
+          "text": "Ein Fehler: EF Core unterstützt nicht mehrere gleichzeitige Operationen auf demselben Context. Du wartest nacheinander oder nimmst je einen Context.",
+          "correct": true,
+          "feedback": "Typisch ist eine `InvalidOperationException` („A second operation started on this context …“)."
+        },
+        {
+          "text": "Beide Abfragen laufen parallel und sind so doppelt so schnell.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "Ein Context erlaubt nur eine Operation zur Zeit."
+        },
+        {
+          "text": "EF Core stellt die zweite Abfrage in eine Warteschlange und führt sie danach aus.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "EF Core serialisiert nicht. Der Zugriff ist nicht thread-sicher, und ein erkannter Fehler wird zur Ausnahme."
+        },
+        {
+          "text": "Das geht, solange beide Abfragen dasselbe `DbSet` benutzen.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "Es kommt auf den Context an, nicht auf das `DbSet`."
+        }
+      ],
+      "explanation": "Ein `DbContext` ist nicht thread-sicher: Jeder asynchrone Aufruf muss fertig sein, bevor der nächste beginnt. Für parallele Arbeit brauchst du je einen Context, zum Beispiel einen pro Scope oder aus der Fabrik."
+    },
+    {
+      "id": "m16-l10-q6",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein `BackgroundService` (ein Singleton) soll Daten aus der Datenbank lesen. Wie kommt er an einen `SecLogDbContext`, ohne die Prüfung der Lebensdauern zu verletzen?",
+      "options": [
+        {
+          "text": "Er erzeugt mit `CreateAsyncScope()` einen eigenen Scope pro Durchlauf und holt den Context daraus, oder er benutzt `IDbContextFactory<T>`.",
+          "correct": true,
+          "feedback": "So hat jede Arbeitseinheit einen eigenen, kurzlebigen Context."
+        },
+        {
+          "text": "Er verlangt den Context im Konstruktor.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein Singleton mit Scoped-Abhängigkeit ist eine Captive Dependency. Mit `ValidateScopes` wirft der Container eine Ausnahme."
+        },
+        {
+          "text": "Er registriert den Context als Singleton.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Dann lebt ein Context für immer und wird von mehreren Aufrufen geteilt."
+        },
+        {
+          "text": "Er legt eine statische Variable mit einem Context an.",
+          "feedback": "Das ist ein Singleton ohne Container, mit denselben Problemen."
+        }
+      ],
+      "explanation": "Ein langlebiger Dienst darf keinen Scoped-Service halten (Captive Dependency). Er erzeugt für jede Arbeitseinheit einen Scope oder lässt sich eine Fabrik geben."
+    },
+    {
+      "id": "m16-l10-q7",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein Dienst erzeugt mit `factory.CreateDbContext()` einen Context aus `IDbContextFactory<SecLogDbContext>`. Wer gibt diesen Context frei?",
+      "options": [
+        {
+          "text": "Der Dienst selbst, zum Beispiel mit `using` oder `await using`.",
+          "correct": true,
+          "feedback": "Der Container verwaltet Contexts aus der Fabrik nicht."
+        },
+        {
+          "text": "Der Container, wenn der Host stoppt.",
+          "feedback": "Contexts aus der Fabrik gehören nicht zum Container."
+        },
+        {
+          "text": "Niemand: Contexts brauchen keine Freigabe.",
+          "feedback": "Ein Context hält Ressourcen und Ereignis-Verknüpfungen. Er muss freigegeben werden."
+        },
+        {
+          "text": "Die Fabrik, sobald sie den nächsten Context erzeugt.",
+          "feedback": "Die Fabrik merkt sich die erzeugten Contexts nicht."
+        }
+      ],
+      "explanation": "Die Fabrik erzeugt, der Aufrufer gibt frei. Darum steht der Context in einem `using`-Block um genau eine Arbeitseinheit."
+    },
+    {
+      "id": "m16-l10-q8",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum zwei gleichzeitige Abfragen auf demselben `DbContext` scheitern und wie du parallele Arbeit trotzdem richtig aufbaust.",
+      "modelAnswer": "Ein `DbContext` ist nicht thread-sicher. Er führt Buch über verfolgte Objekte und den Zustand der Verbindung. Wenn eine zweite Operation beginnt, bevor die erste fertig ist, erkennt EF Core das oft und wirft eine `InvalidOperationException`. Unerkannt kann es den Zustand zerstören.\n\nIch warte jede Operation mit `await` ab, bevor die nächste beginnt. Für parallele Arbeit nehme ich je Operation einen eigenen Context, zum Beispiel pro Scope oder aus einer `IDbContextFactory<T>`."
+    },
+    {
+      "id": "m16-l10-q9",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `AddDbContext` den Context als Scoped-Service registriert und wie ein Hintergrunddienst einen Context bekommt.",
+      "modelAnswer": "Ein Context ist für eine Arbeitseinheit gedacht und soll danach freigegeben werden. Ein Scope ist im Container genau so eine Einheit, deshalb ist Scoped die passende Lebensdauer. Ein Hintergrunddienst ist ein Singleton und darf keinen Scoped-Service halten. Er erzeugt deshalb für jeden Durchlauf mit `CreateAsyncScope()` einen Scope und holt den Context daraus, oder er nutzt eine `IDbContextFactory<T>` und gibt den Context selbst frei."
+    },
+    {
+      "id": "m16-l10-q10",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt rufst du die Datenbank asynchron auf, und wo brauchst du für eine Arbeitseinheit einen eigenen Scope? Nenne je ein Beispiel.",
+      "modelAnswer": "Eine Anwendung, die viele Anfragen gleichzeitig bedient, ruft die Datenbank asynchron auf, damit wartende Threads frei bleiben. Ein Dienst, der regelmäßig im Hintergrund Daten verarbeitet, erzeugt für jeden Durchlauf einen Scope, damit jeder Durchlauf einen frischen Context hat."
     }
   ]
 }
