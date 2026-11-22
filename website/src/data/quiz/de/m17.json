@@ -1420,6 +1420,322 @@
       "type": "explain",
       "question": "Transfer: Das OpenAPI-Dokument von SecLog listet jeden Pfad der API. Warum sollte man sich überlegen, in welchen Umgebungen es erreichbar ist?",
       "modelAnswer": "Das Dokument zeigt alle Pfade, Parameter und Antworten und damit die ganze Angriffsfläche der API. In einer öffentlichen Umgebung erleichtert das jemandem, der die API ausspäht. Für Entwicklung und Test ist es nützlich, in Produktion braucht man es oft nicht. Darum entscheidet man bewusst, wo `MapOpenApi` aktiv ist."
+    },
+    {
+      "id": "m17-l11-q1",
+      "lesson": "m17-l11",
+      "type": "single",
+      "question": "Welche Frage beantwortet die Authentifizierung, und welche die Autorisierung?",
+      "options": [
+        {
+          "text": "Authentifizierung: Wer ruft auf? Autorisierung: Darf dieser Aufrufer das tun?",
+          "correct": true
+        },
+        {
+          "text": "Authentifizierung: Darf der Aufrufer das tun? Autorisierung: Wer ruft auf?",
+          "feedback": "Die Reihenfolge ist vertauscht. Erst muss feststehen, wer aufruft. Danach entscheidet die Autorisierung, was diese Identität darf."
+        },
+        {
+          "text": "Beide prüfen dasselbe. Die Namen unterscheiden nur zwei Schreibweisen.",
+          "misconception": "m17-l11-authentication-equals-authorization",
+          "feedback": "Es sind zwei getrennte Schritte mit zwei Fragen. Eine Identität allein sagt noch nichts über Rechte."
+        },
+        {
+          "text": "Authentifizierung prüft die Eingaben eines Clients, Autorisierung prüft den Body.",
+          "feedback": "Das Prüfen von Eingaben ist die Validierung (Lektion 5). Authentifizierung und Autorisierung betreffen den Aufrufer, nicht die Daten."
+        }
+      ],
+      "explanation": "Authentifizierung stellt fest, wer aufruft. Autorisierung entscheidet, ob diese Identität den Endpunkt aufrufen darf. Die Autorisierung baut auf dem Ergebnis der Authentifizierung auf."
+    },
+    {
+      "id": "m17-l11-q2",
+      "lesson": "m17-l11",
+      "type": "single",
+      "question": "Ein Benutzer hat ein gültiges Token und wird erfolgreich angemeldet. Der Endpunkt `PUT /incidents/1/status` verlangt die Policy `ChangeIncidentStatus` mit der Rolle `responder`. Der Benutzer hat nur die Rolle `viewer`. Was antwortet die API?",
+      "options": [
+        {
+          "text": "`403 Forbidden`: Der Benutzer ist bekannt, hat aber nicht das Recht.",
+          "correct": true
+        },
+        {
+          "text": "`204 No Content`: Wer angemeldet ist, darf alle Endpunkte aufrufen.",
+          "misconception": "m17-l11-authentication-equals-authorization",
+          "feedback": "Die Anmeldung beweist nur die Identität. Ob die Identität den Endpunkt aufrufen darf, entscheidet die Policy."
+        },
+        {
+          "text": "`401 Unauthorized`: Das Token ist ungültig.",
+          "misconception": "m17-l11-401-and-403-same",
+          "feedback": "Das Token ist gültig, der Benutzer ist also bekannt. `401` gilt, wenn die Identität fehlt oder nicht stimmt."
+        },
+        {
+          "text": "`404 Not Found`: Die Policy versteckt den Endpunkt.",
+          "feedback": "Eine fehlgeschlagene Policy lässt den Endpunkt nicht verschwinden. Die Antwort ist `403`."
+        }
+      ],
+      "explanation": "Die Authentifizierung ist gelungen, die Autorisierung nicht. Das ergibt `403`. Ohne Anmeldung wäre es `401`."
+    },
+    {
+      "id": "m17-l11-q3",
+      "lesson": "m17-l11",
+      "type": "match",
+      "question": "Ordne jeder Situation den Statuscode zu.",
+      "pairs": [
+        { "left": "Die Anfrage enthält kein Token.", "right": "`401`" },
+        { "left": "Das Token ist gültig, aber die Rolle fehlt.", "right": "`403`" },
+        { "left": "Das Token ist gültig, und die Rolle passt.", "right": "`204`" }
+      ],
+      "wrongMatches": [
+        {
+          "left": "Das Token ist gültig, aber die Rolle fehlt.",
+          "right": "`401`",
+          "misconception": "m17-l11-401-and-403-same",
+          "feedback": "`401` heißt: Die Identität fehlt oder ist nicht gültig. Hier ist die Identität bekannt, es fehlt nur das Recht."
+        }
+      ],
+      "explanation": "`401` bedeutet: nicht authentifiziert. `403` bedeutet: authentifiziert, aber nicht erlaubt. Passt beides, antwortet der Endpunkt normal, hier mit `204`."
+    },
+    {
+      "id": "m17-l11-q4",
+      "lesson": "m17-l11",
+      "type": "single",
+      "question": "SecLog nutzt Bearer-Token. Was tut die API mit einem Token?",
+      "options": [
+        {
+          "text": "Sie prüft es: Signatur, Aussteller und Zielgruppe. Das Token stellt ein Identitätsanbieter aus.",
+          "correct": true
+        },
+        {
+          "text": "Sie stellt das Token aus, wenn jemand Benutzername und Passwort schickt.",
+          "feedback": "Passwörter und Tokens gehören dem Identitätsanbieter. Die API prüft nur, was sie bekommt."
+        },
+        {
+          "text": "Sie speichert das Token in der Datenbank und vergleicht es bei jeder Anfrage.",
+          "feedback": "Ein signiertes Token trägt seine Angaben selbst. Die API prüft die Signatur, ohne das Token vorher gespeichert zu haben."
+        },
+        {
+          "text": "Sie liest es nur und vertraut jedem Inhalt.",
+          "feedback": "Ohne Prüfung der Signatur könnte jeder ein Token mit beliebigen Rollen erfinden."
+        }
+      ],
+      "explanation": "Die API validiert das Token. Aussteller, Zielgruppe und Signaturschlüssel kommen aus der Konfiguration. Wer Tokens und Passwörter verwaltet, ist der Identitätsanbieter."
+    },
+    {
+      "id": "m17-l11-q5",
+      "lesson": "m17-l11",
+      "type": "single",
+      "question": "SecLog schützt die Gruppe `/incidents` mit `RequireAuthorization()`. Später legt jemand den Endpoint `GET /notes` an, ohne eine Autorisierung anzugeben. Eine Fallback-Policy gibt es nicht. Wer darf `/notes` aufrufen?",
+      "options": [
+        {
+          "text": "Jeder, auch ohne Anmeldung.",
+          "correct": true
+        },
+        {
+          "text": "Nur angemeldete Benutzer, weil die App Authentifizierung eingerichtet hat.",
+          "feedback": "Die Einrichtung der Authentifizierung schützt keinen Endpoint. Nur Endpoints mit Autorisierung verlangen eine Anmeldung."
+        },
+        {
+          "text": "Nur Benutzer mit der Rolle `responder`.",
+          "feedback": "Die Policy hängt nur an dem Endpoint, den sie schützt. `/notes` hat keine."
+        },
+        {
+          "text": "Niemand, denn ohne Angabe verweigert ASP.NET Core den Zugriff.",
+          "feedback": "Ohne Angabe und ohne Fallback-Policy ist der Endpoint offen. Wer verweigern will, setzt eine Fallback-Policy."
+        }
+      ],
+      "explanation": "Ein Endpoint ohne Autorisierungsangabe ist offen, solange keine Fallback-Policy gesetzt ist. Eine Fallback-Policy mit `RequireAuthenticatedUser()` macht Verweigern zum Standard. Öffentliche Endpoints markierst du dann mit `AllowAnonymous()`."
+    },
+    {
+      "id": "m17-l11-q6",
+      "lesson": "m17-l11",
+      "type": "single",
+      "question": "Ein Integrationstest soll einen Benutzer mit der Rolle `responder` simulieren. Was ist der übliche Weg?",
+      "options": [
+        {
+          "text": "Der Test ersetzt das Schema in `ConfigureTestServices` durch einen Test-Handler, der Benutzer und Rolle aus der Anfrage setzt.",
+          "correct": true
+        },
+        {
+          "text": "Der Test holt bei einem echten Identitätsanbieter ein Token und sendet es mit.",
+          "feedback": "Das macht den Test langsam und abhängig von einem fremden System. Ein Test-Handler ersetzt den Anbieter."
+        },
+        {
+          "text": "Der Test schaltet die Autorisierung der App ganz ab.",
+          "feedback": "Dann prüft der Test die Regeln nicht mehr. Der Handler ersetzt nur die Authentifizierung, die Policy läuft wie in der echten App."
+        },
+        {
+          "text": "Der Test setzt `HttpContext.User` im Handler des Endpoints von Hand.",
+          "feedback": "Das ändert den Code, der getestet werden soll, und umgeht die Middleware."
+        }
+      ],
+      "explanation": "Der Test-Handler liefert die Identität, die Policy prüft sie wie im Betrieb. So testest du 401, 403 und Erfolg mit denselben Regeln wie in Produktion."
+    },
+    {
+      "id": "m17-l11-q7",
+      "lesson": "m17-l11",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen Authentifizierung und Autorisierung und zwischen den Statuscodes `401` und `403`.",
+      "modelAnswer": "Authentifizierung stellt fest, wer aufruft, zum Beispiel durch ein geprüftes Bearer-Token. Autorisierung entscheidet, ob diese Identität den Endpunkt aufrufen darf, zum Beispiel über eine Policy mit einer Rolle. Fehlt die Identität oder ist sie ungültig, antwortet die API mit `401`. Ist die Identität bekannt, aber das Recht fehlt, antwortet sie mit `403`."
+    },
+    {
+      "id": "m17-l11-q8",
+      "lesson": "m17-l11",
+      "type": "explain",
+      "question": "Transfer: SecLog bekommt den Endpoint `DELETE /incidents/{id}`, den nur die Rolle `admin` aufrufen soll. Was legst du an, und welche Tests schreibst du?",
+      "modelAnswer": "Ich lege eine Policy mit `RequireRole(\"admin\")` an und hänge sie mit `RequireAuthorization` an den Endpoint. Die Gruppe verlangt weiterhin eine Anmeldung. Die Tests nutzen den Test-Handler: ohne Benutzer `401`, mit Benutzer ohne Rolle `403`, mit der Rolle `admin` `204`. Ein vierter Test prüft, dass der Vorfall danach weg ist."
+    },
+    {
+      "id": "m17-l12-q1",
+      "lesson": "m17-l12",
+      "type": "single",
+      "question": "Eine ASP.NET Core-App soll Anfragen annehmen. Was braucht sie dafür mindestens?",
+      "options": [
+        {
+          "text": "Nichts außer sich selbst: Der Webserver Kestrel ist eingebaut, ein Reverse Proxy ist optional.",
+          "correct": true
+        },
+        {
+          "text": "IIS oder Nginx, denn ohne einen davon nimmt die App keine Anfragen an.",
+          "misconception": "m17-l12-needs-iis-or-nginx",
+          "feedback": "Kestrel nimmt Anfragen selbst an. Ein Reverse Proxy kann davor stehen, er ist aber keine Pflicht."
+        },
+        {
+          "text": "Das Visual Studio, in dem sie gestartet wird.",
+          "feedback": "Die App ist ein Konsolenprogramm. Sie läuft mit `dotnet <App>.dll` auf jedem Rechner mit der Laufzeit."
+        },
+        {
+          "text": "Einen Container, weil Webserver nur dort laufen.",
+          "feedback": "Ein Container ist eine Möglichkeit, die App zu betreiben, aber keine Voraussetzung."
+        }
+      ],
+      "explanation": "Eine ASP.NET Core-App ist ein Konsolenprogramm, das den Webserver Kestrel hostet. Ein Reverse Proxy davor ist eine Möglichkeit, aber keine Pflicht."
+    },
+    {
+      "id": "m17-l12-q2",
+      "lesson": "m17-l12",
+      "type": "single",
+      "question": "Auf dem Server ist weder `ASPNETCORE_ENVIRONMENT` noch `DOTNET_ENVIRONMENT` gesetzt. In welcher Umgebung läuft die App?",
+      "options": [
+        {
+          "text": "In `Production`.",
+          "correct": true
+        },
+        {
+          "text": "In `Development`, denn das ist der Standard beim Entwickeln.",
+          "misconception": "m17-l12-development-settings-in-production",
+          "feedback": "Der Standard ist `Production`. Die Entwicklungsumgebung muss ausdrücklich gesetzt werden, zum Beispiel durch das Startprofil auf dem Rechner des Entwicklers."
+        },
+        {
+          "text": "In `Staging`, als Mittelweg.",
+          "feedback": "`Staging` ist ein üblicher Name, aber kein Standard."
+        },
+        {
+          "text": "Die App startet nicht, weil der Name fehlt.",
+          "feedback": "Ein fehlender Name ist kein Fehler. Die App läuft dann in `Production`."
+        }
+      ],
+      "explanation": "Ohne gesetzte Variable ist die Umgebung `Production`. Die Funktionen der Entwicklung (Entwickler-Fehlerseite, OpenAPI-Dokument) bleiben aus, bis jemand `Development` setzt."
+    },
+    {
+      "id": "m17-l12-q3",
+      "lesson": "m17-l12",
+      "type": "single",
+      "question": "Ein Reverse Proxy nimmt HTTPS-Anfragen an und leitet sie per HTTP an die App weiter. Ohne weitere Einstellung: Was sieht die App?",
+      "options": [
+        {
+          "text": "Das Schema `http` und die Adresse des Proxys als Absender.",
+          "correct": true
+        },
+        {
+          "text": "Das Schema `https` und die Adresse des Clients, denn der Proxy reicht beides durch.",
+          "feedback": "Der Proxy schreibt die Angaben nur in Header. Erst die Forwarded-Headers-Middleware setzt sie in `Request.Scheme` und `RemoteIpAddress` ein."
+        },
+        {
+          "text": "Gar keine Anfrage, weil HTTP und HTTPS sich nicht mischen lassen.",
+          "feedback": "Die Verbindung zwischen Proxy und App ist ein normales HTTP. Die App nimmt die Anfrage an."
+        },
+        {
+          "text": "Das Schema `https`, aber die Adresse des Proxys.",
+          "feedback": "Ohne Auswertung der Header bleibt auch das Schema `http`."
+        }
+      ],
+      "explanation": "Die App sieht nur die Verbindung zum Proxy. Die Angaben über den Client stehen in `X-Forwarded-For` und `X-Forwarded-Proto`. `UseForwardedHeaders` setzt sie in die Anfrage ein."
+    },
+    {
+      "id": "m17-l12-q4",
+      "lesson": "m17-l12",
+      "type": "single",
+      "question": "`UseForwardedHeaders` ist eingeschaltet, und `KnownProxies` enthält nur den Proxy `198.51.100.1`. Eine Anfrage kommt von `192.0.2.99` und trägt `X-Forwarded-For: 203.0.113.7`. Welche Client-Adresse sieht die App?",
+      "options": [
+        {
+          "text": "`192.0.2.99`: Die Header kommen von keinem bekannten Proxy und werden ignoriert.",
+          "correct": true
+        },
+        {
+          "text": "`203.0.113.7`: Der Header gilt immer, sobald die Middleware läuft.",
+          "feedback": "Dann könnte jeder Client seine Adresse fälschen. Die Middleware wertet die Header nur von bekannten Proxys aus."
+        },
+        {
+          "text": "`198.51.100.1`: Die App setzt den bekannten Proxy ein.",
+          "feedback": "Die App ersetzt die Adresse nicht durch einen Eintrag der Liste. Sie bleibt bei der echten Verbindungsadresse."
+        },
+        {
+          "text": "Keine: Die Anfrage wird mit `403` abgelehnt.",
+          "feedback": "Die Anfrage wird normal bearbeitet. Nur die Header werden nicht ausgewertet."
+        }
+      ],
+      "explanation": "Die Middleware vertraut den Headern nur, wenn die Verbindung von einem bekannten Proxy kommt. Sonst bleibt die Adresse der Verbindung."
+    },
+    {
+      "id": "m17-l12-q5",
+      "lesson": "m17-l12",
+      "type": "match",
+      "question": "Ordne jeder Aufgabe zu, wer sie übernimmt.",
+      "pairs": [
+        { "left": "Anfragen annehmen und an die Endpoints weiterreichen", "right": "Kestrel (in der App)" },
+        { "left": "Die App beim Systemstart starten und nach einem Absturz neu starten", "right": "ein Prozessmanager" },
+        { "left": "TLS beenden und Anfragen an die App weiterleiten", "right": "ein Reverse Proxy" },
+        { "left": "Die Dateien der App für den Betrieb in einen Ordner schreiben", "right": "`dotnet publish`" }
+      ],
+      "explanation": "Kestrel gehört zur App. Prozessmanager, Reverse Proxy und die Veröffentlichung sind getrennte Aufgaben um die App herum."
+    },
+    {
+      "id": "m17-l12-q6",
+      "lesson": "m17-l12",
+      "type": "single",
+      "question": "Wohin gehört `app.UseForwardedHeaders()` in der Pipeline, und warum?",
+      "options": [
+        {
+          "text": "An den Anfang, denn spätere Middleware soll schon die korrigierte Adresse und das korrigierte Schema sehen.",
+          "correct": true
+        },
+        {
+          "text": "Ans Ende, direkt vor die Endpoints, weil dort die Anfrage fertig ist.",
+          "feedback": "Dann hätte alle Middleware davor noch die Werte des Proxys gesehen, zum Beispiel für Umleitungen oder Logs."
+        },
+        {
+          "text": "Egal, denn die Reihenfolge ändert bei Middleware nichts.",
+          "feedback": "Die Reihenfolge entscheidet, was jede Middleware sieht (Lektion 8)."
+        },
+        {
+          "text": "Hinter `UseAuthorization`, weil erst dann der Benutzer bekannt ist.",
+          "feedback": "Authentifizierung und Autorisierung können die Client-Adresse oder das Schema brauchen. Die Header müssen vorher ausgewertet sein."
+        }
+      ],
+      "explanation": "Die Middleware ändert Werte der Anfrage. Alles, was danach läuft, sieht die korrigierten Werte. Darum steht sie früh."
+    },
+    {
+      "id": "m17-l12-q7",
+      "lesson": "m17-l12",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Reverse Proxy für eine ASP.NET Core-App tut und warum die App dann `UseForwardedHeaders` braucht.",
+      "modelAnswer": "Ein Reverse Proxy nimmt die Anfragen aus dem Netz an, beendet oft TLS und leitet sie an Kestrel weiter. Die App sieht dann nur die Verbindung zum Proxy: Schema `http` und die Adresse des Proxys. Der Proxy schreibt die ursprünglichen Angaben in `X-Forwarded-Proto` und `X-Forwarded-For`. `UseForwardedHeaders` liest sie und setzt sie in `Request.Scheme` und `RemoteIpAddress` ein, aber nur, wenn die Anfrage von einem bekannten Proxy kommt."
+    },
+    {
+      "id": "m17-l12-q8",
+      "lesson": "m17-l12",
+      "type": "explain",
+      "question": "Transfer: Welche Funktionen von SecLog sollen nur in der Entwicklungsumgebung laufen, und welche Gefahr besteht, wenn sie in Produktion aktiv sind?",
+      "modelAnswer": "Das OpenAPI-Dokument und die Entwickler-Fehlerseite gehören in die Entwicklung. Das Dokument zeigt jeden Pfad der API, die Fehlerseite zeigt die Aufrufliste, Pfade und Einstellungen. In Produktion helfen beide jemandem, der die API ausspäht. Mit `app.Environment.IsDevelopment()` schaltest du sie ab, und ein Test mit der Umgebung `Production` prüft, dass das Dokument dort `404` liefert."
     }
   ]
 }
