@@ -1,0 +1,198 @@
+---
+title: Fehler als Problem Details
+sidebar_position: 7
+description: Wie eine API Fehler in einem Standardformat meldet, wie AddProblemDetails, UseExceptionHandler und UseStatusCodePages jeder Fehlerantwort dasselbe Format geben und warum kein Stacktrace in die Antwort gehört.
+lesson_id: m17-l07
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import problem from '!!raw-loader!@site/examples/_ci/m17-l07-problem-details/Program.cs';
+import problemOutput from '!!raw-loader!@site/examples/_ci/m17-l07-problem-details/expected.out.txt';
+import handler from '!!raw-loader!@site/examples/_ci/m17-l07-exception-handler/Program.cs';
+import handlerOutput from '!!raw-loader!@site/examples/_ci/m17-l07-exception-handler/expected.out.txt';
+import gapHandler from '!!raw-loader!@site/examples/m17/l07/gap-exception-handler.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l07/src/SecLog.Api/Program.cs';
+import problemTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l07/tests/SecLog.Api.Tests/ProblemDetailsTests.cs';
+
+# Fehler als Problem Details
+
+:::note[Lernziele]
+- Du erklärst die Felder einer Problem-Details-Antwort: `type`, `title`, `status`, `detail` und `errors`.
+- Du richtest mit `AddProblemDetails`, `UseExceptionHandler` und `UseStatusCodePages` eine zentrale Fehlerbehandlung ein.
+- Du begründest, warum eine Fehlerantwort keinen Stacktrace und keine Exception-Meldung enthalten darf.
+:::
+
+## Rückblick
+
+<Quiz id="m07-l03-q6" />
+
+<Quiz id="m17-l05-q2" />
+
+<Quiz id="m17-l06-q1" />
+
+## Ein Format für alle Fehler
+
+Bisher antwortet die API auf Fehler uneinheitlich. Die Validierung aus Lektion 5 schickt einen Body mit Fehlern, `TypedResults.NotFound()` schickt gar keinen, und eine unbehandelte Exception ergibt `500` ohne brauchbaren Body. Ein Client, der die API aufruft, müsste jede dieser Antworten anders lesen.
+
+Dafür gibt es ein Standardformat: <Term id="problem-details">Problem Details</Term> (RFC 9457). Die Antwort ist JSON mit dem Content-Type `application/problem+json` und diesen Feldern:
+
+| Feld | Bedeutung |
+| --- | --- |
+| `type` | Eine Adresse, die die Art des Problems benennt |
+| `title` | Eine kurze Beschreibung der Art des Problems |
+| `status` | Der Statuscode der Antwort |
+| `detail` | Eine Erklärung zu diesem einen Fall |
+| `errors` | Erweiterung von ASP.NET Core bei Validierungsfehlern: je Eigenschaft eine Liste von Meldungen |
+
+Außerdem kann eine Antwort weitere Felder haben. ASP.NET Core ergänzt zum Beispiel `traceId`, eine Kennung der Anfrage, die sich bei jeder Anfrage ändert. Die Ausgaben unten lassen sie weg, damit sie bei jedem Lauf gleich sind.
+
+Ein Handler kann ein Problem selbst erzeugen: `TypedResults.Problem(…)` für beliebige Fehler, `TypedResults.ValidationProblem(errors)` für Validierungsfehler mit dem Feld `errors`. Aber nicht jede Fehlerantwort entsteht in einem Handler. Eine unbekannte Route, ein leeres `404` oder eine Exception haben keinen Handler, der sie formatiert. Dafür richtest du die Fehlerbehandlung einmal zentral ein, mit drei Aufrufen:
+
+1. `builder.Services.AddProblemDetails()` registriert den Dienst, der Problem Details schreibt.
+2. `app.UseExceptionHandler()` fügt die <Term id="exception-handler-middleware">Exception-Handler-Middleware</Term> hinzu. Sie fängt eine unbehandelte Exception und schreibt eine `500`-Antwort als Problem Details.
+3. `app.UseStatusCodePages()` ergänzt für Antworten mit einem Statuscode von 400 bis 599 und ohne Body einen Body, hier also Problem Details.
+
+<Forward concepts={['Middleware']} lesson="m17-l08" />
+
+Das Programm unten hat drei Endpoints: `GET /incidents/{id}` mit `TypedResults.NotFound()`, `PUT /incidents/{id}/status` mit `Results.ValidationProblem` und `GET /crash`, das eine Exception wirft. Die Meldung der Exception enthält absichtlich ein Passwort, um zu zeigen, dass sie nicht in der Antwort landet.
+
+:::info[Vorhersage]
+Welchen Statuscode, welchen Content-Type und welchen Body liefert jede der vier Anfragen? Steht das Passwort in einer Antwort? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={problem} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{problemOutput}</CodeBlock>
+
+1. **Leeres `404`:** Der Handler gibt `TypedResults.NotFound()` zurück, ohne Body. `UseStatusCodePages` ergänzt Problem Details mit `status` 404 und `title` „Not Found“. Der Content-Type ist `application/problem+json`.
+2. **Unbekannte Route:** Auch hier gibt es keinen Handler und keinen Body. Die Antwort ist dieselbe.
+3. **Validierungsfehler:** `Results.ValidationProblem(errors)` schreibt `status` 400 und das Feld `errors`: Der Schlüssel `Status` hat eine Liste mit einer Meldung.
+4. **Exception:** `UseExceptionHandler` fängt die `InvalidOperationException` und antwortet mit `500` und Problem Details. Weder die Meldung noch das Passwort stehen in der Antwort, auch kein Stacktrace.
+
+**Was passiert, wenn …** du `AddProblemDetails()` weglässt? `UseExceptionHandler()` ohne Argumente hat dann keinen Fallback und löst beim Start einen Fehler aus ([Handle errors in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling)).
+
+</details>
+
+<Quiz id="m17-l07-q1" />
+
+<Quiz id="m17-l07-q2" />
+
+<Quiz id="m17-l07-q3" />
+
+<Quiz id="m17-l07-q4" />
+
+## Eigene Zuordnung mit IExceptionHandler
+
+<Since dotnet="8" /> Manche Exceptions bedeuten einen Fehler des Clients, nicht des Servers. Wirft ein Handler eine `IncidentNotFoundException`, soll die Antwort `404` sein, nicht `500`. Dafür implementierst du die Schnittstelle `IExceptionHandler` mit der Methode `TryHandleAsync(httpContext, exception, cancellationToken)`:
+
+- Ist der Handler für die Exception zuständig, schreibt er die komplette Antwort (Statuscode und Body) und gibt `true` zurück.
+- Ist er nicht zuständig, gibt er `false` zurück. Dann fragt die Middleware den nächsten Handler.
+
+Du registrierst ihn mit `builder.Services.AddExceptionHandler<T>()`. Mehrere Handler laufen in der Reihenfolge der Registrierung. Registrieren allein reicht nicht: Aufgerufen werden sie von `UseExceptionHandler()`. Gibt keiner `true` zurück, greift die Standardantwort aus Problem Details ([IExceptionHandler](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling#iexceptionhandler)).
+
+Das Beispiel nutzt den Dienst `IProblemDetailsService`, den `AddProblemDetails()` registriert. Er schreibt dasselbe Format wie bei allen anderen Fehlern. Der Handler bekommt ihn über den Konstruktor (Modul 15).
+
+<Forward concepts={['`ValueTask`']} lesson="m13-l02" />
+
+:::info[Vorhersage]
+Was antworten die beiden Anfragen? Welche Antwort kommt vom eigenen Handler, welche von der Standardbehandlung?
+:::
+
+<FoldedCode code={handler} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{handlerOutput}</CodeBlock>
+
+1. **Bekannter Typ:** Der Handler erkennt die `IncidentNotFoundException`, setzt den Status 404 und schreibt Problem Details mit eigenem `title` und `detail`. Das `detail` nennt die Id, die der Client ohnehin gesendet hat, und sonst nichts.
+2. **Anderer Typ:** Der Handler gibt `false` zurück. Es gibt keinen weiteren Handler, also schreibt die Middleware die Standardantwort `500` ohne Meldung.
+
+</details>
+
+<Quiz id="m17-l07-q5" />
+
+<Quiz id="m17-l07-q6" />
+
+## Gap-Beispiel: die zentrale Fehlerbehandlung
+
+Die Lücke `___` fehlt. Setze den Aufruf ein, der eine unbehandelte Exception in eine `500`-Antwort mit Problem Details verwandelt.
+
+<CodeBlock language="csharp" title="gap-exception-handler.snippet.cs">{gapHandler}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `UseExceptionHandler`. Der Dienst aus `AddProblemDetails()` schreibt den Body, die Middleware fängt die Exception.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l06/`) antwortet mit 404, wenn es einen Vorfall nicht gibt, und mit 204 nach einer Statusänderung. Die Fehlerantworten haben aber noch kein einheitliches Format.
+
+**Neue Anforderung:** Alle Fehlerantworten der API haben dasselbe Format (Problem Details) und verraten keine Interna. Dafür kommen in `src/SecLog.Api/Program.cs` drei Aufrufe dazu: `AddProblemDetails()`, `UseExceptionHandler()` und `UseStatusCodePages()`. Neue Tests prüfen drei Fälle: Eine unbekannte Id ergibt `404` mit `application/problem+json`. Ein ungültiger Status ergibt `400` mit einem Eintrag `Status` in `errors`. Und wenn die Datenbank ausfällt, ergibt die Anfrage `500` ohne Pfad und ohne Fehlermeldung der Datenbank im Body. Den dritten Fall erzeugt der Test mit einer Factory, deren Datenbankdatei in einem Ordner liegt, den es nicht gibt. In `SecLog.Api` steht dafür kein Testcode.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/ProblemDetailsTests.cs (neu)">{problemTests}</CodeBlock>
+
+1. **Dienst registrieren:** `AddProblemDetails()` kommt zu den Diensten.
+2. **Exception fangen:** `UseExceptionHandler()` kommt vor die Endpoints, damit es alles fängt, was in ihnen schiefgeht.
+3. **Leere Antworten füllen:** `UseStatusCodePages()` ergänzt den Body für `404`.
+4. **Tests:** Sie prüfen Content-Type und `status` beziehungsweise `errors` und stellen sicher, dass der Body des `500` weder Pfad noch Datenbankmeldung enthält.
+5. **Ergebnis:** In `expected.out.txt` sind die drei Zeilen `ProblemDetailsTests` neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l07/`) meldet jeden Fehler als Problem Details und verrät keine Interna.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l07-error-response-shows-exception" />
+
+**„Eine gute Fehlerantwort enthält die Exception-Meldung und den Stacktrace, damit der Client den Fehler findet.“** Beides verrät Interna wie Pfade, Tabellennamen oder Versionen, und der Client kann damit nichts reparieren. Die Antwort nennt Statuscode und Titel. Meldung und Stacktrace gehören ins Log des Servers.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l07-try-catch-in-every-handler" />
+
+**„Jeder Handler braucht ein eigenes `try`/`catch`, das den Fehler formatiert.“** Dann hat jeder Handler sein eigenes Format, und ein vergessener Handler liefert ein anderes. Eine zentrale Stelle behandelt alle Fälle gleich. `try`/`catch` bleibt sinnvoll, wenn ein Handler eine bestimmte Exception selbst behandeln kann.
+:::
+
+<details>
+<summary>Vertiefung: Developer Exception Page und Umgebungen (optional)</summary>
+
+In der Umgebung `Development` zeigt die Developer Exception Page Stacktrace und Details. Sie ist für Entwickler gedacht und darf nur in `Development` laufen. In Produktion gibt der Server solche Informationen nicht heraus ([Handle errors in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling)). Wie eine App ihre Umgebung erkennt, steht in Lektion `m15-l07`. In Lektion 12 kommt dazu, wie du sie beim Betrieb einstellst.
+
+Seit <Since dotnet="10" /> schreibt die Exception-Handler-Middleware für Exceptions, die ein `IExceptionHandler` behandelt hat, standardmäßig keine Diagnose mehr. Das lässt sich mit `SuppressDiagnosticsCallback` ändern.
+
+</details>
+
+## Zusammenfassung
+
+Problem Details (RFC 9457) ist das Standardformat für Fehlerantworten: `application/problem+json` mit `type`, `title`, `status`, `detail` und bei Validierungsfehlern `errors`. `AddProblemDetails` registriert den Dienst, `UseExceptionHandler` macht aus einer unbehandelten Exception eine `500`-Antwort, und `UseStatusCodePages` füllt leere Fehlerantworten. Mit `IExceptionHandler` ordnest du eine Exception einem Statuscode zu. Die Antwort enthält keine Meldung und keinen Stacktrace, denn beides gehört ins Log.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l07-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l07-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Handle errors in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling)
+- Microsoft Learn: [Handle errors in ASP.NET Core APIs](https://learn.microsoft.com/aspnet/core/fundamentals/error-handling-api)
+- RFC 9457: [Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc9457)

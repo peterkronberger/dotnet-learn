@@ -1,0 +1,187 @@
+---
+title: Die Middleware-Pipeline
+sidebar_position: 8
+description: Wie jede Anfrage durch eine Kette von Middleware läuft, wie app.Use vor und nach next arbeitet, wie eine Middleware die Anfrage beendet und warum die Reihenfolge das Ergebnis ändert.
+lesson_id: m17-l08
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import pipeline from '!!raw-loader!@site/examples/_ci/m17-l08-pipeline/Program.cs';
+import pipelineOutput from '!!raw-loader!@site/examples/_ci/m17-l08-pipeline/expected.out.txt';
+import order from '!!raw-loader!@site/examples/_ci/m17-l08-order/Program.cs';
+import orderOutput from '!!raw-loader!@site/examples/_ci/m17-l08-order/expected.out.txt';
+import gapMiddleware from '!!raw-loader!@site/examples/m17/l08/gap-middleware.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l08/src/SecLog.Api/Program.cs';
+import headerTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l08/tests/SecLog.Api.Tests/SecurityHeaderTests.cs';
+
+# Die Middleware-Pipeline
+
+:::note[Lernziele]
+- Du verfolgst den Weg einer Anfrage durch die Pipeline und sagst die Ausgabe voraus.
+- Du schreibst mit `app.Use` eine eigene Middleware, die vor und nach `next` arbeitet.
+- Du erklärst, warum die Fehlerbehandlung vorne in der Pipeline stehen muss.
+:::
+
+## Rückblick
+
+<Quiz id="m10-l02-q1" />
+
+<Quiz id="m13-l01-q1" />
+
+<Quiz id="m17-l07-q3" />
+
+## Eine Kette von Komponenten
+
+In Lektion 7 hast du `UseExceptionHandler()` und `UseStatusCodePages()` aufgerufen, ohne zu fragen, wo sie in der App stehen. Beide sind <Term id="middleware">Middleware</Term>: eine Komponente, die eine Anfrage bearbeitet, bevor der Endpoint sie bekommt, und die Antwort, nachdem er sie erzeugt hat. Alle Komponenten zusammen bilden die <Term id="request-pipeline">Pipeline</Term> der App.
+
+Jede Anfrage durchläuft die Pipeline in der Reihenfolge, in der du die Komponenten in `Program.cs` hinzufügst. Die Antwort läuft in umgekehrter Reihenfolge zurück ([ASP.NET Core Middleware](https://learn.microsoft.com/aspnet/core/fundamentals/middleware/)). Der Endpoint, der den Handler aufruft, ist die innerste Station.
+
+Eine eigene Middleware schreibst du mit `app.Use`. Du gibst ihr ein Lambda (Modul 10) mit zwei Parametern:
+
+- `context` ist die <Term id="http-context">`HttpContext`</Term> der Anfrage. Sie enthält `Request` und `Response` mit `Response.StatusCode` und `Response.Headers`.
+- `next` ist ein <Term id="request-delegate">Request Delegate</Term>: ein Delegate (Modul 10), der den Rest der Pipeline ausführt.
+
+Das Lambda ist `async`, und `await next(context)` (Modul 13) ruft die nächste Komponente auf. Der Code vor dem Aufruf läuft auf dem Weg hinein, der Code dahinter auf dem Weg zurück. Eine Middleware kann auch `next` auslassen. Dann ist die Anfrage hier zu Ende: ein <Term id="short-circuit">Short Circuit</Term>. Die Komponenten dahinter laufen für diese Anfrage nicht.
+
+Das Programm hat zwei Middleware, A und B, und einen Endpoint. Jeder Schritt schreibt eine Zeile in eine Liste. B beendet Anfragen an `/blocked` mit `403`. Die Hilfsmethode am Ende druckt nach jeder Anfrage den Statuscode und die Liste.
+
+:::info[Vorhersage]
+Welche Zeilen stehen für jede der drei Anfragen in der Liste, und in welcher Reihenfolge? Welchen Statuscode bekommt `/nothing`, obwohl kein Endpoint passt? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={pipeline} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{pipelineOutput}</CodeBlock>
+
+1. **Bis zum Endpoint:** Die Anfrage geht durch A und B zum Endpoint. Dann läuft sie zurück: erst der Code nach `next` in B, dann der in A.
+2. **Short Circuit:** B setzt `403` und ruft `next` nicht auf. Der Endpoint läuft nicht, und es gibt keine Zeile „B after“. Der Code nach `next` in A läuft trotzdem, denn A hat `next` aufgerufen und bekommt die Kontrolle zurück.
+3. **Kein Endpoint:** Die Anfrage geht durch A und B. Wenn kein Endpoint passt, antwortet die App mit `404`, und die Anfrage läuft zurück. Beide Middleware laufen also auch dann.
+
+**Was passiert, wenn …** du A und B vertauschst? Die Zeilen „A …“ und „B …“ tauschen die Plätze. Bei `/blocked` stünde dann „A before“ nicht mehr in der Liste, denn B beendet die Anfrage vor A.
+
+</details>
+
+<Quiz id="m17-l08-q1" />
+
+<Quiz id="m17-l08-q2" />
+
+## Warum die Reihenfolge zählt
+
+Aus dem Weg hinein und zurück folgt: Eine Komponente wirkt nur auf das, was hinter ihr liegt. Die Fehlerbehandlung aus Lektion 7 fängt nur Exceptions, die in einer Komponente nach ihr entstehen. Darum steht sie ganz vorn. Die Dokumentation nennt für die Pipeline einer App diese Reihenfolge: zuerst Fehlerbehandlung, dann HTTPS-Umleitung, statische Dateien, Routing, Authentifizierung, Autorisierung und zuletzt die Endpoints. `WebApplication` fügt Routing und Endpoints selbst hinzu, wenn du `UseRouting` nicht aufrufst. Authentifizierung und Autorisierung kommen in Lektion 11.
+
+Das Programm unten baut dieselbe App zweimal: Eine Middleware wirft für jede Anfrage eine Exception, und der Exception Handler steht einmal davor und einmal dahinter.
+
+:::info[Vorhersage]
+Was bekommt der Client in jedem der beiden Fälle? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={order} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{orderOutput}</CodeBlock>
+
+1. **Handler zuerst:** Die werfende Middleware liegt hinter dem Handler. Er fängt die Exception und antwortet mit `500`.
+2. **Handler zuletzt:** Die Exception entsteht, bevor die Anfrage den Handler erreicht. Er sieht sie nie, und sie erreicht den Server. Im Test wirft der Client sie deshalb weiter, ein echter Client bekäme keine brauchbare Antwort.
+
+</details>
+
+<Quiz id="m17-l08-q3" />
+
+<Quiz id="m17-l08-q4" />
+
+## Terminal, Klasse und Filter
+
+Drei verwandte Begriffe, nur kurz:
+
+- `app.Run(...)` ist eine **terminale** Middleware: Sie bekommt kein `next` und beendet die Pipeline. Was dahinter steht, läuft nie.
+- Eine Middleware lässt sich auch als Klasse mit der Methode `InvokeAsync` schreiben. Sie macht dasselbe wie das Lambda und lohnt sich, wenn sie größer wird ([Write custom ASP.NET Core middleware](https://learn.microsoft.com/aspnet/core/fundamentals/middleware/write)).
+- Ein <Term id="endpoint-filter">Endpoint Filter</Term> mit `AddEndpointFilter` läuft um einen einzelnen Handler, vor und nach ihm. Eine Middleware gilt für alle Anfragen, ein Filter nur für den Endpoint, an dem er hängt ([Filters in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/min-api-filters)).
+
+<Quiz id="m17-l08-q5" />
+
+## Gap-Beispiel: eine Middleware
+
+Die Lücke `___` fehlt. Setze den Parameter ein, der den Rest der Pipeline aufruft.
+
+<CodeBlock language="csharp" title="gap-middleware.snippet.cs">{gapMiddleware}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `next`: `await next(context);`. Davor druckt die Middleware „before“, dahinter „after“.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l07/`) meldet jeden Fehler als Problem Details. Die Antworten haben aber noch keine Schutz-Header.
+
+**Neue Anforderung:** Jede Antwort der API trägt den Header `X-Content-Type-Options: nosniff`, auch Fehlerantworten. Der Header sagt dem Browser, dass er den Typ der Antwort nicht aus dem Inhalt erraten soll, sondern dem Content-Type der Antwort glauben muss. So kann ein Browser eine Antwort nicht als etwas anderes behandeln, als sie ist.
+
+Dafür kommt in `src/SecLog.Api/Program.cs` eine kleine Middleware mit `app.Use` dazu. Sie steht vor `UseExceptionHandler()`, damit sie jede Anfrage sieht, auch die, die der Handler abfängt. Sie setzt den Header in `context.Response.OnStarting`: Dieser Rückruf läuft kurz bevor die Antwort beginnt. Setzte sie den Header direkt vor `next`, fehlte er bei der `500`-Antwort: Der Test dafür schlug in diesem Aufbau fehl, weil die Fehlerbehandlung die Antwort zurücksetzt, bevor sie die Problem Details schreibt. Die Tests prüfen den Header bei einer `200`-Antwort, bei einer `404`-Problemantwort und bei einer `500`-Antwort.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/SecurityHeaderTests.cs (neu)">{headerTests}</CodeBlock>
+
+1. **Ort wählen:** Die Middleware steht ganz vorn, vor der Fehlerbehandlung. Sie wirkt auf alles, was dahinter liegt, auch auf die Antworten der Fehlerbehandlung.
+2. **Header zum richtigen Zeitpunkt setzen:** `OnStarting` setzt den Header, nachdem die Fehlerbehandlung ihre Antwort vorbereitet hat und bevor sie beginnt.
+3. **Weitergeben:** `await next(context)` führt den Rest der Pipeline aus.
+4. **Tests:** Sie prüfen den Header bei `200`, `404` und `500`. `BrokenDatabaseFactory` aus Lektion 7 erzeugt den `500`.
+5. **Ergebnis:** In `expected.out.txt` sind die drei Zeilen `SecurityHeaderTests` neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l08/`) setzt `X-Content-Type-Options: nosniff` auf jede Antwort, auch auf Fehlerantworten.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l08-middleware-order-irrelevant" />
+
+**„Die Reihenfolge der Middleware spielt keine Rolle.“** Eine Komponente wirkt nur auf das, was hinter ihr liegt. Steht die Fehlerbehandlung hinter der Komponente, die wirft, fängt sie nichts. Eine Prüfung, die nach der Protokollierung steht, lässt abgelehnte Anfragen im Log erscheinen, steht sie davor, nicht.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l08-middleware-runs-only-before" />
+
+**„Eine Middleware läuft nur vor dem Endpoint.“** Der Code hinter `await next(context)` läuft danach, auf dem Weg zurück. Dort kann die Middleware die Antwort lesen, protokollieren oder ergänzen.
+:::
+
+<details>
+<summary>Vertiefung: Header nach dem Start der Antwort (optional)</summary>
+
+Ein HTTP-Header gehört vor den Body (Lektion 1). Hat der Server begonnen, die Antwort zu senden, lässt sich ein Header nicht mehr ändern. Darum bietet `Response.OnStarting` einen Rückruf an, der kurz davor läuft. Wer nach `next` einen Header setzen will, setzt ihn dort. Die Beschreibung der Methode steht in der [API-Referenz zu `HttpResponse.OnStarting`](https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.httpresponse.onstarting).
+
+</details>
+
+## Zusammenfassung
+
+Jede Anfrage läuft durch eine Pipeline aus Middleware, in der Reihenfolge, in der du sie hinzufügst, und die Antwort läuft rückwärts zurück. Mit `app.Use` schreibst du eine Komponente, die vor und nach `await next(context)` arbeitet oder `next` auslässt und die Anfrage beendet. Die Reihenfolge ändert das Ergebnis: Eine Komponente wirkt nur auf das, was hinter ihr liegt. Darum steht die Fehlerbehandlung vorn. Ein Header, der auch Fehlerantworten treffen soll, wird mit `OnStarting` kurz vor dem Start der Antwort gesetzt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m17-l08-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l08-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l08-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [ASP.NET Core Middleware](https://learn.microsoft.com/aspnet/core/fundamentals/middleware/)
+- Microsoft Learn: [Write custom ASP.NET Core middleware](https://learn.microsoft.com/aspnet/core/fundamentals/middleware/write)
+- Microsoft Learn: [Filters in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/min-api-filters)

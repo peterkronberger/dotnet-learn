@@ -11848,6 +11848,133 @@
         "title": "Create responses in Minimal API applications",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/responses"
       }
+    },
+    {
+      "id": "problem-details",
+      "term": "Problem Details",
+      "german": "Problemdetails",
+      "category": "platform",
+      "definition": "Ein Standardformat für Fehlerantworten von HTTP-APIs (RFC 9457) mit den Feldern `type`, `title`, `status`, `detail`. Der Content-Type ist `application/problem+json`.",
+      "related": [
+        "http-status-code",
+        "exception-handler-middleware"
+      ],
+      "lesson": "m17-l07",
+      "source": {
+        "title": "Handle errors in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/error-handling"
+      }
+    },
+    {
+      "id": "exception-handler-middleware",
+      "term": "Exception Handler Middleware",
+      "german": "Middleware für die Ausnahmebehandlung",
+      "category": "platform",
+      "definition": "Eine Middleware, die eine unbehandelte Exception fängt und eine Fehlerantwort schreibt. `UseExceptionHandler` fügt sie der Pipeline hinzu.",
+      "related": [
+        "problem-details",
+        "middleware"
+      ],
+      "lesson": "m17-l07",
+      "source": {
+        "title": "Handle errors in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/error-handling"
+      }
+    },
+    {
+      "id": "middleware",
+      "term": "Middleware",
+      "category": "platform",
+      "definition": "Eine Komponente der Pipeline, die eine Anfrage bearbeitet. Sie kann vor und nach der nächsten Komponente arbeiten oder die Anfrage beenden.",
+      "related": [
+        "request-pipeline",
+        "request-delegate",
+        "short-circuit"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "ASP.NET Core Middleware",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/middleware/"
+      }
+    },
+    {
+      "id": "request-pipeline",
+      "term": "Request Pipeline",
+      "german": "Anfrage-Pipeline",
+      "category": "platform",
+      "definition": "Die Kette von Middleware, durch die jede Anfrage läuft. Die Reihenfolge, in der du sie hinzufügst, bestimmt die Reihenfolge der Aufrufe.",
+      "related": [
+        "middleware",
+        "endpoint"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "ASP.NET Core Middleware",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/middleware/"
+      }
+    },
+    {
+      "id": "request-delegate",
+      "term": "Request Delegate",
+      "category": "platform",
+      "definition": "Ein Delegate vom Typ `RequestDelegate`, der eine `HttpContext` bearbeitet und einen `Task` liefert. Der Parameter `next` einer Middleware ist ein Request Delegate.",
+      "related": [
+        "middleware",
+        "http-context"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "ASP.NET Core Middleware",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/middleware/"
+      }
+    },
+    {
+      "id": "http-context",
+      "term": "HttpContext",
+      "category": "platform",
+      "definition": "Das Objekt mit allen Daten einer Anfrage: `Request`, `Response` und weitere Informationen. Jede Middleware und jeder Handler kann es bekommen.",
+      "related": [
+        "middleware",
+        "http-request",
+        "http-response"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "HttpContext class",
+        "url": "https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.http.httpcontext"
+      }
+    },
+    {
+      "id": "short-circuit",
+      "term": "Short Circuit",
+      "german": "Abkürzen der Pipeline",
+      "category": "platform",
+      "definition": "Eine Middleware beendet die Anfrage, ohne `next` aufzurufen. Die Komponenten dahinter laufen für diese Anfrage nicht.",
+      "related": [
+        "middleware",
+        "request-pipeline"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "ASP.NET Core Middleware",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/middleware/"
+      }
+    },
+    {
+      "id": "endpoint-filter",
+      "term": "Endpoint Filter",
+      "german": "Endpoint-Filter",
+      "category": "platform",
+      "definition": "Code, der um einen einzelnen Handler läuft, vor und nach ihm. Anders als Middleware gilt er nur für den Endpoint, an dem er hängt.",
+      "related": [
+        "middleware",
+        "endpoint"
+      ],
+      "lesson": "m17-l08",
+      "source": {
+        "title": "Filters in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/min-api-filters"
+      }
     }
   ]
 }
