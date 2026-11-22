@@ -1,0 +1,5 @@
+== 1. Exception handler first ==
+< 500 Internal Server Error
+
+== 2. Exception handler last ==
+< exception reached the server: Database is down

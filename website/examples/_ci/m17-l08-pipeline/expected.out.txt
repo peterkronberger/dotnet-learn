@@ -1,0 +1,24 @@
+== 1. A request that reaches the endpoint ==
+> GET /hello
+< 200 OK
+  A before
+  B before
+  endpoint
+  B after
+  A after
+
+== 2. A request that middleware B stops ==
+> GET /blocked
+< 403 Forbidden
+  A before
+  B before
+  B stops the request
+  A after
+
+== 3. A request that matches no endpoint ==
+> GET /nothing
+< 404 Not Found
+  A before
+  B before
+  B after
+  A after
