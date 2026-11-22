@@ -58,6 +58,7 @@
       "id": "m17-l01-q5",
       "lesson": "m17-l01",
       "type": "single",
+      "placement": true,
       "question": "Ein Client sendet `POST /incidents` zweimal mit demselben Body. Danach sendet er `PUT /incidents/1/status` zweimal mit demselben Body. Was ist richtig?",
       "options": [
         { "text": "Die beiden `POST`-Anfragen legen zwei Vorfälle an. Die beiden `PUT`-Anfragen lassen den Vorfall im selben Zustand.", "correct": true },
@@ -131,6 +132,7 @@
       "id": "m17-l02-q2",
       "lesson": "m17-l02",
       "type": "single",
+      "placement": true,
       "question": "Ein Objekt mit der Eigenschaft `FailureCount` wird mit `JsonSerializerDefaults.Web` serialisiert. Welchen Namen hat die Eigenschaft im JSON?",
       "options": [
         { "text": "`failureCount`", "correct": true },
@@ -296,6 +298,8 @@
       "id": "m17-l03-q3",
       "lesson": "m17-l03",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m17-l04"],
       "question": "Die Route `/incidents/{id:int}` bekommt `GET /incidents/abc`. Es gibt keine andere passende Route. Was antwortet die App?",
       "options": [
         {
@@ -589,6 +593,7 @@
       "id": "m17-l05-q2",
       "lesson": "m17-l05",
       "type": "single",
+      "placement": true,
       "question": "Ein Record hat die Eigenschaft `[Required] string User`. Die App ruft `builder.Services.AddValidation()` nicht auf. Ein Client sendet `{\"user\":\"\"}` an einen Endpoint, der diesen Record als Parameter hat. Was passiert?",
       "options": [
         { "text": "Der Handler läuft mit einem leeren `User`. Niemand prüft die Annotation.", "correct": true },
@@ -708,6 +713,7 @@
       "id": "m17-l06-q4",
       "lesson": "m17-l06",
       "type": "single",
+      "placement": true,
       "question": "Ein `POST /incidents` legt einen neuen Vorfall mit der Id 3 an. Welche Antwort passt am besten?",
       "options": [
         { "text": "201 Created mit dem Header `Location: /incidents/3` und dem neuen Vorfall im Body.", "correct": true },
@@ -986,6 +992,8 @@
       "id": "m17-l08-q3",
       "lesson": "m17-l08",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m17-l07"],
       "question": "Die Exception-Handler-Middleware steht in der Pipeline hinter einer Middleware, die für jede Anfrage eine Exception wirft. Was bekommt der Client?",
       "options": [
         {
@@ -1181,6 +1189,8 @@
       "id": "m17-l09-q4",
       "lesson": "m17-l09",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m17-l10"],
       "question": "Ein Handler hat den Parameter `CancellationToken cancellationToken`. Woher kommt der Wert?",
       "options": [
         {
@@ -1523,6 +1533,8 @@
       "id": "m17-l11-q5",
       "lesson": "m17-l11",
       "type": "single",
+      "placement": true,
+      "placementLessons": ["m17-l12"],
       "question": "SecLog schützt die Gruppe `/incidents` mit `RequireAuthorization()`. Später legt jemand den Endpoint `GET /notes` an, ohne eine Autorisierung anzugeben. Eine Fallback-Policy gibt es nicht. Wer darf `/notes` aufrufen?",
       "options": [
         {

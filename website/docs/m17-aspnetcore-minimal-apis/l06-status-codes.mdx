@@ -46,7 +46,7 @@ Eine Antwort hat einen Statuscode (Lektion 1), und den kann nur der Handler wäh
 
 Die Bedeutung der Codes legt RFC 9110 fest. `201 Created` sagt zusätzlich, wo die neue Ressource liegt: im <Term id="location-header">Location-Header</Term> der Antwort. `TypedResults.Created(uri, value)` setzt ihn aus dem ersten Argument. `400` kennst du schon von Bindung und Validierung. Die Antwort mit dem genauen Fehlerformat kommt in Lektion 7.
 
-Es gibt auch die Klasse `Results` mit denselben Methoden, zum Beispiel `Results.NotFound()`. Ihr Rückgabetyp ist nur `IResult`. `TypedResults.NotFound()` liefert dagegen den Typ `NotFound`. Die Antwort ist dieselbe, der Unterschied liegt im Typ, und der hilft in zwei Fällen:
+Es gibt auch die Klasse `Results` mit denselben Methoden, zum Beispiel `Results.NotFound()`. Ihr Rückgabetyp ist nur `IResult`. `TypedResults.NotFound()` liefert dagegen den Typ `NotFound`, ein <Term id="typed-result">typisiertes Ergebnis</Term>. Die Antwort ist dieselbe, der Unterschied liegt im Typ, und der hilft in zwei Fällen:
 
 1. **Test:** Ein Test kann den Typ prüfen, ohne einen Server zu starten.
 2. **Beschreibung:** Werkzeuge lesen aus dem Typ, welche Antworten ein Endpoint hat. Lektion 10 nutzt das für OpenAPI.

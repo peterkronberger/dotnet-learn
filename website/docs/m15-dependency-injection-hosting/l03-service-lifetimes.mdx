@@ -47,9 +47,7 @@ In der letzten Lektion hat jedes Beispiel `AddSingleton` benutzt. Das war eine E
 
 Ein **Scope** ist eine Arbeitseinheit, die du mit `provider.CreateScope()` anlegst. Du holst die Services aus `scope.ServiceProvider` und gibst den Scope am Ende frei. Du kannst dir einen Scope als einen Durchlauf vorstellen, zum Beispiel die Analyse einer Datei. Auch `IServiceScope` ist `IDisposable`, darum steht `using` davor.
 
-<Forward concepts={['Web-Anfragen']} module="17" />
-
-Bei einer Web-Anwendung ist ein Scope normalerweise eine Anfrage. Dafür legt das Framework den Scope an. Das lernst du in Modul 17.
+Bei einer Web-Anwendung ist ein Scope normalerweise eine Anfrage. Dafür legt das Framework den Scope an. Das lernst du in der Lektion [Services und Abbruch in Endpunkten](../m17-aspnetcore-minimal-apis/l09-di-cancellation).
 
 :::info[Vorhersage]
 Das Programm registriert je einen Singleton-, einen Scoped- und einen Transient-Service. Jeder Service nummeriert seine Instanzen in der Reihenfolge, in der sie entstehen. Das Programm legt zwei Scopes an und holt in jedem Scope jeden Service zweimal. Es druckt die Nummer und ob beide Objekte dasselbe sind. Welche Ausgabe erwartest du? Notiere deinen Tipp und führe den Code dann aus.
