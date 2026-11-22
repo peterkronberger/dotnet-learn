@@ -1,0 +1,10 @@
+{"Id":7,"User":"bob","Status":"open","FailureCount":5,"sourceIp":"203.0.113.7"}
+{
+  "id": 7,
+  "user": "bob",
+  "status": "open",
+  "failureCount": 5,
+  "sourceIp": "203.0.113.7"
+}
+Incident { Id = 8, User = carol, Status = closed, FailureCount = 0, Source =  }
+Incident { Id = 0, User = , Status = , FailureCount = 0, Source =  }

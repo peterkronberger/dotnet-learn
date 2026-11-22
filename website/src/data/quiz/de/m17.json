@@ -1,4 +1,245 @@
 {
   "module": "m17",
-  "questions": []
+  "questions": [
+    {
+      "id": "m17-l01-q1",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Welcher Teil gehört zu einer HTTP-Antwort und nicht zu einer HTTP-Anfrage?",
+      "options": [
+        { "text": "Der Statuscode", "correct": true },
+        { "text": "Die Methode", "feedback": "Die Methode steht in der Anfragezeile des Clients." },
+        { "text": "Der Pfad", "feedback": "Der Pfad steht in der Anfragezeile des Clients." },
+        { "text": "Die Query", "feedback": "Die Query ist Teil der Adresse, die der Client anfragt." }
+      ],
+      "explanation": "Der Server nennt das Ergebnis mit dem Statuscode in der Statuszeile. Methode, Pfad und Query schickt der Client."
+    },
+    {
+      "id": "m17-l01-q2",
+      "lesson": "m17-l01",
+      "type": "match",
+      "question": "Ordne jedem Statuscode seine Bedeutung zu.",
+      "pairs": [
+        { "left": "200", "right": "Erfolg, die Antwort hat einen Body" },
+        { "left": "201", "right": "Eine neue Ressource wurde angelegt" },
+        { "left": "204", "right": "Erfolg, die Antwort hat keinen Body" },
+        { "left": "404", "right": "Die Ressource wurde nicht gefunden" },
+        { "left": "500", "right": "Der Server ist auf einen Fehler gelaufen" }
+      ],
+      "explanation": "200 und 201 melden Erfolg. 201 sagt zusätzlich, dass etwas Neues entstand. 204 meldet Erfolg ohne Inhalt. 404 liegt an der Anfrage, 500 liegt am Server."
+    },
+    {
+      "id": "m17-l01-q3",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Ein Client soll einen Vorfall nur lesen. Er ändert dabei nichts auf dem Server. Welche Methode passt?",
+      "options": [
+        { "text": "`GET`", "correct": true },
+        { "text": "`POST`", "feedback": "`POST` schickt Daten zur Verarbeitung und kann dabei Neues anlegen." },
+        { "text": "`PUT`", "feedback": "`PUT` ersetzt eine Ressource und ändert damit den Zustand." },
+        { "text": "`DELETE`", "feedback": "`DELETE` entfernt eine Ressource." }
+      ],
+      "explanation": "`GET` liest und ändert nichts. Darum ist `GET` die sichere Methode unter den vieren."
+    },
+    {
+      "id": "m17-l01-q4",
+      "lesson": "m17-l01",
+      "type": "multi",
+      "question": "Welche der vier Methoden sind idempotent?",
+      "options": [
+        { "text": "`GET`", "correct": true },
+        { "text": "`PUT`", "correct": true },
+        { "text": "`DELETE`", "correct": true },
+        { "text": "`POST`", "feedback": "Zweimal `POST /incidents` legt zwei Vorfälle an." }
+      ],
+      "explanation": "`GET`, `PUT` und `DELETE` verändern den Zustand des Servers nach mehreren gleichen Anfragen nicht anders als nach einer. `POST` ist nicht idempotent."
+    },
+    {
+      "id": "m17-l01-q5",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Ein Client sendet `POST /incidents` zweimal mit demselben Body. Danach sendet er `PUT /incidents/1/status` zweimal mit demselben Body. Was ist richtig?",
+      "options": [
+        { "text": "Die beiden `POST`-Anfragen legen zwei Vorfälle an. Die beiden `PUT`-Anfragen lassen den Vorfall im selben Zustand.", "correct": true },
+        { "text": "`POST` und `PUT` verhalten sich gleich: Beide speichern nur einmal.", "misconception": "m17-l01-put-and-post-are-same", "feedback": "`POST` ist nicht idempotent. Jeder Aufruf kann etwas Neues anlegen." },
+        { "text": "Beide Methoden legen bei jedem Aufruf einen neuen Vorfall an.", "misconception": "m17-l01-put-and-post-are-same", "feedback": "`PUT` setzt eine bestimmte Ressource auf den gesendeten Zustand. Ein zweites `PUT` ändert nichts mehr." },
+        { "text": "Der Server lehnt jede zweite Anfrage ab.", "feedback": "Die Regel der Methoden betrifft den Zustand, nicht das Ablehnen." }
+      ],
+      "explanation": "`POST` legt bei jedem Aufruf etwas Neues an. `PUT` nennt die Ressource und ihren Zielzustand. Wiederholung ändert den Zustand nicht mehr. Darum sind die beiden Methoden nicht austauschbar."
+    },
+    {
+      "id": "m17-l01-q6",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Der Server antwortet mit `404 Not Found`. Was bedeutet das?",
+      "options": [
+        { "text": "Die Anfrage nennt eine Ressource, die der Server nicht kennt. Der Fehler liegt auf der Seite der Anfrage.", "correct": true },
+        { "text": "Der Server ist ausgefallen oder fehlerhaft.", "misconception": "m17-l01-4xx-means-server-broken", "feedback": "Ein Fehler im Server meldet die Klasse 5xx, zum Beispiel `500`." },
+        { "text": "Die Anfrage war erfolgreich, aber die Antwort ist leer.", "feedback": "Eine leere Antwort mit Erfolg ist `204`." },
+        { "text": "Der Server hat die Ressource gerade angelegt.", "feedback": "Das Anlegen meldet `201`." }
+      ],
+      "explanation": "Alle Codes von 400 bis 499 sagen: Die Anfrage hat ein Problem. Der Server arbeitet und sagt das auch. Fehler im Server haben 5xx."
+    },
+    {
+      "id": "m17-l01-q7",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Zu welcher Klasse gehört der Statuscode `403`?",
+      "options": [
+        { "text": "4xx, Fehler der Anfrage", "correct": true },
+        { "text": "2xx, Erfolg", "feedback": "2xx beginnt mit der Ziffer 2." },
+        { "text": "3xx, Umleitung", "feedback": "3xx beginnt mit der Ziffer 3." },
+        { "text": "5xx, Fehler im Server", "misconception": "m17-l01-4xx-means-server-broken", "feedback": "Die erste Ziffer bestimmt die Klasse: Die 4 steht für Fehler der Anfrage." }
+      ],
+      "explanation": "Die erste Ziffer legt die Klasse fest. 1xx informiert, 2xx meldet Erfolg, 3xx leitet um, 4xx meldet einen Fehler der Anfrage, 5xx einen Fehler im Server."
+    },
+    {
+      "id": "m17-l01-q8",
+      "lesson": "m17-l01",
+      "type": "single",
+      "question": "Ein Client sendet zweimal `DELETE /incidents/2`. Die erste Antwort ist `204`, die zweite `404`. Ist `DELETE` trotzdem idempotent?",
+      "options": [
+        { "text": "Ja. Idempotenz betrifft den Zustand des Servers: Nach beiden Anfragen gibt es den Vorfall nicht mehr. Die Antworten dürfen sich unterscheiden.", "correct": true },
+        { "text": "Nein. Idempotent heißt, dass beide Antworten gleich sein müssen.", "feedback": "Idempotent betrifft die Wirkung auf den Server, nicht den Wortlaut der Antwort." },
+        { "text": "Nein. `DELETE` ist sicher und darum nicht idempotent.", "feedback": "`DELETE` ist nicht sicher, weil es den Zustand ändert, aber idempotent." }
+      ],
+      "explanation": "Sicher heißt: ändert nichts. Idempotent heißt: Wiederholung ändert nichts mehr gegenüber dem ersten Mal. `DELETE` ist idempotent und nicht sicher."
+    },
+    {
+      "id": "m17-l01-q9",
+      "lesson": "m17-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen einer sicheren und einer idempotenten Methode. Nenne je ein Beispiel.",
+      "modelAnswer": "Eine sichere Methode ändert den Zustand des Servers nicht, zum Beispiel `GET`. Eine idempotente Methode darf ihn ändern, aber mehrfaches Senden derselben Anfrage ändert ihn nicht weiter als das erste Senden, zum Beispiel `PUT` oder `DELETE`. Jede sichere Methode ist auch idempotent, aber nicht umgekehrt."
+    },
+    {
+      "id": "m17-l01-q10",
+      "lesson": "m17-l01",
+      "type": "explain",
+      "question": "Transfer: Eine Anwendung soll den Status eines Vorfalls auf „geschlossen“ setzen. Das Netz ist unzuverlässig, der Client sendet die Anfrage bei einem Fehler noch einmal. Welche Methode wählst du und warum?",
+      "modelAnswer": "`PUT` auf die Adresse des Vorfalls (zum Beispiel `/incidents/1/status`) mit dem Zielzustand im Body. `PUT` ist idempotent: Kommt die Anfrage zweimal an, bleibt der Vorfall geschlossen. Mit `POST` könnte ein Wiederholen zweimal etwas anlegen oder auslösen."
+    },
+    {
+      "id": "m17-l02-q1",
+      "lesson": "m17-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m17/l02/json-round-trip.cs",
+      "explanation": "`Serialize` schreibt die Eigenschaften mit den C#-Namen in JSON. `Deserialize<Incident>` baut daraus ein neues Objekt. Records vergleichen ihre Werte, darum ist `copy == incident` wahr."
+    },
+    {
+      "id": "m17-l02-q2",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "Ein Objekt mit der Eigenschaft `FailureCount` wird mit `JsonSerializerDefaults.Web` serialisiert. Welchen Namen hat die Eigenschaft im JSON?",
+      "options": [
+        { "text": "`failureCount`", "correct": true },
+        { "text": "`FailureCount`", "misconception": "m17-l02-json-names-match-csharp", "feedback": "Ohne Einstellungen bleibt der Name so. Die Web-Einstellungen schreiben camelCase." },
+        { "text": "`failure_count`", "feedback": "Snake Case ist eine andere Namensrichtlinie, die nicht zu den Web-Einstellungen gehört." },
+        { "text": "`failurecount`", "feedback": "camelCase macht nur den ersten Buchstaben klein und behält die Wortgrenzen." }
+      ],
+      "explanation": "Die Web-Einstellungen wenden `JsonNamingPolicy.CamelCase` an: Der erste Buchstabe wird klein, spätere Wörter behalten ihren Großbuchstaben."
+    },
+    {
+      "id": "m17-l02-q3",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "Welcher Text ist gültiges JSON?",
+      "options": [
+        { "text": "`{\"id\": 3, \"user\": \"bob\"}`", "correct": true },
+        { "text": "`{id: 3, user: \"bob\"}`", "feedback": "Namen müssen in doppelten Anführungszeichen stehen." },
+        { "text": "`{'id': 3}`", "feedback": "JSON kennt nur doppelte Anführungszeichen." },
+        { "text": "`{\"id\" = 3}`", "feedback": "Name und Wert trennt ein Doppelpunkt." }
+      ],
+      "explanation": "Ein JSON-Objekt hat Namen in doppelten Anführungszeichen, einen Doppelpunkt vor dem Wert und Kommas zwischen den Paaren."
+    },
+    {
+      "id": "m17-l02-q4",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "`Ticket` hat die Eigenschaft `User` mit dem Startwert `\"unknown\"`. Der JSON-Text `{\"id\": 3}` wird zu `Ticket` eingelesen. Welchen Wert hat `User`?",
+      "options": [
+        { "text": "`\"unknown\"`: Eine fehlende Eigenschaft im JSON lässt den Startwert stehen.", "correct": true },
+        { "text": "`null`", "feedback": "`null` entsteht nur, wenn der Text ihn nennt oder der Typ keinen Startwert hat." },
+        { "text": "Eine `JsonException`, weil `user` fehlt", "feedback": "Nur `required` macht eine Eigenschaft zur Pflicht." },
+        { "text": "Eine leere Zeichenkette", "feedback": "Die Eigenschaft behält ihren eigenen Startwert." }
+      ],
+      "explanation": "Der Serializer setzt nur, was im JSON steht. Alles andere bleibt, wie der Konstruktor und die Initialisierer es hinterlassen."
+    },
+    {
+      "id": "m17-l02-q5",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "Die Eigenschaft `string User` ist nicht nullable. Der Text `{\"user\": null}` wird mit Standardoptionen eingelesen. Was passiert?",
+      "options": [
+        { "text": "Es gibt keinen Fehler, `User` ist danach `null`.", "correct": true },
+        { "text": "Eine `JsonException`, weil `string` ohne `?` kein `null` erlaubt", "misconception": "m17-l02-nullable-checked-on-read", "feedback": "Ohne die Option `RespectNullableAnnotations` prüft der Serializer die Nullbarkeit nicht." },
+        { "text": "`User` bekommt den Wert `\"\"`.", "feedback": "Der Serializer ersetzt `null` nicht durch eine leere Zeichenkette." }
+      ],
+      "explanation": "Die Nullbarkeit von Referenztypen prüft der Compiler, nicht die Laufzeit. Der Serializer prüft sie nur mit `RespectNullableAnnotations = true`."
+    },
+    {
+      "id": "m17-l02-q6",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "Was löst `JsonSerializer.Deserialize<Ticket>(\"{id: 3}\")` aus?",
+      "options": [
+        { "text": "Eine `JsonException`, weil der Text kein gültiges JSON ist", "correct": true },
+        { "text": "Es gibt `null` zurück.", "feedback": "`null` gibt es nur für den JSON-Wert `null`. Ungültiger Text löst eine Ausnahme aus." },
+        { "text": "Es liefert ein `Ticket` mit `Id` = 0.", "feedback": "Ungültiger Text wird nicht als leeres Objekt gedeutet." }
+      ],
+      "explanation": "Text, der kein JSON ist, bricht die Verarbeitung mit einer `JsonException` ab. Wie jede Ausnahme (Modul 7) fängst du sie mit `try`/`catch`."
+    },
+    {
+      "id": "m17-l02-q7",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "Eine Eigenschaft trägt `[JsonPropertyName(\"sourceIp\")]`, die Optionen setzen `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`. Die Eigenschaft heißt in C# `Source`. Wie heißt sie im JSON?",
+      "options": [
+        { "text": "`sourceIp`: Das Attribut hat Vorrang vor der Namensrichtlinie.", "correct": true },
+        { "text": "`source`", "feedback": "Die Richtlinie gilt nur für Eigenschaften ohne eigenen Namen." },
+        { "text": "`Source`", "misconception": "m17-l02-json-names-match-csharp", "feedback": "Der JSON-Name muss nicht der C#-Name sein." }
+      ],
+      "explanation": "Ein Name aus `[JsonPropertyName]` gilt in beide Richtungen und steht vor der Namensrichtlinie."
+    },
+    {
+      "id": "m17-l02-q8",
+      "lesson": "m17-l02",
+      "type": "multi",
+      "question": "Was gehört zu den Web-Einstellungen `JsonSerializerDefaults.Web`?",
+      "options": [
+        { "text": "Eigenschaftsnamen in camelCase", "correct": true },
+        { "text": "Beim Einlesen zählt die Groß- und Kleinschreibung der Namen nicht.", "correct": true },
+        { "text": "Eingerückte Ausgabe (`WriteIndented`)", "feedback": "Eingerückt schreibt nur, wer `WriteIndented = true` setzt." },
+        { "text": "Jede Eigenschaft ist Pflicht.", "feedback": "Pflicht macht nur `required`." }
+      ],
+      "explanation": "Die Web-Einstellungen sind camelCase beim Schreiben, Groß-/Kleinschreibung egal beim Lesen und Zahlen aus Zeichenketten erlaubt. Einrückung und Pflichtfelder gehören nicht dazu."
+    },
+    {
+      "id": "m17-l02-q9",
+      "lesson": "m17-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein fehlender Wert und ein `null`-Wert im JSON beim Einlesen bewirken, und was `required` ändert.",
+      "modelAnswer": "Fehlt eine Eigenschaft im JSON, lässt der Serializer den Startwert der Eigenschaft stehen. Steht `null` im JSON, setzt er `null`, auch bei einem nicht nullablen `string`, solange `RespectNullableAnnotations` aus ist. Mit `required` muss die Eigenschaft im JSON stehen, sonst gibt es eine `JsonException`."
+    },
+    {
+      "id": "m17-l02-q10",
+      "lesson": "m17-l02",
+      "type": "explain",
+      "question": "Transfer: SecLog soll Vorfälle später als JSON an andere Programme liefern. Welche Optionen und Attribute wählst du, damit die Namen im JSON stabil und üblich sind, auch wenn du eine C#-Eigenschaft umbenennst?",
+      "modelAnswer": "Die Web-Einstellungen (`JsonSerializerDefaults.Web`) geben camelCase. Für Namen, die sich nie ändern sollen, setze ich `[JsonPropertyName]` an die Eigenschaft. Dann bleibt der JSON-Name gleich, auch wenn ich die C#-Eigenschaft umbenenne."
+    },
+    {
+      "id": "m17-l02-q11",
+      "lesson": "m17-l02",
+      "type": "single",
+      "question": "`Account` hat `public required int Id { get; set; }`. Was passiert bei `Deserialize<Account>(\"{\\\"name\\\": \\\"x\\\"}\")`?",
+      "options": [
+        { "text": "Eine `JsonException`, weil `id` im JSON fehlt", "correct": true },
+        { "text": "`Id` ist 0, es gibt keinen Fehler.", "feedback": "Ohne `required` wäre es so. Mit `required` ist die Eigenschaft Pflicht." },
+        { "text": "Es gibt `null` zurück.", "feedback": "Eine fehlende Pflichteigenschaft löst eine Ausnahme aus." }
+      ],
+      "explanation": "Der Serializer behandelt `required` als Pflicht im JSON. Fehlt die Eigenschaft, löst er eine `JsonException` aus."
+    }
+  ]
 }

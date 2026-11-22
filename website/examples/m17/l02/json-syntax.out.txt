@@ -1,0 +1,7 @@
+id: Number
+user: String
+resolved: False
+score: Number
+note: Null
+ips: Array
+owner: Object
