@@ -924,6 +924,426 @@
       "type": "explain",
       "question": "Wo in einem eigenen Projekt würdest du Migrationen einsetzen, und wo reicht `EnsureCreated`? Nenne je ein Beispiel.",
       "modelAnswer": "Bei einer Anwendung mit echten Nutzerdaten brauche ich Migrationen, damit neue Spalten ankommen, ohne dass Daten verloren gehen. Für einen Test mit einer frischen Datenbank oder einen Prototyp, den ich jederzeit wegwerfen kann, reicht `EnsureCreated`."
+    },
+    {
+      "id": "m16-l09-q1",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Der Wert `user` kommt aus einem Eingabefeld. Der Code lautet `db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE User = {user}\")`. Ist das eine Lücke für SQL-Injection?",
+      "options": [
+        {
+          "text": "Nein: `FromSql` nimmt den interpolierten String als Vorlage und sendet `user` als Parameter. Der Wert wird nie zu SQL-Text.",
+          "correct": true,
+          "feedback": "Der Parameter `@p0` steht im SQL-Text, der Wert geht getrennt an die Datenbank."
+        },
+        {
+          "text": "Ja: Ein interpolierter String setzt den Wert immer in den SQL-Text ein.",
+          "misconception": "m16-l09-interpolated-sql-is-unsafe",
+          "feedback": "Bei `FromSql` ist die Interpolation nur die Schreibweise. EF Core macht aus jedem Platzhalter einen Parameter."
+        },
+        {
+          "text": "Ja, aber nur wenn `user` Anführungszeichen enthält.",
+          "misconception": "m16-l09-interpolated-sql-is-unsafe",
+          "feedback": "Auch mit Anführungszeichen bleibt der Wert ein Wert. Er kann die Abfrage nicht ändern."
+        },
+        {
+          "text": "Das hängt davon ab, ob die Datenbank SQLite oder ein anderes System ist.",
+          "feedback": "`FromSql` parametrisiert für jeden Anbieter."
+        }
+      ],
+      "explanation": "`FromSql` erwartet einen `FormattableString`: Vorlage und Werte bleiben getrennt. EF Core ersetzt jeden Platzhalter durch einen SQL-Parameter. Der Text sieht wie String-Interpolation aus, wirkt aber wie eine Message Template aus dem Logging."
+    },
+    {
+      "id": "m16-l09-q2",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Der Code lautet `db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + user + \"'\")`. Der Wert von `user` ist `x' OR '1'='1`. Was passiert?",
+      "options": [
+        {
+          "text": "Das Anführungszeichen beendet den Text, der Rest `OR '1'='1'` wird SQL. Die Bedingung ist immer wahr, die Abfrage liefert alle Zeilen.",
+          "correct": true,
+          "feedback": "Die Eingabe ändert die Bedeutung der Abfrage. Das ist SQL-Injection."
+        },
+        {
+          "text": "`FromSqlRaw` maskiert das Anführungszeichen. Es gibt keine Zeile, weil kein Benutzer so heißt.",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "`FromSqlRaw` bekommt den fertigen Text und prüft ihn nicht."
+        },
+        {
+          "text": "Es kommt eine Ausnahme, weil `x' OR '1'='1` kein gültiger Benutzername ist.",
+          "feedback": "Die Datenbank sieht gültiges SQL und führt es aus."
+        },
+        {
+          "text": "Es kommt genau die Zeile von `bob`, weil `User` zuerst geprüft wird.",
+          "feedback": "Die Bedingung `OR '1'='1'` ist für jede Zeile wahr."
+        }
+      ],
+      "explanation": "Beim Verketten ist die Eingabe Teil des SQL-Texts. Die Datenbank kann nicht mehr unterscheiden, was der Programmierer und was der Benutzer geschrieben hat. Mit Parametern bleibt die Eingabe ein Wert."
+    },
+    {
+      "id": "m16-l09-q3",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du gibst `query.ToQueryString()` einer `FromSql`-Abfrage mit dem Wert `bob` aus. Woran erkennst du, dass die Abfrage sicher parametrisiert ist?",
+      "options": [
+        {
+          "text": "Im SQL-Text steht ein Platzhalter wie `@p0`, der Wert `'bob'` steht getrennt davon in der Zeile `.param set`.",
+          "correct": true,
+          "feedback": "Der Text bleibt für jeden Wert gleich, nur der Parameter ändert sich."
+        },
+        {
+          "text": "Im SQL-Text steht `'bob'` in Anführungszeichen direkt hinter `User =`.",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Dann steckt der Wert im SQL-Text. Das ist das Zeichen für verkettetes SQL."
+        },
+        {
+          "text": "Im SQL-Text steht das Wort `SELECT`.",
+          "feedback": "Jede Abfrage enthält `SELECT`. Das sagt nichts über Parameter."
+        },
+        {
+          "text": "Die Ausgabe enthält keine Zeile mit `.param`.",
+          "feedback": "Ohne Parameter steckt der Wert im Text, nicht umgekehrt."
+        }
+      ],
+      "explanation": "Eine parametrisierte Abfrage trennt SQL-Text und Werte. Im Text steht nur der Platzhalter."
+    },
+    {
+      "id": "m16-l09-q4",
+      "lesson": "m16-l09",
+      "type": "multi",
+      "question": "Eine Eingabe `input` kommt von außen. Welche Aufrufe senden `input` als Parameter?",
+      "options": [
+        {
+          "text": "`db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE User = {input}\")`",
+          "correct": true,
+          "feedback": "Jeder Platzhalter wird ein Parameter."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = {0}\", input)`",
+          "correct": true,
+          "feedback": "Der Platzhalter `{0}` mit einem Argument wird ebenfalls ein Parameter."
+        },
+        {
+          "text": "`db.Database.ExecuteSql($\"UPDATE Incidents SET Status = 'closed' WHERE User = {input}\")`",
+          "correct": true,
+          "feedback": "`ExecuteSql` parametrisiert wie `FromSql`."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw($\"SELECT * FROM Incidents WHERE User = '{input}'\")`",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Die Interpolation ist fertig, bevor `FromSqlRaw` den Text sieht. Der Wert steckt im SQL-Text."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + input + \"'\")`",
+          "misconception": "m16-l09-raw-escapes-input",
+          "feedback": "Das Verketten macht die Eingabe zum SQL-Text."
+        }
+      ],
+      "explanation": "Sicher ist, was Vorlage und Werte getrennt übergibt: `FromSql`/`ExecuteSql` mit Interpolation oder `…Raw` mit `{0}` und Argumenten. Unsicher ist, was den Text vorher zusammenbaut, egal ob mit `+` oder mit `$`."
+    },
+    {
+      "id": "m16-l09-q5",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du willst mit eigenem SQL nur eine Zahl lesen, zum Beispiel die Anzahl der Vorfälle mit mindestens 2 Fehlversuchen. Welche Methode passt?",
+      "options": [
+        {
+          "text": "`db.Database.SqlQuery<int>(…)`",
+          "correct": true,
+          "feedback": "`SqlQuery<T>` liefert Werte, die keine Entität sind, zum Beispiel `int`."
+        },
+        {
+          "text": "`db.Incidents.FromSql(…)`",
+          "feedback": "`FromSql` liefert Entitäten und braucht alle Spalten der Entität."
+        },
+        {
+          "text": "`db.Database.ExecuteSql(…)`",
+          "feedback": "`ExecuteSql` führt einen Befehl aus und gibt nur die Zahl der geänderten Zeilen zurück."
+        },
+        {
+          "text": "`db.Incidents.FromSqlRaw(…)`",
+          "feedback": "Auch `FromSqlRaw` liefert Entitäten."
+        }
+      ],
+      "explanation": "`FromSql` für Entitäten, `SqlQuery<T>` für Werte ohne Entität, `ExecuteSql` für Befehle ohne Ergebnismenge."
+    },
+    {
+      "id": "m16-l09-q6",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "`int changed = db.Database.ExecuteSql($\"UPDATE Incidents SET Status = {status} WHERE User = {user}\");` ändert genau eine Zeile. Welchen Wert hat `changed`?",
+      "options": [
+        {
+          "text": "`1`: die Zahl der geänderten Zeilen.",
+          "correct": true,
+          "feedback": "`ExecuteSql` gibt die Zahl der betroffenen Zeilen zurück."
+        },
+        {
+          "text": "Die geänderte Zeile als `Incident`.",
+          "feedback": "`ExecuteSql` liefert keine Zeilen. Dafür gibt es `FromSql`."
+        },
+        {
+          "text": "`true`, weil der Befehl gelungen ist.",
+          "feedback": "Der Rückgabetyp ist `int`."
+        },
+        {
+          "text": "`0`, weil `ExecuteSql` nur liest.",
+          "feedback": "`ExecuteSql` ist für Befehle gedacht, die Daten ändern."
+        }
+      ],
+      "explanation": "`UPDATE` ändert Zeilen. `ExecuteSql` gibt zurück, wie viele es waren."
+    },
+    {
+      "id": "m16-l09-q7",
+      "lesson": "m16-l09",
+      "type": "single",
+      "question": "Du schreibst `db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE FailureCount >= {n}\").OrderBy(i => i.User)`. Was macht EF Core mit dem eigenen SQL?",
+      "options": [
+        {
+          "text": "Es behandelt es als Unterabfrage und setzt die Sortierung außen darum. Die Datenbank sortiert.",
+          "correct": true,
+          "feedback": "Die Ausgabe zeigt `FROM ( SELECT * … ) AS \"i\"` und `ORDER BY` außen."
+        },
+        {
+          "text": "Es lädt alle Zeilen und sortiert in C#.",
+          "feedback": "Die Sortierung wird zu SQL und läuft in der Datenbank."
+        },
+        {
+          "text": "Es verwirft das eigene SQL und erzeugt eine neue Abfrage aus LINQ.",
+          "feedback": "Das eigene SQL bleibt Teil der Abfrage."
+        },
+        {
+          "text": "Es wirft eine Ausnahme, weil LINQ nicht auf `FromSql` folgen darf.",
+          "feedback": "LINQ darf folgen, solange das SQL mit `SELECT` beginnt und als Unterabfrage taugt."
+        }
+      ],
+      "explanation": "Eigenes SQL und LINQ lassen sich verbinden: EF Core macht das SQL zur Unterabfrage. Die Parameter bleiben dabei Parameter."
+    },
+    {
+      "id": "m16-l09-q8",
+      "lesson": "m16-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum eine verkettete SQL-Abfrage durch eine Eingabe ihre Bedeutung ändern kann und warum `FromSql` mit Interpolation das nicht tut.",
+      "modelAnswer": "Beim Verketten wird die Eingabe Teil des SQL-Texts. Enthält sie ein Anführungszeichen, endet der Text-Wert dort, und der Rest wird als SQL gelesen. So kann eine Eingabe die Bedingung ändern, zum Beispiel immer wahr machen.\n\n`FromSql` bekommt den interpolierten String als Vorlage mit getrennten Werten. EF Core setzt für jeden Platzhalter einen Parameter in den Text und sendet den Wert getrennt. Die Datenbank liest den Wert nie als SQL."
+    },
+    {
+      "id": "m16-l09-q9",
+      "lesson": "m16-l09",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt kommen Werte von außen in eine Abfrage? Wie stellst du sicher, dass sie als Parameter gesendet werden?",
+      "modelAnswer": "Zum Beispiel ein Suchfeld, ein Parameter der Befehlszeile oder ein Wert aus der Konfiguration, den ich in einer Abfrage nach einem Benutzernamen verwende. Ich nehme LINQ oder `FromSql` mit Interpolation und prüfe mit `ToQueryString()`, dass im SQL-Text nur ein Platzhalter steht und der Wert in der Parameterzeile."
+    },
+    {
+      "id": "m16-l10-q1",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Warum schreibst du in einer `async`-Methode `await db.Incidents.ToListAsync()` statt `db.Incidents.ToList()`?",
+      "options": [
+        {
+          "text": "Der Datenbankaufruf ist Ein-/Ausgabe. Mit `ToListAsync` blockiert der Thread nicht, während die Datenbank arbeitet.",
+          "correct": true,
+          "feedback": "So bleibt der Thread für andere Arbeit frei, zum Beispiel für andere Anfragen."
+        },
+        {
+          "text": "`ToListAsync` ist schneller, weil die Datenbank die Abfrage dann schneller ausführt.",
+          "feedback": "Die Datenbank arbeitet gleich schnell. Nur der wartende Thread wird frei."
+        },
+        {
+          "text": "`ToListAsync` führt die Abfrage parallel zu den nächsten Zeilen des Programms aus, ohne `await`.",
+          "feedback": "Ohne `await` läuft die nächste Zeile zu früh. Auf demselben Context ist das sogar ein Fehler."
+        },
+        {
+          "text": "Nur `ToListAsync` kann die Abfrage in SQL umwandeln.",
+          "feedback": "Beide Methoden führen dieselbe Abfrage aus. Die Übersetzung in SQL ist gleich."
+        }
+      ],
+      "explanation": "Datenbankaufrufe warten auf eine andere Stelle. Die `Async`-Varianten geben den Thread währenddessen frei. Du wartest sie mit `await` ab."
+    },
+    {
+      "id": "m16-l10-q2",
+      "lesson": "m16-l10",
+      "type": "multi",
+      "question": "Welche Aufrufe führen die Abfrage aus und haben deshalb eine `Async`-Version?",
+      "options": [
+        {
+          "text": "`ToListAsync`",
+          "correct": true,
+          "feedback": "Es holt alle Zeilen aus der Datenbank."
+        },
+        {
+          "text": "`FirstOrDefaultAsync`",
+          "correct": true,
+          "feedback": "Es führt die Abfrage aus und liefert die erste Zeile oder `null`."
+        },
+        {
+          "text": "`CountAsync`",
+          "correct": true,
+          "feedback": "Es führt eine Zählabfrage aus."
+        },
+        {
+          "text": "`Where` und `OrderBy`",
+          "feedback": "Sie bauen nur die Abfrage auf, es gibt keine Datenbankarbeit. Darum gibt es kein `WhereAsync`."
+        }
+      ],
+      "explanation": "Nur Operatoren, die die Abfrage ausführen, sind Ein-/Ausgabe und haben eine `Async`-Version. `Where`, `Select` und `OrderBy` ergänzen nur den Ausdrucksbaum."
+    },
+    {
+      "id": "m16-l10-q3",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Du rufst `await db.SaveChangesAsync(stoppingToken)` auf, und der Token wird abgebrochen, bevor der Aufruf beginnt. Was passiert?",
+      "options": [
+        {
+          "text": "Der Aufruf bricht mit einer `OperationCanceledException` ab. Ob eine schon laufende Anweisung sofort stoppt, hängt vom Datenbankanbieter ab.",
+          "correct": true,
+          "feedback": "EF Core reicht den Token an den Anbieter weiter."
+        },
+        {
+          "text": "Nichts: der Token wird von `SaveChangesAsync` ignoriert.",
+          "feedback": "Der Token wird ausgewertet. Ein schon abgebrochener Token bricht den Aufruf ab."
+        },
+        {
+          "text": "Die Änderungen werden gespeichert und danach wird der Token geprüft.",
+          "feedback": "Der abgebrochene Aufruf löst eine Ausnahme aus, statt weiterzumachen."
+        },
+        {
+          "text": "Der `DbContext` wird automatisch freigegeben.",
+          "feedback": "Freigeben musst du den Context über `using` oder den Scope."
+        }
+      ],
+      "explanation": "Der `CancellationToken` ist der Weg, laufende Arbeit zu beenden, zum Beispiel beim Stoppen des Hosts. Der Abbruch zeigt sich als `OperationCanceledException`."
+    },
+    {
+      "id": "m16-l10-q4",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein Kollege registriert `SecLogDbContext` als Singleton, „weil das Erzeugen teuer ist“. Was stimmt?",
+      "options": [
+        {
+          "text": "Ein `DbContext` ist für eine kurze Arbeitseinheit gedacht und nicht thread-sicher. `AddDbContext` registriert ihn deshalb als Scoped-Service.",
+          "correct": true,
+          "feedback": "Ein Scope pro Arbeitseinheit gibt jedem Durchlauf einen eigenen Context."
+        },
+        {
+          "text": "Das ist richtig: Ein Singleton spart die Erzeugung, und der Context lebt so lange wie die Anwendung.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein langlebiger Context sammelt verfolgte Objekte an und wird von mehreren Threads genutzt. Beides ist fehleranfällig."
+        },
+        {
+          "text": "Das geht, wenn man vor jeder Abfrage `Dispose()` aufruft.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein freigegebener Context ist nicht mehr nutzbar."
+        },
+        {
+          "text": "Das ist egal: Der Lebenszyklus ändert nur die Geschwindigkeit.",
+          "feedback": "Er ändert die Korrektheit: verfolgte Objekte und Nebenläufigkeit."
+        }
+      ],
+      "explanation": "Ein Context ist billig zu erzeugen und trägt Zustand, nämlich die verfolgten Objekte. Er gehört in eine kurze Arbeitseinheit. `AddDbContext` registriert ihn als Scoped-Service."
+    },
+    {
+      "id": "m16-l10-q5",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "`await Task.WhenAll(db.Incidents.CountAsync(), db.Incidents.AnyAsync());` läuft auf einem einzigen Context. Was ist zu erwarten?",
+      "options": [
+        {
+          "text": "Ein Fehler: EF Core unterstützt nicht mehrere gleichzeitige Operationen auf demselben Context. Du wartest nacheinander oder nimmst je einen Context.",
+          "correct": true,
+          "feedback": "Typisch ist eine `InvalidOperationException` („A second operation started on this context …“)."
+        },
+        {
+          "text": "Beide Abfragen laufen parallel und sind so doppelt so schnell.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "Ein Context erlaubt nur eine Operation zur Zeit."
+        },
+        {
+          "text": "EF Core stellt die zweite Abfrage in eine Warteschlange und führt sie danach aus.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "EF Core serialisiert nicht. Der Zugriff ist nicht thread-sicher, und ein erkannter Fehler wird zur Ausnahme."
+        },
+        {
+          "text": "Das geht, solange beide Abfragen dasselbe `DbSet` benutzen.",
+          "misconception": "m16-l10-parallel-queries-one-context",
+          "feedback": "Es kommt auf den Context an, nicht auf das `DbSet`."
+        }
+      ],
+      "explanation": "Ein `DbContext` ist nicht thread-sicher: Jeder asynchrone Aufruf muss fertig sein, bevor der nächste beginnt. Für parallele Arbeit brauchst du je einen Context, zum Beispiel einen pro Scope oder aus der Fabrik."
+    },
+    {
+      "id": "m16-l10-q6",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein `BackgroundService` (ein Singleton) soll Daten aus der Datenbank lesen. Wie kommt er an einen `SecLogDbContext`, ohne die Prüfung der Lebensdauern zu verletzen?",
+      "options": [
+        {
+          "text": "Er erzeugt mit `CreateAsyncScope()` einen eigenen Scope pro Durchlauf und holt den Context daraus, oder er benutzt `IDbContextFactory<T>`.",
+          "correct": true,
+          "feedback": "So hat jede Arbeitseinheit einen eigenen, kurzlebigen Context."
+        },
+        {
+          "text": "Er verlangt den Context im Konstruktor.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Ein Singleton mit Scoped-Abhängigkeit ist eine Captive Dependency. Mit `ValidateScopes` wirft der Container eine Ausnahme."
+        },
+        {
+          "text": "Er registriert den Context als Singleton.",
+          "misconception": "m16-l10-dbcontext-as-singleton",
+          "feedback": "Dann lebt ein Context für immer und wird von mehreren Aufrufen geteilt."
+        },
+        {
+          "text": "Er legt eine statische Variable mit einem Context an.",
+          "feedback": "Das ist ein Singleton ohne Container, mit denselben Problemen."
+        }
+      ],
+      "explanation": "Ein langlebiger Dienst darf keinen Scoped-Service halten (Captive Dependency). Er erzeugt für jede Arbeitseinheit einen Scope oder lässt sich eine Fabrik geben."
+    },
+    {
+      "id": "m16-l10-q7",
+      "lesson": "m16-l10",
+      "type": "single",
+      "question": "Ein Dienst erzeugt mit `factory.CreateDbContext()` einen Context aus `IDbContextFactory<SecLogDbContext>`. Wer gibt diesen Context frei?",
+      "options": [
+        {
+          "text": "Der Dienst selbst, zum Beispiel mit `using` oder `await using`.",
+          "correct": true,
+          "feedback": "Der Container verwaltet Contexts aus der Fabrik nicht."
+        },
+        {
+          "text": "Der Container, wenn der Host stoppt.",
+          "feedback": "Contexts aus der Fabrik gehören nicht zum Container."
+        },
+        {
+          "text": "Niemand: Contexts brauchen keine Freigabe.",
+          "feedback": "Ein Context hält Ressourcen und Ereignis-Verknüpfungen. Er muss freigegeben werden."
+        },
+        {
+          "text": "Die Fabrik, sobald sie den nächsten Context erzeugt.",
+          "feedback": "Die Fabrik merkt sich die erzeugten Contexts nicht."
+        }
+      ],
+      "explanation": "Die Fabrik erzeugt, der Aufrufer gibt frei. Darum steht der Context in einem `using`-Block um genau eine Arbeitseinheit."
+    },
+    {
+      "id": "m16-l10-q8",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum zwei gleichzeitige Abfragen auf demselben `DbContext` scheitern und wie du parallele Arbeit trotzdem richtig aufbaust.",
+      "modelAnswer": "Ein `DbContext` ist nicht thread-sicher. Er führt Buch über verfolgte Objekte und den Zustand der Verbindung. Wenn eine zweite Operation beginnt, bevor die erste fertig ist, erkennt EF Core das oft und wirft eine `InvalidOperationException`. Unerkannt kann es den Zustand zerstören.\n\nIch warte jede Operation mit `await` ab, bevor die nächste beginnt. Für parallele Arbeit nehme ich je Operation einen eigenen Context, zum Beispiel pro Scope oder aus einer `IDbContextFactory<T>`."
+    },
+    {
+      "id": "m16-l10-q9",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum `AddDbContext` den Context als Scoped-Service registriert und wie ein Hintergrunddienst einen Context bekommt.",
+      "modelAnswer": "Ein Context ist für eine Arbeitseinheit gedacht und soll danach freigegeben werden. Ein Scope ist im Container genau so eine Einheit, deshalb ist Scoped die passende Lebensdauer. Ein Hintergrunddienst ist ein Singleton und darf keinen Scoped-Service halten. Er erzeugt deshalb für jeden Durchlauf mit `CreateAsyncScope()` einen Scope und holt den Context daraus, oder er nutzt eine `IDbContextFactory<T>` und gibt den Context selbst frei."
+    },
+    {
+      "id": "m16-l10-q10",
+      "lesson": "m16-l10",
+      "type": "explain",
+      "question": "Wo in einem eigenen Projekt rufst du die Datenbank asynchron auf, und wo brauchst du für eine Arbeitseinheit einen eigenen Scope? Nenne je ein Beispiel.",
+      "modelAnswer": "Eine Anwendung, die viele Anfragen gleichzeitig bedient, ruft die Datenbank asynchron auf, damit wartende Threads frei bleiben. Ein Dienst, der regelmäßig im Hintergrund Daten verarbeitet, erzeugt für jeden Durchlauf einen Scope, damit jeder Durchlauf einen frischen Context hat."
     }
   ]
 }

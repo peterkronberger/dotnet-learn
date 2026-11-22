@@ -1,0 +1,9 @@
+Rows written: 3
+Severe: 1
+Any for alice: True
+Count: 3
+First: bob
+Row: bob
+Row: dave
+Row: alice
+Query cancelled

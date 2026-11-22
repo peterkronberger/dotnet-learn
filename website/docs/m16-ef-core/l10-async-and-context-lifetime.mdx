@@ -1,0 +1,201 @@
+---
+title: Asynchrone Abfragen und Kontext-Lebensdauer
+sidebar_position: 10
+description: Warum Datenbankaufrufe asynchron laufen, wie ein DbContext als kurzlebige Arbeitseinheit im Container lebt und warum zwei gleichzeitige Operationen auf einem Context scheitern.
+lesson_id: m16-l10
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import asyncProgram from '!!raw-loader!@site/examples/_ci/m16-l10-async/Program.cs';
+import asyncOutput from '!!raw-loader!@site/examples/_ci/m16-l10-async/expected.out.txt';
+import parallelProgram from '!!raw-loader!@site/examples/_ci/m16-l10-parallel/Program.cs';
+import parallelOutput from '!!raw-loader!@site/examples/_ci/m16-l10-parallel/expected.out.txt';
+import lifetimeProgram from '!!raw-loader!@site/examples/_ci/m16-l10-lifetime/Program.cs';
+import lifetimeOutput from '!!raw-loader!@site/examples/_ci/m16-l10-lifetime/expected.out.txt';
+import gapToList from '!!raw-loader!@site/examples/m16/l10/gap-to-list-async.snippet.cs';
+import programBlock from '!!raw-loader!@site/examples/m16/l10/seclog-program-block.snippet.cs';
+
+# Asynchrone Abfragen und Kontext-Lebensdauer
+
+:::note[Lernziele]
+- Du schreibst eine EF-Core-Abfrage und das Speichern asynchron und gibst ein `CancellationToken` weiter.
+- Du erklärst, warum ein `DbContext` als Scoped-Service registriert wird und wie ein Hintergrunddienst einen eigenen Scope oder eine Fabrik nutzt.
+- Du erklärst, warum zwei gleichzeitige Abfragen auf demselben Context scheitern.
+:::
+
+## Rückblick
+
+<Quiz id="m13-l04-q2" />
+
+<Quiz id="m15-l03-q3" />
+
+<Quiz id="m15-l04-q1" />
+
+## Datenbankaufrufe sind Ein-/Ausgabe
+
+Eine Abfrage wartet auf die Datenbank, ähnlich wie das Lesen einer Datei. EF Core bietet deshalb zu jeder Methode, die die Datenbank anspricht, eine <Term id="async-query">asynchrone Variante</Term> mit der Endung `Async`. Du wartest sie mit `await` ab (Modul 13). Der Thread blockiert dann nicht, solange die Datenbank arbeitet ([Asynchronous Programming](https://learn.microsoft.com/ef/core/miscellaneous/async)).
+
+Die Varianten gibt es für die Operatoren, die die Abfrage ausführen: `ToListAsync`, `FirstOrDefaultAsync`, `CountAsync`, `AnyAsync` und für das Speichern `SaveChangesAsync`. Für `Where`, `Select` und `OrderBy` gibt es keine, denn sie bauen die Abfrage nur auf. Jede dieser Methoden nimmt am Ende ein `CancellationToken` (`m13-l05`). Wird es abgebrochen, bricht der Aufruf mit einer `OperationCanceledException` ab. Ob eine schon laufende Anweisung sofort stoppt, hängt vom Datenbankanbieter ab. Für Zeilen, die einzeln kommen sollen, liefert `AsAsyncEnumerable()` einen `IAsyncEnumerable<T>`, den `await foreach` liest (`m13-l06`). Dasselbe gibt es für das Anlegen der Datenbank: `EnsureCreatedAsync` und `MigrateAsync`.
+
+<CodeBlock language="csharp" title="Program.cs">{asyncProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Wie viele Zeilen schreibt Abschnitt 1, wie viele Vorfälle findet Abschnitt 2 mit mindestens 2 Fehlversuchen, und was passiert in Abschnitt 4? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{asyncOutput}</CodeBlock>
+
+1. **Speichern:** `SaveChangesAsync` schreibt die drei Zeilen und gibt `3` zurück.
+2. **Abfragen:** Nur `bob` hat mindestens 2 Fehlversuche. `AnyAsync`, `CountAsync` und `FirstOrDefaultAsync` führen je eine eigene Abfrage aus.
+3. **Strom:** `await foreach` liest die Zeilen eine nach der anderen.
+4. **Abbruch:** Der Token ist schon abgebrochen. Der Aufruf löst eine `OperationCanceledException` aus, bevor er Zeilen liefert.
+
+**Was passiert, wenn …** du das `await` vor `ToListAsync` weglässt? Dann bekommst du einen `Task<List<Incident>>` statt der Liste, und die Abfrage läuft vielleicht noch, wenn das Programm weitermacht.
+
+</details>
+
+<Quiz id="m16-l10-q1" />
+
+<Quiz id="m16-l10-q2" />
+
+<Quiz id="m16-l10-q3" />
+
+## Ein Context ist eine kurze Arbeitseinheit
+
+Ein `DbContext` ist für eine einzige Arbeitseinheit (<Term id="unit-of-work">Unit of Work</Term>) gedacht: erzeugen, Objekte laden und ändern, `SaveChanges` aufrufen, freigeben. Seine Lebensdauer ist darum meist sehr kurz. Er ist nicht thread-sicher: Teile ihn nicht zwischen Threads und warte jeden asynchronen Aufruf ab, bevor du den Context weiter benutzt ([DbContext Lifetime](https://learn.microsoft.com/ef/core/dbcontext-configuration/)).
+
+`AddDbContext<T>` registriert den Context als Scoped-Service (`m15-l03`). Ein Scope ist im Container die Arbeitseinheit: In einem Scope bekommst du immer denselben Context, ein anderer Scope bekommt einen anderen. Der Context braucht dafür einen öffentlichen Konstruktor mit `DbContextOptions<T>`, wie ihn `SecLogDbContext` hat.
+
+Ein Singleton oder ein `BackgroundService` darf keinen Scoped-Service im Konstruktor verlangen (Captive Dependency, `m15-l04`). Er hat zwei Wege. Erstens erzeugt er für jede Arbeitseinheit mit `CreateAsyncScope()` einen Scope und holt den Context daraus. Zweitens registriert man mit `AddDbContextFactory<T>` die <Term id="dbcontext-factory">Fabrik</Term> `IDbContextFactory<T>`, die bei jedem Aufruf einen neuen Context erzeugt. Diesen Context verwaltet der Container nicht, du gibst ihn selbst frei. Die Fabrik passt, wenn keine Scopes pro Arbeitseinheit vorhanden sind, zum Beispiel in einer Blazor-Anwendung.
+
+<CodeBlock language="csharp" title="Program.cs">{lifetimeProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Sind die Contexts in Abschnitt 1 gleich? Was passiert in Abschnitt 2 mit `ValidateScopes = true`? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{lifetimeOutput}</CodeBlock>
+
+1. **Scope:** Zweimal angefragt im selben Scope ergibt dasselbe Objekt (`True`), in zwei Scopes verschiedene (`False`).
+2. **Captive Dependency:** Der Singleton verlangt einen Scoped-Context. Der Container verweigert das mit einer `InvalidOperationException`.
+3. **Eigener Scope:** `CreateAsyncScope()` liefert einen Scope, in dem `RunCounter` und sein Context leben. Beim Verlassen des `await using`-Blocks ist der Context freigegeben.
+4. **Fabrik:** `CreateDbContextAsync()` liefert einen frischen Context. Der `await using`-Block gibt ihn frei.
+
+**Was passiert, wenn …** du `ValidateScopes` nicht einschaltest? Dann bekommt der Singleton einen Context aus dem Wurzel-Container, der nicht zu einer Arbeitseinheit gehört und von mehreren Aufrufen geteilt wird. Die Prüfung findet den Fehler früh (`m15-l04`).
+
+</details>
+
+<Quiz id="m16-l10-q4" />
+
+<Quiz id="m16-l10-q6" />
+
+<Quiz id="m16-l10-q7" />
+
+## Nicht zwei Operationen zugleich
+
+EF Core unterstützt nicht mehrere parallele Operationen auf demselben Context. Das gilt auch für asynchrone Abfragen, die du gleichzeitig startest. Erkennt EF Core das, wirft es eine `InvalidOperationException` mit einer Meldung, dass eine zweite Operation startete, bevor die erste fertig war. Unerkannt kann es den Zustand des Contexts zerstören. Warte deshalb jeden Aufruf sofort ab oder nimm für parallele Arbeit je einen eigenen Context ([DbContext Lifetime](https://learn.microsoft.com/ef/core/dbcontext-configuration/)).
+
+Das folgende Programm bremst jede Abfrage kurz (die eingeklappte Hilfsklasse), damit sich zwei Operationen sicher überlappen. SQLite würde sie sonst so schnell erledigen, dass der Fehler nicht auftritt. Das ist ein Zufall des Anbieters und keine Erlaubnis.
+
+<CodeBlock language="csharp" title="Program.cs">{parallelProgram}</CodeBlock>
+
+:::info[Vorhersage]
+Welche der drei Varianten scheitert? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{parallelOutput}</CodeBlock>
+
+1. **Ein Context, zwei Operationen:** `Task.WhenAll` startet beide, bevor die erste fertig ist. EF Core meldet die `InvalidOperationException`.
+2. **Nacheinander:** Jedes `await` beendet die Operation vor der nächsten. Das läuft.
+3. **Zwei Contexts:** Jede Operation hat ihren eigenen Context und ihre eigene Verbindung. `Task.WhenAll` ist jetzt erlaubt.
+
+**Was passiert, wenn …** du in Variante 1 den Fehler fängst und mit demselben Context weitermachst? Die Ausnahme zeigt einen Programmfehler an. Der Context kann danach in einem unbrauchbaren Zustand sein. Verwirf ihn.
+
+</details>
+
+<Quiz id="m16-l10-q5" />
+
+## Gap-Beispiel: asynchron lesen
+
+Die Lücke `___` fehlt. Der Aufruf soll alle Vorfälle asynchron lesen und den Token weitergeben. Setze den Namen der Methode ein.
+
+<CodeBlock language="csharp" title="gap-to-list-async.snippet.cs">{gapToList}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `ToListAsync`: `.ToListAsync(token)`. Das `await` davor wartet auf die Liste.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m16-l09/`) speichert Vorfälle, fragt sie ab und sucht sie sicher parametrisiert. Das Programm baut den Context noch von Hand mit `new` und ruft die Datenbank synchron auf.
+
+**Neue Anforderung:** SecLog bekommt seinen Datenbankkontext aus dem DI-Container und greift asynchron auf die Datenbank zu. Das ist eine Umstrukturierung. `Program.cs` registriert `AddDbContext<SecLogDbContext>(o => o.UseSqlite(connectionString))`. Jeder Analyselauf erzeugt einen Scope. Alle synchronen Datenbankaufrufe werden zu den asynchronen und bekommen `stoppingToken`. Die Ausgabe unter `== Database ==` bleibt gleich wie in `seclog-m16-l09`. `ValidateScopes` und `ValidateOnBuild` bleiben an.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Cli/Program.cs (geänderte Blöcke)">{programBlock}</CodeBlock>
+
+1. **Registrieren:** `AddDbContext` macht aus `SecLogDbContext` einen Scoped-Service. Ein weiterer Filter setzt das Log von `Microsoft.EntityFrameworkCore` auf `Warning`, weil der Context aus dem Container jede SQL-Anweisung loggt und die Ausgabe sonst nicht mehr gleich bleibt.
+2. **Token weitergeben:** `AnalysisService` übergibt `stoppingToken` an die Analyse, und die Analyse reicht ihn an jeden Datenbankaufruf weiter.
+3. **Scope pro Lauf:** Der Hintergrunddienst ist ein Singleton. Darum holt `provider.CreateAsyncScope()` den Context aus einem eigenen Scope. Eine Fabrik wäre auch möglich. Der Scope passt besser, weil der Analyselauf schon in Scopes arbeitet (`AnalysisRun`) und genau eine Arbeitseinheit ist.
+4. **Asynchron:** `MigrateAsync`, `SaveChangesAsync`, `ToListAsync` und `SingleAsync` ersetzen die synchronen Aufrufe, `await foreach` liest den Bericht.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m16-l10/`) holt seinen Context aus dem Container und arbeitet asynchron. Das ist der Stand von Modul 16: SecLog speichert Ereignisse und Vorfälle in einer Datenbank.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m16-l10-dbcontext-as-singleton" />
+
+**„Ein `DbContext` sollte als Singleton registriert werden, weil das Erzeugen teuer ist.“** Ein Context ist für eine kurze Arbeitseinheit gedacht, trägt Zustand (verfolgte Objekte) und ist nicht thread-sicher. `AddDbContext` registriert ihn als Scoped-Service.
+:::
+
+:::warning[Achtung]
+<Misconception id="m16-l10-parallel-queries-one-context" />
+
+**„Mit `Task.WhenAll` kann ich mehrere Abfragen auf demselben Context parallel ausführen.“** Ein Context erlaubt nur eine Operation zur Zeit. Für parallele Arbeit brauchst du je einen Context.
+:::
+
+<details>
+<summary>Vertiefung: Context-Pooling (optional)</summary>
+
+`AddDbContextPool` ist eine Variante von `AddDbContext`, die Context-Objekte wiederverwendet, statt sie jedes Mal neu zu erzeugen. Sie gehört zu den Themen der Leistungsoptimierung. Für SecLog brauchst du sie nicht, Einzelheiten stehen bei [Advanced Performance Topics](https://learn.microsoft.com/ef/core/performance/advanced-performance-topics).
+
+</details>
+
+## Zusammenfassung
+
+Datenbankaufrufe sind Ein-/Ausgabe: Du nimmst die `Async`-Varianten, wartest sie ab und gibst ein `CancellationToken` weiter. Ein `DbContext` ist eine kurze, nicht thread-sichere Arbeitseinheit. `AddDbContext` registriert ihn als Scoped-Service. Ein Singleton oder Hintergrunddienst erzeugt einen Scope pro Arbeitseinheit oder nutzt `IDbContextFactory<T>`. Zwei gleichzeitige Operationen brauchen zwei Contexts.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m16-l10-q8" />
+
+<Quiz id="m16-l10-q9" />
+
+### Transferfrage
+
+<Quiz id="m16-l10-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Asynchronous Programming](https://learn.microsoft.com/ef/core/miscellaneous/async)
+- Microsoft Learn: [DbContext Lifetime, Configuration, and Initialization](https://learn.microsoft.com/ef/core/dbcontext-configuration/)

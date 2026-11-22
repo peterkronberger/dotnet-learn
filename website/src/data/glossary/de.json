@@ -11172,6 +11172,102 @@
         "title": "Design-time DbContext Creation",
         "url": "https://learn.microsoft.com/ef/core/cli/dbcontext-creation"
       }
+    },
+    {
+      "id": "raw-sql",
+      "term": "Raw SQL",
+      "german": "SQL-Text von Hand",
+      "category": "platform",
+      "definition": "SQL, das du selbst schreibst und über `FromSql`, `SqlQuery` oder `ExecuteSql` an die Datenbank schickst, statt es EF Core aus LINQ erzeugen zu lassen.",
+      "related": [
+        "sql",
+        "sql-parameter"
+      ],
+      "lesson": "m16-l09",
+      "source": {
+        "title": "SQL Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/sql-queries"
+      }
+    },
+    {
+      "id": "sql-injection",
+      "term": "SQL Injection",
+      "german": "SQL-Einschleusung",
+      "category": "platform",
+      "definition": "Eine Eingabe wird in den SQL-Text eingebaut und ändert so die Bedeutung der Abfrage. Schutz: Werte als Parameter senden, nie in den SQL-Text einfügen.",
+      "related": [
+        "sql-parameter",
+        "parameterized-query"
+      ],
+      "lesson": "m16-l09",
+      "source": {
+        "title": "SQL Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/sql-queries"
+      }
+    },
+    {
+      "id": "sql-parameter",
+      "term": "SQL Parameter",
+      "german": "SQL-Parameter",
+      "category": "platform",
+      "definition": "Ein Platzhalter im SQL-Text (zum Beispiel `@p0`), dessen Wert getrennt vom Text an die Datenbank geht. Die Datenbank liest den Wert nie als SQL.",
+      "related": [
+        "parameterized-query",
+        "sql-injection"
+      ],
+      "lesson": "m16-l09",
+      "source": {
+        "title": "SQL Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/sql-queries"
+      }
+    },
+    {
+      "id": "async-query",
+      "term": "Async Query",
+      "german": "asynchrone Abfrage",
+      "category": "platform",
+      "definition": "Ein EF-Core-Aufruf mit Endung `Async`, der die Datenbank anspricht, ohne einen Thread zu blockieren, zum Beispiel `ToListAsync` oder `SaveChangesAsync`. Du wartest ihn mit `await` ab.",
+      "related": [
+        "async-method",
+        "cancellation-token"
+      ],
+      "lesson": "m16-l10",
+      "source": {
+        "title": "Asynchronous Programming",
+        "url": "https://learn.microsoft.com/ef/core/miscellaneous/async"
+      }
+    },
+    {
+      "id": "dbcontext-factory",
+      "term": "DbContext Factory",
+      "german": "DbContext-Fabrik",
+      "category": "platform",
+      "definition": "`IDbContextFactory<T>` erzeugt bei jedem Aufruf einen neuen `DbContext`. Du gibst ihn selbst frei. Sie passt, wenn ein Dienst kein Scope pro Arbeitseinheit hat.",
+      "related": [
+        "dbcontext",
+        "scope"
+      ],
+      "lesson": "m16-l10",
+      "source": {
+        "title": "DbContext Lifetime, Configuration, and Initialization",
+        "url": "https://learn.microsoft.com/ef/core/dbcontext-configuration/"
+      }
+    },
+    {
+      "id": "parameterized-query",
+      "term": "Parameterized Query",
+      "german": "parametrisierte Abfrage",
+      "category": "platform",
+      "definition": "Eine Abfrage, deren SQL-Text feste Platzhalter enthält und deren Werte als Parameter mitgeschickt werden. `FromSql` mit einem interpolierten String erzeugt sie.",
+      "related": [
+        "sql-parameter",
+        "raw-sql"
+      ],
+      "lesson": "m16-l09",
+      "source": {
+        "title": "SQL Queries",
+        "url": "https://learn.microsoft.com/ef/core/querying/sql-queries"
+      }
     }
   ]
 }

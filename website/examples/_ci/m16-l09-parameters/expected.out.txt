@@ -1,0 +1,17 @@
+.param set p0 'bob'
+
+SELECT * FROM Incidents WHERE User = @p0
+
+Rows: 1
+
+.param set p0 1
+
+SELECT "i"."User"
+FROM (
+    SELECT * FROM Incidents WHERE FailureCount >= @p0
+) AS "i"
+ORDER BY "i"."User"
+alice, bob, dave
+
+Incidents with at least 2 failures: 1
+Rows changed: 1
