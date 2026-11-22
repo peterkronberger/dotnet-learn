@@ -74,6 +74,13 @@ From `m14-l01` on, SecLog is no longer one `.cs` file but a .NET project, later 
 - **In the lesson.** The project step shows the start code from the previous folder with `<CodeBlock>` and the model solution from the new folder with `<FoldedCode>` (folds are allowed in big files, rules as in "Short task files"). Only the files that the step changes are shown; each code block title is the path inside the folder, for example `src/SecLog.Core/FailureRule.cs`.
 - **In the PR.** The PR of a lesson shows `diff -r <previous folder> <new folder>` without `bin/`, `obj/` and `TestResults/` (for example `diff -r -x bin -x obj -x TestResults …`) and says that the diff contains only the new requirement.
 
+### M18: runnable excerpts
+
+- M18 lessons that are ▶ have their automatically checked project task as a runnable single file in `website/examples/m18/lYY/`: `core-<topic>-task.cs`, `core-<topic>-task.tests.snippet.cs`, `core-<topic>-solution.cs` and the `.out.txt` snapshots. Never use the prefix `seclog-` (the chain check of `tools/check-seclog.mjs` would compare these files with the M13 solution).
+- The excerpt contains only the types the task needs. Its type declarations are identical to the files of the SecLog folder of the same lesson (`_ci/seclog-m18-lYY/src/SecLog.Core/…`), except for `namespace` and `using` lines. The task file holds the previous state of these types (or a stub that throws `NotImplementedException`).
+- The real step is still the folder `_ci/seclog-m18-lYY/` (chain rule above). The lesson shows the excerpt in `<CSharpRunner tests>` and, in the model solution, the excerpt (`<FoldedCode>`) and the changed files of the folder (`<CodeBlock>`).
+- The PR of the lesson shows the diff that proves the identity.
+
 ## Milestones
 
 | Module | After this module SecLog can … | Concepts |
