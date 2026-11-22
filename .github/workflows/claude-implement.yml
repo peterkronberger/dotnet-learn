@@ -140,8 +140,10 @@ jobs:
                  For lesson work: `bash tools/check-examples.sh --lesson <mNN-lYY>` once for every
                  lesson you implemented (only these lessons, not the whole module and not the full
                  check; CI runs the full check on the PR), `node tools/check-quiz.mjs` and
-                 `npm run build`. For other work (tools, components, playground) run the full
-                 `bash tools/check-examples.sh`. Fix problems in further commits and push them
+                 `npm run build`. Run `check-examples.sh` only for the lessons or modules that
+                 your change really affects (`--lesson`, or `--module` when a whole module is
+                 affected). Never run the full check yourself. If the change affects no lesson
+                 or module, skip it. Fix problems in further commits and push them
                  (no force push).
                - When the checks pass, check with
                  `gh pr list --head claude/issue-${{ env.ISSUE }} --state open` whether a PR already exists.
