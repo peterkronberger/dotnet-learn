@@ -1,5 +1,6 @@
 using System.Text;
 using System.Globalization;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -1588,6 +1589,17 @@ async Task RunAnalysisAsync(
         {
             Console.WriteLine($"Found: #{row.Id} {row.User} {row.FailureCount}");
         }
+        // Print the stored incidents as JSON, in the shape the API will use
+        Console.WriteLine("== JSON ==");
+        List<IncidentSummary> summaries = (await db.Incidents
+            .AsNoTracking()
+            .OrderBy(i => i.Id)
+            .ToListAsync(stoppingToken))
+            .Select(IncidentSummary.From)
+            .ToList();
+        JsonSerializerOptions jsonOptions =
+            new(JsonSerializerDefaults.Web) { WriteIndented = true };
+        Console.WriteLine(JsonSerializer.Serialize(summaries, jsonOptions));
     }
 }
 

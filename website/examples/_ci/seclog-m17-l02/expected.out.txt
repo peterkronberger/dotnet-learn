@@ -444,6 +444,30 @@ FROM (
 ) AS "s"
 ORDER BY "s"."Id"
 Found: #1 bob 5
+== JSON ==
+[
+  {
+    "id": 1,
+    "user": "bob",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 5
+  },
+  {
+    "id": 2,
+    "user": "dave",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 1
+  },
+  {
+    "id": 3,
+    "user": "carol",
+    "source": "sample log",
+    "status": "investigating",
+    "failureCount": 1
+  }
+]
 
 == Tests ==
 Passed SecLog.Tests.DetectionOptionsTests.Defaults_AreValid
