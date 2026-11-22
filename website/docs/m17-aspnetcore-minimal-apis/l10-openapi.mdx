@@ -1,0 +1,180 @@
+---
+title: Die API mit OpenAPI beschreiben
+sidebar_position: 10
+description: Was ein OpenAPI-Dokument ist, wie ASP.NET Core es mit AddOpenApi und MapOpenApi aus den Endpoints erzeugt und wie typisierte Ergebnisse, Attribute und Metadaten seinen Inhalt bestimmen.
+lesson_id: m17-l10
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import document from '!!raw-loader!@site/examples/_ci/m17-l10-document/Program.cs';
+import documentOutput from '!!raw-loader!@site/examples/_ci/m17-l10-document/expected.out.txt';
+import gapOpenApi from '!!raw-loader!@site/examples/m17/l10/gap-openapi.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l10/src/SecLog.Api/Program.cs';
+import endpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l10/src/SecLog.Api/IncidentEndpoints.cs';
+import openApiTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l10/tests/SecLog.Api.Tests/OpenApiTests.cs';
+
+# Die API mit OpenAPI beschreiben
+
+:::note[Lernziele]
+- Du erklärst, wofür ein OpenAPI-Dokument gebraucht wird.
+- Du erzeugst mit `AddOpenApi` und `MapOpenApi` ein Dokument und findest darin Pfade und Antworten.
+- Du beeinflusst mit `WithName`, `WithSummary` und typisierten Ergebnissen, was im Dokument steht.
+:::
+
+## Rückblick
+
+<Quiz id="m17-l06-q3" />
+
+<Quiz id="m17-l02-q1" />
+
+<Quiz id="m14-l06-q1" />
+
+## Eine API, die sich selbst beschreibt
+
+Ein Client, der deine API aufrufen will, muss wissen, welche Pfade es gibt, welche Methoden sie annehmen, welche Parameter und Bodys sie erwarten und welche Antworten zurückkommen. Das lässt sich aufschreiben, aber ein Text veraltet, sobald sich der Code ändert. <Term id="openapi">OpenAPI</Term> ist ein Standard, der dieselben Angaben maschinenlesbar festhält ([Overview of OpenAPI support in ASP.NET Core API apps](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/overview)). Die Beschreibung heißt <Term id="openapi-document">OpenAPI-Dokument</Term> und ist JSON (Lektion 2) oder YAML. Werkzeuge lesen sie und erzeugen daraus Dokumentation, Client-Code oder Tests.
+
+ASP.NET Core schreibt das Dokument nicht von Hand, sondern erzeugt es aus den Endpoints der App. Dafür ist das Paket `Microsoft.AspNetCore.OpenApi` nötig, und zwei Aufrufe <Since dotnet="9" />:
+
+- `builder.Services.AddOpenApi()` registriert die Dienste, die das Dokument erzeugen.
+- `app.MapOpenApi()` legt einen Endpoint an, der das Dokument als JSON ausliefert, standardmäßig unter `/openapi/v1.json`.
+
+Der Inhalt kommt aus dem, was die App über jeden Endpoint weiß: Pfad und Methode, die Parameter des Handlers, der Body und seine Attribute, der Rückgabetyp. Dazu kommen <Term id="endpoint-metadata">Metadaten</Term>, die du an den Endpoint hängst:
+
+- `WithName("…")` setzt die Operation-Id, den eindeutigen Namen der Operation.
+- `WithSummary("…")` setzt eine Kurzbeschreibung, `WithDescription("…")` eine längere.
+- `WithTags("…")` ordnet die Operation einer Gruppe zu. Werkzeuge nutzen das zum Sortieren.
+- `Produces<T>(…)` und `ProducesProblem(…)` nennen zusätzliche Antworten, die der Rückgabetyp nicht zeigt.
+
+([Include OpenAPI metadata in an ASP.NET Core app](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/include-metadata))
+
+Metadaten beschreiben nur. Sie ändern das Verhalten des Endpoints nicht: Steht dort `418`, der Handler sendet aber `200`, bleibt es bei `200`.
+
+Antworten musst du meist nicht selbst nennen. Ein typisiertes Ergebnis (Lektion 6) bringt seine Metadaten mit, und bei `Results<Ok<T>, NotFound>` steht je Typ ein Eintrag im Dokument. Auch Attribute zur Validierung (Lektion 5) wirken: `[MaxLength(32)]` wird zur Grenze `maxLength: 32` im Schema. Das Dokument beschreibt die Grenze, die Prüfung selbst bleibt Sache der Validierung.
+
+Das Programm unten baut zwei Endpoints mit Namen und Kurzbeschreibung, ruft das Dokument ab und liest es mit `JsonDocument` (Lektion 2). Es druckt nur einen kleinen, stabilen Teil: die Version, die Pfade mit Name, Kurzbeschreibung und Antwortcodes und die Grenze aus dem Attribut.
+
+:::info[Vorhersage]
+Welche Antwortcodes stehen bei jedem der beiden Endpoints, obwohl du sie nirgends von Hand angegeben hast? Welche Grenze hat `status`? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={document} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{documentOutput}</CodeBlock>
+
+1. **Dokument abrufen:** `MapOpenApi` liefert das JSON unter `/openapi/v1.json`. Das Programm liest es mit `JsonDocument`.
+2. **Antworten:** Die Codes kommen aus den Rückgabetypen. `Results<Ok<Incident>, NotFound>` ergibt `200` und `404`, `Results<NoContent, NotFound>` ergibt `204` und `404`.
+3. **Metadaten:** `WithName` erscheint als `operationId`, `WithSummary` als `summary`.
+4. **Attribut:** `[MaxLength(32)]` am Body-Typ wird zu `maxLength: 32` im Schema von `StatusChange`.
+5. **Version:** In `.NET 11` erzeugt der Generator standardmäßig ein Dokument der OpenAPI-Version 3.2. <Since dotnet="11" /> Mit `options.OpenApiVersion` in `AddOpenApi` lässt sich eine ältere Version wählen, wenn ein Werkzeug 3.2 noch nicht versteht.
+
+**Was passiert, wenn …** du `.WithSummary(…)` weglässt? Der Endpoint bleibt im Dokument, aber ohne `summary`. Der Aufruf `GetProperty("summary")` im Programm würde dann scheitern.
+
+</details>
+
+<Quiz id="m17-l10-q1" />
+
+<Quiz id="m17-l10-q2" />
+
+<Quiz id="m17-l10-q3" />
+
+## Metadaten sind Beschreibung
+
+<Quiz id="m17-l10-q4" />
+
+<Quiz id="m17-l10-q5" />
+
+## Oberflächen, YAML und Build
+
+Drei Randthemen, nur kurz und nur mit Namen:
+
+- **Oberflächen:** ASP.NET Core erzeugt nur das Dokument. Oberflächen zum Ausprobieren, etwa Swagger UI oder Scalar, gehören nicht dazu. Sie sind eigene Pakete und lesen das Dokument nur.
+- **YAML:** Mit `app.MapOpenApi("/openapi/{documentName}.yaml")` liefert die App dasselbe Dokument als YAML.
+- **Beim Build erzeugen:** Das Paket `Microsoft.Extensions.ApiDescription.Server` schreibt das Dokument beim Build in eine Datei.
+
+**Sicherheit:** Das Dokument nennt jeden Pfad, jeden Parameter und jede Antwort der API. Für jemanden, der die API ausspäht, ist es eine fertige Landkarte. Darum entscheidest du bewusst, in welchen Umgebungen es erreichbar ist. Lektion 12 erledigt das. Die Vorlage von ASP.NET Core ruft `MapOpenApi` nur in der Entwicklung auf.
+
+## Gap-Beispiel: das Dokument ausliefern
+
+Die Lücke `___` fehlt. Setze den Namen der Methode ein, die den Endpoint für das Dokument anlegt.
+
+<CodeBlock language="csharp" title="gap-openapi.snippet.cs">{gapOpenApi}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `MapOpenApi`: `app.MapOpenApi();`. `AddOpenApi` registriert die Dienste, `MapOpenApi` legt den Endpoint an.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l09/`) bietet drei Endpunkte unter `/incidents`. Eine Beschreibung der API gibt es nicht.
+
+**Neue Anforderung:** SecLog beschreibt seine API mit einem OpenAPI-Dokument. Jeder Endpunkt hat einen Namen und eine Kurzbeschreibung.
+
+Dafür kommt das Paket `Microsoft.AspNetCore.OpenApi` in `SecLog.Api.csproj`. In `Program.cs` stehen `AddOpenApi()` und `MapOpenApi()`, vorerst in jeder Umgebung. Lektion 12 schränkt das ein. In `IncidentEndpoints.cs` bekommen die drei Endpunkte `WithName` und `WithSummary`. Die neuen Tests rufen `GET /openapi/v1.json` ab und lesen das Dokument mit `JsonDocument`: Es enthält die Pfade `/incidents`, `/incidents/{id}` und `/incidents/{id}/status`, bei `GET /incidents/{id}` den Antwortcode `404`, und jede Operation hat Name und Kurzbeschreibung.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (geändert)">{endpoints}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/OpenApiTests.cs (neu)">{openApiTests}</CodeBlock>
+
+1. **Paket:** `SecLog.Api.csproj` bekommt eine `PackageReference` auf `Microsoft.AspNetCore.OpenApi` (`11.0.*`).
+2. **Dienste und Endpoint:** `AddOpenApi()` registriert die Dienste, `MapOpenApi()` liefert das Dokument aus.
+3. **Metadaten:** `WithName` und `WithSummary` stehen an jedem der drei Endpunkte. Die Antwortcodes kommen aus den typisierten Ergebnissen aus Lektion 6.
+4. **Tests:** Sie lesen das Dokument mit `JsonDocument` und prüfen Pfade, den Code `404` und die Metadaten. In `expected.out.txt` sind die drei Zeilen `OpenApiTests` neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l10/`) liefert unter `/openapi/v1.json` ein OpenAPI-Dokument aus, in dem jeder Endpunkt Namen, Kurzbeschreibung und Antworten hat.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l10-openapi-is-swagger-ui" />
+
+**„OpenAPI ist die Weboberfläche, auf der man Endpunkte ausprobiert.“** OpenAPI ist das Format des Dokuments, JSON oder YAML. Oberflächen wie Swagger UI oder Scalar lesen es nur und zeigen es an. ASP.NET Core liefert das Dokument, aber keine Oberfläche.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l10-document-written-by-hand" />
+
+**„Das OpenAPI-Dokument schreibe ich von Hand.“** ASP.NET Core erzeugt es aus Endpoints, Parametern, Ergebnistypen und Metadaten. Von Hand ergänzt du nur, was der Code nicht zeigt, etwa Kurzbeschreibungen.
+:::
+
+<details>
+<summary>Vertiefung: Schema, Komponenten und Versionen (optional)</summary>
+
+Ein OpenAPI-Dokument hat feste Hauptteile: `paths` ordnet jedem Pfad die Operationen je HTTP-Methode zu, und `components` sammelt wiederverwendbare Schemas, etwa den Typ `StatusChange`. Die Operationen verweisen darauf. Die Version steht im Feld `openapi`. ASP.NET Core erzeugt seit .NET 10 Dokumente der Version 3.1 und seit .NET 11 der Version 3.2 und lässt sich auf frühere Versionen einstellen ([Generate OpenAPI documents](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/aspnetcore-openapi)). Wer Dokumente an andere Werkzeuge gibt, prüft daher, welche Version diese lesen.
+
+</details>
+
+## Zusammenfassung
+
+Ein OpenAPI-Dokument beschreibt eine HTTP-API maschinenlesbar. ASP.NET Core erzeugt es zur Laufzeit aus den Endpoints: `AddOpenApi` registriert die Dienste, `MapOpenApi` liefert das JSON unter `/openapi/v1.json` aus. Typisierte Ergebnisse und Validierungsattribute fließen automatisch ein, `WithName`, `WithSummary` und `Produces` ergänzen Metadaten. Metadaten beschreiben nur und ändern das Verhalten nicht. Oberflächen wie Swagger UI sind getrennte Werkzeuge. Weil das Dokument die ganze API zeigt, entscheidest du, wo es erreichbar ist.
+
+## Prüfe dein Wissen
+
+<Quiz id="m17-l10-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l10-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l10-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Overview of OpenAPI support in ASP.NET Core API apps](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/overview)
+- Microsoft Learn: [Generate OpenAPI documents](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/aspnetcore-openapi)
+- Microsoft Learn: [Include OpenAPI metadata in an ASP.NET Core app](https://learn.microsoft.com/aspnet/core/fundamentals/openapi/include-metadata)

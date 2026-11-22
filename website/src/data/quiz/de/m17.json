@@ -1099,6 +1099,327 @@
       "type": "explain",
       "question": "Transfer: SecLog soll später prüfen, ob ein Aufrufer angemeldet ist, und jede Anfrage protokollieren. In welcher Reihenfolge stehen die beiden Middleware, wenn auch abgelehnte Anfragen im Log erscheinen sollen?",
       "modelAnswer": "Die Protokollierung steht vor der Prüfung. Sie sieht jede Anfrage, bevor die Prüfung sie ablehnt, und nach `next` auch die Antwort mit dem Statuscode. Stünde die Prüfung vorne und beendete die Anfrage, käme die abgelehnte Anfrage nie bei der Protokollierung an."
+    },
+    {
+      "id": "m17-l09-q1",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Eine Web-App registriert einen Service mit `AddScoped`. Wie lange lebt eine Instanz?",
+      "options": [
+        {
+          "text": "Eine Anfrage lang: Jede Anfrage bekommt einen eigenen Scope und darin ihre eigene Instanz.",
+          "correct": true
+        },
+        {
+          "text": "So lange wie die Anwendung, denn eine Web-App läuft die ganze Zeit.",
+          "misconception": "m17-l09-scoped-lives-whole-app",
+          "feedback": "So lange wie die Anwendung lebt ein Singleton. Scoped heißt: so lange wie der Scope, und das Framework legt für jede Anfrage einen an."
+        },
+        {
+          "text": "Einen Aufruf lang: Jedes Mal, wenn der Service injiziert wird, entsteht eine neue Instanz.",
+          "feedback": "Das beschreibt Transient. Innerhalb einer Anfrage bekommen Middleware und Handler dieselbe Scoped-Instanz."
+        },
+        {
+          "text": "So lange, wie ein Client verbunden ist, auch über mehrere Anfragen hinweg.",
+          "feedback": "Der Scope gehört zu einer einzelnen Anfrage, nicht zu einem Client."
+        }
+      ],
+      "explanation": "Das Framework legt für jede Anfrage einen DI-Scope an und gibt ihn mit der Antwort wieder frei. Ein Scoped-Service lebt darin genau eine Anfrage lang."
+    },
+    {
+      "id": "m17-l09-q2",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Scoped-Service `A` wird in einer Middleware und im Handler derselben Anfrage angefordert. Danach kommt eine zweite Anfrage mit denselben Anforderungen. Wie viele Instanzen von `A` entstehen insgesamt?",
+      "options": [
+        {
+          "text": "Zwei: eine je Anfrage, die Middleware und der Handler teilen sich ihre.",
+          "correct": true
+        },
+        {
+          "text": "Eine für beide Anfragen zusammen.",
+          "misconception": "m17-l09-scoped-lives-whole-app",
+          "feedback": "Eine Instanz für alle Anfragen wäre ein Singleton. Ein Scoped-Service bekommt in jeder Anfrage eine neue Instanz."
+        },
+        {
+          "text": "Vier: jede Anforderung bekommt eine neue Instanz.",
+          "feedback": "So verhält sich Transient. Innerhalb eines Scopes liefert der Container dieselbe Scoped-Instanz."
+        },
+        {
+          "text": "Zwei, aber nur wenn der Service `IDisposable` ist.",
+          "feedback": "Die Zahl der Instanzen hängt von der Lebensdauer ab, nicht von `IDisposable`."
+        }
+      ],
+      "explanation": "Innerhalb einer Anfrage ist der Scope derselbe, also auch die Instanz. Die zweite Anfrage bekommt einen neuen Scope und eine neue Instanz."
+    },
+    {
+      "id": "m17-l09-q3",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Singleton-Service in einer Web-App zählt Anfragen in einem Feld. Warum muss er thread-sicher sein?",
+      "options": [
+        {
+          "text": "Viele Anfragen laufen gleichzeitig und greifen alle auf dieselbe Instanz zu.",
+          "correct": true
+        },
+        {
+          "text": "Eine Web-App ruft jeden Service in einem eigenen Thread auf.",
+          "feedback": "Ein Thread je Service gibt es nicht. Das Problem ist, dass mehrere Anfragen dieselbe Singleton-Instanz gleichzeitig benutzen."
+        },
+        {
+          "text": "Singletons werden bei jeder Anfrage neu erzeugt.",
+          "feedback": "Das Gegenteil stimmt: Es gibt nur eine Instanz für die ganze App."
+        },
+        {
+          "text": "Der Container sperrt Singletons nicht, aber Scoped-Services schon.",
+          "feedback": "Der Container synchronisiert keinen Zugriff auf Service-Zustand, auch nicht bei Scoped-Services."
+        }
+      ],
+      "explanation": "Ein Singleton wird von allen Anfragen geteilt, und Anfragen laufen gleichzeitig. Veränderlicher Zustand darin braucht Schutz, zum Beispiel `Interlocked` oder ein `lock`."
+    },
+    {
+      "id": "m17-l09-q4",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Handler hat den Parameter `CancellationToken cancellationToken`. Woher kommt der Wert?",
+      "options": [
+        {
+          "text": "Das Framework bindet ihn an `HttpContext.RequestAborted`. Der Token wird abgebrochen, wenn der Client die Anfrage aufgibt.",
+          "correct": true
+        },
+        {
+          "text": "Er kommt aus dem Query-String der Anfrage.",
+          "feedback": "Ein `CancellationToken` ist ein Sondertyp. Er wird nicht aus Pfad, Query oder Body gelesen."
+        },
+        {
+          "text": "Der Parameter ist immer `default`, bis der Handler selbst einen Abbruch auslöst.",
+          "feedback": "Der Token ist an die Anfrage gebunden und wird abgebrochen, wenn der Client sie aufgibt."
+        },
+        {
+          "text": "Er muss mit `AddScoped<CancellationToken>()` registriert werden.",
+          "feedback": "Dafür ist keine Registrierung nötig. Das Framework kennt den Typ."
+        }
+      ],
+      "explanation": "Ein `CancellationToken`-Parameter ist ein Sondertyp der Parameterbindung. Er zeigt auf `HttpContext.RequestAborted`."
+    },
+    {
+      "id": "m17-l09-q5",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Handler ruft `await db.Incidents.ToListAsync()` ohne Token auf. Der Client bricht die Anfrage ab. Was passiert mit der Datenbankabfrage?",
+      "options": [
+        {
+          "text": "Sie läuft weiter, denn nur ein weitergereichter Token kann sie abbrechen.",
+          "correct": true
+        },
+        {
+          "text": "Sie wird automatisch abgebrochen, weil die Anfrage abgebrochen ist.",
+          "misconception": "m17-l09-cancellation-automatic",
+          "feedback": "Der Abbruch ist kooperativ (Lektion 5 aus Modul 13): Nur Code, der den Token bekommt, kann darauf reagieren."
+        },
+        {
+          "text": "Der Handler wirft sofort eine `OperationCanceledException` an der Stelle, an der er gerade wartet.",
+          "feedback": "Ohne Token kennt `ToListAsync` den Abbruch nicht. Der Handler wartet weiter, bis die Abfrage fertig ist."
+        },
+        {
+          "text": "Der Client bekommt `500`.",
+          "feedback": "Der Client hat die Anfrage aufgegeben und bekommt keine Antwort mehr."
+        }
+      ],
+      "explanation": "Das Framework setzt den Token der Anfrage auf abgebrochen, mehr nicht. Die Abfrage stoppt nur, wenn der Handler den Token an `ToListAsync` weitergibt."
+    },
+    {
+      "id": "m17-l09-q6",
+      "lesson": "m17-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Services in Handlern stimmen?",
+      "options": [
+        {
+          "text": "Ein Parameter, dessen Typ registriert ist, wird ohne Attribut aus dem Container befüllt.",
+          "correct": true
+        },
+        {
+          "text": "Mit `[FromKeyedServices(\"name\")]` holt ein Parameter den Service, der unter diesem Schlüssel registriert ist.",
+          "correct": true
+        },
+        {
+          "text": "`[FromServices]` ist erlaubt, aber bei einem registrierten Typ nicht nötig.",
+          "correct": true
+        },
+        {
+          "text": "Ein Scoped-Service darf nicht in einen Handler, weil Handler Singletons sind.",
+          "feedback": "Ein Handler läuft innerhalb des Anfrage-Scopes und bekommt Scoped-Services."
+        }
+      ],
+      "explanation": "Die Parameterbindung erkennt registrierte Typen selbst. `[FromServices]` macht die Herkunft ausdrücklich, `[FromKeyedServices]` wählt einen Service nach Schlüssel."
+    },
+    {
+      "id": "m17-l09-q7",
+      "lesson": "m17-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Scoped-Service in einer Web-App genau eine Anfrage lang lebt und was das für den `DbContext` bedeutet.",
+      "modelAnswer": "Das Framework legt für jede Anfrage einen eigenen DI-Scope an und gibt ihn am Ende frei. Ein Scoped-Service wird einmal je Scope erzeugt, also einmal je Anfrage. Der `DbContext` ist per `AddDbContext` Scoped: Jede Anfrage hat ihren eigenen Context, der nicht von parallelen Anfragen geteilt wird, und er wird am Ende der Anfrage entsorgt."
+    },
+    {
+      "id": "m17-l09-q8",
+      "lesson": "m17-l09",
+      "type": "explain",
+      "question": "Transfer: Ein Endpoint von SecLog führt eine Abfrage aus, die mehrere Sekunden dauert. Was änderst du im Handler, damit die Datenbank nicht weiterarbeitet, wenn der Client wegläuft?",
+      "modelAnswer": "Der Handler nimmt einen `CancellationToken` als Parameter an. Das Framework bindet ihn an den Abbruch der Anfrage. Der Handler reicht ihn an `ToListAsync`, `FirstOrDefaultAsync` oder `SaveChangesAsync` weiter. Bricht der Client ab, wirft der Aufruf eine `OperationCanceledException`, und die Abfrage stoppt."
+    },
+    {
+      "id": "m17-l10-q1",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Was ist ein OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Eine maschinenlesbare Beschreibung der API: Pfade, Methoden, Parameter, Bodys und Antworten.",
+          "correct": true
+        },
+        {
+          "text": "Eine Weboberfläche, in der man Endpunkte der API ausprobieren kann.",
+          "misconception": "m17-l10-openapi-is-swagger-ui",
+          "feedback": "Solche Oberflächen (zum Beispiel Swagger UI oder Scalar) lesen das Dokument nur. Das Dokument selbst ist JSON oder YAML und hat keine Oberfläche."
+        },
+        {
+          "text": "Der Quellcode der Handler, als Datei veröffentlicht.",
+          "feedback": "Das Dokument beschreibt die Schnittstelle, nicht die Implementierung. Der Code der Handler steht nicht darin."
+        },
+        {
+          "text": "Eine Sammlung von Testfällen, die jeden Endpunkt aufrufen.",
+          "feedback": "Aus einem Dokument lassen sich Tests ableiten. Es enthält aber selbst keine Testfälle."
+        }
+      ],
+      "explanation": "Ein OpenAPI-Dokument beschreibt die API in einem festen Format. Werkzeuge lesen es und erzeugen daraus Dokumentation, Clients oder Tests."
+    },
+    {
+      "id": "m17-l10-q2",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Die App ruft `builder.Services.AddOpenApi()` und `app.MapOpenApi()` auf. Wie kommt das Dokument zustande, und wo steht es?",
+      "options": [
+        {
+          "text": "Die App erzeugt es aus den Endpoints und ihren Metadaten und liefert es standardmäßig unter `/openapi/v1.json` aus.",
+          "correct": true
+        },
+        {
+          "text": "Der Entwickler schreibt es als Datei, und `MapOpenApi` liefert diese Datei aus.",
+          "misconception": "m17-l10-document-written-by-hand",
+          "feedback": "Das Dokument wird erzeugt: Endpoints, Parameter, Ergebnistypen und Metadaten liefern den Inhalt. Eine von Hand gepflegte Datei läuft dem Code davon."
+        },
+        {
+          "text": "Es entsteht erst, wenn ein Client `/swagger` aufruft.",
+          "feedback": "`MapOpenApi` legt einen Endpoint für das JSON-Dokument an. Eine Oberfläche unter `/swagger` gehört nicht dazu."
+        },
+        {
+          "text": "Es entsteht beim Build und liegt danach nur als Datei im `obj`-Ordner.",
+          "feedback": "Das Erzeugen beim Build gibt es als zusätzliche Option. Mit `AddOpenApi` und `MapOpenApi` entsteht das Dokument zur Laufzeit."
+        }
+      ],
+      "explanation": "`AddOpenApi` registriert die Dienste, die das Dokument erzeugen. `MapOpenApi` legt den Endpoint an, der es als JSON ausliefert, standardmäßig unter `/openapi/v1.json`."
+    },
+    {
+      "id": "m17-l10-q3",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Ein Handler hat den Rückgabetyp `Results<Ok<IncidentSummary>, NotFound>`. Was steht dazu im OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Der Eintrag für den Endpoint beschreibt die Antworten `200` mit dem Typ `IncidentSummary` und `404`.",
+          "correct": true
+        },
+        {
+          "text": "Nur `200`, weil die Beschreibung bei jedem Endpoint nur den Erfolgsfall nennt.",
+          "feedback": "Jeder Typ in `Results<…>`, der Metadaten liefert, bekommt einen Eintrag. Darum steht auch `404` im Dokument."
+        },
+        {
+          "text": "Nichts, denn die Antworten muss man immer von Hand mit `Produces` angeben.",
+          "feedback": "`Produces` ist für Fälle da, die der Rückgabetyp nicht zeigt. Typisierte Ergebnisse liefern ihre Metadaten selbst."
+        },
+        {
+          "text": "Die Liste aller Statuscodes, die HTTP kennt.",
+          "feedback": "Das Dokument nennt nur die Antworten, die der Endpoint deklariert."
+        }
+      ],
+      "explanation": "Typisierte Ergebnisse liefern Metadaten über ihre Antwort mit. Der Generator macht daraus je einen Eintrag unter `responses`."
+    },
+    {
+      "id": "m17-l10-q4",
+      "lesson": "m17-l10",
+      "type": "match",
+      "question": "Ordne jede Methode dem Teil des OpenAPI-Dokuments zu, den sie setzt.",
+      "pairs": [
+        { "left": "`WithName`", "right": "die Operation-Id (`operationId`)" },
+        { "left": "`WithSummary`", "right": "die Kurzbeschreibung (`summary`)" },
+        { "left": "`WithTags`", "right": "die Gruppen, in die Werkzeuge Operationen sortieren" },
+        { "left": "`ProducesProblem`", "right": "eine zusätzliche Fehlerantwort" }
+      ],
+      "explanation": "Diese Methoden hängen Metadaten an den Endpoint. Das Dokument liest sie aus."
+    },
+    {
+      "id": "m17-l10-q5",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Ein Endpoint ist mit `.Produces(StatusCodes.Status418ImATeapot)` beschriftet, sein Handler gibt aber immer `200` zurück. Was gilt?",
+      "options": [
+        {
+          "text": "Der Handler antwortet weiter mit `200`. Das Dokument nennt `418`, denn Metadaten beschreiben nur.",
+          "correct": true
+        },
+        {
+          "text": "Die App ändert die Antwort auf `418`.",
+          "feedback": "Metadaten ändern das Verhalten nicht. Sie sagen dem Dokument nur, was der Endpoint zurückgeben kann."
+        },
+        {
+          "text": "Die App startet nicht, weil Handler und Metadaten nicht übereinstimmen.",
+          "feedback": "Die App prüft das nicht. Eine falsche Beschreibung fällt erst auf, wenn jemand Dokument und Verhalten vergleicht."
+        },
+        {
+          "text": "Das Dokument nennt `418` nicht, weil der Handler ihn nie sendet.",
+          "feedback": "Das Dokument folgt den Metadaten, nicht dem tatsächlichen Verhalten."
+        }
+      ],
+      "explanation": "Metadaten beschreiben den Endpoint, steuern ihn aber nicht. Darum müssen Beschreibung und Verhalten übereinstimmen, am besten durch einen Test."
+    },
+    {
+      "id": "m17-l10-q6",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Das Body-Objekt `StatusChange` hat die Eigenschaft `[MaxLength(32)] string Status`. Was passiert im OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Das Schema der Eigenschaft bekommt die Grenze `maxLength: 32`.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, denn Attribute kennt das Dokument nicht.",
+          "feedback": "Der Generator liest Validierungsattribute und überträgt sie ins Schema."
+        },
+        {
+          "text": "Das Dokument prüft jede Anfrage und lehnt zu lange Werte ab.",
+          "feedback": "Das Dokument ist nur eine Beschreibung. Die Prüfung läuft in der Validierung aus Lektion 5, nicht im Dokument."
+        },
+        {
+          "text": "Die Eigenschaft wird aus dem Dokument entfernt, weil sie eingeschränkt ist.",
+          "feedback": "Die Eigenschaft bleibt im Schema. Das Attribut ergänzt dort die Grenze."
+        }
+      ],
+      "explanation": "Validierungsattribute liefern Metadaten für das Schema. Sie schreiben die Grenze ins Dokument, die Prüfung selbst macht die Validierung der App."
+    },
+    {
+      "id": "m17-l10-q7",
+      "lesson": "m17-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wofür ein OpenAPI-Dokument gebraucht wird und wie ASP.NET Core es erzeugt.",
+      "modelAnswer": "Ein OpenAPI-Dokument beschreibt eine HTTP-API maschinenlesbar: Pfade, Methoden, Parameter, Bodys und Antworten. Werkzeuge erzeugen daraus Dokumentation, Clients und Tests. ASP.NET Core baut das Dokument zur Laufzeit aus den Endpoints und ihren Metadaten, zum Beispiel aus typisierten Ergebnissen, Validierungsattributen, `WithName` und `WithSummary`. `AddOpenApi` registriert die Dienste, `MapOpenApi` liefert das JSON aus."
+    },
+    {
+      "id": "m17-l10-q8",
+      "lesson": "m17-l10",
+      "type": "explain",
+      "question": "Transfer: Das OpenAPI-Dokument von SecLog listet jeden Pfad der API. Warum sollte man sich überlegen, in welchen Umgebungen es erreichbar ist?",
+      "modelAnswer": "Das Dokument zeigt alle Pfade, Parameter und Antworten und damit die ganze Angriffsfläche der API. In einer öffentlichen Umgebung erleichtert das jemandem, der die API ausspäht. Für Entwicklung und Test ist es nützlich, in Produktion braucht man es oft nicht. Darum entscheidet man bewusst, wo `MapOpenApi` aktiv ist."
     }
   ]
 }

@@ -1,0 +1,10 @@
+openapi: 3.2.0
+GET /incidents/{id}
+  name: GetIncident
+  summary: Returns one incident
+  responses: 200, 404
+PUT /incidents/{id}/status
+  name: ChangeStatus
+  summary: Changes the status of an incident
+  responses: 204, 404
+StatusChange.status maxLength: 32

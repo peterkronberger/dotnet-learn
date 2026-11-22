@@ -11975,6 +11975,93 @@
         "title": "Filters in Minimal API apps",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/min-api-filters"
       }
+    },
+    {
+      "id": "request-scope",
+      "term": "Request Scope",
+      "german": "Scope einer Anfrage",
+      "category": "platform",
+      "definition": "Das Framework legt für jede HTTP-Anfrage einen eigenen DI-Scope an. Scoped-Services leben darin genau eine Anfrage lang, auch der `DbContext`.",
+      "related": [
+        "scoped-lifetime",
+        "http-context",
+        "dbcontext"
+      ],
+      "aliases": [
+        "Request-Scope"
+      ],
+      "lesson": "m17-l09",
+      "source": {
+        "title": "Dependency injection in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection"
+      }
+    },
+    {
+      "id": "request-aborted",
+      "term": "RequestAborted",
+      "german": "Abbruch der Anfrage",
+      "category": "platform",
+      "definition": "Ein `CancellationToken` von `HttpContext.RequestAborted`, der abgebrochen wird, wenn der Client die Anfrage aufgibt. Ein `CancellationToken`-Parameter im Handler wird daran gebunden.",
+      "related": [
+        "cancellation-token",
+        "http-context"
+      ],
+      "lesson": "m17-l09",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
+    },
+    {
+      "id": "openapi",
+      "term": "OpenAPI",
+      "german": "Standard zur Beschreibung von HTTP-APIs",
+      "category": "platform",
+      "definition": "Ein programmiersprachenunabhängiger Standard, um eine HTTP-API maschinenlesbar zu beschreiben: Pfade, Methoden, Parameter, Bodys und Antworten.",
+      "related": [
+        "openapi-document",
+        "endpoint"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Overview of OpenAPI support in ASP.NET Core API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/overview"
+      }
+    },
+    {
+      "id": "openapi-document",
+      "term": "OpenAPI Document",
+      "german": "OpenAPI-Dokument",
+      "category": "platform",
+      "definition": "Die Beschreibung einer API im OpenAPI-Format, als JSON oder YAML. ASP.NET Core erzeugt sie mit `AddOpenApi` aus den Endpoints und liefert sie mit `MapOpenApi` aus.",
+      "related": [
+        "openapi",
+        "endpoint-metadata"
+      ],
+      "aliases": [
+        "OpenAPI-Dokument"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Generate OpenAPI documents",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/aspnetcore-openapi"
+      }
+    },
+    {
+      "id": "endpoint-metadata",
+      "term": "Endpoint Metadata",
+      "german": "Metadaten eines Endpoints",
+      "category": "platform",
+      "definition": "Zusatzangaben, die an einem Endpoint hängen, zum Beispiel Name, Kurzbeschreibung, Tags und die möglichen Antworten. Sie ändern das Verhalten nicht, sondern beschreiben den Endpoint.",
+      "related": [
+        "endpoint",
+        "openapi-document"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Include OpenAPI metadata in an ASP.NET Core app",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/include-metadata"
+      }
     }
   ]
 }
