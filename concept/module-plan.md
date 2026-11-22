@@ -535,7 +535,15 @@ Lessons as built: `m17-l01` Grundlagen von HTTP · `m17-l02` JSON mit System.Tex
 
 ### M18 Abschlussprojekt (final project)
 Full SecLog: domain logic, LINQ analysis and message rating ▶ automatically checked; EF Core and API parts ◻ as code-review tasks ("Finde 3 Probleme in diesem Endpoint" – find 3 problems in this endpoint, "Welches SQL entsteht?" – which SQL is produced?).
-- *(new)* Review checklist that covers the whole course: nullability warnings, exception handling, disposal, async pitfalls, DI lifetimes, SQL injection, input validation, time zones, tests for business rules.
+- *(new)* Review checklist that covers the whole course (9 items, introduced in `m18-l01`): 1 nullability warnings, 2 exception handling, 3 disposal, 4 async pitfalls, 5 DI lifetimes, 6 SQL injection, 7 input validation, 8 time zones, 9 tests for business rules.
+- Built (review #658):
+  - `m18-l01` Code-Review mit einer Checkliste ▶ (items 1–3)
+  - `m18-l02` Fachregeln im Kern ▶ (`SeverityRating`; items 9, 2)
+  - `m18-l03` Auswertungen mit LINQ im Kern ▶ (`LogAnalysis.FailuresPerHour`, UTC; item 8)
+  - `m18-l04` Die Meldungsbewertung im Kern ▶ (`MessageRating`; items 7, 1)
+  - `m18-l05` Datenbankcode prüfen: Welches SQL entsteht? ◻ (`IncidentFilters.Search`, SQL test; items 4–6)
+  - `m18-l06` Endpunkte prüfen: Finde 3 Probleme ◻ (endpoint rule test; items 4–7)
+  - 8 placement questions in `de/m18.json`. No spec, library or badge items.
 
 ### M19 Programmieren mit KI (programming with AI) ◻/▶
 See `concept/ai-module.md`.

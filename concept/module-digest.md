@@ -445,3 +445,22 @@ Each module section has these fields:
   - The API parts are ◻ code-review tasks ("Finde 3 Probleme in diesem Endpoint"); typical findings: missing `RequireAuthorization`, missing validation registration, missing `CancellationToken`, exception details in responses, `UseForwardedHeaders` order or trust settings.
   - 8 placement questions in `de/m17.json`; `placementLessons` covers `m17-l04`, `m17-l07`, `m17-l10`, `m17-l12`.
   - Reference project `_ci/minimal-api/` stays; runnable in the browser only `website/examples/m17/l02/`.
+
+## M18 Abschlussprojekt
+
+- **Lessons:**
+  - `m18-l01` Code-Review mit einer Checkliste – code review, the 9-item review checklist (items 1–3 practised: nullability, empty `catch`, `using`), compiler warnings as first reviewer.
+  - `m18-l02` Fachregeln im Kern (▶) – `SeverityRating`, relational patterns, boundary values, guard clause.
+  - `m18-l03` Auswertungen mit LINQ im Kern (▶) – `LogAnalysis.FailuresPerHour`, `HourCount`, grouping by UTC hour, `DateTimeOffset`.
+  - `m18-l04` Die Meldungsbewertung im Kern (▶) – `MessageRating` with input checks and a private copy of the word list.
+  - `m18-l05` Datenbankcode prüfen: Welches SQL entsteht? (◻) – `ToQueryString` as review tool, parameters in SQL, findings for async, context lifetime, SQL injection, N+1.
+  - `m18-l06` Endpunkte prüfen: Finde 3 Probleme (◻) – `EndpointDataSource`, endpoint metadata, `RequireAuthorization` rule test, problem details instead of exception text.
+- **Constructs/APIs taught:** `EndpointDataSource`/`RouteEndpoint`, `IAuthorizeData` metadata, `ToQueryString` (review use, from `m16-l04`), `ArgumentNullException.ThrowIfNull`, `ArgumentOutOfRangeException.ThrowIfNegative`, `UtcDateTime`.
+- **Glossary terms:** code-review, review-checklist, compiler-warning, boundary-value, message-rating, endpoint-data-source.
+- **Misconception ids:** m18-l01-no-warnings-no-bugs, m18-l01-empty-catch-is-safe, m18-l02-relational-pattern-excludes-negative, m18-l02-output-check-is-test, m18-l03-hour-is-utc-hour, m18-l03-query-result-is-stored, m18-l04-non-nullable-never-null, m18-l04-rating-detects-phishing, m18-l05-same-result-same-sql, m18-l06-green-tests-secure-endpoint, m18-l06-one-finding-enough
+- **Open forward references:** none (`grep -rn 'module="18"' website/docs` is empty).
+- **SecLog end state:** `website/examples/_ci/seclog-m18-l06/` – the M17 solution plus the Core classes `SeverityRating`, `LogAnalysis`/`HourCount`, `MessageRating`, `IncidentFilters.Search` (one place, parameterized), the SQL tests (`IncidentQueryTests`) and the endpoint rule test (`EndpointRulesTests`: every `/incidents` endpoint requires authorization). Chain: `seclog-m17-l12` → `seclog-m18-l01` → … → `l06`. M18 milestone reached.
+- **Notes for M19:**
+  - The security lesson reviews made-up AI-written SecLog code and may reuse the checklist of `m18-l01`.
+  - Runnable excerpts for l02–l04 live in `website/examples/m18/lYY/` (`core-*-task.cs`, `-solution.cs`), identical to the SecLog Core files except `namespace`/`using`.
+  - 8 placement questions in `de/m18.json`; `placementLessons` not needed (every lesson has a question).
