@@ -1,6 +1,6 @@
 # Module 19 – Programmieren mit KI (programming with AI)
 
-As of 2026-10-22 · next review: 2027-04
+As of 2026-11-22 · next review: 2027-04
 
 Lesson text is German. German names below are the real learner-facing text and stay as they are.
 
@@ -55,6 +55,17 @@ Sources: Peng et al., arXiv:2302.06590 · Paradis et al., ICSE 2025 SEIP, arXiv:
 - Made up, but realistic. Always label with `:::note[Typische KI-Antwort (konstruiertes Beispiel)]`.
 - They teach concrete knowledge (e.g. an invented API call, a missing input check).
 - The code in them follows the same rules (English, `.cs` file, CI-checked – faulty code deliberately as a fragment or with the expected error message).
+
+## Files and conventions (built module)
+
+- Folder `website/docs/m19-programming-with-ai/`, lessons `l01-realistic-expectations.mdx`, `l02-learning-vs-handing-off.mdx`, `l03-verifying.mdx`, `l04-security.mdx`, `l05-giving-context.mdx`, `l06-self-assessment.mdx`, `l07-data-and-secrets.mdx` (`lesson_id` `m19-l01` … `m19-l07`). Examples in `website/examples/m19/lYY/`, quiz in `website/src/data/quiz/de/m19.json`.
+- Constructed AI answers: code files `ai-<topic>.cs` (runnable, output in `ai-<topic>.out.txt`) or `ai-<topic>.snippet.cs` (does not compile, for example an invented API, or needs packages). The corrected version is `<topic>-fixed.cs` (runnable) or an existing SecLog file. Never prefix a file with `seclog-` (`tools/check-seclog.mjs` would chain it).
+- A constructed AI answer is always inside `:::note[Typische KI-Antwort (konstruiertes Beispiel)]`. The prose of the answer is German, the code is English. Prompts that learners read or write are German lesson text, not code files.
+- No compiler output is typed by hand. If a lesson talks about the error of a `.snippet.cs` file, it names the error in words and the error id from the Microsoft Learn compiler error page, or the learner runs the code in the runner and sees the real message.
+- Every lesson has a line `Stand: YYYY-MM-DD` (the date the sources were checked) directly after the learning goals box (in `m19-l01` after the module box).
+- Project step: every lesson has the one sentence "In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür." (`concept/project-seclog.md`).
+- No product names as a base. A product or model name appears only where it is part of a study description (tool and time of the study).
+- Every statement about productivity, learning or security is checked against the neutrality checklist above. The PR has, in addition to the "Verification" table, a "Neutrality" table: statement · group · task · tool generation/time · sample size · effect with uncertainty · conflict of interest · label (study finding / best practice).
 
 ## Currency
 
