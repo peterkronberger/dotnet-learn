@@ -1,9 +1,13 @@
+// @fold-start
 using Microsoft.AspNetCore.TestHost;
+// @fold-end
 
-// The server runs in memory: no network and no port.
 var builder = WebApplication.CreateBuilder(args);
+// @fold-start
+// The server runs in memory: no network and no port.
 builder.WebHost.UseTestServer();
 builder.Logging.ClearProviders();
+// @fold-end
 var app = builder.Build();
 
 var incidents = new List<IncidentDto>
@@ -24,8 +28,10 @@ app.MapGet("/slow", async () =>
     return incidents.Count;
 });
 
+// @fold-start
 await app.StartAsync();
 using var client = app.GetTestClient();
+// @fold-end
 
 Console.WriteLine("== 1. Text ==");
 await Send(client, "/");

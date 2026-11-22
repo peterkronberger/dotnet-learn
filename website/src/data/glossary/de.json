@@ -11498,6 +11498,243 @@
         "title": "How to customize property names and values with System.Text.Json",
         "url": "https://learn.microsoft.com/dotnet/standard/serialization/system-text-json/customize-properties"
       }
+    },
+    {
+      "id": "asp-net-core",
+      "term": "ASP.NET Core",
+      "category": "platform",
+      "definition": "Das Framework von .NET für Web-Anwendungen und Web-APIs. Es baut auf dem generischen Host auf und nimmt HTTP-Anfragen entgegen.",
+      "related": [
+        "minimal-api",
+        "generic-host",
+        "http-request"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Overview of ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/introduction-to-aspnet-core"
+      }
+    },
+    {
+      "id": "minimal-api",
+      "term": "Minimal API",
+      "category": "platform",
+      "definition": "Eine Art, in ASP.NET Core eine HTTP-API mit wenig Code zu schreiben: Du ordnest Methode und Pfad mit `MapGet` und ähnlichen Aufrufen einem Handler zu.",
+      "related": [
+        "asp-net-core",
+        "route-handler",
+        "endpoint"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Minimal APIs quick reference",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis"
+      }
+    },
+    {
+      "id": "endpoint",
+      "term": "Endpoint",
+      "german": "Endpunkt",
+      "category": "platform",
+      "definition": "Eine Stelle einer Web-App, die Anfragen beantwortet: eine Kombination aus HTTP-Methode, Routenvorlage und Handler.",
+      "aliases": [
+        "Endpunkt"
+      ],
+      "related": [
+        "route-template",
+        "route-handler",
+        "routing"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Routing in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/routing"
+      }
+    },
+    {
+      "id": "routing",
+      "term": "Routing",
+      "category": "platform",
+      "definition": "Der Teil von ASP.NET Core, der zu einer Anfrage den passenden Endpoint sucht. Er vergleicht Methode und Pfad mit den Routenvorlagen und wählt die spezifischste Übereinstimmung.",
+      "related": [
+        "endpoint",
+        "route-template",
+        "route-constraint"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Routing in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/routing"
+      }
+    },
+    {
+      "id": "route-template",
+      "term": "Route Template",
+      "german": "Routenvorlage",
+      "category": "platform",
+      "definition": "Das Muster für einen Pfad, zum Beispiel `/incidents/{id:int}`. Text steht für sich selbst, Teile in geschweiften Klammern sind Routenparameter.",
+      "aliases": [
+        "Routenvorlage"
+      ],
+      "related": [
+        "route-parameter",
+        "route-constraint",
+        "routing"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Routing in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/routing"
+      }
+    },
+    {
+      "id": "route-parameter",
+      "term": "Route Parameter",
+      "german": "Routenparameter",
+      "category": "platform",
+      "definition": "Ein Platzhalter in einer Routenvorlage, etwa `{id}`. ASP.NET Core nimmt den Wert aus dem Pfad und übergibt ihn dem Handler-Parameter mit demselben Namen.",
+      "aliases": [
+        "Routenparameter"
+      ],
+      "related": [
+        "route-template",
+        "route-constraint"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Route handlers in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/route-handlers"
+      }
+    },
+    {
+      "id": "route-constraint",
+      "term": "Route Constraint",
+      "german": "Routeneinschränkung",
+      "category": "platform",
+      "definition": "Eine Bedingung an einen Routenparameter, zum Beispiel `{id:int}`. Passt der Wert nicht, passt die Route nicht, und die Anfrage bekommt meist 404.",
+      "aliases": [
+        "Routeneinschränkung"
+      ],
+      "related": [
+        "route-parameter",
+        "route-template"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Routing in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/routing"
+      }
+    },
+    {
+      "id": "route-handler",
+      "term": "Route Handler",
+      "german": "Handler einer Route",
+      "category": "platform",
+      "definition": "Die Methode oder das Lambda, das läuft, wenn eine Route passt. Der Rückgabewert wird zur HTTP-Antwort.",
+      "aliases": [
+        "Handler"
+      ],
+      "related": [
+        "endpoint",
+        "minimal-api"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Route handlers in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/route-handlers"
+      }
+    },
+    {
+      "id": "route-group",
+      "term": "Route Group",
+      "german": "Routengruppe",
+      "category": "platform",
+      "definition": "Eine Gruppe von Endpoints mit gemeinsamem Pfadpräfix, angelegt mit `MapGroup`. Sie spart Wiederholungen und nimmt gemeinsame Einstellungen für alle Endpoints auf.",
+      "aliases": [
+        "Routengruppe",
+        "MapGroup"
+      ],
+      "related": [
+        "endpoint",
+        "route-template"
+      ],
+      "lesson": "m17-l03",
+      "source": {
+        "title": "Route handlers in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/route-handlers"
+      }
+    },
+    {
+      "id": "integration-test",
+      "term": "Integration Test",
+      "german": "Integrationstest",
+      "category": "platform",
+      "definition": "Ein Test, der mehrere Teile einer App zusammen prüft, zum Beispiel Routing, Handler und JSON einer API. Er ist langsamer und näher an der Wirklichkeit als ein Unit-Test.",
+      "aliases": [
+        "Integrationstest"
+      ],
+      "related": [
+        "unit-test",
+        "test-server",
+        "web-application-factory"
+      ],
+      "lesson": "m17-l04",
+      "source": {
+        "title": "Integration tests in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/test/integration-tests"
+      }
+    },
+    {
+      "id": "test-server",
+      "term": "Test Server",
+      "german": "Testserver",
+      "category": "platform",
+      "definition": "Ein Webserver, der die App im Speicher des Testprozesses ausführt. Anfragen gehen ohne Netzwerk und ohne Port direkt in die Pipeline.",
+      "aliases": [
+        "Testserver",
+        "TestServer"
+      ],
+      "related": [
+        "integration-test",
+        "web-application-factory"
+      ],
+      "lesson": "m17-l04",
+      "source": {
+        "title": "Integration tests in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/test/integration-tests"
+      }
+    },
+    {
+      "id": "web-application-factory",
+      "term": "WebApplicationFactory",
+      "category": "platform",
+      "definition": "Eine Klasse aus `Microsoft.AspNetCore.Mvc.Testing`, die deine App mit einem Testserver startet und mit `CreateClient()` einen `HttpClient` dafür liefert. Konfiguration und Services lassen sich im Test ersetzen.",
+      "related": [
+        "integration-test",
+        "test-server",
+        "http-client"
+      ],
+      "lesson": "m17-l04",
+      "source": {
+        "title": "Integration tests in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/test/integration-tests"
+      }
+    },
+    {
+      "id": "http-client",
+      "term": "HttpClient",
+      "category": "platform",
+      "definition": "Die .NET-Klasse, die HTTP-Anfragen sendet und die Antworten liest, zum Beispiel mit `GetAsync` oder `GetFromJsonAsync<T>`.",
+      "related": [
+        "http-request",
+        "http-response",
+        "web-application-factory"
+      ],
+      "lesson": "m17-l04",
+      "source": {
+        "title": "Make HTTP requests with the HttpClient class",
+        "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
+      }
     }
   ]
 }

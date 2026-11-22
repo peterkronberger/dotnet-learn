@@ -240,6 +240,336 @@
         { "text": "Es gibt `null` zurück.", "feedback": "Eine fehlende Pflichteigenschaft löst eine Ausnahme aus." }
       ],
       "explanation": "Der Serializer behandelt `required` als Pflicht im JSON. Fehlt die Eigenschaft, löst er eine `JsonException` aus."
+    },
+    {
+      "id": "m17-l03-q1",
+      "lesson": "m17-l03",
+      "type": "single",
+      "question": "Welche Anfrage passt zu `app.MapGet(\"/incidents/{id:int}\", …)`?",
+      "options": [
+        {
+          "text": "`GET /incidents/7`",
+          "correct": true
+        },
+        {
+          "text": "`GET /incidents/seven`",
+          "feedback": "`seven` ist keine ganze Zahl. Die Einschränkung `int` lässt die Route nicht passen."
+        },
+        {
+          "text": "`POST /incidents/7`",
+          "feedback": "`MapGet` gilt nur für die Methode `GET`."
+        },
+        {
+          "text": "`GET /incidents`",
+          "feedback": "Der Pfad hat keinen zweiten Teil, die Vorlage verlangt ihn."
+        }
+      ],
+      "explanation": "Die Vorlage verlangt zwei Teile: `incidents` und eine ganze Zahl. Die Methode muss `GET` sein."
+    },
+    {
+      "id": "m17-l03-q2",
+      "lesson": "m17-l03",
+      "type": "single",
+      "question": "Zwei Routen sind in dieser Reihenfolge angelegt: zuerst `MapGet(\"/incidents/{name}\", …)`, danach `MapGet(\"/incidents/latest\", …)`. Welche Route bearbeitet `GET /incidents/latest`?",
+      "options": [
+        {
+          "text": "Die Route mit `latest`, weil Text in der Vorlage spezifischer ist als ein Parameter",
+          "correct": true
+        },
+        {
+          "text": "Die Route mit `{name}`, weil sie zuerst angelegt wurde",
+          "feedback": "Die Reihenfolge der Aufrufe entscheidet nicht. Das Routing wählt die spezifischste Vorlage.",
+          "misconception": "m17-l03-route-order-decides"
+        },
+        {
+          "text": "Beide, die Handler laufen nacheinander",
+          "feedback": "Pro Anfrage läuft genau ein Handler."
+        },
+        {
+          "text": "Keine, die Anfrage ist mehrdeutig und gibt 404",
+          "feedback": "Die beiden Vorlagen sind verschieden spezifisch. Mehrdeutig wäre nur gleich spezifisch."
+        }
+      ],
+      "explanation": "Eine Vorlage mit festem Text ist spezifischer als ein Parameter. Das Routing wählt unter allen passenden Endpoints den spezifischsten, nicht den zuerst angelegten."
+    },
+    {
+      "id": "m17-l03-q3",
+      "lesson": "m17-l03",
+      "type": "single",
+      "question": "Die Route `/incidents/{id:int}` bekommt `GET /incidents/abc`. Es gibt keine andere passende Route. Was antwortet die App?",
+      "options": [
+        {
+          "text": "`404 Not Found`, weil keine Route passt",
+          "correct": true
+        },
+        {
+          "text": "`400 Bad Request`, weil die Einschränkung die Eingabe prüft",
+          "feedback": "Eine Einschränkung wählt nur aus, welche Route passt. Sie meldet keinen Eingabefehler.",
+          "misconception": "m17-l03-constraint-validates-input"
+        },
+        {
+          "text": "`500 Internal Server Error`, weil `abc` keine Zahl ist",
+          "feedback": "Der Handler läuft gar nicht. Es gibt keinen Fehler im Server."
+        },
+        {
+          "text": "`200 OK` mit `null` im Body",
+          "feedback": "Das passiert nur, wenn der Handler läuft und `null` liefert."
+        }
+      ],
+      "explanation": "Die Einschränkung gehört zum Abgleich der Routen. Schlägt sie fehl, passt die Route nicht, und ohne andere Route gibt es 404. Für Eingabefehler mit 400 gibt es die Validierung."
+    },
+    {
+      "id": "m17-l03-q4",
+      "lesson": "m17-l03",
+      "type": "match",
+      "question": "Was wird die Antwort, wenn der Handler diesen Wert zurückgibt?",
+      "pairs": [
+        {
+          "left": "Ein `string`",
+          "right": "Text mit `text/plain`"
+        },
+        {
+          "left": "Ein Objekt wie `IncidentDto`",
+          "right": "Ein JSON-Objekt mit `application/json`"
+        },
+        {
+          "left": "Eine `List<IncidentDto>`",
+          "right": "Ein JSON-Array mit `application/json`"
+        }
+      ],
+      "explanation": "Ein `string` ist Text. Jedes andere Objekt wird mit den Web-Einstellungen aus Lektion 2 zu JSON, eine Liste zu einem Array."
+    },
+    {
+      "id": "m17-l03-q5",
+      "lesson": "m17-l03",
+      "type": "single",
+      "question": "Die Gruppe entsteht mit `var users = app.MapGroup(\"/users\");`. Danach folgt `users.MapGet(\"/{name}\", …)`. Welche Vorlage hat der Endpoint?",
+      "options": [
+        {
+          "text": "`/users/{name}`",
+          "correct": true
+        },
+        {
+          "text": "`/{name}`",
+          "feedback": "Das Präfix der Gruppe gehört zur Vorlage jedes Endpoints."
+        },
+        {
+          "text": "`/users`",
+          "feedback": "`{name}` ist ein Teil der Vorlage und bleibt erhalten."
+        },
+        {
+          "text": "`/users{name}`",
+          "feedback": "Das Präfix und die Vorlage werden mit dem Schrägstrich verbunden."
+        }
+      ],
+      "explanation": "Eine Routengruppe stellt ihr Präfix jeder Vorlage voran. Der Endpoint heißt darum `/users/{name}`."
+    },
+    {
+      "id": "m17-l03-q6",
+      "lesson": "m17-l03",
+      "type": "single",
+      "question": "Die SecLog-Handler lesen Vorfälle mit `AsNoTracking()`. Warum?",
+      "options": [
+        {
+          "text": "Sie ändern nichts. Der Context muss die geladenen Zeilen darum nicht verfolgen.",
+          "correct": true
+        },
+        {
+          "text": "Ohne `AsNoTracking()` würde der Handler die Zeilen in der Datenbank löschen.",
+          "feedback": "Verfolgung ändert keine Daten. Sie kostet nur Arbeit und Speicher."
+        },
+        {
+          "text": "`AsNoTracking()` macht aus dem Handler einen asynchronen Handler.",
+          "feedback": "Asynchron wird er durch `async`, `await` und `Task`."
+        },
+        {
+          "text": "Ohne `AsNoTracking()` kann der Endpoint nicht als JSON antworten.",
+          "feedback": "JSON entsteht aus dem Rückgabewert, unabhängig von der Verfolgung."
+        }
+      ],
+      "explanation": "Die Endpoints lesen nur. Mit `AsNoTracking()` legt der Context keine Verfolgung an (Modul 16)."
+    },
+    {
+      "id": "m17-l03-q7",
+      "lesson": "m17-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ASP.NET Core zu einer Anfrage den Handler findet, wenn mehrere Routen passen könnten.",
+      "modelAnswer": "Das Routing vergleicht Methode und Pfad der Anfrage mit den Vorlagen aller Endpoints. Es behält die passenden und wählt davon die spezifischste: feste Textteile schlagen Parameter, Parameter mit Einschränkung schlagen Parameter ohne. Die Reihenfolge der `Map…`-Aufrufe spielt dafür keine Rolle. Passt keine Route, antwortet die App mit 404."
+    },
+    {
+      "id": "m17-l03-q8",
+      "lesson": "m17-l03",
+      "type": "explain",
+      "question": "Transfer: SecLog soll später auch Regeln über die API anbieten. Wie ordnest du die Endpoints, und wo hilft dir `MapGroup`?",
+      "modelAnswer": "Ich lege für Vorfälle und für Regeln je eine Gruppe an, zum Beispiel `/incidents` und `/rules`, und schreibe die Endpoints jeder Gruppe in eine eigene Erweiterungsmethode. Die Gruppe nimmt das Präfix auf, die Endpoints nennen nur den Rest. Gemeinsame Einstellungen für alle Endpoints einer Gruppe setze ich einmal an der Gruppe."
+    },
+    {
+      "id": "m17-l04-q1",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "Was unterscheidet einen Integrationstest eines Endpoints von einem Unit-Test des Handlers?",
+      "options": [
+        {
+          "text": "Er schickt eine echte HTTP-Anfrage durch die App und prüft Routing, JSON und Statuscode zusammen.",
+          "correct": true
+        },
+        {
+          "text": "Er prüft nur eine Methode und ersetzt alle Abhängigkeiten.",
+          "feedback": "Das beschreibt einen Unit-Test."
+        },
+        {
+          "text": "Er läuft nur gegen eine App, die auf einem Server im Internet läuft.",
+          "feedback": "Der Test startet die App selbst im Speicher."
+        },
+        {
+          "text": "Er braucht kein Testframework.",
+          "feedback": "Auch Integrationstests laufen mit xUnit."
+        }
+      ],
+      "explanation": "Ein Unit-Test prüft eine kleine Einheit für sich. Ein Integrationstest lässt mehrere Teile zusammenarbeiten, hier die ganze Pipeline von der Anfrage bis zur Antwort."
+    },
+    {
+      "id": "m17-l04-q2",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "Du willst einen Endpoint mit `WebApplicationFactory<Program>` testen. Was musst du vorher tun?",
+      "options": [
+        {
+          "text": "Nichts starten. Der Test startet die App selbst in einem Testserver im Speicher.",
+          "correct": true
+        },
+        {
+          "text": "Die App auf einem Port starten und dessen Adresse im Test eintragen.",
+          "feedback": "Der Testserver läuft im Speicher des Testprozesses und braucht keinen Port.",
+          "misconception": "m17-l04-integration-test-needs-running-server"
+        },
+        {
+          "text": "Die App veröffentlichen und auf dem Zielrechner starten.",
+          "feedback": "Das ist der Betrieb (Lektion 12), nicht der Test.",
+          "misconception": "m17-l04-integration-test-needs-running-server"
+        },
+        {
+          "text": "Eine zweite Test-App schreiben, die dieselben Routen nachbaut.",
+          "feedback": "Die Fabrik startet die echte App. Nachgebaut wird nichts."
+        }
+      ],
+      "explanation": "`WebApplicationFactory` startet die echte App mit einem Testserver im Speicher. Anfragen gehen direkt in die Pipeline, ohne Netzwerk und Port."
+    },
+    {
+      "id": "m17-l04-q3",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "Was liefert `factory.CreateClient()`?",
+      "options": [
+        {
+          "text": "Einen `HttpClient`, dessen Anfragen beim Testserver der App ankommen",
+          "correct": true
+        },
+        {
+          "text": "Eine neue Instanz des `DbContext`",
+          "feedback": "Der Context kommt aus der Dependency Injection der App."
+        },
+        {
+          "text": "Den Handler eines Endpoints als Delegate",
+          "feedback": "Du rufst keine Handler direkt auf, sondern schickst Anfragen."
+        },
+        {
+          "text": "Einen Prozess, der die App auf Port 5000 startet",
+          "feedback": "Es entsteht kein Prozess und kein Port."
+        }
+      ],
+      "explanation": "Der Client ist ein normaler `HttpClient`. Er ist mit dem Testserver verbunden und sendet seine Anfragen durch die Pipeline der App."
+    },
+    {
+      "id": "m17-l04-q4",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "In `appsettings.json` der API steht der Verbindungsstring `Data Source=seclog.db`. Was ist für einen Integrationstest richtig?",
+      "options": [
+        {
+          "text": "Der Test setzt den Verbindungsstring auf eine frische Testdatenbank und legt dort Beispieldaten an.",
+          "correct": true
+        },
+        {
+          "text": "Der Test nutzt automatisch `seclog.db`. Eine eigene Datenbank ist nicht möglich.",
+          "feedback": "Die Fabrik kann die Konfiguration überschreiben, zum Beispiel mit `UseSetting`.",
+          "misconception": "m17-l04-test-uses-production-database"
+        },
+        {
+          "text": "Der Test nutzt die Datenbank der echten App, damit die Daten echt sind.",
+          "feedback": "Dann würde der Test echte Daten ändern, und sein Ergebnis hinge vom Inhalt ab.",
+          "misconception": "m17-l04-test-uses-production-database"
+        },
+        {
+          "text": "Der Test braucht keine Datenbank, weil der Testserver keine Services startet.",
+          "feedback": "Der Testserver startet die ganze App mit allen Services."
+        }
+      ],
+      "explanation": "Ein Test soll bei jedem Lauf dieselben Daten sehen. Darum zeigt er die App auf eine frische Datenbank, die er selbst füllt und danach löscht."
+    },
+    {
+      "id": "m17-l04-q5",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "Wofür ist `ConfigureTestServices` im Test gedacht?",
+      "options": [
+        {
+          "text": "Um Services der App durch Test-Doubles zu ersetzen",
+          "correct": true
+        },
+        {
+          "text": "Um neue Routen für den Test anzulegen",
+          "feedback": "Routen bleiben, wie die App sie anlegt."
+        },
+        {
+          "text": "Um den Testserver auf einem Port zu starten",
+          "feedback": "Der Testserver braucht keinen Port."
+        },
+        {
+          "text": "Um den Test zu überspringen",
+          "feedback": "Dafür gibt es Attribute des Testframeworks."
+        }
+      ],
+      "explanation": "`ConfigureTestServices` läuft nach der Registrierung der App. Ein dort registrierter Service ersetzt den der App, zum Beispiel durch ein Test-Double (Modul 14)."
+    },
+    {
+      "id": "m17-l04-q6",
+      "lesson": "m17-l04",
+      "type": "single",
+      "question": "Eine Testklasse implementiert `IClassFixture<SecLogApiFactory>`. Was bewirkt das?",
+      "options": [
+        {
+          "text": "Die Fabrik wird einmal für alle Tests der Klasse erzeugt und danach freigegeben.",
+          "correct": true
+        },
+        {
+          "text": "Jeder Test startet seine eigene App und eine eigene Datenbank.",
+          "feedback": "Das wäre eine neue Fabrik pro Test. Die Fixture teilt eine Fabrik."
+        },
+        {
+          "text": "Die Klasse läuft nur, wenn die App auf einem Port erreichbar ist.",
+          "feedback": "Die Fixture hat mit Ports nichts zu tun."
+        },
+        {
+          "text": "Die Tests der Klasse laufen in einem eigenen Prozess.",
+          "feedback": "Die Fixture teilt ein Objekt, sie ändert den Prozess nicht."
+        }
+      ],
+      "explanation": "Eine Klassen-Fixture erzeugt das Objekt einmal, gibt es an den Konstruktor der Testklasse und gibt es nach dem letzten Test frei (`Dispose`)."
+    },
+    {
+      "id": "m17-l04-q7",
+      "lesson": "m17-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, was ein Integrationstest mit `WebApplicationFactory` tut und was er mit einem Unit-Test gemeinsam hat und was nicht.",
+      "modelAnswer": "Er startet die echte App mit einem Testserver im Speicher, schickt mit einem `HttpClient` eine Anfrage und prüft Statuscode und Body. Wie ein Unit-Test ist er automatisch, wiederholbar und läuft mit xUnit. Anders als ein Unit-Test prüft er Routing, Handler und JSON zusammen und braucht dafür auch eine Datenbank, die er selbst vorbereitet."
+    },
+    {
+      "id": "m17-l04-q8",
+      "lesson": "m17-l04",
+      "type": "explain",
+      "question": "Transfer: Du schreibst einen neuen Endpoint, der die Vorfälle eines Benutzers liefert. Welche Testdaten legst du an, und was prüfst du?",
+      "modelAnswer": "Ich lege in der Testdatenbank Vorfälle für mindestens zwei Benutzer an. Der Test ruft den Endpoint für einen Benutzer auf und prüft den Statuscode und dass nur dessen Vorfälle im JSON stehen. Die Testdaten kommen aus den Beispieldaten von SecLog, nicht aus der echten Datenbank."
     }
   ]
 }

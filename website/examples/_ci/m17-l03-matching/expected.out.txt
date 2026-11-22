@@ -22,7 +22,3 @@
 
 > GET /users/42
 < 404 Not Found
-
-== 3. A method the route does not offer ==
-> POST /users
-< 405 Method Not Allowed
