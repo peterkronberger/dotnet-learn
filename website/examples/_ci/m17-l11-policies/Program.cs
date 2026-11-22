@@ -34,8 +34,8 @@ app.UseAuthorization();
 
 app.MapGet("/ping", () => "pong").AllowAnonymous();
 
-app.MapGet("/incidents", (ClaimsPrincipal user) =>
-        $"incidents for {user.Identity?.Name}")
+app.MapGet("/incidents", (HttpContext context) =>
+        $"incidents for {context.User.Identity?.Name}")
     .RequireAuthorization();
 
 app.MapPut("/incidents/1/status", () => Results.NoContent())
