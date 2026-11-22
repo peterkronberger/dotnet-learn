@@ -7,8 +7,7 @@ public class IncidentReader
     public async Task<List<StoredIncident>> ReadForUserAsync(string user)
     {
         var incidents = db.Incidents
-            .FromSqlRaw("SELECT * FROM Incidents WHERE User = '"
-                + user + "'")
+            .FromSqlRaw("SELECT * FROM Incidents WHERE User = '" + user + "'")
             .ToList();
 
         foreach (var incident in incidents)
@@ -18,7 +17,7 @@ public class IncidentReader
                 .ToList();
         }
 
-        await Task.Delay(10);
+        await db.SaveChangesAsync();
         return incidents;
     }
 }
