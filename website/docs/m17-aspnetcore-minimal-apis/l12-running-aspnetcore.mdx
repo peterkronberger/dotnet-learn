@@ -1,0 +1,239 @@
+---
+title: Eine ASP.NET Core-App betreiben
+sidebar_position: 12
+description: Eine ASP.NET Core-App ist ein Konsolenprogramm mit dem Webserver Kestrel. Wie du sie veröffentlichst, mit einem Prozessmanager betreibst, hinter einem Reverse Proxy Forwarded-Header auswertest und Funktionen je Umgebung steuerst.
+lesson_id: m17-l12
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import environments from '!!raw-loader!@site/examples/_ci/m17-l12-environments/Program.cs';
+import environmentsOutput from '!!raw-loader!@site/examples/_ci/m17-l12-environments/expected.out.txt';
+import forwarded from '!!raw-loader!@site/examples/_ci/m17-l12-forwarded/Program.cs';
+import forwardedOutput from '!!raw-loader!@site/examples/_ci/m17-l12-forwarded/expected.out.txt';
+import gapEnvironment from '!!raw-loader!@site/examples/m17/l12/gap-environment.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l12/src/SecLog.Api/Program.cs';
+import openApiTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l12/tests/SecLog.Api.Tests/OpenApiTests.cs';
+import forwardedTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l12/tests/SecLog.Api.Tests/ForwardedHeadersTests.cs';
+
+# Eine ASP.NET Core-App betreiben
+
+:::note[Lernziele]
+- Du erklärst, dass eine ASP.NET Core-App ein Konsolenprogramm mit dem Webserver Kestrel ist, und veröffentlichst und startest sie.
+- Du beschreibst, was ein Prozessmanager und ein Reverse Proxy tun und warum die App dann Forwarded-Header auswerten muss.
+- Du begründest, welche Funktionen nur in der Entwicklungsumgebung aktiv sein sollen.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l04-q1" />
+
+<Quiz id="m15-l07-q6" />
+
+<Quiz id="m17-l08-q2" />
+
+## Eine Konsolen-App mit eigenem Webserver
+
+Eine ASP.NET Core-App ist ein Konsolenprogramm. Sie hat eine `Program.cs` mit Top-Level-Statements, aus denen der Compiler die `Main`-Methode erzeugt (Modul 6). Der Unterschied zu einer Konsolen-App ohne Web liegt darin, was `app.Run()` tut: Es startet <Term id="kestrel">Kestrel</Term>, den eingebauten <Term id="web-server">Webserver</Term>. Kestrel nimmt Anfragen aus dem Netz an und reicht sie an die Pipeline und die Endpunkte weiter. Ein anderer Server muss nicht installiert sein ([Kestrel web server in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel)).
+
+Auf welcher Adresse die App lauscht, legst du von außen fest, nicht im Code:
+
+- Die Umgebungsvariable `ASPNETCORE_URLS` oder die Kommandozeile `--urls` nennen vollständige Adressen, zum Beispiel `http://*:8080`.
+- Die Umgebungsvariable `ASPNETCORE_HTTP_PORTS` nennt nur Ports. Sie ist die Kurzform für die HTTP-Adressen.
+- Ohne jede Angabe bindet Kestrel an `http://localhost:5000`.
+
+([Configure endpoints for the ASP.NET Core Kestrel web server](https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel/endpoints))
+
+### Veröffentlichen und starten
+
+Das Veröffentlichen kennst du aus Modul 14. Für eine Web-App heißt das zum Beispiel:
+
+```bash
+dotnet publish src/SecLog.Api -c Release -o out
+dotnet out/SecLog.Api.dll
+```
+
+Die erste Zeile schreibt die App in den Ordner `out`. Die zweite startet sie: `dotnet` bekommt den Pfad der `.dll`. Diese Veröffentlichung ist framework-dependent: Auf dem Rechner muss die Laufzeit mit `Microsoft.AspNetCore.App` installiert sein. Self-contained, Single-File und die anderen Optionen aus Modul 14 gehen auch für Web-Apps.
+
+Ein Container-Image erzeugt das SDK ohne Dockerfile mit einem Befehl:
+
+```bash
+dotnet publish src/SecLog.Api -c Release -t:PublishContainer
+```
+
+Zum Starten des Images braucht es eine Container-Runtime, die Registry-Schritte gehören nicht zu diesem Kurs.
+
+Zu Native AOT: Minimal APIs sind mit Native AOT teilweise kompatibel, MVC nicht. Wer das erwägt, prüft die Liste der unterstützten Funktionen ([ASP.NET Core support for Native AOT](https://learn.microsoft.com/aspnet/core/fundamentals/native-aot)).
+
+### Wer startet die App?
+
+Ein Konsolenprogramm, das du in einem Terminal startest, endet, wenn du das Terminal schließt. Ein Server braucht mehr. Ein <Term id="process-manager">Prozessmanager</Term> startet die App beim Systemstart, startet sie nach einem Absturz neu und beendet sie geordnet. Beispiele sind `systemd` unter Linux, ein Windows-Dienst oder die Verwaltung eines Container-Orchestrators. Beim Beenden bekommt die App das Signal und lässt laufende Anfragen zu Ende laufen (<Term id="graceful-shutdown">Graceful Shutdown</Term>, Modul 15).
+
+## Hinter einem Reverse Proxy
+
+Kestrel kann Anfragen selbst annehmen, mit oder ohne Proxy. Oft steht trotzdem ein <Term id="reverse-proxy">Reverse Proxy</Term> davor, zum Beispiel Nginx oder IIS. Er nimmt die Anfragen aus dem Netz an und leitet sie an Kestrel weiter. Er kann TLS beenden: Nur er braucht dann das Zertifikat, zur App läuft einfaches HTTP. Beide Wege sind unterstützte Konfigurationen, ein Proxy ist keine Pflicht.
+
+Das hat eine Folge. Die App sieht nur die Verbindung zum Proxy: Das Schema ist `http`, der Absender ist die Adresse des Proxys, nicht die des Clients. Das stört, wenn die App die Client-Adresse protokolliert, Umleitungen baut oder Regeln nach Adresse prüft. Der Proxy schreibt die ursprünglichen Angaben darum in Header, die <Term id="forwarded-headers">Forwarded-Header</Term>:
+
+- `X-Forwarded-For`: die Adresse des Clients.
+- `X-Forwarded-Proto`: das Schema der ursprünglichen Anfrage, `http` oder `https`.
+
+Die App liest sie mit der Middleware `UseForwardedHeaders` und setzt die Werte in `Request.Scheme` und `Connection.RemoteIpAddress` ein ([Configure ASP.NET Core to work with proxy servers and load balancers](https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer)). Zwei Regeln gelten:
+
+- Die Middleware ist ohne Optionen wirkungslos. `ForwardedHeaders` nennt die Header, die sie auswertet.
+- Jeder Client kann solche Header selbst senden. Die Middleware wertet sie darum nur aus, wenn die Verbindung von einem bekannten Proxy kommt (`KnownProxies`). Standardmäßig sind das nur Loopback-Adressen.
+
+Die Middleware gehört an den Anfang der Pipeline (Lektion 8): Alles, was danach läuft, sieht dann die korrigierten Werte.
+
+Das Programm unten schickt dieselbe Anfrage dreimal. Ein Proxy mit der Adresse `198.51.100.1` meldet einen Client mit der Adresse `203.0.113.7`, der HTTPS benutzt hat. Der Endpoint druckt, was die App für `Request.Scheme` und die Client-Adresse sieht. Im Test steht eine kleine Middleware für das Netz: Sie setzt die Absenderadresse der Verbindung.
+
+:::info[Vorhersage]
+Was druckt der Endpoint in den drei Fällen? Achte vor allem auf den dritten, bei dem die Anfrage von einer anderen Adresse kommt. Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={forwarded} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{forwardedOutput}</CodeBlock>
+
+1. **Ohne Middleware:** Die App sieht `http` und die Adresse des Proxys. Die Header sind da, aber niemand liest sie.
+2. **Mit Middleware, bekannter Proxy:** Die Anfrage kommt von `198.51.100.1`, der in `KnownProxies` steht. Die Middleware setzt `https` und `203.0.113.7` ein.
+3. **Mit Middleware, andere Adresse:** `192.0.2.99` ist kein bekannter Proxy. Die Middleware ignoriert die Header: Die App sieht `http` und `192.0.2.99`. Ein Client kann seine Adresse so nicht fälschen.
+
+**Was passiert, wenn …** du `options.ForwardedHeaders` nicht setzt? Dann ist der Wert `None`, und die Middleware ändert nichts, auch nicht vom bekannten Proxy.
+
+</details>
+
+<details>
+<summary>Vertiefung: Header, die die Middleware ersetzt (optional)</summary>
+
+Die Middleware ersetzt den Wert in der Anfrage und legt den alten Wert in einem `X-Original-…`-Header ab. Aus `X-Forwarded-For` entfernt sie den verbrauchten Eintrag. Läuft eine Anfrage über mehrere Proxys, steht in `X-Forwarded-For` eine Liste, und die Option `ForwardLimit` bestimmt, wie viele Einträge ausgewertet werden. Für `X-Forwarded-Host` und `X-Forwarded-Prefix` gibt es entsprechende Optionen ([Configure ASP.NET Core to work with proxy servers and load balancers](https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer)).
+
+</details>
+
+<Quiz id="m17-l12-q1" />
+
+<Quiz id="m17-l12-q3" />
+
+<Quiz id="m17-l12-q4" />
+
+<Quiz id="m17-l12-q5" />
+
+<Quiz id="m17-l12-q6" />
+
+## Umgebungen
+
+Dieselbe App läuft auf dem Rechner des Entwicklers anders als auf dem Server. Der Name der <Term id="hosting-environment">Umgebung</Term> steuert das. Üblich sind `Development`, `Staging` und `Production`. Die Umgebungsvariable `ASPNETCORE_ENVIRONMENT` setzt den Namen (die Variable `DOTNET_ENVIRONMENT` hat Vorrang, wenn sie gesetzt ist). **Ist keine von beiden gesetzt, heißt die Umgebung `Production`.** Auf dem Rechner des Entwicklers setzt das Startprofil der Vorlage `Development`, auf dem Server tut das niemand von selbst ([ASP.NET Core runtime environments](https://learn.microsoft.com/aspnet/core/fundamentals/environments)).
+
+Im Code fragst du die Umgebung mit `app.Environment.IsDevelopment()` ab. Aus Modul 15 kennst du außerdem `appsettings.{Environment}.json`. Zwei Dinge sollen in Produktion aus sein:
+
+- **Die Entwickler-Fehlerseite:** Sie zeigt bei einer Ausnahme Aufrufliste, Pfade und Einstellungen. `WebApplication` schaltet sie in `Development` von selbst ein. In Produktion antwortet die App stattdessen mit einem knappen Fehler, wie in Lektion 7.
+- **Das OpenAPI-Dokument:** Es listet jeden Pfad der API (Lektion 10). Du legst es nur an, wenn `IsDevelopment()` wahr ist.
+
+Das Programm startet dieselbe App dreimal: ohne Umgebungsnamen, mit `Development` und mit `Production`. Es druckt, ob das Dokument da ist und ob die Fehlerantwort die Meldung der Ausnahme enthält.
+
+:::info[Vorhersage]
+Welche Umgebung hat die App im ersten Durchlauf, in dem kein Name gesetzt wird? Was liefern `/openapi/v1.json` und `/fail` in den drei Durchläufen? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={environments} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{environmentsOutput}</CodeBlock>
+
+1. **Standard:** Ohne Namen ist die Umgebung `Production`. Der erste Durchlauf verhält sich wie der dritte.
+2. **Development:** Das Dokument ist da (`200`). Die Fehlerantwort enthält die Meldung der Ausnahme.
+3. **Production:** Das Dokument gibt es nicht (`404`). Der Fehler ergibt `500` ohne Meldung.
+
+**Was passiert, wenn …** du `app.Environment.IsDevelopment()` durch `true` ersetzt? Dann ist das Dokument in jeder Umgebung da, auch in Produktion.
+
+</details>
+
+<Quiz id="m17-l12-q2" />
+
+## Gap-Beispiel: nur in der Entwicklung
+
+Die Lücke `___` fehlt. Setze den Namen der Methode ein, die prüft, ob die Umgebung `Development` ist.
+
+<CodeBlock language="csharp" title="gap-environment.snippet.cs">{gapEnvironment}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `IsDevelopment`: `app.Environment.IsDevelopment()`. Die Bedingung gilt nur in `Development`.
+
+</details>
+
+### Weitere Randthemen
+
+Drei Dinge nur mit Namen:
+
+- **HTTPS-Umleitung und HSTS:** `UseHttpsRedirection` leitet HTTP auf HTTPS um, `UseHsts` sendet den Header `Strict-Transport-Security`. Hinter einem Proxy, der TLS beendet, braucht die Umleitung das korrekte Schema aus den Forwarded-Headern. `UseForwardedHeaders` läuft darum vor `UseHsts`.
+- **Datenbank-Migrationen:** Das Schema der Datenbank ändert ein eigener Schritt des Deployments (Modul 16), nicht der Start der App. Die API von SecLog wendet keine Migrationen an.
+- **Zustandsprüfung:** Ein Prozessmanager oder Orchestrator kann einen Endpunkt abfragen, um zu sehen, ob die App lebt. Das sind Health Checks, hier nur ein Satz.
+
+Zertifikate, Lastverteilung und die Schritte eines bestimmten Anbieters sind nicht Teil des Kurses.
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l11/`) verlangt für `/incidents` eine Anmeldung und eine Rolle für Statusänderungen. Das OpenAPI-Dokument gibt es in jeder Umgebung.
+
+**Neue Anforderung:** „SecLog läuft hinter einem Reverse Proxy: Die API wertet die Forwarded-Header aus, und das OpenAPI-Dokument gibt es nur in der Entwicklungsumgebung.“
+
+In `Program.cs` stellt `Configure<ForwardedHeadersOptions>` die Header `X-Forwarded-For` und `X-Forwarded-Proto` ein, und `UseForwardedHeaders()` steht als Erstes in der Pipeline. `MapOpenApi()` steht in einer Bedingung mit `app.Environment.IsDevelopment()`. Der Aufruf `AllowAnonymous()` aus Lektion 11 entfällt, denn es gibt kein Dokument mehr, das in Produktion anonym erreichbar sein müsste. Eine Datei `appsettings.Development.json` ist nicht nötig, weil sich keine Einstellung unterscheidet. Die Tests in `OpenApiTests` legen die Umgebung ausdrücklich fest: Mit `Development` liefert `GET /openapi/v1.json` den Status `200`, mit `Production` den Status `404`. Ein Test in `ForwardedHeadersTests` prüft, dass die Optionen beide Header auswerten.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/OpenApiTests.cs (geändert)">{openApiTests}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/ForwardedHeadersTests.cs (neu)">{forwardedTests}</CodeBlock>
+
+1. **Forwarded-Header:** `Configure<ForwardedHeadersOptions>` nennt `XForwardedFor | XForwardedProto`. `UseForwardedHeaders()` steht vor allen anderen Middleware.
+2. **Nur in der Entwicklung:** `MapOpenApi()` steht in `if (app.Environment.IsDevelopment())`.
+3. **Tests:** `WithWebHostBuilder(b => b.UseEnvironment(…))` stellt die Umgebung ein. `WebApplicationFactory` nutzt ohne Angabe `Development`, darum ist die Angabe im Test ausdrücklich.
+4. **Ausgabe:** In `expected.out.txt` sind zwei Zeilen neu: `Document_ProductionEnvironment_ReturnsNotFound` und `Options_Always_ForwardClientAddressAndScheme`.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l12/`) wertet Forwarded-Header aus und liefert das OpenAPI-Dokument nur in `Development`. Damit ist der Meilenstein von Modul 17 erreicht: SecLog bietet eine Vorfall-API an.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l12-needs-iis-or-nginx" />
+
+**„Eine ASP.NET Core-App braucht IIS oder Nginx, um überhaupt Anfragen anzunehmen.“** Kestrel ist eingebaut und nimmt Anfragen selbst an. Ein Reverse Proxy ist eine zusätzliche Möglichkeit, etwa für TLS und den Betrieb mehrerer Apps auf einem Port. Er ist keine Voraussetzung.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l12-development-settings-in-production" />
+
+**„Die Einstellungen der Entwicklungsumgebung gelten automatisch auch in Produktion.“** Es gilt der Name der Umgebung, und ohne gesetzte Variable ist er `Production`. Funktionen unter `IsDevelopment()` sind dort aus. Wer `ASPNETCORE_ENVIRONMENT=Development` auf einem Server setzt, schaltet sie auch dort ein.
+:::
+
+## Zusammenfassung
+
+Eine ASP.NET Core-App ist ein Konsolenprogramm, das den Webserver Kestrel hostet. Du veröffentlichst sie mit `dotnet publish` in einen Ordner oder als Container-Image und startest sie mit `dotnet <App>.dll`. Ein Prozessmanager startet sie beim Systemstart, nach einem Absturz neu und beendet sie geordnet. Ein Reverse Proxy ist optional. Steht er davor, trägt er Client-Adresse und Schema in Forwarded-Header ein, und `UseForwardedHeaders` setzt sie am Anfang der Pipeline ein, aber nur von bekannten Proxys. Die Umgebung steuert, was aktiv ist: Ohne Angabe ist sie `Production`, und Entwickler-Fehlerseite und OpenAPI-Dokument gehören nur in `Development`.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l12-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l12-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Kestrel web server in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel)
+- Microsoft Learn: [Configure ASP.NET Core to work with proxy servers and load balancers](https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer)
+- Microsoft Learn: [ASP.NET Core runtime environments](https://learn.microsoft.com/aspnet/core/fundamentals/environments)

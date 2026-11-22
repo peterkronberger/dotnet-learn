@@ -12062,6 +12062,170 @@
         "title": "Include OpenAPI metadata in an ASP.NET Core app",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/include-metadata"
       }
+    },
+    {
+      "id": "authentication",
+      "term": "Authentication",
+      "german": "Authentifizierung",
+      "category": "platform",
+      "definition": "Der Schritt, der feststellt, wer aufruft. Das Ergebnis ist eine Identität, in ASP.NET Core ein `ClaimsPrincipal` in `HttpContext.User`. Ob die Identität etwas darf, klärt erst die Autorisierung.",
+      "aliases": ["Authentifizierung"],
+      "related": ["authorization", "claim", "authentication-scheme"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Overview of ASP.NET Core Authentication",
+        "url": "https://learn.microsoft.com/aspnet/core/security/authentication/"
+      }
+    },
+    {
+      "id": "authorization",
+      "term": "Authorization",
+      "german": "Autorisierung",
+      "category": "platform",
+      "definition": "Der Schritt, der entscheidet, ob eine bekannte Identität eine Aktion ausführen darf. Eine fehlende Anmeldung führt zu `401`, ein fehlendes Recht bei bekannter Identität zu `403`.",
+      "aliases": ["Autorisierung"],
+      "related": ["authentication", "authorization-policy"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Introduction to authorization in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/security/authorization/introduction"
+      }
+    },
+    {
+      "id": "claim",
+      "term": "Claim",
+      "german": "Aussage über eine Identität",
+      "category": "platform",
+      "definition": "Eine Angabe über den Benutzer als Name-Wert-Paar, zum Beispiel sein Name oder seine Rolle. Die Claims einer Identität bilden zusammen den `ClaimsPrincipal`.",
+      "aliases": ["Claims", "ClaimsPrincipal"],
+      "related": ["authentication", "authorization-policy"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Overview of ASP.NET Core Authentication",
+        "url": "https://learn.microsoft.com/aspnet/core/security/authentication/"
+      }
+    },
+    {
+      "id": "authentication-scheme",
+      "term": "Authentication Scheme",
+      "german": "Authentifizierungsschema",
+      "category": "platform",
+      "definition": "Ein Name für einen Authentifizierungs-Handler und seine Optionen. Der Handler liest die Zugangsdaten einer Anfrage, zum Beispiel ein Bearer-Token, und baut daraus die Identität.",
+      "aliases": ["Authentication Handler"],
+      "related": ["authentication", "bearer-token"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Overview of ASP.NET Core Authentication",
+        "url": "https://learn.microsoft.com/aspnet/core/security/authentication/"
+      }
+    },
+    {
+      "id": "bearer-token",
+      "term": "Bearer Token",
+      "german": "Inhabertoken",
+      "category": "platform",
+      "definition": "Ein signiertes Token, das ein Client im Header `Authorization: Bearer …` mitsendet. Ein Identitätsanbieter stellt es aus. Die API prüft nur Signatur, Aussteller und Zielgruppe.",
+      "aliases": ["JWT", "Bearer-Token"],
+      "related": ["authentication-scheme", "http-header"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Authentication and authorization in Minimal APIs",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security"
+      }
+    },
+    {
+      "id": "authorization-policy",
+      "term": "Authorization Policy",
+      "german": "Autorisierungsrichtlinie",
+      "category": "platform",
+      "definition": "Ein benannter Satz von Anforderungen, zum Beispiel eine Rolle oder ein Claim. Ein Endpoint verlangt die Policy mit `RequireAuthorization(\"Name\")`.",
+      "aliases": ["Autorisierungs-Policy"],
+      "related": ["authorization", "claim", "endpoint"],
+      "lesson": "m17-l11",
+      "source": {
+        "title": "Policy-based authorization in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/security/authorization/policies"
+      }
+    },
+    {
+      "id": "web-server",
+      "term": "Web Server",
+      "category": "platform",
+      "definition": "Ein Programm, das HTTP-Anfragen aus dem Netz annimmt und Antworten zurückschickt. Eine ASP.NET Core-App bringt ihren Webserver mit.",
+      "related": ["kestrel", "http-request"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "Kestrel web server in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel"
+      }
+    },
+    {
+      "id": "kestrel",
+      "term": "Kestrel",
+      "category": "platform",
+      "definition": "Der in ASP.NET Core eingebaute Webserver. Er läuft im Prozess der App und kann Anfragen selbst annehmen, mit oder ohne Reverse Proxy davor.",
+      "related": ["web-server", "reverse-proxy"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "Kestrel web server in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel"
+      }
+    },
+    {
+      "id": "process-manager",
+      "term": "Process Manager",
+      "german": "Prozessmanager",
+      "category": "platform",
+      "definition": "Ein Dienst des Betriebssystems oder der Plattform, der die App beim Systemstart startet, nach einem Absturz neu startet und sie geordnet beendet. Beispiele sind systemd und Windows-Dienste.",
+      "aliases": ["Prozessmanager", "systemd"],
+      "related": ["graceful-shutdown", "kestrel"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "Host ASP.NET Core on Linux with Nginx",
+        "url": "https://learn.microsoft.com/aspnet/core/host-and-deploy/linux-nginx"
+      }
+    },
+    {
+      "id": "reverse-proxy",
+      "term": "Reverse Proxy",
+      "german": "Rückwärts-Proxy",
+      "category": "platform",
+      "definition": "Ein Server vor der App, der Anfragen aus dem Netz annimmt und an die App weiterleitet. Er beendet oft TLS. Die App sieht dann den Proxy als Absender.",
+      "aliases": ["Proxy"],
+      "related": ["kestrel", "forwarded-headers"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "Kestrel web server in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/servers/kestrel"
+      }
+    },
+    {
+      "id": "forwarded-headers",
+      "term": "Forwarded Headers",
+      "german": "weitergeleitete Header",
+      "category": "platform",
+      "definition": "Header wie `X-Forwarded-For` und `X-Forwarded-Proto`, in die ein Proxy Adresse und Schema des Clients schreibt. `UseForwardedHeaders` setzt sie in die Anfrage ein, aber nur von bekannten Proxys.",
+      "aliases": ["X-Forwarded-For", "X-Forwarded-Proto"],
+      "related": ["reverse-proxy", "http-header", "middleware"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "Configure ASP.NET Core to work with proxy servers and load balancers",
+        "url": "https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer"
+      }
+    },
+    {
+      "id": "hosting-environment",
+      "term": "Hosting Environment",
+      "german": "Betriebsumgebung der App",
+      "category": "platform",
+      "definition": "Der Name, unter dem die App läuft, zum Beispiel `Development`, `Staging` oder `Production`. Fehlt die Einstellung, gilt `Production`. Der Name steuert Funktionen und Konfigurationsdateien.",
+      "aliases": ["ASPNETCORE_ENVIRONMENT"],
+      "related": ["environment-variable", "configuration-provider"],
+      "lesson": "m17-l12",
+      "source": {
+        "title": "ASP.NET Core runtime environments",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/environments"
+      }
     }
   ]
 }

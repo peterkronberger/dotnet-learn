@@ -1,0 +1,223 @@
+---
+title: Wer darf den Endpunkt aufrufen?
+sidebar_position: 11
+description: Authentifizierung und Autorisierung in ASP.NET Core unterscheiden, Endpunkte mit RequireAuthorization und Policies schützen, 401 von 403 abgrenzen und einen angemeldeten Benutzer im Integrationstest simulieren.
+lesson_id: m17-l11
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import policies from '!!raw-loader!@site/examples/_ci/m17-l11-policies/Program.cs';
+import policiesOutput from '!!raw-loader!@site/examples/_ci/m17-l11-policies/expected.out.txt';
+import gapPolicy from '!!raw-loader!@site/examples/m17/l11/gap-policy.snippet.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l11/src/SecLog.Api/Program.cs';
+import endpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l11/src/SecLog.Api/IncidentEndpoints.cs';
+import appSettings from '!!raw-loader!@site/examples/_ci/seclog-m17-l11/src/SecLog.Api/appsettings.json';
+import testAuthHandler from '!!raw-loader!@site/examples/_ci/seclog-m17-l11/tests/SecLog.Api.Tests/TestAuthHandler.cs';
+import authorizationTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l11/tests/SecLog.Api.Tests/AuthorizationTests.cs';
+
+# Wer darf den Endpunkt aufrufen?
+
+:::note[Lernziele]
+- Du unterscheidest Authentifizierung und Autorisierung und grenzt `401` von `403` ab.
+- Du schützt einen Endpunkt oder eine Gruppe mit `RequireAuthorization` und einer Policy.
+- Du simulierst in einem Integrationstest einen angemeldeten Benutzer.
+:::
+
+## Rückblick
+
+<Quiz id="m17-l01-q7" />
+
+<Quiz id="m17-l08-q1" />
+
+<Quiz id="m17-l04-q5" />
+
+## Wer ruft auf, und darf er das?
+
+Bisher darf jeder die API von SecLog aufrufen. Das ändert sich jetzt. Zwei Fragen sind dabei zu trennen:
+
+- <Term id="authentication">Authentifizierung</Term>: **Wer** ruft auf?
+- <Term id="authorization">Autorisierung</Term>: **Darf** dieser Aufrufer das tun?
+
+Die erste Frage kommt zuerst, denn ohne bekannte Identität lässt sich über Rechte nichts sagen. Beide Schritte laufen in ASP.NET Core als Middleware (Lektion 8) vor dem Endpunkt ([Overview of ASP.NET Core Authentication](https://learn.microsoft.com/aspnet/core/security/authentication/)).
+
+Das Ergebnis der Authentifizierung ist eine Identität. Sie besteht aus <Term id="claim">Claims</Term>: Angaben über den Benutzer als Name-Wert-Paare, zum Beispiel der Name oder die Rolle. Alle Claims einer Identität zusammen bilden den `ClaimsPrincipal`. Du erreichst ihn über `HttpContext.User` (Lektion 5 und 8).
+
+### Woher kommt die Identität?
+
+Ein <Term id="authentication-scheme">Authentifizierungsschema</Term> ist ein Name für einen Handler und seine Optionen. Der Handler liest die Zugangsdaten einer Anfrage und baut daraus die Identität. Bei einer API ist der übliche Fall ein <Term id="bearer-token">Bearer-Token</Term>: ein signiertes Token, das ein Client im Header `Authorization: Bearer …` mitsendet (Lektion 1 erklärt Header).
+
+Die API stellt das Token nicht aus. Ein Identitätsanbieter verwaltet Benutzer und Passwörter und gibt die Tokens heraus. Die API prüft nur, ob Signatur, Aussteller und Zielgruppe des Tokens stimmen, und übernimmt dessen Claims. Wie ein Anbieter Tokens ausstellt (zum Beispiel mit OAuth 2.0 und OpenID Connect), ist ein eigenes Thema und gehört nicht zu diesem Kurs. Eigenen Sicherheitscode für Passwörter oder Signaturen schreibst du nicht.
+
+In ASP.NET Core registrierst du das Schema für Bearer-Token so:
+
+```csharp
+builder.Services.AddAuthentication().AddJwtBearer();
+```
+
+`AddJwtBearer` steckt im Paket `Microsoft.AspNetCore.Authentication.JwtBearer`. Aussteller und Zielgruppe lesen Minimal APIs aus der Konfiguration, aus dem Abschnitt `Authentication:Schemes:Bearer` (Konfiguration: Modul 15). Es stehen keine Geheimnisse im Repository ([Authentication and authorization in Minimal APIs](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security)). Für lokale Tests erzeugt das Werkzeug `dotnet user-jwts` Tokens. Mehr als den Namen braucht dieser Kurs davon nicht.
+
+### Die Regeln: Policies
+
+Eine <Term id="authorization-policy">Policy</Term> ist ein benannter Satz von Anforderungen. `RequireRole("responder")` verlangt eine Rolle, `RequireClaim(…)` einen bestimmten Claim. Du registrierst die Policy einmal und hängst sie dann an Endpunkte:
+
+- `AddAuthorizationBuilder().AddPolicy("Name", …)` legt die Policy an.
+- `RequireAuthorization()` verlangt einen angemeldeten Benutzer, ohne weitere Regel.
+- `RequireAuthorization("Name")` verlangt die benannte Policy.
+- `AllowAnonymous()` nimmt einen Endpunkt von der Pflicht aus.
+
+([Policy-based authorization in ASP.NET Core](https://learn.microsoft.com/aspnet/core/security/authorization/policies))
+
+`RequireAuthorization` gibt es auch an einer Gruppe (Lektion 3). Dann gilt die Pflicht für alle Endpunkte der Gruppe.
+
+:::note[Offen ist der Standard]
+Die Einrichtung der Authentifizierung schützt keinen Endpunkt. Ein Endpunkt ohne jede Angabe zur Autorisierung ist für alle offen. Wer das umkehren will, setzt eine **Fallback-Policy**, die für jeden Endpunkt ohne Angabe gilt: `SetFallbackPolicy` mit einer Policy, die `RequireAuthenticatedUser()` verlangt. Dann ist Verweigern der Standard, und öffentliche Endpunkte markierst du mit `AllowAnonymous()`.
+:::
+
+### Reihenfolge der Middleware
+
+`UseAuthentication()` setzt die Identität, `UseAuthorization()` prüft sie gegen die Regeln des Endpunkts. Die Authentifizierung muss zuerst laufen. `WebApplication` fügt beide Middleware selbst hinzu, sobald die zugehörigen Dienste registriert sind. Wer die Reihenfolge sichtbar halten oder steuern will, ruft sie ausdrücklich auf, so wie SecLog es unten tut ([Authentication and authorization in Minimal APIs](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security)).
+
+### 401 und 403
+
+Wenn die Regel nicht erfüllt ist, entscheidet die Lage über die Antwort:
+
+- **`401 Unauthorized`:** Der Aufrufer ist nicht authentifiziert, es fehlt das Token oder es ist ungültig. Beim Bearer-Schema kommt dazu der Header `WWW-Authenticate: Bearer`.
+- **`403 Forbidden`:** Der Aufrufer ist authentifiziert, hat aber nicht das Recht.
+
+Die Namen führen in die Irre: `401` heißt „unauthorized“, meint aber die fehlende Authentifizierung ([Overview of ASP.NET Core Authentication](https://learn.microsoft.com/aspnet/core/security/authentication/)).
+
+## Praxisbeispiel: sieben Anfragen
+
+Das Programm hat ein Schema, das Benutzer und Rolle aus zwei Headern liest. Das ist nur zum Lernen so einfach, eine echte API prüft hier ein signiertes Token. Dazu kommen die Policy `ChangeStatus` mit der Rolle `responder`, eine Fallback-Policy und vier Endpunkte. Das Programm sendet sieben Anfragen und druckt zu jeder den Statuscode.
+
+:::info[Vorhersage]
+Welchen Statuscode bekommt jede der sieben Anfragen? Achte auf `/notes`: Der Endpunkt hat keine eigene Regel. Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={policies} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{policiesOutput}</CodeBlock>
+
+1. **Öffentlicher Endpunkt:** `/ping` hat `AllowAnonymous()`. Die Anfrage ohne Benutzer ergibt `200`.
+2. **Nicht angemeldet:** `/incidents` verlangt eine Anmeldung. Ohne Benutzer ergibt das `401`, mit `alice` `200`.
+3. **Angemeldet, aber ohne Recht:** `PUT /incidents/1/status` verlangt die Policy `ChangeStatus`. `alice` ist bekannt, hat aber keine Rolle: `403`.
+4. **Angemeldet mit Recht:** `dave` hat die Rolle `responder`: `204`.
+5. **Fallback-Policy:** `/notes` hat keine Regel, also gilt die Fallback-Policy. Ohne Benutzer ergibt das `401`, mit `alice` `200`.
+
+**Was passiert, wenn …** du `SetFallbackPolicy` entfernst? Dann hat `/notes` keine Regel, und die Anfrage ohne Benutzer ergibt `200`.
+
+</details>
+
+<details>
+<summary>Vertiefung: Fallback-Policy und Standard-Policy (optional)</summary>
+
+Für jeden Endpunkt wählt die Autorisierungs-Middleware die Policy aus seinen Angaben. Ohne Angabe gilt die Fallback-Policy, falls es eine gibt. `RequireAuthorization()` ohne Namen verwendet die Standard-Policy, die einen angemeldeten Benutzer verlangt. Eine benannte Policy ersetzt beide. Die Fallback-Policy wird nie mit einer benannten oder der Standard-Policy kombiniert ([Policy-based authorization: Default and fallback policies](https://learn.microsoft.com/aspnet/core/security/authorization/policies#default-and-fallback-policies)).
+
+</details>
+
+<Quiz id="m17-l11-q1" />
+
+<Quiz id="m17-l11-q2" />
+
+<Quiz id="m17-l11-q3" />
+
+## Einen Benutzer im Test simulieren
+
+Ein Integrationstest soll nicht bei einem Identitätsanbieter anfragen. Stattdessen ersetzt er das Schema durch einen eigenen Handler. Der Handler ist eine Klasse, die von `AuthenticationHandler<AuthenticationSchemeOptions>` erbt und eine Methode überschreibt, die die Identität baut. Der Test registriert ihn in `ConfigureTestServices` (Lektion 4) mit `AddAuthentication` und `AddScheme` ([Integration tests in ASP.NET Core: Mock authentication](https://learn.microsoft.com/aspnet/core/test/integration-tests#mock-authentication)).
+
+Die Policy läuft dabei unverändert: Nur die Quelle der Identität wird ausgetauscht, die Regeln bleiben die der echten App. Darum testen solche Tests wirklich `401`, `403` und den Erfolg.
+
+<Quiz id="m17-l11-q4" />
+
+<Quiz id="m17-l11-q5" />
+
+<Quiz id="m17-l11-q6" />
+
+## Gap-Beispiel: die Rolle verlangen
+
+Die Lücke `___` fehlt. Setze den Namen der Methode ein, die eine Rolle verlangt.
+
+<CodeBlock language="csharp" title="gap-policy.snippet.cs">{gapPolicy}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `RequireRole`: `policy.RequireRole("responder")`. Die Policy verlangt dann, dass der Benutzer die Rolle `responder` hat.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l10/`) bietet drei Endpunkte unter `/incidents` und ein OpenAPI-Dokument. Jeder darf alles aufrufen.
+
+**Neue Anforderung:** „Nur angemeldete Benutzer dürfen Vorfälle lesen, und nur Benutzer mit der Rolle `responder` dürfen den Status ändern.“
+
+Dafür kommt das Paket `Microsoft.AspNetCore.Authentication.JwtBearer` in `SecLog.Api.csproj`. In `Program.cs` stehen `AddAuthentication().AddJwtBearer()`, die Policy `ChangeIncidentStatus` mit `RequireRole("responder")` sowie `UseAuthentication()` und `UseAuthorization()` vor den Endpunkten. `appsettings.json` bekommt Aussteller und Zielgruppe, aber keinen Schlüssel und kein Geheimnis. In `IncidentEndpoints.cs` verlangt die Gruppe `RequireAuthorization()`, und der PUT-Endpunkt die Policy. Das OpenAPI-Dokument bleibt ohne Anmeldung erreichbar (`AllowAnonymous()`), bis Lektion 12 es auf die Entwicklung beschränkt. Im Testprojekt ersetzt `TestAuthHandler` das Schema, und Benutzer und Rolle kommen aus den Headern `X-Test-User` und `X-Test-Role`. Die bisherigen Tests senden jetzt einen angemeldeten Benutzer, und die neuen Tests in `AuthorizationTests` prüfen `401`, `403` und `204`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (geändert)">{endpoints}</CodeBlock>
+
+<CodeBlock language="json" title="src/SecLog.Api/appsettings.json (geändert)">{appSettings}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/TestAuthHandler.cs (neu)">{testAuthHandler}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/AuthorizationTests.cs (neu)">{authorizationTests}</CodeBlock>
+
+1. **Paket und Schema:** `AddAuthentication().AddJwtBearer()` registriert das Schema. Aussteller und Zielgruppe stehen in `appsettings.json`. Ohne Signaturschlüssel wird kein Token akzeptiert: Die API schlägt fehl, statt offen zu sein.
+2. **Policy:** `AddAuthorizationBuilder().AddPolicy("ChangeIncidentStatus", …)` verlangt die Rolle `responder`.
+3. **Middleware:** `UseAuthentication()` und `UseAuthorization()` stehen nach Exception-Handler und Status-Pages und vor den Endpunkten.
+4. **Endpunkte:** Die Gruppe ruft `RequireAuthorization()` auf, `ChangeStatus` zusätzlich `RequireAuthorization("ChangeIncidentStatus")`. `MapOpenApi().AllowAnonymous()` hält das Dokument offen.
+5. **Tests:** `TestAuthHandler` ersetzt das Schema in `ConfigureTestServices`. `AsUser` setzt die Test-Header. In `expected.out.txt` sind die fünf Zeilen `AuthorizationTests` neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l11/`) verlangt für `/incidents` eine Anmeldung. Der Status lässt sich nur mit der Rolle `responder` ändern. Fehlende Anmeldung ergibt `401`, fehlende Rolle `403`.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l11-authentication-equals-authorization" />
+
+**„Wer angemeldet ist, darf alle Endpunkte aufrufen.“** Die Anmeldung beweist nur, wer aufruft. Was die Identität darf, entscheiden Policies und Rollen an den Endpunkten. Ein angemeldeter Benutzer ohne die Rolle `responder` bekommt bei `PUT /incidents/1/status` ein `403`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l11-401-and-403-same" />
+
+**„`401` und `403` bedeuten dasselbe.“** `401` heißt: nicht authentifiziert, die Identität fehlt oder ist ungültig. `403` heißt: authentifiziert, aber nicht erlaubt. Ein Client kann mit einem neuen Token auf `401` reagieren. Auf `403` hilft ein neues Token mit demselben Benutzer nicht.
+:::
+
+<details>
+<summary>Vertiefung: Claims und Rollen (optional)</summary>
+
+Eine Rolle ist ein Claim vom Typ `ClaimTypes.Role`. `RequireRole("responder")` prüft, ob die Identität einen solchen Claim mit diesem Wert hat. Andere Regeln prüfen andere Claims, zum Beispiel mit `RequireClaim("scope", "incidents.write")`. Hinter einer Policy stehen Anforderungen und Handler, die den `ClaimsPrincipal` auswerten. Mehrere Anforderungen einer Policy müssen alle erfüllt sein ([Policy-based authorization](https://learn.microsoft.com/aspnet/core/security/authorization/policies)).
+
+</details>
+
+## Zusammenfassung
+
+Authentifizierung stellt fest, wer aufruft, und liefert einen `ClaimsPrincipal`. Autorisierung entscheidet, ob diese Identität den Endpunkt aufrufen darf. Bei einer API liest ein Schema das Bearer-Token und prüft es, das Token stellt ein Identitätsanbieter aus. Endpunkte oder Gruppen verlangen mit `RequireAuthorization` eine Anmeldung oder eine benannte Policy, ohne Angabe sind sie offen, solange keine Fallback-Policy gilt. Fehlende Anmeldung ergibt `401`, fehlendes Recht `403`. Im Test ersetzt ein Test-Handler das Schema, und die Policy läuft wie in der echten App.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l11-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l11-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Authentication and authorization in Minimal APIs](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/security)
+- Microsoft Learn: [Policy-based authorization in ASP.NET Core](https://learn.microsoft.com/aspnet/core/security/authorization/policies)
+- Microsoft Learn: [Integration tests in ASP.NET Core](https://learn.microsoft.com/aspnet/core/test/integration-tests#mock-authentication)

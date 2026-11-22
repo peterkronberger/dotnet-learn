@@ -1,0 +1,7 @@
+GET /ping as nobody: 200 OK
+GET /incidents as nobody: 401 Unauthorized
+GET /incidents as alice (no role): 200 OK
+PUT /incidents/1/status as alice (no role): 403 Forbidden
+PUT /incidents/1/status as dave (responder): 204 No Content
+GET /notes as nobody: 401 Unauthorized
+GET /notes as alice (no role): 200 OK

@@ -1,0 +1,6 @@
+Without UseForwardedHeaders
+  scheme: http, client: 198.51.100.1
+With UseForwardedHeaders, request from the known proxy
+  scheme: https, client: 203.0.113.7
+With UseForwardedHeaders, request from another address
+  scheme: http, client: 192.0.2.99
