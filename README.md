@@ -34,6 +34,7 @@ cd website && npm run build                # learning site
 dotnet build playground/Playground.csproj  # playground
 bash tools/check-examples.sh               # compile all examples, compare outputs
 bash tools/check-examples.sh --module m16  # only one module (also: 16, w01)
+bash tools/check-examples.sh --lesson m16-l07  # only one lesson (also: 16-7, m16/l07)
 node tools/check-quiz.mjs                  # quiz data, links and wording
 ```
 
