@@ -1,0 +1,174 @@
+---
+title: Statuscodes und typisierte Ergebnisse
+sidebar_position: 6
+description: Wie ein Handler mit TypedResults den Statuscode wählt, warum null kein 404 ist und wie Results<T1, T2> alle möglichen Antworten im Rückgabetyp nennt.
+lesson_id: m17-l06
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import results from '!!raw-loader!@site/examples/_ci/m17-l06-results/Program.cs';
+import resultsOutput from '!!raw-loader!@site/examples/_ci/m17-l06-results/expected.out.txt';
+import gapResult from '!!raw-loader!@site/examples/m17/l06/gap-typed-result.snippet.cs';
+import apiEndpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l06/src/SecLog.Api/IncidentEndpoints.cs';
+import endpointTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l06/tests/SecLog.Api.Tests/IncidentEndpointsTests.cs';
+import inputTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l06/tests/SecLog.Api.Tests/IncidentInputTests.cs';
+
+# Statuscodes und typisierte Ergebnisse
+
+:::note[Lernziele]
+- Du wählst für einen Endpoint den passenden Statuscode: 200, 201 mit `Location`, 204, 400 oder 404.
+- Du schreibst einen Handler mit `TypedResults` und dem Rückgabetyp `Results<Ok<T>, NotFound>`.
+- Du erklärst, warum `null` als Rückgabe kein „nicht gefunden“ ist.
+:::
+
+## Rückblick
+
+<Quiz id="m17-l01-q2" />
+
+<Quiz id="m17-l03-q4" />
+
+<Quiz id="m09-l01-q1" />
+
+## Der Handler wählt den Statuscode
+
+Bisher hat die App den Statuscode selbst gewählt: 200 für jeden Rückgabewert und 404, wenn keine Route passt. Lektion 3 hat gezeigt, dass ein Handler, der für eine unbekannte Id `null` zurückgibt, mit `200 OK` und dem Body `null` antwortet. Für einen Client ist das schlecht: Er muss den Body lesen, um zu merken, dass es den Vorfall nicht gibt.
+
+Eine Antwort hat einen Statuscode (Lektion 1), und den kann nur der Handler wählen, denn nur er weiß, was passiert ist. Dazu gibt er kein Objekt zurück, sondern ein **Ergebnis**: ein Objekt, das die ganze Antwort beschreibt. Die Schnittstelle dafür heißt `IResult`. Die Klasse `TypedResults` hat für jeden häufigen Fall eine Methode:
+
+| Aufruf | Statuscode | Wann |
+| --- | --- | --- |
+| `TypedResults.Ok(value)` | 200 | Erfolg mit Body |
+| `TypedResults.Created(uri, value)` | 201 | Eine neue Ressource entstand |
+| `TypedResults.NoContent()` | 204 | Erfolg ohne Body, zum Beispiel nach `PUT` und `DELETE` |
+| `TypedResults.BadRequest()` | 400 | Die Anfrage ist fehlerhaft |
+| `TypedResults.NotFound()` | 404 | Die Ressource gibt es nicht |
+
+Die Bedeutung der Codes legt RFC 9110 fest. `201 Created` sagt zusätzlich, wo die neue Ressource liegt: im <Term id="location-header">Location-Header</Term> der Antwort. `TypedResults.Created(uri, value)` setzt ihn aus dem ersten Argument. `400` kennst du schon von Bindung und Validierung. Die Antwort mit dem genauen Fehlerformat kommt in Lektion 7.
+
+Es gibt auch die Klasse `Results` mit denselben Methoden, zum Beispiel `Results.NotFound()`. Ihr Rückgabetyp ist nur `IResult`. `TypedResults.NotFound()` liefert dagegen den Typ `NotFound`. Die Antwort ist dieselbe, der Unterschied liegt im Typ, und der hilft in zwei Fällen:
+
+1. **Test:** Ein Test kann den Typ prüfen, ohne einen Server zu starten.
+2. **Beschreibung:** Werkzeuge lesen aus dem Typ, welche Antworten ein Endpoint hat. Lektion 10 nutzt das für OpenAPI.
+
+Hat ein Handler mehrere mögliche Ergebnisse, nennt der Rückgabetyp alle: `Results<Ok<IncidentDto>, NotFound>`. Das ist ein generischer Typ (Modul 9) mit zwei Typargumenten. Er sagt: Der Handler gibt entweder ein `Ok<IncidentDto>` oder ein `NotFound` zurück. Eine andere Rückgabe, etwa `TypedResults.BadRequest()`, übersetzt der Compiler nicht. Der Typ gehört zur Signatur, und der Compiler prüft ihn. Die Typen `Ok<T>`, `NotFound`, `NoContent` und `Created<T>` stehen im Namensraum `Microsoft.AspNetCore.Http.HttpResults`.
+
+Das Programm hat vier Endpoints:
+
+- `/null/{id}` gibt `FirstOrDefault` direkt zurück.
+- `GET /incidents/{id}` gibt `Results<Ok<IncidentDto>, NotFound>` zurück.
+- `POST /incidents` legt einen Vorfall an und gibt `Created` zurück.
+- `DELETE /incidents/{id}` gibt `Results<NoContent, NotFound>` zurück.
+
+Am Ende ruft das Programm `GetIncident(99)` ohne Server auf, denn ein Handler ist eine normale Methode. Das Ergebnis hat die Eigenschaft `Result`, die das tatsächlich gewählte Ergebnis enthält.
+
+:::info[Vorhersage]
+Welchen Statuscode liefert jede Anfrage? Was steht im Body von `/null/99`? Welche Zeilen hat die Antwort auf `POST /incidents` zusätzlich? Was druckt der letzte Abschnitt? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={results} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{resultsOutput}</CodeBlock>
+
+1. **`null`:** Der Handler gibt `null` zurück, ASP.NET Core schreibt `null` als JSON. Statuscode 200 mit dem Body `null`: Der Statuscode hängt nicht vom Wert ab.
+2. **`Ok` oder `NotFound`:** Für Id 1 gibt der Handler `TypedResults.Ok(incident)` zurück: 200 mit dem Vorfall. Für Id 99 gibt er `TypedResults.NotFound()` zurück: 404 ohne Body.
+3. **`Created`:** Die Antwort hat 201, den Header `Location: /incidents/3` und den neuen Vorfall im Body.
+4. **`NoContent` oder `NotFound`:** Das erste `DELETE` löscht den Vorfall und antwortet mit 204 ohne Body. Das zweite findet ihn nicht mehr: 404.
+5. **Ohne Server:** `GetIncident(99)` liefert ein `Results<…>`, dessen `Result` ein `NotFound` ist. Ein Test könnte genau das prüfen.
+
+**Was passiert, wenn …** `GetIncident` zusätzlich `TypedResults.BadRequest()` zurückgibt, der Rückgabetyp aber unverändert bleibt? Der Compiler lehnt das ab, weil `BadRequest` im Typ fehlt.
+
+</details>
+
+<Quiz id="m17-l06-q1" />
+
+<Quiz id="m17-l06-q2" />
+
+<Quiz id="m17-l06-q3" />
+
+<Quiz id="m17-l06-q4" />
+
+## Gap-Beispiel: der Rückgabetyp
+
+Die Lücke `___` fehlt. Der Handler gibt entweder `Ok<string>` oder ein Ergebnis mit dem Statuscode 404 zurück. Setze den Typ ein.
+
+<CodeBlock language="csharp" title="gap-typed-result.snippet.cs">{gapResult}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `NotFound`: `Results<Ok<string>, NotFound>`. Es ist der Typ, den `TypedResults.NotFound()` liefert.
+
+</details>
+
+<Quiz id="m17-l06-q5" />
+
+<Quiz id="m17-l06-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l05/`) filtert die Liste nach Benutzer und ändert den Status eines Vorfalls. Für eine unbekannte Id antworten `GET /incidents/{id}` und `PUT /incidents/{id}/status` noch mit `200 OK` und dem Body `null`.
+
+**Neue Anforderung:** Die API antwortet mit dem passenden Statuscode: 404, wenn es den Vorfall nicht gibt, und 204 nach einer Statusänderung. Dafür bekommt `GetById` den Rückgabetyp `Results<Ok<IncidentSummary>, NotFound>` und `ChangeStatus` den Rückgabetyp `Results<NoContent, NotFound>`. Die 400-Antwort der Validierung aus Lektion 5 bleibt, denn sie kommt, bevor der Handler läuft. Beide Handler sind schon benannte Methoden in `IncidentEndpoints`.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (geändert)">{apiEndpoints}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentEndpointsTests.cs (geändert: GetIncident_UnknownId_ReturnsNotFound ist neu)">{endpointTests}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentInputTests.cs (geändert)">{inputTests}</CodeBlock>
+
+1. **Typen nennen:** `Results<Ok<IncidentSummary>, NotFound>` für `GetById`, `Results<NoContent, NotFound>` für `ChangeStatus`.
+2. **Fälle zurückgeben:** Gibt es den Vorfall nicht, gibt der Handler `TypedResults.NotFound()` zurück. Sonst `TypedResults.Ok(…)` oder, nach `SaveChangesAsync`, `TypedResults.NoContent()`.
+3. **Tests anpassen:** Eine unbekannte Id ergibt 404 für GET und PUT. Der Statuswechsel antwortet mit 204, und ein folgendes GET zeigt den neuen Status.
+4. **Ergebnis:** In `expected.out.txt` sind die Zeilen `…GetIncident_UnknownId_ReturnsNotFound`, `…ChangeStatus_UnknownId_ReturnsNotFound` und `…ChangeStatus_ValidStatus_ReturnsNoContent` die Änderung.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l06/`) antwortet mit 404, wenn es einen Vorfall nicht gibt, und mit 204 nach einer Statusänderung. Die Rückgabetypen nennen alle möglichen Antworten.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l06-null-means-not-found" />
+
+**„Gibt ein Handler `null` zurück, antwortet die API automatisch mit 404.“** Die Antwort ist `200 OK` mit dem Body `null`. Wer 404 will, gibt `TypedResults.NotFound()` zurück.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l06-200-for-everything" />
+
+**„Jeder erfolgreiche Aufruf antwortet mit 200.“** 200 meldet nur Erfolg. Ein neuer Vorfall verdient 201 mit `Location`, eine Änderung ohne Antwort-Body 204. Der Client erkennt am Code, was passiert ist.
+:::
+
+<details>
+<summary>Vertiefung: Ergebnisse ohne Server testen (optional)</summary>
+
+Ein Handler, der `TypedResults` zurückgibt, lässt sich als Methode aufrufen. Der Test prüft dann den Typ des Ergebnisses, ohne Server und ohne HTTP. Das Vorgehen steht im Abschnitt zu Unit-Tests von [Test Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/test-minimal-api). Dass `Results<T1, T2>` ein Ergebnis der Typen `T1` oder `T2` hält und die Eigenschaft `Result` den tatsächlichen Wert liefert, zeigt das Programm oben. Die Bedeutung der Statuscodes steht in [RFC 9110, Abschnitt 15](https://www.rfc-editor.org/rfc/rfc9110#name-status-codes).
+
+</details>
+
+## Zusammenfassung
+
+Der Statuscode hängt nicht vom Wert ab, den ein Handler zurückgibt: Bei `null` antwortet die App mit 200 und dem Body `null`. Der Handler wählt den Code mit `TypedResults`: `Ok` für 200, `Created` für 201 mit `Location`, `NoContent` für 204, `BadRequest` für 400 und `NotFound` für 404. Der Rückgabetyp `Results<T1, T2>` nennt alle möglichen Ergebnisse, und der Compiler prüft ihn. Dadurch lässt sich ein Handler ohne Server testen, und Werkzeuge kennen die Antworten.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l06-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l06-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Create responses in Minimal API applications](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/responses)
+- Microsoft Learn: [Test Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/test-minimal-api)
+- RFC 9110: [Status Codes](https://www.rfc-editor.org/rfc/rfc9110#name-status-codes)

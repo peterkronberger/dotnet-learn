@@ -1,0 +1,215 @@
+---
+title: Parameterbindung und Validierung
+sidebar_position: 5
+description: Wie ASP.NET Core die Parameter eines Handlers aus Route, Query, Header, Body und Services füllt und wie AddValidation Eingaben prüft, bevor der Handler läuft.
+lesson_id: m17-l05
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import binding from '!!raw-loader!@site/examples/_ci/m17-l05-binding/Program.cs';
+import bindingOutput from '!!raw-loader!@site/examples/_ci/m17-l05-binding/expected.out.txt';
+import validation from '!!raw-loader!@site/examples/_ci/m17-l05-validation/Program.cs';
+import validationOutput from '!!raw-loader!@site/examples/_ci/m17-l05-validation/expected.out.txt';
+import gapBinding from '!!raw-loader!@site/examples/m17/l05/gap-binding-source.snippet.cs';
+import statusChange from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/src/SecLog.Api/StatusChange.cs';
+import statusNames from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/src/SecLog.Core/Model/StatusNames.cs';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/src/SecLog.Api/Program.cs';
+import apiEndpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/src/SecLog.Api/IncidentEndpoints.cs';
+import incidentFilters from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/src/SecLog.Data/IncidentFilters.cs';
+import inputTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l05/tests/SecLog.Api.Tests/IncidentInputTests.cs';
+
+# Parameterbindung und Validierung
+
+:::note[Lernziele]
+- Du sagst voraus, aus welcher Quelle ein Handler-Parameter gebunden wird, und legst sie bei Bedarf mit `[FromRoute]`, `[FromQuery]`, `[FromHeader]` oder `[FromBody]` fest.
+- Du prüfst Eingaben mit Data Annotations und `AddValidation`.
+- Du erklärst, warum eine API jede Eingabe von außen prüfen muss.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l08-q1" />
+
+<Quiz id="m17-l03-q1" />
+
+<Quiz id="m17-l02-q1" />
+
+## Woher kommt ein Parameter?
+
+Ein Handler hat Parameter, und ASP.NET Core muss sie bei jeder Anfrage füllen. Dieses Füllen heißt <Term id="parameter-binding">Parameterbindung</Term>. Für jeden Parameter wählt ASP.NET Core eine <Term id="binding-source">Bindungsquelle</Term>. Du schreibst dazu meist nichts: Name und Typ des Parameters genügen. Die Regeln, in dieser Reihenfolge:
+
+1. **Attribut:** Steht `[FromRoute]`, `[FromQuery]`, `[FromHeader]`, `[FromBody]` oder `[FromServices]` am Parameter, gilt die genannte Quelle. Das Attribut ist ein Attribut im Sinn von Modul 14.
+2. **Sondertypen:** `HttpContext`, `HttpRequest`, `HttpResponse` und `CancellationToken` füllt ASP.NET Core selbst. Lektion 9 zeigt den `CancellationToken`.
+3. **Einfache Typen:** Ein `string`, eine Zahl und ähnliche Typen kommen aus der Route, wenn ihr Name in der Routenvorlage steht, sonst aus der <Term id="query-string">Query</Term>.
+4. **Services:** Ein Typ, der in der Dependency Injection registriert ist, kommt von dort. So kam der `SecLogDbContext` in Lektion 3 in den Handler.
+5. **Alles andere:** Ein komplexer Typ, etwa ein Record, wird aus dem JSON-Body der Anfrage gelesen. Der <Term id="request-body">Body</Term> ist der Inhalt der Anfrage, den Lektion 2 als JSON gezeigt hat.
+
+`GET` und `DELETE` lesen nie implizit aus dem Body. Soll ein Parameter dort aus dem Body kommen, braucht er `[FromBody]`.
+
+Ein Parameter ist **erforderlich**, wenn nichts anderes dasteht. Fehlt der Wert, antwortet die App mit 400. Er ist **optional**, wenn sein Typ `null` erlaubt (`string?`) oder wenn er einen Standardwert hat (`int minFailures = 0`). Lässt sich ein vorhandener Wert nicht umwandeln, zum Beispiel `many` für eine `int`, ist die Anfrage fehlerhaft: Die App antwortet mit 400, und der Handler läuft nicht. Ein Body, der kein gültiges JSON ist, ergibt ebenfalls 400. Hat die Anfrage einen anderen Inhaltstyp als `application/json`, antwortet die App mit 415 (Unsupported Media Type).
+
+Das Programm hat sieben Endpoints. Der ausgeblendete Teil startet den Server im Speicher und sendet die Anfragen. Die Ausgabe zeigt je Anfrage die Zeile `> METHODE /pfad`, die Antwort und den Body.
+
+:::info[Vorhersage]
+Welche Ausgabe liefert jede Anfrage? Aus welcher Quelle kommt jeder Parameter? Was antworten `/incidents?minFailures=many` und `/whoami` ohne Header? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={binding} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{bindingOutput}</CodeBlock>
+
+1. **Route:** `id` steht in der Vorlage `/incidents/{id:int}`. Der Wert 7 kommt aus dem Pfad.
+2. **Query:** `user` und `minFailures` stehen nicht in der Route. `user` ist ein `string?` und `minFailures` hat den Standardwert 0. Ohne Query bleiben beide beim Standard.
+3. **Header:** `[FromHeader(Name = "X-Analyst")]` liest den Header. Ohne das Attribut käme der Wert nie aus einem Header.
+4. **Body:** `NewIncident` ist ein Record und damit ein komplexer Typ. ASP.NET Core liest ihn aus dem JSON-Body. Die Namen `user` und `source` passen zu den Eigenschaften, weil die Web-Einstellungen aus Lektion 2 die Groß- und Kleinschreibung ignorieren.
+5. **Service:** `Greeter` ist registriert (`AddSingleton`), darum füllt die Dependency Injection den Parameter.
+6. **Ausdrücklich:** `{term}` steht in der Route, aber `[FromQuery(Name = "term")]` liest den Wert aus der Query. Das Attribut gewinnt gegen die Ableitung.
+7. **Fehler:** `many` ist keine Zahl, und der Header `X-Analyst` fehlt bei einem erforderlichen Parameter. Beide Male kommt 400, und der Handler läuft nicht.
+
+**Was passiert, wenn …** du `string analyst` in `string? analyst` änderst? Dann ist der Header optional. Ohne ihn läuft der Handler mit `null`.
+
+</details>
+
+<Quiz id="m17-l05-q1" />
+
+<Quiz id="m17-l05-q3" />
+
+<Quiz id="m17-l05-q4" />
+
+## Gap-Beispiel: die Quelle festlegen
+
+Die Lücke `___` fehlt. Der Name des Analysten soll aus dem Header `X-Analyst` kommen. Setze den Namen des Attributs ein, ohne die eckigen Klammern.
+
+<CodeBlock language="csharp" title="gap-binding-source.snippet.cs">{gapBinding}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `FromHeader`: `[FromHeader(Name = "X-Analyst")]`. Das Attribut steht im Namensraum `Microsoft.AspNetCore.Mvc`.
+
+</details>
+
+## Eingaben von außen prüfen
+
+Bindung stellt nur sicher, dass sich ein Wert in den Typ umwandeln lässt. Ob er sinnvoll ist, sagt sie nicht: Ein `int` kann `-1` sein, ein `string` kann leer sein oder Megabytes lang. Eine API wird von beliebigen Programmen aufgerufen, nicht nur von deinem Client. Sie darf darum keiner Eingabe von außen glauben, sondern prüft jede, bevor sie damit arbeitet. Das ist <Term id="input-validation">Eingabevalidierung</Term>.
+
+Die Regeln schreibst du mit Data Annotations, die du aus Modul 15 kennst: `[Required]`, `[Range(0, 1000)]`, `[StringLength(64)]` und `[MaxLength(64)]`. Dazu kommt `[AllowedValues("open", "closed")]` <Since dotnet="8" /> für eine feste Liste erlaubter Werte. Ein Record bekommt sie an seine Eigenschaften. Bei einem Record mit Parameterliste schreibst du dafür `[property: Required]`: Der Zusatz `property:` sagt, dass das Attribut an der Eigenschaft hängt und nicht am Konstruktor-Parameter. Auch ein einzelner Handler-Parameter kann ein Attribut tragen.
+
+Die Annotationen prüft aber nur, wer sie auswertet. Dafür gibt es <Since dotnet="10" /> `builder.Services.AddValidation()`. Der Aufruf registriert die Prüfung in der Dependency Injection. Danach läuft sie vor dem Handler:
+
+- Sie prüft Parameter aus Query und Header und den Body.
+- Ist etwas ungültig, antwortet die App mit **400 Bad Request** und einem JSON-Body, der die Fehler je Eigenschaft nennt. Der Handler läuft nicht. Das Format der Fehlerantwort nennt Lektion 7 „Problem Details“.
+- Eine Regel über mehrere Eigenschaften schreibst du, indem der Record `IValidatableObject` umsetzt. Die Methode `Validate` liefert mit `yield return` ein `ValidationResult` je Verstoß (Iteratoren, Modul 11).
+- Mit `.DisableValidation()` am Endpoint schaltest du die Prüfung für diesen Endpoint ab.
+
+Ein Aufruf von `AddValidation` ist nötig. **Ohne ihn läuft keine automatische Prüfung:** Die Annotationen bleiben ohne Wirkung, und ungültige Eingabe erreicht den Handler, ohne Fehler und ohne Eintrag im Log. Ein Projekt braucht dafür keine weitere Einstellung. Ein Source Generator erzeugt die Prüfung beim Build für die Typen des Projekts, das `AddValidation` aufruft.
+
+Das Beispiel startet dieselben Endpoints zweimal: einmal ohne und einmal mit `AddValidation`. `NewIncident` hat `[Required]`, `[StringLength]`, `[Range]` und `[AllowedValues]` und prüft zusätzlich mit `IValidatableObject`, dass ein geschlossener Vorfall mindestens einen Fehlversuch hat. Der Endpoint `/search` prüft einen Query-Parameter mit `[MaxLength(64)]`.
+
+:::info[Vorhersage]
+Welche der fünf Anfragen antworten mit 200, welche mit 400? Wie heißen die Schlüssel der Fehler in der Antwort? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={validation} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{validationOutput}</CodeBlock>
+
+1. **Ohne `AddValidation`:** Der ungültige Body erreicht den Handler. Er antwortet mit 200 und dem leeren Benutzer.
+2. **Gültiger Body:** Mit `AddValidation` läuft der Handler wie gewohnt.
+3. **Ungültiger Body:** Die App antwortet mit 400, und der Handler läuft nicht. Die Fehler stehen je Eigenschaft im Feld `errors`. Die Schlüssel heißen wie die Eigenschaften im Code (`User`, `FailureCount`), nicht in camelCase.
+4. **Query-Parameter:** `[MaxLength(64)]` am Parameter lehnt 65 Zeichen ab.
+5. **Regel über zwei Eigenschaften:** Die Einzelprüfungen bestehen. Erst danach läuft `Validate` und meldet den Fehler an beiden Eigenschaften.
+
+**Was passiert, wenn …** zugleich `User` leer und `Status` falsch ist? Dann nennt die Antwort beide Fehler. Die Prüfung läuft für alle Eigenschaften.
+
+</details>
+
+<Quiz id="m17-l05-q2" />
+
+<Quiz id="m17-l05-q5" />
+
+<Quiz id="m17-l05-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l04/`) hat die API mit `GET /incidents` und `GET /incidents/{id}` und Integrationstests. Die API nimmt noch keine Eingaben an, die sie prüfen müsste.
+
+**Neue Anforderung:** Die API filtert die Liste nach Benutzer (`GET /incidents?user=bob`, höchstens 64 Zeichen) und ändert den Status eines Vorfalls (`PUT /incidents/{id}/status` mit `{ "status": "…" }`). Ungültige Eingaben werden abgelehnt. Dafür:
+
+- `Program.cs` ruft `AddValidation()` auf.
+- `GetAll` bekommt den optionalen Query-Parameter `user` mit `[MaxLength(64)]`. Der Filter `IncidentFilters.ForUser` ist ein Ausdrucksbaum wie `AtLeastFailures`, sodass die Datenbank filtert.
+- Der Record `StatusChange` hat einen `Status` mit `[Required]` und `[AllowedValues]`. Die Texte stehen als Konstanten in `SecLog.Core`, weil ein Attribut nur Konstanten nimmt.
+- Der Handler `ChangeStatus` lädt den Vorfall, setzt den Status, ruft `SaveChangesAsync` auf und gibt den geänderten Vorfall zurück. Für eine unbekannte Id gibt er vorerst `null` zurück. Lektion 6 ersetzt das.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/StatusNames.cs (neu)">{statusNames}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/StatusChange.cs (neu)">{statusChange}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Data/IncidentFilters.cs (geändert: ForUser ist neu)">{incidentFilters}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert: AddValidation ist neu)">{apiProgram}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (geändert)">{apiEndpoints}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentInputTests.cs (neu)">{inputTests}</CodeBlock>
+
+1. **Prüfung einschalten:** `AddValidation()` in `Program.cs`. Ohne diese Zeile wären alle folgenden Annotationen wirkungslos.
+2. **Filter:** `user` steht nicht in der Route, ist also ein Query-Parameter. Mit `null` bleibt die Liste ungefiltert, sonst filtert `Where(IncidentFilters.ForUser(user))`.
+3. **Body:** `StatusChange` ist ein Record und kommt aus dem JSON-Body. `AllowedValues` lässt nur die drei Statustexte zu.
+4. **Ändern:** `FindAsync(id)` lädt den Vorfall, `SaveChangesAsync` schreibt die Änderung (Modul 16).
+5. **Tests:** Filter nach Benutzer, gültiger Statuswechsel, ungültiger Status (drei Fälle) und zu langer Benutzer. Die Zeilen `Passed SecLog.Api.Tests.IncidentInputTests.…` in `expected.out.txt` sind neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l05/`) filtert die Liste nach Benutzer und ändert den Status eines Vorfalls. Zu lange Benutzernamen und unbekannte Statustexte lehnt die API mit 400 ab.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l05-validation-runs-without-registration" />
+
+**„Data Annotations an einem Parameter werden automatisch geprüft, auch ohne `AddValidation`.“** Ohne den Aufruf läuft keine automatische Prüfung. Die Annotation ist dann ohne Wirkung, und ungültige Eingabe erreicht den Handler.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l05-body-from-query" />
+
+**„Ein Record als Parameter wird aus der Query gefüllt.“** Aus der Query kommen einfache Typen. Ein komplexer Typ wie ein Record kommt aus dem JSON-Body. Wer ihn aus der Query braucht, muss ihn selbst zerlegen.
+:::
+
+<details>
+<summary>Vertiefung: Wie die Prüfung zum Handler kommt (optional)</summary>
+
+`AddValidation` stammt aus dem Paket `Microsoft.Extensions.Validation`. Beim Build erzeugt ein Source Generator die Prüfdaten für die Typen, die der Handler als Parameter nutzt, und zwar in dem Projekt, das `AddValidation` aufruft. Liegt ein Typ in einem anderen Projekt, braucht auch dieses Projekt einen Aufruf von `AddValidation` ([Validation in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/validation)). Fehlen die Prüfdaten, gibt es weder eine Ausnahme noch einen Logeintrag, und die Eingabe erreicht den Handler. Die Attribute `ValidatableType` und `SkipValidation` waren in .NET 10 noch experimentell und sind es ab .NET 11 nicht mehr. Diese Lektion braucht sie nicht, weil die Parametertypen im Handler stehen. `AddValidation` prüft keine JSON-Eigenschaften, die der Record nicht kennt: Sie werden standardmäßig übersprungen.
+
+</details>
+
+## Zusammenfassung
+
+ASP.NET Core bindet jeden Handler-Parameter aus einer Quelle: aus der Route, wenn der Name in der Vorlage steht, sonst aus der Query, bei einem Service aus der Dependency Injection und bei einem komplexen Typ aus dem JSON-Body. Attribute wie `[FromHeader]` legen die Quelle fest. Fehlt ein erforderlicher Wert oder lässt er sich nicht umwandeln, antwortet die App mit 400. Ob ein Wert sinnvoll ist, prüft erst `AddValidation` mit Data Annotations und `IValidatableObject`, vor dem Handler und mit einer 400-Antwort. Ohne den Aufruf läuft keine Prüfung. Eine API prüft jede Eingabe von außen.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l05-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l05-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Parameter binding in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding)
+- Microsoft Learn: [Validation in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/validation)
+- Microsoft Learn: [What's new in ASP.NET Core in .NET 10](https://learn.microsoft.com/aspnet/core/release-notes/aspnetcore-10.0)

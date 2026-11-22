@@ -11773,9 +11773,6 @@
       "german": "Anfrage-Body",
       "category": "platform",
       "definition": "Der Inhalt einer HTTP-Anfrage, zum Beispiel ein JSON-Text bei `POST` und `PUT`. Ein Handler-Parameter mit komplexem Typ wird daraus gelesen.",
-      "aliases": [
-        "Body"
-      ],
       "related": [
         "http-request",
         "json",
@@ -11793,9 +11790,6 @@
       "german": "Abfragezeichenfolge",
       "category": "platform",
       "definition": "Der Teil einer Adresse nach dem `?`, zum Beispiel `user=bob&minFailures=3`. Ein einfacher Handler-Parameter, der nicht in der Route steht, wird daraus gelesen.",
-      "aliases": [
-        "Query"
-      ],
       "related": [
         "url",
         "binding-source"
