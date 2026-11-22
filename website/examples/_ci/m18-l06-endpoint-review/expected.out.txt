@@ -1,0 +1,6 @@
+no user: 401 Unauthorized
+invalid body: 400 Bad Request
+  title: One or more validation errors occurred.
+  User: The User field is required.
+valid request: 200 OK
+  body: ["#1 bob"]
