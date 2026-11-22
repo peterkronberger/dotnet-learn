@@ -12011,6 +12011,57 @@
         "title": "Parameter binding in Minimal API apps",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
       }
+    },
+    {
+      "id": "openapi",
+      "term": "OpenAPI",
+      "german": "Standard zur Beschreibung von HTTP-APIs",
+      "category": "platform",
+      "definition": "Ein programmiersprachenunabhängiger Standard, um eine HTTP-API maschinenlesbar zu beschreiben: Pfade, Methoden, Parameter, Bodys und Antworten.",
+      "related": [
+        "openapi-document",
+        "endpoint"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Overview of OpenAPI support in ASP.NET Core API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/overview"
+      }
+    },
+    {
+      "id": "openapi-document",
+      "term": "OpenAPI Document",
+      "german": "OpenAPI-Dokument",
+      "category": "platform",
+      "definition": "Die Beschreibung einer API im OpenAPI-Format, als JSON oder YAML. ASP.NET Core erzeugt sie mit `AddOpenApi` aus den Endpoints und liefert sie mit `MapOpenApi` aus.",
+      "related": [
+        "openapi",
+        "endpoint-metadata"
+      ],
+      "aliases": [
+        "OpenAPI-Dokument"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Generate OpenAPI documents",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/aspnetcore-openapi"
+      }
+    },
+    {
+      "id": "endpoint-metadata",
+      "term": "Endpoint Metadata",
+      "german": "Metadaten eines Endpoints",
+      "category": "platform",
+      "definition": "Zusatzangaben, die an einem Endpoint hängen, zum Beispiel Name, Kurzbeschreibung, Tags und die möglichen Antworten. Sie ändern das Verhalten nicht, sondern beschreiben den Endpoint.",
+      "related": [
+        "endpoint",
+        "openapi-document"
+      ],
+      "lesson": "m17-l10",
+      "source": {
+        "title": "Include OpenAPI metadata in an ASP.NET Core app",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/openapi/include-metadata"
+      }
     }
   ]
 }

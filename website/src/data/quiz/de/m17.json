@@ -1266,6 +1266,160 @@
       "type": "explain",
       "question": "Transfer: Ein Endpoint von SecLog führt eine Abfrage aus, die mehrere Sekunden dauert. Was änderst du im Handler, damit die Datenbank nicht weiterarbeitet, wenn der Client wegläuft?",
       "modelAnswer": "Der Handler nimmt einen `CancellationToken` als Parameter an. Das Framework bindet ihn an den Abbruch der Anfrage. Der Handler reicht ihn an `ToListAsync`, `FirstOrDefaultAsync` oder `SaveChangesAsync` weiter. Bricht der Client ab, wirft der Aufruf eine `OperationCanceledException`, und die Abfrage stoppt."
+    },
+    {
+      "id": "m17-l10-q1",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Was ist ein OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Eine maschinenlesbare Beschreibung der API: Pfade, Methoden, Parameter, Bodys und Antworten.",
+          "correct": true
+        },
+        {
+          "text": "Eine Weboberfläche, in der man Endpunkte der API ausprobieren kann.",
+          "misconception": "m17-l10-openapi-is-swagger-ui",
+          "feedback": "Solche Oberflächen (zum Beispiel Swagger UI oder Scalar) lesen das Dokument nur. Das Dokument selbst ist JSON oder YAML und hat keine Oberfläche."
+        },
+        {
+          "text": "Der Quellcode der Handler, als Datei veröffentlicht.",
+          "feedback": "Das Dokument beschreibt die Schnittstelle, nicht die Implementierung. Der Code der Handler steht nicht darin."
+        },
+        {
+          "text": "Eine Sammlung von Testfällen, die jeden Endpunkt aufrufen.",
+          "feedback": "Aus einem Dokument lassen sich Tests ableiten. Es enthält aber selbst keine Testfälle."
+        }
+      ],
+      "explanation": "Ein OpenAPI-Dokument beschreibt die API in einem festen Format. Werkzeuge lesen es und erzeugen daraus Dokumentation, Clients oder Tests."
+    },
+    {
+      "id": "m17-l10-q2",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Die App ruft `builder.Services.AddOpenApi()` und `app.MapOpenApi()` auf. Wie kommt das Dokument zustande, und wo steht es?",
+      "options": [
+        {
+          "text": "Die App erzeugt es aus den Endpoints und ihren Metadaten und liefert es standardmäßig unter `/openapi/v1.json` aus.",
+          "correct": true
+        },
+        {
+          "text": "Der Entwickler schreibt es als Datei, und `MapOpenApi` liefert diese Datei aus.",
+          "misconception": "m17-l10-document-written-by-hand",
+          "feedback": "Das Dokument wird erzeugt: Endpoints, Parameter, Ergebnistypen und Metadaten liefern den Inhalt. Eine von Hand gepflegte Datei läuft dem Code davon."
+        },
+        {
+          "text": "Es entsteht erst, wenn ein Client `/swagger` aufruft.",
+          "feedback": "`MapOpenApi` legt einen Endpoint für das JSON-Dokument an. Eine Oberfläche unter `/swagger` gehört nicht dazu."
+        },
+        {
+          "text": "Es entsteht beim Build und liegt danach nur als Datei im `obj`-Ordner.",
+          "feedback": "Das Erzeugen beim Build gibt es als zusätzliche Option. Mit `AddOpenApi` und `MapOpenApi` entsteht das Dokument zur Laufzeit."
+        }
+      ],
+      "explanation": "`AddOpenApi` registriert die Dienste, die das Dokument erzeugen. `MapOpenApi` legt den Endpoint an, der es als JSON ausliefert, standardmäßig unter `/openapi/v1.json`."
+    },
+    {
+      "id": "m17-l10-q3",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Ein Handler hat den Rückgabetyp `Results<Ok<IncidentSummary>, NotFound>`. Was steht dazu im OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Der Eintrag für den Endpoint beschreibt die Antworten `200` mit dem Typ `IncidentSummary` und `404`.",
+          "correct": true
+        },
+        {
+          "text": "Nur `200`, weil die Beschreibung bei jedem Endpoint nur den Erfolgsfall nennt.",
+          "feedback": "Jeder Typ in `Results<…>`, der Metadaten liefert, bekommt einen Eintrag. Darum steht auch `404` im Dokument."
+        },
+        {
+          "text": "Nichts, denn die Antworten muss man immer von Hand mit `Produces` angeben.",
+          "feedback": "`Produces` ist für Fälle da, die der Rückgabetyp nicht zeigt. Typisierte Ergebnisse liefern ihre Metadaten selbst."
+        },
+        {
+          "text": "Die Liste aller Statuscodes, die HTTP kennt.",
+          "feedback": "Das Dokument nennt nur die Antworten, die der Endpoint deklariert."
+        }
+      ],
+      "explanation": "Typisierte Ergebnisse liefern Metadaten über ihre Antwort mit. Der Generator macht daraus je einen Eintrag unter `responses`."
+    },
+    {
+      "id": "m17-l10-q4",
+      "lesson": "m17-l10",
+      "type": "match",
+      "question": "Ordne jede Methode dem Teil des OpenAPI-Dokuments zu, den sie setzt.",
+      "pairs": [
+        { "left": "`WithName`", "right": "die Operation-Id (`operationId`)" },
+        { "left": "`WithSummary`", "right": "die Kurzbeschreibung (`summary`)" },
+        { "left": "`WithTags`", "right": "die Gruppen, in die Werkzeuge Operationen sortieren" },
+        { "left": "`ProducesProblem`", "right": "eine zusätzliche Fehlerantwort" }
+      ],
+      "explanation": "Diese Methoden hängen Metadaten an den Endpoint. Das Dokument liest sie aus."
+    },
+    {
+      "id": "m17-l10-q5",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Ein Endpoint ist mit `.Produces(StatusCodes.Status418ImATeapot)` beschriftet, sein Handler gibt aber immer `200` zurück. Was gilt?",
+      "options": [
+        {
+          "text": "Der Handler antwortet weiter mit `200`. Das Dokument nennt `418`, denn Metadaten beschreiben nur.",
+          "correct": true
+        },
+        {
+          "text": "Die App ändert die Antwort auf `418`.",
+          "feedback": "Metadaten ändern das Verhalten nicht. Sie sagen dem Dokument nur, was der Endpoint zurückgeben kann."
+        },
+        {
+          "text": "Die App startet nicht, weil Handler und Metadaten nicht übereinstimmen.",
+          "feedback": "Die App prüft das nicht. Eine falsche Beschreibung fällt erst auf, wenn jemand Dokument und Verhalten vergleicht."
+        },
+        {
+          "text": "Das Dokument nennt `418` nicht, weil der Handler ihn nie sendet.",
+          "feedback": "Das Dokument folgt den Metadaten, nicht dem tatsächlichen Verhalten."
+        }
+      ],
+      "explanation": "Metadaten beschreiben den Endpoint, steuern ihn aber nicht. Darum müssen Beschreibung und Verhalten übereinstimmen, am besten durch einen Test."
+    },
+    {
+      "id": "m17-l10-q6",
+      "lesson": "m17-l10",
+      "type": "single",
+      "question": "Das Body-Objekt `StatusChange` hat die Eigenschaft `[MaxLength(32)] string Status`. Was passiert im OpenAPI-Dokument?",
+      "options": [
+        {
+          "text": "Das Schema der Eigenschaft bekommt die Grenze `maxLength: 32`.",
+          "correct": true
+        },
+        {
+          "text": "Nichts, denn Attribute kennt das Dokument nicht.",
+          "feedback": "Der Generator liest Validierungsattribute und überträgt sie ins Schema."
+        },
+        {
+          "text": "Das Dokument prüft jede Anfrage und lehnt zu lange Werte ab.",
+          "feedback": "Das Dokument ist nur eine Beschreibung. Die Prüfung läuft in der Validierung aus Lektion 5, nicht im Dokument."
+        },
+        {
+          "text": "Die Eigenschaft wird aus dem Dokument entfernt, weil sie eingeschränkt ist.",
+          "feedback": "Die Eigenschaft bleibt im Schema. Das Attribut ergänzt dort die Grenze."
+        }
+      ],
+      "explanation": "Validierungsattribute liefern Metadaten für das Schema. Sie schreiben die Grenze ins Dokument, die Prüfung selbst macht die Validierung der App."
+    },
+    {
+      "id": "m17-l10-q7",
+      "lesson": "m17-l10",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wofür ein OpenAPI-Dokument gebraucht wird und wie ASP.NET Core es erzeugt.",
+      "modelAnswer": "Ein OpenAPI-Dokument beschreibt eine HTTP-API maschinenlesbar: Pfade, Methoden, Parameter, Bodys und Antworten. Werkzeuge erzeugen daraus Dokumentation, Clients und Tests. ASP.NET Core baut das Dokument zur Laufzeit aus den Endpoints und ihren Metadaten, zum Beispiel aus typisierten Ergebnissen, Validierungsattributen, `WithName` und `WithSummary`. `AddOpenApi` registriert die Dienste, `MapOpenApi` liefert das JSON aus."
+    },
+    {
+      "id": "m17-l10-q8",
+      "lesson": "m17-l10",
+      "type": "explain",
+      "question": "Transfer: Das OpenAPI-Dokument von SecLog listet jeden Pfad der API. Warum sollte man sich überlegen, in welchen Umgebungen es erreichbar ist?",
+      "modelAnswer": "Das Dokument zeigt alle Pfade, Parameter und Antworten und damit die ganze Angriffsfläche der API. In einer öffentlichen Umgebung erleichtert das jemandem, der die API ausspäht. Für Entwicklung und Test ist es nützlich, in Produktion braucht man es oft nicht. Darum entscheidet man bewusst, wo `MapOpenApi` aktiv ist."
     }
   ]
 }
