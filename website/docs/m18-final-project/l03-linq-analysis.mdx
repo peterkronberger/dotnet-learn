@@ -1,0 +1,184 @@
+---
+title: Auswertungen mit LINQ im Kern
+sidebar_position: 3
+description: Eine Auswertung ist eine LINQ-Abfrage in einer getesteten Methode des Kerns, die ein fertiges Ergebnis zurückgibt. Zeitbasierte Auswertungen gruppieren nach UTC, weil DateTimeOffset.Hour die Stunde im eigenen Offset liefert.
+lesson_id: m18-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import hourGroups from '!!raw-loader!@site/examples/m18/l03/hour-groups.cs';
+import hourGroupsOutput from '!!raw-loader!@site/examples/m18/l03/hour-groups.out.txt';
+import gaps from '!!raw-loader!@site/examples/m18/l03/analysis-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m18/l03/core-analysis-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m18/l03/core-analysis-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m18/l03/core-analysis-solution.cs';
+import hourCountFile from '!!raw-loader!@site/examples/_ci/seclog-m18-l03/src/SecLog.Core/Model/HourCount.cs';
+import analysisFile from '!!raw-loader!@site/examples/_ci/seclog-m18-l03/src/SecLog.Core/Model/LogAnalysis.cs';
+import analysisTests from '!!raw-loader!@site/examples/_ci/seclog-m18-l03/tests/SecLog.Tests/LogAnalysisTests.cs';
+
+# Auswertungen mit LINQ im Kern
+
+:::note[Lernziele]
+- Du kannst eine LINQ-Auswertung als Methode im Kern schreiben und mit Tests prüfen.
+- Du erkennst, dass `DateTimeOffset.Hour` die Stunde im eigenen Offset liefert, und gruppierst nach der Stunde in UTC.
+- Du kannst begründen, warum eine Methode ihr Abfrageergebnis als fertige Liste zurückgibt.
+:::
+
+## Rückblick
+
+<Quiz id="m05-l11-q1" />
+
+<Quiz id="m11-l07-q1" />
+
+<Quiz id="m11-l05-q1" />
+
+## Ein Befund in der Zeitrechnung
+
+Die Konsolenanwendung von SecLog zählt die Fehlversuche pro Stunde mit diesem Ausdruck:
+
+```text
+.GroupBy(e => e.Timestamp.Hour)
+```
+
+Mit den Beispieldaten ist das Ergebnis richtig. Der Grund ist Zufall: Alle Zeitstempel der Beispieldaten enden mit `Z`, haben also den Offset 0. Ein <Term id="date-time-offset">`DateTimeOffset`</Term> speichert die Uhrzeit zusammen mit dem Versatz zur <Term id="utc">UTC</Term>. Die Eigenschaft `Hour` liefert die Stunde dieser Uhrzeit, also die Stunde mit dem eigenen Offset des Werts ([DateTimeOffset.Hour](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.hour)). Bei einem Zeitstempel mit `+01:00` ist das nicht die Stunde in UTC. Das ist Punkt 8 der Checkliste aus Lektion 1: in UTC speichern und vergleichen.
+
+:::info[Vorhersage]
+Drei Fehlversuche, einer davon mit dem Offset `+01:00`. Welche Gruppen und Zahlen gibt das Programm für `Hour` aus, und welche für `UtcDateTime.Hour`? Notiere deinen Tipp für beide Blöcke.
+:::
+
+<CSharpRunner id="m18-l03-hours" code={hourGroups} predict expected={hourGroupsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe zeigt für den eigenen Offset `hour 8: 1` und `hour 9: 2`, für UTC `hour 8: 2` und `hour 9: 1`.
+
+1. **Eigener Offset:** 08:50Z gibt 8, 09:30+01:00 gibt 9 und 09:10Z gibt 9.
+2. **UTC:** `UtcDateTime` rechnet zuerst um ([DateTimeOffset.UtcDateTime](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.utcdatetime)). 09:30+01:00 ist 08:30Z und gehört zu Stunde 8.
+3. **Befund:** Zwei Ereignisse derselben Stunde landen mit `Hour` in verschiedenen Gruppen.
+
+**Was passiert, wenn …?** … ein Log aus verschiedenen Ländern kommt? Dann gruppiert `Hour` nach den Uhren der Länder und nicht nach der Zeit. Die Auswertung zeigt Stunden, die es so nicht gab.
+
+</details>
+
+## Die Auswertung als Methode im Kern
+
+Eine Auswertung hat dieselbe Form wie eine Fachregel: Sie ist eine Methode im Kern, die Eingaben als Parameter bekommt und das Ergebnis zurückgibt. Die LINQ-Abfrage besteht aus bekannten Operatoren (Lektionen „Gruppieren und Aggregieren“ und „LINQ-Grundlagen“):
+
+1. **Datenquelle wählen:** der Parameter `events`.
+2. **Filtern:** `Where` behält nur die Fehlversuche.
+3. **Gruppieren:** `GroupBy` nach `Timestamp.UtcDateTime.Hour` ([Grouping data](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/grouping-data)).
+4. **Projizieren:** `Select` macht aus jeder Gruppe einen `HourCount` (Stunde und Anzahl), davor ordnet `OrderBy` nach der Stunde.
+5. **Ergebnis materialisieren:** `ToList()` führt die Abfrage jetzt aus.
+
+Der letzte Schritt ist eine Entscheidung. Eine LINQ-Abfrage ist <Term id="deferred-execution">verzögert</Term>: Sie läuft erst beim Durchlaufen und beginnt bei jedem Durchlauf neu. Gibt die Methode die Abfrage selbst zurück, dann rechnet jeder Aufrufer bei jedem Durchlauf neu, und er sieht Änderungen der Quelle, die nach dem Aufruf passiert sind. Die Methode gibt deshalb ein fertiges Ergebnis zurück, eine `IReadOnlyList<HourCount>`. Der Aufrufer kann sie mehrfach lesen, aber nicht ändern. Eine Guard Clause (`ArgumentNullException.ThrowIfNull`) weist `null` zurück.
+
+Auch hier gilt: Die Programmausgabe der Beispieldaten würde den Fehler mit `Hour` nicht zeigen. Ein Test mit einem Zeitstempel in einem anderen Offset zeigt ihn.
+
+## Lückenbeispiel
+
+Die Methode `FailuresPerUser` zählt die Fehlversuche pro Benutzer. Die Teilziele: „1. Datenquelle wählen → 2. Filtern → 3. Gruppieren → 4. Projizieren → 5. Ergebnis materialisieren“. Die Methode gibt bisher eine leere Liste zurück. Das Programm soll `alice: 1` und `bob: 2` ausgeben.
+
+<CSharpRunner id="m18-l03-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Datenquelle:** `events.`
+2. **Filtern:** `.Where(e => e.Type == "login-failed")`
+3. **Gruppieren und ordnen:** `.GroupBy(e => e.User)` und `.OrderBy(g => g.Key, StringComparer.Ordinal)`
+4. **Projizieren:** `.Select(g => new UserCount(g.Key, g.Count()))`
+5. **Materialisieren:** `.ToList()` am Ende. Die Ausgabe ist `alice: 1` und `bob: 2`.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m18-l02/`) zählt die Fehlversuche pro Stunde in der Konsolenanwendung mit `GroupBy(e => e.Timestamp.Hour)`. Der Kern hat keine Auswertung.
+
+Im Runner siehst du nur die Teile, die du brauchst: die Typen `LogEvent` und `LogEventExtensions` (eingeklappt), den neuen Record `HourCount`, die Klasse `LogAnalysis` mit einem Gerüst für `FailuresPerHour` und ein Programm, das die Stunden der Beispieldaten ausgibt.
+
+**Neue Anforderung:** „Die Auswertung der Fehlversuche pro Stunde ist eine Methode im Kern. Sie gruppiert nach der Stunde in UTC und liefert eine fertige, nach Stunde sortierte Liste.“ Schreibe den Rumpf von `FailuresPerHour`.
+
+<CSharpRunner id="m18-l03-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="core-analysis-solution.cs" />
+
+Im Projekt `_ci/seclog-m18-l03/` sind die Typen dieselben Dateien wie im Kern. Zwei Dateien im Kern und eine Testdatei sind neu, und die Konsolenanwendung ruft die Methode auf:
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/HourCount.cs (neu)">{hourCountFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/LogAnalysis.cs (neu)">{analysisFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Tests/LogAnalysisTests.cs (neu)">{analysisTests}</CodeBlock>
+
+1. **Datenquelle:** der Parameter `events`, geprüft mit `ThrowIfNull`.
+2. **Filtern:** `Where(e => e.IsFailure())` benutzt die Erweiterungsmethode des Kerns.
+3. **Gruppieren:** `GroupBy(e => e.Timestamp.UtcDateTime.Hour)`, danach `OrderBy(g => g.Key)`.
+4. **Projizieren:** `Select(g => new HourCount(g.Key, g.Count()))`.
+5. **Materialisieren:** `ToList()`.
+6. **Tests:** Die Beispieldaten ergeben Stunde 8 mit 6 und Stunde 9 mit 1. Ein Fehlversuch um `09:30:00+01:00` zählt für Stunde 8. Eine leere Liste ergibt eine leere Liste, und andere Ereignisarten zählen nicht.
+7. **Aufruf:** In `src/SecLog.Cli/Program.cs` läuft die Schleife über `LogAnalysis.FailuresPerHour(logEvents)`. Die Ausgabe `08:00 6 failures` und `09:00 1 failures` bleibt gleich. In `expected.out.txt` kommen nur die vier neuen Testzeilen dazu.
+
+</details>
+
+**Neuer Stand:** Die Auswertung der Fehlversuche pro Stunde ist eine getestete Methode in `SecLog.Core` und rechnet in UTC. Die häufigsten IP-Adressen bleiben in der Konsolenanwendung. Das ist Punkt 8 der Checkliste („Zeitzonen“).
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l03-hour-is-utc-hour" />
+
+**„`DateTimeOffset.Hour` liefert immer die Stunde in UTC.“** `Hour` ist die Stunde der gespeicherten Uhrzeit mit ihrem eigenen Offset. Nur bei Offset 0 stimmt sie mit UTC überein. Für UTC rechnest du mit `UtcDateTime` um.
+:::
+
+:::warning[Achtung]
+<Misconception id="m18-l03-query-result-is-stored" />
+
+**„Eine Methode, die eine LINQ-Abfrage zurückgibt, hat das Ergebnis schon berechnet.“** Die Abfrage läuft erst beim Durchlaufen und bei jedem Durchlauf neu. Erst `ToList()` berechnet das Ergebnis.
+:::
+
+<details>
+<summary>Vertiefung: Warum nicht einfach TimeZoneInfo? (optional)</summary>
+
+Für Auswertungen und Vergleiche genügt UTC. Die Zeitzone eines Orts, mit Sommerzeit, ist nur für die Anzeige für Menschen nötig und gehört in `TimeZoneInfo` ([Choose between DateTime, DateOnly, DateTimeOffset, TimeSpan, TimeZoneInfo, and TimeZone](https://learn.microsoft.com/dotnet/standard/datetime/choosing-between-datetime)). Ein `DateTimeOffset` kennt nur den Versatz zum Zeitpunkt des Werts, nicht die Regeln der Zeitzone.
+
+</details>
+
+## Zusammenfassung
+
+Eine Auswertung ist eine LINQ-Abfrage in einer getesteten Methode des Kerns. Sie wählt die Quelle, filtert, gruppiert, projiziert und gibt mit `ToList()` ein fertiges Ergebnis zurück, weil eine Abfrage sonst bei jedem Durchlauf neu läuft. `DateTimeOffset.Hour` liefert die Stunde im eigenen Offset. Für Auswertungen nach Zeit gruppierst du nach `UtcDateTime`. Ein Test mit einem anderen Offset als 0 findet den Fehler, den die Beispieldaten verstecken. In SecLog ist das `LogAnalysis.FailuresPerHour`, Punkt 8 der Checkliste aus Lektion 1.
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l03-q1" />
+
+<Quiz id="m18-l03-q2" />
+
+<Quiz id="m18-l03-q3" />
+
+<Quiz id="m18-l03-q4" />
+
+<Quiz id="m18-l03-q5" />
+
+<Quiz id="m18-l03-q6" />
+
+<Quiz id="m18-l03-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l03-q8" />
+
+### Transferfrage
+
+<Quiz id="m18-l03-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [DateTimeOffset.UtcDateTime](https://learn.microsoft.com/dotnet/api/system.datetimeoffset.utcdatetime)
+- Microsoft Learn: [Grouping data](https://learn.microsoft.com/dotnet/csharp/linq/standard-query-operators/grouping-data)
+- Checkliste: [Code-Review mit einer Checkliste](./l01-review-checklist)

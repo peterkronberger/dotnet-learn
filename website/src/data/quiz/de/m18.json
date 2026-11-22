@@ -284,6 +284,313 @@
       "type": "explain",
       "question": "Transfer: In SecLog soll eine Regel sagen, wie viele Anmeldungen pro Minute „auffällig viel“ sind. Wohin kommt sie, und welche Werte testest du?",
       "modelAnswer": "Die Regel kommt als kleine, reine Methode in den Kern (`SecLog.Core`), damit Konsole und API sie gemeinsam nutzen und ein Test sie ohne Datenbank aufrufen kann. Getestet werden die Grenzwerte (der letzte Wert unter und der erste Wert über der Schwelle), 0 und ein ungültiger Wert wie -1, der eine Exception auslösen muss."
+    },
+    {
+      "id": "m18-l03-q1",
+      "lesson": "m18-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m18/l03/hour-groups.cs",
+      "explanation": "`Hour` liefert die Stunde im Offset des Werts: 08:50Z gibt 8, 09:30+01:00 gibt 9 und 09:10Z gibt 9. Die Gruppen sind also 8: 1 und 9: 2. `UtcDateTime.Hour` rechnet vorher auf UTC um: 09:30+01:00 ist 08:30Z und gehört zu Stunde 8. Die Gruppen sind dann 8: 2 und 9: 1."
+    },
+    {
+      "id": "m18-l03-q2",
+      "lesson": "m18-l03",
+      "type": "single",
+      "question": "Ein Ereignis hat den Zeitstempel `2026-03-02T09:30:00+01:00`. Was liefert `timestamp.Hour`?",
+      "options": [
+        {
+          "text": "9, die Stunde in der Uhrzeit des Werts.",
+          "correct": true
+        },
+        {
+          "text": "8, die Stunde in UTC.",
+          "feedback": "`Hour` rechnet nicht um. Für die Stunde in UTC braucht es `UtcDateTime.Hour`.",
+          "misconception": "m18-l03-hour-is-utc-hour"
+        },
+        {
+          "text": "10, die Stunde in der Zeitzone des Rechners.",
+          "feedback": "Die Zeitzone des Rechners spielt keine Rolle. `Hour` liest die Uhrzeit des Werts mit seinem eigenen Offset."
+        }
+      ],
+      "explanation": "Ein `DateTimeOffset` speichert die Uhrzeit zusammen mit dem Versatz zur UTC. `Hour` ist die Stunde dieser Uhrzeit. Um nach UTC zu gruppieren, rechnet man zuerst mit `UtcDateTime` um."
+    },
+    {
+      "id": "m18-l03-q3",
+      "lesson": "m18-l03",
+      "type": "single",
+      "question": "Welcher Ausdruck gruppiert die Fehlversuche nach der Stunde in UTC?",
+      "options": [
+        {
+          "text": "`.GroupBy(e => e.Timestamp.UtcDateTime.Hour)`",
+          "correct": true
+        },
+        {
+          "text": "`.GroupBy(e => e.Timestamp.Hour)`",
+          "feedback": "Das gruppiert nach der Stunde im Offset des jeweiligen Zeitstempels. Bei gemischten Offsets landen gleichzeitige Ereignisse in verschiedenen Gruppen.",
+          "misconception": "m18-l03-hour-is-utc-hour"
+        },
+        {
+          "text": "`.GroupBy(e => e.Timestamp.Offset.Hours)`",
+          "feedback": "`Offset` ist der Versatz zur UTC, nicht die Uhrzeit. Er gruppiert nach der Zeitzone, nicht nach der Stunde."
+        }
+      ],
+      "explanation": "Erst `UtcDateTime` stellt alle Zeitstempel auf dieselbe Uhr (UTC). Danach bezeichnet `Hour` bei jedem Ereignis dieselbe Stunde."
+    },
+    {
+      "id": "m18-l03-q4",
+      "lesson": "m18-l03",
+      "type": "single",
+      "question": "Eine Methode gibt die LINQ-Abfrage selbst zurück (ohne `ToList()`). Der Aufrufer durchläuft das Ergebnis zweimal und fügt dazwischen ein Ereignis zur Quelle hinzu. Was gilt?",
+      "options": [
+        {
+          "text": "Jeder Durchlauf führt die Abfrage neu aus, der zweite sieht das neue Ereignis.",
+          "correct": true
+        },
+        {
+          "text": "Beide Durchläufe liefern dasselbe Ergebnis, weil die Methode es schon berechnet hat.",
+          "feedback": "Eine Abfrage ist verzögert. Die Methode hat nur beschrieben, was beim Durchlaufen passieren soll.",
+          "misconception": "m18-l03-query-result-is-stored"
+        },
+        {
+          "text": "Der zweite Durchlauf löst eine Exception aus, weil die Abfrage schon verbraucht ist.",
+          "feedback": "Eine LINQ-Abfrage über eine Liste kann beliebig oft durchlaufen werden. Sie beginnt jedes Mal von vorn."
+        }
+      ],
+      "explanation": "Die Rückgabe der Abfrage gibt nur die Beschreibung weiter. Mit `ToList()` rechnet die Methode einmal und gibt ein fertiges Ergebnis zurück, das sich später nicht mehr ändert."
+    },
+    {
+      "id": "m18-l03-q5",
+      "lesson": "m18-l03",
+      "type": "single",
+      "question": "Warum ist der Rückgabetyp von `FailuresPerHour` eine `IReadOnlyList<HourCount>` und keine `IEnumerable<HourCount>`?",
+      "options": [
+        {
+          "text": "Der Aufrufer bekommt ein fertiges Ergebnis, das er mehrfach lesen kann, ohne dass die Abfrage neu läuft.",
+          "correct": true
+        },
+        {
+          "text": "Eine `IEnumerable<T>` darf keine Records enthalten.",
+          "feedback": "Eine `IEnumerable<T>` kann Elemente jedes Typs liefern. Der Unterschied liegt im Zeitpunkt der Berechnung."
+        },
+        {
+          "text": "Eine `IReadOnlyList<T>` ist schneller, weil sie `GroupBy` überspringt.",
+          "feedback": "`GroupBy` läuft in jedem Fall. Es geht nicht um Tempo, sondern darum, wann gerechnet wird."
+        }
+      ],
+      "explanation": "`ToList()` führt die Abfrage sofort aus. Die Methode gibt die Liste als `IReadOnlyList<T>` zurück, damit der Aufrufer sie lesen, aber nicht ändern kann."
+    },
+    {
+      "id": "m18-l03-q6",
+      "lesson": "m18-l03",
+      "type": "single",
+      "question": "Welcher Test sichert die Korrektur der Zeitzone ab?",
+      "options": [
+        {
+          "text": "Ein Fehlversuch um `09:30:00+01:00` muss in Stunde 8 gezählt werden.",
+          "correct": true
+        },
+        {
+          "text": "Alle Beispielereignisse mit `Z` ergeben Stunde 8 mit 6 und Stunde 9 mit 1.",
+          "feedback": "Das stimmt auch mit dem fehlerhaften `Timestamp.Hour`, denn alle Beispielzeitstempel haben den Offset 0. Der Test findet den Fehler nicht."
+        },
+        {
+          "text": "Eine leere Liste ergibt ein leeres Ergebnis.",
+          "feedback": "Das prüft einen anderen Fall. Mit der falschen Gruppierung wäre das Ergebnis auch leer."
+        }
+      ],
+      "explanation": "Ein Test findet den Fehler nur, wenn die Eingabe ihn auslöst. Dafür braucht es einen Zeitstempel mit einem anderen Offset als 0."
+    },
+    {
+      "id": "m18-l03-q7",
+      "lesson": "m18-l03",
+      "type": "match",
+      "question": "Ordne jeden Schritt der Auswertung dem LINQ-Operator zu.",
+      "pairs": [
+        { "left": "Nur Fehlversuche behalten", "right": "`Where`" },
+        { "left": "Nach der Stunde in UTC zusammenfassen", "right": "`GroupBy`" },
+        { "left": "Jede Gruppe in einen `HourCount` verwandeln", "right": "`Select`" },
+        { "left": "Das Ergebnis jetzt berechnen und speichern", "right": "`ToList`" }
+      ],
+      "explanation": "`Where` filtert, `GroupBy` bildet Gruppen, `Select` projiziert jede Gruppe in einen neuen Wert und `ToList` führt die Abfrage aus und liefert eine fertige Liste."
+    },
+    {
+      "id": "m18-l03-q8",
+      "lesson": "m18-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum die Auswertung der Fehlversuche pro Stunde nach `UtcDateTime.Hour` gruppiert und nicht nach `Hour`.",
+      "modelAnswer": "`Hour` liefert die Stunde in der Uhrzeit des Zeitstempels, also mit seinem eigenen Offset. Zwei Ereignisse, die zur selben Zeit passiert sind, können dann in verschiedenen Gruppen landen, wenn ihre Offsets verschieden sind. `UtcDateTime` rechnet vorher alle Zeitstempel auf UTC um. Mit den Beispieldaten fällt der Fehler nicht auf, weil dort alle Zeitstempel mit `Z` enden. Darum braucht es einen Test mit einem anderen Offset."
+    },
+    {
+      "id": "m18-l03-q9",
+      "lesson": "m18-l03",
+      "type": "explain",
+      "question": "Transfer: In SecLog soll eine Auswertung die Anmeldungen pro Tag zählen. Welche Uhr benutzt du zum Gruppieren, und was gibt die Methode zurück?",
+      "modelAnswer": "Gruppiert wird nach dem Tag in UTC (zum Beispiel `Timestamp.UtcDateTime.Date`), damit gleichzeitige Ereignisse mit verschiedenen Offsets am selben Tag landen. Die Methode steht im Kern und gibt mit `ToList()` eine fertige `IReadOnlyList` zurück. Ein Test mit einem Zeitstempel kurz nach Mitternacht in einem anderen Offset sichert die Regel ab."
+    },
+    {
+      "id": "m18-l04-q1",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Eine öffentliche Methode hat den Parameter `string message` (ohne `?`). Kann `message` zur Laufzeit `null` sein?",
+      "options": [
+        {
+          "text": "Ja, zum Beispiel wenn der Aufrufer ohne Nullable-Kontext kompiliert oder `null!` übergibt.",
+          "correct": true
+        },
+        {
+          "text": "Nein, der Compiler und die Laufzeit verhindern `null` bei einem Parameter ohne `?`.",
+          "feedback": "Die Annotation ist nur eine Hilfe für die Analyse beim Kompilieren. Die Laufzeit prüft sie nicht.",
+          "misconception": "m18-l04-non-nullable-never-null"
+        },
+        {
+          "text": "Nein, aber nur, weil `string` ein Referenztyp mit Standardwert `\"\"` ist.",
+          "feedback": "Der Standardwert eines Referenztyps ist `null`, nicht der leere Text."
+        }
+      ],
+      "explanation": "Nullable-Annotationen steuern Warnungen des Compilers. Zur Laufzeit gibt es keine Prüfung. Eine öffentliche Methode prüft deshalb selbst, wenn sie auf `null` nicht vorbereitet ist."
+    },
+    {
+      "id": "m18-l04-q2",
+      "lesson": "m18-l04",
+      "type": "multi",
+      "question": "Auf welchen Wegen kann `null` in einen Parameter vom Typ `string` gelangen?",
+      "options": [
+        {
+          "text": "Der Aufrufer kompiliert ohne Nullable-Kontext.",
+          "correct": true
+        },
+        {
+          "text": "Der Aufrufer unterdrückt die Warnung mit dem Operator `!`.",
+          "correct": true
+        },
+        {
+          "text": "Der Parameter ist mit `string` statt `string?` deklariert.",
+          "feedback": "Die Deklaration sagt dem Compiler, dass `null` nicht erwartet wird. Sie verhindert `null` aber nicht.",
+          "misconception": "m18-l04-non-nullable-never-null"
+        }
+      ],
+      "explanation": "Ohne Nullable-Kontext gibt es keine Warnung, und `!` schaltet sie bewusst ab. In beiden Fällen kommt `null` in die Methode."
+    },
+    {
+      "id": "m18-l04-q3",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Was löst `ArgumentNullException.ThrowIfNull(message)` aus, wenn `message` den Wert `null` hat?",
+      "options": [
+        {
+          "text": "Eine `ArgumentNullException`.",
+          "correct": true
+        },
+        {
+          "text": "Eine `NullReferenceException`.",
+          "feedback": "Die tritt erst auf, wenn man auf einen `null`-Wert zugreift. Die Guard Clause kommt dem zuvor und nennt den Parameter."
+        },
+        {
+          "text": "Gar nichts, die Methode gibt `false` zurück.",
+          "feedback": "`ThrowIfNull` löst bei `null` immer die Exception aus."
+        }
+      ],
+      "explanation": "Die Guard Clause weist `null` am Rand der Klasse zurück und nennt den Namen des Parameters. Das ist besser als eine `NullReferenceException` irgendwo tiefer im Code."
+    },
+    {
+      "id": "m18-l04-q4",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Welche Eingabe weist der Konstruktor von `MessageRating` mit einer `ArgumentException` zurück?",
+      "options": [
+        {
+          "text": "Eine leere Liste von Signalwörtern.",
+          "correct": true
+        },
+        {
+          "text": "Eine Liste mit nur einem Signalwort.",
+          "feedback": "Ein Signalwort reicht für die Regel. Nur eine leere Liste kann nichts finden."
+        },
+        {
+          "text": "Eine Liste mit Signalwörtern in Großbuchstaben.",
+          "feedback": "Die Groß- und Kleinschreibung spielt bei der Suche keine Rolle, weil `OrdinalIgnoreCase` benutzt wird."
+        }
+      ],
+      "explanation": "Ohne Signalwort wäre jede Nachricht harmlos. Das ist ein Fehler des Aufrufers und wird sofort gemeldet. Ein leeres oder nur aus Leerzeichen bestehendes Wort wird ebenfalls zurückgewiesen."
+    },
+    {
+      "id": "m18-l04-q5",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Der Konstruktor speichert eine Kopie der Signalwörter (`[.. signalWords]`). Wozu?",
+      "options": [
+        {
+          "text": "Wenn der Aufrufer seine Liste später ändert, bleibt die Regel gleich.",
+          "correct": true
+        },
+        {
+          "text": "Die Kopie ist schneller zu durchsuchen als die Originalliste.",
+          "feedback": "Es geht nicht um Tempo, sondern darum, dass die Klasse ihre Daten besitzt."
+        },
+        {
+          "text": "Der Compiler verlangt eine Kopie bei jedem Parameter vom Typ `IReadOnlyList<T>`.",
+          "feedback": "Der Compiler verlangt keine Kopie. Ohne sie würde die Klasse aber die Liste des Aufrufers weiterbenutzen."
+        }
+      ],
+      "explanation": "Eine `IReadOnlyList<T>` kann hinter dem Rücken der Klasse eine Liste sein, die der Aufrufer ändert. Die eigene Kopie schützt die Regel."
+    },
+    {
+      "id": "m18-l04-q6",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Wozu dient `[MemberData]` bei einer `[Theory]` für die Meldungsbewertung?",
+      "options": [
+        {
+          "text": "Die Testdaten kommen aus einer Eigenschaft der Klasse, zum Beispiel alle Beispielmeldungen mit der erwarteten Bewertung.",
+          "correct": true
+        },
+        {
+          "text": "Sie führt den Test mehrfach mit zufälligen Werten aus.",
+          "feedback": "Die Werte sind fest. `[MemberData]` liefert nur eine andere Quelle als `[InlineData]`."
+        },
+        {
+          "text": "Sie speichert die Testergebnisse in einem Mitglied der Klasse.",
+          "feedback": "`[MemberData]` liest Daten, es speichert keine Ergebnisse."
+        }
+      ],
+      "explanation": "`[InlineData]` schreibt die Werte in das Attribut. `[MemberData]` verweist auf eine Eigenschaft, die die Datenzeilen liefert. Das passt für längere Texte wie die Beispielmeldungen."
+    },
+    {
+      "id": "m18-l04-q7",
+      "lesson": "m18-l04",
+      "type": "single",
+      "question": "Die Meldungsbewertung stuft eine Nachricht als `harmless` ein. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Nur, dass die Lehrregel keinen Treffer gefunden hat. Die Nachricht kann trotzdem gefährlich sein.",
+          "correct": true
+        },
+        {
+          "text": "Die Nachricht ist sicher.",
+          "feedback": "Die Regel prüft nur einen Link mit `http://` und ein Signalwort. Echte Angriffe sehen oft anders aus.",
+          "misconception": "m18-l04-rating-detects-phishing"
+        },
+        {
+          "text": "Die Nachricht enthält kein Signalwort und keinen Link.",
+          "feedback": "Es genügt, dass eine der beiden Bedingungen fehlt, damit die Bewertung `harmless` ist."
+        }
+      ],
+      "explanation": "Die Regel ist eine Vereinfachung für den Kurs und keine zuverlässige Erkennung von Phishing."
+    },
+    {
+      "id": "m18-l04-q8",
+      "lesson": "m18-l04",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum die öffentliche Klasse `MessageRating` ihre Eingaben prüft, obwohl die Parameter nicht nullable sind.",
+      "modelAnswer": "Nullable-Annotationen sind nur eine Analyse des Compilers. Ein Aufrufer ohne Nullable-Kontext oder mit `!` kann trotzdem `null` übergeben. Darum prüft der Konstruktor die Signalwörter (nicht `null`, nicht leer, kein leeres Wort) und die Methode die Nachricht (nicht `null`). So kommt der Fehler mit einer klaren Meldung am Rand der Klasse und nicht als `NullReferenceException` irgendwo tiefer."
+    },
+    {
+      "id": "m18-l04-q9",
+      "lesson": "m18-l04",
+      "type": "explain",
+      "question": "Transfer: Du schreibst eine öffentliche Klasse für SecLog, die einen Benutzernamen und eine IP-Adresse als Text bekommt. Was prüfst du am Rand, und wie testest du es?",
+      "modelAnswer": "Beide Texte werden mit `ArgumentNullException.ThrowIfNull` auf `null` geprüft, und ein leerer Benutzername wird mit einer `ArgumentException` zurückgewiesen. Ein Test pro Fall prüft, dass die erwartete Exception kommt. Eine `[Theory]` prüft die gültigen Beispiele."
     }
   ]
 }
