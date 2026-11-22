@@ -11732,6 +11732,128 @@
         "title": "Make HTTP requests with the HttpClient class",
         "url": "https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient"
       }
+    },
+    {
+      "id": "parameter-binding",
+      "term": "Parameter Binding",
+      "german": "Parameterbindung",
+      "category": "platform",
+      "definition": "ASP.NET Core füllt die Parameter eines Handlers aus der Anfrage: aus der Route, der Query, den Headern, dem Body oder aus der Dependency Injection. Schlägt das fehl, antwortet die App mit 400 und der Handler läuft nicht.",
+      "related": [
+        "binding-source",
+        "route-handler",
+        "request-body"
+      ],
+      "lesson": "m17-l05",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
+    },
+    {
+      "id": "binding-source",
+      "term": "Binding Source",
+      "german": "Bindungsquelle",
+      "category": "platform",
+      "definition": "Die Stelle der Anfrage, aus der ein Handler-Parameter gefüllt wird: Route, Query, Header, Body oder Services. ASP.NET Core leitet sie aus Name und Typ ab. Attribute wie `[FromHeader]` legen sie fest.",
+      "related": [
+        "parameter-binding",
+        "query-string",
+        "request-body"
+      ],
+      "lesson": "m17-l05",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
+    },
+    {
+      "id": "request-body",
+      "term": "Request Body",
+      "german": "Anfrage-Body",
+      "category": "platform",
+      "definition": "Der Inhalt einer HTTP-Anfrage, zum Beispiel ein JSON-Text bei `POST` und `PUT`. Ein Handler-Parameter mit komplexem Typ wird daraus gelesen.",
+      "aliases": [
+        "Body"
+      ],
+      "related": [
+        "http-request",
+        "json",
+        "parameter-binding"
+      ],
+      "lesson": "m17-l05",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
+    },
+    {
+      "id": "query-string",
+      "term": "Query String",
+      "german": "Abfragezeichenfolge",
+      "category": "platform",
+      "definition": "Der Teil einer Adresse nach dem `?`, zum Beispiel `user=bob&minFailures=3`. Ein einfacher Handler-Parameter, der nicht in der Route steht, wird daraus gelesen.",
+      "aliases": [
+        "Query"
+      ],
+      "related": [
+        "url",
+        "binding-source"
+      ],
+      "lesson": "m17-l05",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
+    },
+    {
+      "id": "input-validation",
+      "term": "Input Validation",
+      "german": "Eingabevalidierung",
+      "category": "platform",
+      "definition": "Die Prüfung, ob Eingaben von außen erlaubt sind, bevor die App sie verarbeitet. In Minimal APIs prüft `AddValidation` Data Annotations von Parametern und Bodys und antwortet bei Fehlern mit 400.",
+      "related": [
+        "parameter-binding",
+        "options-validation"
+      ],
+      "lesson": "m17-l05",
+      "source": {
+        "title": "Validation in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/validation"
+      }
+    },
+    {
+      "id": "typed-result",
+      "term": "Typed Result",
+      "german": "typisiertes Ergebnis",
+      "category": "platform",
+      "definition": "Ein Rückgabewert von `TypedResults`, zum Beispiel `Ok<T>` oder `NotFound`. Sein Typ nennt die Antwort. Mit `Results<T1, T2>` listet der Rückgabetyp eines Handlers alle möglichen Antworten.",
+      "related": [
+        "http-status-code",
+        "route-handler",
+        "location-header"
+      ],
+      "lesson": "m17-l06",
+      "source": {
+        "title": "Create responses in Minimal API applications",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/responses"
+      }
+    },
+    {
+      "id": "location-header",
+      "term": "Location Header",
+      "german": "Location-Header",
+      "category": "platform",
+      "definition": "Ein Antwort-Header mit der Adresse einer Ressource. Nach `201 Created` nennt er die Adresse der neu angelegten Ressource.",
+      "related": [
+        "http-header",
+        "typed-result"
+      ],
+      "lesson": "m17-l06",
+      "source": {
+        "title": "Create responses in Minimal API applications",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/responses"
+      }
     }
   ]
 }
