@@ -1,0 +1,6 @@
+Own offset
+  hour 8: 1
+  hour 9: 2
+UTC
+  hour 8: 2
+  hour 9: 1
