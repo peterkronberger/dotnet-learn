@@ -12266,6 +12266,30 @@
       "definition": "Ein Wert direkt an der Grenze zwischen zwei Fällen einer Regel, zum Beispiel 4 und 5 bei der Grenze „ab 5“. Tests an diesen Werten finden Fehler wie `<` statt `<=`.",
       "related": ["business-rule"],
       "lesson": "m18-l02"
+    },
+    {
+      "id": "utc-offset",
+      "term": "UTC Offset",
+      "german": "Versatz zur UTC",
+      "category": "platform",
+      "definition": "Der Unterschied zwischen der Uhrzeit eines Werts und der UTC, zum Beispiel `+01:00`. Bei einem `DateTimeOffset` liefert `Hour` die Stunde mit diesem Versatz. `UtcDateTime` rechnet auf die Uhrzeit in UTC um.",
+      "aliases": ["Offset", "Zeitversatz"],
+      "related": ["utc", "date-time-offset"],
+      "lesson": "m18-l03",
+      "source": {
+        "title": "DateTimeOffset.Offset Property",
+        "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset.offset"
+      }
+    },
+    {
+      "id": "message-rating",
+      "term": "Message Rating",
+      "german": "Meldungsbewertung",
+      "category": "course",
+      "definition": "Die Regel von SecLog, die den Text einer gemeldeten Nachricht als „möglicherweise Phishing“ oder „harmlos“ einstuft: ein Link mit `http://` und mindestens ein Signalwort. Sie ist eine Vereinfachung für den Kurs, keine zuverlässige Erkennung.",
+      "aliases": ["Meldungsbewertung", "Nachrichtenbewertung"],
+      "related": ["input-validation"],
+      "lesson": "m18-l04"
     }
   ]
 }
