@@ -525,19 +525,13 @@ Lessons as built: `m16-l01` Datenbanken und der DbContext · `m16-l02` Das Model
 - **Library (not spec):** EF Core 11 (released with .NET 11; check "What's new in EF Core 11" when writing), provider in CI: SQLite (check the CI project `website/examples/_ci/ef-core`), migrations tooling.
 - Misconceptions handled: `ToList()` at the end changes nothing (`m16-l05`); EF Core sends every LINQ method to the database (`m16-l05`).
 
-### M17 ASP.NET Core Minimal APIs ◻
-Routing, handlers · binding and validation · status codes · middleware pipeline · DI in endpoints. HTTP requests and responses are produced in CI (S2).
-- *(new)* Lesson "HTTP basics" first: methods, status code classes, headers, request/response body, idempotency.
-- *(new)* Lesson "JSON with System.Text.Json" (▶ possible – check in the playground): serialization, naming policy, nullable members.
-- *(new)* Lesson "Errors as problem details" (standard error format, central error handling).
-- *(new)* Lesson "Describing the API with OpenAPI" (built-in document generation since .NET 9).
-- *(new)* Lesson "Who may call the endpoint?": authentication vs. authorization as a concept, defensive (SecLog incident API).
-- *(new)* Integration tests for endpoints (link M14, CI only).
-- *(new)* Cancellation in request handlers (link M13).
-- *(new)* Lesson "Running an ASP.NET Core app" ◻: an ASP.NET Core app is a console app with the built-in web server Kestrel; publish to a folder and start it; a process manager starts and restarts it; optional reverse proxy in front of Kestrel (Nginx or IIS only by name) and the forwarded headers it needs; environments (development vs. production); container image from the SDK (link M14). Concepts only, no provider-specific steps.
-- **Spec:** no new language content; uses lambdas (M10), attributes (M14), records (M8), async (M13).
-- **Library (not spec):** ASP.NET Core 11 Minimal APIs (check "What's new in ASP.NET Core for .NET 11" when writing); built-in validation (`AddValidation`, data annotations, `IValidatableObject`; some validation attributes are experimental in .NET 10); typed results; middleware order; configuration and environments (link M15); `Microsoft.AspNetCore.OpenApi`.
-- More misconceptions: validation runs automatically without registration; middleware order does not matter.
+### M17 ASP.NET Core Minimal APIs ◻/▶
+HTTP basics · JSON · routing and handlers · integration tests · binding and validation · status codes and typed results · problem details · middleware pipeline · services and cancellation · OpenAPI · authentication and authorization · running an app. HTTP requests and responses are produced in CI (S2). Built (module review #639); SecLog got the projects `src/SecLog.Api/` and `tests/SecLog.Api.Tests/`.
+Lessons as built: `m17-l01` Grundlagen von HTTP · `m17-l02` JSON mit System.Text.Json (▶) · `m17-l03` Routing und Handler · `m17-l04` Endpunkte mit Integrationstests prüfen · `m17-l05` Parameterbindung und Validierung · `m17-l06` Statuscodes und typisierte Ergebnisse · `m17-l07` Fehler als Problem Details · `m17-l08` Die Middleware-Pipeline · `m17-l09` Services und Abbruch in Endpunkten · `m17-l10` Die API mit OpenAPI beschreiben · `m17-l11` Wer darf den Endpunkt aufrufen? · `m17-l12` Eine ASP.NET Core-App betreiben.
+- **Spec:** no new language content; uses lambdas (M10), attributes (M14), records (M8), async (M13), generics (M9).
+- **Library (not spec):** ASP.NET Core 11 Minimal APIs; built-in validation `AddValidation` (`<Since dotnet="10" />`, `m17-l05`), data annotations, typed results (`m17-l06`), `IExceptionHandler` (`<Since dotnet="8" />`, `m17-l07`), middleware order (`m17-l08`), keyed services (`<Since dotnet="8" />`, `m17-l09`), `Microsoft.AspNetCore.OpenApi` (`<Since dotnet="9" />`, `m17-l10`), authentication/authorization (`m17-l11`), configuration, environments and forwarded headers (`m17-l12`).
+- **Playground / AOT result:** the `System.Text.Json` examples of `m17-l02` run in `<CSharpRunner>` (▶, CI-checked; the browser spot check was not done by the automated review, see the PR). Native AOT: `m17-l12` states only that Minimal APIs are partly compatible and links the list of supported features; no AOT example. `System.Text.Json` source generators: `m17-l02` deepening, by name only.
+- Misconceptions handled: validation runs without registration (`m17-l05`), middleware order does not matter (`m17-l08`), plus two per lesson (ids in `concept/module-digest.md`).
 
 ### M18 Abschlussprojekt (final project)
 Full SecLog: domain logic, LINQ analysis and message rating ▶ automatically checked; EF Core and API parts ◻ as code-review tasks ("Finde 3 Probleme in diesem Endpoint" – find 3 problems in this endpoint, "Welches SQL entsteht?" – which SQL is produced?).
@@ -612,5 +606,3 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 - dotnet/core, .NET releases overview (checked 2026-10-28): https://github.com/dotnet/core/blob/main/releases.md
 
 Open questions from the review:
-- Playground support for System.Text.Json (M17): check before deciding ▶ or ◻. (Files in M7: CI-checked on disk, browser check pending, see #352 and `### M7`.)
-- M17: Native AOT compatibility of ASP.NET Core Minimal APIs (which features work) before mentioning AOT for web apps.
