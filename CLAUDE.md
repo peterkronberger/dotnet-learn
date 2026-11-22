@@ -43,6 +43,7 @@ dotnet run --project playground               # run locally
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
 bash tools/check-examples.sh --module m16   # only one module (examples/m16 and _ci/m16-*, _ci/seclog-m16-*); use this while building a module
+bash tools/check-examples.sh --lesson m16-l07   # only one lesson (examples/m16/l07, _ci/m16-l07-*, _ci/seclog-m16-l07)
 
 # Check fold markers and the SecLog continuity chain (also run by check-examples.sh)
 node tools/check-seclog.mjs
