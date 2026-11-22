@@ -12251,7 +12251,7 @@
       "german": "Compiler-Warnung",
       "category": "language",
       "definition": "Ein Hinweis des Compilers auf ein mögliches Problem im Code, zum Beispiel CS8602 (möglicher Zugriff auf `null`). Das Programm lässt sich übersetzen. Mit `TreatWarningsAsErrors` bricht der Build bei einer Warnung ab.",
-      "aliases": ["Warnung", "Compiler-Warnungen"],
+      "aliases": ["Compiler-Warnungen"],
       "related": ["code-review", "null-forgiving-operator"],
       "lesson": "m18-l01",
       "source": {
@@ -12262,10 +12262,8 @@
     {
       "id": "boundary-value",
       "term": "Boundary Value",
-      "german": "Grenzwert",
       "category": "course",
-      "definition": "Ein Wert direkt an der Grenze zwischen zwei Fällen einer Regel, zum Beispiel 4 und 5 bei der Grenze „ab 5“. Tests an Grenzwerten finden Fehler wie `<` statt `<=`.",
-      "aliases": ["Grenzwerte"],
+      "definition": "Ein Wert direkt an der Grenze zwischen zwei Fällen einer Regel, zum Beispiel 4 und 5 bei der Grenze „ab 5“. Tests an diesen Werten finden Fehler wie `<` statt `<=`.",
       "related": ["business-rule"],
       "lesson": "m18-l02"
     }

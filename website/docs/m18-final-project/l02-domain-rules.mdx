@@ -1,0 +1,177 @@
+---
+title: Fachregeln im Kern
+sidebar_position: 2
+description: Eine Fachregel gehört als kleine, reine Methode in den Kern, weist ungültige Eingaben mit einer Guard Clause zurück und wird an den Grenzwerten getestet. Gezeigt an der Einstufung der Schwere in SecLog.
+lesson_id: m18-l02
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import relationalSwitch from '!!raw-loader!@site/examples/m18/l02/relational-switch.cs';
+import relationalSwitchOutput from '!!raw-loader!@site/examples/m18/l02/relational-switch.out.txt';
+import gaps from '!!raw-loader!@site/examples/m18/l02/threshold-gaps.cs';
+import projectTask from '!!raw-loader!@site/examples/m18/l02/core-severity-task.cs';
+import projectTests from '!!raw-loader!@site/examples/m18/l02/core-severity-task.tests.snippet.cs';
+import projectSolution from '!!raw-loader!@site/examples/m18/l02/core-severity-solution.cs';
+import ratingFile from '!!raw-loader!@site/examples/_ci/seclog-m18-l02/src/SecLog.Core/Model/SeverityRating.cs';
+import ratingTests from '!!raw-loader!@site/examples/_ci/seclog-m18-l02/tests/SecLog.Tests/SeverityRatingTests.cs';
+
+# Fachregeln im Kern
+
+:::note[Lernziele]
+- Du kannst eine Fachregel aus dem Programm in eine eigene Klasse im Kern verschieben.
+- Du sicherst eine Fachregel mit einer Guard Clause gegen ungültige Eingaben ab.
+- Du prüfst eine Fachregel mit Tests für die Grenzwerte.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l08-q1" />
+
+<Quiz id="m12-l02-q1" />
+
+<Quiz id="m07-l05-q1" />
+
+## Eine Regel an einer Stelle
+
+Eine <Term id="business-rule">Fachregel</Term> ist eine Regel der Fachwelt, die das Programm durchsetzt. In SecLog ist „Wie ernst sind 3 Fehlversuche?“ eine solche Regel. Sie sollte an genau einer Stelle stehen. Dafür eignet sich der Kern, `SecLog.Core`: Er hat keine Abhängigkeit von Konsole, Datenbank oder Web. Die Regel ist dort eine kleine, reine Methode: Die Eingabe kommt als Parameter, das Ergebnis ist der Rückgabewert (Lektionen „Testbarer Code“ und „Abhängigkeiten über Interfaces“). Konsole und API rufen dieselbe Methode auf, und ein Test ruft sie direkt auf.
+
+Ein Review-Befund zeigt, warum das wichtig ist. Die Konsolenanwendung von SecLog hat die lokale Funktion `SeverityOf` mit diesem Ausdruck:
+
+```text
+failures switch { 0 => None, < 3 => Low, < 5 => Medium, _ => High }
+```
+
+Der Ausdruck ist ein `switch`-Ausdruck mit <Term id="relational-pattern">relationalen Mustern</Term>. Die Muster werden von oben nach unten geprüft. Was geschieht mit `-1`? Das Muster `< 3` hat keine Untergrenze und passt auch auf negative Zahlen ([Relational patterns](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#relational-patterns)). Also liefert `SeverityOf(-1)` den Wert `Low`.
+
+:::info[Vorhersage]
+Welche Stufe gibt die Methode `Rate` für `-1`, `0`, `2`, `3` und `5` zurück? Notiere deinen Tipp für jede Zeile.
+:::
+
+<CSharpRunner id="m18-l02-switch" code={relationalSwitch} predict expected={relationalSwitchOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `-1: Low`, `0: None`, `2: Low`, `3: Medium` und `5: High`.
+
+1. **Von oben nach unten:** Die erste passende Zeile gewinnt.
+2. **`-1`:** Es ist nicht `0`, aber `-1 < 3`. Darum `Low`.
+3. **Grenzen:** `3` ist nicht `< 3`, aber `< 5`: `Medium`. `5` ist nicht `< 5`: `High`.
+4. **Befund:** Eine negative Zahl von Fehlversuchen ist sinnlos, und die Regel stuft sie trotzdem still ein.
+
+**Was passiert, wenn …?** … `-1` an der Regel vorbeikommt, weil die Zahl aus einem Rechenfehler stammt? Dann zeigt SecLog einen Wert an, der falsch aussieht, aber nicht falsch wirkt. Ein Fehler, der sich versteckt, ist schwerer zu finden als einer, der auffällt.
+
+</details>
+
+## Ungültige Eingaben zurückweisen
+
+Eine <Term id="guard-clause">Guard Clause</Term> prüft am Anfang einer Methode die Argumente und weist ungültige Werte sofort mit einer Exception zurück. Für negative Zahlen gibt es den Helfer `ArgumentOutOfRangeException.ThrowIfNegative` (Lektion „Exceptions auslösen mit throw“). Er löst die Exception aus, wenn der Wert kleiner als 0 ist, und tut sonst nichts ([ThrowIfNegative](https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception.throwifnegative)).
+
+Danach darf der `switch`-Ausdruck davon ausgehen, dass die Zahl gültig ist. Die Muster stehen von klein nach groß: erst `0`, dann `< 3`, dann `< 5`, zuletzt der Rest.
+
+## Grenzwerte testen
+
+Ein <Term id="boundary-value">Grenzwert</Term> liegt direkt an der Grenze zwischen zwei Fällen. Für „ab 5 ist es `High`“ sind das `4` und `5`. Dort machen Vergleiche die meisten Fehler: Wer `< 5` mit `<= 5` verwechselt, merkt es nur an dieser Stelle. Eine `[Theory]` mit `[InlineData]` (Lektion „Datengetriebene Tests mit [Theory]“) prüft viele Werte mit einem Testkörper. Für die ungültige Eingabe gibt es einen eigenen Test mit `Assert.Throws`.
+
+Die Programmausgabe allein ist kein Test: Sie zeigt nur die Werte, die das Programm gerade benutzt. Der Wert `-1` kommt in den Beispieldaten nicht vor.
+
+## Lückenbeispiel
+
+Eine zweite kleine Regel: Wie voll ist das Log? `TrafficRating.For` bewertet die Zeilen pro Minute (die Grenzen sind erfunden). Die Teilziele: „1. Eingabe prüfen → 2. Fälle von klein nach groß → 3. Test für jede Grenze“. Der dritte Schritt sind die drei Aufrufe im Programm: Sie sollen `Quiet`, `Busy` und `Flooded` ausgeben.
+
+<CSharpRunner id="m18-l02-gaps" code={gaps} />
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+1. **Eingabe prüfen:** `ArgumentOutOfRangeException.ThrowIfNegative(linesPerMinute);` steht als erste Zeile.
+2. **Fälle:** `return linesPerMinute switch { < 10 => "Quiet", < 100 => "Busy", _ => "Flooded" };`
+3. **Grenzen:** 9 ist `Quiet`, 10 ist `Busy`, 100 ist `Flooded`. Jede Grenze gehört zur oberen Stufe, weil das Muster mit `<` die untere Stufe begrenzt.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m18-l01/`) stuft die Schwere in der Konsolenanwendung ein, mit der lokalen Funktion `SeverityOf`. Der Kern hat nur den Typ `Severity`.
+
+Im Runner siehst du nur die Teile, die du für diese Anforderung brauchst: den Typ `Severity`, die Klasse `SeverityRating` und ein Programm, das die Fehlversuche der Beispieldaten ausgibt. Die Klasse `SeverityRating` ist hier ein Gerüst, dessen Methode eine `NotImplementedException` auslöst.
+
+**Neue Anforderung:** „Die Einstufung der Schwere ist eine Fachregel im Kern: `SeverityRating.For` liefert für 0 Fehlversuche `None`, für 1–2 `Low`, für 3–4 `Medium`, ab 5 `High` und lehnt negative Zahlen mit einer `ArgumentOutOfRangeException` ab.“ Die Schwellenwerte bleiben die erfundenen der Konsolenanwendung. Sie sind eine Vereinfachung für den Kurs. Schreibe den Rumpf von `For`: erst die Guard Clause, dann der `switch`-Ausdruck.
+
+<CSharpRunner id="m18-l02-project" code={projectTask} tests={projectTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<FoldedCode code={projectSolution} title="core-severity-solution.cs" />
+
+Im Projekt `_ci/seclog-m18-l02/` sind die Typen dieselben Dateien wie im Kern. Zwei Dateien sind neu, und die Konsolenanwendung ruft die Regel auf:
+
+<CodeBlock language="csharp" title="src/SecLog.Core/Model/SeverityRating.cs (neu)">{ratingFile}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Tests/SeverityRatingTests.cs (neu)">{ratingTests}</CodeBlock>
+
+1. **Eingabe prüfen:** `ThrowIfNegative` ist die erste Anweisung der Methode.
+2. **Fälle von klein nach groß:** `0 => None`, `< 3 => Low`, `< 5 => Medium`, sonst `High`.
+3. **Test für jede Grenze:** Die `[Theory]` prüft 0, 1, 2, 3, 4, 5 und 1000. Der `[Fact]` erwartet für `-1` eine `ArgumentOutOfRangeException`.
+4. **Aufruf:** In `src/SecLog.Cli/Program.cs` gibt `SeverityOf` jetzt `SeverityRating.For(failures)` zurück. Die Ausgabe der Konsolenanwendung bleibt gleich. In `expected.out.txt` kommen nur die acht neuen Testzeilen dazu.
+
+</details>
+
+**Neuer Stand:** Die Einstufung der Schwere ist eine getestete Fachregel in `SecLog.Core`. Konsole und API können dieselbe Methode benutzen.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m18-l02-relational-pattern-excludes-negative" />
+
+**„`< 3` im switch-Ausdruck gilt nur für 0, 1 und 2.“** Das Muster vergleicht nur mit 3 und hat keine Untergrenze. Auch `-1` passt, wenn davor keine Zeile die Zahl abfängt. Wer negative Zahlen ausschließen will, prüft sie vorher oder schreibt `>= 1 and < 3`.
+:::
+
+:::warning[Achtung]
+<Misconception id="m18-l02-output-check-is-test" />
+
+**„Eine Fachregel ist getestet, wenn die Programmausgabe stimmt.“** Die Ausgabe zeigt nur die Eingaben dieses Laufs. Grenzen und ungültige Werte kommen darin oft nicht vor. Ein Test legt sie gezielt fest.
+:::
+
+<details>
+<summary>Vertiefung: Was passiert, wenn kein Muster passt? (optional)</summary>
+
+Passt bei einem `switch`-Ausdruck kein Muster, löst die Laufzeit eine Exception aus, und der Compiler warnt, wenn die Muster nicht alle möglichen Werte abdecken ([switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/switch-expression)). Das Verwerfungsmuster `_` fängt alles ab, was davor nicht passte. Die Reihenfolge der Muster ist Teil der Regel: Die erste passende Zeile gewinnt ([§11.2.9 Relational pattern](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#1129-relational-pattern)).
+
+</details>
+
+## Zusammenfassung
+
+Eine Fachregel steht als kleine, reine Methode im Kern, damit Konsole, API und Tests dieselbe Stelle benutzen. Eine Guard Clause weist ungültige Eingaben sofort zurück. Ein relationales Muster wie `< 3` hat keine Untergrenze und passt auch auf negative Zahlen. Tests an den Grenzwerten und für ungültige Werte sichern die Regel ab. In SecLog ist die Einstufung der Schwere jetzt `SeverityRating.For`. Das ist Punkt 9 der Checkliste aus Lektion 1 („Tests für Fachregeln“) und Teil von Punkt 2 („Ausnahmebehandlung“).
+
+## Prüfe dein Wissen
+
+<Quiz id="m18-l02-q1" />
+
+<Quiz id="m18-l02-q2" />
+
+<Quiz id="m18-l02-q3" />
+
+<Quiz id="m18-l02-q4" />
+
+<Quiz id="m18-l02-q5" />
+
+<Quiz id="m18-l02-q6" />
+
+<Quiz id="m18-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m18-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m18-l02-q9" />
+
+## Weiterlesen
+
+- C#-Referenz: [Patterns (relationale Muster)](https://learn.microsoft.com/dotnet/csharp/language-reference/operators/patterns#relational-patterns)
+- Microsoft Learn: [ArgumentOutOfRangeException.ThrowIfNegative](https://learn.microsoft.com/dotnet/api/system.argumentoutofrangeexception.throwifnegative)
+- Checkliste: [Code-Review mit einer Checkliste](./l01-review-checklist)
