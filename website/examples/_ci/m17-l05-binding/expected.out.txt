@@ -1,0 +1,40 @@
+== 1. Route ==
+> GET /incidents/7
+< 200 OK
+< body: id=7
+
+== 2. Query string ==
+> GET /incidents?user=bob&minFailures=3
+< 200 OK
+< body: user=bob, minFailures=3
+
+> GET /incidents
+< 200 OK
+< body: user=(none), minFailures=0
+
+== 3. Header ==
+> GET /whoami
+< 200 OK
+< body: analyst=alice
+
+== 4. Body ==
+> POST /incidents
+< 200 OK
+< body: new incident for bob (sample log)
+
+== 5. Service ==
+> GET /hello/alice
+< 200 OK
+< body: Hello alice
+
+== 6. Explicit query ==
+> GET /search/x?term=bob
+< 200 OK
+< body: term=bob
+
+== 7. Binding fails ==
+> GET /incidents?minFailures=many
+< 400 Bad Request
+
+> GET /whoami
+< 400 Bad Request

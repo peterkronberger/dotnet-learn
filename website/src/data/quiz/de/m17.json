@@ -570,6 +570,192 @@
       "type": "explain",
       "question": "Transfer: Du schreibst einen neuen Endpoint, der die Vorfälle eines Benutzers liefert. Welche Testdaten legst du an, und was prüfst du?",
       "modelAnswer": "Ich lege in der Testdatenbank Vorfälle für mindestens zwei Benutzer an. Der Test ruft den Endpoint für einen Benutzer auf und prüft den Statuscode und dass nur dessen Vorfälle im JSON stehen. Die Testdaten kommen aus den Beispieldaten von SecLog, nicht aus der echten Datenbank."
+    },
+    {
+      "id": "m17-l05-q1",
+      "lesson": "m17-l05",
+      "type": "match",
+      "question": "Die Route ist `/incidents/{id}`. Aus welcher Quelle bindet ASP.NET Core jeden Handler-Parameter, wenn kein Attribut dasteht?",
+      "pairs": [
+        { "left": "`int id`", "right": "Aus der Route" },
+        { "left": "`string? user`", "right": "Aus der Query" },
+        { "left": "`NewIncident incident` (ein Record)", "right": "Aus dem JSON-Body" },
+        { "left": "`SecLogDbContext db` (registrierter Service)", "right": "Aus der Dependency Injection" },
+        { "left": "`[FromHeader] string analyst`", "right": "Aus einem Header" }
+      ],
+      "explanation": "Steht der Name in der Routenvorlage, kommt der Wert aus der Route. Ein einfacher Typ, der nicht in der Route steht, kommt aus der Query. Ein registrierter Service kommt aus der Dependency Injection, ein anderer komplexer Typ aus dem JSON-Body. Ein Attribut wie `[FromHeader]` legt die Quelle ausdrücklich fest."
+    },
+    {
+      "id": "m17-l05-q2",
+      "lesson": "m17-l05",
+      "type": "single",
+      "question": "Ein Record hat die Eigenschaft `[Required] string User`. Die App ruft `builder.Services.AddValidation()` nicht auf. Ein Client sendet `{\"user\":\"\"}` an einen Endpoint, der diesen Record als Parameter hat. Was passiert?",
+      "options": [
+        { "text": "Der Handler läuft mit einem leeren `User`. Niemand prüft die Annotation.", "correct": true },
+        { "text": "Die App antwortet mit 400, denn `[Required]` wird immer geprüft.", "misconception": "m17-l05-validation-runs-without-registration", "feedback": "Ohne `AddValidation` prüft die Minimal API keine Data Annotations. Das Attribut ist dann nur eine Angabe ohne Wirkung." },
+        { "text": "Die App antwortet mit 404, weil der Body nicht passt.", "feedback": "404 meldet, dass keine Route passt. Hier passt die Route." },
+        { "text": "Die App startet nicht, weil `[Required]` eine Registrierung braucht.", "misconception": "m17-l05-validation-runs-without-registration", "feedback": "Ein fehlender Aufruf führt zu keinem Fehler beim Start. Die Annotation wird still ignoriert." }
+      ],
+      "explanation": "Die Prüfung läuft nur, wenn `AddValidation` registriert ist. Ohne den Aufruf erreicht ungültige Eingabe den Handler, ohne Fehler und ohne Eintrag im Log."
+    },
+    {
+      "id": "m17-l05-q3",
+      "lesson": "m17-l05",
+      "type": "single",
+      "question": "Ein Handler hat den Parameter `int minFailures`. Ein Client ruft `GET /incidents?minFailures=many` auf. Was antwortet die App?",
+      "options": [
+        { "text": "400 Bad Request. Der Handler läuft nicht.", "correct": true },
+        { "text": "200 OK. `minFailures` ist dann 0.", "feedback": "Der Wert 0 ist nur der Standard, wenn der Parameter fehlt. Ein Wert, der sich nicht umwandeln lässt, ist ein Bindungsfehler." },
+        { "text": "404 Not Found, weil die Route nicht passt.", "feedback": "Die Route passt, denn die Query gehört nicht zur Routenvorlage. Der Fehler entsteht beim Binden." },
+        { "text": "500 Internal Server Error, weil die Umwandlung eine Ausnahme wirft.", "feedback": "Ein Bindungsfehler ist ein Fehler der Anfrage und führt zu 400." }
+      ],
+      "explanation": "Lässt sich ein Wert nicht in den Typ des Parameters umwandeln, ist die Anfrage fehlerhaft. Die App antwortet mit 400, und der Handler läuft nicht."
+    },
+    {
+      "id": "m17-l05-q4",
+      "lesson": "m17-l05",
+      "type": "single",
+      "question": "`app.MapPost(\"/incidents\", (NewIncident incident) => …)` – `NewIncident` ist ein Record mit `User` und `Source`. Woher kommen die Werte?",
+      "options": [
+        { "text": "Aus dem JSON-Body der Anfrage.", "correct": true },
+        { "text": "Aus der Query, zum Beispiel `?user=bob&source=log`.", "misconception": "m17-l05-body-from-query", "feedback": "Aus der Query liest ASP.NET Core einfache Typen. Ein Record ist ein komplexer Typ und kommt aus dem Body." },
+        { "text": "Aus den Headern der Anfrage.", "feedback": "Header werden nur mit `[FromHeader]` gelesen." },
+        { "text": "Aus der Dependency Injection, weil der Typ ein Record ist.", "feedback": "Aus der Dependency Injection kommen nur Typen, die als Service registriert sind." }
+      ],
+      "explanation": "Ein komplexer Typ, der kein Service ist und keine Sonderbehandlung hat, wird aus dem JSON-Body gelesen. Die Query ist für einfache Typen wie `string` und `int` da."
+    },
+    {
+      "id": "m17-l05-q5",
+      "lesson": "m17-l05",
+      "type": "multi",
+      "question": "Welche Aussagen über `AddValidation` in einer Minimal API stimmen?",
+      "options": [
+        { "text": "Die Prüfung läuft, bevor der Handler aufgerufen wird.", "correct": true },
+        { "text": "Bei einem Fehler antwortet die App mit 400 und nennt die Fehler je Eigenschaft.", "correct": true },
+        { "text": "Eine Regel über mehrere Eigenschaften schreibst du mit `IValidatableObject`.", "correct": true },
+        { "text": "Die Annotationen werden auch ohne den Aufruf von `AddValidation` geprüft.", "misconception": "m17-l05-validation-runs-without-registration", "feedback": "Ohne den Aufruf läuft keine automatische Prüfung." }
+      ],
+      "explanation": "`AddValidation` prüft Parameter und Body vor dem Handler und liefert bei Fehlern eine 400-Antwort. Regeln über mehrere Eigenschaften gehören in `IValidatableObject`. Ohne die Registrierung läuft nichts."
+    },
+    {
+      "id": "m17-l05-q6",
+      "lesson": "m17-l05",
+      "type": "single",
+      "question": "`Status` darf nur `open`, `investigating` oder `closed` sein. Welches Attribut drückt das aus?",
+      "options": [
+        { "text": "`[AllowedValues(\"open\", \"investigating\", \"closed\")]`", "correct": true },
+        { "text": "`[Range(\"open\", \"closed\")]`", "feedback": "`Range` prüft Zahlen oder Werte, die sich vergleichen lassen, in einem Bereich. Es nennt keine Liste erlaubter Texte." },
+        { "text": "`[StringLength(13)]`", "feedback": "`StringLength` prüft nur die Länge, nicht den Inhalt." },
+        { "text": "`[Required]`", "feedback": "`Required` verlangt einen Wert, sagt aber nichts darüber, welche Werte erlaubt sind." }
+      ],
+      "explanation": "`AllowedValues` nennt die erlaubten Werte. Alles andere wird abgelehnt."
+    },
+    {
+      "id": "m17-l05-q7",
+      "lesson": "m17-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie ASP.NET Core für einen Handler-Parameter die Bindungsquelle bestimmt und was du tust, wenn die Ableitung nicht passt.",
+      "modelAnswer": "Steht der Name in der Routenvorlage, kommt der Wert aus der Route. Ein einfacher Typ, der nicht in der Route steht, kommt aus der Query. Ein registrierter Service kommt aus der Dependency Injection, ein anderer komplexer Typ aus dem JSON-Body. Passt das nicht, lege ich die Quelle mit einem Attribut wie `[FromHeader]` oder `[FromQuery]` fest."
+    },
+    {
+      "id": "m17-l05-q8",
+      "lesson": "m17-l05",
+      "type": "explain",
+      "question": "Transfer: Warum prüft eine API jede Eingabe von außen, auch wenn der Client im Browser schon prüft? Nenne eine Eingabe aus SecLog und ihre Regel.",
+      "modelAnswer": "Die API kann von jedem Programm aufgerufen werden, nicht nur von meinem Client. Sie darf darum nichts glauben, was von außen kommt. Beim Status eines Vorfalls erlaube ich nur `open`, `investigating` und `closed`. Beim Benutzer im Filter erlaube ich höchstens 64 Zeichen."
+    },
+    {
+      "id": "m17-l06-q1",
+      "lesson": "m17-l06",
+      "type": "single",
+      "question": "Ein Handler gibt für eine unbekannte Id `null` zurück, zum Beispiel `incidents.FirstOrDefault(i => i.Id == id)`. Was antwortet die App?",
+      "options": [
+        { "text": "200 OK mit dem Body `null`.", "correct": true },
+        { "text": "404 Not Found, denn `null` heißt „nicht gefunden“.", "misconception": "m17-l06-null-means-not-found", "feedback": "Ein Handler, der `null` zurückgibt, schreibt `null` als JSON in die Antwort. Der Statuscode bleibt 200." },
+        { "text": "204 No Content, weil es keinen Wert gibt.", "misconception": "m17-l06-null-means-not-found", "feedback": "Auch 204 kommt nicht von selbst. Der Handler muss `TypedResults.NoContent()` zurückgeben." },
+        { "text": "500 Internal Server Error, weil `null` nicht serialisiert werden kann.", "feedback": "`null` lässt sich als JSON schreiben. Es gibt keinen Fehler." }
+      ],
+      "explanation": "ASP.NET Core wählt den Statuscode nicht aus dem Wert. Wer 404 will, gibt `TypedResults.NotFound()` zurück."
+    },
+    {
+      "id": "m17-l06-q2",
+      "lesson": "m17-l06",
+      "type": "match",
+      "question": "Ordne jedem Ergebnis von `TypedResults` seinen Statuscode zu.",
+      "pairs": [
+        { "left": "`TypedResults.Ok(value)`", "right": "200" },
+        { "left": "`TypedResults.Created(uri, value)`", "right": "201" },
+        { "left": "`TypedResults.NoContent()`", "right": "204" },
+        { "left": "`TypedResults.BadRequest()`", "right": "400" },
+        { "left": "`TypedResults.NotFound()`", "right": "404" }
+      ],
+      "explanation": "Die Namen folgen den Statuscodes: `Ok` ist 200, `Created` ist 201 und setzt zusätzlich den Location-Header, `NoContent` ist 204, `BadRequest` ist 400, `NotFound` ist 404."
+    },
+    {
+      "id": "m17-l06-q3",
+      "lesson": "m17-l06",
+      "type": "single",
+      "question": "Ein Handler hat den Rückgabetyp `Results<NoContent, NotFound>`. Was folgt daraus?",
+      "options": [
+        { "text": "Der Handler darf nur `NoContent` oder `NotFound` zurückgeben. Eine andere Rückgabe wie `TypedResults.Ok(x)` übersetzt der Compiler nicht.", "correct": true },
+        { "text": "Der Handler sendet immer beide Antworten nacheinander.", "feedback": "Eine Anfrage hat genau eine Antwort. Der Typ nennt die möglichen Fälle." },
+        { "text": "Der Handler darf zur Laufzeit auch andere Statuscodes senden, der Typ ist nur ein Hinweis.", "feedback": "Der Typ ist keine Dokumentation, sondern Teil der Signatur. Der Compiler prüft ihn." },
+        { "text": "Die App wählt den Fall automatisch: bei einem Wert 204, ohne Wert 404.", "misconception": "m17-l06-null-means-not-found", "feedback": "Der Handler wählt den Fall mit `return`. Die App leitet nichts aus dem Wert ab." }
+      ],
+      "explanation": "`Results<T1, T2>` ist ein Typ, der genau diese Ergebnisse zulässt. Dadurch kennen Compiler und Werkzeuge alle möglichen Antworten."
+    },
+    {
+      "id": "m17-l06-q4",
+      "lesson": "m17-l06",
+      "type": "single",
+      "question": "Ein `POST /incidents` legt einen neuen Vorfall mit der Id 3 an. Welche Antwort passt am besten?",
+      "options": [
+        { "text": "201 Created mit dem Header `Location: /incidents/3` und dem neuen Vorfall im Body.", "correct": true },
+        { "text": "200 OK, denn 200 passt für jeden Erfolg.", "misconception": "m17-l06-200-for-everything", "feedback": "200 meldet Erfolg, aber nicht, dass etwas Neues entstand. 201 mit `Location` sagt dem Client, wo er die neue Ressource findet." },
+        { "text": "204 No Content, weil der Client den Vorfall schon kennt.", "feedback": "204 hat keinen Body. Der Client kennt die Id des neuen Vorfalls noch nicht." },
+        { "text": "404 Not Found, weil die Ressource vorher nicht existierte.", "feedback": "404 meldet, dass die angefragte Ressource fehlt. Hier ist die Anfrage gelungen." }
+      ],
+      "explanation": "201 meldet, dass eine Ressource entstand. Der Location-Header nennt ihre Adresse."
+    },
+    {
+      "id": "m17-l06-q5",
+      "lesson": "m17-l06",
+      "type": "single",
+      "question": "`Results.NotFound()` und `TypedResults.NotFound()` senden dieselbe Antwort. Was ist der Vorteil von `TypedResults`?",
+      "options": [
+        { "text": "Der Rückgabetyp nennt die Antwort. Ein Test kann den Typ prüfen, und Werkzeuge lesen die möglichen Antworten.", "correct": true },
+        { "text": "`TypedResults` sendet einen anderen Statuscode.", "feedback": "Der Statuscode ist gleich. Der Unterschied liegt im Typ des Rückgabewerts." },
+        { "text": "`Results.NotFound()` funktioniert in Minimal APIs nicht.", "feedback": "Beide funktionieren. `Results` liefert nur den allgemeinen Typ `IResult`." },
+        { "text": "`TypedResults` prüft die Eingabe des Clients.", "feedback": "Die Eingabe prüft `AddValidation`, nicht `TypedResults`." }
+      ],
+      "explanation": "`Results.NotFound()` hat den Typ `IResult`. `TypedResults.NotFound()` hat den Typ `NotFound`. So wird der Fall Teil der Signatur."
+    },
+    {
+      "id": "m17-l06-q6",
+      "lesson": "m17-l06",
+      "type": "single",
+      "question": "Der Handler `Results<NoContent, NotFound> DeleteIncident(int id)` löscht einen Vorfall. Ein Client sendet `DELETE /incidents/3` zweimal hintereinander, und der Vorfall 3 existiert am Anfang. Welche Statuscodes bekommt er?",
+      "options": [
+        { "text": "Zuerst 204, danach 404.", "correct": true },
+        { "text": "Zweimal 204.", "feedback": "Beim zweiten Aufruf gibt es den Vorfall nicht mehr. Der Handler gibt dann `NotFound` zurück." },
+        { "text": "Zuerst 200, danach 204.", "feedback": "Der Rückgabetyp lässt 200 nicht zu." },
+        { "text": "Zweimal 404.", "feedback": "Beim ersten Aufruf existiert der Vorfall und wird gelöscht." }
+      ],
+      "explanation": "Der Zustand des Servers nach beiden Aufrufen ist derselbe, die Antwort ist es nicht. Das ist mit Idempotenz gemeint: Sie sagt etwas über den Zustand, nicht über die Antwort."
+    },
+    {
+      "id": "m17-l06-q7",
+      "lesson": "m17-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Handler `null` nicht als „nicht gefunden“ melden kann und wie er stattdessen 404 sendet.",
+      "modelAnswer": "ASP.NET Core schreibt den Rückgabewert in die Antwort, und bei `null` steht dort `null` mit dem Status 200. Der Statuscode hängt nicht vom Wert ab. Der Handler prüft selbst, ob es den Vorfall gibt, und gibt `TypedResults.NotFound()` zurück. Der Rückgabetyp `Results<Ok<IncidentSummary>, NotFound>` nennt beide Fälle."
+    },
+    {
+      "id": "m17-l06-q8",
+      "lesson": "m17-l06",
+      "type": "explain",
+      "question": "Transfer: Du schreibst einen Endpoint, der einen Vorfall löscht. Welche Statuscodes sind möglich, und wie sieht der Rückgabetyp aus?",
+      "modelAnswer": "Wenn es den Vorfall gibt, lösche ich ihn und antworte mit 204, weil es nichts zurückzugeben gibt. Gibt es ihn nicht, antworte ich mit 404. Der Rückgabetyp ist `Results<NoContent, NotFound>`."
     }
   ]
 }

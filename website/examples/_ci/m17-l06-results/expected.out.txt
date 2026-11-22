@@ -1,0 +1,28 @@
+== 1. A handler returns null ==
+> GET /null/99
+< 200 OK
+< body: null
+
+== 2. Ok or NotFound ==
+> GET /incidents/1
+< 200 OK
+< body: {"id":1,"user":"bob","failureCount":5}
+
+> GET /incidents/99
+< 404 Not Found
+
+== 3. Created with a Location header ==
+> POST /incidents
+< 201 Created
+< Location: /incidents/3
+< body: {"id":3,"user":"carol","failureCount":2}
+
+== 4. NoContent or NotFound ==
+> DELETE /incidents/3
+< 204 No Content
+
+> DELETE /incidents/3
+< 404 Not Found
+
+== 5. The handler called without a server ==
+NotFound
