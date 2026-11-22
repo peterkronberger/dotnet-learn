@@ -12069,7 +12069,7 @@
       "german": "Authentifizierung",
       "category": "platform",
       "definition": "Der Schritt, der feststellt, wer aufruft. Das Ergebnis ist eine Identität, in ASP.NET Core ein `ClaimsPrincipal` in `HttpContext.User`. Ob die Identität etwas darf, klärt erst die Autorisierung.",
-      "aliases": ["Authentifizierung", "Anmeldung"],
+      "aliases": ["Authentifizierung"],
       "related": ["authorization", "claim", "authentication-scheme"],
       "lesson": "m17-l11",
       "source": {
@@ -12111,7 +12111,7 @@
       "german": "Authentifizierungsschema",
       "category": "platform",
       "definition": "Ein Name für einen Authentifizierungs-Handler und seine Optionen. Der Handler liest die Zugangsdaten einer Anfrage, zum Beispiel ein Bearer-Token, und baut daraus die Identität.",
-      "aliases": ["Schema", "Authentication Handler"],
+      "aliases": ["Authentication Handler"],
       "related": ["authentication", "bearer-token"],
       "lesson": "m17-l11",
       "source": {
@@ -12139,7 +12139,7 @@
       "german": "Autorisierungsrichtlinie",
       "category": "platform",
       "definition": "Ein benannter Satz von Anforderungen, zum Beispiel eine Rolle oder ein Claim. Ein Endpoint verlangt die Policy mit `RequireAuthorization(\"Name\")`.",
-      "aliases": ["Policy", "Autorisierungs-Policy"],
+      "aliases": ["Autorisierungs-Policy"],
       "related": ["authorization", "claim", "endpoint"],
       "lesson": "m17-l11",
       "source": {
@@ -12150,10 +12150,8 @@
     {
       "id": "web-server",
       "term": "Web Server",
-      "german": "Webserver",
       "category": "platform",
       "definition": "Ein Programm, das HTTP-Anfragen aus dem Netz annimmt und Antworten zurückschickt. Eine ASP.NET Core-App bringt ihren Webserver mit.",
-      "aliases": ["Webserver"],
       "related": ["kestrel", "http-request"],
       "lesson": "m17-l12",
       "source": {
@@ -12218,10 +12216,10 @@
     {
       "id": "hosting-environment",
       "term": "Hosting Environment",
-      "german": "Umgebung",
+      "german": "Betriebsumgebung der App",
       "category": "platform",
       "definition": "Der Name, unter dem die App läuft, zum Beispiel `Development`, `Staging` oder `Production`. Fehlt die Einstellung, gilt `Production`. Der Name steuert Funktionen und Konfigurationsdateien.",
-      "aliases": ["Umgebung", "Environment", "ASPNETCORE_ENVIRONMENT"],
+      "aliases": ["ASPNETCORE_ENVIRONMENT"],
       "related": ["environment-variable", "configuration-provider"],
       "lesson": "m17-l12",
       "source": {
