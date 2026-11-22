@@ -756,6 +756,349 @@
       "type": "explain",
       "question": "Transfer: Du schreibst einen Endpoint, der einen Vorfall löscht. Welche Statuscodes sind möglich, und wie sieht der Rückgabetyp aus?",
       "modelAnswer": "Wenn es den Vorfall gibt, lösche ich ihn und antworte mit 204, weil es nichts zurückzugeben gibt. Gibt es ihn nicht, antworte ich mit 404. Der Rückgabetyp ist `Results<NoContent, NotFound>`."
+    },
+    {
+      "id": "m17-l07-q1",
+      "lesson": "m17-l07",
+      "type": "match",
+      "question": "Ordne jedes Feld einer Problem-Details-Antwort seiner Bedeutung zu.",
+      "pairs": [
+        {
+          "left": "`type`",
+          "right": "Eine Adresse, die die Art des Problems benennt"
+        },
+        {
+          "left": "`title`",
+          "right": "Eine kurze Beschreibung der Art des Problems"
+        },
+        {
+          "left": "`status`",
+          "right": "Der Statuscode der Antwort"
+        },
+        {
+          "left": "`detail`",
+          "right": "Eine Erklärung zu diesem einen Fall"
+        },
+        {
+          "left": "`errors`",
+          "right": "Die Fehler der Validierung, je Eigenschaft eine Liste"
+        }
+      ],
+      "explanation": "`type`, `title`, `status` und `detail` sind die Standardfelder des Formats. `errors` ist eine Erweiterung, die ASP.NET Core bei Validierungsfehlern ergänzt."
+    },
+    {
+      "id": "m17-l07-q2",
+      "lesson": "m17-l07",
+      "type": "single",
+      "question": "Eine API antwortet bei einer unerwarteten Exception mit `500` und schreibt die Exception-Meldung samt Stacktrace in den Body. Warum ist das ein Fehler?",
+      "options": [
+        {
+          "text": "Die Meldung kann Interna verraten, zum Beispiel Pfade, Tabellennamen oder Bibliotheksversionen. Wer die API von außen aufruft, braucht sie nicht, und sie erleichtert Angriffe.",
+          "correct": true
+        },
+        {
+          "text": "Der Client kann den Stacktrace nicht lesen, weil er kein JSON ist.",
+          "misconception": "m17-l07-error-response-shows-exception",
+          "feedback": "Ob der Client ihn lesen kann, ist nicht der Punkt. Das Problem ist, dass jeder Aufrufer ihn bekommt."
+        },
+        {
+          "text": "Ein Statuscode `500` darf keinen Body haben.",
+          "feedback": "Eine `500`-Antwort darf einen Body haben. Das Problem-Details-Format ist genau dafür gedacht."
+        },
+        {
+          "text": "Der Stacktrace macht die Antwort langsamer als ein Problem-Details-Body.",
+          "misconception": "m17-l07-error-response-shows-exception",
+          "feedback": "Es geht nicht um Geschwindigkeit, sondern darum, dass interne Informationen nach außen gelangen."
+        }
+      ],
+      "explanation": "Eine Fehlerantwort nennt die Art des Problems, aber keine Interna. Den Stacktrace und die Meldung schreibt der Server in sein Log (Modul 15), dort sieht ihn nur das Team."
+    },
+    {
+      "id": "m17-l07-q3",
+      "lesson": "m17-l07",
+      "type": "single",
+      "question": "Die App ruft `builder.Services.AddProblemDetails()` und `app.UseExceptionHandler()` auf. Ein Handler wirft eine `InvalidOperationException`, und kein `IExceptionHandler` ist registriert. Was antwortet die App?",
+      "options": [
+        {
+          "text": "`500 Internal Server Error` mit `Content-Type: application/problem+json` und ohne die Exception-Meldung.",
+          "correct": true
+        },
+        {
+          "text": "`200 OK` mit einem leeren Body.",
+          "feedback": "Eine unbehandelte Exception ergibt nie `200`. Die Exception-Handler-Middleware setzt `500`."
+        },
+        {
+          "text": "Die App beendet sich, weil die Exception unbehandelt ist.",
+          "feedback": "Die Middleware fängt die Exception. Der Server läuft weiter und beantwortet die nächste Anfrage."
+        },
+        {
+          "text": "`500` mit dem Stacktrace im Feld `detail`.",
+          "misconception": "m17-l07-error-response-shows-exception",
+          "feedback": "In der Standardeinstellung enthält die Antwort keine Meldung und keinen Stacktrace."
+        }
+      ],
+      "explanation": "`UseExceptionHandler()` fängt die Exception. Mit `AddProblemDetails()` schreibt es daraus eine Problem-Details-Antwort mit Status `500`."
+    },
+    {
+      "id": "m17-l07-q4",
+      "lesson": "m17-l07",
+      "type": "single",
+      "question": "Ein Handler gibt `TypedResults.NotFound()` zurück, die App ruft `app.UseStatusCodePages()` auf, und `AddProblemDetails()` ist registriert. Was bekommt der Client?",
+      "options": [
+        {
+          "text": "`404` mit einem Problem-Details-Body, den `UseStatusCodePages` ergänzt.",
+          "correct": true
+        },
+        {
+          "text": "`404` mit leerem Body, denn `NotFound()` schreibt nie einen Body.",
+          "feedback": "Ohne `UseStatusCodePages` wäre der Body leer. Die Middleware ergänzt ihn."
+        },
+        {
+          "text": "`200`, weil `UseStatusCodePages` den Statuscode ändert.",
+          "feedback": "Die Middleware ändert den Statuscode nicht. Sie schreibt nur einen Body zu einer Antwort ohne Body."
+        },
+        {
+          "text": "`500`, weil `NotFound()` eine Exception wirft.",
+          "feedback": "`NotFound()` wirft nichts, es beschreibt die Antwort `404`."
+        }
+      ],
+      "explanation": "`UseStatusCodePages` schaut auf Antworten mit Statuscode 400 bis 599 ohne Body und schreibt einen Body dazu. Mit `AddProblemDetails()` ist das ein Problem-Details-Body."
+    },
+    {
+      "id": "m17-l07-q5",
+      "lesson": "m17-l07",
+      "type": "single",
+      "question": "Jeder Handler einer API soll bei einem Fehler dasselbe Fehlerformat liefern. Welcher Weg ist der beste?",
+      "options": [
+        {
+          "text": "Die Fehlerbehandlung einmal zentral einrichten: `AddProblemDetails`, `UseExceptionHandler` und `UseStatusCodePages`.",
+          "correct": true
+        },
+        {
+          "text": "In jedem Handler `try`/`catch` schreiben und den Fehler selbst formatieren.",
+          "misconception": "m17-l07-try-catch-in-every-handler",
+          "feedback": "Das wiederholt denselben Code in jedem Handler. Wer ihn in einem Handler vergisst, liefert dort ein anderes Format."
+        },
+        {
+          "text": "Den Fehler im Client abfangen und dort das Format vereinheitlichen.",
+          "feedback": "Der Client sieht nur, was der Server schickt. Das Format legt der Server fest."
+        },
+        {
+          "text": "Jeden Handler ein `null` zurückgeben lassen.",
+          "feedback": "`null` ergibt `200` mit dem Body `null`, keine Fehlerantwort."
+        }
+      ],
+      "explanation": "Eine zentrale Stelle gibt jeder Fehlerantwort dasselbe Format. Ein Handler wirft oder gibt ein Ergebnis zurück, und die Pipeline kümmert sich um den Rest."
+    },
+    {
+      "id": "m17-l07-q6",
+      "lesson": "m17-l07",
+      "type": "single",
+      "question": "Zwei `IExceptionHandler` sind registriert. Der erste gibt für eine `IncidentNotFoundException` `true` zurück, für alle anderen Exceptions `false`. Eine `InvalidOperationException` wird geworfen. Was passiert?",
+      "options": [
+        {
+          "text": "Der zweite Handler bekommt die Exception. Gibt er auch `false` zurück, schreibt die Middleware ihre Standardantwort (`500`).",
+          "correct": true
+        },
+        {
+          "text": "Die Anfrage endet ohne Antwort, weil der erste Handler `false` zurückgegeben hat.",
+          "feedback": "`false` heißt „nicht zuständig“. Die Middleware fragt den nächsten Handler."
+        },
+        {
+          "text": "Der erste Handler schreibt trotzdem die Antwort, denn er ist zuerst registriert.",
+          "feedback": "Eine Antwort schreibt nur ein Handler, der `true` zurückgibt."
+        },
+        {
+          "text": "Die App wirft die Exception an den Client weiter.",
+          "feedback": "Ein Client bekommt nie eine Exception, nur eine Antwort. Die Standardantwort ist `500`."
+        }
+      ],
+      "explanation": "Die Handler laufen in der Reihenfolge, in der sie registriert wurden. Der erste, der `true` zurückgibt, beendet die Kette. Gibt keiner `true` zurück, greift die Standardantwort."
+    },
+    {
+      "id": "m17-l07-q7",
+      "lesson": "m17-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie `AddProblemDetails`, `UseExceptionHandler` und `UseStatusCodePages` zusammen jeder Fehlerantwort dasselbe Format geben.",
+      "modelAnswer": "`AddProblemDetails` registriert den Dienst, der Problem Details schreibt. `UseExceptionHandler` fängt eine unbehandelte Exception und lässt eine `500`-Antwort in diesem Format schreiben, ohne Meldung und Stacktrace. `UseStatusCodePages` ergänzt einen Body für Antworten wie `404`, die nur einen Statuscode haben. So muss kein Handler selbst ein Fehlerformat bauen."
+    },
+    {
+      "id": "m17-l07-q8",
+      "lesson": "m17-l07",
+      "type": "explain",
+      "question": "Transfer: Ein Kollege will in der Fehlerantwort die SQL-Meldung der Datenbank mitschicken, „damit der Client den Fehler findet“. Was sagst du, und wo landet die Meldung stattdessen?",
+      "modelAnswer": "Die SQL-Meldung verrät Tabellen, Spalten und oft Pfade der Datenbank. Wer die API von außen aufruft, kann damit Angriffe vorbereiten und braucht sie nicht. Der Client bekommt einen Statuscode und einen kurzen Titel. Die Meldung gehört ins Log des Servers, wo das Team sie liest."
+    },
+    {
+      "id": "m17-l08-q1",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Eine Anfrage `GET /` läuft durch den Code. Welche Zeilen druckt er, in dieser Reihenfolge?",
+      "example": "m17/l08/quiz-order.snippet.cs",
+      "options": [
+        {
+          "text": "A before, B before, endpoint, B after, A after",
+          "correct": true
+        },
+        {
+          "text": "A before, A after, B before, B after, endpoint",
+          "misconception": "m17-l08-middleware-runs-only-before",
+          "feedback": "`await next(context)` wartet auf den Rest der Pipeline. „A after“ kommt erst, wenn alles dahinter fertig ist."
+        },
+        {
+          "text": "A before, B before, A after, B after, endpoint",
+          "misconception": "m17-l08-middleware-runs-only-before",
+          "feedback": "Der Endpoint läuft innen, vor dem Code nach `next`. Danach geht es in umgekehrter Reihenfolge zurück."
+        },
+        {
+          "text": "endpoint, B before, A before, A after, B after",
+          "feedback": "Eine Anfrage trifft zuerst die Middleware, die zuerst hinzugefügt wurde. Der Endpoint kommt zuletzt."
+        }
+      ],
+      "explanation": "Die Anfrage geht in der Reihenfolge des Hinzufügens hinein und kommt in umgekehrter Reihenfolge zurück: A before, B before, endpoint, B after, A after."
+    },
+    {
+      "id": "m17-l08-q2",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Eine Middleware setzt `context.Response.StatusCode = 403` und kehrt zurück, ohne `next` aufzurufen. Was passiert mit den Komponenten dahinter?",
+      "options": [
+        {
+          "text": "Sie laufen für diese Anfrage nicht. Die Anfrage ist abgekürzt (Short Circuit).",
+          "correct": true
+        },
+        {
+          "text": "Sie laufen trotzdem, nur die Antwort ändert sich nicht.",
+          "feedback": "Dahinter liegende Komponenten laufen nur, wenn `next` aufgerufen wird."
+        },
+        {
+          "text": "Der Compiler lehnt die Middleware ab, weil `next` aufgerufen werden muss.",
+          "feedback": "`next` aufzurufen ist keine Pflicht. Wer es auslässt, beendet die Anfrage an dieser Stelle."
+        },
+        {
+          "text": "Die App ruft `next` automatisch nach dem Code der Middleware auf.",
+          "feedback": "Die App ruft `next` nie von selbst auf. Das tut nur die Middleware."
+        }
+      ],
+      "explanation": "Jede Middleware entscheidet selbst, ob die Anfrage weitergeht. Ruft sie `next` nicht auf, bleibt der Rest der Pipeline für diese Anfrage unberührt."
+    },
+    {
+      "id": "m17-l08-q3",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Die Exception-Handler-Middleware steht in der Pipeline hinter einer Middleware, die für jede Anfrage eine Exception wirft. Was bekommt der Client?",
+      "options": [
+        {
+          "text": "Keine Problem-Details-Antwort: Die Exception läuft am Handler vorbei, denn er fängt nur, was hinter ihm geworfen wird.",
+          "correct": true
+        },
+        {
+          "text": "Eine `500`-Antwort im Problem-Details-Format, denn die Reihenfolge ist egal.",
+          "misconception": "m17-l08-middleware-order-irrelevant",
+          "feedback": "Die Middleware fängt nur Exceptions aus den Komponenten, die nach ihr kommen. Davor geworfene sieht sie nicht."
+        },
+        {
+          "text": "Eine `404`-Antwort, weil der Endpoint nicht erreicht wird.",
+          "feedback": "Die Exception ist unbehandelt. Es gibt keine `404`-Antwort."
+        },
+        {
+          "text": "`200 OK`, weil die Exception übersprungen wird.",
+          "misconception": "m17-l08-middleware-order-irrelevant",
+          "feedback": "Eine unbehandelte Exception ergibt keinen Erfolg."
+        }
+      ],
+      "explanation": "Die Fehlerbehandlung muss vorne stehen, damit sie alles fängt, was dahinter schiefgeht. Die Reihenfolge ändert das Ergebnis."
+    },
+    {
+      "id": "m17-l08-q4",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Eine Middleware soll einen Wert in den Log schreiben, nachdem der Endpoint die Antwort erzeugt hat. Wohin schreibt sie diesen Code?",
+      "options": [
+        {
+          "text": "Hinter `await next(context)` in derselben Middleware.",
+          "correct": true
+        },
+        {
+          "text": "Vor `await next(context)`. Eine Middleware läuft nur vor dem Endpoint.",
+          "misconception": "m17-l08-middleware-runs-only-before",
+          "feedback": "Eine Middleware kann vor und nach `next` arbeiten. Was nach dem Endpoint passieren soll, steht hinter `next`."
+        },
+        {
+          "text": "In eine zweite Middleware vor der ersten.",
+          "feedback": "Eine Middleware davor läuft vor der Antwort. Sie sieht die Antwort erst nach ihrem eigenen `next`."
+        },
+        {
+          "text": "Das geht nicht, nach `next` ist die Anfrage vorbei.",
+          "misconception": "m17-l08-middleware-runs-only-before",
+          "feedback": "Nach `next` ist die Antwort fertig oder fast fertig. Hier kann eine Middleware sie lesen oder protokollieren."
+        }
+      ],
+      "explanation": "Der Aufruf von `next` teilt die Middleware in zwei Hälften: davor die Arbeit auf dem Weg hinein, dahinter die Arbeit auf dem Weg zurück."
+    },
+    {
+      "id": "m17-l08-q5",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Was unterscheidet `app.Run(...)` von `app.Use(...)`?",
+      "options": [
+        {
+          "text": "`Run` ist terminal: Es bekommt kein `next` und beendet die Pipeline. `Use` bekommt `next` und kann die Anfrage weitergeben.",
+          "correct": true
+        },
+        {
+          "text": "`Run` startet den Server, `Use` fügt Middleware hinzu.",
+          "feedback": "`app.Run()` ohne Argument startet den Server. Mit einem Delegate als Argument ist es eine terminale Middleware."
+        },
+        {
+          "text": "`Run` läuft nach dem Endpoint, `Use` davor.",
+          "feedback": "Beide stehen in der Reihenfolge, in der sie hinzugefügt werden. Der Unterschied ist `next`."
+        },
+        {
+          "text": "Es gibt keinen Unterschied, nur zwei Namen.",
+          "feedback": "`Run` hat kein `next`. Was danach steht, läuft nie."
+        }
+      ],
+      "explanation": "`Run` ist die letzte Komponente einer Kette. `Use` ist eine Komponente, die mit `next` weitergeben darf."
+    },
+    {
+      "id": "m17-l08-q6",
+      "lesson": "m17-l08",
+      "type": "single",
+      "question": "Eine Middleware soll den Header `X-Content-Type-Options` auch an Fehlerantworten hängen, die die Exception-Handler-Middleware schreibt. Warum setzt sie den Header in `Response.OnStarting`?",
+      "options": [
+        {
+          "text": "Der Callback läuft kurz bevor die Antwort beginnt. Ein Header, den sie früher setzt, kann die Fehlerbehandlung wieder entfernen, weil sie die Antwort zurücksetzt.",
+          "correct": true
+        },
+        {
+          "text": "Header lassen sich nur in `OnStarting` setzen.",
+          "feedback": "Auf `Response.Headers` kannst du vor dem Start der Antwort direkt schreiben. Hier reicht das nicht für Fehlerantworten."
+        },
+        {
+          "text": "`OnStarting` macht den Header sicherer.",
+          "feedback": "`OnStarting` ändert nichts an der Wirkung des Headers, nur daran, wann er gesetzt wird."
+        },
+        {
+          "text": "`OnStarting` setzt den Header erst, nachdem der Client die Antwort gelesen hat.",
+          "feedback": "Nach dem Lesen ließe sich kein Header mehr setzen. Der Callback läuft, bevor die Antwort beginnt."
+        }
+      ],
+      "explanation": "Header gehören vor den Body und sind nach dem Start der Antwort nicht mehr änderbar. `OnStarting` ist der letzte Zeitpunkt davor. Im Test dieser Lektion fehlt der Header bei der `500`-Antwort, wenn er direkt vor `next` gesetzt wird."
+    },
+    {
+      "id": "m17-l08-q7",
+      "lesson": "m17-l08",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wie eine Anfrage durch die Middleware-Pipeline läuft und warum die Reihenfolge das Ergebnis ändert.",
+      "modelAnswer": "Jede Middleware bekommt die Anfrage und `next`. Sie arbeitet, ruft `next` auf, und danach läuft ihr restlicher Code. Die Anfrage geht in der Reihenfolge des Hinzufügens hinein und in umgekehrter Reihenfolge zurück. Eine Middleware kann auch `next` auslassen und die Anfrage beenden. Darum zählt die Reihenfolge: Die Fehlerbehandlung fängt nur, was hinter ihr geworfen wird, und eine Prüfung schützt nur, was hinter ihr liegt."
+    },
+    {
+      "id": "m17-l08-q8",
+      "lesson": "m17-l08",
+      "type": "explain",
+      "question": "Transfer: SecLog soll später prüfen, ob ein Aufrufer angemeldet ist, und jede Anfrage protokollieren. In welcher Reihenfolge stehen die beiden Middleware, wenn auch abgelehnte Anfragen im Log erscheinen sollen?",
+      "modelAnswer": "Die Protokollierung steht vor der Prüfung. Sie sieht jede Anfrage, bevor die Prüfung sie ablehnt, und nach `next` auch die Antwort mit dem Statuscode. Stünde die Prüfung vorne und beendete die Anfrage, käme die abgelehnte Anfrage nie bei der Protokollierung an."
     }
   ]
 }
