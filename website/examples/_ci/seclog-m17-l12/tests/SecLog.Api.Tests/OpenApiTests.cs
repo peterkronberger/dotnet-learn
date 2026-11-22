@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
 using Xunit;
 
 namespace SecLog.Api.Tests;
@@ -7,7 +8,23 @@ namespace SecLog.Api.Tests;
 public class OpenApiTests(SecLogApiFactory factory)
     : IClassFixture<SecLogApiFactory>
 {
-    private readonly HttpClient _client = factory.CreateClient();
+    // The document exists only in development, so the test says so
+    private readonly HttpClient _client = factory
+        .WithWebHostBuilder(builder => builder.UseEnvironment("Development"))
+        .CreateClient();
+
+    [Fact]
+    public async Task Document_ProductionEnvironment_ReturnsNotFound()
+    {
+        var token = TestContext.Current.CancellationToken;
+        using var client = factory
+            .WithWebHostBuilder(builder => builder.UseEnvironment("Production"))
+            .CreateClient();
+
+        var response = await client.GetAsync("/openapi/v1.json", token);
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 
     private async Task<JsonElement> GetDocumentAsync()
     {

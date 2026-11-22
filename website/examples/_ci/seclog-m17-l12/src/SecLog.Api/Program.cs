@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using SecLog.Api;
 using SecLog.Data;
@@ -28,7 +29,17 @@ builder.Services.AddAuthorizationBuilder()
     .AddPolicy("ChangeIncidentStatus", policy =>
         policy.RequireRole("responder"));
 
+// Behind a reverse proxy: take the client address and the scheme
+// from the headers that the proxy adds
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+    options.ForwardedHeaders =
+        ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto);
+
 var app = builder.Build();
+
+// First in the pipeline, so that every later middleware sees the
+// corrected client address and scheme
+app.UseForwardedHeaders();
 
 // Adds the protection header to every response, also to error responses
 app.Use(async (context, next) =>
@@ -52,9 +63,11 @@ app.UseStatusCodePages();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Serves the document at /openapi/v1.json (m17-l12 limits this later);
-// anonymous, so that the document stays reachable without a token
-app.MapOpenApi().AllowAnonymous();
+// The document at /openapi/v1.json exists only in development
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 app.MapIncidentEndpoints();
 
