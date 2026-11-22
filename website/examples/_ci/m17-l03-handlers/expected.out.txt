@@ -1,0 +1,47 @@
+== 1. Text ==
+> GET /
+< 200 OK
+< Content-Type: text/plain; charset=utf-8
+< body: SecLog API
+
+== 2. A list as JSON ==
+> GET /incidents
+< 200 OK
+< Content-Type: application/json; charset=utf-8
+< body: [{"id":1,"user":"bob","failureCount":5},{"id":2,"user":"dave","failureCount":1}]
+
+== 3. Route parameter ==
+> GET /incidents/2
+< 200 OK
+< Content-Type: application/json; charset=utf-8
+< body: {"id":2,"user":"dave","failureCount":1}
+
+> GET /users/alice
+< 200 OK
+< Content-Type: text/plain; charset=utf-8
+< body: Hello alice
+
+== 4. Constraint fails ==
+> GET /incidents/abc
+< 404 Not Found
+
+== 5. Handler returns null ==
+> GET /incidents/99
+< 200 OK
+< Content-Type: application/json; charset=utf-8
+< body: null
+
+== 6. Named and async handler ==
+> GET /count
+< 200 OK
+< Content-Type: application/json; charset=utf-8
+< body: 2
+
+> GET /slow
+< 200 OK
+< Content-Type: application/json; charset=utf-8
+< body: 2
+
+== 7. No matching route ==
+> GET /nothing
+< 404 Not Found

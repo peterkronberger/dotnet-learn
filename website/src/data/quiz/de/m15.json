@@ -1704,7 +1704,7 @@
         },
         {
           "text": "Einen Webserver, der Anfragen beantwortet.",
-          "feedback": "Ein Webserver gehört zu ASP.NET Core (Modul 17). Der Generic Host kennt keinen."
+          "feedback": "Ein Webserver gehört zu Web-Anwendungen (Modul 17). Der Generic Host kennt keinen."
         }
       ],
       "explanation": "Der Builder fasst Konfiguration, Logging und Dependency Injection in einem Objekt zusammen. Aus ihm entsteht mit `Build()` der Host."

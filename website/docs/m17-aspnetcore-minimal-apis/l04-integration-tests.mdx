@@ -1,0 +1,182 @@
+---
+title: Endpunkte mit Integrationstests prüfen
+sidebar_position: 4
+description: Wie WebApplicationFactory die ganze App im Speicher startet, ein HttpClient echte Anfragen schickt und ein Test Routing, JSON und Statuscode zusammen prüft.
+lesson_id: m17-l04
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import testsCode from '!!raw-loader!@site/examples/_ci/m17-l04-tests/Counter.Tests/FailureEndpointTests.cs';
+import testsOutput from '!!raw-loader!@site/examples/_ci/m17-l04-tests/expected.out.txt';
+import counterApi from '!!raw-loader!@site/examples/_ci/m17-l04-tests/Counter.Api/Program.cs';
+import counterTestsCsproj from '!!raw-loader!@site/examples/_ci/m17-l04-tests/Counter.Tests/Counter.Tests.csproj';
+import gapClient from '!!raw-loader!@site/examples/m17/l04/gap-test-client.snippet.cs';
+import factoryCode from '!!raw-loader!@site/examples/_ci/seclog-m17-l04/tests/SecLog.Api.Tests/SecLogApiFactory.cs';
+import incidentTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l04/tests/SecLog.Api.Tests/IncidentEndpointsTests.cs';
+import testsProject from '!!raw-loader!@site/examples/_ci/seclog-m17-l04/tests/SecLog.Api.Tests/SecLog.Api.Tests.csproj';
+import apiProgram from '!!raw-loader!@site/examples/_ci/seclog-m17-l04/src/SecLog.Api/Program.cs';
+
+# Endpunkte mit Integrationstests prüfen
+
+:::note[Lernziele]
+- Du erklärst den Unterschied zwischen einem Unit-Test und einem Integrationstest an einem Endpoint.
+- Du schreibst mit `WebApplicationFactory<Program>` und `HttpClient` einen Test für einen GET-Endpoint.
+- Du ersetzt für einen Test die Datenbank durch eine eigene Testdatenbank.
+:::
+
+## Rückblick
+
+<Quiz id="m14-l07-q1" />
+
+<Quiz id="m14-l10-q1" />
+
+<Quiz id="m17-l03-q2" />
+
+## Unit-Test und Integrationstest
+
+Ein Unit-Test (Modul 14) prüft eine kleine Einheit für sich, meist mit Test-Doubles für ihre Abhängigkeiten. Ein <Term id="integration-test">Integrationstest</Term> lässt mehrere Teile zusammenarbeiten. Für einen Endpoint heißt das: Eine echte HTTP-Anfrage läuft durch die ganze App. Routing, Parameter, Handler, Datenbank und JSON werden gemeinsam geprüft. Ein Unit-Test des Handlers sieht den Statuscode und die JSON-Namen nicht, ein Integrationstest sieht sie. Dafür ist er langsamer und braucht mehr Vorbereitung. Eine gute Testsuite hat viele schnelle Unit-Tests und weniger Integrationstests.
+
+Du musst die App dafür nicht auf einem Port starten. Das Paket `Microsoft.AspNetCore.Mvc.Testing` bringt die Klasse <Term id="web-application-factory">`WebApplicationFactory<TEntryPoint>`</Term> mit. Sie startet die echte App mit einem <Term id="test-server">Testserver</Term>, der im Speicher des Testprozesses läuft. Mit `CreateClient()` bekommst du einen <Term id="http-client">`HttpClient`</Term>, dessen Anfragen direkt in der Pipeline der App ankommen: ohne Netzwerk und ohne Port.
+
+Die Fabrik braucht einen Typ aus der App, meist die Klasse `Program` von `Program.cs`. Sie ist aus Top-Level-Statements entstanden und für andere Projekte nicht sichtbar. Die Zeile `public partial class Program;` am Ende von `Program.cs` macht sie sichtbar.
+
+Im xUnit-Test (Modul 14) übergibst du die Fabrik mit `IClassFixture<T>`: xUnit erzeugt sie einmal für alle Tests der Klasse, gibt sie dem Konstruktor und gibt sie danach frei. Im Test:
+
+1. **Client holen:** `factory.CreateClient()`.
+2. **Anfrage senden:** `client.GetAsync(pfad, token)` liefert die Antwort. `GetFromJsonAsync<T>(pfad, token)` sendet und liest den JSON-Body gleich als `T`. Beide kennen die Web-Einstellungen aus Lektion 2.
+3. **Prüfen:** `Assert.Equal` auf den Statuscode (`response.StatusCode`) und auf den Inhalt.
+
+Das Token kommt wie in Lektion 12 von Modul 14 aus `TestContext.Current.CancellationToken`.
+
+Services lassen sich im Test ersetzen. `WithWebHostBuilder` liefert eine Fabrik mit zusätzlicher Konfiguration, und `ConfigureTestServices` registriert einen Service, der den der App ersetzt, zum Beispiel ein Test-Double. Die Konfiguration läuft nach dem Code in `Program.cs`.
+
+Das Beispiel hat einen Endpoint `GET /failures/{user}`, der einen `IFailureCounter` aus der Dependency Injection nutzt. Es hat drei Tests: eine Anfrage mit dem echten Service, eine mit einem Fake und eine auf eine Route, die es nicht gibt.
+
+<CodeBlock language="csharp" title="Counter.Api/Program.cs">{counterApi}</CodeBlock>
+
+<CodeBlock language="xml" title="Counter.Tests/Counter.Tests.csproj">{counterTestsCsproj}</CodeBlock>
+
+:::info[Vorhersage]
+Welche Tests bestehen? Was liefert die erste Anfrage im Body, was die zweite? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<CodeBlock language="csharp" title="FailureEndpointTests.cs">{testsCode}</CodeBlock>
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe von dotnet test (sortiert)">{testsOutput}</CodeBlock>
+
+1. **Echter Service:** `GET /failures/bob` geht durch Routing, Handler und JSON. Der Body ist `{"user":"bob","failures":5}`. Der Test liest ihn als `FailureCount` und vergleicht mit einem Record (Werte-Gleichheit, Modul 8).
+2. **Service ersetzt:** `ConfigureTestServices` registriert `FakeCounter` anstelle von `FixedFailureCounter`. Dieselbe Route liefert jetzt 42.
+3. **Keine Route:** Für `/nothing` gibt es keinen Endpoint. Der Test prüft den Statuscode `404`.
+
+Die Tests laufen ohne Port und ohne Netzwerk.
+
+**Was passiert, wenn …** die erste Anfrage `/failures/dave` wäre? Der echte Zähler gibt für jeden anderen Benutzer 0 zurück, und der Test würde mit 5 fehlschlagen.
+
+</details>
+
+<Quiz id="m17-l04-q1" />
+
+<Quiz id="m17-l04-q2" />
+
+<Quiz id="m17-l04-q3" />
+
+<Quiz id="m17-l04-q5" />
+
+## Eine frische Testdatenbank
+
+Ein Test soll bei jedem Lauf dieselben Daten sehen. Die API von SecLog liest `ConnectionStrings:SecLog` aus `appsettings.json`: `Data Source=seclog.db`. Im Test soll sie eine eigene SQLite-Datei nutzen. Die Fabrik kann die Konfiguration überschreiben: `UseSetting("ConnectionStrings:SecLog", …)` in `ConfigureWebHost`. Einstellungen aus dem Test haben Vorrang vor `appsettings.json` (Modul 15).
+
+Der Rest ist in `SecLogApiFactory` zusammengefasst:
+
+1. **Ordner anlegen:** `Directory.CreateTempSubdirectory` erzeugt einen neuen Ordner. Die Datei darin gehört nur diesem Testlauf.
+2. **Datenbank zeigen:** `UseSetting` setzt den Verbindungsstring auf diese Datei.
+3. **Vorbereiten:** `CreateHost` baut den Host. Danach legt `Database.Migrate()` das Schema an (Modul 16), und zwei Vorfälle aus den SecLog-Beispieldaten werden gespeichert.
+4. **Aufräumen:** `Dispose` gibt die SQLite-Verbindungen frei und löscht den Ordner.
+
+## Gap-Beispiel: der Client
+
+Die Lücke `___` fehlt. Der Test braucht einen `HttpClient`, der mit dem Testserver der App verbunden ist. Setze den Namen der Methode der Fabrik ein.
+
+<CodeBlock language="csharp" title="gap-test-client.snippet.cs">{gapClient}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `CreateClient`: `factory.CreateClient()`.
+
+</details>
+
+<Quiz id="m17-l04-q4" />
+
+<Quiz id="m17-l04-q6" />
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l03/`) hat das Projekt `src/SecLog.Api/` mit `GET /incidents` und `GET /incidents/{id}`. Die Endpoints rufen noch keine Tests auf.
+
+**Neue Anforderung:** Tests prüfen die Vorfall-API: Die Liste enthält die gespeicherten Vorfälle, und ein Vorfall lässt sich über seine Id abrufen. Dafür kommt das Testprojekt `tests/SecLog.Api.Tests/` dazu. Es steht in `SecLog.slnx`. In `Program.cs` der API macht `public partial class Program;` die Klasse sichtbar.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="xml" title="tests/SecLog.Api.Tests/SecLog.Api.Tests.csproj (neu)">{testsProject}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/SecLogApiFactory.cs (neu)">{factoryCode}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentEndpointsTests.cs (neu)">{incidentTests}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/Program.cs (geändert: die letzten Zeilen sind neu)">{apiProgram}</CodeBlock>
+
+1. **Projekt anlegen:** xUnit v3, `Microsoft.AspNetCore.Mvc.Testing` und ein Verweis auf `SecLog.Api`.
+2. **Fabrik schreiben:** `SecLogApiFactory` zeigt die API auf eine frische Datenbank und füllt sie mit zwei Vorfällen.
+3. **Tests schreiben:** `GetIncidents_SeededDatabase_ReturnsAll` prüft Statuscode und Benutzer der Liste, `GetIncident_KnownId_ReturnsIncident` prüft einen Vorfall über `/incidents/1`.
+4. **Ergebnis:** Die sortierten Testergebnisse stehen in `expected.out.txt`. Die Zeilen `Passed SecLog.Api.Tests.IncidentEndpointsTests.…` sind neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l04/`) prüft die API mit zwei Integrationstests. Spätere Lektionen ergänzen ihre Tests in diesem Projekt.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l04-integration-test-needs-running-server" />
+
+**„Für einen Integrationstest muss die App vorher auf einem Port gestartet werden.“** `WebApplicationFactory` startet die App selbst, mit einem Testserver im Speicher. Der Test braucht weder einen Port noch ein Netzwerk.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l04-test-uses-production-database" />
+
+**„Der Test nutzt die Datenbank der echten App.“** Die App liest ihre Konfiguration auch im Test. Ohne Eingriff zeigt sie auf die Datenbank aus `appsettings.json`. Darum überschreibt die Fabrik den Verbindungsstring mit einer frischen Testdatei.
+:::
+
+<details>
+<summary>Vertiefung: Konfiguration im Test überschreiben (optional)</summary>
+
+Die Fabrik bietet mehrere Wege, die App im Test zu ändern: `UseSetting` und `ConfigureAppConfiguration` für Konfiguration, `ConfigureTestServices` für Services. Das Vorgehen ist im Abschnitt „Customize WebApplicationFactory“ von [Integration tests in ASP.NET Core](https://learn.microsoft.com/aspnet/core/test/integration-tests) beschrieben. Für Tests mit einer Datenbank nennt EF Core mehrere Strategien. SQLite als echte, aber leichte Datenbank ist eine davon ([Choosing a testing strategy](https://learn.microsoft.com/ef/core/testing/choosing-a-testing-strategy)).
+
+</details>
+
+## Zusammenfassung
+
+Ein Integrationstest schickt eine echte Anfrage durch die ganze App und prüft Routing, Handler und JSON zusammen. `WebApplicationFactory<Program>` startet die App mit einem Testserver im Speicher, `CreateClient()` liefert den passenden `HttpClient`. Im Test prüfst du Statuscode und Body, etwa mit `GetFromJsonAsync<T>`. Mit `ConfigureTestServices` ersetzt du Services, mit einer eigenen Verbindung eine Testdatenbank. Eine Klassen-Fixture teilt die Fabrik zwischen den Tests einer Klasse.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l04-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l04-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Integration tests in ASP.NET Core](https://learn.microsoft.com/aspnet/core/test/integration-tests)
+- Microsoft Learn: [Test Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/test-minimal-api)
+- Microsoft Learn: [Choosing a testing strategy](https://learn.microsoft.com/ef/core/testing/choosing-a-testing-strategy)
