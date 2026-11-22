@@ -42,6 +42,7 @@ dotnet run --project playground               # run locally
 # Check example code (compile + compare output with <name>.out.txt), see S2
 bash tools/check-examples.sh
 bash tools/check-examples.sh --update   # rewrite snapshots on purpose, review the diff
+bash tools/check-examples.sh --module m16   # only one module (examples/m16 and _ci/m16-*, _ci/seclog-m16-*); use this while building a module
 
 # Check fold markers and the SecLog continuity chain (also run by check-examples.sh)
 node tools/check-seclog.mjs
@@ -50,7 +51,7 @@ node tools/check-seclog.mjs
 node tools/check-quiz.mjs
 ```
 
-Before every commit: run both build checks. If one fails, do not commit.
+Before every commit: run both build checks (for module work, `check-examples.sh --module mNN` is enough while building; CI runs the full check on the PR). If one fails, do not commit.
 
 ## Non-negotiable rules
 

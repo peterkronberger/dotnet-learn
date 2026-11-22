@@ -3,6 +3,8 @@
 #
 #   tools/check-examples.sh            compare outputs with the snapshots (<name>.out.txt)
 #   tools/check-examples.sh --update   rewrite the snapshots from the actual run
+#   tools/check-examples.sh --module m16     only one module (also: 16, w01); combinable with --update
+#                                            checks examples/m16/ and _ci/m16-* and _ci/seclog-m16-*
 #
 # Kinds of examples:
 #   *.cs            file-based app (`dotnet run file.cs`), output must match <name>.out.txt.
@@ -17,7 +19,28 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 examples="$root/website/examples"
 update=false
-[[ "${1:-}" == "--update" ]] && update=true
+module=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --update) update=true ;;
+    --module)
+      [[ $# -ge 2 ]] || { echo "--module needs a value (for example m16)" >&2; exit 2; }
+      module="$2"
+      shift
+      ;;
+    --module=*) module="${1#--module=}" ;;
+    *) echo "Unknown argument: $1" >&2; exit 2 ;;
+  esac
+  shift
+done
+if [[ -n "$module" ]]; then
+  [[ "$module" =~ ^[0-9]+$ ]] && module="m$(printf '%02d' "$((10#$module))")"
+  module="$(printf '%s' "$module" | tr 'A-Z' 'a-z')"
+  if [[ ! "$module" =~ ^[mw][0-9]{2}$ || ! -d "$root/website/examples/$module" ]]; then
+    echo "Unknown module: $module (no folder website/examples/$module)" >&2
+    exit 2
+  fi
+fi
 
 # Same culture behavior as the playground (InvariantGlobalization).
 export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
@@ -68,6 +91,7 @@ compile_only() { # <label> <file>
 # 1. Single-file examples
 while IFS= read -r -d '' file; do
   rel="${file#"$examples"/}"
+  [[ -z "$module" || "$rel" == "$module"/* ]] || continue
   case "$rel" in
     _ci/*) continue ;;
     *.snippet.cs) echo "SKIP  $rel (snippet)"; continue ;;
@@ -81,7 +105,11 @@ done < <(find "$examples" -name '*.cs' -not -path '*/bin/*' -not -path '*/obj/*'
 # 2. CI projects (EF Core, Minimal API, xUnit)
 for dir in "$examples"/_ci/*/; do
   [[ -f "$dir/run.sh" ]] || continue
-  name="_ci/$(basename "$dir")"
+  base="$(basename "$dir")"
+  if [[ -n "$module" && "$base" != "$module"-* && "$base" != "seclog-$module"-* ]]; then
+    continue
+  fi
+  name="_ci/$base"
   check "$name" "$dir/expected.out.txt" bash "$dir/run.sh"
 done
 
