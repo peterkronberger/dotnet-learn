@@ -1,0 +1,22 @@
+1. Where, OrderBy, Select:
+.param set @user 'bob'
+
+SELECT "i"."Id", "i"."FailureCount"
+FROM "Incidents" AS "i"
+WHERE "i"."User" = @user
+ORDER BY "i"."Id"
+
+2. FromSql with interpolation:
+.param set p0 'bob'
+
+SELECT * FROM Incidents WHERE User = @p0
+
+
+3. FromSqlRaw with concatenation:
+SELECT * FROM Incidents WHERE User = 'bob'
+
+
+4. Filter after AsEnumerable:
+SELECT "i"."Id", "i"."FailureCount", "i"."User"
+FROM "Incidents" AS "i"
+ORDER BY "i"."Id"

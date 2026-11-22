@@ -591,6 +591,216 @@
       "type": "explain",
       "question": "Transfer: Du schreibst eine öffentliche Klasse für SecLog, die einen Benutzernamen und eine IP-Adresse als Text bekommt. Was prüfst du am Rand, und wie testest du es?",
       "modelAnswer": "Beide Texte werden mit `ArgumentNullException.ThrowIfNull` auf `null` geprüft, und ein leerer Benutzername wird mit einer `ArgumentException` zurückgewiesen. Ein Test pro Fall prüft, dass die erwartete Exception kommt. Eine `[Theory]` prüft die gültigen Beispiele."
+    },
+    {
+      "id": "m18-l05-q1",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Welche der Abfragen schickt keine `WHERE`-Bedingung an die Datenbank?",
+      "options": [
+        {
+          "text": "`db.Incidents.Where(i => i.User == user)`",
+          "feedback": "Das `Where` auf dem `DbSet` wird zu `WHERE` übersetzt."
+        },
+        {
+          "text": "`db.Incidents.AsEnumerable().Where(i => i.User == user)`",
+          "correct": true
+        },
+        {
+          "text": "`db.Incidents.FromSql($\"SELECT * FROM Incidents WHERE User = {user}\")`",
+          "feedback": "Der SQL-Text enthält das `WHERE` selbst."
+        },
+        {
+          "text": "`db.Incidents.Where(i => i.User == user).OrderBy(i => i.Id)`",
+          "feedback": "Beide Operatoren stehen vor jedem Wechsel in den Speicher und werden übersetzt."
+        }
+      ],
+      "explanation": "`AsEnumerable()` wechselt in den Speicher. Der Teil davor wird zu SQL, alles danach läuft in C#. Hier ist davor nur die ganze Tabelle."
+    },
+    {
+      "id": "m18-l05-q2",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Abfrage A ist `db.Incidents.Where(i => i.User == \"bob\").ToList()`. Abfrage B ist `db.Incidents.AsEnumerable().Where(i => i.User == \"bob\").ToList()`. Beide liefern dieselben Zeilen. Schicken sie dasselbe SQL an die Datenbank?",
+      "options": [
+        {
+          "text": "Ja: Gleiches Ergebnis heißt gleiches SQL.",
+          "feedback": "Das Ergebnis sagt nichts über den Weg. Bei B filtert C# erst nach dem Laden.",
+          "misconception": "m18-l05-same-result-same-sql"
+        },
+        {
+          "text": "Ja, EF Core erkennt das und verlegt das `Where` von B in die Datenbank.",
+          "feedback": "Was nach `AsEnumerable()` steht, übersetzt EF Core nicht mehr.",
+          "misconception": "m18-l05-same-result-same-sql"
+        },
+        {
+          "text": "Nein: A sendet ein `WHERE`, B lädt alle Zeilen und filtert im Speicher.",
+          "correct": true
+        },
+        {
+          "text": "Nein: B ist ungültig und wirft eine Exception.",
+          "feedback": "B läuft. Es lädt nur mehr Daten."
+        }
+      ],
+      "explanation": "Beide Abfragen liefern dasselbe, aber A überträgt nur die passenden Zeilen und B die ganze Tabelle. Darum liest ein Review das SQL und nicht nur das Ergebnis."
+    },
+    {
+      "id": "m18-l05-q3",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Du gibst bei `FromSqlRaw(\"SELECT * FROM Incidents WHERE User = '\" + user + \"'\")` mit `user` = `bob` das Ergebnis von `ToQueryString()` aus. Was siehst du?",
+      "options": [
+        {
+          "text": "Eine Zeile `.param set` mit `bob` und im SQL einen Platzhalter.",
+          "feedback": "So sieht `FromSql` mit Interpolation aus. Bei `FromSqlRaw` mit `+` ist der Text schon fertig."
+        },
+        {
+          "text": "Im SQL-Text steht `'bob'` direkt, und es gibt keinen Parameter.",
+          "correct": true
+        },
+        {
+          "text": "Eine Fehlermeldung, weil `FromSqlRaw` keinen Text mit `+` annimmt.",
+          "feedback": "`FromSqlRaw` nimmt jeden Text an und prüft ihn nicht."
+        }
+      ],
+      "explanation": "Die Verkettung passiert in C#, bevor `FromSqlRaw` aufgerufen wird. Der Wert ist Teil des SQL-Textes. Genau das ist Punkt 6 der Checkliste."
+    },
+    {
+      "id": "m18-l05-q4",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Ein Test ruft `Search(db.Incidents, \"bob\").ToQueryString()` auf. Der SQL-Text enthält `WHERE` und `@user`, aber nicht `bob`. Was zeigt das?",
+      "options": [
+        {
+          "text": "Der Name geht als Parameter an die Datenbank, und die Datenbank filtert.",
+          "correct": true
+        },
+        {
+          "text": "Die Abfrage liefert die richtigen Vorfälle.",
+          "feedback": "`ToQueryString()` führt die Abfrage nicht aus. Es zeigt nur das SQL."
+        },
+        {
+          "text": "Die Abfrage ist langsam, weil sie einen Parameter hat.",
+          "feedback": "Ein Parameter kostet praktisch nichts, und er schützt vor SQL Injection."
+        }
+      ],
+      "explanation": "Der Test prüft die Form des SQL: Filter in der Datenbank, Wert als Parameter. Ob die richtigen Zeilen zurückkommen, prüfen andere Tests, die die Abfrage ausführen."
+    },
+    {
+      "id": "m18-l05-q5",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Eine `async`-Methode ruft `db.Incidents.ToList()` auf und hat keinen `CancellationToken`-Parameter. Zu welchem Punkt der Checkliste gehört das?",
+      "options": [
+        {
+          "text": "Stolperfallen bei async (Punkt 4)",
+          "correct": true
+        },
+        {
+          "text": "Nullability-Warnungen (Punkt 1)",
+          "feedback": "Hier geht es nicht um `null`."
+        },
+        {
+          "text": "Eingabevalidierung (Punkt 7)",
+          "feedback": "Es gibt keine Eingabe, die geprüft werden müsste."
+        },
+        {
+          "text": "Zeitzonen (Punkt 8)",
+          "feedback": "Es kommt keine Zeit vor."
+        }
+      ],
+      "explanation": "Die synchrone Abfrage blockiert den Thread, solange die Datenbank antwortet. Ohne Token lässt sie sich nicht abbrechen. Richtig ist `ToListAsync(cancellationToken)`."
+    },
+    {
+      "id": "m18-l05-q6",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Eine Klasse hat das Feld `private static SecLogDbContext db = new();`. Warum ist das ein Befund im Review?",
+      "options": [
+        {
+          "text": "Der Context ist für eine Unit of Work gedacht, aber das Feld teilt ihn mit allen Aufrufen und lebt so lange wie das Programm.",
+          "correct": true
+        },
+        {
+          "text": "Ein `static`-Feld darf kein Objekt halten.",
+          "feedback": "Das geht. Das Problem ist die Lebensdauer des Contexts."
+        },
+        {
+          "text": "Ein `static`-Context macht jede Abfrage langsamer.",
+          "feedback": "Es geht nicht um Tempo, sondern um geteilten Zustand."
+        }
+      ],
+      "explanation": "Der Context verfolgt geladene Objekte und ist nicht für parallele Zugriffe gedacht. Ein geteilter Context sammelt Zustand an. Besser: ein Context pro Anfrage (scoped) über die Abhängigkeitsinjektion."
+    },
+    {
+      "id": "m18-l05-q7",
+      "lesson": "m18-l05",
+      "type": "single",
+      "question": "Eine Schleife lädt für jeden von 100 Vorfällen die Events mit einer eigenen Abfrage. Der Code hat vorher einmal alle Vorfälle geladen. Wie viele SQL-Befehle gehen an die Datenbank?",
+      "options": [
+        {
+          "text": "1",
+          "feedback": "Das wäre `Include` in einer Abfrage."
+        },
+        {
+          "text": "100",
+          "feedback": "Du zählst die erste Abfrage für die Vorfälle nicht mit."
+        },
+        {
+          "text": "101",
+          "correct": true
+        }
+      ],
+      "explanation": "Ein Befehl lädt die Vorfälle, 100 Befehle laden die Events. Das ist das N+1-Problem. `Include` lädt alles mit einer Abfrage."
+    },
+    {
+      "id": "m18-l05-q8",
+      "lesson": "m18-l05",
+      "type": "find-bug",
+      "question": "Welche Zeilen sind Befunde aus der Checkliste? Wähle alle fünf.",
+      "example": "m18/l05/review-incident-reader.snippet.cs",
+      "bugLines": [
+        5,
+        7,
+        10,
+        11,
+        13
+      ],
+      "lineFeedback": {
+        "5": {
+          "feedback": "Der Context lebt in einem statischen Feld und wird von allen Aufrufen geteilt."
+        },
+        "7": {
+          "feedback": "Die Methode nimmt keinen `CancellationToken` an."
+        },
+        "10": {
+          "feedback": "Der Name wird in den SQL-Text verkettet."
+        },
+        "11": {
+          "feedback": "`ToList()` blockiert in einer `async`-Methode."
+        },
+        "13": {
+          "feedback": "Die Schleife schickt pro Vorfall eine Abfrage (N+1)."
+        },
+        "16": {
+          "feedback": "Diese Zeile gehört zur Schleife. Der Befund ist die Schleife selbst."
+        }
+      },
+      "explanation": "Fünf Befunde: statischer Context (Zeile 5), fehlender Token (7), `FromSqlRaw` mit Verkettung (10), `ToList()` in `async` (11) und N+1 in der Schleife (13)."
+    },
+    {
+      "id": "m18-l05-q9",
+      "lesson": "m18-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum du bei einem Review von EF-Core-Code das erzeugte SQL liest und nicht nur den C#-Code.",
+      "modelAnswer": "Der C#-Code sagt nicht, was die Datenbank bekommt. Zwei Abfragen mit gleichem Ergebnis können sehr verschiedenes SQL erzeugen, zum Beispiel mit `WHERE` oder mit der ganzen Tabelle nach `AsEnumerable()`. Im SQL sehe ich, ob die Datenbank filtert und ob ein Wert als Parameter oder als Text ankommt. `ToQueryString()` zeigt das, ohne die Abfrage auszuführen."
+    },
+    {
+      "id": "m18-l05-q10",
+      "lesson": "m18-l05",
+      "type": "explain",
+      "question": "Transfer: Du bekommst in einem Pull Request eine neue Methode `FindByIp(string ip)` von SecLog, die EF Core benutzt. Worauf achtest du, und wie sicherst du dein Ergebnis ab?",
+      "modelAnswer": "Ich lese das SQL mit `ToQueryString()`: Steht ein `WHERE` darin, und kommt die IP als Parameter an? Ich prüfe, ob `FromSqlRaw` mit Verkettung vorkommt, ob `ToListAsync` mit Token benutzt wird, ob der Context pro Anfrage lebt und ob eine Schleife Abfragen stellt. Einen Test mit `ToQueryString()` und Prüfungen auf `WHERE` und den Parameter schreibe ich dazu."
     }
   ]
 }
