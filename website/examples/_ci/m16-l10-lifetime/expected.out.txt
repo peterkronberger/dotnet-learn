@@ -1,0 +1,5 @@
+1. Same scope, same context: True
+   Two scopes, same context: False
+2. The singleton cannot use the scoped context
+3. Incidents in this run: 1
+4. Incidents from the factory: 1
