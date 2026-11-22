@@ -12268,20 +12268,6 @@
       "lesson": "m18-l02"
     },
     {
-      "id": "utc-offset",
-      "term": "UTC Offset",
-      "german": "Versatz zur UTC",
-      "category": "platform",
-      "definition": "Der Unterschied zwischen der Uhrzeit eines Werts und der UTC, zum Beispiel `+01:00`. Bei einem `DateTimeOffset` liefert `Hour` die Stunde mit diesem Versatz. `UtcDateTime` rechnet auf die Uhrzeit in UTC um.",
-      "aliases": ["Offset", "Zeitversatz"],
-      "related": ["utc", "date-time-offset"],
-      "lesson": "m18-l03",
-      "source": {
-        "title": "DateTimeOffset.Offset Property",
-        "url": "https://learn.microsoft.com/dotnet/api/system.datetimeoffset.offset"
-      }
-    },
-    {
       "id": "message-rating",
       "term": "Message Rating",
       "german": "Meldungsbewertung",
