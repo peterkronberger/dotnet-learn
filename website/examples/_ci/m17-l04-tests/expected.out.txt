@@ -1,0 +1,3 @@
+Passed FailureEndpointTests.Get_KnownUser_ReturnsJsonWithFailures
+Passed FailureEndpointTests.Get_UnknownRoute_ReturnsNotFound
+Passed FailureEndpointTests.Get_WithFakeCounter_UsesTheFake

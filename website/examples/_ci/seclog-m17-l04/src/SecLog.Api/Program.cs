@@ -12,3 +12,6 @@ var app = builder.Build();
 app.MapIncidentEndpoints();
 
 app.Run();
+
+// Makes the Program class visible to the test project
+public partial class Program;

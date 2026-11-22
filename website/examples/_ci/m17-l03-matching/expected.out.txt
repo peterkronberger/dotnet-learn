@@ -1,0 +1,28 @@
+== 1. Which route matches? ==
+> GET /incidents/latest
+< 200 OK
+< body: the latest incident
+
+> GET /incidents/7
+< 200 OK
+< body: by id: 7
+
+> GET /incidents/bob
+< 200 OK
+< body: by name: bob
+
+== 2. Group with a prefix ==
+> GET /users
+< 200 OK
+< body: all users
+
+> GET /users/alice
+< 200 OK
+< body: user: alice
+
+> GET /users/42
+< 404 Not Found
+
+== 3. A method the route does not offer ==
+> POST /users
+< 405 Method Not Allowed
