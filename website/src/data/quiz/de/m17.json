@@ -825,11 +825,11 @@
         },
         {
           "text": "`200 OK` mit einem leeren Body.",
-          "feedback": "Eine unbehandelte Exception ergibt nie `200`. Die Exception-Handler-Middleware setzt `500`."
+          "feedback": "Eine unbehandelte Exception ergibt nie `200`. `UseExceptionHandler` setzt `500`."
         },
         {
           "text": "Die App beendet sich, weil die Exception unbehandelt ist.",
-          "feedback": "Die Middleware fängt die Exception. Der Server läuft weiter und beantwortet die nächste Anfrage."
+          "feedback": "`UseExceptionHandler` fängt die Exception. Der Server läuft weiter und beantwortet die nächste Anfrage."
         },
         {
           "text": "`500` mit dem Stacktrace im Feld `detail`.",
@@ -851,11 +851,11 @@
         },
         {
           "text": "`404` mit leerem Body, denn `NotFound()` schreibt nie einen Body.",
-          "feedback": "Ohne `UseStatusCodePages` wäre der Body leer. Die Middleware ergänzt ihn."
+          "feedback": "Ohne `UseStatusCodePages` wäre der Body leer. `UseStatusCodePages` ergänzt ihn."
         },
         {
           "text": "`200`, weil `UseStatusCodePages` den Statuscode ändert.",
-          "feedback": "Die Middleware ändert den Statuscode nicht. Sie schreibt nur einen Body zu einer Antwort ohne Body."
+          "feedback": "`UseStatusCodePages` ändert den Statuscode nicht. Sie schreibt nur einen Body zu einer Antwort ohne Body."
         },
         {
           "text": "`500`, weil `NotFound()` eine Exception wirft.",
@@ -897,12 +897,12 @@
       "question": "Zwei `IExceptionHandler` sind registriert. Der erste gibt für eine `IncidentNotFoundException` `true` zurück, für alle anderen Exceptions `false`. Eine `InvalidOperationException` wird geworfen. Was passiert?",
       "options": [
         {
-          "text": "Der zweite Handler bekommt die Exception. Gibt er auch `false` zurück, schreibt die Middleware ihre Standardantwort (`500`).",
+          "text": "Der zweite Handler bekommt die Exception. Gibt er auch `false` zurück, schreibt `UseExceptionHandler` die Standardantwort (`500`).",
           "correct": true
         },
         {
           "text": "Die Anfrage endet ohne Antwort, weil der erste Handler `false` zurückgegeben hat.",
-          "feedback": "`false` heißt „nicht zuständig“. Die Middleware fragt den nächsten Handler."
+          "feedback": "`false` heißt „nicht zuständig“. `UseExceptionHandler` fragt den nächsten Handler."
         },
         {
           "text": "Der erste Handler schreibt trotzdem die Antwort, denn er ist zuerst registriert.",
