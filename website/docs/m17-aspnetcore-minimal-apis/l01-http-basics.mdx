@@ -1,0 +1,211 @@
+---
+title: Grundlagen von HTTP
+sidebar_position: 1
+description: Wie ein Client eine Anfrage an einen Server schickt und eine Antwort bekommt – mit Methode, Pfad, Headern, Statuscode und Body.
+lesson_id: m17-l01
+duration_min: 20
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import exchangeOutput from '!!raw-loader!@site/examples/_ci/m17-l01-http-exchange/expected.out.txt';
+import gapRequestLine from '!!raw-loader!@site/examples/m17/l01/gap-request-line.snippet.txt';
+
+# Grundlagen von HTTP
+
+:::note[Lernziele]
+- Du benennst die Teile einer HTTP-Anfrage und einer HTTP-Antwort.
+- Du ordnest die Methoden `GET`, `POST`, `PUT` und `DELETE` einer Aufgabe zu und erklärst, welche sicher und welche idempotent sind.
+- Du ordnest einen Statuscode einer Klasse (1xx bis 5xx) zu.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- Vorfälle über eine HTTP-API als JSON abrufen
+- Den Status eines Vorfalls über die API ändern – mit Validierung und klaren Fehlerantworten
+- Die API mit Integrationstests prüfen und mit OpenAPI beschreiben
+- Festlegen, wer die API aufrufen darf, und wissen, wie die App betrieben wird
+:::
+
+## Rückblick
+
+<Quiz id="m15-l07-q1" />
+
+<Quiz id="m16-l10-q1" />
+
+<Quiz id="m13-l05-q2" />
+
+## Client und Server
+
+Bei den meisten Programmen im Netz arbeiten zwei Seiten zusammen. Der <Term id="client-server">Client</Term> schickt eine Anfrage, der Server beantwortet sie. Ein Browser ist ein Client, ein Programm, das Daten abruft, ebenso. Der Server wartet auf Anfragen und liefert Antworten. Beide sprechen über ein festes Protokoll. Für das Web ist das <Term id="http">HTTP</Term>. Bei HTTPS läuft dieselbe Sprache verschlüsselt. Die Verschlüsselung selbst ist hier kein Thema.
+
+HTTP ist zustandslos: Der Server behält zwischen zwei Anfragen nichts von der ersten, was zur zweiten gehört. Jede Anfrage enthält alles, was der Server braucht, um sie zu beantworten.
+
+## Die Adresse einer Anfrage
+
+Der Client nennt, welche Ressource er meint, mit einer <Term id="url">URL</Term>. Sie hat vier Teile, hier an `https://example.com/incidents?user=bob`:
+
+- **Schema:** `https` – das Protokoll.
+- **Host:** `example.com` – der Server.
+- **Pfad:** `/incidents` – die Ressource auf dem Server.
+- **Query:** `user=bob` – Angaben nach dem `?`, mit denen der Client die Antwort eingrenzt.
+
+Im Beispiel dieser Lektion fehlen Schema und Host: Die Anfragen gehen in dasselbe Programm. Du siehst nur den Pfad.
+
+## Anfrage und Antwort
+
+Eine <Term id="http-request">Anfrage</Term> besteht aus vier Teilen:
+
+1. **Anfragezeile:** <Term id="http-method">Methode</Term>, Pfad und Protokollversion, zum Beispiel `GET /incidents/1 HTTP/1.1`.
+2. **<Term id="http-header">Header</Term>:** Zeilen der Form `Name: Wert` mit Zusatzangaben. `Accept` nennt das Format, das der Client erwartet. `Content-Type` nennt das Format des Bodys.
+3. **Leerzeile:** Sie trennt die Header vom Body.
+4. **Body:** der Inhalt, optional. Eine Anfrage zum Lesen hat meist keinen.
+
+Eine <Term id="http-response">Antwort</Term> hat denselben Aufbau, nur mit einer Statuszeile: Protokollversion, <Term id="http-status-code">Statuscode</Term> und ein Kurztext, zum Beispiel `200 OK`. Dann folgen Header und ein optionaler Body.
+
+Der Body ist in diesem Modul meist JSON-Text. Hier genügt: Es ist Text mit Namen und Werten.
+
+<Forward concepts={['JSON']} lesson="m17-l02" />
+
+Ein kleines Beispielprojekt startet einen Server und sendet Anfragen an ihn. Es verarbeitet die Anfragen im Speicher, ohne Netzwerk. Der Server ist ein Programm mit ASP.NET Core, das ab Lektion 3 dieses Moduls dran ist.
+
+<Forward concepts={['ASP.NET Core']} module="17" />
+
+Die Ausgabe zeigt jeden Austausch. Zeilen mit `>` sendet der Client, Zeilen mit `<` antwortet der Server. Gezeigt sind nur die Header, über die die Lektion spricht.
+
+:::info[Vorhersage]
+Der Client sendet nacheinander diese Anfragen:
+
+1. `GET /incidents/1` und `GET /incidents/99`
+2. `POST /incidents` mit dem Body `{"user":"bob"}`, zweimal
+3. `PUT /incidents/1/status` mit dem Body `{"status":"closed"}`, zweimal
+4. `DELETE /incidents/2`, zweimal
+5. `DELETE /incidents`
+
+Die Vorfälle 1 und 2 sind schon vorhanden. Welchen Statuscode bekommt jede der neun Anfragen? Welche Antworten unterscheiden sich, obwohl die Anfrage gleich war? Notiere deinen Tipp und öffne dann die Lösung.
+:::
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{exchangeOutput}</CodeBlock>
+
+1. **Anfragezeile lesen:** Jede Gruppe beginnt mit der Methode und dem Pfad.
+2. **Statuscode prüfen:** `200` beim Lesen von Vorfall 1, `404` bei Vorfall 99, den es nicht gibt.
+3. **Header deuten:** Bei `POST` und `PUT` nennt `Content-Type` das Format des Bodys. Die Antwort `201 Created` hat zusätzlich `Location` mit der Adresse des neuen Vorfalls.
+4. **Wiederholung vergleichen:** Das zweite `POST` legt einen weiteren Vorfall an (`/incidents/4`). Das zweite `PUT` liefert dieselbe Antwort wie das erste. Das zweite `DELETE` liefert `404`, weil der Vorfall schon weg ist. Ein `DELETE` auf `/incidents` bekommt `405`: Der Pfad kennt die Methode nicht.
+
+**Was passiert, wenn …** der Client die Anfrage `GET /incidents/1` mit `Accept: text/plain` sendet? Das Beispiel prüft den Header nicht. Ob ein Server ihn beachtet, entscheidet der Server.
+
+</details>
+
+<Quiz id="m17-l01-q1" />
+
+## Die vier Methoden
+
+Die Methode sagt, was der Server mit der Ressource tun soll:
+
+| Methode | Zweck | Beispiel im Lauf |
+| --- | --- | --- |
+| `GET` | Eine Ressource lesen | `GET /incidents/1` |
+| `POST` | Daten zur Verarbeitung schicken, zum Beispiel etwas Neues anlegen | `POST /incidents` |
+| `PUT` | Eine Ressource durch den gesendeten Zustand ersetzen | `PUT /incidents/1/status` |
+| `DELETE` | Eine Ressource entfernen | `DELETE /incidents/2` |
+
+Zwei Eigenschaften unterscheiden die Methoden. Eine Methode ist **sicher**, wenn sie den Zustand des Servers nicht ändert. Von den vier ist nur `GET` sicher. Eine Methode ist <Term id="idempotency">idempotent</Term>, wenn mehrfaches Senden derselben Anfrage den Zustand so ändert wie ein einziges Senden. `GET`, `PUT` und `DELETE` sind idempotent, `POST` nicht. Sicher ist also strenger als idempotent: Jede sichere Methode ist idempotent, aber `PUT` und `DELETE` sind es, ohne sicher zu sein.
+
+Idempotenz betrifft den Zustand, nicht den Wortlaut der Antwort. Das zweite `DELETE` im Lauf hat eine andere Antwort (`404`) als das erste (`204`). Der Zustand ist nach beiden gleich: Vorfall 2 gibt es nicht.
+
+Das hilft bei unsicheren Netzen. Ein Client, der eine Antwort nicht erhält, weiß nicht, ob die Anfrage ankam. Bei `PUT` kann er sie gefahrlos wiederholen. Bei `POST` kann er dadurch ein zweites Objekt anlegen.
+
+<Quiz id="m17-l01-q3" />
+
+<Quiz id="m17-l01-q4" />
+
+<Quiz id="m17-l01-q5" />
+
+<Quiz id="m17-l01-q8" />
+
+## Statuscodes
+
+Der Statuscode ist eine dreistellige Zahl. Die erste Ziffer gibt die Klasse an:
+
+| Klasse | Bedeutung | Codes im Lauf |
+| --- | --- | --- |
+| 1xx | Information | – |
+| 2xx | Erfolg | `200 OK`, `201 Created`, `204 No Content` |
+| 3xx | Umleitung | – |
+| 4xx | Fehler der Anfrage | `404 Not Found`, `405 Method Not Allowed` |
+| 5xx | Fehler im Server | – |
+
+Die Codes, die du in diesem Modul oft siehst:
+
+- `200`: Erfolg, die Antwort hat einen Body.
+- `201`: Eine neue Ressource ist entstanden. Der Header `Location` nennt ihre Adresse.
+- `204`: Erfolg ohne Body.
+- `400`: Die Anfrage ist fehlerhaft, zum Beispiel ungültiger Inhalt.
+- `401`: Die Ressource verlangt eine Anmeldung, die fehlt.
+- `403`: Der Server verweigert die Anfrage.
+- `404`: Die Ressource gibt es nicht.
+- `500`: Im Server ist ein Fehler aufgetreten.
+
+<Quiz id="m17-l01-q2" />
+
+<Quiz id="m17-l01-q7" />
+
+## Gap-Beispiel: die Methode ergänzen
+
+Die Lücke `___` fehlt. Der Client soll Vorfall 2 entfernen. Setze die Methode ein.
+
+<CodeBlock language="text" title="gap-request-line.snippet.txt">{gapRequestLine}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `DELETE`. `DELETE /incidents/2 HTTP/1.1` entfernt die Ressource. Im Lauf antwortet der Server darauf mit `204`.
+
+</details>
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog noch keinen Webcode hat. Die API beginnt in Lektion 3, die JSON-Ausgabe in Lektion 2.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l01-put-and-post-are-same" />
+
+**„`PUT` und `POST` sind austauschbar, beide speichern einfach Daten.“** `PUT` nennt die Ressource und ihren Zielzustand und ist idempotent: Wiederholen ändert nichts mehr. `POST` ist es nicht, jeder Aufruf kann etwas Neues anlegen. Im Lauf legt das zweite `POST` einen weiteren Vorfall an, das zweite `PUT` ändert nichts mehr.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l01-4xx-means-server-broken" />
+
+**„Ein Statuscode 4xx heißt, dass der Server kaputt ist.“** 4xx meldet ein Problem der Anfrage: Die Ressource fehlt (`404`), die Methode passt nicht (`405`), der Inhalt ist ungültig (`400`). Der Server arbeitet und sagt das deutlich. Fehler im Server haben die Klasse 5xx.
+:::
+
+<details>
+<summary>Vertiefung: Wo die Regeln stehen (optional)</summary>
+
+Die Bedeutung der Methoden, ihre Eigenschaften „sicher“ und „idempotent“ und die Statuscodes legt die Spezifikation „HTTP Semantics“ fest ([RFC 9110](https://www.rfc-editor.org/rfc/rfc9110)). Die .NET-Aufzählung `HttpStatusCode` folgt ihrem Abschnitt 15 ([HttpStatusCode](https://learn.microsoft.com/dotnet/api/system.net.httpstatuscode)). Neben den vier Methoden dieser Lektion gibt es weitere, zum Beispiel `PATCH` für Teiländerungen. Sie sind hier nicht dran.
+
+</details>
+
+## Zusammenfassung
+
+Ein Client schickt eine Anfrage mit Methode, Pfad, Headern und optionalem Body. Der Server antwortet mit Statuscode, Headern und optionalem Body. HTTP ist zustandslos. `GET` liest und ist sicher. `PUT` und `DELETE` sind idempotent, `POST` ist es nicht. Die erste Ziffer des Statuscodes nennt die Klasse: 2xx Erfolg, 4xx Fehler der Anfrage, 5xx Fehler im Server.
+
+## Prüfe dein Wissen
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l01-q9" />
+
+### Transferfrage
+
+<Quiz id="m17-l01-q10" />
+
+<Quiz id="m17-l01-q6" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Make HTTP requests with the HttpClient](https://learn.microsoft.com/dotnet/fundamentals/networking/http/httpclient)
+- Microsoft Learn: [HttpStatusCode Enum](https://learn.microsoft.com/dotnet/api/system.net.httpstatuscode)

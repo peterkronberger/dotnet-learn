@@ -11311,9 +11311,6 @@
       "german": "HTTP-Anfrage",
       "category": "platform",
       "definition": "Die Nachricht des Clients: Anfragezeile mit Methode und Pfad, Header und optional ein Body.",
-      "aliases": [
-        "Anfrage"
-      ],
       "related": [
         "http-method",
         "http-header",
@@ -11331,9 +11328,6 @@
       "german": "HTTP-Antwort",
       "category": "platform",
       "definition": "Die Nachricht des Servers: Statuszeile mit Statuscode, Header und optional ein Body.",
-      "aliases": [
-        "Antwort"
-      ],
       "related": [
         "http-status-code",
         "http-header"
