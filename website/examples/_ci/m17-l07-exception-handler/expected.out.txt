@@ -1,0 +1,11 @@
+== 1. A known exception type ==
+> GET /incidents/99
+< 404 Not Found
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.5.5","title":"Incident not found","status":404,"detail":"There is no incident with id 99."}
+
+== 2. Any other exception ==
+> GET /crash
+< 500 Internal Server Error
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.6.1","title":"Internal Server Error","status":500}

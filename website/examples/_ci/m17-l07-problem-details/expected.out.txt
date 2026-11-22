@@ -1,0 +1,23 @@
+== 1. Unknown id: the empty 404 gets a body ==
+> GET /incidents/99
+< 404 Not Found
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.5.5","title":"Not Found","status":404}
+
+== 2. Unknown route ==
+> GET /nothing
+< 404 Not Found
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.5.5","title":"Not Found","status":404}
+
+== 3. Validation errors ==
+> PUT /incidents/1/status?status=archived
+< 400 Bad Request
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.5.1","title":"One or more validation errors occurred.","status":400,"errors":{"Status":["Status must be open, investigating or closed."]}}
+
+== 4. An unhandled exception ==
+> GET /crash
+< 500 Internal Server Error
+< Content-Type: application/problem+json
+< body: {"type":"https://tools.ietf.org/html/rfc9110#section-15.6.1","title":"Internal Server Error","status":500}
