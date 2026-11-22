@@ -45,9 +45,9 @@ Clauses of the draft and where they are taught:
 | §7 Basic concepts | `basic-concepts` | M6 (application startup, accessibility), M3 (declarations, scopes, signatures), M4 (automatic memory management, deep dive), M13 part B (execution order between threads) |
 | §8 Types | `types` | M1, M4, M8, M9, M16 (expression tree types) |
 | §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values) |
-| §10 Conversions | `conversions` | M1 (numeric), M4 (boxing, nullable), M5 (collection expressions), M8 (reference, user-defined), M10 (anonymous function and method group) |
+| §10 Conversions | `conversions` | M1 (numeric), M4 (boxing, nullable), M5 (collection expressions), M8 (reference, user-defined), M10 (anonymous function and method group), M16 (lambda to expression tree) |
 | §11 Patterns and pattern matching | `patterns` | M2 (simple), M12 (all) |
-| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13 |
+| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13, M16 (query expressions on `IQueryable<T>`) |
 | §13 Statements | `statements` | M2, M3, M7, M11, M13 |
 | §14 Namespaces | `namespaces` | M6 |
 | §15 Classes | `classes` | M6, M8 (incl. sealed classes and members), M9, M10, M11, M13 (async functions; volatile fields in part B) |
@@ -517,18 +517,13 @@ Lessons as built:
 - Misconceptions: `m15-l03-transient-disposed-immediately`, `m15-l06-interpolation-equals-template` and the others listed in `concept/module-digest.md`.
 
 ### M16 EF Core ◻
-`DbContext`, model, relations (1:n, n:m) · LINQ → SQL (shown SQL comes from a CI run) · change tracking · migrations.
-- *(new)* Lesson "IQueryable vs. IEnumerable": why a lambda becomes SQL (expression trees); what happens with code that cannot be translated.
-- *(new)* Lesson "Loading related data" (explicit include, the N+1 problem).
-- *(new)* Tracking vs. no-tracking queries; saving as one unit of work (transactions, short).
-- *(new)* Lesson "Raw SQL safely": parameterized queries vs. string concatenation (SQL injection, defensive).
-- *(new)* Async queries and the context lifetime in DI (scoped).
-- *(new)* Configuration by convention, by data annotations and by fluent API; keys.
+`DbContext`, model, relations (1:n, n:m) · LINQ → SQL (shown SQL comes from a CI run) · change tracking · migrations. Built (module review #604); SecLog got the project `src/SecLog.Data/`.
+Lessons as built: `m16-l01` Datenbanken und der DbContext · `m16-l02` Das Modell konfigurieren · `m16-l03` Beziehungen zwischen Entitäten · `m16-l04` Von LINQ zu SQL · `m16-l05` IQueryable und IEnumerable · `m16-l06` Verwandte Daten laden · `m16-l07` Change Tracking und Speichern · `m16-l08` Migrationen · `m16-l09` Raw SQL sicher verwenden · `m16-l10` Asynchrone Abfragen und Kontext-Lebensdauer.
 - **Spec:**
   - §8/§10: expression tree types – a lambda converted to an expression tree is data, not code (this is the language basis of LINQ to SQL).
   - §12: query expressions again (translated to `Queryable` calls).
 - **Library (not spec):** EF Core 11 (released with .NET 11; check "What's new in EF Core 11" when writing), provider in CI: SQLite (check the CI project `website/examples/_ci/ef-core`), migrations tooling.
-- More misconceptions: `ToList()` at the end changes nothing; EF Core sends every LINQ method to the database.
+- Misconceptions handled: `ToList()` at the end changes nothing (`m16-l05`); EF Core sends every LINQ method to the database (`m16-l05`).
 
 ### M17 ASP.NET Core Minimal APIs ◻
 Routing, handlers · binding and validation · status codes · middleware pipeline · DI in endpoints. HTTP requests and responses are produced in CI (S2).
@@ -576,6 +571,8 @@ Content of the specification or platform that the course leaves out, and why. "O
 | .NET Framework-only technology (AppDomains, remoting, WCF server) | platform | Not available in modern .NET; only mentioned as history in M0. |
 | Non-virtual static interface members on older runtimes (C# 15) | feature specs | The course targets `net11.0`, so the runtime restriction never applies. |
 | Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
+| EF Core: lazy loading (named in `m16-l06`), concurrency tokens, inheritance mapping, owned types, value converters, global query filters, interceptors, compiled models, bulk updates (`ExecuteUpdate`/`ExecuteDelete`), EF Core 10/11 features | library | Beyond one core concept per lesson; the lessons teach the context, model, queries, tracking, migrations, safe raw SQL and the context lifetime. Revisit at the half-yearly review (2027-04). |
+| Database providers other than SQLite, provider-specific SQL and migrations tooling for them | library | The course examples run on SQLite in CI (`m16-l01`); the EF Core code stays the same, only the provider package and connection string change. |
 
 ## Practice project SecLog
 

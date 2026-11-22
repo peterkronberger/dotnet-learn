@@ -1,6 +1,6 @@
 # Project SecLog – the one example project
 
-As of 2026-11-02. This file is binding for all lessons, quizzes and issues. SecLog is the **only** example project of the course. It grows in every lesson. There is no second project (the former phishing classifier is the SecLog feature "message rating", see M11).
+As of 2026-11-22. This file is binding for all lessons, quizzes and issues. SecLog is the **only** example project of the course. It grows in every lesson. There is no second project (the former phishing classifier is the SecLog feature "message rating", see M11).
 
 ## Vision
 
@@ -58,7 +58,8 @@ The first project step of a module starts from the last solution of the previous
 From `m14-l01` on, SecLog is no longer one `.cs` file but a .NET project, later a solution. It lives in CI projects (exception 3 above), with these rules:
 
 - **One folder per project step.** Every lesson with a project step gets the folder `website/examples/_ci/seclog-m14-lYY/` (later modules: `seclog-mXX-lYY/`). The folder is the **solution state** after lesson YY. There is no task copy: the start state of a step is the folder of the previous step, so the continuity rule holds by construction. Create the folder of a step with `bash tools/copy-example.sh <previous-folder> <new-folder>` (for example `bash tools/copy-example.sh seclog-m15-l09 seclog-m16-l01`; it copies without `bin/`, `obj/`, `TestResults/`; do not use `cp -r`). The first step of M14 starts from the last SecLog solution file of M13 (exception 2: the lesson moves that code into the project).
-- **File names.** The solution file is `SecLog.slnx`. Code goes into `src/SecLog.Core/` (the analysis: events, rules, detection), `src/SecLog.Cli/` (the console app that prints the results) and `tests/SecLog.Tests/` (the xUnit tests). A folder only contains the parts that exist at that step; for example the first step can be a single project without `SecLog.slnx`.
+- **File names.** The solution file is `SecLog.slnx`. Code goes into `src/SecLog.Core/` (the analysis: events, rules, detection), `src/SecLog.Cli/` (the console app that prints the results) and `tests/SecLog.Tests/` (the xUnit tests). A folder only contains the parts that exist at that step; for example the first step can be a single project without `SecLog.slnx`. From `m16-l01` on, `src/SecLog.Data/` holds the EF Core part: `SecLogDbContext`, the entities `StoredIncident` and `StoredEvent`, and the migrations (a generated migration is committed for every model change from `m16-l08` on). The connection string key is `ConnectionStrings:SecLog`. From `m16-l10` on, the context comes from DI (scoped) and the database calls are async.
+- **Temporary database in `run.sh`.** A step with a database sets `ConnectionStrings__SecLog` to a SQLite file in a fresh directory from `mktemp -d` (removed by `trap … EXIT`), so every run starts with an empty database and `expected.out.txt` stays stable. Never use a file inside the example folder.
 - **`run.sh` and `expected.out.txt`.** Every folder has both, like every `_ci` project, so `bash tools/check-examples.sh` checks it without changes. `run.sh` prints the program output first, then the test results of the shared helper, for example:
 
   ```bash
