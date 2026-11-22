@@ -1,0 +1,196 @@
+---
+title: Services und Abbruch in Endpunkten
+sidebar_position: 9
+description: Warum jede HTTP-Anfrage ihren eigenen DI-Scope hat, wie Handler Services bekommen und wie ein CancellationToken den Abbruch durch den Client an Datenbankaufrufe weitergibt.
+lesson_id: m17-l09
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import scope from '!!raw-loader!@site/examples/_ci/m17-l09-scope/Program.cs';
+import scopeOutput from '!!raw-loader!@site/examples/_ci/m17-l09-scope/expected.out.txt';
+import cancellation from '!!raw-loader!@site/examples/_ci/m17-l09-cancellation/Program.cs';
+import cancellationOutput from '!!raw-loader!@site/examples/_ci/m17-l09-cancellation/expected.out.txt';
+import gapCancellation from '!!raw-loader!@site/examples/m17/l09/gap-cancellation.snippet.cs';
+import serviceInterface from '!!raw-loader!@site/examples/_ci/seclog-m17-l09/src/SecLog.Api/IIncidentService.cs';
+import serviceClass from '!!raw-loader!@site/examples/_ci/seclog-m17-l09/src/SecLog.Api/IncidentService.cs';
+import endpoints from '!!raw-loader!@site/examples/_ci/seclog-m17-l09/src/SecLog.Api/IncidentEndpoints.cs';
+import serviceTests from '!!raw-loader!@site/examples/_ci/seclog-m17-l09/tests/SecLog.Api.Tests/IncidentServiceTests.cs';
+
+# Services und Abbruch in Endpunkten
+
+:::note[Lernziele]
+- Du erklärst, warum ein Scoped-Service in einer Web-App genau eine Anfrage lang lebt.
+- Du injizierst einen eigenen Service in einen Handler, mit und ohne `[FromServices]` und `[FromKeyedServices]`.
+- Du nimmst einen `CancellationToken` im Handler an und gibst ihn an asynchrone Aufrufe weiter.
+:::
+
+## Rückblick
+
+<Quiz id="m15-l03-q3" />
+
+<Quiz id="m13-l05-q7" />
+
+<Quiz id="m16-l10-q3" />
+
+## Eine Anfrage ist ein Scope
+
+In Modul 15 hast du gelernt, dass ein Scoped-Service in jedem DI-Scope einmal entsteht. Damals blieb offen, was in einer Web-App ein Scope ist. Die Antwort: Das Framework legt für jede Anfrage einen eigenen <Term id="request-scope">Scope</Term> an und gibt ihn frei, wenn die Antwort fertig ist ([Dependency injection in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection)). Ein Scoped-Service lebt darum genau eine Anfrage lang. Middleware und Handler derselben Anfrage teilen sich seine Instanz, die nächste Anfrage bekommt eine neue.
+
+Genauso funktioniert der `DbContext`: `AddDbContext` registriert ihn als Scoped-Service (Lektion 10 in Modul 16). Jede Anfrage hat deshalb ihren eigenen Context, und parallele Anfragen teilen sich keinen.
+
+Services registrierst du auf `builder.Services`, wie in Modul 15. Ein Handler bekommt sie als Parameter: Ist der Typ des Parameters registriert, füllt das Framework ihn aus dem Container, ohne Attribut. Das zeigt das Programm unten. Es registriert zwei Services:
+
+- `RequestCounter` ist Scoped. Jede neue Instanz bekommt die nächste Nummer.
+- `AppCounter` ist ein Singleton und zählt alle Anfragen. Viele Anfragen laufen gleichzeitig und benutzen dieselbe Instanz, darum zählt er mit `Interlocked` (Modul 13) und nicht mit `++` (Strategien für Thread-Sicherheit, Lektion 15 in Modul 13).
+
+Die Middleware holt ihren `RequestCounter` über `context.RequestServices`. Das ist der Service-Provider des Anfrage-Scopes. Du nutzt ihn hier nur, um zu zeigen, dass auch die Middleware im selben Scope läuft. Im eigenen Code fragst du einen Service lieber als Parameter an, statt ihn mit `GetRequiredService` zu holen: Dieses Muster heißt Service Locator und versteckt die Abhängigkeiten einer Klasse. Die Dokumentation rät davon ab.
+
+:::info[Vorhersage]
+Welche Nummer sehen Middleware und Handler in der ersten, welche in der zweiten und dritten Anfrage? Was zählt der `AppCounter`? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={scope} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{scopeOutput}</CodeBlock>
+
+1. **Ein Scope je Anfrage:** Middleware und Handler einer Anfrage sehen dieselbe Nummer, denn sie teilen sich den Scope und damit die Instanz.
+2. **Neue Anfrage, neuer Scope:** Jede Anfrage hat eine neue Nummer.
+3. **Singleton:** `AppCounter` gibt es nur einmal. Er zählt über alle Anfragen hinweg bis 3.
+
+**Was passiert, wenn …** du `RequestCounter` mit `AddSingleton` registrierst? Alle drei Anfragen sähen Instanz 1, denn es gibt nur eine.
+
+</details>
+
+<Quiz id="m17-l09-q1" />
+
+<Quiz id="m17-l09-q2" />
+
+<Quiz id="m17-l09-q3" />
+
+## Wie ein Handler an Services kommt
+
+Für den Parameter eines Handlers gibt es drei Schreibweisen ([Parameter binding in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding)):
+
+- **Ohne Attribut:** `(IIncidentService incidents) => …`. Das Framework erkennt, dass der Typ registriert ist.
+- **Mit `[FromServices]`:** Dasselbe, aber ausdrücklich. Es ist nur nötig, wenn das Framework sonst raten müsste.
+- **Mit `[FromKeyedServices("name")]`:** <Since dotnet="8" /> Der Parameter holt den Service, der mit `AddKeyedScoped` (oder `AddKeyedSingleton`, `AddKeyedTransient`) unter diesem Schlüssel registriert ist. Keyed Services kennst du aus Modul 15.
+
+Ein Singleton darf keinen Scoped-Service im Konstruktor halten, sonst entsteht die Captive Dependency aus Modul 15: Er würde die erste Instanz für immer festhalten. Ein Handler hat dieses Problem nicht, denn er läuft innerhalb des Anfrage-Scopes.
+
+## Abbruch: der CancellationToken der Anfrage
+
+Ein Client kann eine Anfrage aufgeben: Der Benutzer schließt den Tab, oder eine Zeitgrenze läuft ab. Der Server merkt das und bricht den <Term id="cancellation-token">`CancellationToken`</Term> der Anfrage ab (Modul 13). Du bekommst ihn, indem du im Handler einen Parameter vom Typ `CancellationToken` anlegst. Das Framework bindet ihn an <Term id="request-aborted">`HttpContext.RequestAborted`</Term>.
+
+Der Abbruch ist kooperativ, wie in Modul 13: Das Framework setzt nur den Token. Eine Datenbankabfrage stoppt nur, wenn du ihn an `ToListAsync`, `FirstOrDefaultAsync` oder `SaveChangesAsync` weitergibst. Dann wirft der Aufruf eine `OperationCanceledException`, und die Arbeit endet. Eine Antwort bekommt der Client nicht mehr, denn er ist weg.
+
+Das Programm unten hat einen langsamen Handler. `Task.Delay` steht stellvertretend für eine lange Abfrage. Der Client bricht nach 200 Millisekunden ab. Eine Zeile im ausgeblendeten Teil gibt dem Server nur Zeit, seine Meldung zu schreiben.
+
+:::info[Vorhersage]
+Welche Zeilen erscheinen, und in welcher Reihenfolge? Läuft der Handler 30 Sekunden weiter? Notiere deinen Tipp und lies dann die Lösung.
+:::
+
+<FoldedCode code={cancellation} title="Program.cs" />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+<CodeBlock language="text" title="Ausgabe">{cancellationOutput}</CodeBlock>
+
+1. **Token annehmen:** Der Parameter `cancellationToken` ist an die Anfrage gebunden.
+2. **Weitergeben:** `Task.Delay` bekommt den Token. Gäbe der Handler ihn nicht weiter, liefe er 30 Sekunden weiter.
+3. **Abbruch:** Der Client bricht ab, der Token wird abgebrochen, und `Task.Delay` wirft eine `OperationCanceledException`. Der Handler meldet das und wirft sie weiter. Das Framework behandelt sie als Abbruch der Anfrage und nicht als Fehler.
+
+</details>
+
+<Quiz id="m17-l09-q4" />
+
+<Quiz id="m17-l09-q5" />
+
+## Gap-Beispiel: den Token annehmen
+
+Die Lücke `___` fehlt. Setze den Typ ein, den das Framework an den Abbruch der Anfrage bindet.
+
+<CodeBlock language="csharp" title="gap-cancellation.snippet.cs">{gapCancellation}</CodeBlock>
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+Die Lücke ist `CancellationToken`. Der Name des Parameters ist frei, der Typ entscheidet.
+
+</details>
+
+## Projektschritt
+
+**Stand bisher:** SecLog (`_ci/seclog-m17-l08/`) liest die Vorfälle direkt mit dem `SecLogDbContext` in den Handlern. Die Abfragen kennen den Abbruch nicht.
+
+**Neue Anforderung:** Die Endpunkte greifen über einen Service auf die Vorfälle zu, und jede Datenbankabfrage bricht ab, wenn der Client die Anfrage abbricht.
+
+Dafür kommt in `src/SecLog.Api/` die Schnittstelle `IIncidentService` und die Klasse `IncidentService` dazu. Sie ist Scoped registriert und nutzt den `SecLogDbContext`, der ebenfalls Scoped ist. Alle Methoden sind `async` und nehmen einen `CancellationToken` an. Die Handler in `IncidentEndpoints.cs` bekommen den Service und einen `CancellationToken` als Parameter und geben ihn weiter. Verhalten und Statuscodes bleiben gleich, die bisherigen Tests laufen unverändert. Neu ist `IncidentServiceTests`: Ein Test ruft den Service mit einem abgebrochenen Token auf und erwartet eine `OperationCanceledException`. Ein zweiter prüft, dass ein abgebrochenes `ChangeStatusAsync` den Status nicht ändert. Der dritte zeigt, dass zwei Scopes zwei Instanzen bekommen.
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IIncidentService.cs (neu)">{serviceInterface}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentService.cs (neu)">{serviceClass}</CodeBlock>
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs (geändert)">{endpoints}</CodeBlock>
+
+<CodeBlock language="csharp" title="tests/SecLog.Api.Tests/IncidentServiceTests.cs (neu)">{serviceTests}</CodeBlock>
+
+1. **Schnittstelle:** `IIncidentService` beschreibt, was die Endpunkte brauchen. Jede Methode nimmt einen Token.
+2. **Service:** `IncidentService` bekommt den `SecLogDbContext` per Konstruktor (Modul 15) und gibt den Token an `ToListAsync`, `FirstOrDefaultAsync`, `FindAsync` und `SaveChangesAsync` weiter.
+3. **Registrierung:** In `Program.cs` steht `builder.Services.AddScoped<IIncidentService, IncidentService>()`. Service und `DbContext` leben eine Anfrage lang.
+4. **Handler:** Sie bekommen `IIncidentService` und `CancellationToken` als Parameter. Der Statuscode hängt weiter vom Ergebnistyp ab (Lektion 6).
+5. **Tests:** `factory.Services.CreateScope()` ist der Scope, den eine Anfrage bekäme. In `expected.out.txt` sind die drei Zeilen `IncidentServiceTests` neu.
+
+</details>
+
+**Neuer Stand:** SecLog (`_ci/seclog-m17-l09/`) liest und ändert Vorfälle über einen Scoped-Service. Jede Abfrage bekommt den Token der Anfrage.
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m17-l09-scoped-lives-whole-app" />
+
+**„Ein Scoped-Service lebt in einer Web-App so lange wie die Anwendung.“** Der Scope einer Web-App ist die einzelne Anfrage. Ein Scoped-Service lebt eine Anfrage lang. So lange wie die App lebt ein Singleton, und darum muss er mit gleichzeitigen Anfragen zurechtkommen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m17-l09-cancellation-automatic" />
+
+**„Der Abbruch einer Anfrage stoppt die Datenbankabfrage auch ohne weitergereichten Token.“** Das Framework setzt nur den Token. Eine Abfrage, die ihn nie bekommt, läuft bis zum Ende, und ihr Ergebnis wird verworfen.
+:::
+
+<details>
+<summary>Vertiefung: Dieselbe Anfrage, viele Threads (optional)</summary>
+
+Die Arbeit einer Anfrage kann nach jedem `await` auf einem anderen Thread weiterlaufen (Modul 13). Der Scope hängt nicht am Thread, sondern an der Anfrage: `RequestServices` zeigt in der ganzen Anfrage auf denselben Provider. Der `HttpContext` selbst ist dagegen nicht für parallelen Zugriff ausgelegt. Die Empfehlungen zu `HttpContext` und zum Abbruch stehen in [ASP.NET Core Best Practices](https://learn.microsoft.com/aspnet/core/fundamentals/best-practices).
+
+</details>
+
+## Zusammenfassung
+
+Das Framework legt für jede Anfrage einen DI-Scope an. Ein Scoped-Service lebt darin genau eine Anfrage lang, auch der `DbContext`. Ein Handler bekommt registrierte Services als Parameter, mit `[FromServices]` ausdrücklich und mit `[FromKeyedServices]` nach Schlüssel. Ein Singleton wird von allen Anfragen geteilt und muss thread-sicher sein. Ein `CancellationToken`-Parameter ist an den Abbruch der Anfrage gebunden. Er stoppt Datenbankaufrufe nur, wenn der Handler ihn weitergibt.
+
+## Prüfe dein Wissen
+
+<Quiz id="m17-l09-q6" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m17-l09-q7" />
+
+### Transferfrage
+
+<Quiz id="m17-l09-q8" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Dependency injection in ASP.NET Core](https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection)
+- Microsoft Learn: [Parameter binding in Minimal API apps](https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding)
+- Microsoft Learn: [ASP.NET Core Best Practices](https://learn.microsoft.com/aspnet/core/fundamentals/best-practices)

@@ -10,9 +10,6 @@ builder.Logging.ClearProviders();
 // @fold-end
 var app = builder.Build();
 
-// Lets the client wait until the handler has noticed the cancellation
-var handlerStopped = new TaskCompletionSource();
-
 // The parameter is bound to HttpContext.RequestAborted.
 app.MapGet("/slow", async (CancellationToken cancellationToken) =>
 {
@@ -26,7 +23,6 @@ app.MapGet("/slow", async (CancellationToken cancellationToken) =>
     catch (OperationCanceledException)
     {
         Console.WriteLine("handler was cancelled");
-        handlerStopped.SetResult();
         throw;
     }
 });
@@ -43,7 +39,10 @@ try
 }
 catch (OperationCanceledException)
 {
-    await handlerStopped.Task;
+    // @fold-start
+    // The server notices the abort a moment later: give it time to print.
+    await Task.Delay(1000);
+    // @fold-end
     Console.WriteLine("client: request cancelled");
 }
 

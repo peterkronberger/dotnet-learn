@@ -26,9 +26,8 @@ app.Use(async (context, next) =>
 app.MapGet("/count", (RequestCounter counter, AppCounter total) =>
 {
     counter.Lines.Add($"handler sees instance {counter.Number}");
-    total.Requests++;
     return string.Join("\n", counter.Lines) +
-        $"\nrequests so far: {total.Requests}";
+        $"\nrequests so far: {total.CountRequest()}";
 });
 // @fold-start
 await app.StartAsync();
@@ -52,7 +51,10 @@ class RequestCounter
     public List<string> Lines { get; } = [];
 }
 
+// Many requests run at the same time, so the shared state is atomic
 class AppCounter
 {
-    public int Requests { get; set; }
+    private int _requests;
+
+    public int CountRequest() => Interlocked.Increment(ref _requests);
 }

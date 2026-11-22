@@ -1099,6 +1099,173 @@
       "type": "explain",
       "question": "Transfer: SecLog soll später prüfen, ob ein Aufrufer angemeldet ist, und jede Anfrage protokollieren. In welcher Reihenfolge stehen die beiden Middleware, wenn auch abgelehnte Anfragen im Log erscheinen sollen?",
       "modelAnswer": "Die Protokollierung steht vor der Prüfung. Sie sieht jede Anfrage, bevor die Prüfung sie ablehnt, und nach `next` auch die Antwort mit dem Statuscode. Stünde die Prüfung vorne und beendete die Anfrage, käme die abgelehnte Anfrage nie bei der Protokollierung an."
+    },
+    {
+      "id": "m17-l09-q1",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Eine Web-App registriert einen Service mit `AddScoped`. Wie lange lebt eine Instanz?",
+      "options": [
+        {
+          "text": "Eine Anfrage lang: Jede Anfrage bekommt einen eigenen Scope und darin ihre eigene Instanz.",
+          "correct": true
+        },
+        {
+          "text": "So lange wie die Anwendung, denn eine Web-App läuft die ganze Zeit.",
+          "misconception": "m17-l09-scoped-lives-whole-app",
+          "feedback": "So lange wie die Anwendung lebt ein Singleton. Scoped heißt: so lange wie der Scope, und das Framework legt für jede Anfrage einen an."
+        },
+        {
+          "text": "Einen Aufruf lang: Jedes Mal, wenn der Service injiziert wird, entsteht eine neue Instanz.",
+          "feedback": "Das beschreibt Transient. Innerhalb einer Anfrage bekommen Middleware und Handler dieselbe Scoped-Instanz."
+        },
+        {
+          "text": "So lange, wie ein Client verbunden ist, auch über mehrere Anfragen hinweg.",
+          "feedback": "Der Scope gehört zu einer einzelnen Anfrage, nicht zu einem Client."
+        }
+      ],
+      "explanation": "Das Framework legt für jede Anfrage einen DI-Scope an und gibt ihn mit der Antwort wieder frei. Ein Scoped-Service lebt darin genau eine Anfrage lang."
+    },
+    {
+      "id": "m17-l09-q2",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Scoped-Service `A` wird in einer Middleware und im Handler derselben Anfrage angefordert. Danach kommt eine zweite Anfrage mit denselben Anforderungen. Wie viele Instanzen von `A` entstehen insgesamt?",
+      "options": [
+        {
+          "text": "Zwei: eine je Anfrage, die Middleware und der Handler teilen sich ihre.",
+          "correct": true
+        },
+        {
+          "text": "Eine für beide Anfragen zusammen.",
+          "misconception": "m17-l09-scoped-lives-whole-app",
+          "feedback": "Eine Instanz für alle Anfragen wäre ein Singleton. Ein Scoped-Service bekommt in jeder Anfrage eine neue Instanz."
+        },
+        {
+          "text": "Vier: jede Anforderung bekommt eine neue Instanz.",
+          "feedback": "So verhält sich Transient. Innerhalb eines Scopes liefert der Container dieselbe Scoped-Instanz."
+        },
+        {
+          "text": "Zwei, aber nur wenn der Service `IDisposable` ist.",
+          "feedback": "Die Zahl der Instanzen hängt von der Lebensdauer ab, nicht von `IDisposable`."
+        }
+      ],
+      "explanation": "Innerhalb einer Anfrage ist der Scope derselbe, also auch die Instanz. Die zweite Anfrage bekommt einen neuen Scope und eine neue Instanz."
+    },
+    {
+      "id": "m17-l09-q3",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Singleton-Service in einer Web-App zählt Anfragen in einem Feld. Warum muss er thread-sicher sein?",
+      "options": [
+        {
+          "text": "Viele Anfragen laufen gleichzeitig und greifen alle auf dieselbe Instanz zu.",
+          "correct": true
+        },
+        {
+          "text": "Eine Web-App ruft jeden Service in einem eigenen Thread auf.",
+          "feedback": "Ein Thread je Service gibt es nicht. Das Problem ist, dass mehrere Anfragen dieselbe Singleton-Instanz gleichzeitig benutzen."
+        },
+        {
+          "text": "Singletons werden bei jeder Anfrage neu erzeugt.",
+          "feedback": "Das Gegenteil stimmt: Es gibt nur eine Instanz für die ganze App."
+        },
+        {
+          "text": "Der Container sperrt Singletons nicht, aber Scoped-Services schon.",
+          "feedback": "Der Container synchronisiert keinen Zugriff auf Service-Zustand, auch nicht bei Scoped-Services."
+        }
+      ],
+      "explanation": "Ein Singleton wird von allen Anfragen geteilt, und Anfragen laufen gleichzeitig. Veränderlicher Zustand darin braucht Schutz, zum Beispiel `Interlocked` oder ein `lock`."
+    },
+    {
+      "id": "m17-l09-q4",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Handler hat den Parameter `CancellationToken cancellationToken`. Woher kommt der Wert?",
+      "options": [
+        {
+          "text": "Das Framework bindet ihn an `HttpContext.RequestAborted`. Der Token wird abgebrochen, wenn der Client die Anfrage aufgibt.",
+          "correct": true
+        },
+        {
+          "text": "Er kommt aus dem Query-String der Anfrage.",
+          "feedback": "Ein `CancellationToken` ist ein Sondertyp. Er wird nicht aus Pfad, Query oder Body gelesen."
+        },
+        {
+          "text": "Der Parameter ist immer `default`, bis der Handler selbst einen Abbruch auslöst.",
+          "feedback": "Der Token ist an die Anfrage gebunden und wird abgebrochen, wenn der Client sie aufgibt."
+        },
+        {
+          "text": "Er muss mit `AddScoped<CancellationToken>()` registriert werden.",
+          "feedback": "Dafür ist keine Registrierung nötig. Das Framework kennt den Typ."
+        }
+      ],
+      "explanation": "Ein `CancellationToken`-Parameter ist ein Sondertyp der Parameterbindung. Er zeigt auf `HttpContext.RequestAborted`."
+    },
+    {
+      "id": "m17-l09-q5",
+      "lesson": "m17-l09",
+      "type": "single",
+      "question": "Ein Handler ruft `await db.Incidents.ToListAsync()` ohne Token auf. Der Client bricht die Anfrage ab. Was passiert mit der Datenbankabfrage?",
+      "options": [
+        {
+          "text": "Sie läuft weiter, denn nur ein weitergereichter Token kann sie abbrechen.",
+          "correct": true
+        },
+        {
+          "text": "Sie wird automatisch abgebrochen, weil die Anfrage abgebrochen ist.",
+          "misconception": "m17-l09-cancellation-automatic",
+          "feedback": "Der Abbruch ist kooperativ (Lektion 5 aus Modul 13): Nur Code, der den Token bekommt, kann darauf reagieren."
+        },
+        {
+          "text": "Der Handler wirft sofort eine `OperationCanceledException` an der Stelle, an der er gerade wartet.",
+          "feedback": "Ohne Token kennt `ToListAsync` den Abbruch nicht. Der Handler wartet weiter, bis die Abfrage fertig ist."
+        },
+        {
+          "text": "Der Client bekommt `500`.",
+          "feedback": "Der Client hat die Anfrage aufgegeben und bekommt keine Antwort mehr."
+        }
+      ],
+      "explanation": "Das Framework setzt den Token der Anfrage auf abgebrochen, mehr nicht. Die Abfrage stoppt nur, wenn der Handler den Token an `ToListAsync` weitergibt."
+    },
+    {
+      "id": "m17-l09-q6",
+      "lesson": "m17-l09",
+      "type": "multi",
+      "question": "Welche Aussagen über Services in Handlern stimmen?",
+      "options": [
+        {
+          "text": "Ein Parameter, dessen Typ registriert ist, wird ohne Attribut aus dem Container befüllt.",
+          "correct": true
+        },
+        {
+          "text": "Mit `[FromKeyedServices(\"name\")]` holt ein Parameter den Service, der unter diesem Schlüssel registriert ist.",
+          "correct": true
+        },
+        {
+          "text": "`[FromServices]` ist erlaubt, aber bei einem registrierten Typ nicht nötig.",
+          "correct": true
+        },
+        {
+          "text": "Ein Scoped-Service darf nicht in einen Handler, weil Handler Singletons sind.",
+          "feedback": "Ein Handler läuft innerhalb des Anfrage-Scopes und bekommt Scoped-Services."
+        }
+      ],
+      "explanation": "Die Parameterbindung erkennt registrierte Typen selbst. `[FromServices]` macht die Herkunft ausdrücklich, `[FromKeyedServices]` wählt einen Service nach Schlüssel."
+    },
+    {
+      "id": "m17-l09-q7",
+      "lesson": "m17-l09",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum ein Scoped-Service in einer Web-App genau eine Anfrage lang lebt und was das für den `DbContext` bedeutet.",
+      "modelAnswer": "Das Framework legt für jede Anfrage einen eigenen DI-Scope an und gibt ihn am Ende frei. Ein Scoped-Service wird einmal je Scope erzeugt, also einmal je Anfrage. Der `DbContext` ist per `AddDbContext` Scoped: Jede Anfrage hat ihren eigenen Context, der nicht von parallelen Anfragen geteilt wird, und er wird am Ende der Anfrage entsorgt."
+    },
+    {
+      "id": "m17-l09-q8",
+      "lesson": "m17-l09",
+      "type": "explain",
+      "question": "Transfer: Ein Endpoint von SecLog führt eine Abfrage aus, die mehrere Sekunden dauert. Was änderst du im Handler, damit die Datenbank nicht weiterarbeitet, wenn der Client wegläuft?",
+      "modelAnswer": "Der Handler nimmt einen `CancellationToken` als Parameter an. Das Framework bindet ihn an den Abbruch der Anfrage. Der Handler reicht ihn an `ToListAsync`, `FirstOrDefaultAsync` oder `SaveChangesAsync` weiter. Bricht der Client ab, wirft der Aufruf eine `OperationCanceledException`, und die Abfrage stoppt."
     }
   ]
 }

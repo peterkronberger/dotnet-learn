@@ -11975,6 +11975,42 @@
         "title": "Filters in Minimal API apps",
         "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/min-api-filters"
       }
+    },
+    {
+      "id": "request-scope",
+      "term": "Request Scope",
+      "german": "Scope einer Anfrage",
+      "category": "platform",
+      "definition": "Das Framework legt für jede HTTP-Anfrage einen eigenen DI-Scope an. Scoped-Services leben darin genau eine Anfrage lang, auch der `DbContext`.",
+      "related": [
+        "scoped-lifetime",
+        "http-context",
+        "dbcontext"
+      ],
+      "aliases": [
+        "Request-Scope"
+      ],
+      "lesson": "m17-l09",
+      "source": {
+        "title": "Dependency injection in ASP.NET Core",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/dependency-injection"
+      }
+    },
+    {
+      "id": "request-aborted",
+      "term": "RequestAborted",
+      "german": "Abbruch der Anfrage",
+      "category": "platform",
+      "definition": "Ein `CancellationToken` von `HttpContext.RequestAborted`, der abgebrochen wird, wenn der Client die Anfrage aufgibt. Ein `CancellationToken`-Parameter im Handler wird daran gebunden.",
+      "related": [
+        "cancellation-token",
+        "http-context"
+      ],
+      "lesson": "m17-l09",
+      "source": {
+        "title": "Parameter binding in Minimal API apps",
+        "url": "https://learn.microsoft.com/aspnet/core/fundamentals/minimal-apis/parameter-binding"
+      }
     }
   ]
 }
