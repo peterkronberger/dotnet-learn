@@ -1,0 +1,202 @@
+---
+title: Sicherheit
+sidebar_position: 4
+description: Code von einem KI-Assistenten kann typische Schwachstellen enthalten, und in einer Studie hielten Teilnehmer mit Assistent ihre unsicheren Lösungen häufiger für sicher. Du prüfst jeden Vorschlag mit der Review-Checkliste.
+lesson_id: m19-l04
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aiRating from '!!raw-loader!@site/examples/m19/l04/ai-message-rating.cs';
+import aiRatingOutput from '!!raw-loader!@site/examples/m19/l04/ai-message-rating.out.txt';
+import ratingSolution from '!!raw-loader!@site/examples/m18/l04/core-rating-solution.cs';
+import aiSearch from '!!raw-loader!@site/examples/m19/l04/ai-search-sql.snippet.cs';
+import incidentFilters from '!!raw-loader!@site/examples/_ci/seclog-m18-l06/src/SecLog.Data/IncidentFilters.cs';
+import incidentEndpoints from '!!raw-loader!@site/examples/_ci/seclog-m18-l06/src/SecLog.Api/IncidentEndpoints.cs';
+
+# Sicherheit
+
+:::note[Lernziele]
+- Du findest in konstruierten KI-Vorschlägen für SecLog typische Schwachstellen mit der <Term id="review-checklist">Review-Checkliste</Term> aus Modul 18.
+- Du kannst das Ergebnis von Perry et al. mit Gruppe, Aufgabe, Werkzeug und Einschränkungen wiedergeben.
+- Du kannst erklären, warum großes Vertrauen in einen Vorschlag ein Risiko ist.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+## Rückblick
+
+<Quiz id="m18-l05-q3" />
+
+<Quiz id="m18-l06-q2" />
+
+<Quiz id="m16-l09-q2" />
+
+## Was eine Studie zu Sicherheit gemessen hat
+
+Lektion 3 fragte, ob ein Vorschlag stimmt. Diese Lektion fragt, ob er sicher ist. Eine Nutzerstudie hat das mit Aufgaben untersucht, bei denen Fehler Sicherheitslücken erzeugen.
+
+**Studienergebnis** ([Perry et al., 2023](https://doi.org/10.1145/3576915.3623157)):
+
+- **Gruppe:** 47 Teilnehmer, davon 33 mit KI-Assistent und 14 ohne. Es waren überwiegend Studierende.
+- **Aufgabe:** fünf Aufgaben mit Sicherheitsbezug, zum Beispiel Text verschlüsseln, eine Nachricht signieren, Dateizugriff auf einen Ordner beschränken, einen Wert in eine SQL-Datenbank schreiben und eine Zahl mit Kommas in Text umwandeln. Drei Aufgaben waren in Python, eine in JavaScript, eine in C.
+- **Werkzeug und Zeit:** ein Assistent auf Basis des Modells codex-davinci-002, also eine ältere Modellgeneration. Die Studie wurde 2022 veröffentlicht, die Konferenzfassung erschien 2023.
+- **Ergebnis:** Bei vier der fünf Aufgaben schrieb die Gruppe mit Assistent häufiger unsichere Lösungen. Bei der fünften Aufgabe war das Bild gemischt. Die Gruppe mit Assistent bewertete ihre Lösungen außerdem häufiger als sicher.
+- **Vertrauen:** Teilnehmer mit sicheren Lösungen vertrauten dem Assistenten im Mittel weniger als Teilnehmer mit unsicheren. Wer die Anfragen sorgfältiger formulierte, hatte weniger Schwachstellen (Lektion 5).
+- **Einschränkungen:** kleine Stichprobe, überwiegend Studierende, künstliche Umgebung mit Zeitlimit und ohne Folgen. Die Autoren sind an der Universität Stanford. In den geprüften Teilen der Studie ist kein Interessenkonflikt genannt.
+
+Gesamtbild: In dieser Studie und mit diesem älteren Werkzeug gab es mit Assistent mehr unsichere Lösungen, und sie wurden häufiger für sicher gehalten. Für heutige Werkzeuge sagt das nichts aus. Die Studie zeigt aber ein Muster, das du kennen solltest: Ein Vorschlag, der überzeugt, ist nicht deshalb sicher.
+
+## Vertrauen kalibrieren
+
+**Bewährte Praxis (nicht durch Studien belegt):** Du prüfst jeden Vorschlag mit der Checkliste aus [Lektion „Code-Review mit einer Checkliste“](../m18-final-project/l01-review-checklist). Für Sicherheit sind diese Punkte wichtig:
+
+- **Punkt 6, SQL Injection:** Wird Eingabe zu einem Teil des SQL-Textes? ([Raw SQL sicher verwenden](../m16-ef-core/l09-raw-sql-safely))
+- **Punkt 7, Eingabevalidierung:** Wird jede Eingabe geprüft, bevor sie benutzt wird? ([Parameterbindung und Validierung](../m17-aspnetcore-minimal-apis/l05-binding-validation))
+- **Punkt 2, Ausnahmebehandlung:** Landet der Text einer Exception in einer Antwort an den Nutzer?
+- **Zugriffsprüfung:** Verlangt jeder Endpunkt eine angemeldete Person (`RequireAuthorization`, [Endpunkte prüfen](../m18-final-project/l06-endpoint-review))?
+
+Dabei ist die Verpackung des Vorschlags kein Beleg. Ein Assistent formuliert eine unsichere Lösung genauso sicher wie eine gute.
+
+### Beispiel mit Teilzielen: Meldungsbewertung prüfen
+
+Die Teilziele: „1. Was soll der Code tun? → 2. Checkliste Punkt für Punkt → 3. Fund benennen und begründen → 4. Korrektur mit dem SecLog-Code vergleichen“.
+
+Du hast einen Assistenten gebeten, die Meldungsbewertung für SecLog zu schreiben.
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Klasse `MessageRating`. Sie prüft, ob die Meldung einen Link und ein Signalwort enthält. Die Signalwörter bekommt sie im Konstruktor, so bleibt sie flexibel.
+:::
+
+<CodeBlock language="csharp" title="ai-message-rating.cs">{aiRating}</CodeBlock>
+
+1. **Was soll der Code tun?** Eine Meldung als möglichen Phishing-Versuch einstufen, mit einem Link und einem Signalwort. Das tut der Code für den Normalfall.
+2. **Checkliste Punkt für Punkt:** Punkt 1 (null): `message` ist nicht als nullable gekennzeichnet, wird aber nicht geprüft. Punkt 7 (Eingabe): Der Konstruktor prüft die Wörter nicht. Das Feld `signalWords` zeigt auf dasselbe Array wie die Variable des Aufrufers.
+3. **Fund benennen und begründen:** Erstens: Ein `null`-Text löst eine `NullReferenceException` aus, statt abgewiesen zu werden. Zweitens: Wer das Array später ändert, ändert die Regel des bereits erzeugten Objekts. Ein Programmteil kann so die Erkennung abschwächen, ohne dass es auffällt.
+4. **Korrektur vergleichen:** Die Klasse aus Modul 18 prüft `null` mit `ArgumentNullException.ThrowIfNull`, weist leere Listen und leere Wörter ab und legt mit `[.. signalWords]` eine eigene Kopie an. Du siehst sie beim Vergleich unten.
+
+### Lückenbeispiel
+
+Die Suche nach den Vorfällen eines Benutzers:
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Suche nach den Vorfällen eines Benutzers. Ich nutze eigenes SQL, das ist schnell, und setze den Suchbegriff mit einer Zeichenkette ein.
+:::
+
+<CodeBlock language="csharp" title="ai-search-sql.snippet.cs">{aiSearch}</CodeBlock>
+
+1. **Was soll der Code tun?** Die Vorfälle eines Benutzers liefern.
+2. **Checkliste Punkt für Punkt:** Punkt 6 trifft zu: `term` kommt von außen und steht mit `$"…{term}…"` im SQL-Text von `FromSqlRaw`.
+3. **Fund benennen und begründen:** ______
+4. **Korrektur vergleichen:** ______
+
+<details>
+<summary>Mögliche Lösung anzeigen</summary>
+
+3. **Fund benennen und begründen:** SQL Injection: `FromSqlRaw` übernimmt die Zeichenkette unverändert. Die Eingabe wird Teil des SQL-Textes und kann dessen Bedeutung ändern (Lektion „Raw SQL sicher verwenden“). `FromSql` und `FromSqlInterpolated` senden den Wert dagegen als Parameter.
+4. **Korrektur vergleichen:** Die Datei von SecLog nutzt gar kein eigenes SQL: Sie filtert mit LINQ (`incident.User == user`), EF Core erzeugt daraus eine parametrisierte Abfrage.
+
+<CodeBlock language="csharp" title="src/SecLog.Data/IncidentFilters.cs">{incidentFilters}</CodeBlock>
+
+</details>
+
+Der dritte Vorschlag ist eine Übung ohne Lösungsvorgabe:
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist der Endpunkt, der die Vorfälle als Liste zurückgibt. Fehler fange ich ab und melde sie mit allen Details, damit man sie leicht findet.
+:::
+
+<Quiz id="m19-l04-q7" />
+
+<details>
+<summary>Vergleich mit dem SecLog-Endpunkt anzeigen</summary>
+
+Die Datei von SecLog verlangt für die ganze Gruppe eine angemeldete Person, begrenzt `user` mit `[MaxLength(64)]` und hat keinen `catch`, der Exception-Text an Nutzer schickt.
+
+<CodeBlock language="csharp" title="src/SecLog.Api/IncidentEndpoints.cs">{incidentEndpoints}</CodeBlock>
+
+</details>
+
+## Stimmt der KI-Vorschlag?
+
+Die Meldungsbewertung des Assistenten bekommt drei Eingaben, die der Normalfall nicht zeigt.
+
+:::info[Vorhersage]
+Das Programm bewertet erst eine Phishing-Meldung, ändert dann das Array der Signalwörter und übergibt zuletzt einen fehlenden Text. Welche drei Zeilen gibt es aus? Notiere deinen Tipp.
+:::
+
+<CSharpRunner id="m19-l04-rating" code={aiRating} predict expected={aiRatingOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `True`, dann `False`, dann `NullReferenceException`.
+
+1. **Erste Zeile:** Die Meldung hat einen Link und das Signalwort `locked`. Die Bewertung ist `True`.
+2. **Zweite Zeile:** `Array.Fill` überschreibt das Array, das auch das Objekt benutzt. Die Signalwörter sind weg, dieselbe Meldung ist jetzt harmlos.
+3. **Dritte Zeile:** `message.Contains` auf `null` löst eine `NullReferenceException` aus.
+4. **Vergleich:** Die Klasse aus Modul 18 behält ihre Kopie der Wörter, sodass die Änderung des Arrays nichts bewirkt, und weist `null` mit einer `ArgumentNullException` ab.
+
+Hier ist die Klasse aus Modul 18 mit ihrer eigenen Ausgabe:
+
+<CSharpRunner id="m19-l04-rating-m18" code={ratingSolution} />
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum ein Assistent solche Lücken lässt (optional)</summary>
+
+Ein Assistent erzeugt wahrscheinlichen Code (Lektion 1). Der Normalfall ist häufiger als der Randfall, und ein Vorschlag, der für den Normalfall funktioniert, wirkt vollständig. Das ist eine Erklärung, kein gemessenes Ergebnis. Die Studie zeigt, dass Lücken auftraten und dass Teilnehmer sie seltener bemerkten. Sie untersucht nicht, warum.
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l04-ai-code-secure-by-default" />
+
+**„Code von einer KI ist sicher, weil sie aus sehr viel Code gelernt hat.“** Das stimmt nicht. Die Menge der Trainingsdaten sagt nichts über die Sicherheit eines einzelnen Vorschlags. In der Studie gab es mit Assistent bei vier von fünf Aufgaben mehr unsichere Lösungen.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l04-confident-answer-is-secure" />
+
+**„Wenn die KI ihre Lösung sicher und begründet präsentiert, ist sie auch sicher.“** Das stimmt nicht. Eine Begründung ist Text, und der Ton sagt nichts über den Code. Prüfe den Code mit der Checkliste, nicht die Sicherheit der Formulierung.
+:::
+
+## Zusammenfassung
+
+In einer Studie mit 47 Teilnehmern schrieb die Gruppe mit einem Assistenten auf Basis eines älteren Modells bei vier von fünf Sicherheitsaufgaben häufiger unsichere Lösungen und hielt sie häufiger für sicher. Die Stichprobe war klein und überwiegend studentisch. Wer dem Assistenten weniger vertraute, hatte sicherere Lösungen. Als Praxis bietet sich an, jeden Vorschlag mit der Review-Checkliste zu prüfen: SQL Injection, Eingabevalidierung, Ausnahmebehandlung und Zugriffsprüfung. Das ist Bewährte Praxis und kein Studienergebnis.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l04-q1" />
+
+<Quiz id="m19-l04-q2" />
+
+<Quiz id="m19-l04-q3" />
+
+<Quiz id="m19-l04-q4" />
+
+<Quiz id="m19-l04-q5" />
+
+<Quiz id="m19-l04-q6" />
+
+### AI-Code-Review
+
+<Quiz id="m19-l04-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l04-q9" />
+
+### Transferfrage
+
+<Quiz id="m19-l04-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [SQL Queries – EF Core](https://learn.microsoft.com/ef/core/querying/sql-queries)
+- Microsoft Learn: [Secure coding guidelines for .NET](https://learn.microsoft.com/dotnet/standard/security/secure-coding-guidelines)

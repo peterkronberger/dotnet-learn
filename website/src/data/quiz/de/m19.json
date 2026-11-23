@@ -468,6 +468,178 @@
       "type": "explain",
       "question": "Transferfrage: Ein Assistent liefert dir eine Methode, die Zahlen aus Text liest. Welche Eingaben testest du, bevor du sie übernimmst?",
       "modelAnswer": "Ich sage die Ausgabe für eine normale Eingabe voraus und führe den Code aus. Dann teste ich die Grenzen: einen leeren Text, `null`, Text mit Buchstaben, einen sehr großen und einen negativen Wert. Außerdem schlage ich jede aufgerufene Methode in der API-Referenz nach. Das ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l04-q1",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Welche Beschreibung der Studie von Perry et al. passt?",
+      "options": [
+        {
+          "text": "47 Teilnehmer, überwiegend Studierende, fünf Aufgaben mit Sicherheitsbezug, ein Assistent auf Basis eines älteren Modells.",
+          "correct": true
+        },
+        {
+          "text": "Eine Untersuchung des Codes von Berufsentwicklern in großen Firmenprojekten mit heutigen Werkzeugen.",
+          "feedback": "Die Studie nutzte Aufgaben in einer Studienumgebung und ein älteres Modell."
+        },
+        {
+          "text": "Ein Test, bei dem eine KI selbst Sicherheitslücken in fremdem Code sucht.",
+          "feedback": "Es ging darum, wie sicher der Code war, den Menschen mit und ohne Assistent schrieben."
+        }
+      ],
+      "explanation": "Die Gruppe war klein, die Umgebung künstlich und das Werkzeug eine ältere Generation. Ergebnisse gelten für diese Bedingungen."
+    },
+    {
+      "id": "m19-l04-q2",
+      "lesson": "m19-l04",
+      "type": "multi",
+      "question": "Welche Einschränkungen der Studie von Perry et al. sind richtig?",
+      "options": [
+        {
+          "text": "Die Stichprobe ist klein.",
+          "correct": true
+        },
+        {
+          "text": "Die Teilnehmer waren überwiegend Studierende.",
+          "correct": true
+        },
+        {
+          "text": "Die Umgebung war künstlich, mit Zeitlimit und ohne Folgen.",
+          "correct": true
+        },
+        {
+          "text": "Das Werkzeug ist ein heutiger Assistent.",
+          "feedback": "Der Assistent beruht auf einem älteren Modell. Die Ergebnisse gelten nicht ohne Weiteres für heutige Werkzeuge."
+        }
+      ],
+      "explanation": "Kleine Stichprobe, überwiegend Studierende und künstliche Umgebung schränken ein, wie weit die Ergebnisse reichen. Dazu kommt das ältere Modell."
+    },
+    {
+      "id": "m19-l04-q3",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Ein Kollege sagt: „KI-Code ist sicher, weil das Modell aus sehr viel Code gelernt hat.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Das folgt nicht: Die Menge der Trainingsdaten sagt nichts über einen einzelnen Vorschlag. Du prüfst ihn mit der Checkliste.",
+          "correct": true
+        },
+        {
+          "text": "Das stimmt, denn viel Code enthält überwiegend sichere Muster.",
+          "feedback": "Auch unsichere Muster kommen vor, und der Assistent erzeugt wahrscheinlichen Code, nicht geprüften. In der Studie gab es bei vier von fünf Aufgaben mehr unsichere Lösungen.",
+          "misconception": "m19-l04-ai-code-secure-by-default"
+        },
+        {
+          "text": "Das stimmt, wenn der Code kompiliert.",
+          "feedback": "Der Compiler prüft die Form, nicht die Sicherheit.",
+          "misconception": "m19-l04-ai-code-secure-by-default"
+        }
+      ],
+      "explanation": "Wie sicher ein Vorschlag ist, zeigt nur die Prüfung. Die Trainingsmenge ist kein Beleg."
+    },
+    {
+      "id": "m19-l04-q4",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Der Assistent erklärt sicher und ausführlich, warum seine Lösung sicher ist. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Nichts. Du prüfst den Code mit der Checkliste, unabhängig vom Ton der Begründung.",
+          "correct": true
+        },
+        {
+          "text": "Die Lösung ist sicher, weil sie begründet ist.",
+          "feedback": "Eine Begründung ist erzeugter Text. Sie kann zu einer unsicheren Lösung genauso überzeugend klingen.",
+          "misconception": "m19-l04-confident-answer-is-secure"
+        },
+        {
+          "text": "Die Lösung ist sicher, wenn der Assistent keine Warnung nennt.",
+          "feedback": "Dass keine Warnung kommt, belegt nichts. Der Assistent prüft seinen Code nicht selbst.",
+          "misconception": "m19-l04-confident-answer-is-secure"
+        }
+      ],
+      "explanation": "Überzeugende Antworten und sichere Lösungen sind zwei verschiedene Dinge. In der Studie hielt die Gruppe mit Assistent ihre Lösungen häufiger für sicher, obwohl es mehr unsichere gab."
+    },
+    {
+      "id": "m19-l04-q5",
+      "lesson": "m19-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m19/l04/ai-message-rating.cs",
+      "explanation": "Die erste Meldung enthält einen Link und das Signalwort `locked`, also `True`. Das Array der Signalwörter gehört auch dem Objekt, und `Array.Fill` überschreibt es: Dieselbe Meldung ist danach `False`. Der fehlende Text löst eine `NullReferenceException` aus."
+    },
+    {
+      "id": "m19-l04-q6",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Der Vorschlag `db.Incidents.FromSqlRaw($\"SELECT * FROM Incidents WHERE User = '{term}'\")` nutzt eine Eingabe `term` von außen. Welcher Befund passt?",
+      "options": [
+        {
+          "text": "SQL Injection: Der Wert wird Teil des SQL-Textes, statt als Parameter gesendet zu werden.",
+          "correct": true
+        },
+        {
+          "text": "Kein Befund: Die Interpolation `$\"…\"` macht den Wert immer zum Parameter.",
+          "feedback": "Bei `FromSqlRaw` wird der fertige Text unverändert benutzt. Nur `FromSql` macht aus der Interpolation Parameter."
+        },
+        {
+          "text": "Das Problem ist nur die Geschwindigkeit der Abfrage.",
+          "feedback": "Die Lücke betrifft die Sicherheit, nicht die Geschwindigkeit."
+        }
+      ],
+      "explanation": "Mit `FromSqlRaw` und einer interpolierten Zeichenkette wird die Eingabe Teil des SQL-Textes. Sicher sind `FromSql` mit Interpolation (Parameter) oder eine LINQ-Abfrage."
+    },
+    {
+      "id": "m19-l04-q7",
+      "lesson": "m19-l04",
+      "type": "find-bug",
+      "question": "Finde 3 Probleme in diesem Vorschlag für einen Endpunkt. Wähle die drei Zeilen.",
+      "example": "m19/l04/ai-endpoint.snippet.cs",
+      "bugLines": [
+        10,
+        17,
+        26
+      ],
+      "lineFeedback": {
+        "11": {
+          "feedback": "Diese Zeile registriert den Endpunkt. Das Problem liegt in der Gruppe der Zeile davor: Ihr fehlt `RequireAuthorization()`."
+        },
+        "16": {
+          "feedback": "Der `CancellationToken` ist vorhanden. Das ist kein Befund."
+        }
+      },
+      "explanation": "Zeile 10: Die Gruppe hat kein `RequireAuthorization()`, jeder kann die Vorfälle lesen. Zeile 17: Der Parameter `user` wird nicht geprüft (Punkt 7, zum Beispiel mit `[MaxLength]`). Zeile 26: `ex.ToString()` schickt den Text der Exception an den Nutzer (Punkt 2). Das verrät Interna."
+    },
+    {
+      "id": "m19-l04-q8",
+      "lesson": "m19-l04",
+      "type": "find-bug",
+      "question": "Welche Zeile des Vorschlags macht die Eingabe zum Teil des SQL-Textes?",
+      "example": "m19/l04/ai-search-sql.snippet.cs",
+      "bugLines": [
+        12
+      ],
+      "lineFeedback": {
+        "11": {
+          "feedback": "Der Aufruf von `FromSqlRaw` ist der Ort des Problems, aber die Eingabe wird in der Zeile mit der interpolierten Zeichenkette eingesetzt."
+        }
+      },
+      "explanation": "In Zeile 12 steht `{term}` in der interpolierten Zeichenkette. `FromSqlRaw` benutzt den fertigen Text, und die Eingabe wird Teil des SQL-Textes."
+    },
+    {
+      "id": "m19-l04-q9",
+      "lesson": "m19-l04",
+      "type": "explain",
+      "question": "Gib das Ergebnis der Studie von Perry et al. mit Gruppe, Aufgabe, Werkzeug und einer Einschränkung wieder.",
+      "modelAnswer": "47 Teilnehmer, überwiegend Studierende, bearbeiteten fünf Aufgaben mit Sicherheitsbezug, ein Teil mit einem Assistenten auf Basis eines älteren Modells. Bei vier der fünf Aufgaben schrieb die Gruppe mit Assistent häufiger unsichere Lösungen und hielt sie häufiger für sicher. Einschränkung: kleine Stichprobe und künstliche Umgebung, und das Werkzeug ist eine ältere Generation."
+    },
+    {
+      "id": "m19-l04-q10",
+      "lesson": "m19-l04",
+      "type": "explain",
+      "question": "Transferfrage: Warum ist großes Vertrauen in einen Vorschlag ein Risiko, und was tust du in deinem Projekt dagegen?",
+      "modelAnswer": "Wer einem Vorschlag stark vertraut, prüft ihn weniger, und Lücken bleiben unbemerkt. In der Studie vertrauten Teilnehmer mit sicheren Lösungen dem Assistenten weniger. In meinem Projekt prüfe ich jeden Vorschlag mit der Review-Checkliste: SQL Injection, Eingabevalidierung, Ausnahmebehandlung und Zugriffsprüfung. Das ist Bewährte Praxis."
     }
   ]
 }
