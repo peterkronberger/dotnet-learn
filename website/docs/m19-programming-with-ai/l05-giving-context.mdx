@@ -1,0 +1,220 @@
+---
+title: Kontext geben
+sidebar_position: 5
+description: Eine genaue Aufgabe mit Ziel, vorhandenem Code, Randbedingungen und Prüfkriterium führt zu Vorschlägen, die besser zum Projekt passen. Eine Projekt-Anweisungsdatei hält Regeln fest, garantiert aber keinen korrekten Code.
+lesson_id: m19-l05
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aiWeak from '!!raw-loader!@site/examples/m19/l05/ai-weak-prompt.cs';
+import aiWeakOutput from '!!raw-loader!@site/examples/m19/l05/ai-weak-prompt.out.txt';
+import aiPrecise from '!!raw-loader!@site/examples/m19/l05/ai-precise-prompt.cs';
+import aiPreciseOutput from '!!raw-loader!@site/examples/m19/l05/ai-precise-prompt.out.txt';
+
+# Kontext geben
+
+:::note[Lernziele]
+- Du formulierst eine Aufgabe für einen KI-Assistenten mit Ziel, vorhandenem Code, Randbedingungen und Prüfkriterium.
+- Du kannst erklären, wozu eine <Term id="project-instruction-file">Projekt-Anweisungsdatei</Term> dient und was sie nicht garantiert.
+- Du kannst unterscheiden, welche Aussage zu Prompts ein Studienergebnis ist und welche Bewährte Praxis.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+## Rückblick
+
+<Quiz id="m19-l02-q2" />
+
+<Quiz id="m19-l03-q2" />
+
+<Quiz id="m19-l04-q2" />
+
+## Was ein Assistent von deinem Projekt weiß
+
+Ein Assistent kennt von deinem Projekt nur, was du ihm gibst. Der <Term id="prompt">Prompt</Term> ist seine ganze Aufgabe. Was darin fehlt, ergänzt er mit Annahmen, und die sind aus wahrscheinlichem Code gebildet (Lektion 1), nicht aus deinem Projekt.
+
+Zwei Aussagen zu Prompts musst du auseinanderhalten.
+
+**Studienergebnis** ([Perry et al., 2023](https://doi.org/10.1145/3576915.3623157), siehe [Lektion „Sicherheit“](./l04-security)):
+
+- **Gruppe und Aufgabe:** 47 Teilnehmer, überwiegend Studierende, fünf Aufgaben mit Sicherheitsbezug.
+- **Werkzeug und Zeit:** ein Assistent auf Basis von codex-davinci-002, eine ältere Modellgeneration. Veröffentlicht 2022, Konferenzfassung 2023.
+- **Ergebnis:** Wer die Anfragen sorgfältiger formulierte, hatte weniger Schwachstellen.
+- **Einschränkungen:** kleine Stichprobe, künstliche Umgebung mit Zeitlimit, ein älteres Werkzeug. Die Aussage beschreibt einen Zusammenhang in dieser Gruppe. Die Autoren sind an der Universität Stanford, ein Interessenkonflikt ist in den geprüften Teilen nicht genannt.
+
+Mehr belegt diese Lektion nicht. Alles Weitere ist **Bewährte Praxis (nicht durch Studien belegt)**: Erfahrung aus der Arbeit mit Assistenten, kein gemessenes Ergebnis.
+
+## Die Teile einer genauen Aufgabe
+
+**Bewährte Praxis (nicht durch Studien belegt):** Eine Aufgabe enthält diese Teile:
+
+- **Ziel:** Was soll herauskommen? Eingabe und Ausgabe, wenn möglich mit einem Beispiel.
+- **Vorhandener Code:** Typen und Hilfsmethoden, die der Vorschlag wiederverwenden soll. Füge den Code in die Anfrage ein, ein Verweis auf eine Datei reicht nicht, wenn der Assistent die Datei nicht sieht.
+- **Randbedingungen:** C# 15 / .NET 11, Nullable an, keine neuen Pakete.
+- **Prüfkriterium:** Woran erkennst du eine richtige Antwort? Tests, die bestehen müssen, oder die erwartete Ausgabe für die Beispieldaten.
+
+Ein Prompt besteht aus [Anweisungen, Beispielen und Hinweisen zum Format](https://learn.microsoft.com/dotnet/ai/conceptual/prompt-engineering-dotnet), mit denen sich die Antwort lenken lässt. Eine lange Anfrage ist kein Selbstzweck: Gib das, was für die Aufgabe nötig ist.
+
+### Projekt-Anweisungsdateien
+
+Regeln, die für jede Aufgabe gelten, schreibst du nicht jedes Mal neu. Eine **Projekt-Anweisungsdatei** ist eine Textdatei im Repository mit Regeln für Assistenten. Viele Werkzeuge lesen sie, wenn sie im Projekt arbeiten. Typischer Inhalt: Version von C# und .NET, Nullable-Einstellung, Namensregeln, welche Pakete erlaubt sind, wie die Tests laufen.
+
+Was die Datei **nicht** garantiert: Sie gibt Regeln vor, sie prüft nichts. Ein Vorschlag kann Regeln übersehen oder die Fachregel falsch umsetzen. Kontext macht Vorschläge passender, aber er ersetzt das Prüfen nicht ([Lektion „Verifizieren“](./l03-verifying)).
+
+## Beispiel mit Teilzielen: eine Anfrage umschreiben
+
+Die Teilziele: „1. Ziel → 2. Vorhandener Code → 3. Randbedingungen → 4. Prüfkriterium“.
+
+Du willst für SecLog Fehlversuche pro Benutzer zählen. Die erste Anfrage lautet:
+
+> Schreib Code, der Fehlversuche zählt.
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist eine Zählung für jeden Benutzer. Sie zählt die Zeilen, die den Benutzernamen und `status=failed` enthalten.
+:::
+
+<CodeBlock language="csharp" title="ai-weak-prompt.cs (Ausschnitt: die Zählung)">{aiWeak.slice(aiWeak.indexOf('string[] users'))}</CodeBlock>
+
+Die Antwort kompiliert. Sie nimmt aber ein Zeilenformat an, das es in den Beispieldaten nicht gibt, denn dort steht `login-failed`. Die Anfrage hat das Format nicht genannt, und die vorhandene Methode `LogParser.Parse` kannte der Assistent nicht.
+
+Jetzt die genaue Anfrage, Teil für Teil:
+
+1. **Ziel:** „Zähle für jeden Benutzer, wie viele Zeilen den Typ `login-failed` haben. Gib die Benutzer absteigend nach Anzahl aus, bei Gleichstand alphabetisch. Eingabe: ein `string[]` mit den Zeilen der Beispieldaten. Beispiel einer Zeile: `2026-03-02T08:01:40Z login-failed user=bob ip=203.0.113.7`.“
+2. **Vorhandener Code:** „Nutze die Methode `LogParser.Parse`, die ein `LogEvent` mit `Kind`, `User` und `Ip` liefert oder `null`, wenn die Zeile ungültig ist.“ Dazu fügst du den Code der Methode ein.
+3. **Randbedingungen:** „C# 15 / .NET 11, Nullable an, nur LINQ und die Standardbibliothek, keine neuen Pakete.“
+4. **Prüfkriterium:** „Für die Beispieldaten muss die Ausgabe `bob: 5`, `alice: 1`, `dave: 1` sein.“
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Zählung. Sie ruft deine Methode `LogParser.Parse` auf, überspringt ungültige Zeilen und gruppiert nach Benutzer.
+:::
+
+<CodeBlock language="csharp" title="ai-precise-prompt.cs (Ausschnitt: Abfrage und vorhandener Code)">{aiPrecise.slice(aiPrecise.indexOf('var failuresPerUser'))}</CodeBlock>
+
+Diese Antwort nutzt die vorhandene Methode, passt zum Format und lässt sich gegen das Prüfkriterium halten. Mehr Kontext macht den Vorschlag wahrscheinlicher passend. Richtig ist er erst, wenn die Prüfung bestanden ist.
+
+### Lückenbeispiel
+
+Die zweite Anfrage lautet: „Zeig mir verdächtige IP-Adressen.“ Das Wort „verdächtig“ ist offen. Fülle die Teilziele aus, dann vergleiche mit der möglichen Lösung.
+
+1. **Ziel:** Gib die IP-Adressen aus, die in den Beispieldaten mindestens zwei Fehlversuche hatten, absteigend nach Anzahl.
+2. **Vorhandener Code:** Die Methode `LogParser.Parse` und der Typ `LogEvent` aus der Anfrage oben.
+3. **Randbedingungen:** ______
+4. **Prüfkriterium:** ______
+
+<details>
+<summary>Mögliche Lösung anzeigen</summary>
+
+3. **Randbedingungen:** C# 15 / .NET 11, Nullable an, nur LINQ und die Standardbibliothek, keine neuen Pakete. „Verdächtig“ bedeutet hier: mindestens zwei Fehlversuche (eine vereinfachte Regel für den Unterricht, echte Erkennung braucht mehr Kontext).
+4. **Prüfkriterium:** Für die Beispieldaten muss genau eine IP-Adresse in der Ausgabe stehen: `203.0.113.7` mit 5 Fehlversuchen. `192.0.2.10` und `198.51.100.8` haben je einen Fehlversuch und fehlen.
+
+</details>
+
+## Stimmt der KI-Vorschlag?
+
+Zuerst die Antwort auf die kurze Anfrage.
+
+:::info[Vorhersage]
+Was gibt das Programm für `alice`, `bob`, `carol` und `dave` aus? Notiere deinen Tipp. Suche in den Beispieldaten nach dem Text `status=failed`.
+:::
+
+<CSharpRunner id="m19-l05-weak" code={aiWeak} predict expected={aiWeakOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist viermal 0, auch für `bob`.
+
+1. **Suchen:** Die Zählung sucht `status=failed`. In den Zeilen steht `login-failed`.
+2. **Zählen:** Keine Zeile enthält den gesuchten Text, jede Zählung ist 0.
+3. **Erklären:** Die Anfrage nannte das Format nicht. Der Assistent hat eines angenommen.
+
+**Was passiert, wenn …?** … die Zählung `Contains("failed")` suchen würde? Dann wäre sie für diese Daten richtig, wäre aber weiter nicht an die Methode `LogParser.Parse` gebunden.
+
+</details>
+
+Jetzt die Antwort auf die genaue Anfrage.
+
+:::info[Vorhersage]
+Was gibt dieses Programm aus? Wie sortiert es bei Gleichstand?
+:::
+
+<CSharpRunner id="m19-l05-precise" code={aiPrecise} predict expected={aiPreciseOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `bob: 5`, `alice: 1`, `dave: 1`.
+
+1. **Parsen:** `LogParser.Parse` macht aus jeder Zeile ein `LogEvent`. `OfType<LogEvent>()` lässt `null` weg.
+2. **Filtern und gruppieren:** `Where` behält `login-failed`, `GroupBy` gruppiert nach Benutzer.
+3. **Sortieren:** `OrderByDescending` sortiert nach Anzahl, `ThenBy` bei Gleichstand nach Name. Deshalb steht `alice` vor `dave`.
+4. **Vergleichen:** Die Ausgabe erfüllt das Prüfkriterium der Anfrage.
+
+Der Unterschied zur ersten Antwort: Die genaue Anfrage enthielt das Format und die vorhandene Methode. Die Antwort musste nichts raten.
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l05-short-prompt-is-enough" />
+
+**„Eine kurze Anfrage reicht, die KI weiß schon, was gemeint ist.“** Das stimmt nicht. Der Assistent kennt dein Projekt nicht. Was in der Anfrage fehlt, ergänzt er mit Annahmen, zum Beispiel mit einem erfundenen Zeilenformat.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l05-instruction-file-guarantees-correct-code" />
+
+**„Mit einer Projekt-Anweisungsdatei schreibt die KI immer korrekten Code.“** Das stimmt nicht. Die Datei gibt Regeln vor, sie prüft nichts. Ein Vorschlag kann Regeln übersehen oder die Fachregel falsch umsetzen.
+:::
+
+## Übung: Verbessere den Prompt
+
+Schreibe die folgende Anfrage so um, dass sie Ziel, vorhandenen Code, Randbedingungen und Prüfkriterium enthält. Vergleiche dann mit der Musterlösung und bewerte dich selbst.
+
+<Quiz id="m19-l05-q9" />
+
+<details>
+<summary>Vertiefung: Warum Kontext wirkt (optional)</summary>
+
+Ein Sprachmodell erzeugt die wahrscheinliche Fortsetzung eines Textes (Lektion 1). Der Text deiner Anfrage ist der Anfang dieses Textes. Enthält er dein Zeilenformat und deine Hilfsmethode, ist eine Fortsetzung, die beides nutzt, wahrscheinlicher. Das ist eine Erklärung des Mechanismus, kein gemessenes Ergebnis. Gemessen hat die Studie von Perry et al. nur den Zusammenhang zwischen sorgfältigen Anfragen und weniger Schwachstellen.
+
+</details>
+
+## Zusammenfassung
+
+Ein Assistent kennt von deinem Projekt nur, was du ihm gibst. Eine genaue Aufgabe enthält Ziel, vorhandenen Code, Randbedingungen und ein Prüfkriterium. Das ist Bewährte Praxis. Studienergebnis ist nur der Zusammenhang aus einer Nutzerstudie von 2022 mit einem älteren Werkzeug: Wer Anfragen sorgfältiger formulierte, hatte weniger Schwachstellen. Eine Projekt-Anweisungsdatei hält Regeln für das Projekt fest, garantiert aber keinen korrekten Code. Das Prüfen aus Lektion 3 bleibt nötig.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l05-q1" />
+
+<Quiz id="m19-l05-q2" />
+
+<Quiz id="m19-l05-q3" />
+
+<Quiz id="m19-l05-q4" />
+
+<Quiz id="m19-l05-q5" />
+
+<Quiz id="m19-l05-q6" />
+
+<Quiz id="m19-l05-q7" />
+
+<Quiz id="m19-l05-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l05-q10" />
+
+### Transferfrage
+
+<Quiz id="m19-l05-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Prompt engineering concepts](https://learn.microsoft.com/dotnet/ai/conceptual/prompt-engineering-dotnet)
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)

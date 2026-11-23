@@ -1,0 +1,4 @@
+alice: 0
+bob: 0
+carol: 0
+dave: 0

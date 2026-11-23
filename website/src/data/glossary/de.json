@@ -12363,6 +12363,15 @@
       "aliases": ["Konfidenzintervall", "CI"],
       "related": ["randomized-controlled-trial"],
       "lesson": "m19-l01"
+    },
+    {
+      "id": "project-instruction-file",
+      "term": "Projekt-Anweisungsdatei",
+      "category": "course",
+      "definition": "Eine Textdatei im Repository mit Regeln für KI-Assistenten, zum Beispiel Sprachversion und Namensregeln. Viele Werkzeuge lesen sie. Sie garantiert nicht, dass ein Vorschlag richtig ist.",
+      "aliases": ["Anweisungsdatei", "Projekt-Anweisungsdateien"],
+      "related": ["prompt"],
+      "lesson": "m19-l05"
     }
   ]
 }
