@@ -1,6 +1,8 @@
 # Module 19 – Programmieren mit KI (programming with AI)
 
-As of 2026-11-22 · next review: 2027-04
+As of 2026-11-23 · next review: 2027-04
+
+Review state (module review #670): all seven lessons carry `Stand: 2026-11-23`. At the half-yearly review (2027-04) re-check: the six studies below (new RCTs, replications, newer tool generations; METR updated its page in 2026-02), dead links, the wording against the neutrality checklist. Numbers spot-checked against the papers on 2026-11-23: Peng (71.17 vs 160.89 min, 55.8 %, CI 21–89 %), Shen & Tamkin (52 analysed, 26 per group, 4.15 of 27 points = 17 %), Perry (47 analysed, 33/14, five tasks), Prather (21 students, 11 without difficulties), METR (16 developers, 246 tasks, 19 %, 24 %, 20 %), Paradis (96 engineers, about 21 %, wide interval).
 
 Lesson text is German. German names below are the real learner-facing text and stay as they are.
 

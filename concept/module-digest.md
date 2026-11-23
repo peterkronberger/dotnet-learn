@@ -2,7 +2,7 @@
 
 Base since #450: C# 15 / .NET 11.
 
-As of 2026-11-22. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-23. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -464,3 +464,23 @@ Each module section has these fields:
   - The security lesson reviews made-up AI-written SecLog code and may reuse the checklist of `m18-l01`.
   - Runnable excerpts for l02–l04 live in `website/examples/m18/lYY/` (`core-*-task.cs`, `-solution.cs`), identical to the SecLog Core files except `namespace`/`using`.
   - 8 placement questions in `de/m18.json`; `placementLessons` not needed (every lesson has a question).
+
+## M19 Programmieren mit KI
+
+- **Lessons:** (all ▶, l04 with ◻ code blocks; every lesson has "Stand: 2026-11-23" and the fixed "kein Projektschritt" sentence)
+  - `m19-l01` Realistische Erwartungen – forms of AI assistants (code completion, chat, agentic), how to read a study (RCT, confidence interval); Peng 2023, Paradis 2025 and METR 2025 together.
+  - `m19-l02` Lernen vs. Abgeben – use AI to understand instead of handing off tasks; Shen & Tamkin 2026 (52 engineers, 26 per group).
+  - `m19-l03` Verifizieren – read, predict, test, look up; outdated idioms and invented APIs; METR checking effort (9 %) is the study finding, the rest best practice.
+  - `m19-l04` Sicherheit (◻) – typical vulnerabilities in AI code (SQL injection, missing authorization); Perry et al. 2023 (47 participants).
+  - `m19-l05` Kontext geben – precise task, helper functions, check criteria, project instruction file; only "more careful prompts, fewer vulnerabilities" (Perry) is a study finding.
+  - `m19-l06` Selbsteinschätzung prüfen – self-test "Kann ich das ohne KI erklären?"; Prather et al. 2024 (21 beginners).
+  - `m19-l07` Daten und Geheimnisse – no secrets or personal data in prompts, mask logs before pasting; best practice.
+- **Constructs/APIs taught:** none new. Exercise forms: AI code review (`find-bug`), improve the prompt (`explain`), "Stimmt der KI-Vorschlag?" (runner with predict).
+- **Glossary terms:** large-language-model, prompt, code-completion, ai-chat-assistant, agentic-assistant, randomized-controlled-trial, confidence-interval (all l01), project-instruction-file (l05), personal-data (l07). `secret` stays with `m15-l06` and is linked in l07.
+- **Misconception ids:** m19-l01-ai-always-faster, m19-l01-felt-speed-is-real-speed, m19-l02-working-code-means-understood, m19-l02-any-ai-use-harms-learning, m19-l03-compiles-means-correct, m19-l03-ai-knows-current-api, m19-l04-ai-code-secure-by-default, m19-l04-confident-answer-is-secure, m19-l05-short-prompt-is-enough, m19-l05-instruction-file-guarantees-correct-code, m19-l06-reading-equals-writing, m19-l06-solved-means-learned, m19-l07-prompt-stays-private, m19-l07-removing-names-is-enough
+- **Open forward references:** none (`grep -rn 'module="19"' website/docs` is empty). M19 is the last module.
+- **SecLog end state:** unchanged, `website/examples/_ci/seclog-m18-l06/`. M19 adds no SecLog step and no `seclog-` file.
+- **Notes:**
+  - Half-yearly review (2027-04): re-check the six studies in `concept/ai-module.md` (new RCTs, replications, newer tool generations), dead links, wording against the neutrality checklist. All lessons carry `Stand: 2026-11-23`.
+  - Rule 11: AI content outside M19 only in `m00-l00` and "Wie dieser Kurs funktioniert".
+  - 8 placement questions in `de/m19.json` (l01-q2, l01-q4, l02-q2, l03-q4, l04-q1, l05-q2, l06-q4, l07-q3); `placementLessons` not needed.
