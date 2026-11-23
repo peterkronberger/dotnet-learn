@@ -1,0 +1,4 @@
+Rejected: the user name is missing.
+Rejected: the user name is missing.
+Rejected: the user name is missing.
+Accepted: bob
