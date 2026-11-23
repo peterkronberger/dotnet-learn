@@ -12381,7 +12381,7 @@
       "definition": "Ein Wert, der nur Berechtigte kennen dürfen, zum Beispiel ein Passwort, ein API-Schlüssel, ein Token oder eine Verbindungszeichenfolge mit Passwort.",
       "aliases": ["Geheimnisse", "Secrets"],
       "related": ["user-secrets", "prompt"],
-      "lesson": "m19-l07"
+      "lesson": "m15-l06"
     },
     {
       "id": "personal-data",
