@@ -1,0 +1,178 @@
+---
+title: Lernen vs. Abgeben
+sidebar_position: 2
+description: Wer etwas Neues lernt, nutzt KI zum Verstehen (Nachfragen, Erklärungen, Konzeptfragen) statt die ganze Aufgabe abzugeben. Abgeben kann Verständnis kosten. Gezeigt an einer Studie mit 52 Ingenieuren.
+lesson_id: m19-l02
+duration_min: 23
+---
+
+import aiDeferred from '!!raw-loader!@site/examples/m19/l02/ai-explanation-deferred.cs';
+import aiDeferredOutput from '!!raw-loader!@site/examples/m19/l02/ai-explanation-deferred.out.txt';
+
+# Lernen vs. Abgeben
+
+:::note[Lernziele]
+- Du kannst den Unterschied zwischen „KI zum Verstehen nutzen“ und „Aufgabe abgeben“ an Beispielen erklären.
+- Du kannst das Ergebnis von Shen und Tamkin mit Gruppe, Aufgabe, Stichprobe und Einschränkungen wiedergeben.
+- Du formulierst eine Anfrage so um, dass sie dein Verstehen unterstützt, statt die Lösung zu liefern.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+## Rückblick
+
+<Quiz id="m19-l01-q4" />
+
+<Quiz id="m19-l01-q5" />
+
+<Quiz id="m11-l05-q1" />
+
+## Zwei Arten, einen Assistenten zu nutzen
+
+Lektion 1 fragte, wie schnell ein Assistent macht. Diese Lektion fragt, was du dabei lernst. Es gibt zwei Arten der Nutzung:
+
+- **Abgeben:** Du gibst die ganze Aufgabe weiter („Schreib mir …“) und übernimmst das Ergebnis.
+- **Zum Verstehen nutzen:** Du versuchst es zuerst selbst, fragst gezielt nach, lässt dir ein Konzept oder eine Fehlermeldung erklären und prüfst das Ergebnis.
+
+Ein Beispiel für den Unterschied: „Schreib mir die Abfrage, die die Fehlversuche pro Benutzer zählt“ ist Abgeben. „Warum braucht `GroupBy` danach ein `Select`?“ ist eine Frage zum Verstehen.
+
+## Die Studie
+
+**Studienergebnis** ([Shen & Tamkin, 2026](https://arxiv.org/abs/2601.20245)):
+
+- **Gruppe:** 52 Ingenieure, die per Zufall in zwei Gruppen zu je 26 geteilt wurden (RCT, Lektion 1). Sie wurden über eine Plattform für Auftragsarbeit gewonnen und bezahlt.
+- **Aufgabe:** In 35 Minuten sollten sie zwei Aufgaben mit einer ihnen unbekannten Python-Bibliothek für nebenläufige Programmierung lösen (Trio). Eine Gruppe hatte einen Chat-Assistenten, die andere nicht. Danach schrieben alle einen Test mit 27 Punkten.
+- **Werkzeug und Zeit:** ein Chat-Assistent mit dem Modell GPT-4o, Studie von 2026.
+- **Ergebnis:** Die Gruppe mit Assistent erreichte im Test im Mittel 4,15 Punkte weniger, etwa 17 %. Der Unterschied war statistisch deutlich. Bei der Bearbeitungszeit gab es keinen statistisch deutlichen Unterschied. Die größte Lücke zeigte sich bei Fragen zum Finden von Fehlern, die kleinste beim Lesen von Code.
+- **Muster der Nutzung:** Die Autoren fanden sechs Arten, den Assistenten zu nutzen. Drei davon hatten im Test im Mittel über 65 %: Code zuerst erzeugen und dann verstehen, Erklärungen zum Code erfragen, Konzeptfragen stellen. Drei hatten im Mittel unter 40 %: Aufgabe komplett abgeben, sich zunehmend auf den Assistenten verlassen, Fehler nur mit dem Assistenten suchen. Jedes Muster kam nur bei wenigen Personen vor, zwischen 2 und 7.
+- **Einschränkungen:** eine einzige Aufgabe, nur ein Chat, nur ein Zeitfenster von etwa einer Stunde, kein berufliches Interesse am Lernen der Bibliothek, ein einziger Test. Die Autoren arbeiten bei Anthropic, einem Hersteller von KI-Modellen (möglicher Interessenkonflikt).
+
+Gesamtbild: Wer die Aufgabe abgab, lernte in dieser Studie weniger. Wer den Assistenten zum Verstehen nutzte, schnitt im Test gut ab. Das gilt für diese Gruppe, diese Bibliothek und dieses Werkzeug.
+
+## Zum Verstehen nutzen
+
+**Bewährte Praxis (nicht durch Studien belegt):**
+
+1. **Erst selbst versuchen.** Wer sich Wissen selbst abruft, behält es länger als beim erneuten Lesen ([Roediger & Karpicke, 2006](https://doi.org/10.1111/j.1467-9280.2006.01693.x)). Ein Versuch ohne Assistent ist Abrufübung.
+2. **Gezielt nachfragen.** Frage nach dem *Warum*, nicht nach der fertigen Lösung.
+3. **Konzept oder Fehlermeldung erklären lassen.** „Was bedeutet diese Warnung?“ statt „Behebe die Warnung.“
+4. **Einen Hinweis statt der Lösung erbitten.**
+5. **Das Ergebnis ohne KI erklären.** Kannst du es nicht, hast du es nicht verstanden. Lektion 6 vertieft diese Prüfung.
+
+### Beispiel mit Teilzielen: aus einer Abgabe wird eine Lernfrage
+
+Die Teilziele: „1. Ziel klären: lernen oder erledigen? → 2. Erst selbst versuchen → 3. Gezielt nachfragen → 4. Ergebnis ohne KI erklären“.
+
+Ausgangsanfrage (Abgeben): „Schreib mir eine LINQ-Abfrage, die in einer Liste von Meldungen die Fehlversuche pro Benutzer zählt.“
+
+1. **Ziel klären:** Du willst `GroupBy` (Modul 11) wirklich können, also lernen. Die Anfrage soll dein Verstehen unterstützen.
+2. **Erst selbst versuchen:** Du schreibst deinen Entwurf mit `GroupBy` und `Select`. Er liefert nicht die erwartete Anzahl.
+3. **Gezielt nachfragen:** „Hier ist mein Entwurf. Ich erwarte pro Benutzer eine Zahl, bekomme aber Gruppen. Gib mir einen Hinweis, wo mein Denkfehler liegt, aber noch nicht die Lösung.“
+4. **Ergebnis ohne KI erklären:** Nach der Antwort schließt du den Chat und erklärst in eigenen Worten, was `GroupBy` zurückgibt und warum `Count()` pro Gruppe gebraucht wird.
+
+### Lückenbeispiel
+
+Ausgangsanfrage (Abgeben): „Gib mir den Code, der die Meldungen nach Stunde sortiert.“
+
+1. **Ziel klären:** ______
+2. **Erst selbst versuchen:** ______
+3. **Gezielt nachfragen:** ______
+4. **Ergebnis ohne KI erklären:** ______
+
+<details>
+<summary>Mögliche Lösung anzeigen</summary>
+
+1. **Ziel klären:** Du willst `OrderBy` mit einem Schlüssel verstehen, nicht nur eine Zeile bekommen.
+2. **Erst selbst versuchen:** Du schreibst `OrderBy` mit der Stunde als Schlüssel und führst es aus.
+3. **Gezielt nachfragen:** „Meine Meldungen stehen in der falschen Reihenfolge. Was macht der Schlüssel bei `OrderBy` genau? Erkläre es, ohne meinen Code zu ersetzen.“
+4. **Ergebnis ohne KI erklären:** Du beschreibst, wie `OrderBy` den Schlüssel jedes Elements vergleicht und warum die Reihenfolge so entsteht.
+
+Andere Formulierungen sind richtig, wenn alle vier Schritte vorkommen.
+
+</details>
+
+## Stimmt der KI-Vorschlag?
+
+Ein Assistent erklärt dir ein Verhalten, das du aus Modul 11 kennst. Der Code unten ist der, den er erklärt.
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+`Where` filtert die Liste sofort, wenn die Zeile mit `even` ausgeführt wird. Das Ergebnis ist dann `2`. Das später hinzugefügte `4` ändert daran nichts. Das Programm gibt deshalb `1` aus.
+:::
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp und entscheide, ob die Erklärung dazu passt.
+:::
+
+<CSharpRunner id="m19-l02-deferred" code={aiDeferred} predict expected={aiDeferredOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `2`. Die Erklärung des Assistenten stimmt nicht.
+
+1. **Behauptung prüfen:** Die Erklärung sagt, `Where` laufe sofort. `Where` ist ein Operator mit verzögerter Ausführung (Lektion „Verzögerte Ausführung“). Die Zeile mit `even` beschreibt die Abfrage nur.
+2. **Wann sie läuft:** Erst `Count()` durchläuft die Liste, und das passiert nach `numbers.Add(4);`.
+3. **Ergebnis:** Dann passen `2` und `4`. Das sind zwei Elemente.
+4. **Fazit:** Die Erklärung klang sicher, aber ein Lauf im Runner widerlegt sie. Nur wer den Code vorhergesagt und ausgeführt hat, bemerkt den Fehler.
+
+**Was passiert, wenn …?** … vor dem `Add` ein `ToList()` an die Abfrage gehängt wird? Dann läuft die Abfrage sofort und merkt sich eine Kopie. `Count()` gibt dann `1` aus.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum Code, der läuft, kein Verständnis beweist (optional)</summary>
+
+Ein Programm kann das richtige Ergebnis liefern, ohne dass du weißt, warum. Das fällt erst auf, wenn die Eingabe sich ändert oder du eine Änderung machen sollst. In der Studie war die Lücke bei Fragen zum Finden von Fehlern am größten. Das passt dazu, bleibt aber eine Vermutung: Die Studie untersuchte den Grund nicht.
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l02-working-code-means-understood" />
+
+**„Wenn der Code von der KI läuft, habe ich ihn verstanden.“** Das stimmt nicht. Lauffähiger Code zeigt nur, dass er für die ausprobierten Eingaben ein Ergebnis liefert. Ob du erklären kannst, warum, prüfst du ohne KI.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l02-any-ai-use-harms-learning" />
+
+**„Jede Nutzung von KI schadet dem Lernen.“** Das stimmt nicht. In der Studie schnitten die Gruppen gut ab, die Erklärungen und Konzeptfragen nutzten. Schlechter schnitt ab, wer die Aufgabe abgab.
+:::
+
+## Zusammenfassung
+
+In einer Studie mit 52 Ingenieuren, die eine unbekannte Bibliothek lernten, erreichte die Gruppe mit Chat-Assistent im Test im Mittel etwa 17 % weniger Punkte. Die Bearbeitungszeit unterschied sich nicht deutlich. Wer Erklärungen und Konzeptfragen nutzte, schnitt gut ab. Die Stichprobe ist klein, der Zeitraum kurz, und die Autoren arbeiten bei einem Hersteller von KI-Modellen. Als Praxis bietet sich an: erst selbst versuchen, gezielt nachfragen und das Ergebnis ohne KI erklären. Das ist Bewährte Praxis und kein Studienergebnis.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l02-q1" />
+
+<Quiz id="m19-l02-q2" />
+
+<Quiz id="m19-l02-q3" />
+
+<Quiz id="m19-l02-q4" />
+
+<Quiz id="m19-l02-q5" />
+
+<Quiz id="m19-l02-q6" />
+
+### Anfrage verbessern
+
+<Quiz id="m19-l02-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l02-q8" />
+
+### Transferfrage
+
+<Quiz id="m19-l02-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Prompt engineering in .NET](https://learn.microsoft.com/dotnet/ai/conceptual/prompt-engineering-dotnet)
+- Microsoft Learn: [How Generative AI and LLMs work](https://learn.microsoft.com/dotnet/ai/conceptual/how-genai-and-llms-work)

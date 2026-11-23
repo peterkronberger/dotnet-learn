@@ -1,0 +1,198 @@
+---
+title: Realistische Erwartungen
+sidebar_position: 1
+description: Wie viel ein KI-Assistent das Programmieren beschleunigt, hängt von Aufgabe, Erfahrung, Codebasis und Werkzeug ab. Das eigene Zeitgefühl ist kein verlässliches Maß. Gezeigt an drei Studien.
+lesson_id: m19-l01
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aiPercent from '!!raw-loader!@site/examples/m19/l01/ai-percent-change.cs';
+import aiPercentOutput from '!!raw-loader!@site/examples/m19/l01/ai-percent-change.out.txt';
+import percentFixed from '!!raw-loader!@site/examples/m19/l01/percent-change-fixed.cs';
+
+# Realistische Erwartungen
+
+:::note[Lernziele]
+- Du kannst die drei Formen von KI-Assistenten (Codevervollständigung, Chat, agentische Assistenten) unterscheiden.
+- Du kannst aus einer Studie Gruppe, Aufgabe, Werkzeug und Zeit, Stichprobe und Effekt mit Unsicherheit herauslesen.
+- Du kannst erklären, warum die Studien von Peng, Paradis und METR zu verschiedenen Ergebnissen kommen.
+- Du kannst begründen, warum gefühlte Zeitersparnis kein verlässliches Maß ist.
+:::
+
+:::tip[Projekt: Was SecLog nach diesem Modul kann]
+- SecLog bekommt in diesem Modul keine neue Funktion – es ist mit dem Abschlussprojekt fertig.
+- Du prüfst konstruierte KI-Vorschläge für SecLog-Code mit der Review-Checkliste aus Modul 18.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+Jede Aussage über Zeitgewinn, Lernen oder Sicherheit trägt in diesem Modul eine Markierung: **Studienergebnis** (mit Gruppe, Aufgabe, Werkzeuggeneration, Stichprobe und Unsicherheit) oder **Bewährte Praxis (nicht durch Studien belegt)**. Studien gelten für eine bestimmte Werkzeuggeneration und werden mit der Zeit älter.
+
+## Rückblick
+
+<Quiz id="m00-l00-q3" />
+
+<Quiz id="m00-l00-q4" />
+
+<Quiz id="m18-l01-q1" />
+
+## Was ein KI-Assistent ist
+
+Ein <Term id="large-language-model">Large Language Model (großes Sprachmodell)</Term> wurde mit sehr großen Textmengen trainiert, darunter Code. Es setzt einen Text Stück für Stück fort: Es wählt jeweils das wahrscheinlichste nächste Stück, und die Ausgabe hängt von der Eingabe ab ([How Generative AI and LLMs work](https://learn.microsoft.com/dotnet/ai/conceptual/how-genai-and-llms-work)). Für dich heißt das: Das Modell erzeugt wahrscheinlichen Code. Es führt ihn nicht aus und prüft ihn nicht. Ob er läuft und das Richtige tut, stellst du fest.
+
+Die Eingabe heißt <Term id="prompt">Prompt</Term>: der Text, den du dem Assistenten gibst, zum Beispiel eine Frage oder eine Aufgabe. Wie ein Prompt gut aufgebaut ist, folgt in Lektion 5.
+
+Assistenten gibt es in drei Formen:
+
+| Form | Was sie tut | Wer entscheidet über den Code |
+| --- | --- | --- |
+| <Term id="code-completion">Codevervollständigung</Term> | Schlägt beim Tippen die nächste Zeile oder den nächsten Block vor | Du nimmst den Vorschlag an oder tippst weiter |
+| <Term id="ai-chat-assistant">Chat</Term> | Antwortet in einem Gesprächsfenster auf Fragen und Aufgaben | Du kopierst Code selbst in dein Programm |
+| <Term id="agentic-assistant">Agentischer Assistent</Term> | Führt mehrere Schritte selbstständig aus, zum Beispiel Dateien ändern und Befehle starten | Du prüfst das Ergebnis, nicht jeden Schritt |
+
+Diese Lektion fragt: Wie viel schneller macht ein solcher Assistent das Programmieren? Dazu gibt es Studien. Um sie zu lesen, brauchst du drei Begriffe.
+
+## Eine Studie lesen
+
+- Eine <Term id="randomized-controlled-trial">randomisierte kontrollierte Studie (RCT)</Term> teilt die Teilnehmenden per Zufall in eine Gruppe mit dem Werkzeug und eine Vergleichsgruppe ohne. Dann unterscheiden sich die Gruppen im Mittel nur durch das Werkzeug.
+- Die **Stichprobe** ist die Zahl der Teilnehmenden. Wenige Teilnehmende machen das Ergebnis unsicherer.
+- Ein <Term id="confidence-interval">Konfidenzintervall</Term> ist der Bereich, in dem der wahre Effekt wahrscheinlich liegt. Ein Wert wie „55,8 % schneller, Intervall 21–89 %“ sagt also: Der wahre Wert liegt wahrscheinlich irgendwo zwischen 21 und 89 %. Je breiter das Intervall, desto unsicherer die Zahl.
+
+Beim Lesen hilft eine feste Reihenfolge.
+
+### Beispiel mit Teilzielen: Peng et al.
+
+Die Teilziele: „1. Wer wurde untersucht? → 2. Welche Aufgabe, welches Werkzeug, wann? → 3. Wie groß ist der Effekt, und wie sicher ist er? → 4. Wer hat die Studie durchgeführt (Interessenkonflikt)?“
+
+**Studienergebnis** ([Peng et al., 2023](https://arxiv.org/abs/2302.06590)):
+
+1. **Wer:** 95 Freelancer, die über eine Plattform für Auftragsarbeit angeworben wurden. 45 bekamen den Assistenten, 50 nicht, per Zufall.
+2. **Aufgabe, Werkzeug, Zeit:** einen HTTP-Server in JavaScript schreiben, so schnell wie möglich. Das Werkzeug war eine Codevervollständigung auf Basis eines Modells von 2022. Das Experiment lief von Mai bis Juni 2022.
+3. **Effekt:** Die Gruppe mit Assistent brauchte im Mittel 71 Minuten, die Vergleichsgruppe 161 Minuten. Das sind 55,8 % weniger Zeit, Konfidenzintervall 21–89 %. Das Intervall ist breit. Die Studie prüfte nur diese eine, eng umrissene Aufgabe, nicht Qualität oder Sicherheit des Codes.
+4. **Wer:** Die Autoren gehören zu GitHub und Microsoft Research. GitHub stellt das untersuchte Werkzeug her.
+
+### Lückenbeispiel: Paradis et al.
+
+Dieselben vier Teilziele. Die Schritte 1 und 2 sind ausgefüllt. Die Schritte 3 und 4 sind Lücken: Lies zuerst die Angaben, schreibe deine Antwort auf und vergleiche dann.
+
+**Studienergebnis** ([Paradis et al., 2025](https://arxiv.org/abs/2410.12944)):
+
+1. **Wer:** 96 Softwareingenieure von Google, 48 mit und 48 ohne KI-Funktionen, per Zufall verteilt (RCT).
+2. **Aufgabe, Werkzeug, Zeit:** eine größere Aufgabe aus dem Firmenalltag: einen neuen Dienst zu einer bestehenden Änderung mit zehn Dateien ergänzen. Drei interne KI-Funktionen von Google, Sommer 2024.
+3. **Effekt und Sicherheit:** ______
+4. **Interessenkonflikt:** ______
+
+<details>
+<summary>Lösung anzeigen</summary>
+
+3. **Effekt und Sicherheit:** Die beste Schätzung liegt bei etwa 21 % weniger Zeit. Die Autoren schreiben selbst, dass das Konfidenzintervall breit ist. Sie halten es für möglich, dass der Effekt bei anderen Werkzeugen oder zu anderer Zeit anders ausfällt.
+4. **Interessenkonflikt:** Alle Autoren arbeiten bei Google, und untersucht wurden Werkzeuge von Google, also die des eigenen Unternehmens. Die Autoren nennen das selbst als mögliche Verzerrung.
+
+</details>
+
+## Drei Studien zusammen
+
+Die dritte Studie ist die von METR. Sie ist ein RCT mit erfahrenen Entwicklern an ihren eigenen großen Projekten. **Studienergebnis** ([METR, 2025](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/)): 16 Entwickler mit mehrjähriger Erfahrung in Open-Source-Projekten bearbeiteten 246 echte Aufgaben, im Mittel etwa zwei Stunden lang. Jede Aufgabe wurde per Zufall mit oder ohne KI-Werkzeuge vergeben. Mit KI dauerten die Aufgaben 19 % **länger**.
+
+| | Peng et al. 2023 | Paradis et al. 2025 | METR 2025 |
+| --- | --- | --- | --- |
+| Gruppe | 95 Freelancer | 96 Google-Ingenieure | 16 erfahrene Entwickler |
+| Aufgabe | HTTP-Server in JavaScript, eine eng umrissene Aufgabe | größere Aufgabe aus dem Firmenalltag | 246 echte Aufgaben in eigenen großen Projekten |
+| Werkzeug und Zeit | Codevervollständigung, Mai–Juni 2022 | drei interne Funktionen, Sommer 2024 | Werkzeuge von Anfang 2025 |
+| Effekt | 55,8 % weniger Zeit | etwa 21 % weniger Zeit | 19 % mehr Zeit |
+| Unsicherheit | Intervall 21–89 % | Intervall breit | nur 16 Personen, mögliche Auswahlverzerrung |
+| Hinweis | Autoren bei GitHub und Microsoft Research | Autoren bei Google, eigene Werkzeuge | In den geprüften Quellen ist kein Interessenkonflikt genannt |
+
+Die Ergebnisse widersprechen sich, und das ist kein Fehler. Die Studien unterscheiden sich in vier Punkten: **Aufgabe** (eng umrissen oder echt und offen), **Erfahrung** (Freelancer oder Entwickler mit jahrelanger Erfahrung im Projekt), **Codebasis** (neue Aufgabe oder große bestehende Projekte) und **Werkzeuggeneration** (2022, 2024, 2025). Aus den Studien folgt nicht, welcher dieser Punkte den Unterschied macht. Das ist eine offene Frage. Die Autoren von METR schreiben, dass sich das Ergebnis bei neueren Werkzeugen ändern kann.
+
+## Das Zeitgefühl täuscht
+
+**Studienergebnis** (METR, Stichprobe wie oben): Vor der Arbeit erwarteten die Entwickler, dass KI sie um 24 % beschleunigt. Nach der Arbeit schätzten sie, dass sie um etwa 20 % schneller waren. Gemessen waren es 19 % mehr Zeit. Die eigene Schätzung lag in dieser Studie also in die falsche Richtung. Für andere Gruppen und Werkzeuge sagt das nichts. Es zeigt aber, dass sich schneller anfühlen und schneller sein zwei verschiedene Dinge sind.
+
+**Bewährte Praxis (nicht durch Studien belegt):** Miss deine eigene Zeit bei vergleichbaren Aufgaben, mit und ohne Assistent, statt dem Gefühl zu trauen. Eine Stoppuhr oder ein Zeitprotokoll genügt. Rechne die Änderung in Prozent aus – dabei passieren leicht Fehler.
+
+## Stimmt der KI-Vorschlag?
+
+Du hast bei fünf ähnlichen Aufgaben gemessen: Ohne Assistent brauchtest du im Mittel 40 Minuten, mit Assistent 50 Minuten. Ein Assistent hat dir ein kleines Programm für die Änderung in Prozent geschrieben.
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist ein Programm, das die Änderung der Zeit in Prozent berechnet. Die Änderung ist die Differenz geteilt durch die Zeit ohne Assistent, mal 100.
+:::
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp. Rechne vorher selbst nach: Um wie viel Prozent hat sich die Zeit geändert?
+:::
+
+<CSharpRunner id="m19-l01-percent" code={aiPercent} predict expected={aiPercentOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `Time change: 0 %`. Richtig wären 25 %: 10 Minuten mehr bei 40 Minuten Ausgangszeit.
+
+1. **Typen prüfen:** `minutesWithAi - minutesWithoutAi` ist `10`, ein `int`. Geteilt durch `minutesWithoutAi` (`40`, ebenfalls `int`) ist das eine Ganzzahldivision. Sie schneidet den Rest ab: `10 / 40` ergibt `0`.
+2. **Folge:** `0 * 100` bleibt `0`. Die Rechnung meldet „keine Änderung“, obwohl die Zeit gestiegen ist.
+3. **Reparatur:** Ein Faktor mit `double` macht die Division zur Gleitkommadivision. Zuerst mit `100.0` malnehmen und dann teilen, dann entsteht `25`.
+
+<CodeBlock language="csharp" title="percent-change-fixed.cs">{percentFixed}</CodeBlock>
+
+**Was passiert, wenn …?** … die Zeit mit Assistent kürzer wäre, zum Beispiel 30 Minuten? Dann ist die Differenz negativ, und das Ergebnis ist eine negative Prozentzahl: weniger Zeit. Das Vorzeichen trägt die Richtung.
+
+</details>
+
+<details>
+<summary>Vertiefung: Ein Prozentwert hängt von der Bezugsgröße ab (optional)</summary>
+
+„Prozent weniger Zeit“ und „Prozent schneller“ sind nicht dasselbe. Wer von 160 auf 71 Minuten kommt, braucht 55,8 % weniger Zeit. Die Geschwindigkeit, also Aufgaben pro Stunde, steigt dann aber um mehr als 100 %. Achte deshalb darauf, worauf sich eine Zahl bezieht. Das ist Rechnen, kein Studienergebnis.
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l01-ai-always-faster" />
+
+**„Mit KI-Assistent ist man bei jeder Aufgabe schneller.“** Das stimmt nicht. Die drei Studien kommen zu Ergebnissen von 19 % mehr bis 55,8 % weniger Zeit, je nach Aufgabe, Erfahrung, Codebasis und Werkzeug.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l01-felt-speed-is-real-speed" />
+
+**„Wenn es sich schneller anfühlt, war ich auch schneller.“** Das stimmt nicht immer. In der METR-Studie schätzten die Entwickler ein Plus von etwa 20 %, gemessen wurden 19 % mehr Zeit.
+:::
+
+## Zusammenfassung
+
+Ein KI-Assistent erzeugt wahrscheinlichen Code und prüft ihn nicht selbst. Er kommt als Codevervollständigung, Chat oder agentischer Assistent vor. Eine Studie liest du mit vier Fragen: Wer, welche Aufgabe mit welchem Werkzeug und wann, wie groß und wie sicher der Effekt, wer hat sie durchgeführt. Die Studien von Peng, Paradis und METR kommen zu 55,8 % weniger Zeit, etwa 21 % weniger Zeit und 19 % mehr Zeit, weil sich Aufgabe, Erfahrung, Codebasis und Werkzeug unterscheiden. Das Zeitgefühl war in der METR-Studie falsch. Messen ist verlässlicher.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l01-q1" />
+
+<Quiz id="m19-l01-q2" />
+
+<Quiz id="m19-l01-q3" />
+
+<Quiz id="m19-l01-q4" />
+
+<Quiz id="m19-l01-q5" />
+
+<Quiz id="m19-l01-q6" />
+
+<Quiz id="m19-l01-q7" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l01-q8" />
+
+### Transferfrage
+
+<Quiz id="m19-l01-q9" />
+
+## Weiterlesen
+
+- Microsoft Learn: [How Generative AI and LLMs work](https://learn.microsoft.com/dotnet/ai/conceptual/how-genai-and-llms-work)
+- Microsoft Learn: [Prompt engineering in .NET](https://learn.microsoft.com/dotnet/ai/conceptual/prompt-engineering-dotnet)

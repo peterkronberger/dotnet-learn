@@ -1,4 +1,302 @@
 {
   "module": "m19",
-  "questions": []
+  "questions": [
+    {
+      "id": "m19-l01-q1",
+      "lesson": "m19-l01",
+      "type": "match",
+      "question": "Ordne jeder Form eines KI-Assistenten die passende Beschreibung zu.",
+      "pairs": [
+        {
+          "left": "Codevervollständigung",
+          "right": "Schlägt beim Tippen die nächste Zeile vor"
+        },
+        {
+          "left": "Chat",
+          "right": "Antwortet in einem Gesprächsfenster, du übernimmst den Code selbst"
+        },
+        {
+          "left": "Agentischer Assistent",
+          "right": "Führt mehrere Schritte selbstständig aus, zum Beispiel Dateien ändern"
+        }
+      ],
+      "explanation": "Die drei Formen unterscheiden sich darin, wie viel der Assistent selbst tut und wo du eingreifst."
+    },
+    {
+      "id": "m19-l01-q2",
+      "lesson": "m19-l01",
+      "type": "single",
+      "question": "Was tut ein großes Sprachmodell, wenn es Code erzeugt?",
+      "options": [
+        {
+          "text": "Es setzt den Text Stück für Stück mit dem jeweils wahrscheinlichsten nächsten Stück fort.",
+          "correct": true
+        },
+        {
+          "text": "Es führt den Code aus und liefert nur Code, der läuft.",
+          "feedback": "Das Modell führt den erzeugten Code nicht aus und prüft ihn nicht."
+        },
+        {
+          "text": "Es schlägt die Lösung in der Dokumentation nach und kopiert sie.",
+          "feedback": "Das Modell erzeugt neuen, statistisch ähnlichen Text aus den Mustern seines Trainings."
+        }
+      ],
+      "explanation": "Das Modell erzeugt wahrscheinlichen Text. Ob der Code läuft und das Richtige tut, stellst du fest."
+    },
+    {
+      "id": "m19-l01-q3",
+      "lesson": "m19-l01",
+      "type": "single",
+      "question": "In einer Studie steht: „55,8 % weniger Zeit, Konfidenzintervall 21–89 %“. Was sagt das Intervall?",
+      "options": [
+        {
+          "text": "Der wahre Effekt liegt wahrscheinlich irgendwo zwischen 21 und 89 %. Ein breites Intervall heißt, dass der Wert unsicher ist.",
+          "correct": true
+        },
+        {
+          "text": "Bei 21 bis 89 % der Teilnehmenden hat der Assistent geholfen.",
+          "feedback": "Das Intervall sagt nichts über Anteile der Teilnehmenden, sondern über die Unsicherheit der Schätzung."
+        },
+        {
+          "text": "Der Effekt war bei jedem Teilnehmenden zwischen 21 und 89 %.",
+          "feedback": "Das Intervall beschreibt, wo der wahre Mittelwert wahrscheinlich liegt, nicht die Werte der Einzelnen."
+        }
+      ],
+      "explanation": "Ein Konfidenzintervall ist der Bereich, in dem der wahre Effekt wahrscheinlich liegt."
+    },
+    {
+      "id": "m19-l01-q4",
+      "lesson": "m19-l01",
+      "type": "single",
+      "question": "In der METR-Studie schätzten die Entwickler nach der Arbeit, dass KI sie um etwa 20 % beschleunigt hat. Gemessen waren es 19 % mehr Zeit. Was zeigt das?",
+      "options": [
+        {
+          "text": "Ihre Schätzung lag in die falsche Richtung. Gefühlte Zeitersparnis ist kein verlässliches Maß.",
+          "correct": true
+        },
+        {
+          "text": "Die Entwickler wissen am besten, wie schnell sie waren, die Messung muss falsch sein.",
+          "misconception": "m19-l01-felt-speed-is-real-speed",
+          "feedback": "Die Zeit wurde gemessen. Die Schätzung der Entwickler wich ab."
+        },
+        {
+          "text": "Wer sich schneller fühlt, ist auch schneller, die Studie ist eine Ausnahme.",
+          "misconception": "m19-l01-felt-speed-is-real-speed",
+          "feedback": "Ein Gefühl ist keine Messung. Ob es für andere Gruppen stimmt, zeigt nur eine eigene Messung."
+        }
+      ],
+      "explanation": "Vorher erwarteten die Entwickler +24 %, nachher schätzten sie +20 %, gemessen waren es 19 % mehr Zeit. Für andere Gruppen und Werkzeuge sagt das nichts, aber es zeigt, dass sich schneller anfühlen und schneller sein verschiedene Dinge sind."
+    },
+    {
+      "id": "m19-l01-q5",
+      "lesson": "m19-l01",
+      "type": "single",
+      "question": "Welche Schlussfolgerung aus den drei Studien von Peng, Paradis und METR ist richtig?",
+      "options": [
+        {
+          "text": "Das Ergebnis hängt von Aufgabe, Erfahrung, Codebasis und Werkzeug ab. Es reicht von 19 % mehr bis 55,8 % weniger Zeit.",
+          "correct": true
+        },
+        {
+          "text": "Ein KI-Assistent macht jede Aufgabe etwa halb so lang.",
+          "misconception": "m19-l01-ai-always-faster",
+          "feedback": "Das gilt nur für die eng umrissene Aufgabe in der ersten Studie. Eine andere Studie fand 19 % mehr Zeit."
+        },
+        {
+          "text": "Ein KI-Assistent verlängert jede Aufgabe, denn die jüngste Studie fand 19 % mehr Zeit.",
+          "misconception": "m19-l01-ai-always-faster",
+          "feedback": "Auch das ist eine Verallgemeinerung. Die Studie gilt für erfahrene Entwickler an ihren eigenen großen Projekten und für Werkzeuge von Anfang 2025."
+        }
+      ],
+      "explanation": "Die Studien untersuchen unterschiedliche Gruppen, Aufgaben und Werkzeuggenerationen. Darum widersprechen sie sich, ohne dass eine falsch sein muss."
+    },
+    {
+      "id": "m19-l01-q6",
+      "lesson": "m19-l01",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m19/l01/ai-percent-change.cs",
+      "explanation": "`10 / 40` ist eine Ganzzahldivision und ergibt `0`. Mit `0 * 100` bleibt es bei `0 %`, obwohl die Zeit um 25 % gestiegen ist."
+    },
+    {
+      "id": "m19-l01-q7",
+      "lesson": "m19-l01",
+      "type": "multi",
+      "question": "Welche Punkte unterscheiden die drei Studien und können deshalb die verschiedenen Ergebnisse erklären?",
+      "options": [
+        {
+          "text": "Die Aufgabe (eng umrissen oder echt und offen)",
+          "correct": true
+        },
+        {
+          "text": "Die Erfahrung der Teilnehmenden",
+          "correct": true
+        },
+        {
+          "text": "Die Werkzeuggeneration und der Zeitpunkt",
+          "correct": true
+        },
+        {
+          "text": "Die Programmiersprache, in der die Teilnehmenden den Prompt tippten",
+          "feedback": "Die Studien unterscheiden sich in Gruppe, Aufgabe, Codebasis und Werkzeug, nicht in der Sprache des Prompts."
+        }
+      ],
+      "explanation": "Aufgabe, Erfahrung, Codebasis und Werkzeuggeneration unterscheiden sich. Welcher Punkt den Unterschied macht, zeigen die Studien nicht."
+    },
+    {
+      "id": "m19-l01-q8",
+      "lesson": "m19-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum das eigene Gefühl für Zeitersparnis kein verlässliches Maß ist. Nenne ein Studienergebnis dazu.",
+      "modelAnswer": "Wie schnell man sich fühlt, ist eine Schätzung und keine Messung. In der METR-Studie mit 16 erfahrenen Entwicklern erwarteten diese vorher +24 % und schätzten nachher +20 %, gemessen waren es aber 19 % mehr Zeit. Die Schätzung lag also in die falsche Richtung. Für andere Gruppen und Werkzeuge sagt das nichts Genaues, aber es zeigt, dass man nachmessen muss."
+    },
+    {
+      "id": "m19-l01-q9",
+      "lesson": "m19-l01",
+      "type": "explain",
+      "question": "Transferfrage: Du willst wissen, ob ein KI-Assistent dir bei deiner Art von Aufgaben Zeit spart. Wie gehst du vor?",
+      "modelAnswer": "Ich suche mehrere ähnliche Aufgaben, bearbeite einen Teil mit und einen Teil ohne Assistent und stoppe die Zeit für jede. Die Zuordnung der Aufgaben wähle ich zufällig, damit nicht die leichten Aufgaben bei einer Gruppe landen. Dann vergleiche ich die mittleren Zeiten in Prozent und achte auf die Bezugsgröße. Bei wenigen Aufgaben bleibt das Ergebnis unsicher. Das ist Bewährte Praxis und kein Studienergebnis."
+    },
+    {
+      "id": "m19-l02-q1",
+      "lesson": "m19-l02",
+      "type": "single",
+      "question": "Welche Anfrage nutzt den Assistenten zum Verstehen und gibt nicht die Aufgabe ab?",
+      "options": [
+        {
+          "text": "„Mein Entwurf liefert Gruppen statt Zahlen. Gib mir einen Hinweis auf meinen Denkfehler, aber noch nicht die Lösung.“",
+          "correct": true
+        },
+        {
+          "text": "„Schreib mir die komplette Abfrage, ich brauche sie bis heute Abend.“",
+          "feedback": "Das ist Abgeben: Du bekommst ein Ergebnis, aber keinen Lernschritt."
+        },
+        {
+          "text": "„Mach das Programm fertig und sag mir nur, wenn es läuft.“",
+          "feedback": "Das ist Abgeben. Du erfährst nicht, warum es läuft."
+        }
+      ],
+      "explanation": "Verstehen heißt: erst selbst versuchen und dann gezielt nach dem Warum oder einem Hinweis fragen."
+    },
+    {
+      "id": "m19-l02-q2",
+      "lesson": "m19-l02",
+      "type": "single",
+      "question": "Was fand die Studie von Shen und Tamkin (52 Ingenieure, unbekannte Python-Bibliothek, Chat-Assistent, 2026) beim Test nach der Aufgabe?",
+      "options": [
+        {
+          "text": "Die Gruppe mit Assistent erreichte im Mittel weniger Punkte. Bei der Bearbeitungszeit gab es keinen deutlichen Unterschied.",
+          "correct": true
+        },
+        {
+          "text": "Die Gruppe mit Assistent war deutlich schneller und verstand genauso viel.",
+          "feedback": "Ein deutlicher Zeitgewinn zeigte sich nicht. Der Test fiel schlechter aus."
+        },
+        {
+          "text": "Beide Gruppen schnitten gleich ab.",
+          "feedback": "Der Unterschied im Test war statistisch deutlich."
+        }
+      ],
+      "explanation": "Im Test erreichte die Gruppe mit Assistent im Mittel 4,15 von 27 Punkten weniger. Beim Zeitgewinn gab es keinen deutlichen Unterschied."
+    },
+    {
+      "id": "m19-l02-q3",
+      "lesson": "m19-l02",
+      "type": "single",
+      "question": "Ein Assistent hat dir Code geschrieben, und er läuft ohne Fehler. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Der Code liefert für die ausprobierten Eingaben ein Ergebnis. Ob du ihn verstanden hast, prüfst du, indem du ihn ohne KI erklärst.",
+          "correct": true
+        },
+        {
+          "text": "Du hast den Code verstanden, sonst hätte er nicht laufen können.",
+          "misconception": "m19-l02-working-code-means-understood",
+          "feedback": "Lauffähiger Code sagt nichts darüber, ob du erklären kannst, warum er läuft."
+        },
+        {
+          "text": "Der Code ist richtig, und du musst ihn nicht lesen.",
+          "misconception": "m19-l02-working-code-means-understood",
+          "feedback": "Auch fehlerfreier Lauf beweist nicht, dass der Code für andere Eingaben stimmt."
+        }
+      ],
+      "explanation": "Verstehen zeigt sich in der eigenen Erklärung, nicht darin, dass der Code läuft."
+    },
+    {
+      "id": "m19-l02-q4",
+      "lesson": "m19-l02",
+      "type": "single",
+      "question": "Welche Aussage zur Nutzung von KI beim Lernen passt zur Studie?",
+      "options": [
+        {
+          "text": "Wer Erklärungen und Konzeptfragen nutzte, schnitt im Test gut ab. Wer die Aufgabe abgab, schnitt schlechter ab.",
+          "correct": true
+        },
+        {
+          "text": "Jede Nutzung eines Assistenten senkt den Lernerfolg.",
+          "misconception": "m19-l02-any-ai-use-harms-learning",
+          "feedback": "Drei der sechs Nutzungsmuster erreichten im Test im Mittel über 65 %."
+        },
+        {
+          "text": "Die Art der Nutzung spielt keine Rolle, nur die Zeit zählt.",
+          "feedback": "Die Testergebnisse unterschieden sich nach dem Muster der Nutzung."
+        }
+      ],
+      "explanation": "Die Muster mit Konzeptfragen und Erklärungen erreichten im Mittel über 65 %, die Muster mit Abgeben unter 40 %. Jedes Muster kam nur bei 2 bis 7 Personen vor."
+    },
+    {
+      "id": "m19-l02-q5",
+      "lesson": "m19-l02",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m19/l02/ai-explanation-deferred.cs",
+      "explanation": "`Where` beschreibt die Abfrage nur. Erst `Count()` durchläuft die Liste, nach `Add(4)`. Es passen `2` und `4`: Die Ausgabe ist `2`."
+    },
+    {
+      "id": "m19-l02-q6",
+      "lesson": "m19-l02",
+      "type": "multi",
+      "question": "Welche Einschränkungen der Studie von Shen und Tamkin sind richtig?",
+      "options": [
+        {
+          "text": "Die Stichprobe ist klein (52 Personen).",
+          "correct": true
+        },
+        {
+          "text": "Der Zeitraum ist kurz, die Aufgabe dauerte nur etwa eine Stunde.",
+          "correct": true
+        },
+        {
+          "text": "Die Autoren arbeiten bei einem Hersteller von KI-Modellen.",
+          "correct": true
+        },
+        {
+          "text": "Die Studie untersuchte nur Kinder ohne Programmiererfahrung.",
+          "feedback": "Die Teilnehmenden waren Ingenieure."
+        }
+      ],
+      "explanation": "Klein, kurz, eine Aufgabe, ein Chat und ein möglicher Interessenkonflikt: Das Ergebnis gilt für diese Bedingungen."
+    },
+    {
+      "id": "m19-l02-q7",
+      "lesson": "m19-l02",
+      "type": "explain",
+      "question": "Verbessere die Anfrage: „Schreib mir den Code, der die Meldungen nach Benutzer gruppiert.“ Schreibe sie so um, dass sie dein Verstehen unterstützt. Bewerte danach dich selbst.",
+      "modelAnswer": "Zum Beispiel: „Ich will GroupBy verstehen. Hier ist mein Entwurf, der Meldungen nach Benutzer gruppiert, aber ich bekomme Gruppen statt Zahlen. Gib mir einen Hinweis, wo mein Denkfehler liegt, aber noch nicht die Lösung. Erkläre, was GroupBy zurückgibt.“\n\nGut ist, wenn deine Anfrage das Ziel nennt (verstehen), deinen eigenen Versuch enthält, nach einem Hinweis oder dem Warum fragt und die fertige Lösung nicht verlangt."
+    },
+    {
+      "id": "m19-l02-q8",
+      "lesson": "m19-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten den Unterschied zwischen „KI zum Verstehen nutzen“ und „Aufgabe abgeben“. Nenne einen Befund der Studie.",
+      "modelAnswer": "Beim Abgeben gebe ich die ganze Aufgabe weiter und übernehme das Ergebnis. Beim Verstehen versuche ich es zuerst selbst, frage gezielt nach und erkläre das Ergebnis danach ohne KI. In der Studie mit 52 Ingenieuren schnitt die Gruppe mit Assistent im Test schlechter ab. Muster mit Konzeptfragen und Erklärungen erreichten im Mittel über 65 %, Abgeben unter 40 %. Die Stichprobe war klein, und die Autoren arbeiten bei einem Hersteller von KI-Modellen."
+    },
+    {
+      "id": "m19-l02-q9",
+      "lesson": "m19-l02",
+      "type": "explain",
+      "question": "Transferfrage: Du lernst gerade ein neues Thema und steckst bei einer Übung fest. Welche zwei Schritte machst du mit einem Assistenten, welchen lässt du weg?",
+      "modelAnswer": "Ich versuche die Übung zuerst selbst, frage dann nach einem Hinweis oder lasse mir das Konzept erklären und erkläre das Ergebnis am Ende ohne KI. Ich lasse weg, die komplette Lösung anzufordern und zu übernehmen. Das ist Bewährte Praxis und kein Studienergebnis."
+    }
+  ]
 }
