@@ -1,0 +1,209 @@
+---
+title: Selbsteinschätzung prüfen
+sidebar_position: 6
+description: Ob du KI-gestützten Code verstanden hast, zeigt sich erst, wenn du ihn ohne KI erklärst, vorhersagst und änderst. Der Selbsttest „Kann ich das ohne KI erklären?“ hat vier Schritte.
+lesson_id: m19-l06
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aiTopIps from '!!raw-loader!@site/examples/m19/l06/ai-top-ips.cs';
+import aiTopIpsOutput from '!!raw-loader!@site/examples/m19/l06/ai-top-ips.out.txt';
+import aiUserFailures from '!!raw-loader!@site/examples/m19/l06/ai-user-failures.cs';
+import aiUserFailuresOutput from '!!raw-loader!@site/examples/m19/l06/ai-user-failures.out.txt';
+import topIpsTask from '!!raw-loader!@site/examples/m19/l06/top-ips-task.cs';
+import topIpsTests from '!!raw-loader!@site/examples/m19/l06/top-ips-task.tests.snippet.cs';
+import topIpsSolution from '!!raw-loader!@site/examples/m19/l06/top-ips-solution.cs';
+import topIpsSolutionOutput from '!!raw-loader!@site/examples/m19/l06/top-ips-solution.out.txt';
+
+# Selbsteinschätzung prüfen
+
+:::note[Lernziele]
+- Du prüfst mit einem Selbsttest, ob du KI-gestützten Code ohne KI erklären, vorhersagen und ändern kannst.
+- Du kannst das Ergebnis von Prather et al. mit Gruppe, Methode und Einschränkungen wiedergeben.
+- Du kannst erklären, warum Lesen und Verstehen eines Codes nicht dasselbe ist wie ihn selbst schreiben zu können.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+## Rückblick
+
+<Quiz id="m19-l02-q2" />
+
+<Quiz id="m19-l05-q2" />
+
+<Quiz id="m11-l07-q2" />
+
+## Was eine Studie zur Selbsteinschätzung beobachtet hat
+
+Lektion 2 fragte, ob du mit KI lernst oder abgibst. Diese Lektion fragt, wie du das bei dir selbst feststellst. Dazu gibt es eine kleine qualitative Studie. Eine Studie mit Beobachtung, Interviews und Blickmessung beschreibt einzelne Fälle genau und zählt keine Wirkung mit Unsicherheitsbereich.
+
+**Studienergebnis** ([Prather et al., 2024](https://arxiv.org/abs/2405.17739)):
+
+- **Gruppe:** 21 Studierende eines Einführungskurses in die Programmierung an einer kleinen Universität in den USA. Sie nahmen freiwillig teil und bekamen Zusatzpunkte.
+- **Methode:** 21 Laborsitzungen mit Beobachtung, Interview und Eye-Tracking. Die Studie ist qualitativ.
+- **Aufgabe und Werkzeug:** eine Programmieraufgabe mit 35 Minuten Zeit, mit zwei KI-Werkzeugen (Code-Vorschläge im Editor und ein Chat-Assistent), Stand der Studie 2024. Veröffentlicht 2024 bei der ICER, einer Konferenz zur Informatikdidaktik.
+- **Ergebnis:** Bei Lernenden, die Schwierigkeiten hatten, verschärfte die KI Probleme bei der Selbsteinschätzung. Sie hielten ihre Leistung für besser, als sie war. Bei 11 von 21 Teilnehmern wurden keine solchen Probleme beobachtet. 20 von 21 lösten die Aufgabe.
+- **Einschränkungen:** kleine Stichprobe, ein Standort, eine Aufgabe, nur zwei Werkzeuge. Als Förderung nennt die Studie ein Forschungsprogramm eines Technologieunternehmens und einen Forschungsrat; ein Interessenkonflikt ist in den geprüften Teilen nicht genannt.
+
+Gesamtbild: In dieser Gruppe sahen die Forschenden, dass manche Lernende mit Schwierigkeiten ihr Können überschätzten. Ob das für andere Gruppen oder heutige Werkzeuge gilt, zeigt die Studie nicht. Die Studie von Lektion 2 (Shen und Tamkin) misst mit einem Test und kommt zu einem passenden, aber eigenständigen Ergebnis.
+
+## Lesen ist nicht Schreiben
+
+Ein fertiger Code gibt viele Hinweise: Namen, Aufbau, die Reihenfolge der Schritte. Beim Lesen erkennst du das Muster wieder. Beim Schreiben musst du es selbst finden. Beides sind verschiedene Fähigkeiten. Dass du einen KI-Vorschlag verstehst, heißt deshalb nicht, dass du ihn so schreiben oder ändern könntest.
+
+Auch eine gelöste Aufgabe zeigt nur, dass der Code stimmt. Ob du das Thema gelernt hast, zeigt sie nicht. Abrufen ohne Vorlage ist eine bewährte Lernmethode (Abrufübung, [Wie dieser Kurs funktioniert](../m00-orientation/how-this-course-works)); der Selbsttest nutzt genau das.
+
+## Der Selbsttest in vier Schritten
+
+**Bewährte Praxis (nicht durch Studien belegt):** Bevor du KI-Code als gelernt abhakst, fragst du: „Kann ich das ohne KI erklären?“ In vier Schritten:
+
+1. **Jede Zeile erklären:** Sage in eigenen Worten, was jede Zeile tut und warum sie da steht.
+2. **Ausgabe vorhersagen:** Notiere die Ausgabe für eine Beispieleingabe, bevor du ausführst.
+3. **Eine Anforderung ändern:** Ändere eine Anforderung, zum Beispiel einen Grenzwert oder eine Bedingung.
+4. **Ohne KI lösen und prüfen:** Setze die Änderung ohne Hilfe um und prüfe sie mit einem Test oder einem Grenzfall.
+
+Gelingt ein Schritt nicht, ist das ein Hinweis darauf, welches Thema du wiederholst.
+
+### Beispiel mit Teilzielen: eine KI-Abfrage prüfen
+
+Die Teilziele: „1. Jede Zeile erklären → 2. Ausgabe vorhersagen → 3. Eine Anforderung ändern → 4. Ohne KI lösen und prüfen“.
+
+Du hast einen Assistenten gebeten, die IP-Adressen mit den meisten Fehlversuchen zu finden (LINQ, Modul 11).
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Abfrage. Sie nimmt alle Zeilen mit `login-failed`, gruppiert sie nach IP-Adresse und gibt die drei Adressen mit den meisten Fehlversuchen aus.
+:::
+
+<CodeBlock language="csharp" title="ai-top-ips.cs (Ausschnitt: die Abfrage)">{aiTopIps.slice(aiTopIps.indexOf('public static class'))}</CodeBlock>
+
+1. **Jede Zeile erklären:** `Where` behält die Zeilen mit `login-failed`. `Select` schneidet die IP-Adresse aus der Zeile: `Split(' ')[3]` ist der vierte Teil, `Replace` entfernt `ip=`. `GroupBy` bildet pro Adresse eine Gruppe, das zweite `Select` macht daraus Adresse und Anzahl. `OrderByDescending` sortiert nach Anzahl, `ThenBy` bei Gleichstand nach Adresse. `Take(3)` behält drei Einträge, `ToList` erzeugt die Liste.
+2. **Ausgabe vorhersagen:** `203.0.113.7` hat 5 Fehlversuche, `192.0.2.10` und `198.51.100.8` je einen. Bei Gleichstand kommt `192.0.2.10` vor `198.51.100.8`.
+3. **Eine Anforderung ändern:** „Nur zwei Adressen statt drei.“ Das ist eine Änderung von `Take(3)` zu `Take(2)`.
+4. **Ohne KI lösen und prüfen:** Du änderst die Zahl selbst. Dann sagst du die Ausgabe vorher: nur `203.0.113.7` und `192.0.2.10`. Danach führst du aus und vergleichst.
+
+### Lückenbeispiel
+
+Eine zweite Antwort des Assistenten:
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Abfrage für die Benutzer mit den meisten Fehlversuchen. Sie gruppiert nach Benutzer, sortiert absteigend und gibt zwei Einträge aus.
+:::
+
+<CodeBlock language="csharp" title="ai-user-failures.cs">{aiUserFailures}</CodeBlock>
+
+1. **Jede Zeile erklären:** `GroupBy(f => f.User)` bildet eine Gruppe pro Benutzer. `g.Key` ist der Name, `g.Count()` die Anzahl. Die Gruppen werden absteigend nach Anzahl sortiert, bei Gleichstand nach Name. `Take(2)` behält zwei Gruppen.
+2. **Ausgabe vorhersagen:** `bob` hat 5 Fehlversuche, `alice` und `dave` je einen. Alphabetisch kommt `alice` zuerst.
+3. **Eine Anforderung ändern:** ______
+4. **Ohne KI lösen und prüfen:** ______
+
+<details>
+<summary>Mögliche Lösung anzeigen</summary>
+
+3. **Eine Anforderung ändern:** „Nur Benutzer mit mindestens zwei Fehlversuchen.“ Vor `OrderByDescending` kommt `.Where(g => g.Count() >= 2)`.
+4. **Ohne KI lösen und prüfen:** Du sagst vorher: Es bleibt nur `bob: 5`, weil `alice` und `dave` je einen Fehlversuch haben. Ein Grenzfall: Mit `>= 1` bleiben alle drei, `Take(2)` begrenzt auf `bob` und `alice`.
+
+</details>
+
+## Stimmt der KI-Vorschlag?
+
+Sage die Ausgabe der ersten Abfrage vorher.
+
+:::info[Vorhersage]
+Was gibt das Programm aus? Notiere deinen Tipp und führe es dann aus.
+:::
+
+<CSharpRunner id="m19-l06-top-ips" code={aiTopIps} predict expected={aiTopIpsOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `203.0.113.7: 5`, `192.0.2.10: 1`, `198.51.100.8: 1`.
+
+1. **Filtern:** Sieben Zeilen haben `login-failed`.
+2. **Gruppieren:** Drei Adressen. `203.0.113.7` kommt fünfmal vor, die anderen einmal.
+3. **Sortieren:** Nach Anzahl absteigend, bei Gleichstand nach Adresse.
+4. **Begrenzen:** `Take(3)` lässt alle drei Einträge durch.
+
+**Was passiert, wenn …?** … es vier Adressen gäbe? Dann fehlte die mit den wenigsten Fehlversuchen in der Ausgabe.
+
+</details>
+
+Jetzt änderst du die Anforderung ohne KI: Es sollen nur Adressen mit mindestens `minFailures` Fehlversuchen in der Liste stehen. Der Parameter ist schon da, wird aber nicht benutzt. Die Tests prüfen mehrere Werte.
+
+<CSharpRunner id="m19-l06-modify" code={topIpsTask} tests={topIpsTests} />
+
+<details>
+<summary>Musterlösung anzeigen</summary>
+
+<CodeBlock language="csharp" title="top-ips-solution.cs">{topIpsSolution}</CodeBlock>
+
+Die Ausgabe der Lösung:
+
+<CodeBlock language="text">{topIpsSolutionOutput}</CodeBlock>
+
+1. **Nach dem Gruppieren filtern:** Die Anzahl steht erst nach `GroupBy` fest. Das neue `Where` gehört deshalb hinter das zweite `Select`.
+2. **Grenzwert:** `>=` lässt eine Adresse mit genau `minFailures` Fehlversuchen im Ergebnis. Mit `>` fiele sie heraus.
+3. **Vor dem Sortieren:** So ordnest du nur die Einträge, die bleiben, und `Take(3)` zählt nur diese.
+
+</details>
+
+<details>
+<summary>Vertiefung: Warum Abrufen ohne Vorlage hilft (optional)</summary>
+
+Der Selbsttest folgt dem Prinzip der Abrufübung: Du holst Wissen aus dem Gedächtnis, statt es wieder zu lesen. Dazu gibt es Studien aus der Lernpsychologie, die im Kurs unter „Wie dieser Kurs funktioniert“ genannt sind. Dass der Selbsttest für KI-Code denselben Nutzen hat, ist eine Folgerung und kein getestetes Ergebnis.
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l06-reading-equals-writing" />
+
+**„Wenn ich den KI-Code beim Lesen verstehe, kann ich ihn auch selbst schreiben.“** Das stimmt nicht. Beim Lesen hilft dir der fertige Code. Beim Schreiben fehlt er. Erst eine Aufgabe ohne KI zeigt, ob du es selbst kannst.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l06-solved-means-learned" />
+
+**„Wenn die Aufgabe mit KI gelöst ist, habe ich das Thema gelernt.“** Das stimmt nicht. Eine gelöste Aufgabe zeigt, dass der Code stimmt. Ob du ihn erklären und ändern kannst, zeigt erst der Selbsttest.
+:::
+
+## Zusammenfassung
+
+Eine qualitative Studie mit 21 Anfängern (Laborsitzungen, Studie von 2024, Beobachtung, Interview, Eye-Tracking) fand, dass KI bei Lernenden mit Schwierigkeiten Probleme bei der Selbsteinschätzung verschärfte. Bei 11 von 21 trat das nicht auf. Die Stichprobe ist klein. Lesen eines Codes ist nicht Schreiben, und eine gelöste Aufgabe ist kein gelerntes Thema. Der Selbsttest „Kann ich das ohne KI erklären?“ ist Bewährte Praxis: jede Zeile erklären, Ausgabe vorhersagen, eine Anforderung ändern, ohne KI lösen und prüfen.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l06-q1" />
+
+<Quiz id="m19-l06-q2" />
+
+<Quiz id="m19-l06-q3" />
+
+<Quiz id="m19-l06-q4" />
+
+<Quiz id="m19-l06-q5" />
+
+<Quiz id="m19-l06-q6" />
+
+<Quiz id="m19-l06-q7" />
+
+<Quiz id="m19-l06-q8" />
+
+<Quiz id="m19-l06-q9" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l06-q10" />
+
+### Transferfrage
+
+<Quiz id="m19-l06-q11" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Introduction to LINQ queries](https://learn.microsoft.com/dotnet/csharp/linq/get-started/introduction-to-linq-queries)
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)

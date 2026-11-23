@@ -640,6 +640,371 @@
       "type": "explain",
       "question": "Transferfrage: Warum ist großes Vertrauen in einen Vorschlag ein Risiko, und was tust du in deinem Projekt dagegen?",
       "modelAnswer": "Wer einem Vorschlag stark vertraut, prüft ihn weniger, und Lücken bleiben unbemerkt. In der Studie vertrauten Teilnehmer mit sicheren Lösungen dem Assistenten weniger. In meinem Projekt prüfe ich jeden Vorschlag mit der Review-Checkliste: SQL Injection, Eingabevalidierung, Ausnahmebehandlung und Zugriffsprüfung. Das ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l05-q1",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Welche Teile gehören zu einer Aufgabe an einen Assistenten, die zum Projekt passt?",
+      "options": [
+        {
+          "text": "Ziel, vorhandener Code zum Wiederverwenden, Randbedingungen und ein Prüfkriterium.",
+          "correct": true
+        },
+        {
+          "text": "Ein kurzer Satz mit dem Ziel. Den Rest erkennt der Assistent selbst.",
+          "feedback": "Der Assistent kennt dein Projekt nicht. Was in der Anfrage fehlt, rät er.",
+          "misconception": "m19-l05-short-prompt-is-enough"
+        },
+        {
+          "text": "Nur eine Liste der Randbedingungen, ohne das Ziel zu nennen.",
+          "feedback": "Ohne Ziel weiß der Assistent nicht, wofür die Randbedingungen gelten."
+        }
+      ],
+      "explanation": "Die Teile sind Bewährte Praxis und kein Studienergebnis: Ziel, Eingabe und Ausgabe mit Beispiel, vorhandene Typen und Hilfsmethoden, Randbedingungen und ein Prüfkriterium."
+    },
+    {
+      "id": "m19-l05-q2",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Wozu dient eine Projekt-Anweisungsdatei?",
+      "options": [
+        {
+          "text": "Sie ist eine Textdatei im Repository mit Regeln für Assistenten, die viele Werkzeuge lesen.",
+          "correct": true
+        },
+        {
+          "text": "Sie sorgt dafür, dass der Assistent immer korrekten Code schreibt.",
+          "feedback": "Die Datei gibt Regeln vor. Ob ein Vorschlag diese Regeln und die Fachregel einhält, prüfst du weiterhin selbst.",
+          "misconception": "m19-l05-instruction-file-guarantees-correct-code"
+        },
+        {
+          "text": "Sie ersetzt die Tests des Projekts.",
+          "feedback": "Tests prüfen den Code. Die Datei sagt dem Assistenten nur, wie er schreiben soll."
+        }
+      ],
+      "explanation": "Eine Projekt-Anweisungsdatei hält Regeln für das Projekt fest, zum Beispiel die Version von C#, die Nullable-Einstellung und die Vorgabe, keine neuen Pakete zu nutzen. Sie garantiert keinen korrekten Code."
+    },
+    {
+      "id": "m19-l05-q3",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Welche Aussage über Prompts ist ein Studienergebnis?",
+      "options": [
+        {
+          "text": "In der Nutzerstudie von Perry et al. hatten Teilnehmer, die ihre Anfragen sorgfältiger formulierten, weniger Schwachstellen.",
+          "correct": true
+        },
+        {
+          "text": "Eine Projekt-Anweisungsdatei halbiert die Zahl der Fehler.",
+          "feedback": "Dazu nennt die Lektion keine Studie. Eine Zahl dafür wäre erfunden."
+        },
+        {
+          "text": "Ein Prompt mit einem Beispiel ist immer besser als einer ohne.",
+          "feedback": "Das ist keine Studienaussage dieser Lektion und gilt nicht immer."
+        }
+      ],
+      "explanation": "Nur diese eine Aussage ist ein Studienergebnis, mit den Einschränkungen von Perry et al. (kleine Stichprobe, älteres Modell, 2022). Alles andere in der Lektion ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l05-q4",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Ein Assistent bekommt die Anfrage „Schreib Code, der Fehlversuche zählt“. Warum ist die Antwort riskant?",
+      "options": [
+        {
+          "text": "Es fehlen Format, vorhandene Hilfsmethoden und ein Prüfkriterium. Der Assistent muss raten.",
+          "correct": true
+        },
+        {
+          "text": "Kurze Anfragen erzeugen immer Code, der nicht kompiliert.",
+          "feedback": "Der Code kann kompilieren und trotzdem das Falsche zählen."
+        },
+        {
+          "text": "Die KI weiß schon, was gemeint ist, und der Code ist deshalb richtig.",
+          "feedback": "Ein Assistent erzeugt wahrscheinlichen Code. Was zu deinem Projekt passt, weiß er nur, wenn du es angibst.",
+          "misconception": "m19-l05-short-prompt-is-enough"
+        }
+      ],
+      "explanation": "Eine kurze Anfrage lässt offen, was gezählt wird, wo die Daten herkommen und woran du eine richtige Antwort erkennst. Der Assistent füllt die Lücken mit Annahmen."
+    },
+    {
+      "id": "m19-l05-q5",
+      "lesson": "m19-l05",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)? Es ist die Antwort auf die kurze Anfrage.",
+      "example": "m19/l05/ai-weak-prompt.cs",
+      "explanation": "Die Antwort sucht den Text `status=failed`, den die Beispieldaten nicht enthalten. Jede Zählung ist 0, obwohl `bob` fünf Fehlversuche hat. Die Anfrage nannte das Format der Zeilen nicht."
+    },
+    {
+      "id": "m19-l05-q6",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Die Antwort auf die präzise Anfrage ruft `LogParser.Parse` auf. Warum?",
+      "options": [
+        {
+          "text": "Die Anfrage enthielt die vorhandene Hilfsmethode und verlangte, sie wiederzuverwenden.",
+          "correct": true
+        },
+        {
+          "text": "Der Assistent kennt jede Hilfsmethode jedes Projekts.",
+          "feedback": "Er kennt nur, was in der Anfrage oder im Kontext steht."
+        },
+        {
+          "text": "Eine Hilfsmethode macht den Code automatisch fehlerfrei.",
+          "feedback": "Auch mit Hilfsmethode prüfst du das Ergebnis.",
+          "misconception": "m19-l05-instruction-file-guarantees-correct-code"
+        }
+      ],
+      "explanation": "Vorhandener Code im Kontext zeigt dem Assistenten das Format der Zeilen und verhindert eine zweite, abweichende Lösung."
+    },
+    {
+      "id": "m19-l05-q7",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Was ist ein Prüfkriterium in einer Aufgabe an einen Assistenten?",
+      "options": [
+        {
+          "text": "Eine Bedingung, an der du erkennst, ob die Antwort stimmt, zum Beispiel die erwartete Ausgabe für die Beispieldaten.",
+          "correct": true
+        },
+        {
+          "text": "Die Bitte, der Assistent möge sorgfältig arbeiten.",
+          "feedback": "Das lässt sich nicht prüfen. Ein Kriterium muss messbar sein."
+        },
+        {
+          "text": "Die Zusage des Assistenten, dass sein Code richtig ist.",
+          "feedback": "Eine Zusage ist kein Beleg. Du prüfst gegen das Kriterium."
+        }
+      ],
+      "explanation": "Ein Prüfkriterium nennt, woran du ein richtiges Ergebnis erkennst: Tests, die bestehen müssen, oder eine erwartete Ausgabe."
+    },
+    {
+      "id": "m19-l05-q8",
+      "lesson": "m19-l05",
+      "type": "single",
+      "question": "Du hast alle Teile einer guten Aufgabe angegeben und eine Projekt-Anweisungsdatei benutzt. Was machst du mit dem Vorschlag?",
+      "options": [
+        {
+          "text": "Ich prüfe ihn weiter: lesen, Ausgabe vorhersagen, ausführen, Grenzwerte testen.",
+          "correct": true
+        },
+        {
+          "text": "Ich übernehme ihn, denn mit der Datei ist der Code korrekt.",
+          "feedback": "Kontext erhöht die Passung, ersetzt aber das Prüfen nicht (Lektion 3).",
+          "misconception": "m19-l05-instruction-file-guarantees-correct-code"
+        },
+        {
+          "text": "Ich prüfe nur, ob er kompiliert.",
+          "feedback": "Kompilieren sagt nichts über die Fachregel (Lektion 3)."
+        }
+      ],
+      "explanation": "Kontext macht Vorschläge passender, aber nicht automatisch richtig. Das Prüfen aus Lektion 3 bleibt nötig."
+    },
+    {
+      "id": "m19-l05-q9",
+      "lesson": "m19-l05",
+      "type": "explain",
+      "question": "Verbessere den Prompt: „Mach, dass die Fehlversuche pro IP-Adresse gezählt werden.“ Schreibe die Anfrage so um, dass sie Ziel, vorhandenen Code, Randbedingungen und ein Prüfkriterium enthält.",
+      "modelAnswer": "Ziel: Zähle in `lines` die Zeilen mit `login-failed` pro IP-Adresse und gib sie absteigend nach Anzahl aus.\n\nVorhandener Code: Nutze die Methode `LogParser.Parse(string line)`, die ein `LogEvent` mit `Kind`, `User` und `Ip` liefert (Code einfügen).\n\nRandbedingungen: C# 15 / .NET 11, Nullable an, keine neuen Pakete, LINQ erlaubt.\n\nPrüfkriterium: Für die Beispieldaten muss `203.0.113.7: 5` die erste Zeile sein, danach `192.0.2.10: 1` und `198.51.100.8: 1`."
+    },
+    {
+      "id": "m19-l05-q10",
+      "lesson": "m19-l05",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, wozu eine Projekt-Anweisungsdatei dient und was sie nicht garantiert.",
+      "modelAnswer": "Eine Projekt-Anweisungsdatei ist eine Textdatei im Repository mit Regeln für Assistenten, zum Beispiel Sprachversion, Nullable-Einstellung und Namensregeln. Viele Werkzeuge lesen sie. Sie garantiert nicht, dass der Code richtig ist: Der Assistent kann Regeln übersehen oder die Fachregel falsch umsetzen. Ich prüfe jeden Vorschlag weiter."
+    },
+    {
+      "id": "m19-l05-q11",
+      "lesson": "m19-l05",
+      "type": "explain",
+      "question": "Transferfrage: Du willst einen Assistenten bitten, eine Methode für ein anderes Projekt zu schreiben. Welche vier Angaben machst du zuerst?",
+      "modelAnswer": "Das Ziel mit einem Beispiel für Eingabe und Ausgabe, die vorhandenen Typen und Hilfsmethoden, die ich wiederverwenden will, die Randbedingungen (Version, Nullable, keine neuen Pakete) und ein Prüfkriterium, zum Beispiel Tests, die bestehen müssen. Das ist Bewährte Praxis. Danach prüfe ich das Ergebnis trotzdem selbst."
+    },
+    {
+      "id": "m19-l06-q1",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Welche Schritte hat der Selbsttest „Kann ich das ohne KI erklären?“ und in welcher Reihenfolge?",
+      "options": [
+        {
+          "text": "Jede Zeile erklären, Ausgabe vorhersagen, eine Anforderung ändern, ohne KI lösen und prüfen.",
+          "correct": true
+        },
+        {
+          "text": "Den Code ausführen, die Ausgabe lesen und fertig.",
+          "feedback": "Das Ausführen allein zeigt nicht, ob du den Code verstehst.",
+          "misconception": "m19-l06-reading-equals-writing"
+        },
+        {
+          "text": "Den Assistenten fragen, ob du den Code verstanden hast.",
+          "feedback": "Der Selbsttest läuft ohne KI. Sonst misst du nicht dein Wissen."
+        }
+      ],
+      "explanation": "Der Selbsttest ist Bewährte Praxis und kein Studienergebnis. Erst wenn du ohne Hilfe erklärst, vorhersagst und änderst, zeigt sich, was du verstanden hast."
+    },
+    {
+      "id": "m19-l06-q2",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Welche Beschreibung der Studie von Prather et al. (ICER 2024) stimmt?",
+      "options": [
+        {
+          "text": "21 Anfänger in Laborsitzungen mit Beobachtung, Interview und Eye-Tracking, also eine qualitative Studie.",
+          "correct": true
+        },
+        {
+          "text": "Eine Umfrage unter tausenden Berufsentwicklern.",
+          "feedback": "Die Studie hatte 21 Teilnehmer in Laborsitzungen."
+        },
+        {
+          "text": "Ein Experiment mit 52 Ingenieuren und einer unbekannten Bibliothek.",
+          "feedback": "Das beschreibt die Studie von Shen und Tamkin (Lektion 2)."
+        }
+      ],
+      "explanation": "Prather et al. beobachteten 21 Anfänger, die mit KI-Werkzeugen eine Programmieraufgabe lösten. Die Studie ist qualitativ und klein."
+    },
+    {
+      "id": "m19-l06-q3",
+      "lesson": "m19-l06",
+      "type": "multi",
+      "question": "Welche Einschränkungen der Studie von Prather et al. sind richtig?",
+      "options": [
+        {
+          "text": "Die Stichprobe ist klein (21 Teilnehmer).",
+          "correct": true
+        },
+        {
+          "text": "Es ist ein einzelner Standort und nur eine Programmieraufgabe.",
+          "correct": true
+        },
+        {
+          "text": "Es wurden nur zwei Werkzeuge untersucht.",
+          "correct": true
+        },
+        {
+          "text": "Die Studie hat bei allen 21 Teilnehmern Probleme bei der Selbsteinschätzung gemessen.",
+          "feedback": "Bei 11 von 21 Teilnehmern wurden keine solchen Probleme beobachtet."
+        }
+      ],
+      "explanation": "Die Zahlen beschreiben diese kleine Gruppe. Sie sind kein Maß für alle Lernenden und nicht für andere Werkzeuge."
+    },
+    {
+      "id": "m19-l06-q4",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Was ergab die Studie von Prather et al. zur Selbsteinschätzung?",
+      "options": [
+        {
+          "text": "Bei Lernenden, die Schwierigkeiten hatten, verschärfte KI Probleme bei der Selbsteinschätzung. Bei 11 von 21 trat das nicht auf.",
+          "correct": true
+        },
+        {
+          "text": "KI verschlechtert die Selbsteinschätzung bei allen Lernenden.",
+          "feedback": "Bei 11 von 21 Teilnehmern wurden keine solchen Probleme beobachtet."
+        },
+        {
+          "text": "KI verbessert die Selbsteinschätzung bei allen Lernenden.",
+          "feedback": "Die Studie beschreibt Probleme bei Lernenden, die Schwierigkeiten hatten."
+        }
+      ],
+      "explanation": "Das Ergebnis ist qualitativ und gilt für diese Gruppe von 21 Anfängern mit Werkzeugen von 2024."
+    },
+    {
+      "id": "m19-l06-q5",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Du verstehst einen KI-Vorschlag beim Lesen vollständig. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Du erkennst den Code wieder. Ob du ihn selbst schreiben oder ändern kannst, zeigt erst eine Aufgabe ohne KI.",
+          "correct": true
+        },
+        {
+          "text": "Du kannst ihn auch selbst schreiben.",
+          "feedback": "Lesen und Schreiben sind verschiedene Fähigkeiten. Beim Lesen hilft dir der fertige Code.",
+          "misconception": "m19-l06-reading-equals-writing"
+        },
+        {
+          "text": "Du musst ihn nicht mehr testen.",
+          "feedback": "Verstehen ersetzt das Testen nicht (Lektion 3)."
+        }
+      ],
+      "explanation": "Ein fertiger Code gibt viele Hinweise. Beim Schreiben fehlen sie. Deshalb prüft der Selbsttest mit einer Änderung ohne KI."
+    },
+    {
+      "id": "m19-l06-q6",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Die Aufgabe ist mit KI gelöst und alle Tests sind grün. Was sagt das über dein Lernen?",
+      "options": [
+        {
+          "text": "Es sagt nichts darüber, ob du das Thema erklären oder ändern kannst. Das zeigt erst der Selbsttest.",
+          "correct": true
+        },
+        {
+          "text": "Du hast das Thema gelernt, weil die Aufgabe gelöst ist.",
+          "feedback": "Grüne Tests zeigen, dass der Code stimmt, nicht dass du ihn verstehst.",
+          "misconception": "m19-l06-solved-means-learned"
+        },
+        {
+          "text": "Du hast nichts gelernt, weil du KI benutzt hast.",
+          "feedback": "Das folgt nicht. Wie du die KI benutzt, entscheidet (Lektion 2)."
+        }
+      ],
+      "explanation": "Das Ergebnis der Aufgabe und dein Lernstand sind zwei Dinge. Lektion 2 zeigt, wie du KI zum Verstehen nutzt."
+    },
+    {
+      "id": "m19-l06-q7",
+      "lesson": "m19-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)? Es ist die Antwort eines Assistenten.",
+      "example": "m19/l06/ai-top-ips.cs",
+      "explanation": "Die Abfrage nimmt die Zeilen mit `login-failed`, gruppiert nach IP-Adresse, sortiert absteigend nach Anzahl und bei Gleichstand nach Adresse. `Take(3)` begrenzt auf drei Einträge."
+    },
+    {
+      "id": "m19-l06-q8",
+      "lesson": "m19-l06",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m19/l06/ai-user-failures.cs",
+      "explanation": "`bob` hat 5 Fehlversuche, `alice` und `dave` je einen. Bei Gleichstand ordnet `ThenBy` nach dem Namen, also kommt `alice` vor `dave`. `Take(2)` behält nur zwei Gruppen."
+    },
+    {
+      "id": "m19-l06-q9",
+      "lesson": "m19-l06",
+      "type": "single",
+      "question": "Welche Aussage ist als „Bewährte Praxis (nicht durch Studien belegt)“ zu lesen?",
+      "options": [
+        {
+          "text": "Der Selbsttest in vier Schritten.",
+          "correct": true
+        },
+        {
+          "text": "Bei 11 von 21 Teilnehmern traten keine Probleme bei der Selbsteinschätzung auf.",
+          "feedback": "Das ist ein Studienergebnis von Prather et al."
+        },
+        {
+          "text": "Die Studie von Prather et al. hatte 21 Teilnehmer.",
+          "feedback": "Das ist eine Angabe zur Studie."
+        }
+      ],
+      "explanation": "Der Selbsttest ist ein Vorschlag aus der Praxis. Die Zahlen stammen aus der Studie."
+    },
+    {
+      "id": "m19-l06-q10",
+      "lesson": "m19-l06",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum Lesen und Verstehen eines Codes nicht dasselbe ist wie ihn selbst schreiben zu können.",
+      "modelAnswer": "Beim Lesen sehe ich eine fertige Lösung und erkenne die Teile wieder. Beim Schreiben muss ich die Lösung selbst finden, ohne Hinweise. Ich kann also einen Code verstehen und ihn trotzdem nicht ohne Vorlage schreiben oder ändern. Der Selbsttest „Kann ich das ohne KI erklären?“ prüft genau das: erklären, vorhersagen, eine Anforderung ändern und ohne KI lösen."
+    },
+    {
+      "id": "m19-l06-q11",
+      "lesson": "m19-l06",
+      "type": "explain",
+      "question": "Transferfrage: Du hast mit KI-Hilfe eine Methode für ein Projekt geschrieben. Wie prüfst du, ob du sie selbst verstanden hast?",
+      "modelAnswer": "Ich erkläre jede Zeile in eigenen Worten. Ich sage die Ausgabe für ein Beispiel voraus und führe dann aus. Ich ändere eine Anforderung und löse sie ohne KI. Zum Schluss schreibe ich einen Test oder einen Grenzfall. Das ist Bewährte Praxis. Gelingt ein Schritt nicht, wiederhole ich das Thema, bevor ich weitermache."
     }
   ]
 }
