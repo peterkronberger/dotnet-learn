@@ -1,4 +1,263 @@
 {
   "module": "w04",
-  "questions": []
+  "questions": [
+    {
+      "id": "w04-l01-q1",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst wissen, für welche der drei Zahlen das Programm `True` ausgibt.",
+      "example": "w04/l01/not-or.cs",
+      "options": [
+        { "text": "Logische Muster `not` und `or` und ihre Rangfolge", "correct": true },
+        { "text": "Typmuster und Nulltest mit `is null`" },
+        { "text": "Eigenschaftsmuster `{ … }`" },
+        { "text": "`switch`-Ausdruck mit `when`" }
+      ],
+      "explanation": "Das Konzept sind die logischen Muster. Du kennst sie aus der Lektion „Relationale und logische Muster“ (Modul 12). `not` bindet stärker als `or`. Darauf kommt es hier an."
+    },
+    {
+      "id": "w04-l01-q2",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die drei Zeilen stehen in der Reihenfolge der Zahlen.",
+      "example": "w04/l01/not-or.cs",
+      "options": [
+        { "text": "`1: True`, `2: False`, `3: True`", "correct": true },
+        { "text": "`1: False`, `2: False`, `3: True`", "misconception": "m12-l02-not-applies-to-whole-pattern", "feedback": "`not` gilt nur für das Muster direkt dahinter, also für `< 3`. Das Muster `or 1` bleibt unverändert. Darum ist die Zeile für `1` wahr." },
+        { "text": "`1: True`, `2: True`, `3: True`", "feedback": "Für `2` sind beide Teile falsch: `not < 3` ist falsch, weil `2` kleiner als `3` ist, und `2` ist nicht `1`." },
+        { "text": "`1: False`, `2: True`, `3: False`", "feedback": "Für `3` ist `not < 3` wahr, weil `3` nicht kleiner als `3` ist." }
+      ],
+      "explanation": "`not` bindet stärker als `or`. Der Ausdruck bedeutet `(not < 3) or 1`. Er ist wahr für `1` (zweiter Teil) und für `3` (erster Teil), aber falsch für `2`. Wer `not (< 3 or 1)` meint, muss Klammern setzen."
+    },
+    {
+      "id": "w04-l01-q3",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst vorhersagen, auf welchem Thread der Anfang der asynchronen Methode läuft und in welcher Reihenfolge die Zeilen erscheinen.",
+      "example": "w04/l01/same-thread.cs",
+      "options": [
+        { "text": "`async` und `await` und ihr Verhältnis zu Threads", "correct": true },
+        { "text": "`Thread`, `Start` und `Join`" },
+        { "text": "`Task.WhenAll` und `WaitAsync`" },
+        { "text": "`await foreach` und asynchrone Streams" }
+      ],
+      "explanation": "Das Konzept ist `async`. Du kennst es aus der Lektion „Asynchrone Methoden mit async und await“ (Modul 13). Gefragt ist, ob `async` einen Thread startet und wann der Rest der Methode läuft."
+    },
+    {
+      "id": "w04-l01-q4",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Was zeigt die Ausgabe des Programms über `async`?",
+      "options": [
+        { "text": "`async` startet keinen Thread. Der Anfang der Methode läuft auf dem Thread des Aufrufers, und beim ersten unfertigen `await` geht die Kontrolle an den Aufrufer zurück.", "correct": true },
+        { "text": "`async` startet beim Aufruf automatisch einen neuen Thread, auf dem die Methode läuft.", "misconception": "m13-l01-async-starts-new-thread", "feedback": "`async` erlaubt `await` in der Methode und ändert, wie die Methode zurückgibt. Einen Thread startet es nicht." },
+        { "text": "Die Methode läuft erst, wenn der Aufrufer `await task` schreibt.", "feedback": "Die Methode läuft schon beim Aufruf bis zum ersten unfertigen `await`. Darum erscheint `CheckAsync started` vor `Caller continues`." }
+      ],
+      "explanation": "Die Ausgabe ist `CheckAsync started`, `Caller continues` und `Same thread before the await: True`. Der Anfang der Methode lief auf dem Thread des Aufrufers. Bei `await Task.Delay(10)` gab die Methode die Kontrolle zurück, deshalb kam `Caller continues` danach."
+    },
+    {
+      "id": "w04-l01-q5",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst wissen, welche der drei Prüfungen auf das Objekt passen und woran sie die Werte erkennen.",
+      "example": "w04/l01/positional-vs-property.cs",
+      "options": [
+        { "text": "Positionsmuster und Eigenschaftsmuster", "correct": true },
+        { "text": "Listenmuster und Slice-Muster" },
+        { "text": "`with`-Ausdruck" },
+        { "text": "Deklarationsmuster und `as`" }
+      ],
+      "explanation": "Das Konzept sind Positionsmuster und Eigenschaftsmuster. Du kennst sie aus den Lektionen „Dekonstruktion und Positionsmuster“ und „Eigenschaftsmuster“ (Modul 12). Das Positionsmuster vergleicht nach der Position in `Deconstruct`, das Eigenschaftsmuster nach dem Namen."
+    },
+    {
+      "id": "w04-l01-q6",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus? Die drei Zeilen stehen in der Reihenfolge der Prüfungen.",
+      "example": "w04/l01/positional-vs-property.cs",
+      "options": [
+        { "text": "`False`, `True`, `True`", "correct": true },
+        { "text": "`True`, `True`, `True`", "misconception": "m12-l04-positional-pattern-matches-by-name", "feedback": "Ein Positionsmuster vergleicht nach der Position in `Deconstruct`, nicht nach dem Namen. In `Deconstruct` steht `user` vor `ip`, darum passt `(\"192.0.2.10\", \"alice\")` nicht." },
+        { "text": "`False`, `False`, `True`", "feedback": "Das Eigenschaftsmuster vergleicht nach den Namen. `Ip` und `User` haben die genannten Werte, darum passt es." },
+        { "text": "`True`, `True`, `False`", "misconception": "m12-l04-positional-pattern-matches-by-name", "feedback": "Die Teilmuster werden nach der Position verglichen. Die erste Prüfung hat die Werte vertauscht und passt nicht, die dritte passt." }
+      ],
+      "explanation": "Das Positionsmuster liest die `out`-Parameter von `Deconstruct` der Reihe nach: zuerst `user`, dann `ip`. Die erste Prüfung hat beide Werte vertauscht und ist `False`. Das Eigenschaftsmuster nutzt Namen, die Reihenfolge ist egal, und es ist `True`. Die dritte Prüfung passt, weil `\"alice\"` an erster Stelle steht und `_` alles andere annimmt."
+    },
+    {
+      "id": "w04-l01-q7",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du sollst beurteilen, ob dieser Test besteht, wenn `Parse(null)` eine `ArgumentNullException` wirft.",
+      "example": "w04/l01/throws-vs-catch.snippet.cs",
+      "options": [
+        { "text": "`Assert.Throws<T>` (genauer Typ) und `ThrowsAny<T>` (auch abgeleitete Typen)", "correct": true },
+        { "text": "`[Theory]` mit `[InlineData]`" },
+        { "text": "`FakeTimeProvider.Advance`" },
+        { "text": "Ein `async Task`-Test mit `ThrowsAsync`" }
+      ],
+      "explanation": "Das Konzept ist die Prüfung einer Exception. Du kennst es aus der Lektion „Exceptions und asynchronen Code testen“ (Modul 14). Entscheidend ist, ob die Prüfung den genauen Typ verlangt oder auch abgeleitete Typen zulässt."
+    },
+    {
+      "id": "w04-l01-q8",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "`Parse(null)` wirft eine `ArgumentNullException`. Was ist das Ergebnis des Tests?",
+      "example": "w04/l01/throws-vs-catch.snippet.cs",
+      "options": [
+        { "text": "Der Test schlägt fehl, weil `Throws<T>` genau den Typ `T` verlangt.", "correct": true },
+        { "text": "Der Test besteht, weil `ArgumentNullException` von `ArgumentException` abgeleitet ist.", "misconception": "m14-l12-throws-accepts-derived-type", "feedback": "`Throws<T>` verlangt genau den Typ `T`. Eine `ArgumentNullException` besteht `Throws<ArgumentException>` nicht." },
+        { "text": "Der Test besteht, weil irgendeine Exception genügt.", "feedback": "`Throws<T>` prüft den Typ. Eine Exception eines anderen Typs besteht die Prüfung nicht." }
+      ],
+      "explanation": "`Assert.Throws<T>` verlangt genau den Typ `T`. Ein `catch (ArgumentException)` würde die abgeleitete `ArgumentNullException` auch fangen, die Prüfung aber nicht. Willst du auch abgeleitete Typen zulassen, nimmst du `ThrowsAny<T>`."
+    },
+    {
+      "id": "w04-l01-q9",
+      "lesson": "w04-l01",
+      "type": "multi",
+      "question": "Mit welchen Änderungen der Prüfung besteht der Test, wenn `Parse(null)` eine `ArgumentNullException` wirft? Wähle alle richtigen.",
+      "example": "w04/l01/throws-vs-catch.snippet.cs",
+      "options": [
+        { "text": "`Assert.ThrowsAny<ArgumentException>(…)`", "correct": true },
+        { "text": "`Assert.Throws<ArgumentNullException>(…)`", "correct": true },
+        { "text": "`Assert.Throws<Exception>(…)`", "feedback": "`Throws<T>` verlangt genau den Typ. Die geworfene Exception ist keine `Exception` im genauen Typ." },
+        { "text": "Den Aufruf in ein `catch (ArgumentException)` setzen und nichts weiter prüfen", "feedback": "Das fängt die Exception, prüft aber nichts. Der Test würde auch ohne Exception bestehen." }
+      ],
+      "explanation": "`ThrowsAny<ArgumentException>` lässt abgeleitete Typen zu. `Throws<ArgumentNullException>` trifft den genauen Typ. `Throws<Exception>` verlangt genau `Exception`, und ein `catch` ohne Prüfung besteht auch dann, wenn nichts geworfen wird."
+    },
+    {
+      "id": "w04-l01-q10",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst vorhersagen, welche der drei Zeilen das Muster mit genau zwei Elementen und welche das Muster mit offenem Ende erfüllen.",
+      "example": "w04/l01/list-vs-slice.cs",
+      "options": [
+        { "text": "Listenmuster und Slice-Muster `..`", "correct": true },
+        { "text": "Positionsmuster mit `Deconstruct`" },
+        { "text": "Relationale Muster `<` und `>=`" },
+        { "text": "Eigenschaftsmuster mit `Length`" }
+      ],
+      "explanation": "Das Konzept sind Listenmuster und Slice-Muster. Du kennst sie aus der Lektion „Listenmuster und Slice-Muster“ (Modul 12). Ein Listenmuster ohne `..` verlangt genau so viele Elemente wie Teilmuster, `..` steht für null oder mehr Elemente."
+    },
+    {
+      "id": "w04-l01-q11",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst wissen, was der aufrufende Thread tut, während er auf den Task wartet.",
+      "example": "w04/l01/wait-for-task.snippet.cs",
+      "options": [
+        { "text": "`await` und blockierendes Warten mit `.Result`", "correct": true },
+        { "text": "`using` und `await using`" },
+        { "text": "Timeout mit `WaitAsync` und Abbruch mit `CancellationToken`" },
+        { "text": "`lock` und `Interlocked`" }
+      ],
+      "explanation": "Das Konzept ist das Warten auf einen Task. Du kennst es aus den Lektionen „Wie eine async-Methode abläuft“ und „Stolperfallen bei async“ (Modul 13). `.Result` blockiert den Thread, `await` gibt die Kontrolle zurück."
+    },
+    {
+      "id": "w04-l01-q12",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Der Task aus `CountAsync()` ist noch nicht fertig. Was unterscheidet `LoadBlocking` und `LoadAsync`?",
+      "example": "w04/l01/wait-for-task.snippet.cs",
+      "options": [
+        { "text": "`LoadBlocking` hält den aufrufenden Thread an, bis der Task fertig ist. `LoadAsync` gibt die Kontrolle an den Aufrufer zurück, und der Thread kann andere Arbeit erledigen.", "correct": true },
+        { "text": "Beide halten den Thread an. `await` blockiert ihn, bis der Task fertig ist, genau wie `.Result`.", "misconception": "m13-l02-await-blocks-thread", "feedback": "Bei einem unfertigen Task gibt die Methode mit `await` die Kontrolle an ihren Aufrufer zurück. Der Thread kann in der Zwischenzeit andere Arbeit erledigen." },
+        { "text": "`LoadAsync` startet für das Warten einen neuen Thread, `LoadBlocking` nicht.", "misconception": "m13-l01-async-starts-new-thread", "feedback": "`async` und `await` starten keinen Thread. Der Unterschied liegt darin, ob der Thread beim Warten belegt bleibt." }
+      ],
+      "explanation": "`.Result` ist ein blockierendes Warten: Der Thread tut nichts, ist aber belegt. `await` wartet, ohne den Thread zu blockieren. Mit einem Synchronisationskontext kann das blockierende Warten außerdem zu einem Deadlock führen."
+    },
+    {
+      "id": "w04-l01-q13",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du willst wissen, welche Werte `first` und `second` am Ende haben.",
+      "example": "w04/l01/with-copy.cs",
+      "options": [
+        { "text": "`with`-Ausdruck (Kopie mit geänderter Eigenschaft)", "correct": true },
+        { "text": "Positionsmuster mit `Deconstruct`" },
+        { "text": "Geschlossene Hierarchie mit `closed`" },
+        { "text": "Eigenschaftsmuster `{ State: … }`" }
+      ],
+      "explanation": "Das Konzept ist der `with`-Ausdruck. Du kennst ihn aus der Lektion „Nicht-destruktive Änderung mit with“ (Modul 12). Er liefert eine Kopie mit den genannten Änderungen."
+    },
+    {
+      "id": "w04-l01-q14",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Was gibt das Programm aus?",
+      "example": "w04/l01/with-copy.cs",
+      "options": [
+        { "text": "`first: open`, `second: closed`, `same Id: True`", "correct": true },
+        { "text": "`first: closed`, `second: closed`, `same Id: True`", "misconception": "m12-l07-with-changes-original", "feedback": "Ein `with`-Ausdruck liefert immer einen neuen Wert. Das Original bleibt, wie es war." },
+        { "text": "`first: open`, `second: closed`, `same Id: False`", "feedback": "Die Kopie übernimmt alle Eigenschaften, die du nicht nennst. `Id` ist in beiden gleich." },
+        { "text": "`first: open`, `second: open`, `same Id: True`", "feedback": "Die Kopie bekommt die in den Klammern genannte Änderung: `State` ist `closed`." }
+      ],
+      "explanation": "`first with { State = \"closed\" }` erzeugt einen neuen Wert und speichert ihn in `second`. `first` bleibt `open`. Die nicht genannte Eigenschaft `Id` wird kopiert."
+    },
+    {
+      "id": "w04-l01-q15",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du sollst beurteilen, ob dieser Test die Exception wirklich prüft.",
+      "example": "w04/l01/throws-async-missing-await.snippet.cs",
+      "options": [
+        { "text": "`ThrowsAsync` mit und ohne `await`", "correct": true },
+        { "text": "`async void`-Test statt `async Task`-Test" },
+        { "text": "`ThrowsAny<T>` statt `Throws<T>`" },
+        { "text": "Test mit `FakeTimeProvider`" }
+      ],
+      "explanation": "Das Konzept ist `ThrowsAsync`. Du kennst es aus der Lektion „Exceptions und asynchronen Code testen“ (Modul 14). `ThrowsAsync` muss mit `await` abgewartet werden."
+    },
+    {
+      "id": "w04-l01-q16",
+      "lesson": "w04-l01",
+      "type": "find-bug",
+      "question": "Dieser Test kann bestehen, obwohl `ReadAsync` keine Exception wirft. Welche Zeile ist die Ursache?",
+      "example": "w04/l01/throws-async-missing-await.snippet.cs",
+      "bugLines": [7],
+      "lineFeedback": {
+        "3": { "feedback": "Die Signatur ist richtig: Ein asynchroner Test gibt `Task` zurück, damit xUnit auf das Ende wartet." },
+        "5": { "feedback": "Das Anlegen des Objekts ist in Ordnung. Der Fehler steht in der Prüfung." }
+      },
+      "explanation": "Die Prüfung `Assert.ThrowsAsync<…>` steht ohne `await`. Ohne `await` läuft der Test an der Prüfung vorbei, und ein falsch positives Ergebnis ist möglich. Richtig ist `await Assert.ThrowsAsync<…>(…)`."
+    },
+    {
+      "id": "w04-l01-q17",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Programm mit nur einem Thread startet zwei langsame Abfragen mit `Task.WhenAll(a, b)` und wartet mit `await` auf beide. Du sollst beschreiben, was dabei gleichzeitig geschieht.",
+      "options": [
+        { "text": "Nebenläufigkeit, Parallelität und Asynchronität unterscheiden", "correct": true },
+        { "text": "`lock` und `Interlocked`" },
+        { "text": "`using` und `await using`" },
+        { "text": "Timeout mit `WaitAsync` und Abbruch mit `CancellationToken`" }
+      ],
+      "explanation": "Das Konzept sind die drei Begriffe aus der Lektion „Nebenläufigkeit, Parallelität, Asynchronität“ (Modul 13). Gefragt ist, ob hier mehrere Aufgaben begonnen sind, ob Arbeit im selben Moment läuft und was das Programm beim Warten tut."
+    },
+    {
+      "id": "w04-l01-q18",
+      "lesson": "w04-l01",
+      "type": "single",
+      "question": "Welche Aussage über das Programm mit den zwei Abfragen passt?",
+      "options": [
+        { "text": "Beide Abfragen sind gleichzeitig begonnen und noch nicht fertig, und das Programm blockiert beim Warten nicht. Ein Thread genügt dafür, es ist also nebenläufig und asynchron, aber nicht parallel.", "correct": true },
+        { "text": "Asynchron heißt immer, dass mehrere Threads gleichzeitig arbeiten. Darum braucht das Programm mindestens zwei Threads.", "misconception": "m13-l09-async-is-multithreading", "feedback": "Asynchroner Code gibt beim Warten die Kontrolle ab und kann mit einem Thread auskommen. Multithreading ist ein anderes Mittel für ein anderes Problem." },
+        { "text": "Das Programm ist parallel, weil zwei Abfragen offen sind. Parallelität heißt nur, dass mehr als eine Aufgabe begonnen wurde.", "feedback": "Parallelität heißt, dass Arbeit im selben Moment auf mehreren Prozessorkernen läuft. Mehrere begonnene Aufgaben sind Nebenläufigkeit." }
+      ],
+      "explanation": "Nebenläufigkeit heißt, dass mehrere Aufgaben begonnen und noch nicht fertig sind. Parallelität heißt, dass Arbeit im selben Moment auf mehreren Prozessorkernen läuft. Asynchronität heißt, beim Warten nicht zu blockieren, und geht mit einem Thread."
+    },
+    {
+      "id": "w04-l01-q19",
+      "lesson": "w04-l01",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Woran erkennst du bei einem Stück Code mit Mustern, `async` oder Tests, welches Konzept das Ergebnis bestimmt?",
+      "modelAnswer": "Ich suche die Stelle, an der sich das Ergebnis entscheidet: ein `not` neben einem `or` (Rangfolge), ein Muster mit Position oder mit Namen, ein Listenmuster mit oder ohne `..`, ein `with`, das eine Kopie liefert, ein `await` oder ein `.Result` (Thread frei oder blockiert) oder eine Prüfung mit `Throws` oder `ThrowsAsync` (genauer Typ, mit oder ohne `await`).\n\nDann frage ich, was dort genau passiert, und sage erst danach das Ergebnis vorher."
+    },
+    {
+      "id": "w04-l01-q20",
+      "lesson": "w04-l01",
+      "type": "explain",
+      "question": "Übertragen: Du schreibst für SecLog einen Test, der prüft, dass das Lesen einer leeren Quelle eine Exception wirft. Welche zwei Stolperstellen aus dieser Lektion prüfst du, bevor du dem Test traust?",
+      "modelAnswer": "Erstens prüfe ich den Typ: `Throws<T>` und `ThrowsAsync<T>` verlangen genau den Typ `T`. Wirft der Code eine abgeleitete Exception, besteht die Prüfung nicht. Dann wähle ich den genauen Typ oder `ThrowsAny<T>`.\n\nZweitens prüfe ich, ob der Test ein `await` vor `ThrowsAsync` hat und `async Task` zurückgibt. Ohne `await` läuft der Test an der Prüfung vorbei und kann bestehen, obwohl keine Exception kommt."
+    }
+  ]
 }

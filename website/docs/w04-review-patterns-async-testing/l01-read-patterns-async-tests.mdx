@@ -1,0 +1,151 @@
+---
+title: "Muster, async und Tests: Code lesen"
+sidebar_position: 1
+description: "Gemischte Leseaufgaben zu den Modulen 12–14: erst das Konzept erkennen, dann das Ergebnis vorhersagen, ein Testergebnis beurteilen oder den Fehler finden."
+lesson_id: w04-l01
+duration_min: 25
+---
+
+import sameThread from '!!raw-loader!@site/examples/w04/l01/same-thread.cs';
+import sameThreadOutput from '!!raw-loader!@site/examples/w04/l01/same-thread.out.txt';
+import listVsSlice from '!!raw-loader!@site/examples/w04/l01/list-vs-slice.cs';
+import listVsSliceOutput from '!!raw-loader!@site/examples/w04/l01/list-vs-slice.out.txt';
+import withCopy from '!!raw-loader!@site/examples/w04/l01/with-copy.cs';
+import withCopyOutput from '!!raw-loader!@site/examples/w04/l01/with-copy.out.txt';
+
+# Muster, async und Tests: Code lesen
+
+:::note[Lernziele]
+- Du erkennst bei kurzem Code, welches Konzept aus den Modulen 12–14 das Verhalten bestimmt.
+- Du sagst die Ausgabe von kurzem Code vorher, beurteilst ein Testergebnis oder findest die fehlerhafte Zeile, ohne den Code auszuführen.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+<OptionalReview modules={[12, 13, 14]} />
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann sagst du das Ergebnis voraus, beurteilst einen Test oder findest den Fehler. Die Aufgaben mischen die Module 12–14. Notiere deinen Tipp, bevor du antwortest.
+
+### Aufgabe 1
+
+<Quiz id="w04-l01-q1" />
+
+<Quiz id="w04-l01-q2" />
+
+### Aufgabe 2
+
+<Quiz id="w04-l01-q3" />
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus, und in welcher Reihenfolge? Achte darauf, wann die Methode `CheckAsync` zum ersten Mal Text ausgibt.
+:::
+
+<CSharpRunner id="w04-l01-same-thread" code={sameThread} predict expected={sameThreadOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `CheckAsync started`, `Caller continues` und `Same thread before the await: True`.
+
+1. **Aufruf:** `CheckAsync()` läuft sofort los, auf dem Thread des Aufrufers. Darum erscheint `CheckAsync started` zuerst.
+2. **Erstes `await`:** `Task.Delay(10)` ist noch nicht fertig. Die Methode gibt die Kontrolle an den Aufrufer zurück, der `Caller continues` ausgibt.
+3. **Ergebnis:** Der Vergleich der Thread-Nummern wurde vor dem `await` berechnet und ist `True`.
+
+</details>
+
+<Quiz id="w04-l01-q4" />
+
+### Aufgabe 3
+
+<Quiz id="w04-l01-q5" />
+
+<Quiz id="w04-l01-q6" />
+
+### Aufgabe 4
+
+<Quiz id="w04-l01-q7" />
+
+<Quiz id="w04-l01-q8" />
+
+<Quiz id="w04-l01-q9" />
+
+### Aufgabe 5
+
+<Quiz id="w04-l01-q10" />
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus? Notiere für jede Zeile, ob das Muster mit genau zwei Elementen und ob das Muster mit offenem Ende passt.
+:::
+
+<CSharpRunner id="w04-l01-list-vs-slice" code={listVsSlice} predict expected={listVsSliceOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `alice login-failure: True True`, `alice login-failure 192.0.2.10: False True` und `login-failure: False False`.
+
+1. **Zwei Wörter:** `[_, "login-failure"]` passt nur bei genau zwei Elementen. `[_, "login-failure", ..]` passt auch, weil `..` null Elemente sein darf.
+2. **Drei Wörter:** Das Muster ohne `..` passt nicht, weil ein Element zu viel da ist. Mit `..` passt es.
+3. **Ein Wort:** Beide Muster verlangen mindestens zwei Elemente. Keines passt.
+
+</details>
+
+### Aufgabe 6
+
+<Quiz id="w04-l01-q11" />
+
+<Quiz id="w04-l01-q12" />
+
+### Aufgabe 7
+
+<Quiz id="w04-l01-q13" />
+
+:::info[Vorhersage]
+Welche drei Zeilen gibt das Programm aus? Überlege, was mit `first` passiert.
+:::
+
+<CSharpRunner id="w04-l01-with-copy" code={withCopy} predict expected={withCopyOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist `first: open`, `second: closed` und `same Id: True`.
+
+1. **Kopie:** `first with { State = "closed" }` erzeugt einen neuen Wert und speichert ihn in `second`.
+2. **Original:** `first` bleibt unverändert und hat weiter den Zustand `open`.
+3. **Nicht genannte Eigenschaften:** `Id` wird in die Kopie übernommen, darum ist sie gleich.
+
+</details>
+
+<Quiz id="w04-l01-q14" />
+
+### Aufgabe 8
+
+<Quiz id="w04-l01-q15" />
+
+<Quiz id="w04-l01-q16" />
+
+### Aufgabe 9
+
+<Quiz id="w04-l01-q17" />
+
+<Quiz id="w04-l01-q18" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w04-l01-q19" />
+
+### Übertragen
+
+<Quiz id="w04-l01-q20" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- C#-Spezifikation: [Logisches Muster](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)
+- C#-Spezifikation: [Slice-Muster](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11212-slice-pattern)
+- Microsoft Learn: [Asynchronous programming scenarios](https://learn.microsoft.com/dotnet/csharp/asynchronous-programming/async-scenarios)
