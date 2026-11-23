@@ -12293,6 +12293,76 @@
       "aliases": ["Meldungsbewertung", "Nachrichtenbewertung"],
       "related": ["input-validation"],
       "lesson": "m18-l04"
+    },
+    {
+      "id": "large-language-model",
+      "term": "Large Language Model",
+      "german": "großes Sprachmodell",
+      "category": "platform",
+      "definition": "Ein Modell, das mit sehr großen Textmengen trainiert wurde und Text Stück für Stück fortsetzt: Es wählt jeweils das wahrscheinlichste nächste Stück. Es führt erzeugten Code nicht aus und prüft ihn nicht.",
+      "aliases": ["LLM", "Sprachmodell"],
+      "related": ["prompt"],
+      "lesson": "m19-l01",
+      "source": { "title": "How Generative AI and LLMs work", "url": "https://learn.microsoft.com/dotnet/ai/conceptual/how-genai-and-llms-work" }
+    },
+    {
+      "id": "prompt",
+      "term": "Prompt",
+      "german": "Eingabe an ein Sprachmodell",
+      "category": "platform",
+      "definition": "Der Text, den du einem KI-Assistenten gibst, zum Beispiel eine Frage oder eine Aufgabe. Die Ausgabe hängt von dieser Eingabe ab.",
+      "aliases": ["Prompts"],
+      "related": ["large-language-model"],
+      "lesson": "m19-l01",
+      "source": { "title": "How Generative AI and LLMs work", "url": "https://learn.microsoft.com/dotnet/ai/conceptual/how-genai-and-llms-work" }
+    },
+    {
+      "id": "code-completion",
+      "term": "Code Completion",
+      "german": "Codevervollständigung",
+      "category": "course",
+      "definition": "Eine Form von KI-Assistent: Er schlägt beim Tippen die nächste Zeile oder den nächsten Block vor. Du nimmst den Vorschlag an oder tippst weiter.",
+      "aliases": ["Codevervollständigung"],
+      "related": ["ai-chat-assistant", "agentic-assistant"],
+      "lesson": "m19-l01"
+    },
+    {
+      "id": "ai-chat-assistant",
+      "term": "Chat-Assistent",
+      "category": "course",
+      "definition": "Eine Form von KI-Assistent: Du stellst in einem Gesprächsfenster Fragen oder Aufgaben und bekommst Text und Code als Antwort. Du übernimmst Code selbst.",
+      "aliases": ["Chat", "KI-Chat"],
+      "related": ["code-completion", "agentic-assistant"],
+      "lesson": "m19-l01"
+    },
+    {
+      "id": "agentic-assistant",
+      "term": "Agentischer Assistent",
+      "category": "course",
+      "definition": "Eine Form von KI-Assistent, der mehrere Schritte selbstständig ausführt, zum Beispiel Dateien lesen und ändern oder Befehle starten, bis die Aufgabe erledigt scheint.",
+      "aliases": ["agentisch", "Agent"],
+      "related": ["code-completion", "ai-chat-assistant"],
+      "lesson": "m19-l01"
+    },
+    {
+      "id": "randomized-controlled-trial",
+      "term": "Randomized Controlled Trial",
+      "german": "randomisierte kontrollierte Studie",
+      "category": "course",
+      "definition": "Eine Studie, in der der Zufall bestimmt, wer zur Gruppe mit dem untersuchten Werkzeug und wer zur Vergleichsgruppe gehört. So unterscheiden sich die Gruppen im Mittel nur durch das Werkzeug.",
+      "aliases": ["RCT"],
+      "related": ["confidence-interval"],
+      "lesson": "m19-l01"
+    },
+    {
+      "id": "confidence-interval",
+      "term": "Confidence Interval",
+      "german": "Konfidenzintervall",
+      "category": "course",
+      "definition": "Der Bereich, in dem der wahre Effekt wahrscheinlich liegt. Ein breites Intervall heißt: Der Wert ist unsicher.",
+      "aliases": ["Konfidenzintervall", "CI"],
+      "related": ["randomized-controlled-trial"],
+      "lesson": "m19-l01"
     }
   ]
 }
