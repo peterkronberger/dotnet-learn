@@ -1,0 +1,3 @@
+CheckAsync started
+Caller continues
+Same thread before the await: True
