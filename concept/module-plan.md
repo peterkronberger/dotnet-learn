@@ -468,8 +468,8 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
 
 ### W4 Wiederholung M12–M14 ▶
 Mixes M12–M14. Folder `w04-review-patterns-async-testing/`, quiz file `de/w04.json`, position 14.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
-- Lesson L1: mixed reading and tracing set (title chosen by the architect of W4).
-- Lesson L2: mixed writing set and final set (title chosen by the architect of W4).
+- Lesson L1 `w04-l01`: "Muster, async und Tests: Code lesen" (mixed reading and tracing set).
+- Lesson L2 `w04-l02`: "Muster, async und Tests: Code schreiben" (mixed writing set and final set).
 - **M12** (from `module-digest.md` `## M12`):
   - Concepts:
     - declaration pattern vs. cast and `as` (`m12-l01`, `m08-l06`)

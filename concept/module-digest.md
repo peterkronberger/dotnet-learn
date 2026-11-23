@@ -2,7 +2,7 @@
 
 Base since #450: C# 15 / .NET 11.
 
-As of 2026-11-23. One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
+As of 2026-11-23 (through W4). One section per finished module, written by its module review. A task for module N reads this file instead of the lessons, examples and quiz files of earlier modules (`CLAUDE.md`, "Context budget"). It lists ids and paths, not text. Max. about 40 lines per module.
 
 ## Format
 
@@ -350,6 +350,12 @@ Each module section has these fields:
 - **Lessons:**
   - `w03-l01` Generics, Delegates und LINQ: Code lesen – mixed reading and tracing set for M9–M11 (quiz ids `w03-l01-q1` … `w03-l01-q22`).
   - `w03-l02` Generics, Delegates und LINQ: Code schreiben – mixed writing set and final set for M9–M11 (quiz ids `w03-l02-q1` … `w03-l02-q24`).
+
+## W4 Wiederholung M12–M14
+
+- **Lessons:**
+  - `w04-l01` Muster, async und Tests: Code lesen – mixed reading and tracing set for M12–M14 (quiz ids `w04-l01-q1` … `w04-l01-q20`).
+  - `w04-l02` Muster, async und Tests: Code schreiben – mixed writing set and final set for M12–M14 (quiz ids `w04-l02-q1` … `w04-l02-q25`).
 
 ## M14 Testen
 
