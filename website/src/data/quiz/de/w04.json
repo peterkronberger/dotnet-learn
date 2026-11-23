@@ -258,6 +258,567 @@
       "type": "explain",
       "question": "Übertragen: Du schreibst für SecLog einen Test, der prüft, dass das Lesen einer leeren Quelle eine Exception wirft. Welche zwei Stolperstellen aus dieser Lektion prüfst du, bevor du dem Test traust?",
       "modelAnswer": "Erstens prüfe ich den Typ: `Throws<T>` und `ThrowsAsync<T>` verlangen genau den Typ `T`. Wirft der Code eine abgeleitete Exception, besteht die Prüfung nicht. Dann wähle ich den genauen Typ oder `ThrowsAny<T>`.\n\nZweitens prüfe ich, ob der Test ein `await` vor `ThrowsAsync` hat und `async Task` zurückgibt. Ohne `await` läuft der Test an der Prüfung vorbei und kann bestehen, obwohl keine Exception kommt."
+    },
+    {
+      "id": "w04-l02-q1",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Wert hat den Typ `object`. Du willst ihn nur dann als `int` benutzen, wenn er wirklich eine Zahl ist. Bei einem anderen Typ darf keine Exception fliegen.",
+      "options": [
+        {
+          "text": "Deklarationsmuster mit `is`",
+          "correct": true
+        },
+        {
+          "text": "Eigenschaftsmuster `{ … }`"
+        },
+        {
+          "text": "Listenmuster `[…]`"
+        },
+        {
+          "text": "`with`-Ausdruck"
+        }
+      ],
+      "explanation": "Das Konzept ist das Deklarationsmuster. Du kennst es aus der Lektion „Typmuster, Deklarationsmuster und Nulltests“ (Modul 12). Es prüft den Typ und legt bei einem Treffer gleich die Variable an."
+    },
+    {
+      "id": "w04-l02-q2",
+      "lesson": "w04-l02",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Es soll nur bei einer Zahl `int: …` ausgeben, bei den anderen Werten `not an int`.",
+      "example": "w04/l02/declaration-pattern.cs",
+      "blanks": [
+        {
+          "text": "is int",
+          "hint": "Das Muster steht hinter dem Wert und ergibt einen `bool`.",
+          "wrongAnswers": [
+            {
+              "text": "as int",
+              "feedback": "`as` ist kein Muster und liefert keinen `bool`. Die Bedingung des `if` braucht aber einen `bool`."
+            },
+            {
+              "text": "(int)",
+              "feedback": "Ein Cast wirft bei einem anderen Typ eine `InvalidCastException`. Ein Muster liefert dann nur `false`."
+            }
+          ]
+        },
+        {
+          "text": "number",
+          "hint": "Der Name wird in der nächsten Zeile für die Ausgabe benutzt."
+        }
+      ],
+      "explanation": "`value is int number` prüft den Typ und legt bei einem Treffer die Variable `number` an. Bei `\"forty-two\"` und `4.2` ergibt der Ausdruck `false`, es gibt keine Exception. Ein Cast `(int)value` würde bei diesen Werten eine `InvalidCastException` werfen."
+    },
+    {
+      "id": "w04-l02-q3",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Task ist langsam. Dein Code soll nach 50 ms aufhören zu warten und das melden. Der langsame Task selbst darf weiterlaufen.",
+      "options": [
+        {
+          "text": "Zeitlimit mit `WaitAsync`",
+          "correct": true
+        },
+        {
+          "text": "Abbrechen mit `CancellationTokenSource`"
+        },
+        {
+          "text": "Auf alle Tasks warten mit `Task.WhenAll`"
+        },
+        {
+          "text": "Asynchrones Freigeben mit `await using`"
+        }
+      ],
+      "explanation": "Das Konzept ist das Zeitlimit mit `WaitAsync`. Du kennst es aus der Lektion „Auf mehrere Tasks warten“ (Modul 13). `WaitAsync` begrenzt nur das Warten. Der Task wird dadurch nicht abgebrochen."
+    },
+    {
+      "id": "w04-l02-q4",
+      "lesson": "w04-l02",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Es soll nach 50 ms aufgeben und `Gave up waiting` ausgeben.",
+      "example": "w04/l02/timeout-wait.cs",
+      "blanks": [
+        {
+          "text": "WaitAsync",
+          "hint": "Die Methode hängst du an den Task an und gibst ihr eine Zeitspanne.",
+          "wrongAnswers": [
+            {
+              "text": "Wait",
+              "feedback": "`Wait` blockiert den aufrufenden Thread. Hier brauchst du eine Methode, die du mit `await` abwartest."
+            },
+            {
+              "text": "Cancel",
+              "feedback": "Ein Task hat keine Methode `Cancel`. Abbrechen geht mit einem `CancellationToken`, das der Task selbst beachten muss."
+            }
+          ]
+        },
+        {
+          "text": "TimeoutException",
+          "hint": "Welche Exception löst ein abgelaufenes Zeitlimit aus?",
+          "wrongAnswers": [
+            {
+              "text": "OperationCanceledException",
+              "feedback": "Diese Exception kommt beim Abbrechen mit einem `CancellationToken`. Ein abgelaufenes Zeitlimit von `WaitAsync` löst eine `TimeoutException` aus."
+            }
+          ]
+        }
+      ],
+      "explanation": "`slow.WaitAsync(TimeSpan.FromMilliseconds(50))` wartet höchstens 50 ms und löst dann eine `TimeoutException` aus. Der Task läuft weiter: Die zweite Zeile zeigt `Task completed: False`. Wer die Arbeit selbst beenden will, braucht ein `CancellationToken`."
+    },
+    {
+      "id": "w04-l02-q5",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du schreibst einen Test für ein Zeitfenster von 10 Minuten. Der Test soll prüfen, dass ein Fehler nach genau 10 Minuten noch zählt, aber nicht 10 Minuten dauern.",
+      "example": "w04/l02/fake-clock-start.snippet.cs",
+      "options": [
+        {
+          "text": "Zeit vorspulen mit `FakeTimeProvider`",
+          "correct": true
+        },
+        {
+          "text": "Im Test warten mit `Task.Delay`"
+        },
+        {
+          "text": "Zeitlimit mit `WaitAsync`"
+        },
+        {
+          "text": "Exceptions prüfen mit `Assert.ThrowsAsync`"
+        }
+      ],
+      "explanation": "Das Konzept ist die vorgespulte Uhr. Du kennst sie aus der Lektion „Zeitabhängigen Code testen“ (Modul 14). Der Test übergibt dem Code eine `FakeTimeProvider`-Uhr und stellt sie selbst weiter. Warten würde den Test langsam und ungenau machen."
+    },
+    {
+      "id": "w04-l02-q6",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Der Test benutzt `clock.Advance(Window)`. Welche Aussage über diesen Test stimmt?",
+      "example": "w04/l02/fake-clock-test.snippet.cs",
+      "options": [
+        {
+          "text": "`Advance` schiebt nur die Uhr des `FakeTimeProvider` vor. Der Test wartet nicht.",
+          "correct": true
+        },
+        {
+          "text": "Der Test dauert 10 Minuten, weil `Advance` so lange wartet.",
+          "feedback": "Der Test übergibt eine Uhr, die er selbst vorspult. `Advance` kostet keine Zeit.",
+          "misconception": "m14-l11-test-must-wait-window"
+        },
+        {
+          "text": "Der Test besteht nur, wenn vorher `await Task.Delay(Window)` aufgerufen wird.",
+          "feedback": "Wer im Test wirklich wartet, bekommt langsame und ungenaue Tests. Die vorgespulte Uhr macht das Warten überflüssig.",
+          "misconception": "m14-l11-test-must-wait-window"
+        },
+        {
+          "text": "`Advance` stellt die Systemuhr vor. Danach zeigt auch `DateTimeOffset.UtcNow` die Zeit 10 Minuten später.",
+          "feedback": "Ein `FakeTimeProvider` ist ein gewöhnliches Objekt. Nur Code, der ihn als `TimeProvider` bekommt, sieht seine Zeit.",
+          "misconception": "m14-l11-fake-time-provider-changes-system-clock"
+        }
+      ],
+      "explanation": "`Advance` verschiebt nur die Zeit des `FakeTimeProvider`. `FailureTracker` bekommt diese Uhr und sieht die vorgespulte Zeit sofort. Die Systemuhr bleibt unverändert, und der Test wartet nie."
+    },
+    {
+      "id": "w04-l02-q7",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Alarme haben eine gemeinsame Basis und genau zwei Arten. Ein `switch` darüber soll vom Compiler auf Vollständigkeit geprüft werden. Fremder Code soll keine weiteren Arten anlegen können.",
+      "options": [
+        {
+          "text": "Geschlossene Hierarchie mit `closed`",
+          "correct": true
+        },
+        {
+          "text": "Union-Typ mit `union`"
+        },
+        {
+          "text": "Positionsmuster mit `Deconstruct`"
+        },
+        {
+          "text": "Relationale Muster `<` und `>=`"
+        }
+      ],
+      "explanation": "Das Konzept ist die geschlossene Hierarchie. Du kennst sie aus der Lektion „Geschlossene Hierarchien“ (Modul 12). Ein `closed` Basistyp erlaubt Untertypen nur in derselben Assembly, und der `switch` kann auf Vollständigkeit geprüft werden."
+    },
+    {
+      "id": "w04-l02-q8",
+      "lesson": "w04-l02",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Der `switch` soll beide Untertypen behandeln und die Basis soll eine geschlossene Hierarchie sein.",
+      "example": "w04/l02/closed-alert.cs",
+      "blanks": [
+        {
+          "text": "Warning warning",
+          "hint": "Der Arm braucht den Typ und einen Namen, den die rechte Seite benutzt.",
+          "wrongAnswers": [
+            {
+              "text": "Warning",
+              "feedback": "Ohne Namen kennt die rechte Seite `warning` nicht. Das Deklarationsmuster legt die Variable an."
+            }
+          ]
+        },
+        {
+          "text": "closed",
+          "hint": "Der Modifizierer erlaubt Untertypen nur in derselben Assembly.",
+          "wrongAnswers": [
+            {
+              "text": "sealed",
+              "feedback": "`sealed` verbietet jeden Untertyp. Dann gäbe es `Info` und `Warning` nicht. `closed` erlaubt Untertypen in derselben Assembly.",
+              "misconception": "m12-l09-closed-means-sealed"
+            },
+            {
+              "text": "abstract",
+              "feedback": "`abstract` erlaubt Untertypen auch in anderen Assemblies. Dann kann der Compiler die Vollständigkeit des `switch` nicht garantieren."
+            }
+          ]
+        }
+      ],
+      "explanation": "`closed record Alert;` macht die Basis zu einer geschlossenen Hierarchie. Die Untertypen `Info` und `Warning` stehen in derselben Datei, und der `switch` deckt beide ab. `closed` ist nicht `sealed`: `sealed` verbietet jeden Untertyp."
+    },
+    {
+      "id": "w04-l02-q9",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Ein Ergebnis ist entweder ein `SecurityEvent` oder ein `LineError`. Beide Typen haben keine gemeinsame Basis außer `object`. Was passt?",
+      "options": [
+        {
+          "text": "Ein Union-Typ mit den beiden Fall-Typen",
+          "correct": true
+        },
+        {
+          "text": "Eine geschlossene Hierarchie mit `closed`",
+          "feedback": "Eine geschlossene Hierarchie braucht einen gemeinsamen Basistyp, von dem die Fälle erben. Ein Union-Typ fasst Typen zusammen, die keine Basis teilen."
+        },
+        {
+          "text": "Ein `sealed` Basistyp",
+          "feedback": "`sealed` verbietet Untertypen. Damit lassen sich keine zwei Fälle unter einem Typ zusammenfassen."
+        }
+      ],
+      "explanation": "Ein Union-Typ (Lektion „Union-Typen“, Modul 12) fasst Typen ohne gemeinsame Basis zu einem Typ zusammen. Eine geschlossene Hierarchie passt, wenn die Fälle von einer gemeinsamen Basis erben. `sealed` verbietet Untertypen."
+    },
+    {
+      "id": "w04-l02-q10",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Zwei Threads erhöhen je 1000 Mal gemeinsame Zähler. Am Ende müssen beide Zähler genau 2000 zeigen. Das Erhöhen besteht aus Lesen, Ändern und Schreiben.",
+      "options": [
+        {
+          "text": "Gegenseitiger Ausschluss und atomare Operationen (`lock`, `Interlocked`)",
+          "correct": true
+        },
+        {
+          "text": "Sichtbarkeit von Feldern mit `volatile`"
+        },
+        {
+          "text": "Datenparallelität mit `Parallel.For`"
+        },
+        {
+          "text": "Producer und Consumer mit `Channel`"
+        }
+      ],
+      "explanation": "Das Konzept sind `lock` und `Interlocked`. Du kennst sie aus den Lektionen „Gegenseitiger Ausschluss mit lock“ und „Atomare Operationen und Sichtbarkeit“ (Modul 13). Lesen, Ändern und Schreiben muss als Ganzes geschützt sein."
+    },
+    {
+      "id": "w04-l02-q11",
+      "lesson": "w04-l02",
+      "type": "cloze",
+      "question": "Ergänze das Programm: Der erste Zähler wird mit einer Sperre geschützt, der zweite mit einer atomaren Operation. Beide sollen am Ende `2000` zeigen.",
+      "example": "w04/l02/lock-interlocked.cs",
+      "blanks": [
+        {
+          "text": "lock",
+          "hint": "Das Schlüsselwort nimmt das Sperrobjekt `gate` in Klammern.",
+          "wrongAnswers": [
+            {
+              "text": "volatile",
+              "feedback": "`volatile` betrifft nur die Sichtbarkeit einzelner Lese- und Schreibzugriffe. Ein Ablauf aus Lesen, Ändern und Schreiben wie `total++` braucht `lock` oder `Interlocked`.",
+              "misconception": "m13-l14-volatile-makes-thread-safe"
+            }
+          ]
+        },
+        {
+          "text": "Increment",
+          "hint": "Die Methode von `Interlocked` erhöht eine Variable um 1.",
+          "wrongAnswers": [
+            {
+              "text": "Decrement",
+              "feedback": "`Decrement` zählt um 1 herunter. Der Zähler soll steigen."
+            }
+          ]
+        }
+      ],
+      "explanation": "`lock (gate)` lässt nur einen Thread gleichzeitig in den Block. `Interlocked.Increment(ref hits)` erhöht den Zähler als eine unteilbare Operation. Beide Zähler zeigen 2000. `volatile` ersetzt beides nicht."
+    },
+    {
+      "id": "w04-l02-q12",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du prüfst, ob dieser Test so laufen kann. Er ruft eine Methode mit `await` auf und prüft danach das Ergebnis.",
+      "example": "w04/l02/async-void-test.snippet.cs",
+      "options": [
+        {
+          "text": "Asynchrone Tests und ihre Signatur",
+          "correct": true
+        },
+        {
+          "text": "Datengetriebene Tests mit `[Theory]`"
+        },
+        {
+          "text": "Exceptions mit `Assert.Throws` prüfen"
+        },
+        {
+          "text": "Test-Doubles: Stub und Spy"
+        }
+      ],
+      "explanation": "Das Konzept ist der asynchrone Test. Du kennst ihn aus der Lektion „Exceptions und asynchronen Code testen“ (Modul 14). Wichtig ist der Rückgabetyp, denn von ihm hängt ab, ob xUnit auf das Ende wartet."
+    },
+    {
+      "id": "w04-l02-q13",
+      "lesson": "w04-l02",
+      "type": "find-bug",
+      "question": "Dieser Test lässt sich mit xUnit v3 nicht ausführen. Welche Zeile muss sich ändern?",
+      "example": "w04/l02/async-void-test.snippet.cs",
+      "bugLines": [
+        2
+      ],
+      "lineFeedback": {
+        "6": {
+          "feedback": "Das `await` ist richtig. Der Fehler steht in der Signatur."
+        },
+        "9": {
+          "feedback": "Die Prüfung ist in Ordnung. Der Fehler steht in der Signatur."
+        }
+      },
+      "explanation": "Ein asynchroner Test gibt `Task` zurück, damit xUnit auf das Ende wartet. Die Signatur muss `public async Task …` lauten. Der Rest des Tests bleibt gleich."
+    },
+    {
+      "id": "w04-l02-q14",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Eine Kollegin sagt: „Ein asynchroner Test darf `async void` sein, der Test wartet ja mit `await`.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Ein Test gibt `Task` zurück. xUnit v3 unterstützt `async void` bei Tests nicht, damit xUnit auf das Ende warten kann.",
+          "correct": true
+        },
+        {
+          "text": "Ein Test darf `async void` sein, denn das `await` im Test sorgt dafür, dass xUnit wartet.",
+          "feedback": "Eine Methode mit `async void` gibt dem Aufrufer nichts zurück, worauf er warten könnte. xUnit v3 unterstützt diese Signatur bei Tests nicht.",
+          "misconception": "m14-l12-async-void-test-is-ok"
+        },
+        {
+          "text": "Ein Test darf `async void` sein, solange er keine Exception prüft.",
+          "feedback": "Die Signatur ist unabhängig davon, was der Test prüft. xUnit v3 unterstützt `async void` bei Tests nicht.",
+          "misconception": "m14-l12-async-void-test-is-ok"
+        }
+      ],
+      "explanation": "Ein asynchroner Test gibt `Task` zurück. Bei `async void` hat xUnit nichts, worauf es warten könnte. Ein Analyzer meldet die Signatur beim Bauen als Fehler."
+    },
+    {
+      "id": "w04-l02-q15",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Ein Objekt gibt seine Ressource asynchron frei: Dafür hat es die Methode `DisposeAsync`. Die Freigabe soll fertig sein, bevor das Programm `Done` ausgibt.",
+      "options": [
+        {
+          "text": "Asynchrones Freigeben mit `await using`",
+          "correct": true
+        },
+        {
+          "text": "Normales `using` mit `Dispose`"
+        },
+        {
+          "text": "Warten auf den ersten Task mit `Task.WhenAny`"
+        },
+        {
+          "text": "Methoden mit `async void`"
+        }
+      ],
+      "explanation": "Das Konzept ist `await using`. Du kennst es aus der Lektion „Asynchrones Freigeben mit await using“ (Modul 13), dem asynchronen Gegenstück zu `using` (Modul 7). Es ruft `DisposeAsync` auf und wartet darauf."
+    },
+    {
+      "id": "w04-l02-q16",
+      "lesson": "w04-l02",
+      "type": "parsons",
+      "question": "Bringe die Zeilen in die richtige Reihenfolge. Zwei Zeilen gehören nicht zum Programm.",
+      "example": "w04/l02/await-using.cs",
+      "distractors": [
+        "using (Connection connection = new())",
+        "class Connection : IDisposable"
+      ],
+      "distractorMisconceptions": {
+        "using (Connection connection = new())": "m13-l07-using-calls-disposeasync"
+      },
+      "explanation": "`await using` ruft `DisposeAsync` auf und wartet darauf. Darum erscheint `Closed` vor `Done`. Ein normales `using` verlangt `IDisposable`. Für einen Typ, der nur `IAsyncDisposable` hat, ist es ein Übersetzungsfehler."
+    },
+    {
+      "id": "w04-l02-q17",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Im Startcode gibt `bob` die Zeile `starts with bo` aus. Du sollst erreichen, dass `bob` die Zeile `exactly bob` ausgibt, ohne ein Muster zu entfernen.",
+      "example": "w04/l02/switch-order-task.cs",
+      "options": [
+        {
+          "text": "`switch`-Ausdruck: der erste passende Arm gewinnt",
+          "correct": true
+        },
+        {
+          "text": "Listenmuster mit `..`"
+        },
+        {
+          "text": "`with`-Ausdruck"
+        },
+        {
+          "text": "Positionsmuster mit `Deconstruct`"
+        }
+      ],
+      "explanation": "Das Konzept ist die Reihenfolge der Arme im `switch`-Ausdruck. Du kennst sie aus der Lektion „switch-Ausdrücke im Detail“ (Modul 12). Der erste Arm, der passt, gewinnt. Das engere Muster muss darum zuerst stehen."
+    },
+    {
+      "id": "w04-l02-q18",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Im Startcode steht der Arm mit `when` vor dem Arm für `\"bob\"`. Warum gibt `bob` dort `starts with bo` aus?",
+      "options": [
+        {
+          "text": "Der erste Arm, der passt, gewinnt. `var text when …` passt auch auf `\"bob\"`.",
+          "correct": true
+        },
+        {
+          "text": "Die Reihenfolge der Arme ist egal. Der Compiler wählt den engsten passenden Arm.",
+          "feedback": "Die Reihenfolge entscheidet. Ein weites Muster früh macht spätere Arme unerreichbar oder ändert still das Ergebnis, wenn ein Arm `when` hat.",
+          "misconception": "m12-l06-switch-arm-order-irrelevant"
+        },
+        {
+          "text": "Ein Arm mit `when` hat immer Vorrang vor einem Konstantenmuster, egal wo er steht.",
+          "feedback": "Es gibt keinen solchen Vorrang. Die Arme werden von oben nach unten geprüft, der erste Treffer gewinnt.",
+          "misconception": "m12-l06-switch-arm-order-irrelevant"
+        }
+      ],
+      "explanation": "Die Arme werden von oben nach unten geprüft. Der Arm `var text when text.StartsWith(…)` passt auch auf `\"bob\"` und kommt zuerst. Schreibe das engere Muster zuerst."
+    },
+    {
+      "id": "w04-l02-q19",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Du schreibst einen Test, der prüft, dass `CountAsync` mit einem bereits abgebrochenen Token eine Exception wirft. Der Test läuft, besteht aber nicht.",
+      "example": "w04/l02/cancel-test.snippet.cs",
+      "options": [
+        {
+          "text": "Exceptions in asynchronem Code prüfen (`ThrowsAsync`, `ThrowsAnyAsync`)",
+          "correct": true
+        },
+        {
+          "text": "Zeit vorspulen mit `FakeTimeProvider`"
+        },
+        {
+          "text": "Datengetriebene Tests mit `[Theory]`"
+        },
+        {
+          "text": "Test-Doubles: Stub und Spy"
+        }
+      ],
+      "explanation": "Das Konzept ist die Prüfung von Exceptions in asynchronem Code. Du kennst sie aus der Lektion „Exceptions und asynchronen Code testen“ (Modul 14). Welche Prüfung passt, hängt vom Typ der Exception ab, die wirklich kommt."
+    },
+    {
+      "id": "w04-l02-q20",
+      "lesson": "w04-l02",
+      "type": "find-bug",
+      "question": "Der Test schlägt fehl, obwohl `CountAsync` abgebrochen wird. Welche Zeile muss sich ändern?",
+      "example": "w04/l02/cancel-test.snippet.cs",
+      "bugLines": [
+        8
+      ],
+      "lineFeedback": {
+        "5": {
+          "feedback": "Die eigene `CancellationTokenSource` ist hier richtig: Der Test will den Abbruch selbst auslösen."
+        },
+        "6": {
+          "feedback": "Der Abbruch vor dem Aufruf ist gewollt. Der Fehler steht in der Prüfung."
+        }
+      },
+      "explanation": "`Task.Delay` wirft bei einem abgebrochenen Token eine `TaskCanceledException`. Sie erbt von `OperationCanceledException`. `ThrowsAsync<OperationCanceledException>` verlangt den exakten Typ und schlägt fehl. `ThrowsAnyAsync<OperationCanceledException>` akzeptiert auch die abgeleitete Klasse."
+    },
+    {
+      "id": "w04-l02-q21",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Wann nimmst du in einem Test `TestContext.Current.CancellationToken`, und wann eine eigene `CancellationTokenSource`?",
+      "options": [
+        {
+          "text": "Das Token des Tests übergibst du normal: xUnit löst es aus, wenn der Test abgebrochen wird. Willst du den Abbruch selbst auslösen, brauchst du eine eigene `CancellationTokenSource` mit `Cancel()`.",
+          "correct": true
+        },
+        {
+          "text": "Das Token des Tests rufst du mit `Cancel()` ab, um den Abbruch zu testen.",
+          "feedback": "Ein `CancellationToken` hat keine Methode `Cancel`. Auslösen kann nur die `CancellationTokenSource`."
+        },
+        {
+          "text": "Beide sind gleich. Du brauchst immer eine eigene `CancellationTokenSource`.",
+          "feedback": "Das Token des Tests gehört zum laufenden Test und meldet dessen Abbruch, zum Beispiel durch ein Zeitlimit. Du musst dafür keine Quelle anlegen."
+        }
+      ],
+      "explanation": "Das Token des Tests gehört zum laufenden Test, und xUnit löst es aus, wenn der Test abgebrochen wird. Soll der Test den Abbruch selbst auslösen, legt er eine `CancellationTokenSource` an und ruft `Cancel()` auf."
+    },
+    {
+      "id": "w04-l02-q22",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welches Konzept brauchst du hier? Mehrere Tasks rufen `Add` auf. Ein anderer Task liest zur gleichen Zeit `Total`. Du sollst beurteilen, ob das Lesen gegen die Zähler-Änderungen geschützt ist.",
+      "example": "w04/l02/locked-writer.snippet.cs",
+      "options": [
+        {
+          "text": "Gegenseitiger Ausschluss mit `lock` und seine Reichweite",
+          "correct": true
+        },
+        {
+          "text": "Atomare Operationen mit `Interlocked`"
+        },
+        {
+          "text": "Asynchrone Streams mit `await foreach`"
+        },
+        {
+          "text": "Thread-Pool und `Task.Run`"
+        }
+      ],
+      "explanation": "Das Konzept ist der `lock` und seine Reichweite. Du kennst ihn aus der Lektion „Gegenseitiger Ausschluss mit lock“ (Modul 13). Entscheidend ist, welcher Code dieselbe Sperre nimmt."
+    },
+    {
+      "id": "w04-l02-q23",
+      "lesson": "w04-l02",
+      "type": "single",
+      "question": "Welche Aussage über den Zugriff auf `Total` stimmt?",
+      "example": "w04/l02/locked-writer.snippet.cs",
+      "options": [
+        {
+          "text": "`Total` nimmt die Sperre nicht. Der `lock` in `Add` hält den lesenden Zugriff nicht auf.",
+          "correct": true
+        },
+        {
+          "text": "Der `lock` in `Add` schützt das Feld `_count` auch beim Lesen über `Total`.",
+          "feedback": "Ein `lock` schließt nur Code aus, der dieselbe Sperre nimmt. Code, der die Daten ohne diese Sperre anfasst, wird nicht aufgehalten.",
+          "misconception": "m13-l12-lock-protects-unlocked-access"
+        },
+        {
+          "text": "Mit `volatile` am Feld `_count` wäre `Total` zusammen mit `Add` ohne `lock` thread-sicher.",
+          "feedback": "`volatile` betrifft nur Sichtbarkeit einzelner Zugriffe. Das `_count++` in `Add` braucht weiter `Interlocked` oder einen `lock`.",
+          "misconception": "m13-l14-volatile-makes-thread-safe"
+        }
+      ],
+      "explanation": "Ein `lock` schließt nur Code aus, der dieselbe Sperre nimmt. `Total` liest `_count` ohne Sperre. Soll das Lesen geschützt sein, muss es ebenfalls `lock (_gate)` benutzen."
+    },
+    {
+      "id": "w04-l02-q24",
+      "lesson": "w04-l02",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten: Wie erkennst du bei einer Schreibaufgabe zu Mustern, `async` oder Tests, welches Konzept du brauchst, bevor du Code schreibst?",
+      "modelAnswer": "Ich lese zuerst, was das Ergebnis sein soll, und suche das Wort, das die Aufgabe entscheidet: ein Wert, der nur bei richtigem Typ benutzt werden darf (Deklarationsmuster), ein Zeitlimit für das Warten oder ein Abbruch (`WaitAsync` oder `CancellationToken`), eine Ressource mit `DisposeAsync` (`await using`), ein gemeinsamer Zähler (`lock` oder `Interlocked`), ein Zeitfenster im Test (vorgespulte Uhr) oder eine Exception im asynchronen Test (`ThrowsAsync` oder `ThrowsAnyAsync`).\n\nDann prüfe ich die Stolperstelle des Konzepts: Reihenfolge der Arme, `closed` ist nicht `sealed`, `lock` schützt nur Code mit derselben Sperre, ein Test gibt `Task` zurück. Erst danach schreibe ich den Code."
+    },
+    {
+      "id": "w04-l02-q25",
+      "lesson": "w04-l02",
+      "type": "explain",
+      "question": "Übertragen: Für SecLog soll ein Test prüfen, dass eine Meldung nach 10 Minuten aus dem Fenster fällt, und ein zweiter, dass das Lesen einer Datei bei einem Abbruch eine Exception wirft. Welche Konzepte nimmst du, und wie schreibst du die beiden Tests?",
+      "modelAnswer": "Für das Zeitfenster übergebe ich dem Code einen `FakeTimeProvider` als `TimeProvider`, rufe `Advance` mit dem Fenster plus einer Sekunde auf und prüfe das Ergebnis. Der Test wartet nicht.\n\nFür den Abbruch lege ich eine `CancellationTokenSource` an, rufe `Cancel()` auf und übergebe das Token. Der Test ist `async Task`, die Prüfung steht mit `await` vor `Assert.ThrowsAnyAsync<OperationCanceledException>`, weil die Exception eine abgeleitete Klasse sein kann."
     }
   ]
 }
