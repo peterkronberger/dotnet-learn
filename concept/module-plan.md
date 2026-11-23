@@ -546,7 +546,15 @@ Full SecLog: domain logic, LINQ analysis and message rating ▶ automatically ch
   - 8 placement questions in `de/m18.json`. No spec, library or badge items.
 
 ### M19 Programmieren mit KI (programming with AI) ◻/▶
-See `concept/ai-module.md`.
+See `concept/ai-module.md`. Built (all ▶, l04 with ◻ code blocks; study per lesson in brackets):
+
+- `m19-l01` Realistische Erwartungen (Peng 2023, Paradis 2025, METR 2025)
+- `m19-l02` Lernen vs. Abgeben (Shen & Tamkin 2026)
+- `m19-l03` Verifizieren (METR 2025: checking effort; rest best practice)
+- `m19-l04` Sicherheit ◻ (Perry et al. 2023)
+- `m19-l05` Kontext geben (Perry et al. 2023 for prompt care; rest best practice)
+- `m19-l06` Selbsteinschätzung prüfen (Prather et al. 2024)
+- `m19-l07` Daten und Geheimnisse (best practice, no study)
 
 ## Deliberately not covered
 
