@@ -1,4 +1,4 @@
-// Print the number only when the value really is an int
+// Print the value only when it has the type int
 object[] values = { 42, "forty-two", 4.2 };
 
 foreach (object value in values)
