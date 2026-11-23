@@ -1,0 +1,130 @@
+---
+title: "Muster, async und Tests: Code schreiben"
+sidebar_position: 2
+description: "Gemischte Schreibaufgaben zu den Modulen 12–14: erst das Konzept erkennen, dann Code ergänzen, ordnen, verbessern oder beurteilen, dazu ein kurzer Abschlusssatz."
+lesson_id: w04-l02
+duration_min: 25
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import switchOrderTask from '!!raw-loader!@site/examples/w04/l02/switch-order-task.cs';
+import switchOrderTests from '!!raw-loader!@site/examples/w04/l02/switch-order-task.tests.snippet.cs';
+import switchOrderSolution from '!!raw-loader!@site/examples/w04/l02/switch-order-solution.cs';
+
+# Muster, async und Tests: Code schreiben
+
+:::note[Lernziele]
+- Du erkennst bei einer Schreibaufgabe, welches Konzept aus den Modulen 12–14 gebraucht wird.
+- Du ergänzt, ordnest oder verbesserst Code zu Mustern, `async`, Threads und Tests und beurteilst Testcode.
+- Du erklärst in eigenen Worten, woran du das passende Konzept erkennst, und nennst eine Stelle, an der du es einsetzt.
+:::
+
+Jede Aufgabe hat zwei Schritte: Erst erkennst du das Konzept, dann ergänzt, ordnest oder verbesserst du den Code. Die Aufgaben mischen die Module 12–14. Notiere deinen Tipp, bevor du antwortest. Die letzten drei Aufgaben bilden den kurzen Abschlusssatz.
+
+### Aufgabe 1
+
+<Quiz id="w04-l02-q1" />
+
+<Quiz id="w04-l02-q2" />
+
+### Aufgabe 2
+
+<Quiz id="w04-l02-q3" />
+
+<Quiz id="w04-l02-q4" />
+
+### Aufgabe 3
+
+<Quiz id="w04-l02-q5" />
+
+<Quiz id="w04-l02-q6" />
+
+### Aufgabe 4
+
+<Quiz id="w04-l02-q7" />
+
+<Quiz id="w04-l02-q8" />
+
+<Quiz id="w04-l02-q9" />
+
+### Aufgabe 5
+
+<Quiz id="w04-l02-q10" />
+
+<Quiz id="w04-l02-q11" />
+
+### Aufgabe 6
+
+<Quiz id="w04-l02-q12" />
+
+<Quiz id="w04-l02-q13" />
+
+<Quiz id="w04-l02-q14" />
+
+### Aufgabe 7
+
+<Quiz id="w04-l02-q15" />
+
+<Quiz id="w04-l02-q16" />
+
+## Abschlusssatz
+
+### Aufgabe 8
+
+<Quiz id="w04-l02-q17" />
+
+:::info[Vorhersage]
+Der Startcode gibt drei Zeilen aus. Welche? Und was musst du ändern, damit die erste Zeile `exactly bob` lautet?
+:::
+
+Aufgabe: Ändere nur die Reihenfolge der Arme, sodass `bob` die Zeile `exactly bob` ausgibt.
+
+<CSharpRunner id="w04-l02-switch-order" code={switchOrderTask} tests={switchOrderTests} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Der Startcode gibt `starts with bo`, `starts with bo` und `other` aus. Mit der Lösung ist die erste Zeile `exactly bob`.
+
+<CodeBlock language="csharp" title="switch-order-solution.cs">{switchOrderSolution}</CodeBlock>
+
+1. **Erster Treffer:** Der Arm `var text when …` passt auch auf `"bob"`. Steht er zuerst, kommt der Arm für `"bob"` nie an die Reihe.
+2. **Engeres zuerst:** Das Konstantenmuster `"bob"` steht jetzt vor dem weiteren Arm. `"bobby"` passt nicht auf `"bob"` und fällt auf den Arm mit `when`.
+
+</details>
+
+<Quiz id="w04-l02-q18" />
+
+### Aufgabe 9
+
+<Quiz id="w04-l02-q19" />
+
+<Quiz id="w04-l02-q20" />
+
+<Quiz id="w04-l02-q21" />
+
+### Aufgabe 10
+
+<Quiz id="w04-l02-q22" />
+
+<Quiz id="w04-l02-q23" />
+
+## Abschluss
+
+### In eigenen Worten erklären
+
+<Quiz id="w04-l02-q24" />
+
+### Übertragen
+
+<Quiz id="w04-l02-q25" />
+
+## Projektschritt
+
+In dieser Lektion kommt kein Projektschritt dazu, weil eine Wiederholung nur bereits Gelerntes mischt.
+
+## Weiterlesen
+
+- C#-Spezifikation: [Logisches Muster](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/patterns#11210-logical-pattern)
+- Microsoft Learn: [Task.WaitAsync](https://learn.microsoft.com/dotnet/api/system.threading.tasks.task.waitasync)
+- Microsoft Learn: [TimeProvider im Überblick](https://learn.microsoft.com/dotnet/standard/datetime/timeprovider-overview#use-with-net)
