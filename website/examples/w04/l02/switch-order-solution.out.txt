@@ -1,0 +1,3 @@
+exactly bob
+starts with bo
+other
