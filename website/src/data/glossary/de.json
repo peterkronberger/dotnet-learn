@@ -12372,6 +12372,25 @@
       "aliases": ["Anweisungsdatei", "Projekt-Anweisungsdateien"],
       "related": ["prompt"],
       "lesson": "m19-l05"
+    },
+    {
+      "id": "secret",
+      "term": "Secret",
+      "german": "Geheimnis",
+      "category": "course",
+      "definition": "Ein Wert, der nur Berechtigte kennen dürfen, zum Beispiel ein Passwort, ein API-Schlüssel, ein Token oder eine Verbindungszeichenfolge mit Passwort.",
+      "aliases": ["Geheimnisse", "Secrets"],
+      "related": ["user-secrets", "prompt"],
+      "lesson": "m15-l06"
+    },
+    {
+      "id": "personal-data",
+      "term": "Personenbezogene Daten",
+      "category": "course",
+      "definition": "Angaben, die sich auf eine bestimmte Person beziehen oder helfen, sie zu erkennen. In Logs sind das zum Beispiel Benutzernamen und IP-Adressen.",
+      "aliases": ["personenbezogene Daten", "Personenbezug"],
+      "related": ["secret", "prompt"],
+      "lesson": "m19-l07"
     }
   ]
 }

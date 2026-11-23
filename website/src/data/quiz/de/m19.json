@@ -1005,6 +1005,194 @@
       "type": "explain",
       "question": "Transferfrage: Du hast mit KI-Hilfe eine Methode für ein Projekt geschrieben. Wie prüfst du, ob du sie selbst verstanden hast?",
       "modelAnswer": "Ich erkläre jede Zeile in eigenen Worten. Ich sage die Ausgabe für ein Beispiel voraus und führe dann aus. Ich ändere eine Anforderung und löse sie ohne KI. Zum Schluss schreibe ich einen Test oder einen Grenzfall. Das ist Bewährte Praxis. Gelingt ein Schritt nicht, wiederhole ich das Thema, bevor ich weitermache."
+    },
+    {
+      "id": "m19-l07-q1",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "Du fügst Text in die Frage an einen KI-Assistenten ein. Was gilt für diesen Text?",
+      "options": [
+        {
+          "text": "Er wird an einen Dienst gesendet und kann dort gespeichert oder verarbeitet werden. Er verlässt also deinen Rechner.",
+          "correct": true
+        },
+        {
+          "text": "Er bleibt auf deinem Rechner, solange du die Antwort nicht teilst.",
+          "feedback": "Eine Frage wird an einen Dienst gesendet. Was dort mit dem Inhalt passiert, hängt vom Dienst ab.",
+          "misconception": "m19-l07-prompt-stays-private"
+        },
+        {
+          "text": "Er wird nur gesendet, wenn er Code enthält.",
+          "feedback": "Der gesamte Inhalt der Frage wird gesendet, nicht nur der Code."
+        }
+      ],
+      "explanation": "Ein Prompt wird an einen Dienst geschickt. Deshalb entscheidest du vor dem Absenden, was darin stehen darf. Das ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l07-q2",
+      "lesson": "m19-l07",
+      "type": "multi",
+      "question": "Welche Angaben sind Geheimnisse, die nicht in einen Prompt gehören?",
+      "options": [
+        {
+          "text": "Ein Passwort aus einer Konfigurationsdatei.",
+          "correct": true
+        },
+        {
+          "text": "Ein API-Schlüssel.",
+          "correct": true
+        },
+        {
+          "text": "Ein Token in einem Request-Header.",
+          "correct": true
+        },
+        {
+          "text": "Eine Verbindungszeichenfolge mit Passwort.",
+          "correct": true
+        },
+        {
+          "text": "Der Ereignistyp `login-failed`.",
+          "feedback": "Ein Ereignistyp ist kein Geheimnis. Er verrät keinen Zugang."
+        }
+      ],
+      "explanation": "Ein Geheimnis ist ein Wert, der Zugang öffnet oder nur Berechtigte betrifft. Passwörter, Schlüssel, Tokens und Verbindungszeichenfolgen mit Passwort gehören dazu."
+    },
+    {
+      "id": "m19-l07-q3",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "In einem Log stehen Benutzername und IP-Adresse. Du ersetzt alle Namen durch Platzhalter. Was stimmt?",
+      "options": [
+        {
+          "text": "Die IP-Adresse kann eine Person erkennbar machen. Du ersetzt sie auch.",
+          "correct": true
+        },
+        {
+          "text": "Jetzt enthält der Log keine personenbezogenen Daten mehr.",
+          "feedback": "Auch eine IP-Adresse kann helfen, eine Person zu erkennen.",
+          "misconception": "m19-l07-removing-names-is-enough"
+        },
+        {
+          "text": "IP-Adressen sind nie personenbezogen, weil sie nur Zahlen sind.",
+          "feedback": "Zahlen können eine Person erkennbar machen, wenn man weiß, wem die Adresse gehört.",
+          "misconception": "m19-l07-removing-names-is-enough"
+        }
+      ],
+      "explanation": "Personenbezogene Daten sind Angaben, die sich auf eine Person beziehen oder helfen, sie zu erkennen. Im Log sind das Namen und IP-Adressen."
+    },
+    {
+      "id": "m19-l07-q4",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "Du ersetzt eine echte IP-Adresse in einer Log-Zeile durch einen Beispielwert. Welcher Wert ist dafür vorgesehen?",
+      "options": [
+        {
+          "text": "`203.0.113.7` aus einem Bereich für Dokumentation (RFC 5737).",
+          "correct": true
+        },
+        {
+          "text": "Die IP-Adresse eines Kollegen.",
+          "feedback": "Das ist wieder eine echte Angabe über eine Person."
+        },
+        {
+          "text": "Die Adresse mit nur einer Ziffer geändert.",
+          "feedback": "Eine leicht geänderte echte Adresse kann auf das Netz der echten Adresse zeigen."
+        }
+      ],
+      "explanation": "Die Bereiche `192.0.2.0/24`, `198.51.100.0/24` und `203.0.113.0/24` sind für Beispiele reserviert. Der Kurs benutzt nur sie."
+    },
+    {
+      "id": "m19-l07-q5",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "Du hast versehentlich einen API-Schlüssel in einen Prompt eingefügt und abgeschickt. Was tust du?",
+      "options": [
+        {
+          "text": "Ich behandle den Schlüssel als bekannt und ersetze ihn durch einen neuen.",
+          "correct": true
+        },
+        {
+          "text": "Ich lösche die Unterhaltung und mache weiter wie bisher.",
+          "feedback": "Gelöschtes lässt sich nicht zurückholen. Der Schlüssel war schon gesendet."
+        },
+        {
+          "text": "Ich tue nichts, weil niemand den Schlüssel sucht.",
+          "feedback": "Ob ihn jemand sucht, weißt du nicht. Sicher ist nur ein neuer Schlüssel."
+        }
+      ],
+      "explanation": "Ein weitergegebenes Geheimnis behandelst du als bekannt und ersetzt es (rotieren). Das ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l07-q6",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "Welche Schritte gehören zum Vorbereiten einer Frage, die Log-Zeilen enthält?",
+      "options": [
+        {
+          "text": "Geheimnisse und Personenbezug finden, ersetzen, nur behalten, was die Frage braucht, prüfen, ob die Frage noch verständlich ist.",
+          "correct": true
+        },
+        {
+          "text": "Alles einfügen und den Assistenten bitten, Geheimnisse selbst zu verstecken.",
+          "feedback": "Dann ist der Text schon gesendet, bevor etwas ersetzt ist."
+        },
+        {
+          "text": "Alle Zeilen löschen, damit die Frage keine Daten enthält.",
+          "feedback": "Ohne die nötigen Zeilen kann die Frage nicht beantwortet werden."
+        }
+      ],
+      "explanation": "Du ersetzt vor dem Absenden. Zeitstempel und Ereignistyp bleiben oft stehen, weil die Frage sie braucht."
+    },
+    {
+      "id": "m19-l07-q7",
+      "lesson": "m19-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)? Es ist die Antwort eines Assistenten.",
+      "example": "m19/l07/ai-mask-log.cs",
+      "explanation": "Die Methode ersetzt nur Teile, die mit `user=` beginnen. Die Teile mit `ip=` bleiben unverändert, die IP-Adressen stehen also noch in der Ausgabe."
+    },
+    {
+      "id": "m19-l07-q8",
+      "lesson": "m19-l07",
+      "type": "output",
+      "question": "Was gibt das Programm aus (eine Zeile pro Ausgabe)?",
+      "example": "m19/l07/mask-log-solution.cs",
+      "explanation": "Jetzt ersetzt die Methode auch Teile, die mit `ip=` beginnen. Zeitstempel und Ereignistyp bleiben stehen."
+    },
+    {
+      "id": "m19-l07-q9",
+      "lesson": "m19-l07",
+      "type": "single",
+      "question": "Wie ist die Aussage „Geheimnisse und personenbezogene Daten gehören nicht in einen Prompt“ in diesem Kurs einzuordnen?",
+      "options": [
+        {
+          "text": "Als Bewährte Praxis (nicht durch Studien belegt).",
+          "correct": true
+        },
+        {
+          "text": "Als Studienergebnis.",
+          "feedback": "Diese Lektion stützt sich auf keine Studie."
+        },
+        {
+          "text": "Als Rechtsberatung.",
+          "feedback": "Die Lektion gibt keine Rechtsberatung."
+        }
+      ],
+      "explanation": "Die Regel ist eine Vorsichtsmaßnahme aus der Praxis. Sie ist nicht durch eine Studie belegt."
+    },
+    {
+      "id": "m19-l07-q10",
+      "lesson": "m19-l07",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum du Geheimnisse und Personenbezug ersetzt, bevor du eine Frage an eine KI stellst, und wie du dabei vorgehst.",
+      "modelAnswer": "Eine Frage wird an einen Dienst gesendet und kann dort gespeichert oder verarbeitet werden. Danach kann ich sie nicht zurückholen. Deshalb suche ich vorher Geheimnisse wie Passwörter, Schlüssel und Tokens und Angaben, die eine Person erkennbar machen, zum Beispiel Namen und IP-Adressen. Ich ersetze sie durch Platzhalter oder Beispielwerte, behalte nur, was die Frage braucht, und prüfe, ob sie noch verständlich ist."
+    },
+    {
+      "id": "m19-l07-q11",
+      "lesson": "m19-l07",
+      "type": "explain",
+      "question": "Transferfrage: Ein Kollege will eine Fehlermeldung aus seinem Projekt in einen Chat einfügen. Sie enthält eine Verbindungszeichenfolge mit Passwort und eine E-Mail-Adresse. Was rätst du ihm?",
+      "modelAnswer": "Er ersetzt das Passwort durch einen Platzhalter und die E-Mail-Adresse durch eine Beispieladresse mit example.com. Er behält den Rest der Fehlermeldung, weil die Frage ihn braucht, und prüft, ob die Frage noch Sinn ergibt. Hat er die Meldung schon abgeschickt, behandelt er das Passwort als bekannt und ersetzt es durch ein neues. Das ist Bewährte Praxis."
     }
   ]
 }
