@@ -1,0 +1,3 @@
+bob: alarm
+alice: no alarm
+dave: no alarm

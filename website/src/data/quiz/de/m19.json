@@ -297,6 +297,349 @@
       "type": "explain",
       "question": "Transferfrage: Du lernst gerade ein neues Thema und steckst bei einer Übung fest. Welche zwei Schritte machst du mit einem Assistenten, welchen lässt du weg?",
       "modelAnswer": "Ich versuche die Übung zuerst selbst, frage dann nach einem Hinweis oder lasse mir das Konzept erklären und erkläre das Ergebnis am Ende ohne KI. Ich lasse weg, die komplette Lösung anzufordern und zu übernehmen. Das ist Bewährte Praxis und kein Studienergebnis."
+    },
+    {
+      "id": "m19-l03-q1",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "In welcher Reihenfolge prüfst du einen Vorschlag eines Assistenten?",
+      "options": [
+        {
+          "text": "Lesen, Ausgabe vorhersagen, ausführen, Grenzwerte testen, API nachschlagen.",
+          "correct": true
+        },
+        {
+          "text": "Ausführen, und wenn keine Fehlermeldung kommt, übernehmen.",
+          "feedback": "Ohne Lesen und Vorhersage fällt eine plausible, aber falsche Ausgabe nicht auf.",
+          "misconception": "m19-l03-compiles-means-correct"
+        },
+        {
+          "text": "Den Assistenten fragen, ob sein Vorschlag richtig ist, und seiner Antwort folgen.",
+          "feedback": "Ein Assistent erzeugt wahrscheinlichen Text und prüft nicht selbst. Du prüfst mit Lesen, Vorhersage, Lauf und Test."
+        }
+      ],
+      "explanation": "Die fünf Schritte sind Bewährte Praxis und kein Studienergebnis. Die Vorhersage vor dem Lauf zeigt dir, ob du den Code verstanden hast. Grenzwerte und Nachschlagen decken Fehler auf, die eine plausible Ausgabe verdeckt."
+    },
+    {
+      "id": "m19-l03-q2",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "Welche Aussage zur METR-Studie über die Prüfarbeit ist richtig?",
+      "options": [
+        {
+          "text": "Bei 16 erfahrenen Entwicklern mit KI-Werkzeugen von Anfang 2025 gingen etwa 9 % der Zeit für das Prüfen und Aufräumen der KI-Ausgaben drauf.",
+          "correct": true
+        },
+        {
+          "text": "Bei allen Entwicklern und allen Werkzeugen kostet das Prüfen etwa 9 % der Zeit.",
+          "feedback": "Die Zahl gilt für diese Gruppe, diese Aufgaben und Werkzeuge von Anfang 2025. Für andere Gruppen sagt sie nichts."
+        },
+        {
+          "text": "Die Entwickler nahmen fast alle Vorschläge unverändert an.",
+          "feedback": "Es war umgekehrt: Sie nahmen deutlich weniger als 44 % der Vorschläge an."
+        }
+      ],
+      "explanation": "Die Studie nennt die Gruppe (16 Entwickler), die Zeit (Anfang 2025) und die Stichprobe der Messung (44 Aufgaben mit nutzbarer Bildschirmaufnahme). Aussagen über andere Gruppen und neuere Werkzeuge folgen daraus nicht."
+    },
+    {
+      "id": "m19-l03-q3",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "Der Compiler meldet CS0117 für den Aufruf `string.IsNullOrBlank(user)`. Was bedeutet das?",
+      "options": [
+        {
+          "text": "Der Typ `string` enthält kein Mitglied mit dem Namen `IsNullOrBlank`.",
+          "correct": true
+        },
+        {
+          "text": "Die Methode existiert, aber `user` hat den falschen Typ.",
+          "feedback": "CS0117 sagt, dass der Name am Typ nicht definiert ist, nicht dass ein Argument nicht passt."
+        },
+        {
+          "text": "Die Methode existiert, ist aber nicht öffentlich.",
+          "feedback": "Dafür gäbe es eine andere Meldung. CS0117 heißt: keine Definition mit diesem Namen."
+        }
+      ],
+      "explanation": "CS0117 bedeutet, dass ein Typ keine Definition für den Bezeichner enthält. Hier hat der Assistent eine Methode erfunden. Die richtige Methode heißt `IsNullOrWhiteSpace`."
+    },
+    {
+      "id": "m19-l03-q4",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "Ein Vorschlag des Assistenten kompiliert ohne Fehler und Warnung. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Nur, dass der Code zur Sprache und zu den Typen passt. Ob er die Fachregel einhält, ist offen.",
+          "correct": true
+        },
+        {
+          "text": "Der Code ist richtig und kann übernommen werden.",
+          "feedback": "Der Compiler kennt deine Fachregel nicht. `>` und `>=` sind beide gültiges C#.",
+          "misconception": "m19-l03-compiles-means-correct"
+        },
+        {
+          "text": "Der Code ist richtig, wenn der Assistent ihn begründet hat.",
+          "feedback": "Eine Begründung ist Text. Sie ersetzt keinen Lauf und keinen Test.",
+          "misconception": "m19-l03-compiles-means-correct"
+        }
+      ],
+      "explanation": "Der Compiler prüft die Form. Die Fachregel prüfst du mit Vorhersage, Lauf und Grenzwerttests."
+    },
+    {
+      "id": "m19-l03-q5",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "Ein Kollege sagt: „Der Assistent kennt die aktuelle .NET-API, also muss ich Methodennamen nicht nachschlagen.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Das reicht nicht: Der Assistent kann eine Methode vorschlagen, die es nicht gibt, oder ein älteres Muster. Du schlägst sie in der API-Referenz nach.",
+          "correct": true
+        },
+        {
+          "text": "Das stimmt, weil Assistenten mit der Dokumentation trainiert sind.",
+          "feedback": "Auch dann erzeugt der Assistent wahrscheinlichen Code und gibt keine Garantie für die aktuelle API.",
+          "misconception": "m19-l03-ai-knows-current-api"
+        },
+        {
+          "text": "Das stimmt, solange das Programm startet.",
+          "feedback": "Ein veraltetes Idiom startet und läuft, ist aber nicht mehr die beste Wahl. Starten beweist die Aktualität nicht.",
+          "misconception": "m19-l03-ai-knows-current-api"
+        }
+      ],
+      "explanation": "Eine erfundene API fällt dem Compiler auf, ein veraltetes Idiom nicht. Das Nachschlagen in der API-Referenz auf Microsoft Learn ist der fünfte Prüfschritt."
+    },
+    {
+      "id": "m19-l03-q6",
+      "lesson": "m19-l03",
+      "type": "output",
+      "question": "Was gibt das Programm aus? Die Regel lautet: fünf Fehlversuche innerhalb von 10 Minuten sind ein Alarm.",
+      "example": "m19/l03/ai-brute-force-boundary.cs",
+      "explanation": "`bob` hat genau fünf Fehlversuche im Fenster. `recent > 5` ist für 5 falsch, deshalb steht auch für `bob` „no alarm“. Laut Regel müsste hier ein Alarm stehen: Die Grenze braucht `>=`."
+    },
+    {
+      "id": "m19-l03-q7",
+      "lesson": "m19-l03",
+      "type": "single",
+      "question": "Ein Assistent schlägt `DateTime.Now` für die Zeitstempel eines Logs vor. Wie prüfst du das?",
+      "options": [
+        {
+          "text": "Du erkennst ein Idiom, das der Kurs besser gelöst hat: `DateTimeOffset.UtcNow` ist für Log-Zeitstempel die bessere Wahl.",
+          "correct": true
+        },
+        {
+          "text": "Der Vorschlag ist richtig, weil er kompiliert und eine Zeit liefert.",
+          "feedback": "`DateTime.Now` liefert die Ortszeit des Rechners. Zwei Server in verschiedenen Zeitzonen schreiben verschiedene Zeiten für denselben Moment.",
+          "misconception": "m19-l03-compiles-means-correct"
+        },
+        {
+          "text": "Der Vorschlag ist erfunden, weil `DateTime.Now` nicht existiert.",
+          "feedback": "`DateTime.Now` existiert. Das Problem ist die Ortszeit, nicht ein fehlendes Mitglied.",
+          "misconception": "m19-l03-ai-knows-current-api"
+        }
+      ],
+      "explanation": "Hier ist nichts erfunden, aber ein besseres Muster ist bekannt. Das ist ein veraltetes Idiom: Es läuft, ist aber nicht die beste Wahl."
+    },
+    {
+      "id": "m19-l03-q8",
+      "lesson": "m19-l03",
+      "type": "find-bug",
+      "question": "Die Regel lautet: fünf Fehlversuche innerhalb von 10 Minuten sind ein Alarm. Welche Zeile des Vorschlags ist falsch?",
+      "example": "m19/l03/ai-brute-force-boundary.cs",
+      "bugLines": [
+        27
+      ],
+      "lineFeedback": {
+        "26": {
+          "feedback": "Die Zeile zählt die Fehlversuche im Fenster von 10 Minuten. Das passt zur Regel."
+        }
+      },
+      "explanation": "Die Regel verlangt mindestens fünf Fehlversuche. Der Vergleich `recent > 5` verlangt mehr als fünf. Genau an der Grenze 5 bleibt der Alarm aus. `recent >= 5` ist richtig."
+    },
+    {
+      "id": "m19-l03-q9",
+      "lesson": "m19-l03",
+      "type": "explain",
+      "question": "Erkläre in eigenen Worten, warum „kompiliert“ nicht „richtig“ heißt. Nenne ein Beispiel.",
+      "modelAnswer": "Der Compiler prüft, ob der Code zur Sprache und zu den Typen passt, aber er kennt die Fachregel nicht. Beispiel: Die Regel verlangt mindestens fünf Fehlversuche, der Vorschlag vergleicht mit `> 5`. Beides ist gültiges C#, aber bei genau fünf Versuchen bleibt der Alarm aus. Nur Vorhersage, Lauf und ein Test an der Grenze zeigen das."
+    },
+    {
+      "id": "m19-l03-q10",
+      "lesson": "m19-l03",
+      "type": "explain",
+      "question": "Transferfrage: Ein Assistent liefert dir eine Methode, die Zahlen aus Text liest. Welche Eingaben testest du, bevor du sie übernimmst?",
+      "modelAnswer": "Ich sage die Ausgabe für eine normale Eingabe voraus und führe den Code aus. Dann teste ich die Grenzen: einen leeren Text, `null`, Text mit Buchstaben, einen sehr großen und einen negativen Wert. Außerdem schlage ich jede aufgerufene Methode in der API-Referenz nach. Das ist Bewährte Praxis."
+    },
+    {
+      "id": "m19-l04-q1",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Welche Beschreibung der Studie von Perry et al. passt?",
+      "options": [
+        {
+          "text": "47 Teilnehmer, überwiegend Studierende, fünf Aufgaben mit Sicherheitsbezug, ein Assistent auf Basis eines älteren Modells.",
+          "correct": true
+        },
+        {
+          "text": "Eine Untersuchung des Codes von Berufsentwicklern in großen Firmenprojekten mit heutigen Werkzeugen.",
+          "feedback": "Die Studie nutzte Aufgaben in einer Studienumgebung und ein älteres Modell."
+        },
+        {
+          "text": "Ein Test, bei dem eine KI selbst Sicherheitslücken in fremdem Code sucht.",
+          "feedback": "Es ging darum, wie sicher der Code war, den Menschen mit und ohne Assistent schrieben."
+        }
+      ],
+      "explanation": "Die Gruppe war klein, die Umgebung künstlich und das Werkzeug eine ältere Generation. Ergebnisse gelten für diese Bedingungen."
+    },
+    {
+      "id": "m19-l04-q2",
+      "lesson": "m19-l04",
+      "type": "multi",
+      "question": "Welche Einschränkungen der Studie von Perry et al. sind richtig?",
+      "options": [
+        {
+          "text": "Die Stichprobe ist klein.",
+          "correct": true
+        },
+        {
+          "text": "Die Teilnehmer waren überwiegend Studierende.",
+          "correct": true
+        },
+        {
+          "text": "Die Umgebung war künstlich, mit Zeitlimit und ohne Folgen.",
+          "correct": true
+        },
+        {
+          "text": "Das Werkzeug ist ein heutiger Assistent.",
+          "feedback": "Der Assistent beruht auf einem älteren Modell. Die Ergebnisse gelten nicht ohne Weiteres für heutige Werkzeuge."
+        }
+      ],
+      "explanation": "Kleine Stichprobe, überwiegend Studierende und künstliche Umgebung schränken ein, wie weit die Ergebnisse reichen. Dazu kommt das ältere Modell."
+    },
+    {
+      "id": "m19-l04-q3",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Ein Kollege sagt: „KI-Code ist sicher, weil das Modell aus sehr viel Code gelernt hat.“ Was stimmt?",
+      "options": [
+        {
+          "text": "Das folgt nicht: Die Menge der Trainingsdaten sagt nichts über einen einzelnen Vorschlag. Du prüfst ihn mit der Checkliste.",
+          "correct": true
+        },
+        {
+          "text": "Das stimmt, denn viel Code enthält überwiegend sichere Muster.",
+          "feedback": "Auch unsichere Muster kommen vor, und der Assistent erzeugt wahrscheinlichen Code, nicht geprüften. In der Studie gab es bei vier von fünf Aufgaben mehr unsichere Lösungen.",
+          "misconception": "m19-l04-ai-code-secure-by-default"
+        },
+        {
+          "text": "Das stimmt, wenn der Code kompiliert.",
+          "feedback": "Der Compiler prüft die Form, nicht die Sicherheit.",
+          "misconception": "m19-l04-ai-code-secure-by-default"
+        }
+      ],
+      "explanation": "Wie sicher ein Vorschlag ist, zeigt nur die Prüfung. Die Trainingsmenge ist kein Beleg."
+    },
+    {
+      "id": "m19-l04-q4",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Der Assistent erklärt sicher und ausführlich, warum seine Lösung sicher ist. Was folgt daraus?",
+      "options": [
+        {
+          "text": "Nichts. Du prüfst den Code mit der Checkliste, unabhängig vom Ton der Begründung.",
+          "correct": true
+        },
+        {
+          "text": "Die Lösung ist sicher, weil sie begründet ist.",
+          "feedback": "Eine Begründung ist erzeugter Text. Sie kann zu einer unsicheren Lösung genauso überzeugend klingen.",
+          "misconception": "m19-l04-confident-answer-is-secure"
+        },
+        {
+          "text": "Die Lösung ist sicher, wenn der Assistent keine Warnung nennt.",
+          "feedback": "Dass keine Warnung kommt, belegt nichts. Der Assistent prüft seinen Code nicht selbst.",
+          "misconception": "m19-l04-confident-answer-is-secure"
+        }
+      ],
+      "explanation": "Überzeugende Antworten und sichere Lösungen sind zwei verschiedene Dinge. In der Studie hielt die Gruppe mit Assistent ihre Lösungen häufiger für sicher, obwohl es mehr unsichere gab."
+    },
+    {
+      "id": "m19-l04-q5",
+      "lesson": "m19-l04",
+      "type": "output",
+      "question": "Was gibt das Programm aus?",
+      "example": "m19/l04/ai-message-rating.cs",
+      "explanation": "Die erste Meldung enthält einen Link und das Signalwort `locked`, also `True`. Das Array der Signalwörter gehört auch dem Objekt, und `Array.Fill` überschreibt es: Dieselbe Meldung ist danach `False`. Der fehlende Text löst eine `NullReferenceException` aus."
+    },
+    {
+      "id": "m19-l04-q6",
+      "lesson": "m19-l04",
+      "type": "single",
+      "question": "Der Vorschlag `db.Incidents.FromSqlRaw($\"SELECT * FROM Incidents WHERE User = '{term}'\")` nutzt eine Eingabe `term` von außen. Welcher Befund passt?",
+      "options": [
+        {
+          "text": "SQL Injection: Der Wert wird Teil des SQL-Textes, statt als Parameter gesendet zu werden.",
+          "correct": true
+        },
+        {
+          "text": "Kein Befund: Die Interpolation `$\"…\"` macht den Wert immer zum Parameter.",
+          "feedback": "Bei `FromSqlRaw` wird der fertige Text unverändert benutzt. Nur `FromSql` macht aus der Interpolation Parameter."
+        },
+        {
+          "text": "Das Problem ist nur die Geschwindigkeit der Abfrage.",
+          "feedback": "Die Lücke betrifft die Sicherheit, nicht die Geschwindigkeit."
+        }
+      ],
+      "explanation": "Mit `FromSqlRaw` und einer interpolierten Zeichenkette wird die Eingabe Teil des SQL-Textes. Sicher sind `FromSql` mit Interpolation (Parameter) oder eine LINQ-Abfrage."
+    },
+    {
+      "id": "m19-l04-q7",
+      "lesson": "m19-l04",
+      "type": "find-bug",
+      "question": "Finde 3 Probleme in diesem Vorschlag für einen Endpunkt. Wähle die drei Zeilen.",
+      "example": "m19/l04/ai-endpoint.snippet.cs",
+      "bugLines": [
+        10,
+        17,
+        26
+      ],
+      "lineFeedback": {
+        "11": {
+          "feedback": "Diese Zeile registriert den Endpunkt. Das Problem liegt in der Gruppe der Zeile davor: Ihr fehlt `RequireAuthorization()`."
+        },
+        "16": {
+          "feedback": "Der `CancellationToken` ist vorhanden. Das ist kein Befund."
+        }
+      },
+      "explanation": "Zeile 10: Die Gruppe hat kein `RequireAuthorization()`, jeder kann die Vorfälle lesen. Zeile 17: Der Parameter `user` wird nicht geprüft (Punkt 7, zum Beispiel mit `[MaxLength]`). Zeile 26: `ex.ToString()` schickt den Text der Exception an den Nutzer (Punkt 2). Das verrät Interna."
+    },
+    {
+      "id": "m19-l04-q8",
+      "lesson": "m19-l04",
+      "type": "find-bug",
+      "question": "Welche Zeile des Vorschlags macht die Eingabe zum Teil des SQL-Textes?",
+      "example": "m19/l04/ai-search-sql.snippet.cs",
+      "bugLines": [
+        12
+      ],
+      "lineFeedback": {
+        "11": {
+          "feedback": "Der Aufruf von `FromSqlRaw` ist der Ort des Problems, aber die Eingabe wird in der Zeile mit der interpolierten Zeichenkette eingesetzt."
+        }
+      },
+      "explanation": "In Zeile 12 steht `{term}` in der interpolierten Zeichenkette. `FromSqlRaw` benutzt den fertigen Text, und die Eingabe wird Teil des SQL-Textes."
+    },
+    {
+      "id": "m19-l04-q9",
+      "lesson": "m19-l04",
+      "type": "explain",
+      "question": "Gib das Ergebnis der Studie von Perry et al. mit Gruppe, Aufgabe, Werkzeug und einer Einschränkung wieder.",
+      "modelAnswer": "47 Teilnehmer, überwiegend Studierende, bearbeiteten fünf Aufgaben mit Sicherheitsbezug, ein Teil mit einem Assistenten auf Basis eines älteren Modells. Bei vier der fünf Aufgaben schrieb die Gruppe mit Assistent häufiger unsichere Lösungen und hielt sie häufiger für sicher. Einschränkung: kleine Stichprobe und künstliche Umgebung, und das Werkzeug ist eine ältere Generation."
+    },
+    {
+      "id": "m19-l04-q10",
+      "lesson": "m19-l04",
+      "type": "explain",
+      "question": "Transferfrage: Warum ist großes Vertrauen in einen Vorschlag ein Risiko, und was tust du in deinem Projekt dagegen?",
+      "modelAnswer": "Wer einem Vorschlag stark vertraut, prüft ihn weniger, und Lücken bleiben unbemerkt. In der Studie vertrauten Teilnehmer mit sicheren Lösungen dem Assistenten weniger. In meinem Projekt prüfe ich jeden Vorschlag mit der Review-Checkliste: SQL Injection, Eingabevalidierung, Ausnahmebehandlung und Zugriffsprüfung. Das ist Bewährte Praxis."
     }
   ]
 }
