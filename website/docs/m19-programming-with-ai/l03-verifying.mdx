@@ -1,0 +1,226 @@
+---
+title: Verifizieren
+sidebar_position: 3
+description: Code von einem KI-Assistenten ist ein Vorschlag. Du liest ihn, sagst die Ausgabe voraus, führst ihn aus, testest Grenzwerte und schlägst die API nach. Typische Fehler sind erfundene APIs, veraltete Idiome und falsche Grenzen.
+lesson_id: m19-l03
+duration_min: 24
+---
+
+import CodeBlock from '@theme/CodeBlock';
+import aiInvented from '!!raw-loader!@site/examples/m19/l03/ai-invented-api.snippet.cs';
+import inventedFixed from '!!raw-loader!@site/examples/m19/l03/invented-api-fixed.cs';
+import inventedFixedOutput from '!!raw-loader!@site/examples/m19/l03/invented-api-fixed.out.txt';
+import aiBoundary from '!!raw-loader!@site/examples/m19/l03/ai-brute-force-boundary.cs';
+import aiBoundaryOutput from '!!raw-loader!@site/examples/m19/l03/ai-brute-force-boundary.out.txt';
+import boundaryFixed from '!!raw-loader!@site/examples/m19/l03/brute-force-boundary-fixed.cs';
+import boundaryTests from '!!raw-loader!@site/examples/m19/l03/brute-force-boundary.tests.snippet.cs';
+import aiTimestamp from '!!raw-loader!@site/examples/m19/l03/ai-timestamp-now.cs';
+import aiTimestampOutput from '!!raw-loader!@site/examples/m19/l03/ai-timestamp-now.out.txt';
+
+# Verifizieren
+
+:::note[Lernziele]
+- Du prüfst einen KI-Vorschlag in festen Schritten: lesen, Ausgabe vorhersagen, ausführen, Grenzwerte testen, API nachschlagen.
+- Du erkennst eine erfundene API und ein veraltetes Idiom in einem KI-Vorschlag.
+- Du kannst erklären, warum „kompiliert“ nicht „richtig“ heißt.
+:::
+
+Stand: 2026-11-23
+
+In dieser Lektion kommt kein Projektschritt dazu, weil SecLog mit dem Abschlussprojekt fertig ist; dieses Modul verändert SecLog nicht, sondern prüft Code dafür.
+
+## Rückblick
+
+<Quiz id="m14-l08-q5" />
+
+<Quiz id="m19-l01-q4" />
+
+<Quiz id="m19-l02-q3" />
+
+## Ein Vorschlag ist noch kein Ergebnis
+
+Ein Assistent erzeugt wahrscheinlichen Code (Lektion 1). Ob der Code zu deiner Aufgabe passt, weiß er nicht. Deshalb behandelst du jede Antwort als **Vorschlag**: Du prüfst ihn, bevor du ihn benutzt. Dasselbe tust du bei fremdem Code im Code-Review (<Term id="code-review">Code-Review</Term>, Modul 18).
+
+Das Prüfen kostet Zeit. Eine Studie hat gemessen, wie viel.
+
+**Studienergebnis** ([METR, 2025](https://arxiv.org/abs/2507.09089)):
+
+- **Gruppe und Aufgabe:** 16 erfahrene Entwickler bearbeiteten 246 echte Aufgaben in ihren eigenen großen Open-Source-Projekten (Lektion 1).
+- **Werkzeug und Zeit:** KI-Werkzeuge von Anfang 2025, Studie von 2025.
+- **Annahme von Vorschlägen:** Die Entwickler nahmen deutlich weniger als 44 % der erzeugten Vorschläge an. Drei Entwickler fehlen in dieser Zahl, weil für sie keine Daten vorlagen.
+- **Prüfaufwand:** Mit KI gingen etwa 9 % der Zeit dafür drauf, die Ausgaben der KI zu prüfen und aufzuräumen. Diese Zahl stammt aus 44 Aufgaben, zu denen nutzbare Bildschirmaufnahmen vorlagen.
+- **Einschränkungen:** nur 16 Personen, eine bestimmte Art von Aufgaben und Projekten, die Zahlen beschreiben diese Gruppe. Die Autoren erwarten bei neueren Werkzeugen andere Ergebnisse. In den geprüften Teilen der Studie ist kein Interessenkonflikt genannt.
+
+Gesamtbild: In dieser Studie wurde ein großer Teil der Vorschläge nicht übernommen, und das Prüfen und Aufräumen brauchte messbar Zeit. Für andere Gruppen und neuere Werkzeuge sagt das nichts.
+
+## Fünf Schritte zum Prüfen
+
+**Bewährte Praxis (nicht durch Studien belegt):** Du prüfst einen Vorschlag in dieser Reihenfolge:
+
+1. **Lesen:** Was soll der Code tun? Tut er das, was du verlangt hast?
+2. **Vorhersagen:** Was gibt er für eine Beispieleingabe aus? Notiere es, bevor du ausführst (PRIMM, Modul 1).
+3. **Ausführen:** Stimmt die echte Ausgabe mit deiner Vorhersage überein?
+4. **Grenzwerte testen:** Was passiert genau an der Grenze, bei leerer Eingabe und bei `null`? ([Grenzwerte](../m14-testing/l08-data-driven-tests))
+5. **Nachschlagen:** Gibt es jede aufgerufene Methode wirklich, und macht sie das, was der Vorschlag annimmt? Die Referenz dazu ist der API-Katalog auf Microsoft Learn.
+
+Ein Test hält die Prüfung fest. Er läuft danach bei jeder Änderung von selbst.
+
+## Drei typische Fehler
+
+- **Erfundene API:** Der Vorschlag ruft ein Mitglied auf, das es nicht gibt. Der Compiler meldet das.
+- **Veraltetes Idiom:** Der Vorschlag nutzt ein älteres Muster, obwohl der Kurs ein besseres gezeigt hat.
+- **Falsche Grenze:** Der Code kompiliert und läuft, rechnet aber an der Grenze falsch, zum Beispiel `>` statt `>=`.
+
+Der erste Fehler fällt sofort auf. Die anderen beiden nicht: Sie erzeugen eine Ausgabe, und die sieht plausibel aus.
+
+### Beispiel mit Teilzielen: Grenzwert prüfen
+
+Die Teilziele: „1. Lesen → 2. Vorhersagen → 3. Ausführen → 4. Grenzwerte testen → 5. API nachschlagen“.
+
+Die Regel von SecLog (vereinfacht für den Unterricht, echte Erkennung braucht mehr Kontext): fünf Fehlversuche innerhalb von 10 Minuten sind ein Alarm. Du hast einen Assistenten gebeten, sie für die Beispieldaten umzusetzen.
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist eine Prüfung pro Benutzer. Sie nimmt die späteste Zeit und zählt, wie viele Fehlversuche in den 10 Minuten davor liegen. Wenn es mehr als 5 sind, gibt es Alarm.
+:::
+
+<CodeBlock language="csharp" title="ai-brute-force-boundary.cs">{aiBoundary}</CodeBlock>
+
+1. **Lesen:** Die Regel heißt „fünf Fehlversuche“. Der Code vergleicht mit `recent > 5`. Die Antwort sagt selbst „mehr als 5“ – das ist etwas anderes als die Regel.
+2. **Vorhersagen:** `bob` hat in den Beispieldaten genau fünf Fehlversuche zwischen 08:01:40 und 08:06:48. Alle liegen im Fenster, `recent` ist 5. Mit `>` gibt es keinen Alarm. Erwartet war aber einer.
+3. **Ausführen:** Das Programm gibt für `bob` „no alarm“ aus (Ausgabe unten im Runner der Übung).
+4. **Grenzwerte testen:** Teste 4, 5 und 6 Fehlversuche. Die 5 ist der Grenzwert, und gerade dort liegt der Fehler.
+5. **Nachschlagen:** Hier gibt es keine API zu prüfen. Prüfe stattdessen die Regel: Wo steht in der Fachregel „mindestens 5“ oder „mehr als 5“? Der Fehler liegt in der Bedingung, nicht in der Methode.
+
+Die Korrektur ist ein Zeichen: `recent >= 5`.
+
+<CodeBlock language="csharp" title="brute-force-boundary-fixed.cs (Ausschnitt: nur die Regel)">{boundaryFixed.slice(boundaryFixed.indexOf('public static class'))}</CodeBlock>
+
+### Lückenbeispiel
+
+Der Assistent hat noch eine Prüfung geschrieben:
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Hier ist die Prüfung, ob ein Benutzername fehlt. Ich nutze `string.IsNullOrBlank`, das ist kürzer als zwei Prüfungen.
+:::
+
+<CodeBlock language="csharp" title="ai-invented-api.snippet.cs">{aiInvented}</CodeBlock>
+
+1. **Lesen:** Die Schleife prüft vier Namen: `null`, leer, nur Leerzeichen und `bob`. Der Name `IsNullOrBlank` klingt vertraut.
+2. **Vorhersagen:** Wenn die Methode existierte, gäbe sie für die ersten drei Namen „Rejected“ aus. Ob sie existiert, ist offen.
+3. **Ausführen:** Der Compiler meldet den Fehler CS0117: Der Typ `string` enthält keine Definition für `IsNullOrBlank`. Das Programm startet nicht.
+4. **Grenzwerte testen:** ______
+5. **API nachschlagen:** ______
+
+<details>
+<summary>Mögliche Lösung anzeigen</summary>
+
+4. **Grenzwerte testen:** Nach der Korrektur testest du `null`, einen leeren Text, einen Text nur aus Leerzeichen und einen echten Namen. Genau diese vier stehen schon im Programm.
+5. **API nachschlagen:** Auf Microsoft Learn heißt die Methode `String.IsNullOrWhiteSpace`. Sie gibt `true` zurück, wenn der Wert `null` oder leer ist oder nur aus Leerzeichen und ähnlichen Zeichen besteht. Das ist, was der Vorschlag meinte.
+
+Die korrigierte Fassung gibt für die ersten drei Namen „Rejected“ aus und für `bob` „Accepted“:
+
+<CSharpRunner id="m19-l03-fixed-api" code={inventedFixed} expected={inventedFixedOutput} />
+
+</details>
+
+Eine erfundene API ist das einfache Beispiel: Der Compiler stoppt dich. Das passiert beim Kompilieren, bevor ein Fehler Schaden anrichten kann. Gefährlicher sind Fehler, die kompilieren.
+
+## Veraltetes Idiom
+
+Ein Idiom ist ein übliches Muster für eine Aufgabe. Ein Assistent kann ein älteres Muster vorschlagen, das noch funktioniert, aber nicht mehr die beste Wahl ist. Ein Beispiel aus dem Kurs: Für Zeitstempel in Logs nutzt du `DateTimeOffset.UtcNow` und nicht `DateTime.Now` (Lektion [Datum und Uhrzeit](../m05-arrays-strings-collections/l11-date-and-time)).
+
+:::note[Typische KI-Antwort (konstruiertes Beispiel)]
+Für den Zeitstempel des Log-Eintrags nehme ich `DateTime.Now`.
+:::
+
+<CSharpRunner id="m19-l03-timestamp" code={aiTimestamp} predict expected={aiTimestampOutput} />
+
+`DateTime.Now` liefert die Ortszeit des Rechners, im Wert steht `Kind` gleich `Local`. Zwei Server in verschiedenen Zeitzonen schreiben damit verschiedene Zeiten für denselben Moment. Das Programm gibt die aktuelle Uhrzeit absichtlich nicht aus, denn sie würde sich bei jedem Lauf ändern.
+
+Warum schlägt ein Assistent so etwas vor? Er erzeugt wahrscheinlichen Code (Lektion 1). Was häufig in seinen Trainingsdaten vorkam, ist wahrscheinlich, auch wenn es älter ist. Das ist eine Erklärung, kein gemessenes Ergebnis. Als Praxis gilt: Frage bei jeder API nach, ob sie noch die aktuelle ist.
+
+## Stimmt der KI-Vorschlag?
+
+Die Prüfung aus dem Beispiel oben läuft im Runner. Sage die Ausgabe vorher.
+
+:::info[Vorhersage]
+Was gibt das Programm für `bob`, `alice` und `dave` aus? Notiere deinen Tipp. Erwartest du für `bob` laut Regel einen Alarm?
+:::
+
+<CSharpRunner id="m19-l03-boundary" code={aiBoundary} predict expected={aiBoundaryOutput} />
+
+<details>
+<summary>Lösung und Erklärung anzeigen</summary>
+
+Die Ausgabe ist dreimal „no alarm“, auch für `bob`. Laut Regel müsste `bob` einen Alarm auslösen.
+
+1. **Zählen:** Alle fünf Fehlversuche von `bob` liegen im Fenster von 10 Minuten. `recent` ist 5.
+2. **Vergleichen:** `5 > 5` ist falsch. Der Alarm bleibt aus.
+3. **Korrigieren:** `recent >= 5` ist wahr.
+4. **Ergebnis:** Das Programm lief ohne Fehler und gab eine Ausgabe aus. Nur wer die Ausgabe mit der Regel vergleicht, sieht den Fehler.
+
+**Was passiert, wenn …?** … `bob` nur vier Fehlversuche hätte? Dann ist `recent` 4, und auch mit `>=` gibt es keinen Alarm.
+
+</details>
+
+Korrigiere den Fehler im Runner. Die Tests prüfen 4, 5 und 6 Fehlversuche und ein Fenster, das zu groß ist.
+
+<CSharpRunner id="m19-l03-boundary-fix" code={aiBoundary} tests={boundaryTests} />
+
+<details>
+<summary>Vertiefung: Warum „kompiliert“ wenig aussagt (optional)</summary>
+
+Der Compiler prüft, ob der Code zur Sprache und zu den Typen passt. Er kennt deine Fachregel nicht. `recent > 5` und `recent >= 5` sind beide gültiges C#. Welche Zeile richtig ist, sagt nur die Regel, und das prüft ein Test mit Grenzwerten. Fehler, die der Compiler nicht findet, bleiben ohne Test unbemerkt ([CS0117](https://learn.microsoft.com/dotnet/csharp/misc/cs0117) ist dagegen einer, den er findet).
+
+</details>
+
+## Achtung
+
+:::warning[Achtung]
+<Misconception id="m19-l03-compiles-means-correct" />
+
+**„Wenn der KI-Vorschlag ohne Fehler kompiliert, ist er richtig.“** Das stimmt nicht. Der Compiler prüft die Form, nicht die Fachregel. Der Vorschlag mit `>` kompiliert und läuft, hält aber die Regel nicht ein.
+:::
+
+:::warning[Achtung]
+<Misconception id="m19-l03-ai-knows-current-api" />
+
+**„Die KI kennt immer die aktuelle .NET-API.“** Das stimmt nicht. Ein Assistent kann eine Methode vorschlagen, die es nicht gibt, oder ein älteres Muster. Schlage jede aufgerufene API im Katalog auf Microsoft Learn nach.
+:::
+
+## Zusammenfassung
+
+Ein KI-Vorschlag ist ein Vorschlag, den du prüfst: lesen, vorhersagen, ausführen, Grenzwerte testen, nachschlagen. Das ist Bewährte Praxis. In einer Studie mit 16 erfahrenen Entwicklern gingen mit KI-Werkzeugen von Anfang 2025 etwa 9 % der Zeit für das Prüfen und Aufräumen drauf, und deutlich weniger als 44 % der Vorschläge wurden angenommen. Typische Fehler sind erfundene APIs (Compiler-Fehler CS0117), veraltete Idiome wie `DateTime.Now` für Log-Zeitstempel und falsche Grenzen wie `>` statt `>=`. Dass der Code kompiliert, sagt nichts über die Fachregel.
+
+## Prüfe dein Wissen
+
+<Quiz id="m19-l03-q1" />
+
+<Quiz id="m19-l03-q2" />
+
+<Quiz id="m19-l03-q3" />
+
+<Quiz id="m19-l03-q4" />
+
+<Quiz id="m19-l03-q5" />
+
+<Quiz id="m19-l03-q6" />
+
+<Quiz id="m19-l03-q7" />
+
+### AI-Code-Review
+
+<Quiz id="m19-l03-q8" />
+
+### In eigenen Worten erklären
+
+<Quiz id="m19-l03-q9" />
+
+### Transferfrage
+
+<Quiz id="m19-l03-q10" />
+
+## Weiterlesen
+
+- Microsoft Learn: [Best practices for writing unit tests](https://learn.microsoft.com/dotnet/core/testing/unit-testing-best-practices)
+- Microsoft Learn: [String.IsNullOrWhiteSpace](https://learn.microsoft.com/dotnet/api/system.string.isnullorwhitespace)
