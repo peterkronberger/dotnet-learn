@@ -149,6 +149,8 @@ Manche Zeichen kannst du nicht einfach in einen String tippen: den Zeilenumbruch
 
 Ein String-Literal, in dem Escape-Sequenzen gelten, heißt regulär. Die Escape-Sequenzen funktionieren auch in Zeichen-Literalen, zum Beispiel `'\t'`.
 
+Es gibt weitere Escape-Sequenzen, zum Beispiel `\r` (Wagenrücklauf) und `\0` (das Zeichen mit dem Code 0). Mit `\u` und genau vier Hexadezimalziffern schreibst du ein Unicode-Zeichen über seinen Code, zum Beispiel `\u0041` für `A` ([§6.4.5.5 Character literals](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/lexical-structure#6455-character-literals)). Du brauchst sie in diesem Kurs selten.
+
 :::info[Vorhersage]
 Wie viele Zeilen gibt das Programm aus, und was steht in ihnen?
 :::
