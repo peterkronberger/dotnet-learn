@@ -145,6 +145,8 @@ Was gibt das Programm aus? Achte auf die Reihenfolge der ersten beiden Arme.
 
 </details>
 
+Der Typ eines switch-Ausdrucks ist der beste gemeinsame Typ der Ausdrücke aller Arme, wenn es ihn gibt und sich jeder Ausdruck implizit in ihn umwandeln lässt. Gibt es keinen solchen Typ, hat der Ausdruck keinen eigenen Typ, kann aber noch in den Zieltyp seiner Umgebung umgewandelt werden ([§12.12 The switch expression](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/expressions#1212-switch-expression)).
+
 Auch die `switch`-Anweisung nimmt Muster und `when` an ([§13.8.3 The switch statement](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/statements#1383-the-switch-statement)). Dort steht vor jedem Muster `case`, und jeder Abschnitt endet mit `break`:
 
 <CodeBlock language="csharp" title="switch-statement-patterns.cs">{switchStatementPatterns}</CodeBlock>
