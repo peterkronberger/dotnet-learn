@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-11-14 (third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-11-25 (audit #685 applied; before: 2026-11-14, third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -32,8 +32,8 @@ M0 (module review 2026-10-25), M1 (module review 2026-10-30), M2 (module review 
 DoD point 13 asks to validate every C# statement against the language specification. There are three layers, and a lesson must link the right one:
 
 1. **ECMA-334 (published standard).** The latest published edition on the Ecma site is the 7th edition (December 2023); Ecma maps it to C# 7.
-2. **C# standard draft on Microsoft Learn** (`/dotnet/csharp/language-reference/language-specification/<slug>`). Working text of the next edition(s). It already contains later features (for example records, record structs, file-scoped namespaces, global using directives). Clause numbers below follow this draft; check them when linking, they can move between drafts.
-3. **Feature specifications** (`/dotnet/csharp/language-reference/proposals/…`, overview page "Latest feature specifications"). The normative-like source for features that are not in the draft yet – in practice everything from about C# 12 on (collection expressions, primary constructors, `params` collections, C# 14 extension members, `field`, …).
+2. **C# standard draft on Microsoft Learn** (`/dotnet/csharp/language-reference/language-specification/<slug>`). Working text of the next edition(s). It already contains later features (for example records, record structs, file-scoped namespaces, global using directives, collection expressions, primary constructors, `params` collections, extension members, `field`). The foreword of the draft lists features up to C# 10 as the changes against the previous edition; features of C# 12–14 appear in the clauses although the foreword does not list them. Clause numbers below follow this draft (pages updated up to 2026-11-25); check them when linking, they can move between drafts.
+3. **Feature specifications** (`/dotnet/csharp/language-reference/proposals/…`, overview page "Latest feature specifications"). The normative-like source for features that are not in the draft clauses – in practice the C# 15 features (collection expression arguments, labeled `break`/`continue`, extension indexers, closed hierarchies, unions) and memory safety (`unsafe-evolution`). Older features moved into the draft.
 
 Rule: link layer 2 when the clause exists there, otherwise layer 3. Library behavior (BCL, ASP.NET Core, EF Core) is not part of the language specification; link the Microsoft Learn conceptual docs or API reference instead.
 
@@ -44,22 +44,25 @@ Clauses of the draft and where they are taught:
 | §6 Lexical structure | `lexical-structure` | M1 (literals, comments, identifiers), M14 (preprocessing directives, only the ones listed there) |
 | §7 Basic concepts | `basic-concepts` | M6 (application startup, accessibility), M3 (declarations, scopes, signatures), M4 (automatic memory management, deep dive), M13 part B (execution order between threads) |
 | §8 Types | `types` | M1, M4, M8, M9, M16 (expression tree types) |
-| §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values) |
+| §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values), M13 part B (§9.6 atomicity) |
 | §10 Conversions | `conversions` | M1 (numeric), M4 (boxing, nullable), M5 (collection expressions), M8 (reference, user-defined), M10 (anonymous function and method group), M16 (lambda to expression tree) |
 | §11 Patterns and pattern matching | `patterns` | M2 (simple), M12 (all) |
-| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13, M16 (query expressions on `IQueryable<T>`) |
+| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13, M14 (`nameof`), M16 (query expressions on `IQueryable<T>`) |
 | §13 Statements | `statements` | M2, M3, M7, M11, M13 |
 | §14 Namespaces | `namespaces` | M6 |
-| §15 Classes | `classes` | M6, M8 (incl. sealed classes and members), M9, M10, M11, M13 (async functions; volatile fields in part B) |
-| §16 Structs | `structs` | M8 (incl. "structs are implicitly sealed") |
+| §15 Classes | `classes` | M3 (methods, parameters), M6, M7 (finalizers, deep dive), M8 (incl. sealed classes and members, records), M9, M10, M11 (extension members, iterators), M13 (async functions; volatile fields in part B) |
+| §16 Structs | `structs` | M4 (value semantics, boxing), M8 (incl. "structs are implicitly sealed", record structs), M12 (`with` on structs) |
 | §17 Arrays | `arrays` | M5 |
-| §18 Interfaces | `interfaces` | M8, M9 |
-| §19 Enums | `enums` | M8 |
-| §20 Delegates | `delegates` | M10 |
-| §21 Exceptions | `exceptions` | M7 |
-| §22 Attributes | `attributes` | M14 |
-| §23 Unsafe code | `unsafe-code` | not covered (see "Deliberately not covered") |
-| Annex: Documentation comments | – | M6 (short) |
+| §18 Extended indexing and slicing | `ranges` | M5 (`Index`, `Range`, `^` and `..`), M12 (list and slice patterns) |
+| §19 Interfaces | `interfaces` | M8, M9 |
+| §20 Enums | `enums` | M8 |
+| §21 Delegates | `delegates` | M10 |
+| §22 Exceptions | `exceptions` | M7 |
+| §23 Attributes | `attributes` | M14 |
+| §24 Unsafe code | `unsafe-code` | not covered (see "Deliberately not covered") |
+| Annex B Portability issues | `portability-issues` | not covered (see "Deliberately not covered") |
+| Annex C Standard library | `standard-library` | M0 (by name) |
+| Annex D Documentation comments | `documentation-comments` | M6 (short) |
 
 ## Modules
 
