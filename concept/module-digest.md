@@ -48,12 +48,13 @@ Each module section has these fields:
   - `m01-l07` Explizite Umwandlungen und Überlauf – implicit and explicit conversions, casts, overflow, `checked`.
   - `m01-l08` Text in Zahlen umwandeln: Parse und TryParse – `int.Parse`, `int.TryParse`.
   - `m01-l09` Konsoleneingabe – `Console.ReadLine()` returns one line of text.
-- **Constructs taught:** `//` and `/* */` comments (`m01-l01`), escapes `\t \n \" \\` (`m01-l01`), `@"…"` (`m01-l01`), literals `0x`, `0b`, `_`, `1e3`, `'A'` (`m01-l01`), `int double bool char string` (`m01-l02`), `=` and declaration (`m01-l02`), `true`/`false` (`m01-l02`), `long` with `L`, `decimal` with `m`, `f`/`d` suffixes (`m01-l03`), `+ - * / %` (`m01-l03`), `1.0 / 0` and NaN (`m01-l03`), `Math.Round(x, n)`, `Math.Abs` (`m01-l03`), parentheses (`m01-l04`), `+= -= *= /= %=` (`m01-l04`), `x++`, `++x` (`m01-l04`), `const` (`m01-l05`), `var` (`m01-l05`), `"a" + b` (`m01-l06`), `$"…{x}"`, `{x:F1}` (`m01-l06`), `"""…"""` (`m01-l06`), `.Length`, `.ToUpper()` (`m01-l06`), `(int)x`, `(byte)x` (`m01-l07`), `int.MaxValue`, `int.MinValue` (`m01-l07`), `checked(…)` (`m01-l07`), `Math.Round(x)` (`m01-l07`), `int.Parse`, `double.Parse` (`m01-l08`), `int.TryParse(s, out int n)` as a recipe (`m01-l08`), `Console.ReadLine()` (`m01-l09`)
+- **Constructs taught:** `//` and `/* */` comments (`m01-l01`), escapes `\t \n \" \\` (`m01-l01`), `\r`, `\0`, `\u` + four hex digits (`m01-l01`, §6.4.5.5), `@"…"` (`m01-l01`), literals `0x`, `0b`, `_`, `1e3`, `'A'` (`m01-l01`), `int double bool char string` (`m01-l02`), `=` and declaration (`m01-l02`), `true`/`false` (`m01-l02`), `long` with `L`, `decimal` with `m`, `f`/`d` suffixes (`m01-l03`), `+ - * / %` (`m01-l03`), `1.0 / 0` and NaN (`m01-l03`), `Math.Round(x, n)`, `Math.Abs` (`m01-l03`), parentheses (`m01-l04`), `+= -= *= /= %=` (`m01-l04`), `x++`, `++x` (`m01-l04`), `const` (`m01-l05`), `var` (`m01-l05`), `"a" + b` (`m01-l06`), `$"…{x}"`, `{x:F1}` (`m01-l06`), `"""…"""` (`m01-l06`), `.Length`, `.ToUpper()` (`m01-l06`), `(int)x`, `(byte)x` (`m01-l07`), `int.MaxValue`, `int.MinValue` (`m01-l07`), `checked(…)` (`m01-l07`), `Math.Round(x)` (`m01-l07`), `int.Parse`, `double.Parse` (`m01-l08`), `int.TryParse(s, out int n)` as a recipe (`m01-l08`), `Console.ReadLine()` (`m01-l09`)
 - **Glossary terms:** comment, escape-sequence, verbatim-string-literal, identifier, declaration, assignment, definite-assignment, variable, type, static-typing, built-in-type, integer-division, integral-type, floating-point-type, operand, decimal-type, numeric-promotion, nan, round-off-error, exception, expression, operator, operator-precedence, compound-assignment, increment-operator, type-inference, constant, constant-expression, implicitly-typed-variable, string-interpolation, string-concatenation, format-string, raw-string-literal, culture, cast, implicit-conversion, explicit-conversion, overflow, checked-context, parsing, console-input
 - **Misconception ids:** m01-l01-comment-is-executed, m01-l01-escape-in-verbatim, m01-l02-assignment-is-comparison, m01-l02-variable-remembers-old-values, m01-l03-integer-division-rounds, m01-l03-double-is-exact, m01-l04-postfix-returns-new-value, m01-l04-left-to-right-always, m01-l05-var-is-dynamic, m01-l05-const-from-variable, m01-l06-string-plus-number-adds, m01-l06-toupper-changes-variable, m01-l07-cast-rounds, m01-l07-overflow-always-error, m01-l08-parse-accepts-decimals, m01-l08-tryparse-keeps-old-value, m01-l09-readline-reads-all, m01-l09-readline-returns-number
 - **Open forward references:**
 - **SecLog end state:** `website/examples/m01/l09/seclog-event-solution.cs` – prints the profile, sample log event 2 from variables, failure rate, bob's failures and share, a formatted log line, and reads a failure count from console input with `TryParse`.
 - **Notes for later modules:**
+  - Numeric promotion of types smaller than `int` (`byte + byte` is `int`) and the `U`/`UL` literal suffixes are only named in `m01-l03`. `typeof` is used from `m00-l02` on but not explained in M1 (open question in the plan).
   - `if` is taught in `m02-l01` (M1 only pointed to it). In M1, `bool` only stores `true`/`false` and the result of `TryParse`.
   - `TryParse` and `out` are used as a recipe. The `bool` result is ignored in the `m01-l09` SecLog solution. `out` is explained in `m03-l08`.
 
@@ -114,7 +115,7 @@ Each module section has these fields:
   - `m04-l09` Boxing und Unboxing – `object` holds a copy of a value in a new object; unboxing needs the exact type.
 - **Constructs taught:** value and reference type, `new StringBuilder(…)` as recipe (`m04-l01`), `ref` with reference types (`m04-l03`), `null`, `string?`, `!` (`m04-l04`), `int?`, `HasValue`, `Value`, default values (`m04-l05`), `?.` `?[]` `??` `??=` (`m04-l06`), `Trim()`, `ToLower()`, `Append` (`m04-l07`), `Equals`, `object.ReferenceEquals` (`m04-l08`), boxing, unboxing cast `(int)obj` (`m04-l09`).
 - **Glossary terms:** value-type, reference-type, object, simple-type, string-builder, stack, heap, garbage-collector, automatic-memory-management, pass-by-reference, null, nullable-reference-type, nullable-context, null-state-analysis, null-forgiving-operator, nullable-value-type, lifted-operator, default-value, null-conditional-operator, null-coalescing-operator, null-coalescing-assignment, null-conditional-assignment, immutable, reference-equality, value-equality, boxing, unboxing
-- **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack, m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null, m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
+- **Misconception ids:** m04-l01-assignment-copies-object, m04-l02-value-types-on-stack (plan: "value types always live on the stack"), m04-l03-reference-types-passed-by-reference, m04-l04-annotation-prevents-null (plan: "annotation prevents null"), m04-l05-local-gets-default, m04-l06-coalesce-always-evaluates, m04-l07-string-method-changes-string, m04-l08-string-equality-compares-references, m04-l09-box-shares-value
 - **Open forward references:** none. The nullable project setting is taught in `m14-l01`.
 - **SecLog end state:** `website/examples/m04/l08/seclog-types-solution.cs` – the M3 end state plus: findings in one `StringBuilder` passed to a method (`l03`), `FindUser` returns `string?` (`l04`), `FailuresOrNull` returns `int?` (`l05`), `??`, `?.`, `??=` for missing values (`l06`), `Trim().ToLower()` for user names (`l07`), `==`/`Equals`/`ReferenceEquals` (`l08`). `l02` and `l09` have no step. Chain: `m03/l10` → `m04/l01` → `l03` → `l04` → `l05` → `l06` → `l07` → `l08`.
 - **Notes for later modules:**
@@ -124,7 +125,7 @@ Each module section has these fields:
 ## M5 Arrays, Strings, Collections
 
 - **Lessons:**
-  - `m05-l01` Arrays – fixed length, index from 0, `Length`, `for`/`foreach`; index out of range.
+  - `m05-l01` Arrays – fixed length, index from 0, `Length`, `for`/`foreach`; index out of range; `System.Array` is the base type of all arrays (§17.2.2).
   - `m05-l02` Mehrdimensionale und verzweigte Arrays – `int[,]` (rectangular) vs. `int[][]` (jagged).
   - `m05-l03` Index vom Ende und Bereiche – `^n`, `a..b` (end exclusive), `Index`/`Range`.
   - `m05-l04` Listen: List<T> – growing list, `Add`, `Insert`, `Remove`, `IndexOf`, `Count`; a list is a reference type.
@@ -286,7 +287,7 @@ Each module section has these fields:
   - `m12-l03` Eigenschaftsmuster – `{ Name: pattern }`, `{ }`, nested and extended property patterns (`A.B: …`).
   - `m12-l04` Dekonstruktion und Positionsmuster – `Deconstruct` with `out` parameters, `var (a, b) = obj;`, positional pattern, `var` pattern, discards.
   - `m12-l05` Listenmuster und Slice-Muster – `[p1, p2]`, length must match, `..` and `.. var rest`.
-  - `m12-l06` switch-Ausdrücke im Detail – first match wins, `when`, subsumption (CS8510), exhaustiveness (CS8509, CS8524), `SwitchExpressionException`, switch over a tuple.
+  - `m12-l06` switch-Ausdrücke im Detail – first match wins, `when`, subsumption (CS8510), exhaustiveness (CS8509, CS8524), `SwitchExpressionException`, switch over a tuple; the type of a switch expression (§12.12: best common type, no own type otherwise).
   - `m12-l07` Nicht-destruktive Änderung mit `with` – copy with changed properties for records, structs and anonymous types; shallow copy.
   - `m12-l08` Union-Typen – `union Name(A, B)` (C# 15), case types, implicit conversion, exhaustive `switch`, `default` union without value.
   - `m12-l09` Geschlossene Hierarchien – `closed` (C# 15): implicitly abstract, direct subtypes only in the same assembly, exhaustive `switch`; not `sealed`; union vs. closed hierarchy.
@@ -367,7 +368,7 @@ Each module section has these fields:
   - `m14-l05` Einen Debugger benutzen – breakpoint, stepping, variables, call stack (tool-neutral).
   - `m14-l06` Attribute – positional/named parameters, targets, `[Obsolete]`, `[Conditional]`, caller info, own attribute class.
   - `m14-l07` Unit-Tests mit xUnit – `[Fact]`, `Assert`, Arrange-Act-Assert, naming, `dotnet test`, xUnit v3, VSTest vs. MTP.
-  - `m14-l08` Datengetriebene Tests mit [Theory] – `[Theory]`, `[InlineData]`, `[MemberData]`, boundary values.
+  - `m14-l08` Datengetriebene Tests mit [Theory] – `[Theory]`, `[InlineData]`, `[MemberData]` with `nameof(…)` (glossary id `nameof-operator`), boundary values.
   - `m14-l09` Testbarer Code – pure methods, input as parameters, `LogParser`, code coverage.
   - `m14-l10` Test-Doubles – dependency, stub, spy, fake, mock (terms), hand-written doubles.
   - `m14-l11` Zeitabhängigen Code testen – `TimeProvider`, `FakeTimeProvider`, boundary of a time window.

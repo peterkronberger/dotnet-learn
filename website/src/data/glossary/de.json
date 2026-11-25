@@ -12391,6 +12391,18 @@
       "aliases": ["personenbezogene Daten", "Personenbezug"],
       "related": ["secret", "prompt"],
       "lesson": "m19-l07"
+    },
+    {
+      "id": "nameof-operator",
+      "term": "nameof-Operator",
+      "category": "language",
+      "definition": "`nameof(x)` liefert den Namen eines Typs oder Members als Text, zum Beispiel `\"x\"`. Der Compiler prüft, dass es den Namen gibt. Wird das Member umbenannt, ändert sich der Text mit.",
+      "aliases": ["nameof"],
+      "lesson": "m14-l08",
+      "source": {
+        "title": "nameof expression (C# reference)",
+        "url": "https://learn.microsoft.com/dotnet/csharp/language-reference/operators/nameof"
+      }
     }
   ]
 }

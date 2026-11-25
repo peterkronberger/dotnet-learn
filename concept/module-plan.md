@@ -1,6 +1,6 @@
 # Module plan
 
-As of 2026-11-14 (third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
+As of 2026-11-25 (audit #685 applied; before: 2026-11-14, third revision: .NET 11 / C# 15; before: 2026-10-25, second revision: sealing, concurrency, build and publish). 20 modules (0–19) plus 4 mixed review modules. Planning assumption: 60–80 h for beginners (not derived empirically). The spec review of 2026-10-25 adds 56 lesson proposals and 30 smaller parts inside lessons. Lessons only: 56 × 15–25 min = 840–1,400 min ≈ +14–23 h, so the new working assumption is about 75–105 h (still not derived empirically; the smaller parts are assumed to fit into the existing 15–25 min per lesson). Lessons are proposals. The order inside a module may change when it is written. The order of modules may not.
 
 Lesson titles and text are German. German titles below are the real learner-facing names and stay as they are.
 
@@ -32,8 +32,8 @@ M0 (module review 2026-10-25), M1 (module review 2026-10-30), M2 (module review 
 DoD point 13 asks to validate every C# statement against the language specification. There are three layers, and a lesson must link the right one:
 
 1. **ECMA-334 (published standard).** The latest published edition on the Ecma site is the 7th edition (December 2023); Ecma maps it to C# 7.
-2. **C# standard draft on Microsoft Learn** (`/dotnet/csharp/language-reference/language-specification/<slug>`). Working text of the next edition(s). It already contains later features (for example records, record structs, file-scoped namespaces, global using directives). Clause numbers below follow this draft; check them when linking, they can move between drafts.
-3. **Feature specifications** (`/dotnet/csharp/language-reference/proposals/…`, overview page "Latest feature specifications"). The normative-like source for features that are not in the draft yet – in practice everything from about C# 12 on (collection expressions, primary constructors, `params` collections, C# 14 extension members, `field`, …).
+2. **C# standard draft on Microsoft Learn** (`/dotnet/csharp/language-reference/language-specification/<slug>`). Working text of the next edition(s). It already contains later features (for example records, record structs, file-scoped namespaces, global using directives, collection expressions, primary constructors, `params` collections, extension members, `field`). The foreword of the draft lists features up to C# 10 as the changes against the previous edition; features of C# 12–14 appear in the clauses although the foreword does not list them. Clause numbers below follow this draft (pages updated up to 2026-11-25); check them when linking, they can move between drafts.
+3. **Feature specifications** (`/dotnet/csharp/language-reference/proposals/…`, overview page "Latest feature specifications"). The normative-like source for features that are not in the draft clauses – in practice the C# 15 features (collection expression arguments, labeled `break`/`continue`, extension indexers, closed hierarchies, unions) and memory safety (`unsafe-evolution`). Older features moved into the draft.
 
 Rule: link layer 2 when the clause exists there, otherwise layer 3. Library behavior (BCL, ASP.NET Core, EF Core) is not part of the language specification; link the Microsoft Learn conceptual docs or API reference instead.
 
@@ -44,22 +44,25 @@ Clauses of the draft and where they are taught:
 | §6 Lexical structure | `lexical-structure` | M1 (literals, comments, identifiers), M14 (preprocessing directives, only the ones listed there) |
 | §7 Basic concepts | `basic-concepts` | M6 (application startup, accessibility), M3 (declarations, scopes, signatures), M4 (automatic memory management, deep dive), M13 part B (execution order between threads) |
 | §8 Types | `types` | M1, M4, M8, M9, M16 (expression tree types) |
-| §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values) |
+| §9 Variables | `variables` | M1 (definite assignment), M3 (parameter kinds), M4 (default values), M13 part B (§9.6 atomicity) |
 | §10 Conversions | `conversions` | M1 (numeric), M4 (boxing, nullable), M5 (collection expressions), M8 (reference, user-defined), M10 (anonymous function and method group), M16 (lambda to expression tree) |
 | §11 Patterns and pattern matching | `patterns` | M2 (simple), M12 (all) |
-| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13, M16 (query expressions on `IQueryable<T>`) |
+| §12 Expressions | `expressions` | M1, M2, M4, M5, M10, M11, M12, M13, M14 (`nameof`), M16 (query expressions on `IQueryable<T>`) |
 | §13 Statements | `statements` | M2, M3, M7, M11, M13 |
 | §14 Namespaces | `namespaces` | M6 |
-| §15 Classes | `classes` | M6, M8 (incl. sealed classes and members), M9, M10, M11, M13 (async functions; volatile fields in part B) |
-| §16 Structs | `structs` | M8 (incl. "structs are implicitly sealed") |
+| §15 Classes | `classes` | M3 (methods, parameters), M6, M7 (finalizers, deep dive), M8 (incl. sealed classes and members, records), M9, M10, M11 (extension members, iterators), M13 (async functions; volatile fields in part B) |
+| §16 Structs | `structs` | M4 (value semantics, boxing), M8 (incl. "structs are implicitly sealed", record structs), M12 (`with` on structs) |
 | §17 Arrays | `arrays` | M5 |
-| §18 Interfaces | `interfaces` | M8, M9 |
-| §19 Enums | `enums` | M8 |
-| §20 Delegates | `delegates` | M10 |
-| §21 Exceptions | `exceptions` | M7 |
-| §22 Attributes | `attributes` | M14 |
-| §23 Unsafe code | `unsafe-code` | not covered (see "Deliberately not covered") |
-| Annex: Documentation comments | – | M6 (short) |
+| §18 Extended indexing and slicing | `ranges` | M5 (`Index`, `Range`, `^` and `..`), M12 (list and slice patterns) |
+| §19 Interfaces | `interfaces` | M8, M9 |
+| §20 Enums | `enums` | M8 |
+| §21 Delegates | `delegates` | M10 |
+| §22 Exceptions | `exceptions` | M7 |
+| §23 Attributes | `attributes` | M14 |
+| §24 Unsafe code | `unsafe-code` | not covered (see "Deliberately not covered") |
+| Annex B Portability issues | `portability-issues` | not covered (see "Deliberately not covered") |
+| Annex C Standard library | `standard-library` | M0 (by name) |
+| Annex D Documentation comments | `documentation-comments` | M6 (short) |
 
 ## Modules
 
@@ -73,7 +76,7 @@ Legend: ▶ runnable in the playground · ◻ not runnable (normal code block) �
 5. From code to running program: compiler → IL → JIT → CLR (medium depth, no machine code). Plus the overview of execution models: JIT at run time (default), ReadyToRun (IL plus precompiled native code, less JIT work at startup), Native AOT (native code only, no JIT, limits on compatibility). Only the idea here; the build and publish commands come in M14.
 - Page "Wie dieser Kurs funktioniert": methods, limits, how to use it (Leitner, export/import), **one** paragraph on AI use while learning.
 - Facts already verified for L4: C#/.NET mapping C# 9/.NET 5, 10/.NET 6, 11/.NET 7, 12/.NET 8, 13/.NET 9, 14/.NET 10 (Roslyn wiki), 15/.NET 11 (What's new in C# 15: "C# 15 is the default language version for projects that target `net11.0`", checked 2026-11-13); .NET 10 = LTS, released 2025-11-11, support until November 2028. Check everything else (older years, .NET Framework versions) against Microsoft Learn when writing.
-- **Spec:** language vs. implementation: the standard describes the language, not the runtime or the library (draft: Scope, Conformance, Annex "Standard library"); the three source layers from "Reference" above, in learner words.
+- **Spec:** language vs. implementation: the standard describes the language, not the runtime or the library (draft: Scope, Conformance, Annex C "Standard library"); the three source layers from "Reference" above, in learner words.
 - Facts checked 2026-10-25 (support policy page, .NET Blog):
   - STS support is 24 months, starting with .NET 9 (announced 2025-09-16). LTS stays 3 years.
   - .NET 8 (LTS) and .NET 9 (STS) both reached end of support on **2026-11-10** (support policy page, checked 2026-11-13). L4 must reflect this.
@@ -97,6 +100,7 @@ Expected misconceptions: `=` as comparison; integer division rounds; `"3" + 4` g
   - §12: numeric promotion, integer division and remainder (incl. negative operands), floating point special values (infinity, NaN), `decimal` precision, string concatenation with non-string operands, operator precedence and associativity, constant expressions.
   - §10/§12: implicit vs. explicit numeric conversions, loss of data on explicit conversion, overflow in checked vs. unchecked context (default is unchecked for non-constant expressions; constant expressions are checked at compile time).
   - Implicitly typed local variables: the type is fixed at compile time (no dynamic typing).
+  - Not taught in M1 (audit #685): numeric promotion of types smaller than `int` (`byte + byte` is `int`) is only named in `m01-l03`; `U`/`UL` literal suffixes are named in one sentence.
 - **Library (not spec):** `Console` output and input, `int.Parse` vs. `TryParse` (TryParse needs `out` – forward reference to M3, use it as a recipe here), `Math`, composite formatting and format strings; culture dependency of formatting and parsing (playground: `InvariantGlobalization`).
 - More misconceptions: postfix increment returns the new value; `var` makes a variable dynamic; a cast rounds instead of truncating.
 - **Dependency:** console input uses the `stdin` parameter of `<CSharpRunner>` (see `components.md`) and an `<name>.in.txt` file next to the example (used in `m01-l09`).
@@ -144,6 +148,7 @@ Misconceptions: assignment copies the object; value types always live on the sta
   - §12: reference equality vs. value equality for predefined types; string equality compares content; null-conditional member and element access; null-coalescing operator and assignment.
   - §7 (deep dive): automatic memory management – the standard does not say where values live; stack/heap is an implementation model.
   - Project setting: nullable context on/off (link to M14).
+  - §12.24.7 null-conditional assignment (C# 14, in the draft).
 - **Badge:** null-conditional assignment (C# 14 / .NET 10).
 - More misconceptions: "reference types are passed by reference"; a nullable annotation prevents `null` at runtime.
 
@@ -197,9 +202,9 @@ Misconceptions: the index starts at 1; changing a list during `foreach`.
 - *(new)* Lesson "Working with strings": searching, splitting, joining, comparing with ordinal vs. culture-sensitive rules.
 - *(new)* Lesson "Date and time" (needed for SecLog timestamps such as "5 failed attempts in 10 minutes").
 - **Spec:**
-  - §17: array types, rank, single-dimensional, multi-dimensional and jagged arrays, array creation and initializers, element access and bounds checking (exception on a wrong index), the `System.Array` base type; array covariance and its runtime check (deep dive).
-  - §12: element access with index-from-end and ranges (C# 8), the `foreach` contract (pattern-based enumeration, the iteration variable is read-only).
-  - §10/§12: collection expressions and the spread element (target-typed; which target types are allowed).
+  - §17: array types, rank, single-dimensional, multi-dimensional and jagged arrays, array creation and initializers, element access and bounds checking (exception on a wrong index), the `System.Array` base type; array covariance and its runtime check (deep dive); a single-dimensional array implements `IList<T>` (§17.2.3, shown in the table of `m09-l05`).
+  - §12 and §18 Extended indexing and slicing: element access with index-from-end and ranges (C# 8, `Index` and `Range` types), the `foreach` contract (pattern-based enumeration, the iteration variable is read-only).
+  - §10.2.22/§12.8.25: collection expressions and the spread element (target-typed; which target types are allowed; in the draft, feature spec only for the `with(...)` arguments).
   - §8/§12: object and collection initializers.
 - **Library (not spec):** generic collection interfaces (`IEnumerable<T>`, `ICollection<T>`, `IList<T>`, the read-only variants, `IDictionary<TKey,TValue>`); the enumerator invalidation rule when a collection changes during enumeration; dictionary keys need consistent equality and hash code (forward reference M8); `StringBuilder`; `DateTime` vs. `DateTimeOffset`, `TimeSpan`, `DateOnly`/`TimeOnly`, time zones only as a warning (UTC for logs).
 - *(C# 15)* Collection expression arguments `with(...)` in the lesson "Collection expressions" (`m05-l08`): capacity or comparer passed to the collection.
@@ -216,7 +221,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 - *(new)* Lesson "Where the program starts": entry point, top-level statements as generated `Main`, command-line arguments, exit code. (`CLAUDE.md` says "`Main` is explained later" – this is that place.)
 - *(new)* Short part "Documentation comments" for public members.
 - **Spec:**
-  - §15: class declarations and modifiers (static classes; sealed classes only by name here, taught in M8; partial types only by name), members, accessibility (`public`, `private`, `internal`, `protected` – the last one in M8; `protected internal`/`private protected` only by name), instance and static fields, readonly fields vs. constants, methods, properties and accessors (incl. accessor accessibility), instance and static constructors, constructor overloading and chaining with `this`, `this` access; primary constructors: parameters are in scope for the whole class and are captured, they are **not** properties (unlike records).
+  - §15: class declarations and modifiers (static classes; sealed classes only by name here, taught in M8; partial types and partial members only by name), members, accessibility (`public`, `private`, `internal`, `protected` – the last one in M8; `protected internal`/`private protected` only by name), instance and static fields, readonly fields vs. constants, methods, properties and accessors (incl. accessor accessibility), instance and static constructors, constructor overloading and chaining with `this`, `this` access; primary constructors: parameters are in scope for the whole class and are captured, they are **not** properties (unlike records).
   - §7: accessibility domains; `internal` means "same assembly" (link M14 projects); application startup and termination, entry point rules, top-level statements.
   - §14: compilation units, namespace declarations (block and file-scoped), using directives (namespace, alias, static), global using directives; fully qualified names and the global namespace alias (short).
   - §12: object creation, target-typed object creation, object initializers, member access.
@@ -230,7 +235,7 @@ Classes and objects · fields and properties · constructors · encapsulation ·
 - *(new)* Lesson "Exception or not?": exceptions vs. the Try-pattern vs. return values (Microsoft design guidelines, not spec).
 - *(new)* Lesson "Reading and writing files" (▶).
 - **Spec:**
-  - §21: causes of exceptions, the `System.Exception` class, how an exception is handled (search for a matching catch clause outward through the call stack, finally blocks run on the way), common exception classes defined by the standard.
+  - §22: causes of exceptions, the `System.Exception` class, how an exception is handled (search for a matching catch clause outward through the call stack, finally blocks run on the way), common exception classes defined by the standard.
   - §13: try statement forms, order of catch clauses (more specific first, compile error otherwise), exception filters, rethrow without losing the stack trace vs. throwing the caught object again, the using statement and using declarations (C# 8), disposal order.
   - §12: throw expressions (for example in a null-coalescing expression).
   - §15 (deep dive): finalizers and why application code rarely needs them; the dispose pattern.
@@ -252,10 +257,10 @@ Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · e
   - §15: base classes, inheritance of members, protected accessibility, virtual, override and abstract members, member hiding and the warning for it, base access, abstract classes;
   - §15 (sealing): a sealed class cannot be a base class (compile error on derivation); a sealed member is only allowed together with an override and stops further overriding; a class cannot be sealed and abstract at the same time; a non-virtual member needs no sealing, because it cannot be overridden anyway;
   - §16 (sealing): struct types are implicitly sealed, so there is no inheritance between structs; records: a record class can be sealed like a class; operator overloading and user-defined conversions (short or deep dive); indexers (deep dive).
-  - §18: interface declarations and members, implementation and explicit interface member implementation, default interface members (C# 8, deep dive), interfaces as types.
+  - §19: interface declarations and members, implementation and explicit interface member implementation, default interface members (C# 8, deep dive), interfaces as types.
   - §16: struct semantics (copy on assignment, value of `default`, no inheritance from other structs), readonly structs and readonly members, record structs (C# 10), boxing when a struct is used through an interface.
-  - Records (in the draft): record class vs. record struct, positional records, compiler-generated members (value-based equality, `ToString`, deconstruction, copy constructor), records and inheritance.
-  - §19: enum declarations, underlying type, enum members and their values, enum operations and conversions; any value of the underlying type is valid, so switches over enums are not exhaustive.
+  - Records (in the draft: §15.17 Record classes, §16.5 Record structs, §15.19 and §16.7 differences to non-record types): record class vs. record struct, positional records, compiler-generated members (value-based equality, `ToString`, deconstruction, copy constructor), records and inheritance.
+  - §20: enum declarations, underlying type, enum members and their values, enum operations and conversions; any value of the underlying type is valid, so switches over enums are not exhaustive.
   - §12: type-testing operator, `as` operator, explicit reference conversions and their runtime check.
   - §8/§10: implicit and explicit reference conversions.
 - **Library (not spec):** the virtual members of `object` and the equality contract (`Equals` and `GetHashCode` must agree), `IEquatable<T>`, `IComparable<T>`/`IComparer<T>`, flags attribute for enums, `Enum.Parse`/`TryParse`.
@@ -264,8 +269,8 @@ Interfaces · inheritance, `abstract`, polymorphism · `record` · `struct` · e
 
 ### W2 Wiederholung M5–M8 ▶
 Mixes M5–M8. Folder `w02-review-collections-oop/`, quiz file `de/w02.json`, position 8.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
-- Lesson L1: mixed reading and tracing set (title chosen by the architect of W2).
-- Lesson L2: mixed writing set and final set (title chosen by the architect of W2).
+- Lesson L1 `w02-l01`: "Sammlungen und Objekte: Code lesen" (mixed reading and tracing set).
+- Lesson L2 `w02-l02`: "Sammlungen und Objekte: Code schreiben" (mixed writing set and final set).
 - **M5** (from `module-digest.md` `## M5`):
   - Concepts:
     - array vs. `List<T>` (fixed vs. growing); `Length` vs. `Count` (`m05-l01`, `m05-l04`)
@@ -313,7 +318,7 @@ Generic methods and classes · constraints · understanding generic collections.
   - §15: type parameters and type parameter constraints (class, struct, notnull, base class, interface, parameterless constructor; unmanaged only by name), generic methods.
   - §8: constructed types, open and closed types, type arguments; type parameters and nullable annotations.
   - §12: type inference for generic method calls (simple cases), default value expressions.
-  - §18 (deep dive): variance of interfaces and delegates (`in`/`out`) – why `IEnumerable<string>` converts to `IEnumerable<object>` but `List<string>` does not convert to `List<object>`.
+  - §19 (deep dive): variance of interfaces and delegates (`in`/`out`) – why `IEnumerable<string>` converts to `IEnumerable<object>` but `List<string>` does not convert to `List<object>`.
 - More misconceptions: `List<object>` accepts a `List<string>`; generics cost boxing for value types.
 
 ### M10 Delegates, Lambdas, Events ▶
@@ -322,7 +327,7 @@ Misconception: a lambda captures the value instead of the variable.
 - *(new)* Method groups as delegate values.
 - *(new)* Multicast delegates and unsubscribing from events.
 - **Spec:**
-  - §20: delegate declarations, compatibility, instantiation, invocation, multicast invocation lists (order, return value of the last target).
+  - §21: delegate declarations, compatibility, instantiation, invocation, multicast invocation lists (order, return value of the last target).
   - §10: anonymous function conversions and method group conversions.
   - §12: anonymous functions (lambda expressions), captured outer variables and their lifetime, static anonymous functions, natural type of lambdas (C# 10), discard parameters.
   - §15: events, field-like events, event accessors (short); the standard event pattern with sender and event args (library convention).
@@ -341,7 +346,7 @@ Misconception: the query already runs when it is defined.
 - *(.NET 11)* LINQ `FullJoin` and the tuple-returning `Join` / `GroupJoin` overloads: deep dive in `m11-l09`.
 - **Spec:**
   - §15: extension methods (static class, first parameter with `this`, lookup rules: instance methods win); iterators: iterator blocks, enumerable and enumerator objects, lazy execution, yield return and yield break.
-  - C# 14 extension members (feature specification): extension blocks with properties and static members.
+  - C# 14 extension members (§15.14, in the draft): extension blocks with properties and static members (extension operators, §15.14.4, only by name).
   - C# 15 extension indexers (feature specification `csharp-15.0/extension-indexers`; language reference "Extension declaration", section "Extension indexers").
   - §12: anonymous object creation expressions; query expressions and their syntactic translation into method calls (this is why query syntax and method syntax are the same).
   - §13: the yield statement and its restrictions.
@@ -351,8 +356,8 @@ Misconception: the query already runs when it is defined.
 
 ### W3 Wiederholung M9–M11 ▶
 Mixes M9–M11. Folder `w03-review-generics-linq/`, quiz file `de/w03.json`, position 11.5. Structure and DoD: `concept/lesson-template.md`, "Review lesson".
-- Lesson L1: mixed reading and tracing set (Generics, Delegates und LINQ: Code lesen).
-- Lesson L2: mixed writing set and final set (Generics, Delegates und LINQ: Code schreiben).
+- Lesson L1 `w03-l01`: "Generics, Delegates und LINQ: Code lesen" (mixed reading and tracing set).
+- Lesson L2 `w03-l02`: "Generics, Delegates und LINQ: Code schreiben" (mixed writing set and final set).
 - **M9** (from `module-digest.md` `## M9`):
   - Concepts:
     - type parameter vs. type argument (`m09-l01`)
@@ -392,10 +397,10 @@ Type, property, relational and list patterns · `switch` expressions · `record`
 - *(C# 15)* Closed hierarchies: lesson proposal, together with unions or right after; the `closed` modifier fixes the direct descendants in the declaring assembly, so a `switch` over them is exhaustive; link to sealing in `m08-l04`.
 - **Spec:**
   - §11: all pattern kinds – declaration, type, constant, relational, logical, property (incl. extended property patterns, C# 10), positional, var, discard, list and slice patterns (C# 11); the null test with patterns; subsumption (an unreachable arm is an error) and exhaustiveness (warning, runtime exception).
-  - §12: switch expression typing, the is-pattern expression, with expressions – for records, and since C# 10 also for structs (spec §12.10 "With expressions": receiver is a record class, record struct or non-record struct; feature spec `csharp-10.0/record-structs`, section "Allow `with` expression on structs") and for anonymous types (language reference "with expression", which also lists tuples; the spec clause and the feature spec do not name anonymous types; compiled with .NET 11 SDK 11.0.100). Checked 2026-11-13.
+  - §12: switch expression typing, the is-pattern expression, with expressions – for records, and since C# 10 also for structs (spec §12.10 "With expressions": receiver is a record class, record struct or non-record struct; §16.5 Record structs) and for anonymous types (language reference "with expression", which also lists tuples; the spec clause and the feature spec do not name anonymous types; compiled with .NET 11 SDK 11.0.100). Checked 2026-11-13.
   - Deconstruction: user-defined deconstruct methods and how positional patterns use them.
   - C# 15 feature specifications `csharp-15.0/unions` and `csharp-15.0/closed-hierarchies` (https://learn.microsoft.com/dotnet/csharp/language-reference/proposals/csharp-15.0/); language reference "Union types", "closed modifier" and "Closed hierarchy patterns" (in "Patterns").
-- **Badge:** union types (C# 15 / .NET 11); closed hierarchies, `closed` modifier (C# 15 / .NET 11). Library scaffolding (`UnionAttribute`, `IUnion` in `System.Runtime.CompilerServices`, .NET 11): check when writing.
+- **Badge:** union types (C# 15 / .NET 11); closed hierarchies, `closed` modifier (C# 15 / .NET 11). Library scaffolding (`UnionAttribute`, `IUnion` in `System.Runtime.CompilerServices`, .NET 11): check when writing. `System.Text.Json` serializes C# unions (.NET 11), by name.
 - More misconceptions: `with` changes the original; the order of switch arms does not matter; `closed` is the same as `sealed` (a closed class is implicitly abstract and can still have descendants in its assembly).
 
 ### M13 async/await und Nebenläufigkeit (async/await and concurrency) ▶ (part A) · ◻ (part B)
@@ -408,13 +413,13 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
 - *(new)* Lesson "Waiting for several tasks" (all, any; timeouts).
 - *(new)* Lesson "Async streams" (asynchronous iteration).
 - *(new)* Async disposal.
-- *(.NET 11)* Runtime Async (the runtime runs async methods natively; cleaner stack traces, lower overhead): only by name in a deep dive; no code change for learners.
+- *(.NET 11)* Runtime Async (the runtime runs async methods natively; cleaner stack traces, lower overhead): only by name in a deep dive; no code change for learners; enabled for `net11.0` projects without a preview opt-in ("What's new in .NET 11", runtime section).
 - *(new)* Part "Pitfalls": async void (only for event handlers), blocking on a task (deadlock risk, ◻), I/O-bound vs. CPU-bound work.
 - **Spec (part A):**
   - §15: async functions, the allowed return types (task types, void, async iterators), evaluation of an async function (runs synchronously until the first await of an incomplete task).
   - §12: await expressions, the awaitable pattern; an exception in an async method is stored in the task and rethrown at the await.
   - §13: asynchronous foreach and asynchronous using (C# 8).
-- **Library (part A, not spec):** `Task`/`Task<T>`, `ValueTask` (only by name), `Task.WhenAll`/`WhenAny`, cancellation tokens and their sources, `IAsyncEnumerable<T>`, `IAsyncDisposable`, synchronization context and `ConfigureAwait` (deep dive, library code).
+- **Library (part A, not spec):** `Task`/`Task<T>`, `ValueTask` (only by name), `Task.WhenAll`/`WhenAny`, cancellation tokens and their sources, `IAsyncEnumerable<T>` (with `[EnumeratorCancellation]`, §23.5.10, by name, `m13-l06`), `IAsyncDisposable`, synchronization context and `ConfigureAwait` (deep dive, library code).
 - More misconceptions (part A): `await` blocks the thread; an exception in an awaited task is lost.
 
 **Part B – Threads and concurrency ◻** *(new, replaces the former deep dive "Shared data and locks")*
@@ -428,7 +433,8 @@ The module has two parts. Part A (asynchrony) is runnable. Part B (threads and c
 8. *(new)* Lesson "Data parallelism": parallel loops, async parallel loops, PLINQ; overhead and when parallel code is slower; the serial part limits the possible speedup (Amdahl's law – add a source before use); results order and side effects.
 9. *(new)* Lesson "Coordinating workers": producer/consumer with channels, limiting concurrency with an async-compatible semaphore, cancellation for several workers; SecLog: analyze many log files in parallel and collect results safely.
 - **Spec (part B):**
-  - §13: the lock statement (what it guarantees: mutual exclusion on one object, release on every exit path) and which expressions are allowed as the lock target.
+  - §13.13: the lock statement (what it guarantees: mutual exclusion on one object, release on every exit path), which expressions are allowed as the lock target, and the `System.Threading.Lock` form (a lock on `Lock` is an error in async methods).
+  - §9.6: atomicity of variable references – reads and writes of most simple types are atomic, a read-modify-write like `i++` is not (`m13-l03`, `m13-l14`).
   - §15: volatile fields (what the standard promises about ordering, and what it does not); static constructors run at most once.
   - §7: execution order – the standard only guarantees the order of side effects as observed by one thread; other threads can observe other orders.
   - §12: await expressions again (await does not block the thread; link part A).
@@ -457,12 +463,13 @@ xUnit: `[Fact]`, `[Theory]`, `Assert` · Arrange-Act-Assert · testable code. Th
   - `m14-l11` Zeitabhängigen Code testen: `TimeProvider`, `FakeTimeProvider`, SecLog time windows.
   - `m14-l12` Exceptions und asynchronen Code testen: `Assert.Throws`, `ThrowsAsync`, async tests.
 - **Spec:**
-  - §22: attribute classes, attribute usage, positional and named parameters, attribute targets, reserved attributes (conditional, obsolete, caller info attributes, attribute usage).
+  - §23: attribute classes, attribute usage, positional and named parameters, attribute targets, reserved attributes (conditional, obsolete, caller info attributes, attribute usage); reserved attributes seen earlier: `[Flags]` (M8), `[EnumeratorCancellation]` (M13).
+  - §12.8.23: the `nameof` operator (`m14-l08`, `[MemberData(nameof(…))]`).
   - §6: preprocessing directives – only conditional compilation symbols (Debug/Release), the nullable directive and the directives of file-based apps; nothing else.
   - §7: assemblies as the unit of deployment and accessibility (`internal`).
 - **Tooling (not spec), build and publish:** `dotnet build`/`run`/`publish`, publish properties for self-contained, single-file, ReadyToRun, Native AOT and trimming, the RID catalog, SDK container publishing; Microsoft Learn ".NET application publishing overview" and "Containerize a .NET app with dotnet publish" as main references. Shown publish outputs (file lists, sizes) only from CI runs, and sizes with units (MB) and the date of the run, because they change between SDK versions.
 - **Library / tooling (not spec):** xUnit.net (check current major version, v3 at the time of writing), test platforms VSTest vs. Microsoft.Testing.Platform (MTP); MSTest, NUnit and TUnit only by name; data-driven tests; `TimeProvider` (.NET 8) and `FakeTimeProvider` (package `Microsoft.Extensions.TimeProvider.Testing`).
-- **.NET 11 SDK (check when writing):** built-in test templates support xUnit v3 (defaulting to Microsoft.Testing.Platform) and NUnit; `dotnet test` improvements ("What's new in .NET 11", SDK).
+- **.NET 11 SDK (check when writing):** built-in test templates support xUnit v3 (defaulting to Microsoft.Testing.Platform) and NUnit; `dotnet test` improvements; solution filters `.slnf` (`m14-l02`, by name), `dotnet run -e` (`m14-l01`/`m14-l03`), container publishing runtime order (`m14-l04`, by name), `#:property` quoting and item metadata on `#:package`/`#:project`/`#:ref` (`m14-l01`) ("What's new in .NET 11", SDK; the lessons were not checked for these items).
 - **Badge:** `TimeProvider` (.NET 8); file-based apps (.NET 10 SDK); `#:include` in file-based apps (.NET 11 SDK).
 - More misconceptions: a test that never fails is a good test; 100 % coverage means no bugs; a Debug build is fine for production; self-contained apps get runtime security patches automatically; Native AOT works with every library.
 
@@ -562,15 +569,15 @@ Content of the specification or platform that the course leaves out, and why. "O
 
 | Content | Spec / area | Reason |
 | --- | --- | --- |
-| Unsafe code, pointers, fixed buffers, stack allocation into pointers, memory safety (preview, C# 15) | §23, feature specs | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
+| Unsafe code, pointers, fixed buffers, stack allocation into pointers, memory safety (preview, C# 15) | §24, feature specs | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
 | `goto` | §13 | Rarely used, makes control flow hard to read; the switch statement rules are enough. Only by name in M2. Labels are taught only as targets of labeled `break`/`continue` (C# 15, M2). |
 | Dynamic binding (`dynamic`) | §8, §12 | Mainly for COM and dynamic languages interop; works against the static typing the course teaches. |
-| `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions | §16, feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
-| Generic math, static abstract interface members | feature spec (C# 11) | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
-| Reflection, source generators, interceptors, partial events and partial constructors (C# 14) | library, feature specs | Infrastructure for frameworks and generators, not for beginners' application code. Attributes are taught (M14), reading them via reflection is not. |
-| Interop (P/Invoke, COM), `extern` members, extern alias | §15, §14 | Platform-specific; not needed for cross-platform web and console apps. |
-| Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, …) | §6 | Tool and editor concerns; no effect on program logic. |
-| UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), `nameof` of unbound generic types (C# 14) | feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
+| `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions, ref safe contexts and the `scoped` modifier (§9.7.2–§9.7.4), `scoped`/`UnscopedRef`, safe `stackalloc` into `Span<T>` (§12.8.22), `ref readonly` parameters (C# 12), `allows ref struct`, `ref struct` interfaces, `ref` locals in async methods and iterators (C# 13) | §16, §10, §9.7 (draft), feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
+| Generic math, static abstract interface members | language reference (`interface`, static abstract and virtual members), C# 11 | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
+| Reflection, source generators, interceptors, partial methods, properties and indexers (C# 13), partial events and partial constructors (C# 14), file-local types (`file` modifier, C# 11), module initializers (`[ModuleInitializer]`) | library, §15, feature specs | Infrastructure for frameworks and generators, not for beginners' application code. Attributes are taught (M14), reading them via reflection is not. |
+| Interop (P/Invoke, COM), `extern` members, extern alias, attributes for interoperation (§23.6) | §15, §14, §23 | Platform-specific; not needed for cross-platform web and console apps. |
+| Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, `#error`, `#warning`, `#undef`, …) | §6 (§6.5.4, §6.5.6) | Tool and editor concerns; no effect on program logic. |
+| UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), extension operators (C# 14, §15.14.4), `nameof` of unbound generic types (C# 14), method group natural type improvements (C# 13), `[Experimental]` attribute (C# 12) | §12, §15 (draft), feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
 | Low-level threading primitives and expert topics: wait handles and mutexes across processes, spin locks, lock-free algorithms, TPL Dataflow, custom task schedulers and partitioners | library | Expert topics; Microsoft's best practices point to higher-level APIs. Multithreading as such **is** covered in full in M13 part B (concepts, race conditions, locks, deadlocks, atomic operations, thread-safe design, parallel loops, channels) – only without runnable examples, because the playground runs on one thread. |
 | Amdahl's law by name and formula | concept | The paper could not be opened (only the bibliographic record was checked), so `m13-l16` explains in plain words that the serial part limits the speedup, based on Microsoft Learn. |
 | Garbage collector internals, finalization details, memory profiling | runtime | Implementation detail, not specified by the standard (§7 only requires automatic memory management). Only a deep dive in M4/M7. |
@@ -580,9 +587,17 @@ Content of the specification or platform that the course leaves out, and why. "O
 | Blazor, MAUI, WPF, WinForms, Unity, gRPC, SignalR | frameworks | Outside the end goal (see top of file). |
 | .NET Framework-only technology (AppDomains, remoting, WCF server) | platform | Not available in modern .NET; only mentioned as history in M0. |
 | Non-virtual static interface members on older runtimes (C# 15) | feature specs | The course targets `net11.0`, so the runtime restriction never applies. |
-| Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
+| Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, `System.Text.Json` union support and JSON Lines, asynchronous data annotation validation, `Complex<T>`, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
 | EF Core: lazy loading (named in `m16-l06`), concurrency tokens, inheritance mapping, owned types, value converters, global query filters, interceptors, compiled models, bulk updates (`ExecuteUpdate`/`ExecuteDelete`), EF Core 10/11 features | library | Beyond one core concept per lesson; the lessons teach the context, model, queries, tracking, migrations, safe raw SQL and the context lifetime. Revisit at the half-yearly review (2027-04). |
 | Database providers other than SQLite, provider-specific SQL and migrations tooling for them | library | The course examples run on SQLite in CI (`m16-l01`); the EF Core code stays the same, only the provider package and connection string change. |
+| Native-sized integers `nint` and `nuint` | §8.3.6, §12.26 | For interop and low-level code; not needed for application code; the simple types of M1 are enough. |
+| Annex A Grammar, Annex B Portability issues, Annex E Bibliography | annexes | Reference material for tool builders and implementers; lessons link the clause that explains a rule instead. M0 teaches "language vs. implementation" without the annex. |
+| Bit manipulation beyond flags enums (`~`, shifts `<<` `>>`, `^`, masks on integers) | §12.9.5, §12.14, §12.16.2 | Not needed for the end goal. `\|` and `&` are shown on `[Flags]` enums (`m08-l07`). |
+| Custom task types: task-type builder pattern, `AsyncMethodBuilder` attribute | §15.15.2, §15.15.5, §23.5.5 | Needed only to write own awaitable types (library authors); `Task` and `ValueTask` are enough for application code. |
+| Declaring own collection types for collection expressions (`CollectionBuilder` attribute, collection construction) | §15.18, §23.5.13 | Library-author topic; `m05-l08` shows which built-in types can be targets. |
+| Pattern-based `Index` and `Range` support for own types (§18.4), implicit index-from-end access in object initializers (C# 13) | §18.4, §12 | Niche; indexers (M8), `^` and ranges (M5), object initializers (M6) are taught separately. |
+| Exceptions from static initializers (`TypeInitializationException`) | §22.4, §22.5 | Rare in application code; the lessons on stack traces and exceptions cover the general rule. |
+| `\e` escape sequence (C# 13) | §6.4.5.5 | Rarely needed; `m01-l01` teaches the common escape sequences. |
 
 ## Practice project SecLog
 
@@ -591,7 +606,7 @@ See `concept/project-seclog.md`.
 ## Sources of the spec review (as of 2026-10-25)
 
 Primary sources:
-- Microsoft Learn, C# language specification (draft, overview and table of contents): https://learn.microsoft.com/dotnet/csharp/specification – updated 2026-05-01.
+- Microsoft Learn, C# language specification (draft, overview and table of contents): https://learn.microsoft.com/dotnet/csharp/specification – pages updated up to 2026-11-25 (checked 2026-11-25).
 - Microsoft Learn, C# standard foreword (features added compared with the previous edition): https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/foreword
 - Ecma International, ECMA-334 (latest published edition: 7th, December 2023): https://ecma-international.org/publications-and-standards/standards/ecma-334
 - Microsoft Learn, What's new in C# 15: https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-15 – `ms.date` 2026-11-10.
@@ -622,3 +637,15 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 - dotnet/core, .NET releases overview (checked 2026-10-28): https://github.com/dotnet/core/blob/main/releases.md
 
 Open questions from the review:
+
+- Audit #685, M1: the `typeof` operator (§12.8.18) is used in `m00-l02` (with a `<Forward module="1">`), `m06-l09`, `m08-l04` and `m09-l01`, but no lesson of M1 explains it. Proposal: one short section in `m01-l03` (types); then point the `<Forward>` of `m00-l02` to that lesson.
+- Audit #685, M3: end points and reachability (§13.2: a method with a return type must not reach its end, compile error; unreachable code gives a warning) is not taught. Proposal: a short section in `m03-l02` (`return`).
+- Audit #685, M6: accessibility constraints (§7.4.5: a public member cannot expose a less accessible type, compile error) are not taught. Proposal: a short "Achtung" box in `m06-l03` (accessibility).
+- Audit #685, M6: nested types (§15.3.9) are not taught. Proposal: a short part in `m06-l03` or a new section in `m06-l09`.
+- Audit #685, M6: `using` alias for any type (`using Point = (int X, int Y);`, §14.6.2, C# 12) is not taught. Proposal: one example plus `<Since csharp="12" dotnet="8" />` in `m06-l09`; add the alias to the M6 **Badge** line then.
+- Audit #685, M7: code analysis attributes for Try-methods (`[NotNullWhen(true)]`, §23.5.7) are not taught. Proposal: a deep dive in `m07-l07`, forward reference to `m14-l06`.
+- Audit #685, M8: primary constructors for structs (§16.4, C# 12) are not taught (M6 teaches them for classes). Proposal: a deepening in `m08-l06` or `m08-l10`; then change the M6 **Badge** to "classes and structs".
+- Audit #685, W1: `x++` vs. `++x` inside an expression (`m01-l04`) is in the `### W1` list but no task asks it. Proposal: one predict question in `w01-l02` (and drop a weaker task), or remove the concept from the `### W1` M1 list and the digest.
+- Audit #685, W1: "`else` belongs to the nearest `if`" (`m02-l01`) is in the `### W1` list but no task asks it. Proposal: one predict question with a nested `if` without braces in `w01-l02`, or remove the concept from the `### W1` M2 list.
+- Audit #685, W2: `IOException` vs. `UnauthorizedAccessException` (`m07-l09`) is in the `### W2` list but no task asks it. Proposal: one question in `w02-l02`, or shorten the plan item to "`WriteAllText` vs. `AppendAllText`".
+- Audit #685, M0: the draft foreword names the edition it replaces as "ECMA-334:2026", the plan fact says the 7th edition (December 2023). Not checkable from Microsoft Learn. Proposal: a human checks the Ecma site; if the fact changes, update "Reference" item 1 and `m00-l03`.
