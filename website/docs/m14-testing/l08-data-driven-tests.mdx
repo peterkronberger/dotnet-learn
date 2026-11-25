@@ -75,7 +75,7 @@ Was passiert, wenn du `>` durch `>=` ersetzt? Dann besteht auch die Zeile mit 8 
 
 `[InlineData]` ist praktisch, aber begrenzt: Objekte wie ein `DateTimeOffset` kannst du nicht als Attributargument schreiben. Und stehen dieselben Zeilen in mehreren Tests, kopierst du sie. Für beide Fälle gibt es `[MemberData]`. Das Attribut zeigt auf ein öffentliches statisches Member, das die Zeilen liefert: eine Eigenschaft, eine Methode oder ein Feld.
 
-Den Namen des Members schreibst du mit `nameof(...)`. Der Ausdruck `nameof(FirstProblemRows)` liefert den Namen des Members als Text, hier `"FirstProblemRows"`. Der Compiler prüft, dass es das Member gibt. Ein Tippfehler im Text würde dir erst beim Testlauf auffallen.
+Den Namen des Members schreibst du mit dem <Term id="nameof-operator">`nameof`-Operator</Term>, also `nameof(...)`. Der Ausdruck `nameof(FirstProblemRows)` liefert den Namen des Members als Text, hier `"FirstProblemRows"`. Der Compiler prüft, dass es das Member gibt. Ein Tippfehler im Text würde dir erst beim Testlauf auffallen.
 
 Für die Zeilen empfiehlt xUnit v3 den Typ `IEnumerable<TheoryDataRow<…>>`. Die Typargumente passen zu den Parametern der Testmethode. Der Compiler und die xUnit-Analyzer prüfen das. Die Zeilen schreibst du als Collection Expression (Modul 5) mit `new(…)`, wobei der Compiler den Typ der Zeile aus dem Zusammenhang kennt. Die zweite Theory im Beispiel oben nutzt das.
 
