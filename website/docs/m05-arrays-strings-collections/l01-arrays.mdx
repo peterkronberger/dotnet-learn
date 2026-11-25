@@ -51,7 +51,7 @@ Bisher hielt jede Variable einen Wert. SecLog soll aber 14 Log-Zeilen halten, un
 
 Den Typ schreibst du mit eckigen Klammern hinter dem Elementtyp: `int[]` ist ein Array von `int`, `string[]` ein Array von `string`. Einen solchen Parameter kennst du schon: `params string[]` aus der Lektion über Methoden mit beliebig vielen Argumenten war ein Array.
 
-Ein Array ist ein Referenztyp. Die Variable hält also einen Verweis auf das Array, nicht die Werte selbst.
+Ein Array ist ein Referenztyp. Die Variable hält also einen Verweis auf das Array, nicht die Werte selbst. Jeder Array-Typ stammt von der Klasse `System.Array` ab ([§17.2.2 The System.Array type](https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/arrays#1722-the-systemarray-type)). Von ihr erbt er Mitglieder wie `Length`.
 
 Ein Element erreichst du über seinen <Term id="index">Index</Term> in eckigen Klammern. Der Index beginnt bei `0`. Die Anzahl der Elemente liefert `Length`.
 
