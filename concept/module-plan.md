@@ -569,15 +569,15 @@ Content of the specification or platform that the course leaves out, and why. "O
 
 | Content | Spec / area | Reason |
 | --- | --- | --- |
-| Unsafe code, pointers, fixed buffers, stack allocation into pointers, memory safety (preview, C# 15) | §23, feature specs | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
+| Unsafe code, pointers, fixed buffers, stack allocation into pointers, memory safety (preview, C# 15) | §24, feature specs | Not needed for the end goal; high risk of memory errors; rarely used in application code. |
 | `goto` | §13 | Rarely used, makes control flow hard to read; the switch statement rules are enough. Only by name in M2. Labels are taught only as targets of labeled `break`/`continue` (C# 15, M2). |
 | Dynamic binding (`dynamic`) | §8, §12 | Mainly for COM and dynamic languages interop; works against the static typing the course teaches. |
-| `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions | §16, feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
-| Generic math, static abstract interface members | feature spec (C# 11) | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
-| Reflection, source generators, interceptors, partial events and partial constructors (C# 14) | library, feature specs | Infrastructure for frameworks and generators, not for beginners' application code. Attributes are taught (M14), reading them via reflection is not. |
-| Interop (P/Invoke, COM), `extern` members, extern alias | §15, §14 | Platform-specific; not needed for cross-platform web and console apps. |
-| Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, …) | §6 | Tool and editor concerns; no effect on program logic. |
-| UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), `nameof` of unbound generic types (C# 14) | feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
+| `ref struct`, `Span<T>`, ref returns and ref locals, inline arrays, C# 14 implicit span conversions, ref safe contexts and the `scoped` modifier (§9.7.2–§9.7.4), `scoped`/`UnscopedRef`, safe `stackalloc` into `Span<T>` (§12.8.22), `ref readonly` parameters (C# 12), `allows ref struct`, `ref struct` interfaces, `ref` locals in async methods and iterators (C# 13) | §16, §10, §9.7 (draft), feature specs | Performance topics. They need a solid model of memory first and are not needed for the end goal. Only by name in M5 ("further topics"). |
+| Generic math, static abstract interface members | language reference (`interface`, static abstract and virtual members), C# 11 | Mainly for library authors; high abstraction level. Not covered in M9 (decision in #388). |
+| Reflection, source generators, interceptors, partial methods, properties and indexers (C# 13), partial events and partial constructors (C# 14), file-local types (`file` modifier, C# 11), module initializers (`[ModuleInitializer]`) | library, §15, feature specs | Infrastructure for frameworks and generators, not for beginners' application code. Attributes are taught (M14), reading them via reflection is not. |
+| Interop (P/Invoke, COM), `extern` members, extern alias, attributes for interoperation (§23.6) | §15, §14, §23 | Platform-specific; not needed for cross-platform web and console apps. |
+| Preprocessing directives beyond those in M14 (`#region`, `#pragma`, `#line`, `#error`, `#warning`, `#undef`, …) | §6 (§6.5.4, §6.5.6) | Tool and editor concerns; no effect on program logic. |
+| UTF-8 string literals, interpolated string handlers, overload resolution priority, user-defined compound assignment (C# 14), extension operators (C# 14, §15.14.4), `nameof` of unbound generic types (C# 14), method group natural type improvements (C# 13), `[Experimental]` attribute (C# 12) | §12, §15 (draft), feature specs | Niche or library-author features; little value for the learning goal. Revisit at the half-yearly review. |
 | Low-level threading primitives and expert topics: wait handles and mutexes across processes, spin locks, lock-free algorithms, TPL Dataflow, custom task schedulers and partitioners | library | Expert topics; Microsoft's best practices point to higher-level APIs. Multithreading as such **is** covered in full in M13 part B (concepts, race conditions, locks, deadlocks, atomic operations, thread-safe design, parallel loops, channels) – only without runnable examples, because the playground runs on one thread. |
 | Amdahl's law by name and formula | concept | The paper could not be opened (only the bibliographic record was checked), so `m13-l16` explains in plain words that the serial part limits the speedup, based on Microsoft Learn. |
 | Garbage collector internals, finalization details, memory profiling | runtime | Implementation detail, not specified by the standard (§7 only requires automatic memory management). Only a deep dive in M4/M7. |
@@ -587,9 +587,17 @@ Content of the specification or platform that the course leaves out, and why. "O
 | Blazor, MAUI, WPF, WinForms, Unity, gRPC, SignalR | frameworks | Outside the end goal (see top of file). |
 | .NET Framework-only technology (AppDomains, remoting, WCF server) | platform | Not available in modern .NET; only mentioned as history in M0. |
 | Non-virtual static interface members on older runtimes (C# 15) | feature specs | The course targets `net11.0`, so the runtime restriction never applies. |
-| Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
+| Other .NET 11 library additions (decimal floating-point types, `Process` helpers, Zstandard, `EqualityComparer<T>.Create`, generic `Random` overloads, new `Stream` types, `System.Text.Json` union support and JSON Lines, asynchronous data annotation validation, `Complex<T>`, …) | library | Not needed for the learning goal. Revisit at the half-yearly review (2027-04). |
 | EF Core: lazy loading (named in `m16-l06`), concurrency tokens, inheritance mapping, owned types, value converters, global query filters, interceptors, compiled models, bulk updates (`ExecuteUpdate`/`ExecuteDelete`), EF Core 10/11 features | library | Beyond one core concept per lesson; the lessons teach the context, model, queries, tracking, migrations, safe raw SQL and the context lifetime. Revisit at the half-yearly review (2027-04). |
 | Database providers other than SQLite, provider-specific SQL and migrations tooling for them | library | The course examples run on SQLite in CI (`m16-l01`); the EF Core code stays the same, only the provider package and connection string change. |
+| Native-sized integers `nint` and `nuint` | §8.3.6, §12.26 | For interop and low-level code; not needed for application code; the simple types of M1 are enough. |
+| Annex A Grammar, Annex B Portability issues, Annex E Bibliography | annexes | Reference material for tool builders and implementers; lessons link the clause that explains a rule instead. M0 teaches "language vs. implementation" without the annex. |
+| Bit manipulation beyond flags enums (`~`, shifts `<<` `>>`, `^`, masks on integers) | §12.9.5, §12.14, §12.16.2 | Not needed for the end goal. `\|` and `&` are shown on `[Flags]` enums (`m08-l07`). |
+| Custom task types: task-type builder pattern, `AsyncMethodBuilder` attribute | §15.15.2, §15.15.5, §23.5.5 | Needed only to write own awaitable types (library authors); `Task` and `ValueTask` are enough for application code. |
+| Declaring own collection types for collection expressions (`CollectionBuilder` attribute, collection construction) | §15.18, §23.5.13 | Library-author topic; `m05-l08` shows which built-in types can be targets. |
+| Pattern-based `Index` and `Range` support for own types (§18.4), implicit index-from-end access in object initializers (C# 13) | §18.4, §12 | Niche; indexers (M8), `^` and ranges (M5), object initializers (M6) are taught separately. |
+| Exceptions from static initializers (`TypeInitializationException`) | §22.4, §22.5 | Rare in application code; the lessons on stack traces and exceptions cover the general rule. |
+| `\e` escape sequence (C# 13) | §6.4.5.5 | Rarely needed; `m01-l01` teaches the common escape sequences. |
 
 ## Practice project SecLog
 
@@ -598,7 +606,7 @@ See `concept/project-seclog.md`.
 ## Sources of the spec review (as of 2026-10-25)
 
 Primary sources:
-- Microsoft Learn, C# language specification (draft, overview and table of contents): https://learn.microsoft.com/dotnet/csharp/specification – updated 2026-05-01.
+- Microsoft Learn, C# language specification (draft, overview and table of contents): https://learn.microsoft.com/dotnet/csharp/specification – pages updated up to 2026-11-25 (checked 2026-11-25).
 - Microsoft Learn, C# standard foreword (features added compared with the previous edition): https://learn.microsoft.com/dotnet/csharp/language-reference/language-specification/foreword
 - Ecma International, ECMA-334 (latest published edition: 7th, December 2023): https://ecma-international.org/publications-and-standards/standards/ecma-334
 - Microsoft Learn, What's new in C# 15: https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-15 – `ms.date` 2026-11-10.
@@ -629,3 +637,15 @@ Primary source for the planned .NET 11 date (replaces a Visual Studio Magazine a
 - dotnet/core, .NET releases overview (checked 2026-10-28): https://github.com/dotnet/core/blob/main/releases.md
 
 Open questions from the review:
+
+- Audit #685, M1: the `typeof` operator (§12.8.18) is used in `m00-l02` (with a `<Forward module="1">`), `m06-l09`, `m08-l04` and `m09-l01`, but no lesson of M1 explains it. Proposal: one short section in `m01-l03` (types); then point the `<Forward>` of `m00-l02` to that lesson.
+- Audit #685, M3: end points and reachability (§13.2: a method with a return type must not reach its end, compile error; unreachable code gives a warning) is not taught. Proposal: a short section in `m03-l02` (`return`).
+- Audit #685, M6: accessibility constraints (§7.4.5: a public member cannot expose a less accessible type, compile error) are not taught. Proposal: a short "Achtung" box in `m06-l03` (accessibility).
+- Audit #685, M6: nested types (§15.3.9) are not taught. Proposal: a short part in `m06-l03` or a new section in `m06-l09`.
+- Audit #685, M6: `using` alias for any type (`using Point = (int X, int Y);`, §14.6.2, C# 12) is not taught. Proposal: one example plus `<Since csharp="12" dotnet="8" />` in `m06-l09`; add the alias to the M6 **Badge** line then.
+- Audit #685, M7: code analysis attributes for Try-methods (`[NotNullWhen(true)]`, §23.5.7) are not taught. Proposal: a deep dive in `m07-l07`, forward reference to `m14-l06`.
+- Audit #685, M8: primary constructors for structs (§16.4, C# 12) are not taught (M6 teaches them for classes). Proposal: a deepening in `m08-l06` or `m08-l10`; then change the M6 **Badge** to "classes and structs".
+- Audit #685, W1: `x++` vs. `++x` inside an expression (`m01-l04`) is in the `### W1` list but no task asks it. Proposal: one predict question in `w01-l02` (and drop a weaker task), or remove the concept from the `### W1` M1 list and the digest.
+- Audit #685, W1: "`else` belongs to the nearest `if`" (`m02-l01`) is in the `### W1` list but no task asks it. Proposal: one predict question with a nested `if` without braces in `w01-l02`, or remove the concept from the `### W1` M2 list.
+- Audit #685, W2: `IOException` vs. `UnauthorizedAccessException` (`m07-l09`) is in the `### W2` list but no task asks it. Proposal: one question in `w02-l02`, or shorten the plan item to "`WriteAllText` vs. `AppendAllText`".
+- Audit #685, M0: the draft foreword names the edition it replaces as "ECMA-334:2026", the plan fact says the 7th edition (December 2023). Not checkable from Microsoft Learn. Proposal: a human checks the Ecma site; if the fact changes, update "Reference" item 1 and `m00-l03`.
